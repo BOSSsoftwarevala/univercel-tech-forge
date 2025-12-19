@@ -174,9 +174,6 @@ export async function createBuzzerAlert(
   priority = "normal",
   region?: string
 ) {
-  priority = "normal",
-  region?: string
-) {
   try {
     await supabaseAdmin.from("buzzer_queue").insert({
       trigger_type: triggerType,
