@@ -2,18 +2,17 @@ import { motion } from "framer-motion";
 import { 
   Scale, 
   LayoutDashboard, 
-  FileText, 
-  Users, 
-  Building2, 
+  Globe,
+  FileSignature,
   Shield,
-  BookOpen,
   Gavel,
-  AlertTriangle,
-  ClipboardList,
-  Eye,
+  Search,
+  MapPin,
   Lock,
-  Key,
-  Globe
+  MessageSquare,
+  Database,
+  AlertTriangle,
+  Sparkles
 } from "lucide-react";
 
 interface LegalSidebarProps {
@@ -24,17 +23,17 @@ interface LegalSidebarProps {
 const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) => {
   const menuItems = [
     { id: "dashboard", label: "Dashboard Overview", icon: LayoutDashboard },
-    { id: "templates", label: "Contract Templates", icon: FileText },
-    { id: "client-contracts", label: "Client Contracts", icon: Users },
-    { id: "franchise-agreements", label: "Franchise Agreements", icon: Building2 },
-    { id: "developer-nda", label: "Developer NDA & IP", icon: Shield },
-    { id: "policy-center", label: "Policy Center", icon: BookOpen },
-    { id: "compliance", label: "Compliance Rulebook", icon: Gavel },
-    { id: "disputes", label: "Dispute Tracker", icon: AlertTriangle },
-    { id: "risk-analysis", label: "Risk Analysis", icon: AlertTriangle },
-    { id: "audit-logs", label: "Audit Logs", icon: ClipboardList },
-    { id: "ip-protection", label: "IP Protection", icon: Lock },
-    { id: "license-manager", label: "License Manager", icon: Key },
+    { id: "global-compliance", label: "Global Compliance", icon: Globe },
+    { id: "contract-automation", label: "Contract Automation", icon: FileSignature },
+    { id: "data-privacy", label: "Data Privacy Control", icon: Shield },
+    { id: "dispute-hub", label: "Dispute Resolution", icon: Gavel },
+    { id: "audit-lab", label: "Audit & Investigation", icon: Search },
+    { id: "risk-heatmap", label: "Risk Heatmap", icon: MapPin },
+    { id: "ip-protection", label: "IP & Code Shield", icon: Lock },
+    { id: "evidence-vault", label: "Evidence Vault", icon: Database },
+    { id: "regulatory-api", label: "Regulatory APIs", icon: Globe },
+    { id: "ai-assistant", label: "AI Assistant", icon: Sparkles },
+    { id: "audit-logs", label: "Audit Logs", icon: AlertTriangle },
   ];
 
   return (
@@ -51,19 +50,19 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Legal & Compliance</h1>
-            <p className="text-xs text-amber-500/70">Manager Dashboard</p>
+            <p className="text-xs text-amber-500/70">Global SaaS Compliance</p>
           </div>
         </div>
         
         {/* Status Badge */}
         <motion.div 
-          className="mt-4 p-3 rounded-lg bg-stone-800/50 border border-amber-900/30"
-          animate={{ boxShadow: ["0 0 15px rgba(245,158,11,0.1)", "0 0 25px rgba(245,158,11,0.2)", "0 0 15px rgba(245,158,11,0.1)"] }}
+          className="mt-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30"
+          animate={{ boxShadow: ["0 0 15px rgba(16,185,129,0.1)", "0 0 25px rgba(16,185,129,0.2)", "0 0 15px rgba(16,185,129,0.1)"] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
           <div className="flex items-center gap-2">
-            <Gavel className="w-4 h-4 text-amber-500" />
-            <span className="text-sm text-amber-400 font-medium">Compliance Active</span>
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-sm text-emerald-400 font-medium">Compliance Active • 94%</span>
           </div>
         </motion.div>
       </div>
@@ -100,14 +99,14 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
         })}
       </nav>
 
-      {/* Footer */}
+      {/* One-Domain Enforcement */}
       <div className="p-4 border-t border-amber-900/30">
-        <div className="p-3 rounded-lg bg-stone-800/30 border border-stone-700/50">
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
           <div className="flex items-center gap-2 mb-2">
-            <Globe className="w-4 h-4 text-stone-500" />
-            <span className="text-xs text-stone-500">Jurisdiction</span>
+            <Lock className="w-4 h-4 text-red-400" />
+            <span className="text-xs text-red-400 font-medium">One-Domain Activation</span>
           </div>
-          <p className="text-sm text-stone-300">Global Multi-Region</p>
+          <p className="text-xs text-stone-500">Enforced on all licenses</p>
         </div>
       </div>
     </motion.aside>

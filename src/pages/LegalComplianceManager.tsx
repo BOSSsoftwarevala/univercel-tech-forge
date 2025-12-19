@@ -14,6 +14,15 @@ import RiskAnalysis from "@/components/legal/RiskAnalysis";
 import AuditLogs from "@/components/legal/AuditLogs";
 import IPProtection from "@/components/legal/IPProtection";
 import LicenseManager from "@/components/legal/LicenseManager";
+import GlobalComplianceCenter from "@/components/legal/GlobalComplianceCenter";
+import ContractAutomationStudio from "@/components/legal/ContractAutomationStudio";
+import DataPrivacyControl from "@/components/legal/DataPrivacyControl";
+import DisputeResolutionHub from "@/components/legal/DisputeResolutionHub";
+import AuditInvestigationLab from "@/components/legal/AuditInvestigationLab";
+import RegulatoryAPIHub from "@/components/legal/RegulatoryAPIHub";
+import RiskHeatmapDashboard from "@/components/legal/RiskHeatmapDashboard";
+import EvidenceVault from "@/components/legal/EvidenceVault";
+import ComplianceAIAssistant from "@/components/legal/ComplianceAIAssistant";
 import LegalQuickActions from "@/components/legal/LegalQuickActions";
 import LegalNotifications from "@/components/legal/LegalNotifications";
 
@@ -24,6 +33,24 @@ const LegalComplianceManager = () => {
     switch (activeSection) {
       case "dashboard":
         return <LegalDashboard />;
+      case "global-compliance":
+        return <GlobalComplianceCenter />;
+      case "contract-automation":
+        return <ContractAutomationStudio />;
+      case "data-privacy":
+        return <DataPrivacyControl />;
+      case "dispute-hub":
+        return <DisputeResolutionHub />;
+      case "audit-lab":
+        return <AuditInvestigationLab />;
+      case "regulatory-api":
+        return <RegulatoryAPIHub />;
+      case "risk-heatmap":
+        return <RiskHeatmapDashboard />;
+      case "evidence-vault":
+        return <EvidenceVault />;
+      case "ai-assistant":
+        return <ComplianceAIAssistant />;
       case "templates":
         return <ContractTemplates />;
       case "client-contracts":
