@@ -6382,6 +6382,17 @@ export type Database = {
         | "influencer"
         | "marketing_manager"
         | "client_success"
+        | "seo_manager"
+        | "lead_manager"
+        | "task_manager"
+        | "rnd_manager"
+        | "performance_manager"
+        | "finance_manager"
+        | "legal_compliance"
+        | "hr_manager"
+        | "support"
+        | "ai_manager"
+        | "admin"
       demo_status: "active" | "inactive" | "maintenance" | "down"
       demo_tech_stack:
         | "php"
@@ -6566,6 +6577,17 @@ export const Constants = {
         "influencer",
         "marketing_manager",
         "client_success",
+        "seo_manager",
+        "lead_manager",
+        "task_manager",
+        "rnd_manager",
+        "performance_manager",
+        "finance_manager",
+        "legal_compliance",
+        "hr_manager",
+        "support",
+        "ai_manager",
+        "admin",
       ],
       demo_status: ["active", "inactive", "maintenance", "down"],
       demo_tech_stack: [
