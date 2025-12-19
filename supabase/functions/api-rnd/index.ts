@@ -109,18 +109,22 @@ Deno.serve(async (req) => {
       if (error) return errorResponse("Unable to retrieve ideas.");
 
       // Summary stats
+      interface IdeaRecord {
+        status: string;
+        ai_scores?: { overall?: number };
+      }
       const summary = {
         total: ideas?.length || 0,
         by_status: {
-          submitted: ideas?.filter(i => i.status === "submitted").length || 0,
-          under_review: ideas?.filter(i => i.status === "under_review").length || 0,
-          approved: ideas?.filter(i => i.status === "approved").length || 0,
-          in_development: ideas?.filter(i => i.status === "in_development").length || 0,
-          completed: ideas?.filter(i => i.status === "completed").length || 0,
-          rejected: ideas?.filter(i => i.status === "rejected").length || 0,
+          submitted: ideas?.filter((i: IdeaRecord) => i.status === "submitted").length || 0,
+          under_review: ideas?.filter((i: IdeaRecord) => i.status === "under_review").length || 0,
+          approved: ideas?.filter((i: IdeaRecord) => i.status === "approved").length || 0,
+          in_development: ideas?.filter((i: IdeaRecord) => i.status === "in_development").length || 0,
+          completed: ideas?.filter((i: IdeaRecord) => i.status === "completed").length || 0,
+          rejected: ideas?.filter((i: IdeaRecord) => i.status === "rejected").length || 0,
         },
         avg_score: ideas?.length 
-          ? Math.floor(ideas.reduce((sum, i) => sum + (i.ai_scores?.overall || 0), 0) / ideas.length)
+          ? Math.floor(ideas.reduce((sum: number, i: IdeaRecord) => sum + (i.ai_scores?.overall || 0), 0) / ideas.length)
           : 0,
       };
 

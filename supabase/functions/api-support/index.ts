@@ -124,7 +124,12 @@ Deno.serve(async (req) => {
       if (error) return errorResponse("Unable to retrieve tickets.");
 
       // Add SLA status
-      const ticketsWithSLA = (tickets || []).map(ticket => {
+      interface TicketRecord {
+        sla_due_at: string;
+        status: string;
+        [key: string]: unknown;
+      }
+      const ticketsWithSLA = (tickets || []).map((ticket: TicketRecord) => {
         const now = new Date();
         const slaDue = new Date(ticket.sla_due_at);
         const remainingMs = slaDue.getTime() - now.getTime();
@@ -140,10 +145,10 @@ Deno.serve(async (req) => {
         tickets: applyMasking(ticketsWithSLA, ctx.user!.role),
         summary: {
           total: ticketsWithSLA.length,
-          open: ticketsWithSLA.filter(t => t.status === "open").length,
-          in_progress: ticketsWithSLA.filter(t => t.status === "in_progress").length,
-          resolved: ticketsWithSLA.filter(t => t.status === "resolved").length,
-          sla_breached: ticketsWithSLA.filter(t => t.sla_status === "breached").length,
+          open: ticketsWithSLA.filter((t: { status: string }) => t.status === "open").length,
+          in_progress: ticketsWithSLA.filter((t: { status: string }) => t.status === "in_progress").length,
+          resolved: ticketsWithSLA.filter((t: { status: string }) => t.status === "resolved").length,
+          sla_breached: ticketsWithSLA.filter((t: { sla_status: string }) => t.sla_status === "breached").length,
         },
       });
     }, {

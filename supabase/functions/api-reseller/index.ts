@@ -227,8 +227,12 @@ Deno.serve(async (req) => {
         .eq("reseller_id", targetResellerId)
         .gte("clicked_at", startDate.toISOString());
 
-      const totalSales = (commissions || []).reduce((sum, c) => sum + Number(c.sale_amount), 0);
-      const totalCommission = (commissions || []).reduce((sum, c) => sum + Number(c.commission_amount), 0);
+      interface CommissionRecord {
+        sale_amount: number | string;
+        commission_amount: number | string;
+      }
+      const totalSales = (commissions || []).reduce((sum: number, c: CommissionRecord) => sum + Number(c.sale_amount), 0);
+      const totalCommission = (commissions || []).reduce((sum: number, c: CommissionRecord) => sum + Number(c.commission_amount), 0);
       const conversions = (commissions || []).length;
       const totalClicks = (clicks || []).length;
       const conversionRate = totalClicks > 0 ? ((conversions / totalClicks) * 100).toFixed(2) : 0;

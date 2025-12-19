@@ -350,7 +350,12 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: false });
 
       // Calculate SLA status for each task
-      const tasksWithSLA = (tasks || []).map(task => {
+      interface TaskRecord {
+        deadline: string;
+        status: string;
+        [key: string]: unknown;
+      }
+      const tasksWithSLA = (tasks || []).map((task: TaskRecord) => {
         const now = new Date();
         const deadline = new Date(task.deadline);
         const remainingHours = Math.max(0, (deadline.getTime() - now.getTime()) / (60 * 60 * 1000));
@@ -365,8 +370,8 @@ Deno.serve(async (req) => {
       return jsonResponse({
         tasks: tasksWithSLA,
         total: tasksWithSLA.length,
-        in_progress: tasksWithSLA.filter(t => t.status === "in_progress").length,
-        completed: tasksWithSLA.filter(t => t.status === "completed").length,
+        in_progress: tasksWithSLA.filter((t: { status: string }) => t.status === "in_progress").length,
+        completed: tasksWithSLA.filter((t: { status: string }) => t.status === "completed").length,
       });
     }, {
       module: "prime",

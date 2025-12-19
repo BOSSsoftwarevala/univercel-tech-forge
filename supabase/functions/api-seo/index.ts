@@ -191,9 +191,14 @@ Deno.serve(async (req) => {
         .limit(100);
 
       // Aggregate metrics
+      interface RankingRecord {
+        keyword: string;
+        position: number;
+        checked_at: string;
+      }
       const keywordStats = new Map();
       
-      (rankings || []).forEach(r => {
+      (rankings || []).forEach((r: RankingRecord) => {
         if (!keywordStats.has(r.keyword)) {
           keywordStats.set(r.keyword, {
             keyword: r.keyword,
@@ -311,10 +316,14 @@ Deno.serve(async (req) => {
       if (error) return errorResponse("Unable to retrieve campaign analytics.");
 
       // Calculate aggregate metrics
+      interface CampaignRecord {
+        budget: number | string;
+        status: string;
+      }
       const totals = {
         total_campaigns: campaigns?.length || 0,
-        total_budget: campaigns?.reduce((sum, c) => sum + Number(c.budget), 0) || 0,
-        active_campaigns: campaigns?.filter(c => c.status === "active").length || 0,
+        total_budget: campaigns?.reduce((sum: number, c: CampaignRecord) => sum + Number(c.budget), 0) || 0,
+        active_campaigns: campaigns?.filter((c: CampaignRecord) => c.status === "active").length || 0,
       };
 
       return jsonResponse({
