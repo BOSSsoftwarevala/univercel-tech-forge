@@ -10,8 +10,8 @@ import FranchiseLanding from "./pages/FranchiseLanding";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
 import ResellerLanding from "./pages/ResellerLanding";
 import ResellerDashboard from "./pages/ResellerDashboard";
+import DeveloperDashboard from "./pages/DeveloperDashboard";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -28,6 +28,7 @@ const App = () => (
           <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
           <Route path="/reseller-program" element={<ResellerLanding />} />
           <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
+          <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
