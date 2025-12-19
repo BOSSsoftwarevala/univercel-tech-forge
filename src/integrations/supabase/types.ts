@@ -224,6 +224,113 @@ export type Database = {
         }
         Relationships: []
       }
+      developer_activity_logs: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          developer_id: string
+          device_info: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          developer_id: string
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          developer_id?: string
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_activity_logs_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      developer_code_submissions: {
+        Row: {
+          ai_review_feedback: string | null
+          ai_review_score: number | null
+          commit_message: string | null
+          created_at: string
+          developer_id: string
+          file_urls: Json | null
+          id: string
+          notes: string | null
+          review_notes: string | null
+          review_status: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          submission_type: string
+          task_id: string
+        }
+        Insert: {
+          ai_review_feedback?: string | null
+          ai_review_score?: number | null
+          commit_message?: string | null
+          created_at?: string
+          developer_id: string
+          file_urls?: Json | null
+          id?: string
+          notes?: string | null
+          review_notes?: string | null
+          review_status?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          submission_type?: string
+          task_id: string
+        }
+        Update: {
+          ai_review_feedback?: string | null
+          ai_review_score?: number | null
+          commit_message?: string | null
+          created_at?: string
+          developer_id?: string
+          file_urls?: Json | null
+          id?: string
+          notes?: string | null
+          review_notes?: string | null
+          review_status?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          submission_type?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_code_submissions_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "developer_code_submissions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       developer_messages: {
         Row: {
           attachments: Json | null
@@ -306,11 +413,14 @@ export type Database = {
       developer_tasks: {
         Row: {
           accepted_at: string | null
+          actual_delivery_at: string | null
           assigned_by: string | null
           buzzer_acknowledged_at: string | null
           buzzer_active: boolean | null
           category: string
+          checkpoint_status: string | null
           client_id: string | null
+          client_rating: number | null
           completed_at: string | null
           created_at: string
           deadline: string | null
@@ -323,10 +433,15 @@ export type Database = {
           max_delivery_hours: number | null
           pause_reason: string | null
           paused_at: string | null
+          penalty_amount: number | null
           priority: string | null
           promised_at: string | null
+          promised_delivery_at: string | null
+          quality_score: number | null
+          sla_hours: number | null
           started_at: string | null
           status: string
+          task_amount: number | null
           tech_stack: string[] | null
           title: string
           total_paused_minutes: number | null
@@ -334,11 +449,14 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          actual_delivery_at?: string | null
           assigned_by?: string | null
           buzzer_acknowledged_at?: string | null
           buzzer_active?: boolean | null
           category: string
+          checkpoint_status?: string | null
           client_id?: string | null
+          client_rating?: number | null
           completed_at?: string | null
           created_at?: string
           deadline?: string | null
@@ -351,10 +469,15 @@ export type Database = {
           max_delivery_hours?: number | null
           pause_reason?: string | null
           paused_at?: string | null
+          penalty_amount?: number | null
           priority?: string | null
           promised_at?: string | null
+          promised_delivery_at?: string | null
+          quality_score?: number | null
+          sla_hours?: number | null
           started_at?: string | null
           status?: string
+          task_amount?: number | null
           tech_stack?: string[] | null
           title: string
           total_paused_minutes?: number | null
@@ -362,11 +485,14 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          actual_delivery_at?: string | null
           assigned_by?: string | null
           buzzer_acknowledged_at?: string | null
           buzzer_active?: boolean | null
           category?: string
+          checkpoint_status?: string | null
           client_id?: string | null
+          client_rating?: number | null
           completed_at?: string | null
           created_at?: string
           deadline?: string | null
@@ -379,10 +505,15 @@ export type Database = {
           max_delivery_hours?: number | null
           pause_reason?: string | null
           paused_at?: string | null
+          penalty_amount?: number | null
           priority?: string | null
           promised_at?: string | null
+          promised_delivery_at?: string | null
+          quality_score?: number | null
+          sla_hours?: number | null
           started_at?: string | null
           status?: string
+          task_amount?: number | null
           tech_stack?: string[] | null
           title?: string
           total_paused_minutes?: number | null
@@ -398,46 +529,295 @@ export type Database = {
           },
         ]
       }
+      developer_timer_logs: {
+        Row: {
+          action: string
+          checkpoint_type: string | null
+          developer_id: string
+          elapsed_minutes: number | null
+          id: string
+          metadata: Json | null
+          pause_reason: string | null
+          task_id: string
+          timestamp: string
+        }
+        Insert: {
+          action: string
+          checkpoint_type?: string | null
+          developer_id: string
+          elapsed_minutes?: number | null
+          id?: string
+          metadata?: Json | null
+          pause_reason?: string | null
+          task_id: string
+          timestamp?: string
+        }
+        Update: {
+          action?: string
+          checkpoint_type?: string | null
+          developer_id?: string
+          elapsed_minutes?: number | null
+          id?: string
+          metadata?: Json | null
+          pause_reason?: string | null
+          task_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_timer_logs_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "developer_timer_logs_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      developer_violations: {
+        Row: {
+          acknowledged_at: string | null
+          auto_generated: boolean | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          developer_id: string
+          id: string
+          is_acknowledged: boolean | null
+          penalty_amount: number | null
+          severity: string
+          task_id: string | null
+          violation_type: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          auto_generated?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          developer_id: string
+          id?: string
+          is_acknowledged?: boolean | null
+          penalty_amount?: number | null
+          severity?: string
+          task_id?: string | null
+          violation_type: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          auto_generated?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          developer_id?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          penalty_amount?: number | null
+          severity?: string
+          task_id?: string | null
+          violation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_violations_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "developer_violations_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      developer_wallet: {
+        Row: {
+          available_balance: number
+          created_at: string
+          developer_id: string
+          id: string
+          last_payout_at: string | null
+          pending_balance: number
+          total_earned: number
+          total_penalties: number
+          total_withdrawn: number
+          updated_at: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string
+          developer_id: string
+          id?: string
+          last_payout_at?: string | null
+          pending_balance?: number
+          total_earned?: number
+          total_penalties?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string
+          developer_id?: string
+          id?: string
+          last_payout_at?: string | null
+          pending_balance?: number
+          total_earned?: number
+          total_penalties?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_wallet_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: true
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      developer_wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          developer_id: string
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          status: string | null
+          task_id: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          developer_id: string
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string | null
+          task_id?: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          developer_id?: string
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string | null
+          task_id?: string | null
+          transaction_type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_wallet_transactions_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "developer_wallet_transactions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "developer_wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "developer_wallet"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       developers: {
         Row: {
+          availability_status: string | null
           created_at: string
+          current_task_id: string | null
           email: string
+          frozen_at: string | null
+          frozen_reason: string | null
           full_name: string
           id: string
+          is_frozen: boolean | null
           joined_at: string | null
           masked_email: string | null
           masked_phone: string | null
           onboarding_completed: boolean | null
           phone: string | null
+          skill_test_score: number | null
+          skill_test_status: string | null
           status: string
+          total_strikes: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          availability_status?: string | null
           created_at?: string
+          current_task_id?: string | null
           email: string
+          frozen_at?: string | null
+          frozen_reason?: string | null
           full_name: string
           id?: string
+          is_frozen?: boolean | null
           joined_at?: string | null
           masked_email?: string | null
           masked_phone?: string | null
           onboarding_completed?: boolean | null
           phone?: string | null
+          skill_test_score?: number | null
+          skill_test_status?: string | null
           status?: string
+          total_strikes?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          availability_status?: string | null
           created_at?: string
+          current_task_id?: string | null
           email?: string
+          frozen_at?: string | null
+          frozen_reason?: string | null
           full_name?: string
           id?: string
+          is_frozen?: boolean | null
           joined_at?: string | null
           masked_email?: string | null
           masked_phone?: string | null
           onboarding_completed?: boolean | null
           phone?: string | null
+          skill_test_score?: number | null
+          skill_test_status?: string | null
           status?: string
+          total_strikes?: number | null
           updated_at?: string
           user_id?: string
         }
