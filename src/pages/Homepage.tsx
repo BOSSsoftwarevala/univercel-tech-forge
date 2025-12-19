@@ -1,47 +1,46 @@
-import { motion } from 'framer-motion';
 import HomepageNavbar from '@/components/homepage/HomepageNavbar';
-import HeroSection from '@/components/homepage/HeroSection';
-import FeaturesGrid from '@/components/homepage/FeaturesGrid';
-import GlobalReach from '@/components/homepage/GlobalReach';
-import IndustryModules from '@/components/homepage/IndustryModules';
-import HologramInfographic from '@/components/homepage/HologramInfographic';
-import TestimonialsSection from '@/components/homepage/TestimonialsSection';
-import CTASection from '@/components/homepage/CTASection';
 import HomepageFooter from '@/components/homepage/HomepageFooter';
-import ParticleBackground from '@/components/homepage/ParticleBackground';
+import FuturisticHero from '@/components/landing/FuturisticHero';
+import AIBrainWidget from '@/components/landing/AIBrainWidget';
+import ValueBadgeBar from '@/components/landing/ValueBadgeBar';
+import CategoryGrid from '@/components/landing/CategoryGrid';
+import TrendingDemoShowcase from '@/components/landing/TrendingDemoShowcase';
+import DemoFilterBar from '@/components/landing/DemoFilterBar';
+import ValueSlider from '@/components/landing/ValueSlider';
+import RoleInvitePanel from '@/components/landing/RoleInvitePanel';
 
 const Homepage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[hsl(222,47%,4%)] via-[hsl(220,50%,8%)] to-[hsl(225,55%,6%)] overflow-x-hidden">
-      {/* Animated Background */}
-      <ParticleBackground />
-      
+    <div className="min-h-screen bg-[hsl(220,20%,4%)] overflow-x-hidden">
       {/* Navigation */}
       <HomepageNavbar />
       
       {/* Hero Section */}
-      <HeroSection />
+      <FuturisticHero />
       
-      {/* Features Grid */}
-      <FeaturesGrid />
+      {/* Value Badge Bar */}
+      <ValueBadgeBar />
       
-      {/* Global Reach */}
-      <GlobalReach />
+      {/* Category Grid - 40 Categories */}
+      <CategoryGrid />
       
-      {/* Hologram Infographic */}
-      <HologramInfographic />
+      {/* Demo Filter Bar */}
+      <DemoFilterBar />
       
-      {/* Industry Modules */}
-      <IndustryModules />
+      {/* Trending Demo Showcase */}
+      <TrendingDemoShowcase />
       
-      {/* Testimonials */}
-      <TestimonialsSection />
+      {/* Value Slider Ticker */}
+      <ValueSlider />
       
-      {/* CTA Section */}
-      <CTASection />
+      {/* Role Invite Panel */}
+      <RoleInvitePanel />
       
       {/* Footer */}
       <HomepageFooter />
+      
+      {/* AI Brain Widget - Floating */}
+      <AIBrainWidget />
     </div>
   );
 };
