@@ -2,42 +2,38 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DemoManagerSidebar from "@/components/demo-manager/DemoManagerSidebar";
 import DemoManagerTopBar from "@/components/demo-manager/DemoManagerTopBar";
-import DemoStatusGrid from "@/components/demo-manager/DemoStatusGrid";
-import DemoUptimeMonitor from "@/components/demo-manager/DemoUptimeMonitor";
-import DemoURLManager from "@/components/demo-manager/DemoURLManager";
-import DemoAnalytics from "@/components/demo-manager/DemoAnalytics";
-import DemoCatalog from "@/components/demo-manager/DemoCatalog";
-import DemoCreator from "@/components/demo-manager/DemoCreator";
+import DemoDashboard from "@/components/demo-manager/DemoDashboard";
+import DemoAddEdit from "@/components/demo-manager/DemoAddEdit";
+import DemoClickAnalytics from "@/components/demo-manager/DemoClickAnalytics";
+import DemoUptimeAlerts from "@/components/demo-manager/DemoUptimeAlerts";
+import DemoRentalAssignment from "@/components/demo-manager/DemoRentalAssignment";
 import DemoNotifications from "@/components/demo-manager/DemoNotifications";
 
 type DemoView = 
-  | "status"
-  | "uptime"
-  | "urls"
+  | "dashboard"
+  | "manage"
   | "analytics"
-  | "catalog"
-  | "create";
+  | "uptime"
+  | "rentals";
 
 const ProductDemoManager = () => {
-  const [activeView, setActiveView] = useState<DemoView>("status");
+  const [activeView, setActiveView] = useState<DemoView>("dashboard");
   const [showNotifications, setShowNotifications] = useState(false);
 
   const renderContent = () => {
     switch (activeView) {
-      case "status":
-        return <DemoStatusGrid />;
-      case "uptime":
-        return <DemoUptimeMonitor />;
-      case "urls":
-        return <DemoURLManager />;
+      case "dashboard":
+        return <DemoDashboard />;
+      case "manage":
+        return <DemoAddEdit />;
       case "analytics":
-        return <DemoAnalytics />;
-      case "catalog":
-        return <DemoCatalog />;
-      case "create":
-        return <DemoCreator />;
+        return <DemoClickAnalytics />;
+      case "uptime":
+        return <DemoUptimeAlerts />;
+      case "rentals":
+        return <DemoRentalAssignment />;
       default:
-        return <DemoStatusGrid />;
+        return <DemoDashboard />;
     }
   };
 
@@ -50,7 +46,7 @@ const ProductDemoManager = () => {
         <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-neon-green/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
       </div>
 
-      <DemoManagerSidebar activeView={activeView} onViewChange={setActiveView} />
+      <DemoManagerSidebar activeView={activeView} onViewChange={(view) => setActiveView(view as DemoView)} />
       
       <div className="flex-1 flex flex-col ml-64">
         <DemoManagerTopBar onNotificationsClick={() => setShowNotifications(true)} />

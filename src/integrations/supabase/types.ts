@@ -14,16 +14,365 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      demo_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          action_taken: string | null
+          alert_type: string
+          created_at: string
+          demo_id: string
+          escalated_to: string[] | null
+          id: string
+          is_active: boolean | null
+          message: string
+          requires_action: boolean | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          alert_type: string
+          created_at?: string
+          demo_id: string
+          escalated_to?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          message: string
+          requires_action?: boolean | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          alert_type?: string
+          created_at?: string
+          demo_id?: string
+          escalated_to?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          message?: string
+          requires_action?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_alerts_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_clicks: {
+        Row: {
+          browser: string | null
+          city: string | null
+          clicked_at: string
+          converted: boolean | null
+          country: string | null
+          demo_id: string
+          device_type: string | null
+          franchise_id: string | null
+          id: string
+          ip_address: string | null
+          referrer: string | null
+          region: string | null
+          reseller_id: string | null
+          session_duration: number | null
+          user_id: string | null
+          user_role: Database["public"]["Enums"]["app_role"] | null
+        }
+        Insert: {
+          browser?: string | null
+          city?: string | null
+          clicked_at?: string
+          converted?: boolean | null
+          country?: string | null
+          demo_id: string
+          device_type?: string | null
+          franchise_id?: string | null
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          region?: string | null
+          reseller_id?: string | null
+          session_duration?: number | null
+          user_id?: string | null
+          user_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Update: {
+          browser?: string | null
+          city?: string | null
+          clicked_at?: string
+          converted?: boolean | null
+          country?: string | null
+          demo_id?: string
+          device_type?: string | null
+          franchise_id?: string | null
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          region?: string | null
+          reseller_id?: string | null
+          session_duration?: number | null
+          user_id?: string | null
+          user_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_clicks_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_health: {
+        Row: {
+          checked_at: string
+          demo_id: string
+          error_message: string | null
+          id: string
+          response_time: number | null
+          status: Database["public"]["Enums"]["demo_status"]
+        }
+        Insert: {
+          checked_at?: string
+          demo_id: string
+          error_message?: string | null
+          id?: string
+          response_time?: number | null
+          status: Database["public"]["Enums"]["demo_status"]
+        }
+        Update: {
+          checked_at?: string
+          demo_id?: string
+          error_message?: string | null
+          id?: string
+          response_time?: number | null
+          status?: Database["public"]["Enums"]["demo_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_health_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demos: {
+        Row: {
+          backup_url: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          health_check_interval: number | null
+          id: string
+          last_health_check: string | null
+          masked_url: string | null
+          max_concurrent_logins: number | null
+          multi_login_enabled: boolean | null
+          status: Database["public"]["Enums"]["demo_status"]
+          tech_stack: Database["public"]["Enums"]["demo_tech_stack"]
+          title: string
+          updated_at: string
+          uptime_percentage: number | null
+          url: string
+        }
+        Insert: {
+          backup_url?: string | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          health_check_interval?: number | null
+          id?: string
+          last_health_check?: string | null
+          masked_url?: string | null
+          max_concurrent_logins?: number | null
+          multi_login_enabled?: boolean | null
+          status?: Database["public"]["Enums"]["demo_status"]
+          tech_stack?: Database["public"]["Enums"]["demo_tech_stack"]
+          title: string
+          updated_at?: string
+          uptime_percentage?: number | null
+          url: string
+        }
+        Update: {
+          backup_url?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          health_check_interval?: number | null
+          id?: string
+          last_health_check?: string | null
+          masked_url?: string | null
+          max_concurrent_logins?: number | null
+          multi_login_enabled?: boolean | null
+          status?: Database["public"]["Enums"]["demo_status"]
+          tech_stack?: Database["public"]["Enums"]["demo_tech_stack"]
+          title?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+          url?: string
+        }
+        Relationships: []
+      }
+      rental_assign: {
+        Row: {
+          assigned_by: string
+          assigned_to: string
+          assignee_role: Database["public"]["Enums"]["app_role"]
+          created_at: string
+          demo_id: string
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          start_date: string
+        }
+        Insert: {
+          assigned_by: string
+          assigned_to: string
+          assignee_role: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          demo_id: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          start_date?: string
+        }
+        Update: {
+          assigned_by?: string
+          assigned_to?: string
+          assignee_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          demo_id?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_assign_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uptime_logs: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          demo_id: string
+          event_message: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          severity: string | null
+          triggered_by: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          demo_id: string
+          event_message: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          severity?: string | null
+          triggered_by?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          demo_id?: string
+          event_message?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          severity?: string | null
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uptime_logs_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_access_demos: { Args: { _user_id: string }; Returns: boolean }
+      can_manage_demos: { Args: { _user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "super_admin"
+        | "demo_manager"
+        | "franchise"
+        | "reseller"
+        | "client"
+        | "prime"
+        | "developer"
+      demo_status: "active" | "inactive" | "maintenance" | "down"
+      demo_tech_stack:
+        | "php"
+        | "node"
+        | "java"
+        | "python"
+        | "react"
+        | "angular"
+        | "vue"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +499,27 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "super_admin",
+        "demo_manager",
+        "franchise",
+        "reseller",
+        "client",
+        "prime",
+        "developer",
+      ],
+      demo_status: ["active", "inactive", "maintenance", "down"],
+      demo_tech_stack: [
+        "php",
+        "node",
+        "java",
+        "python",
+        "react",
+        "angular",
+        "vue",
+        "other",
+      ],
+    },
   },
 } as const
