@@ -125,7 +125,7 @@ const AuditLogs = () => {
 
   const getCategoryBadge = (category: string) => {
     const styles: Record<string, string> = {
-      Finance: "bg-emerald-100 text-emerald-700",
+      Finance: "bg-cyan-100 text-cyan-700",
       Invoice: "bg-blue-100 text-blue-700",
       Security: "bg-red-100 text-red-700",
       Access: "bg-purple-100 text-purple-700",
@@ -135,7 +135,7 @@ const AuditLogs = () => {
 
   const getActionIcon = (action: string) => {
     if (action.includes("APPROVED") || action.includes("RELEASED")) {
-      return <div className="w-2 h-2 rounded-full bg-emerald-500" />;
+      return <div className="w-2 h-2 rounded-full bg-cyan-500" />;
     }
     if (action.includes("REJECTED") || action.includes("FROZEN") || action.includes("FLAGGED")) {
       return <div className="w-2 h-2 rounded-full bg-red-500" />;
@@ -168,8 +168,8 @@ const AuditLogs = () => {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-                <Shield className="w-5 h-5 text-emerald-600" />
+              <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+                <Shield className="w-5 h-5 text-cyan-600" />
               </div>
               <div>
                 <p className="font-semibold text-slate-800 dark:text-slate-200">Legal Compliance Mode Active</p>
@@ -185,7 +185,7 @@ const AuditLogs = () => {
                 <Clock className="w-4 h-4" />
                 UTC Timestamps
               </div>
-              <Badge variant="outline" className="text-emerald-600 border-emerald-300">GST/VAT Compliant</Badge>
+              <Badge variant="outline" className="text-cyan-600 border-cyan-300">GST/VAT Compliant</Badge>
             </div>
           </div>
         </CardContent>
@@ -238,7 +238,7 @@ const AuditLogs = () => {
             {auditLogs.map((log, index) => (
               <div
                 key={index}
-                className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l-4 border-l-transparent hover:border-l-emerald-500"
+                className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l-4 border-l-transparent hover:border-l-cyan-500"
               >
                 <div className="flex items-center gap-2 min-w-[180px]">
                   {getActionIcon(log.action)}
@@ -280,7 +280,7 @@ const AuditLogs = () => {
           <div className="flex items-center justify-center mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
             <p className="text-sm text-slate-500">
               Showing 8 of 48,293 entries • 
-              <Button variant="link" className="text-emerald-600 px-1">Load more</Button>
+              <Button variant="link" className="text-cyan-600 px-1">Load more</Button>
             </p>
           </div>
         </CardContent>

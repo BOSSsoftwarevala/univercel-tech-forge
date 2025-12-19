@@ -66,7 +66,7 @@ const FinanceTopBar = ({
                 </span>
                 {metric.trend && (
                   <span className={`flex items-center text-[10px] font-medium ${
-                    metric.positive ? 'text-emerald-600' : 'text-red-500'
+                    metric.positive ? 'text-cyan-600' : 'text-red-500'
                   }`}>
                     {metric.positive ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
                     {metric.trend}
@@ -102,7 +102,7 @@ const FinanceTopBar = ({
         />
 
         <div className="flex items-center gap-2 pl-4 border-l border-slate-200 dark:border-slate-700">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-sm font-medium">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center text-white text-sm font-medium">
             FM
           </div>
           <div className="flex flex-col">

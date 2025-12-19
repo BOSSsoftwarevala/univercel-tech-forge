@@ -52,7 +52,7 @@ const WalletSystem = () => {
     {
       role: "Developer Pool",
       icon: "DV",
-      color: "from-emerald-500 to-emerald-600",
+      color: "from-cyan-500 to-cyan-600",
       earned: 45670,
       pending: 4890,
       locked: 890,
@@ -97,18 +97,18 @@ const WalletSystem = () => {
       </div>
 
       {/* Pricing Rules Banner */}
-      <Card className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-800">
+      <Card className="bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-cyan-900/20 dark:to-teal-900/20 border-cyan-200 dark:border-cyan-800">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-emerald-800 dark:text-emerald-300">Fixed Pricing - No Negotiation</p>
-              <p className="text-sm text-emerald-600 dark:text-emerald-400">All products have fixed pricing. No discounts allowed.</p>
+              <p className="font-semibold text-cyan-800 dark:text-cyan-300">Fixed Pricing - No Negotiation</p>
+              <p className="text-sm text-cyan-600 dark:text-cyan-400">All products have fixed pricing. No discounts allowed.</p>
             </div>
             <div className="flex gap-4">
               {pricingRules.map((rule, i) => (
-                <div key={i} className="bg-white dark:bg-slate-800 rounded-lg px-4 py-2 border border-emerald-200 dark:border-emerald-700">
+                <div key={i} className="bg-white dark:bg-slate-800 rounded-lg px-4 py-2 border border-cyan-200 dark:border-cyan-700">
                   <p className="text-xs text-slate-500">{rule.product}</p>
-                  <p className="text-lg font-bold text-emerald-600">{rule.price}</p>
+                  <p className="text-lg font-bold text-cyan-600">{rule.price}</p>
                 </div>
               ))}
             </div>
@@ -138,7 +138,7 @@ const WalletSystem = () => {
 
               <div className="grid grid-cols-4 gap-3 mb-4">
                 <div className="text-center p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <TrendingUp className="w-4 h-4 mx-auto text-emerald-500 mb-1" />
+                  <TrendingUp className="w-4 h-4 mx-auto text-cyan-500 mb-1" />
                   <p className="text-xs text-slate-500">Earned</p>
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">${wallet.earned.toLocaleString()}</p>
                 </div>
@@ -153,9 +153,9 @@ const WalletSystem = () => {
                   <p className="text-sm font-semibold text-red-600">${wallet.locked.toLocaleString()}</p>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <Unlock className="w-4 h-4 mx-auto text-emerald-500 mb-1" />
+                  <Unlock className="w-4 h-4 mx-auto text-cyan-500 mb-1" />
                   <p className="text-xs text-slate-500">Released</p>
-                  <p className="text-sm font-semibold text-emerald-600">${wallet.released.toLocaleString()}</p>
+                  <p className="text-sm font-semibold text-cyan-600">${wallet.released.toLocaleString()}</p>
                 </div>
               </div>
 
@@ -191,14 +191,14 @@ const WalletSystem = () => {
                     className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`p-2 rounded-lg ${
+                    <div className={`p-2 rounded-lg ${
                         tx.status === 'locked' ? 'bg-red-100 dark:bg-red-900/30' :
                         tx.status === 'releasing' ? 'bg-yellow-100 dark:bg-yellow-900/30' :
-                        'bg-emerald-100 dark:bg-emerald-900/30'
+                        'bg-cyan-100 dark:bg-cyan-900/30'
                       }`}>
                         {tx.status === 'locked' ? <Lock className="w-4 h-4 text-red-600" /> :
                          tx.status === 'releasing' ? <RefreshCcw className="w-4 h-4 text-yellow-600" /> :
-                         <Unlock className="w-4 h-4 text-emerald-600" />}
+                         <Unlock className="w-4 h-4 text-cyan-600" />}
                       </div>
                       <div>
                         <p className="font-medium text-slate-900 dark:text-white">{tx.client}</p>
@@ -215,7 +215,7 @@ const WalletSystem = () => {
                       <Badge variant="outline" className={`${
                         tx.status === 'locked' ? 'border-red-300 text-red-600' :
                         tx.status === 'releasing' ? 'border-yellow-300 text-yellow-600' :
-                        'border-emerald-300 text-emerald-600'
+                        'border-cyan-300 text-cyan-600'
                       }`}>
                         {tx.status}
                       </Badge>
@@ -241,10 +241,10 @@ const WalletSystem = () => {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg ${
-                        activity.positive ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-700'
+                        activity.positive ? 'bg-cyan-100 dark:bg-cyan-900/30' : 'bg-slate-100 dark:bg-slate-700'
                       }`}>
                         {activity.positive ? 
-                          <ArrowDownRight className="w-4 h-4 text-emerald-600" /> : 
+                          <ArrowDownRight className="w-4 h-4 text-cyan-600" /> : 
                           <ArrowUpRight className="w-4 h-4 text-slate-500" />
                         }
                       </div>
@@ -254,7 +254,7 @@ const WalletSystem = () => {
                       </div>
                     </div>
                     <span className={`text-sm font-semibold ${
-                      activity.amount > 0 && activity.positive ? 'text-emerald-600' : 
+                      activity.amount > 0 && activity.positive ? 'text-cyan-600' : 
                       activity.amount < 0 ? 'text-red-500' : 'text-slate-600'
                     }`}>
                       {activity.amount > 0 && activity.positive ? '+' : ''}${Math.abs(activity.amount).toFixed(2)}

@@ -85,7 +85,7 @@ const FinanceSidebar = ({ activeView, onViewChange }: FinanceSidebarProps) => {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                 item.active
-                  ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
+                  ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               )}
             >
@@ -106,7 +106,7 @@ const FinanceSidebar = ({ activeView, onViewChange }: FinanceSidebarProps) => {
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
                 activeView === view.id
-                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"
+                  ? "bg-cyan-600 text-white shadow-lg shadow-cyan-600/25"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               )}
             >
@@ -124,22 +124,22 @@ const FinanceSidebar = ({ activeView, onViewChange }: FinanceSidebarProps) => {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-500">Razorpay</span>
-              <span className="flex items-center gap-1 text-emerald-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex items-center gap-1 text-cyan-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
                 Active
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-500">Stripe</span>
-              <span className="flex items-center gap-1 text-emerald-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex items-center gap-1 text-cyan-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
                 Active
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-500">PayPal</span>
-              <span className="flex items-center gap-1 text-emerald-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex items-center gap-1 text-cyan-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
                 Active
               </span>
             </div>

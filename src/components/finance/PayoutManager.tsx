@@ -98,14 +98,14 @@ const PayoutManager = () => {
   const stats = [
     { label: "Pending Payouts", value: "$34,521", count: 23, color: "text-yellow-600" },
     { label: "Processing", value: "$12,847", count: 8, color: "text-blue-600" },
-    { label: "Cleared Today", value: "$8,420", count: 15, color: "text-emerald-600" },
+    { label: "Cleared Today", value: "$8,420", count: 15, color: "text-cyan-600" },
     { label: "On Hold", value: "$6,150", count: 2, color: "text-red-600" },
   ];
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-      approved: "bg-emerald-100 text-emerald-700 border-emerald-300",
+      approved: "bg-cyan-100 text-cyan-700 border-cyan-300",
       processing: "bg-blue-100 text-blue-700 border-blue-300",
       cleared: "bg-slate-100 text-slate-700 border-slate-300",
       on_hold: "bg-red-100 text-red-700 border-red-300",
@@ -172,7 +172,7 @@ const PayoutManager = () => {
               variant={filter === f ? "default" : "outline"}
               size="sm"
               onClick={() => setFilter(f)}
-              className={filter === f ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+              className={filter === f ? "bg-cyan-600 hover:bg-cyan-700" : ""}
             >
               {f.charAt(0).toUpperCase() + f.slice(1).replace("_", " ")}
             </Button>
@@ -226,7 +226,7 @@ const PayoutManager = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+                            className="text-cyan-600 border-cyan-300 hover:bg-cyan-50"
                             onClick={() => handleApprove(payout.id)}
                           >
                             <CheckCircle className="w-4 h-4" />

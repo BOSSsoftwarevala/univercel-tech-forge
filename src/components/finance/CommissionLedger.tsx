@@ -38,7 +38,7 @@ const CommissionLedger = () => {
     { role: "Reseller", rate: "15%", icon: Users, color: "text-blue-600", bgColor: "bg-blue-100" },
     { role: "Franchise", rate: "40-60%", icon: Building2, color: "text-purple-600", bgColor: "bg-purple-100" },
     { role: "Influencer", rate: "CPC + Conv", icon: Megaphone, color: "text-pink-600", bgColor: "bg-pink-100" },
-    { role: "Developer", rate: "Task-based", icon: Code, color: "text-emerald-600", bgColor: "bg-emerald-100" },
+    { role: "Developer", rate: "Task-based", icon: Code, color: "text-cyan-600", bgColor: "bg-cyan-100" },
   ];
 
   const commissionData = [
@@ -195,7 +195,7 @@ const CommissionLedger = () => {
               <Bar dataKey="reseller" name="Reseller" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               <Bar dataKey="franchise" name="Franchise" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
               <Bar dataKey="influencer" name="Influencer" fill="#ec4899" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="developer" name="Developer" fill="#10b981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="developer" name="Developer" fill="#06b6d4" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -258,13 +258,13 @@ const CommissionLedger = () => {
                       <td className="py-3 px-4 text-sm text-right text-slate-600 dark:text-slate-400">
                         {entry.saleAmount ? `$${entry.saleAmount.toLocaleString()}` : '-'}
                       </td>
-                      <td className="py-3 px-4 text-sm text-right font-semibold text-emerald-600">
+                      <td className="py-3 px-4 text-sm text-right font-semibold text-cyan-600">
                         ${entry.commission.toLocaleString()}
                       </td>
                       <td className="py-3 px-4 text-sm text-center text-slate-500">{entry.rate}</td>
                       <td className="py-3 px-4 text-center">
                         <Badge className={`text-xs ${
-                          entry.status === 'released' ? 'bg-emerald-100 text-emerald-700' :
+                          entry.status === 'released' ? 'bg-cyan-100 text-cyan-700' :
                           entry.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                           entry.status === 'processing' ? 'bg-blue-100 text-blue-700' :
                           'bg-red-100 text-red-700'

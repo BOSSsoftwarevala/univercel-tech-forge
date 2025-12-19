@@ -24,7 +24,7 @@ const InvoiceCenter = () => {
 
   const invoiceStats = [
     { label: "Total Invoices", value: "1,247", color: "text-slate-600" },
-    { label: "Paid", value: "1,189", color: "text-emerald-600" },
+    { label: "Paid", value: "1,189", color: "text-cyan-600" },
     { label: "Pending", value: "45", color: "text-yellow-600" },
     { label: "Overdue", value: "13", color: "text-red-600" },
   ];
@@ -114,7 +114,7 @@ const InvoiceCenter = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "paid":
-        return <CheckCircle className="w-4 h-4 text-emerald-600" />;
+        return <CheckCircle className="w-4 h-4 text-cyan-600" />;
       case "pending":
         return <Clock className="w-4 h-4 text-yellow-600" />;
       case "overdue":
@@ -126,7 +126,7 @@ const InvoiceCenter = () => {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      paid: "bg-emerald-100 text-emerald-700 border-emerald-300",
+      paid: "bg-cyan-100 text-cyan-700 border-cyan-300",
       pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
       overdue: "bg-red-100 text-red-700 border-red-300",
     };
@@ -142,7 +142,7 @@ const InvoiceCenter = () => {
           <p className="text-slate-500 text-sm">Generate, manage, and track all invoices with GST/VAT support</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
+          <Button className="bg-cyan-600 hover:bg-cyan-700">
             <Plus className="w-4 h-4 mr-2" />
             Generate Invoice
           </Button>

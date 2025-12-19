@@ -118,12 +118,12 @@ const RevenueDashboard = () => {
           <Card key={index} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-5">
               <div className="flex items-start justify-between">
-                <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
-                  <metric.icon className="w-5 h-5 text-emerald-600" />
+                <div className="p-2 rounded-lg bg-cyan-50 dark:bg-cyan-900/20">
+                  <metric.icon className="w-5 h-5 text-cyan-600" />
                 </div>
                 <Badge 
                   variant={metric.positive ? "default" : "destructive"} 
-                  className={`text-xs ${metric.positive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : ''}`}
+                  className={`text-xs ${metric.positive ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400' : ''}`}
                 >
                   {metric.positive ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
                   {metric.change}
@@ -164,9 +164,9 @@ const RevenueDashboard = () => {
                 <Line 
                   type="monotone" 
                   dataKey="revenue" 
-                  stroke="#10b981" 
+                  stroke="#06b6d4" 
                   strokeWidth={2}
-                  dot={{ fill: '#10b981', strokeWidth: 2 }}
+                  dot={{ fill: '#06b6d4', strokeWidth: 2 }}
                   name="Revenue"
                 />
                 <Line 
@@ -234,7 +234,7 @@ const RevenueDashboard = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Recent Transactions</CardTitle>
-            <Button variant="ghost" size="sm" className="text-emerald-600">View All</Button>
+            <Button variant="ghost" size="sm" className="text-cyan-600">View All</Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -244,14 +244,14 @@ const RevenueDashboard = () => {
                 key={index}
                 className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-lg ${
-                    tx.amount > 0 
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30' 
-                      : 'bg-orange-100 dark:bg-orange-900/30'
-                  }`}>
-                    {tx.amount > 0 ? (
-                      <ArrowDownRight className="w-4 h-4 text-emerald-600" />
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2 rounded-lg ${
+                      tx.amount > 0 
+                        ? 'bg-cyan-100 dark:bg-cyan-900/30' 
+                        : 'bg-orange-100 dark:bg-orange-900/30'
+                    }`}>
+                      {tx.amount > 0 ? (
+                        <ArrowDownRight className="w-4 h-4 text-cyan-600" />
                     ) : (
                       <ArrowUpRight className="w-4 h-4 text-orange-600" />
                     )}
@@ -262,19 +262,19 @@ const RevenueDashboard = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Badge 
-                    variant="outline"
-                    className={`text-xs ${
-                      tx.status === 'completed' ? 'border-emerald-500 text-emerald-600' :
+                    <Badge 
+                      variant="outline"
+                      className={`text-xs ${
+                        tx.status === 'completed' ? 'border-cyan-500 text-cyan-600' :
                       tx.status === 'pending' ? 'border-yellow-500 text-yellow-600' :
                       'border-blue-500 text-blue-600'
                     }`}
                   >
                     {tx.status}
                   </Badge>
-                  <span className={`text-sm font-semibold ${
-                    tx.amount > 0 ? 'text-emerald-600' : 'text-slate-600 dark:text-slate-400'
-                  }`}>
+                    <span className={`text-sm font-semibold ${
+                      tx.amount > 0 ? 'text-cyan-600' : 'text-slate-600 dark:text-slate-400'
+                    }`}>
                     {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toFixed(2)}
                   </span>
                 </div>

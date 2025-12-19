@@ -87,7 +87,7 @@ const FinanceNotifications = ({ open, onClose }: FinanceNotificationsProps) => {
 
   const getTypeStyles = (type: string) => {
     const styles: Record<string, string> = {
-      success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+      success: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
       warning: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600",
       info: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
       error: "bg-red-100 dark:bg-red-900/30 text-red-600",
@@ -107,7 +107,7 @@ const FinanceNotifications = ({ open, onClose }: FinanceNotificationsProps) => {
                 Finance Alerts
               </SheetTitle>
               {unreadCount > 0 && (
-                <Badge className="bg-emerald-600">{unreadCount} new</Badge>
+                <Badge className="bg-cyan-600">{unreadCount} new</Badge>
               )}
             </div>
             <Button variant="ghost" size="sm" className="text-slate-500">
@@ -124,7 +124,7 @@ const FinanceNotifications = ({ open, onClose }: FinanceNotificationsProps) => {
                 className={`p-4 rounded-lg border transition-colors ${
                   notification.read 
                     ? 'bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700' 
-                    : 'bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-sm'
+                    : 'bg-white dark:bg-slate-800 border-cyan-200 dark:border-cyan-800 shadow-sm'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -141,7 +141,7 @@ const FinanceNotifications = ({ open, onClose }: FinanceNotificationsProps) => {
                         {notification.title}
                       </p>
                       {!notification.read && (
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-cyan-500 flex-shrink-0" />
                       )}
                     </div>
                     <p className="text-sm text-slate-500 mt-0.5">{notification.message}</p>

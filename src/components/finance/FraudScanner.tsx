@@ -126,7 +126,7 @@ const FraudScanner = () => {
     const styles: Record<string, string> = {
       high: "bg-red-100 text-red-700 border-red-300",
       medium: "bg-yellow-100 text-yellow-700 border-yellow-300",
-      low: "bg-emerald-100 text-emerald-700 border-emerald-300",
+      low: "bg-cyan-100 text-cyan-700 border-cyan-300",
     };
     return styles[risk] || styles.low;
   };
@@ -136,7 +136,7 @@ const FraudScanner = () => {
       frozen: "bg-red-100 text-red-700",
       reviewing: "bg-yellow-100 text-yellow-700",
       monitoring: "bg-blue-100 text-blue-700",
-      cleared: "bg-emerald-100 text-emerald-700",
+      cleared: "bg-cyan-100 text-cyan-700",
     };
     return styles[status] || "";
   };
@@ -152,7 +152,7 @@ const FraudScanner = () => {
         <Button 
           onClick={runScan}
           disabled={scanning}
-          className="bg-emerald-600 hover:bg-emerald-700"
+          className="bg-cyan-600 hover:bg-cyan-700"
         >
           {scanning ? (
             <>
@@ -170,15 +170,15 @@ const FraudScanner = () => {
 
       {/* Scan Progress */}
       {scanning && (
-        <Card className="bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800">
+        <Card className="bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800">
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
-              <Activity className="w-6 h-6 text-emerald-600 animate-pulse" />
+              <Activity className="w-6 h-6 text-cyan-600 animate-pulse" />
               <div className="flex-1">
-                <p className="font-medium text-emerald-800 dark:text-emerald-300">AI Fraud Scanner Running...</p>
+                <p className="font-medium text-cyan-800 dark:text-cyan-300">AI Fraud Scanner Running...</p>
                 <Progress value={66} className="h-2 mt-2" />
               </div>
-              <span className="text-sm text-emerald-600">Analyzing 847 transactions</span>
+              <span className="text-sm text-cyan-600">Analyzing 847 transactions</span>
             </div>
           </CardContent>
         </Card>
@@ -191,7 +191,7 @@ const FraudScanner = () => {
             <CardContent className="p-4">
               <p className="text-sm text-slate-500">{metric.label}</p>
               <p className={`text-2xl font-bold mt-1 ${
-                metric.label === "Risk Score" ? 'text-emerald-600' : 'text-slate-900 dark:text-white'
+                metric.label === "Risk Score" ? 'text-cyan-600' : 'text-slate-900 dark:text-white'
               }`}>
                 {metric.value}
               </p>
@@ -269,12 +269,12 @@ const FraudScanner = () => {
                       </Button>
                     )}
                     {tx.status !== 'cleared' && (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="text-emerald-600 border-emerald-300"
-                        onClick={() => handleClear(tx.id)}
-                      >
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-cyan-600 border-cyan-300"
+                          onClick={() => handleClear(tx.id)}
+                        >
                         <CheckCircle className="w-4 h-4 mr-1" />
                         Clear
                       </Button>
@@ -291,7 +291,7 @@ const FraudScanner = () => {
       <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Shield className="w-5 h-5 text-emerald-600" />
+            <Shield className="w-5 h-5 text-cyan-600" />
             Active Fraud Detection Rules
           </CardTitle>
         </CardHeader>
@@ -303,7 +303,7 @@ const FraudScanner = () => {
                 className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50"
               >
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-cyan-500" />
                   <div>
                     <p className="text-sm font-medium text-slate-900 dark:text-white">{rule.rule}</p>
                     <p className="text-xs text-slate-500">Last triggered: {rule.lastTriggered}</p>

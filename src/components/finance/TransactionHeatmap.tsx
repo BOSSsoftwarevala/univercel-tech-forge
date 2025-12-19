@@ -54,10 +54,10 @@ const TransactionHeatmap = () => {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const getHeatColor = (value: number) => {
-    if (value < 10) return "bg-emerald-100 dark:bg-emerald-900/30";
-    if (value < 20) return "bg-emerald-300 dark:bg-emerald-800/50";
-    if (value < 30) return "bg-emerald-500 dark:bg-emerald-700";
-    return "bg-emerald-700 dark:bg-emerald-600";
+    if (value < 10) return "bg-cyan-100 dark:bg-cyan-900/30";
+    if (value < 20) return "bg-cyan-300 dark:bg-cyan-800/50";
+    if (value < 30) return "bg-cyan-500 dark:bg-cyan-700";
+    return "bg-cyan-700 dark:bg-cyan-600";
   };
 
   const hourlyData = [
@@ -126,8 +126,8 @@ const TransactionHeatmap = () => {
                   <p className="text-xl font-bold text-slate-900 dark:text-white mt-1">{metric.value}</p>
                   <p className="text-xs text-slate-400 mt-0.5">{metric.subtext}</p>
                 </div>
-                <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-                  <metric.icon className="w-5 h-5 text-emerald-600" />
+                <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+                  <metric.icon className="w-5 h-5 text-cyan-600" />
                 </div>
               </div>
             </CardContent>
@@ -157,7 +157,7 @@ const TransactionHeatmap = () => {
                 {heatmapData.map((cell, index) => (
                   <div
                     key={index}
-                    className={`h-8 rounded-sm ${getHeatColor(cell.value)} hover:ring-2 hover:ring-emerald-400 cursor-pointer transition-all group relative`}
+                    className={`h-8 rounded-sm ${getHeatColor(cell.value)} hover:ring-2 hover:ring-cyan-400 cursor-pointer transition-all group relative`}
                   >
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                       {cell.date}: {cell.value} transactions
@@ -170,10 +170,10 @@ const TransactionHeatmap = () => {
               <div className="flex items-center justify-end gap-2 mt-4">
                 <span className="text-xs text-slate-500">Less</span>
                 <div className="flex gap-1">
-                  <div className="w-4 h-4 rounded-sm bg-emerald-100 dark:bg-emerald-900/30" />
-                  <div className="w-4 h-4 rounded-sm bg-emerald-300 dark:bg-emerald-800/50" />
-                  <div className="w-4 h-4 rounded-sm bg-emerald-500 dark:bg-emerald-700" />
-                  <div className="w-4 h-4 rounded-sm bg-emerald-700 dark:bg-emerald-600" />
+                  <div className="w-4 h-4 rounded-sm bg-cyan-100 dark:bg-cyan-900/30" />
+                  <div className="w-4 h-4 rounded-sm bg-cyan-300 dark:bg-cyan-800/50" />
+                  <div className="w-4 h-4 rounded-sm bg-cyan-500 dark:bg-cyan-700" />
+                  <div className="w-4 h-4 rounded-sm bg-cyan-700 dark:bg-cyan-600" />
                 </div>
                 <span className="text-xs text-slate-500">More</span>
               </div>
@@ -196,7 +196,7 @@ const TransactionHeatmap = () => {
                   <span className="text-xs text-slate-500 w-12">{hour.hour}</span>
                   <div className="flex-1 h-6 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all"
+                      className="h-full bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full transition-all"
                       style={{ width: `${(hour.transactions / 22) * 100}%` }}
                     />
                   </div>
@@ -235,7 +235,7 @@ const TransactionHeatmap = () => {
                   </div>
                   <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-emerald-500 rounded-full"
+                      className="h-full bg-cyan-500 rounded-full"
                       style={{ width: `${curr.percentage}%` }}
                     />
                   </div>
