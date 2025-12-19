@@ -80,6 +80,7 @@ import DomainProtection from "./components/security/DomainProtection";
 import PendingItemsSuggestion from "./components/shared/PendingItemsSuggestion";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
+import DemoCredentials from "./pages/DemoCredentials";
 
 const queryClient = new QueryClient();
 
@@ -190,6 +191,7 @@ const App = () => (
               <Route path="/internal-chat" element={<InternalChat />} />
               <Route path="/personal-chat" element={<PersonalChat />} />
               <Route path="/ai-console" element={<AIOptimizationConsole />} />
+              <Route path="/demo-credentials" element={<DemoCredentials />} />
 
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
