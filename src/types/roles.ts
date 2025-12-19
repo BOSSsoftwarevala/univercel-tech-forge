@@ -1,4 +1,4 @@
-// All 19 roles in the Software Vala system
+// All 21 roles in the Software Vala system (matches database enum)
 export type AppRole = 
   | 'super_admin'
   | 'admin'
