@@ -40,17 +40,17 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
     <motion.aside
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="w-72 bg-gradient-to-b from-stone-900 to-stone-950 border-r border-amber-900/30 flex flex-col"
+      className="w-72 bg-gradient-to-b from-slate-900 to-slate-950 border-r border-cyan-900/30 flex flex-col"
     >
       {/* Header */}
-      <div className="p-6 border-b border-amber-900/30">
+      <div className="p-6 border-b border-cyan-900/30">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-900/50">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-700 flex items-center justify-center shadow-lg shadow-cyan-900/50">
             <Scale className="w-7 h-7 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Legal & Compliance</h1>
-            <p className="text-xs text-amber-500/70">Global SaaS Compliance</p>
+            <p className="text-xs text-cyan-500/70">Global SaaS Compliance</p>
           </div>
         </div>
         
@@ -81,16 +81,16 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
               whileTap={{ scale: 0.98 }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive
-                  ? "bg-gradient-to-r from-amber-600/20 to-amber-700/10 text-amber-400 border border-amber-600/30"
-                  : "text-stone-400 hover:text-amber-400 hover:bg-stone-800/50"
+                  ? "bg-gradient-to-r from-cyan-600/20 to-cyan-700/10 text-cyan-400 border border-cyan-600/30"
+                  : "text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50"
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? "text-amber-500" : ""}`} />
+              <Icon className={`w-5 h-5 ${isActive ? "text-cyan-500" : ""}`} />
               <span className="font-medium text-sm">{item.label}</span>
               {isActive && (
                 <motion.div
                   layoutId="legalActiveIndicator"
-                  className="ml-auto w-2 h-2 rounded-full bg-amber-500"
+                  className="ml-auto w-2 h-2 rounded-full bg-cyan-500"
                   initial={false}
                 />
               )}
@@ -100,13 +100,13 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
       </nav>
 
       {/* One-Domain Enforcement */}
-      <div className="p-4 border-t border-amber-900/30">
+      <div className="p-4 border-t border-cyan-900/30">
         <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
           <div className="flex items-center gap-2 mb-2">
             <Lock className="w-4 h-4 text-red-400" />
             <span className="text-xs text-red-400 font-medium">One-Domain Activation</span>
           </div>
-          <p className="text-xs text-stone-500">Enforced on all licenses</p>
+          <p className="text-xs text-slate-500">Enforced on all licenses</p>
         </div>
       </div>
     </motion.aside>

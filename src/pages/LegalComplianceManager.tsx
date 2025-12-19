@@ -79,7 +79,7 @@ const LegalComplianceManager = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex">
       <LegalSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
       
       <div className="flex-1 flex flex-col">

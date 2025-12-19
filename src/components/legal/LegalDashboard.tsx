@@ -41,8 +41,8 @@ const LegalDashboard = () => {
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Contracts", value: "1,247", change: "+12%", icon: FileCheck, color: "text-emerald-400" },
-          { label: "Active Disputes", value: "8", change: "-3", icon: Gavel, color: "text-amber-400" },
+          { label: "Total Contracts", value: "1,247", change: "+12%", icon: FileCheck, color: "text-cyan-400" },
+          { label: "Active Disputes", value: "8", change: "-3", icon: Gavel, color: "text-emerald-400" },
           { label: "Compliance Score", value: "92%", change: "+2%", icon: Shield, color: "text-blue-400" },
           { label: "Pending Reviews", value: "34", change: "5 urgent", icon: Clock, color: "text-purple-400" },
         ].map((stat, index) => (
@@ -52,15 +52,15 @@ const LegalDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="bg-stone-900/80 border-stone-800/50 hover:border-amber-600/30 transition-colors">
+            <Card className="bg-slate-900/80 border-slate-800/50 hover:border-cyan-600/30 transition-colors">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-stone-500">{stat.label}</p>
+                    <p className="text-sm text-slate-500">{stat.label}</p>
                     <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
                     <p className="text-xs text-emerald-400 mt-1">{stat.change}</p>
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-stone-800/50 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center">
                     <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
                 </div>
@@ -72,10 +72,10 @@ const LegalDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Agreement Expiry Timeline */}
-        <Card className="bg-stone-900/80 border-stone-800/50">
-          <CardHeader className="border-b border-stone-800/50">
+        <Card className="bg-slate-900/80 border-slate-800/50">
+          <CardHeader className="border-b border-slate-800/50">
             <CardTitle className="text-white flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-amber-500" />
+              <Calendar className="w-5 h-5 text-cyan-500" />
               Agreement Expiry Timeline
             </CardTitle>
           </CardHeader>
@@ -86,7 +86,7 @@ const LegalDashboard = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-between p-3 rounded-lg bg-stone-800/30 border border-stone-700/30"
+                className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-slate-700/30"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -101,14 +101,14 @@ const LegalDashboard = () => {
                      <FileCheck className="w-5 h-5 text-emerald-400" />}
                   </div>
                   <div>
-                    <p className="text-stone-200 font-medium text-sm">{agreement.name}</p>
-                    <p className="text-xs text-stone-500 capitalize">{agreement.type}</p>
+                    <p className="text-slate-200 font-medium text-sm">{agreement.name}</p>
+                    <p className="text-xs text-slate-500 capitalize">{agreement.type}</p>
                   </div>
                 </div>
                 <Badge className={
                   agreement.days <= 7 
                     ? "bg-red-500/20 text-red-400 border-red-500/40" 
-                    : "bg-amber-500/20 text-amber-400 border-amber-500/40"
+                    : "bg-cyan-500/20 text-cyan-400 border-cyan-500/40"
                 }>
                   {agreement.days} days
                 </Badge>
@@ -118,8 +118,8 @@ const LegalDashboard = () => {
         </Card>
 
         {/* High-Risk Case List */}
-        <Card className="bg-stone-900/80 border-stone-800/50">
-          <CardHeader className="border-b border-stone-800/50">
+        <Card className="bg-slate-900/80 border-slate-800/50">
+          <CardHeader className="border-b border-slate-800/50">
             <CardTitle className="text-white flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
               High-Risk Cases
@@ -132,23 +132,23 @@ const LegalDashboard = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="p-4 rounded-lg bg-stone-800/30 border border-stone-700/30"
+                className="p-4 rounded-lg bg-slate-800/30 border border-slate-700/30"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-stone-500 font-mono">{caseItem.id}</span>
+                      <span className="text-xs text-slate-500 font-mono">{caseItem.id}</span>
                       <Badge className={
                         caseItem.severity === "critical" ? "bg-red-500/20 text-red-400 border-red-500/40" :
-                        caseItem.severity === "high" ? "bg-amber-500/20 text-amber-400 border-amber-500/40" :
+                        caseItem.severity === "high" ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/40" :
                         "bg-blue-500/20 text-blue-400 border-blue-500/40"
                       }>
                         {caseItem.severity}
                       </Badge>
                     </div>
-                    <p className="text-stone-200 font-medium mt-2">{caseItem.title}</p>
+                    <p className="text-slate-200 font-medium mt-2">{caseItem.title}</p>
                   </div>
-                  <Badge className="bg-stone-700/50 text-stone-300 border-stone-600/40 capitalize">
+                  <Badge className="bg-slate-700/50 text-slate-300 border-slate-600/40 capitalize">
                     {caseItem.status}
                   </Badge>
                 </div>
@@ -159,8 +159,8 @@ const LegalDashboard = () => {
       </div>
 
       {/* Compliance Score Heatmap */}
-      <Card className="bg-stone-900/80 border-stone-800/50">
-        <CardHeader className="border-b border-stone-800/50">
+      <Card className="bg-slate-900/80 border-slate-800/50">
+        <CardHeader className="border-b border-slate-800/50">
           <CardTitle className="text-white flex items-center gap-2">
             <Shield className="w-5 h-5 text-emerald-500" />
             Regional Compliance Score
@@ -174,10 +174,10 @@ const LegalDashboard = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className="p-4 rounded-xl bg-stone-800/50 border border-stone-700/50"
+                className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-stone-300 font-medium">{region.region}</p>
+                  <p className="text-slate-300 font-medium">{region.region}</p>
                   <Badge className={
                     region.status === "excellent" 
                       ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" 
@@ -191,7 +191,7 @@ const LegalDashboard = () => {
                     <span className="text-3xl font-bold text-white">{region.score}%</span>
                     <TrendingUp className="w-5 h-5 text-emerald-400" />
                   </div>
-                  <Progress value={region.score} className="h-2 bg-stone-700" />
+                  <Progress value={region.score} className="h-2 bg-slate-700" />
                 </div>
               </motion.div>
             ))}

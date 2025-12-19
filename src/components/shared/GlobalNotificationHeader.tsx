@@ -136,7 +136,7 @@ const GlobalNotificationHeader = ({
       demo_manager: 'from-indigo-500 to-violet-500',
       client_success: 'from-teal-500 to-cyan-500',
       hr: 'from-purple-500 to-pink-500',
-      legal: 'from-slate-500 to-gray-500',
+      legal: 'from-cyan-500 to-teal-500',
     };
     return colors[role] || 'from-slate-500 to-gray-500';
   };
