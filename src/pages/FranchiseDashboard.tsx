@@ -47,7 +47,7 @@ const FranchiseDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white overflow-hidden">
-      {/* Animated Background */}
+      {/* Static Background - No JS animations */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.1),transparent_50%)]" />
@@ -61,15 +61,6 @@ const FranchiseDashboard = () => {
           </defs>
           <rect width="100%" height="100%" fill="url(#franchise-grid)" />
         </svg>
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-indigo-400 rounded-full"
-            style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
-            animate={{ y: [0, -40, 0], opacity: [0.2, 0.8, 0.2], scale: [1, 1.5, 1] }}
-            transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }}
-          />
-        ))}
       </div>
 
       {/* Top Bar */}
@@ -84,22 +75,16 @@ const FranchiseDashboard = () => {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <motion.div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30"
-            animate={{ opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <div className="w-2 h-2 rounded-full bg-indigo-400" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30">
+            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
             <span className="text-xs text-indigo-400">Online</span>
-          </motion.div>
+          </div>
         </div>
       </header>
 
       <div className="flex pt-16">
         {/* Sidebar */}
-        <motion.aside
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
+        <aside
           className={`fixed left-0 top-16 bottom-0 ${collapsed ? 'w-20' : 'w-64'} bg-slate-900/60 backdrop-blur-xl border-r border-indigo-500/20 z-40 transition-all duration-300`}
         >
           {/* Collapse Toggle */}
@@ -112,28 +97,17 @@ const FranchiseDashboard = () => {
 
           {/* Navigation */}
           <nav className="p-4 space-y-2 mt-4">
-            {menuItems.map((item, index) => (
-              <motion.button
+            {menuItems.map((item) => (
+              <button
                 key={item.id}
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.03 }}
                 onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                   activeSection === item.id
                     ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/10 border border-indigo-500/50 text-indigo-400 shadow-lg shadow-indigo-500/10'
                     : 'hover:bg-slate-800/50 text-slate-400 hover:text-indigo-400'
                 }`}
               >
-                <div className={`relative ${activeSection === item.id ? 'text-indigo-400' : ''}`}>
-                  <item.icon className="w-5 h-5" />
-                  {activeSection === item.id && (
-                    <motion.div
-                      layoutId="franchise-sidebar-glow"
-                      className="absolute inset-0 bg-indigo-400/30 blur-md rounded-full"
-                    />
-                  )}
-                </div>
+                <item.icon className={`w-5 h-5 ${activeSection === item.id ? 'text-indigo-400' : ''}`} />
                 {!collapsed && (
                   <>
                     <span className="font-medium flex-1 text-left text-sm">{item.label}</span>
@@ -147,14 +121,11 @@ const FranchiseDashboard = () => {
                       </span>
                     )}
                     {activeSection === item.id && (
-                      <motion.div
-                        layoutId="franchise-active-dot"
-                        className="w-2 h-2 bg-indigo-400 rounded-full shadow-lg shadow-indigo-400/50"
-                      />
+                      <div className="w-2 h-2 bg-indigo-400 rounded-full" />
                     )}
                   </>
                 )}
-              </motion.button>
+              </button>
             ))}
           </nav>
 
@@ -173,12 +144,7 @@ const FranchiseDashboard = () => {
                       <span className="text-emerald-400">₹8.5L / ₹10L</span>
                     </div>
                     <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
-                        initial={{ width: 0 }}
-                        animate={{ width: '85%' }}
-                        transition={{ duration: 1 }}
-                      />
+                      <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-[85%]" />
                     </div>
                   </div>
                   <div>
@@ -187,12 +153,7 @@ const FranchiseDashboard = () => {
                       <span className="text-indigo-400">42 / 50</span>
                     </div>
                     <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"
-                        initial={{ width: 0 }}
-                        animate={{ width: '84%' }}
-                        transition={{ duration: 1, delay: 0.1 }}
-                      />
+                      <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 w-[84%]" />
                     </div>
                   </div>
                 </div>
@@ -207,7 +168,7 @@ const FranchiseDashboard = () => {
               {!collapsed && <span className="font-medium">Settings</span>}
             </button>
           </div>
-        </motion.aside>
+        </aside>
 
         {/* Main Content */}
         <main className={`flex-1 ${collapsed ? 'ml-20' : 'ml-64'} p-6 min-h-screen transition-all duration-300`}>
