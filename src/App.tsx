@@ -3,7 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
 import Homepage from "./pages/Homepage";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Index";
 import FranchiseManagement from "./pages/FranchiseManagement";
 import FranchiseLanding from "./pages/FranchiseLanding";
@@ -32,17 +34,20 @@ import SystemSettings from "./pages/SystemSettings";
 import NotificationBuzzerConsole from "./pages/NotificationBuzzerConsole";
 import APIIntegrationDashboard from "./pages/APIIntegrationDashboard";
 import NotFound from "./pages/NotFound";
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/franchise" element={<FranchiseManagement />} />
           <Route path="/franchise-program" element={<FranchiseLanding />} />
           <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
@@ -70,10 +75,11 @@ const App = () => (
           <Route path="/buzzer-console" element={<NotificationBuzzerConsole />} />
           <Route path="/api-integrations" element={<APIIntegrationDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

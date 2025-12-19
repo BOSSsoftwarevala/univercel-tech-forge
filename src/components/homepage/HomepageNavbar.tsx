@@ -102,7 +102,7 @@ const HomepageNavbar = () => {
             {/* Login Button */}
             <Button
               variant="outline"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/auth')}
               className="border-primary/50 text-primary hover:bg-primary/10 hover:border-primary"
             >
               Login
@@ -143,7 +143,7 @@ const HomepageNavbar = () => {
                 <Button
                   variant="outline"
                   className="w-full border-primary/50 text-primary"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/auth')}
                 >
                   Login
                 </Button>
