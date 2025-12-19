@@ -37,6 +37,7 @@ import APIIntegrationDashboard from "./pages/APIIntegrationDashboard";
 import ApplyPortal from "./pages/ApplyPortal";
 import InternalChat from "./pages/InternalChat";
 import UnifiedSecurityCenter from "./components/security/UnifiedSecurityCenter";
+import DomainProtection from "./components/security/DomainProtection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,47 +46,49 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/onboard/:category" element={<CategoryOnboarding />} />
-          <Route path="/franchise" element={<FranchiseManagement />} />
-          <Route path="/franchise-program" element={<FranchiseLanding />} />
-          <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
-          <Route path="/reseller-program" element={<ResellerLanding />} />
-          <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
-          <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
-          <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
-          <Route path="/influencer-manager" element={<InfluencerManager />} />
-          <Route path="/support-dashboard" element={<SupportDashboard />} />
-          <Route path="/seo-dashboard" element={<SEODashboard />} />
-          <Route path="/lead-manager" element={<LeadManager />} />
-          <Route path="/task-manager" element={<TaskManager />} />
-          <Route path="/rnd-dashboard" element={<RnDDashboard />} />
-          <Route path="/client-success" element={<ClientSuccessDashboard />} />
-          <Route path="/performance" element={<PerformanceManager />} />
-          <Route path="/finance" element={<FinanceManager />} />
-          <Route path="/super-admin" element={<SuperAdminDashboard />} />
-          <Route path="/demo-manager" element={<ProductDemoManager />} />
-          <Route path="/prime-user" element={<PrimeUserDashboard />} />
-          <Route path="/legal" element={<LegalComplianceManager />} />
-          <Route path="/marketing" element={<MarketingManager />} />
-          <Route path="/sales-support" element={<SalesSupportDashboard />} />
-          <Route path="/hr-dashboard" element={<HRDashboard />} />
-          <Route path="/system-settings" element={<SystemSettings />} />
-          <Route path="/buzzer-console" element={<NotificationBuzzerConsole />} />
-          <Route path="/api-integrations" element={<APIIntegrationDashboard />} />
-          <Route path="/apply" element={<ApplyPortal />} />
-          <Route path="/internal-chat" element={<InternalChat />} />
-          <Route path="/security-center" element={<UnifiedSecurityCenter />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <DomainProtection>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/onboard/:category" element={<CategoryOnboarding />} />
+              <Route path="/franchise" element={<FranchiseManagement />} />
+              <Route path="/franchise-program" element={<FranchiseLanding />} />
+              <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
+              <Route path="/reseller-program" element={<ResellerLanding />} />
+              <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
+              <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
+              <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
+              <Route path="/influencer-manager" element={<InfluencerManager />} />
+              <Route path="/support-dashboard" element={<SupportDashboard />} />
+              <Route path="/seo-dashboard" element={<SEODashboard />} />
+              <Route path="/lead-manager" element={<LeadManager />} />
+              <Route path="/task-manager" element={<TaskManager />} />
+              <Route path="/rnd-dashboard" element={<RnDDashboard />} />
+              <Route path="/client-success" element={<ClientSuccessDashboard />} />
+              <Route path="/performance" element={<PerformanceManager />} />
+              <Route path="/finance" element={<FinanceManager />} />
+              <Route path="/super-admin" element={<SuperAdminDashboard />} />
+              <Route path="/demo-manager" element={<ProductDemoManager />} />
+              <Route path="/prime-user" element={<PrimeUserDashboard />} />
+              <Route path="/legal" element={<LegalComplianceManager />} />
+              <Route path="/marketing" element={<MarketingManager />} />
+              <Route path="/sales-support" element={<SalesSupportDashboard />} />
+              <Route path="/hr-dashboard" element={<HRDashboard />} />
+              <Route path="/system-settings" element={<SystemSettings />} />
+              <Route path="/buzzer-console" element={<NotificationBuzzerConsole />} />
+              <Route path="/api-integrations" element={<APIIntegrationDashboard />} />
+              <Route path="/apply" element={<ApplyPortal />} />
+              <Route path="/internal-chat" element={<InternalChat />} />
+              <Route path="/security-center" element={<UnifiedSecurityCenter />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </DomainProtection>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
