@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Globe, MapPin } from 'lucide-react';
+import softwarevalaLogo from '@/assets/softwarevala-logo.jpg';
 
 const countries = [
   { name: 'India', flag: '🇮🇳', region: 'South Asia' },
@@ -78,31 +79,13 @@ const GlobalReach = () => {
                 className="absolute inset-4 rounded-full border border-neon-teal/40"
               />
               
-              {/* Inner globe */}
-              <div className="absolute inset-8 rounded-full bg-gradient-to-br from-primary/20 via-background to-neon-blue/20 border border-primary/50 flex items-center justify-center overflow-hidden">
-                {/* Grid lines */}
-                <div className="absolute inset-0 opacity-30">
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute inset-0 border border-primary/20 rounded-full"
-                      style={{ transform: `rotateX(${i * 30}deg)` }}
-                    />
-                  ))}
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={`v-${i}`}
-                      className="absolute top-0 bottom-0 left-1/2 w-px bg-primary/20"
-                      style={{ transform: `rotateY(${i * 22.5}deg)` }}
-                    />
-                  ))}
-                </div>
-                
-                {/* Center text */}
-                <div className="text-center z-10">
-                  <p className="text-5xl font-mono font-bold text-primary">7+</p>
-                  <p className="text-sm text-muted-foreground uppercase tracking-wider">Countries</p>
-                </div>
+              {/* Inner globe with logo */}
+              <div className="absolute inset-8 rounded-full bg-white border-4 border-primary flex items-center justify-center overflow-hidden shadow-xl shadow-primary/30">
+                <img 
+                  src={softwarevalaLogo} 
+                  alt="Softwarevala Logo" 
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Floating country markers */}
