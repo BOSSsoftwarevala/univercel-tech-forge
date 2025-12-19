@@ -32,7 +32,21 @@ type AdminView =
   | "dev-orchestration"
   | "performance-ai"
   | "compliance"
-  | "emergency";
+  | "emergency"
+  | "franchise"
+  | "reseller"
+  | "sales"
+  | "support"
+  | "seo"
+  | "marketing"
+  | "rnd"
+  | "client-success"
+  | "legal"
+  | "hr"
+  | "demo-product"
+  | "influencer"
+  | "prime-users"
+  | "settings";
 
 const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState<AdminView>("live-control");
