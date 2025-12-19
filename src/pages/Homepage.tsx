@@ -9,6 +9,7 @@ import TrendingDemoShowcase from '@/components/landing/TrendingDemoShowcase';
 import DemoFilterBar from '@/components/landing/DemoFilterBar';
 import ValueSlider from '@/components/landing/ValueSlider';
 import RoleInvitePanel from '@/components/landing/RoleInvitePanel';
+import WorldMapPanel from '@/components/landing/WorldMapPanel';
 
 const Homepage = () => {
   return (
@@ -21,6 +22,9 @@ const Homepage = () => {
       
       {/* Apply Hub - Top Priority Section */}
       <ApplyHub />
+      
+      {/* World Map Panel - Global Network */}
+      <WorldMapPanel />
       
       {/* Value Badge Bar */}
       <ValueBadgeBar />
