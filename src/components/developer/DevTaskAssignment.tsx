@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, Clock, CheckCircle2, XCircle, AlertTriangle,
-  Code2, Timer, Play, Shield, FileText, Tag
+  Code2, Timer, Play, Shield, FileText, Tag, Handshake
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import PromiseTaskCard from '@/components/shared/PromiseTaskCard';
+import { PromiseStatus } from '@/components/shared/PromiseButton';
+import promiseHandshakeIcon from '@/assets/promise-handshake-icon.jpg';
 
 interface Task {
   id: string;
@@ -20,6 +23,10 @@ interface Task {
   buzzerActive: boolean;
   assignedAt: Date;
   clientInfo: { masked: true; industry: string };
+  promiseStatus: PromiseStatus;
+  deadline?: string;
+  startedAt?: string;
+  slaHours?: number;
 }
 
 const DevTaskAssignment = () => {
@@ -36,6 +43,8 @@ const DevTaskAssignment = () => {
       buzzerActive: true,
       assignedAt: new Date(),
       clientInfo: { masked: true, industry: 'E-commerce' },
+      promiseStatus: 'assigned',
+      slaHours: 2,
     },
     {
       id: '2',
@@ -49,6 +58,25 @@ const DevTaskAssignment = () => {
       buzzerActive: true,
       assignedAt: new Date(Date.now() - 300000),
       clientInfo: { masked: true, industry: 'Finance' },
+      promiseStatus: 'assigned',
+      slaHours: 2,
+    },
+    {
+      id: '3',
+      title: 'User Authentication Module',
+      description: 'Implement JWT-based authentication with refresh token rotation.',
+      category: 'Backend Development',
+      techStack: ['Node.js', 'JWT', 'Redis'],
+      priority: 'medium',
+      estimatedHours: 3,
+      maxDeliveryHours: 4,
+      buzzerActive: false,
+      assignedAt: new Date(Date.now() - 3600000),
+      clientInfo: { masked: true, industry: 'SaaS' },
+      promiseStatus: 'in_progress',
+      startedAt: new Date(Date.now() - 1800000).toISOString(),
+      deadline: new Date(Date.now() + 7200000).toISOString(),
+      slaHours: 4,
     },
   ]);
 
@@ -56,143 +84,195 @@ const DevTaskAssignment = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showPromiseModal, setShowPromiseModal] = useState(false);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'text-red-400 bg-red-500/20 border-red-500/50';
-      case 'high': return 'text-orange-400 bg-orange-500/20 border-orange-500/50';
-      case 'medium': return 'text-amber-400 bg-amber-500/20 border-amber-500/50';
-      default: return 'text-slate-400 bg-slate-500/20 border-slate-500/50';
-    }
-  };
-
-  const handleAcceptTask = (task: Task) => {
-    setSelectedTask(task);
-    setShowPromiseModal(true);
-  };
-
-  const handlePromiseAndStart = () => {
-    if (!agreedToTerms || !selectedTask) return;
-
+  const handlePromiseStart = async (taskId: string, deadline: Date) => {
     setTasks(prev => prev.map(t => 
-      t.id === selectedTask.id 
-        ? { ...t, buzzerActive: false }
+      t.id === taskId 
+        ? { 
+            ...t, 
+            buzzerActive: false,
+            promiseStatus: 'promised' as PromiseStatus,
+            startedAt: new Date().toISOString(),
+            deadline: deadline.toISOString(),
+          }
         : t
     ));
+    
+    // Simulate updating database
+    // In production: await supabase.from('promise_logs').insert(...)
+  };
 
-    toast({
-      title: "Task Accepted!",
-      description: `Timer started for "${selectedTask.title}". Deliver within ${selectedTask.maxDeliveryHours} hours.`,
-    });
-
-    setShowPromiseModal(false);
-    setSelectedTask(null);
-    setAgreedToTerms(false);
+  const handlePromiseComplete = async (taskId: string) => {
+    setTasks(prev => prev.map(t => 
+      t.id === taskId 
+        ? { 
+            ...t, 
+            promiseStatus: 'completed' as PromiseStatus,
+          }
+        : t
+    ));
   };
 
   const handleRejectTask = (taskId: string) => {
-    toast({
-      title: "Task Rejected",
-      description: "The task will be reassigned to another developer.",
-      variant: "destructive",
-    });
+    setTasks(prev => prev.filter(t => t.id !== taskId));
+    toast.error("Task Rejected - Will be reassigned to another developer");
   };
+
+  const pendingTasks = tasks.filter(t => t.promiseStatus === 'assigned');
+  const activeTasks = tasks.filter(t => t.promiseStatus === 'promised' || t.promiseStatus === 'in_progress');
+  const completedTasks = tasks.filter(t => t.promiseStatus === 'completed');
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Task Assignment</h1>
-          <p className="text-slate-400">Accept tasks to start the timer. Buzzer requires action.</p>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <img 
+              src={promiseHandshakeIcon} 
+              alt="Promise" 
+              className="w-10 h-10 rounded-full border-2 border-cyan-500/50"
+            />
+            Task Assignment
+          </h1>
+          <p className="text-slate-400 mt-1">Accept tasks to start the promise timer. Buzzer requires action.</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/50 rounded-lg">
-          <Bell className="w-4 h-4 text-amber-400" />
-          <span className="text-amber-400 text-sm font-medium">{tasks.filter(t => t.buzzerActive).length} Pending</span>
+        <div className="flex items-center gap-3">
+          {pendingTasks.some(t => t.buzzerActive) && (
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ repeat: Infinity, duration: 1 }}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-lg"
+            >
+              <Bell className="w-4 h-4 text-red-400" />
+              <span className="text-red-400 text-sm font-medium">
+                {pendingTasks.filter(t => t.buzzerActive).length} BUZZER ACTIVE
+              </span>
+            </motion.div>
+          )}
+          <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/50 rounded-lg">
+            <Clock className="w-4 h-4 text-amber-400" />
+            <span className="text-amber-400 text-sm font-medium">{pendingTasks.length} Pending</span>
+          </div>
         </div>
       </div>
 
-      {/* Pending Tasks */}
-      <div className="space-y-4">
-        {tasks.map((task, index) => (
-          <motion.div
-            key={task.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`p-6 rounded-xl border backdrop-blur-sm transition-all ${
-              task.buzzerActive 
-                ? 'bg-red-500/5 border-red-500/30 animate-pulse' 
-                : 'bg-slate-800/50 border-slate-700/50'
-            }`}
-          >
-            {/* Buzzer Alert */}
-            {task.buzzerActive && (
-              <div className="flex items-center gap-2 mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 0.5 }}
-                >
-                  <Bell className="w-5 h-5 text-red-400" />
-                </motion.div>
-                <span className="text-red-400 font-medium">BUZZER ACTIVE - Action Required</span>
-              </div>
-            )}
-
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-semibold text-white">{task.title}</h3>
-                  <span className={`px-2 py-0.5 rounded text-xs border ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
-                  </span>
-                </div>
-                <p className="text-slate-400 text-sm mb-4">{task.description}</p>
-
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Tag className="w-4 h-4" />
-                    <span>{task.category}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Timer className="w-4 h-4" />
-                    <span>Est. {task.estimatedHours}h • Max {task.maxDeliveryHours}h</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Shield className="w-4 h-4" />
-                    <span>Client: [MASKED] • {task.clientInfo.industry}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {task.techStack.map(tech => (
-                    <span key={tech} className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full border border-cyan-500/30">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2 ml-4">
-                <Button
-                  onClick={() => handleAcceptTask(task)}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Accept & Start
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleRejectTask(task.id)}
-                  className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-                >
-                  <XCircle className="w-4 h-4 mr-2" />
-                  Reject
-                </Button>
-              </div>
+      {/* Promise Legend */}
+      <div className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <Handshake className="w-4 h-4 text-cyan-400" />
+          Promise Status Guide
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          {[
+            { status: 'assigned', label: 'Assigned', color: 'slate' },
+            { status: 'promised', label: 'Promised', color: 'cyan' },
+            { status: 'in_progress', label: 'In Progress', color: 'amber' },
+            { status: 'completed', label: 'Completed', color: 'green' },
+            { status: 'breached', label: 'Breached', color: 'red' },
+          ].map(item => (
+            <div 
+              key={item.status}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-${item.color}-500/20 border border-${item.color}-500/30`}
+            >
+              <div className={`w-2 h-2 rounded-full bg-${item.color}-400`} />
+              <span className={`text-xs text-${item.color}-400`}>{item.label}</span>
             </div>
-          </motion.div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Pending Tasks Section */}
+      {pendingTasks.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-400" />
+            Pending Tasks ({pendingTasks.length})
+          </h2>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {pendingTasks.map((task) => (
+              <div key={task.id} className="relative">
+                {/* Buzzer Alert Overlay */}
+                {task.buzzerActive && (
+                  <motion.div
+                    className="absolute -inset-1 bg-red-500/20 rounded-2xl z-0"
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ repeat: Infinity, duration: 1 }}
+                  />
+                )}
+                <div className="relative z-10">
+                  <PromiseTaskCard
+                    task={{
+                      ...task,
+                      clientMasked: `[MASKED] • ${task.clientInfo.industry}`,
+                    }}
+                    onPromiseStart={handlePromiseStart}
+                    onPromiseComplete={handlePromiseComplete}
+                    showTimer={false}
+                  />
+                  {/* Reject Button */}
+                  <div className="mt-2 flex justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleRejectTask(task.id)}
+                      className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Reject Task
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Active Tasks Section */}
+      {activeTasks.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Timer className="w-5 h-5 text-cyan-400" />
+            Active Promises ({activeTasks.length})
+          </h2>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {activeTasks.map((task) => (
+              <PromiseTaskCard
+                key={task.id}
+                task={{
+                  ...task,
+                  clientMasked: `[MASKED] • ${task.clientInfo.industry}`,
+                }}
+                onPromiseStart={handlePromiseStart}
+                onPromiseComplete={handlePromiseComplete}
+                showTimer={true}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Completed Tasks Section */}
+      {completedTasks.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            Completed Today ({completedTasks.length})
+          </h2>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {completedTasks.map((task) => (
+              <PromiseTaskCard
+                key={task.id}
+                task={{
+                  ...task,
+                  clientMasked: `[MASKED] • ${task.clientInfo.industry}`,
+                }}
+                showTimer={false}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {tasks.length === 0 && (
         <div className="text-center py-12">
@@ -201,74 +281,6 @@ const DevTaskAssignment = () => {
           <p className="text-slate-400">No pending tasks at the moment.</p>
         </div>
       )}
-
-      {/* Promise Modal */}
-      <AnimatePresence>
-        {showPromiseModal && selectedTask && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowPromiseModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-lg p-6 bg-slate-900 border border-cyan-500/30 rounded-2xl"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-8 h-8 text-cyan-400" />
-                </div>
-                <h2 className="text-xl font-bold text-white">Promise & Start</h2>
-                <p className="text-slate-400 text-sm mt-2">Review and accept the task terms</p>
-              </div>
-
-              <div className="p-4 bg-slate-800/50 rounded-lg mb-4">
-                <h3 className="font-semibold text-white mb-2">{selectedTask.title}</h3>
-                <div className="text-sm text-slate-400 space-y-1">
-                  <p>• Maximum delivery time: <span className="text-amber-400">{selectedTask.maxDeliveryHours} hours</span></p>
-                  <p>• Timer starts immediately upon acceptance</p>
-                  <p>• Late delivery affects performance score</p>
-                  <p>• Pause allowed only with valid justification</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg mb-6">
-                <Checkbox
-                  id="agree"
-                  checked={agreedToTerms}
-                  onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-                />
-                <label htmlFor="agree" className="text-sm text-slate-300 cursor-pointer">
-                  I agree to complete this task within the specified time. I understand that late delivery or abandonment will affect my performance score and may result in penalties.
-                </label>
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowPromiseModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 bg-emerald-500 hover:bg-emerald-600"
-                  disabled={!agreedToTerms}
-                  onClick={handlePromiseAndStart}
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  I Promise & Start
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

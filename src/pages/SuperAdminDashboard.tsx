@@ -12,6 +12,7 @@ import SecurityCenter from "@/components/admin/SecurityCenter";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 import GlobalLiveControlCenter from "@/components/admin/GlobalLiveControlCenter";
 import GlobalBranchMap from "@/components/admin/GlobalBranchMap";
+import GlobalPromiseStatus from "@/components/admin/GlobalPromiseStatus";
 import WalletFinanceConsole from "@/components/admin/WalletFinanceConsole";
 import LeadDistributionHub from "@/components/admin/LeadDistributionHub";
 import DeveloperTaskOrchestration from "@/components/admin/DeveloperTaskOrchestration";
@@ -19,7 +20,7 @@ import PerformanceScoringAI from "@/components/admin/PerformanceScoringAI";
 import ComplianceLegalShield from "@/components/admin/ComplianceLegalShield";
 import EmergencyBuzzerControls from "@/components/admin/EmergencyBuzzerControls";
 
-type AdminView = 
+type AdminView =
   | "overview"
   | "roles"
   | "users"
@@ -57,13 +58,16 @@ const SuperAdminDashboard = () => {
     switch (activeView) {
       case "live-control":
         return (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-[calc(100vh-140px)]">
-            <div className="overflow-auto">
-              <GlobalLiveControlCenter />
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <div className="overflow-auto max-h-[600px]">
+                <GlobalLiveControlCenter />
+              </div>
+              <div className="h-[600px]">
+                <GlobalBranchMap />
+              </div>
             </div>
-            <div className="h-full min-h-[600px]">
-              <GlobalBranchMap />
-            </div>
+            <GlobalPromiseStatus />
           </div>
         );
       case "overview":

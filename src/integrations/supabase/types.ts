@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      buzzer_queue: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          auto_escalate_after: number | null
+          created_at: string
+          escalation_level: number | null
+          id: string
+          lead_id: string | null
+          priority: string | null
+          region: string | null
+          role_target: Database["public"]["Enums"]["app_role"] | null
+          status: string | null
+          task_id: string | null
+          trigger_type: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          auto_escalate_after?: number | null
+          created_at?: string
+          escalation_level?: number | null
+          id?: string
+          lead_id?: string | null
+          priority?: string | null
+          region?: string | null
+          role_target?: Database["public"]["Enums"]["app_role"] | null
+          status?: string | null
+          task_id?: string | null
+          trigger_type: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          auto_escalate_after?: number | null
+          created_at?: string
+          escalation_level?: number | null
+          id?: string
+          lead_id?: string | null
+          priority?: string | null
+          region?: string | null
+          role_target?: Database["public"]["Enums"]["app_role"] | null
+          status?: string | null
+          task_id?: string | null
+          trigger_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buzzer_queue_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dedicated_support_messages: {
         Row: {
           attachments: Json | null
@@ -3296,6 +3352,96 @@ export type Database = {
           },
         ]
       }
+      legal_logs: {
+        Row: {
+          action_type: string
+          compliance_flag: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          module_affected: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          compliance_flag?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          module_affected?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          compliance_flag?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          module_affected?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      marketing_campaigns: {
+        Row: {
+          budget: number | null
+          channel: string
+          conversion_rate: number | null
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          franchise_id: string | null
+          id: string
+          influencer_id: string | null
+          leads_generated: number | null
+          name: string
+          spent: number | null
+          start_date: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          budget?: number | null
+          channel: string
+          conversion_rate?: number | null
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          franchise_id?: string | null
+          id?: string
+          influencer_id?: string | null
+          leads_generated?: number | null
+          name: string
+          spent?: number | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          budget?: number | null
+          channel?: string
+          conversion_rate?: number | null
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          franchise_id?: string | null
+          id?: string
+          influencer_id?: string | null
+          leads_generated?: number | null
+          name?: string
+          spent?: number | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payout_records: {
         Row: {
           amount: number
@@ -3423,6 +3569,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      permissions: {
+        Row: {
+          admin_access: boolean | null
+          created_at: string
+          id: string
+          module_name: string
+          read_access: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          write_access: boolean | null
+        }
+        Insert: {
+          admin_access?: boolean | null
+          created_at?: string
+          id?: string
+          module_name: string
+          read_access?: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          write_access?: boolean | null
+        }
+        Update: {
+          admin_access?: boolean | null
+          created_at?: string
+          id?: string
+          module_name?: string
+          read_access?: boolean | null
+          role?: Database["public"]["Enums"]["app_role"]
+          write_access?: boolean | null
+        }
+        Relationships: []
       }
       prime_feature_access: {
         Row: {
@@ -3819,6 +3995,123 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      promise_logs: {
+        Row: {
+          acknowledged_at: string | null
+          breach_reason: string | null
+          created_at: string
+          deadline: string
+          developer_id: string
+          extended_by: string | null
+          extended_count: number | null
+          extended_deadline: string | null
+          finished_time: string | null
+          id: string
+          promise_time: string
+          score_effect: number | null
+          status: Database["public"]["Enums"]["promise_status"]
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          breach_reason?: string | null
+          created_at?: string
+          deadline: string
+          developer_id: string
+          extended_by?: string | null
+          extended_count?: number | null
+          extended_deadline?: string | null
+          finished_time?: string | null
+          id?: string
+          promise_time?: string
+          score_effect?: number | null
+          status?: Database["public"]["Enums"]["promise_status"]
+          task_id: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          breach_reason?: string | null
+          created_at?: string
+          deadline?: string
+          developer_id?: string
+          extended_by?: string | null
+          extended_count?: number | null
+          extended_deadline?: string | null
+          finished_time?: string | null
+          id?: string
+          promise_time?: string
+          score_effect?: number | null
+          status?: Database["public"]["Enums"]["promise_status"]
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promise_logs_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promise_logs_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rd_ideas: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          implementation_notes: string | null
+          priority: string | null
+          status: string | null
+          submitted_by: string | null
+          title: string
+          updated_at: string
+          votes: number | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          implementation_notes?: string | null
+          priority?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          title: string
+          updated_at?: string
+          votes?: number | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          implementation_notes?: string | null
+          priority?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          title?: string
+          updated_at?: string
+          votes?: number | null
+        }
+        Relationships: []
       }
       rental_activity: {
         Row: {
@@ -4883,11 +5176,19 @@ export type Database = {
       can_manage_prime_users: { Args: { _user_id: string }; Returns: boolean }
       can_manage_resellers: { Args: { _user_id: string }; Returns: boolean }
       can_view_leads: { Args: { _user_id: string }; Returns: boolean }
+      exceeds_workload_threshold: {
+        Args: { _developer_id: string }
+        Returns: boolean
+      }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
       get_franchise_id: { Args: { _user_id: string }; Returns: string }
       get_influencer_id: { Args: { _user_id: string }; Returns: string }
       get_prime_user_id: { Args: { _user_id: string }; Returns: string }
       get_reseller_id: { Args: { _user_id: string }; Returns: string }
+      has_overlapping_promise: {
+        Args: { _deadline: string; _developer_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4952,6 +5253,12 @@ export type Database = {
         | "negotiation"
         | "closed_won"
         | "closed_lost"
+      promise_status:
+        | "assigned"
+        | "promised"
+        | "in_progress"
+        | "breached"
+        | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5134,6 +5441,13 @@ export const Constants = {
         "negotiation",
         "closed_won",
         "closed_lost",
+      ],
+      promise_status: [
+        "assigned",
+        "promised",
+        "in_progress",
+        "breached",
+        "completed",
       ],
     },
   },
