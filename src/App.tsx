@@ -23,11 +23,13 @@ import AccessDenied from "./pages/auth/AccessDenied";
 
 // Super Admin Pages
 import SuperAdminDashboard from "./pages/super-admin/Dashboard";
+import SuperAdminCommandCenter from "./pages/super-admin/CommandCenter";
 import LiveTracking from "./pages/super-admin/LiveTracking";
 import RoleManager from "./pages/super-admin/RoleManager";
 import UserManager from "./pages/super-admin/UserManager";
 import PermissionMatrix from "./pages/super-admin/PermissionMatrix";
 import SecurityCenter from "./pages/super-admin/SecurityCenter";
+import AuthGateway from "./pages/auth/AuthGateway";
 
 // Franchise Layout & Pages
 import FranchiseLayout from "./components/layouts/FranchiseLayout";
@@ -111,8 +113,9 @@ const App = () => (
               <Route path="/access-denied" element={<AccessDenied />} />
 
               {/* Super Admin Routes */}
-              <Route path="/super-admin" element={<SuperAdminDashboard />} />
-              <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+              <Route path="/super-admin" element={<SuperAdminCommandCenter />} />
+              <Route path="/super-admin/dashboard" element={<SuperAdminCommandCenter />} />
+              <Route path="/super-admin/command-center" element={<SuperAdminCommandCenter />} />
               <Route path="/super-admin/live-tracking" element={<LiveTracking />} />
               <Route path="/super-admin/role-manager" element={<RoleManager />} />
               <Route path="/super-admin/user-manager" element={<UserManager />} />
