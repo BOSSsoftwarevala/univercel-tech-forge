@@ -40,7 +40,7 @@ import PersonalChat from "./pages/PersonalChat";
 import UnifiedSecurityCenter from "./components/security/UnifiedSecurityCenter";
 import DomainProtection from "./components/security/DomainProtection";
 import PendingItemsSuggestion from "./components/shared/PendingItemsSuggestion";
-import FloatingAIChatbot from "./components/shared/FloatingAIChatbot";
+import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -52,8 +52,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <PendingItemsSuggestion />
-          <FloatingAIChatbot />
           <BrowserRouter>
+            <FloatingAIChatbotWrapper />
             <Routes>
               <Route path="/" element={<Homepage />} />
               <Route path="/auth" element={<Auth />} />
