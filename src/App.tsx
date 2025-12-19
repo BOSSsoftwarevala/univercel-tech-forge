@@ -13,6 +13,7 @@ import ResellerDashboard from "./pages/ResellerDashboard";
 import DeveloperDashboard from "./pages/DeveloperDashboard";
 import InfluencerDashboard from "./pages/InfluencerDashboard";
 import SupportDashboard from "./pages/SupportDashboard";
+import SEODashboard from "./pages/SEODashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
           <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
           <Route path="/support-dashboard" element={<SupportDashboard />} />
+          <Route path="/seo-dashboard" element={<SEODashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
