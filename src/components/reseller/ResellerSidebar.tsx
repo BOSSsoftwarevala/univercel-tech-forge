@@ -31,16 +31,13 @@ const sidebarItems = [
   { id: 'scripts', label: 'AI Sales Script', icon: Bot },
   { id: 'wallet', label: 'Wallet & Commission', icon: Wallet },
   { id: 'chat', label: 'Customer Chat', icon: MessageSquare, badge: 5 },
-  { id: 'products', label: 'Product Library', icon: Package },
   { id: 'marketing', label: 'Marketing Toolkit', icon: Megaphone },
-  { id: 'followup', label: 'Follow-Up Manager', icon: Clock },
+  { id: 'targets', label: 'Targets & Goals', icon: Target },
   { id: 'performance', label: 'Performance Board', icon: BarChart3 },
-  { id: 'escalation', label: 'Escalation', icon: HeadphonesIcon },
+  { id: 'escalations', label: 'Escalations', icon: HeadphonesIcon },
   { id: 'territory', label: 'Territory View', icon: MapPin },
-  { id: 'incentives', label: 'Incentives', icon: Award },
   { id: 'training', label: 'Micro Training', icon: GraduationCap },
-  { id: 'leadpool', label: 'Shared Lead Pool', icon: Target },
-  { id: 'orders', label: 'Lead to Order', icon: ShoppingCart },
+  { id: 'incentives', label: 'Incentives', icon: Award },
   { id: 'compliance', label: 'Compliance', icon: Shield }
 ];
 

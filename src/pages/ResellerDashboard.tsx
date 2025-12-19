@@ -184,6 +184,8 @@ const ResellerDashboard = () => {
       case 'marketing': return <MarketingToolkit />;
       case 'performance': return <ResellerPerformanceBoard />;
       case 'training': return <MicroTrainingLessons />;
+      case 'escalations': return <ResellerEscalations />;
+      case 'targets': return <ResellerTargets />;
       default: return <CommandOverview />;
     }
   };
