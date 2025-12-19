@@ -28,8 +28,8 @@ export function AdaptiveMotion({
 
   // Disable animations in low-data mode
   if (lowDataMode && disableInLowData) {
-    const { className, style, id } = props;
-    return <div className={className} style={style} id={id}>{children}</div>;
+    const { className, id } = props;
+    return <div className={className} id={id}>{children}</div>;
   }
 
   return (

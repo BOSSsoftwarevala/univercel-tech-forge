@@ -133,13 +133,13 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 /**
  * Lazy component wrapper with automatic code splitting
  */
-export function lazyLoad<P extends object>(
-  importFn: () => Promise<{ default: React.ComponentType<P> }>,
+export function lazyLoad(
+  importFn: () => Promise<{ default: React.ComponentType<Record<string, unknown>> }>,
   fallback?: React.ReactNode
 ) {
   const LazyComponent = React.lazy(importFn);
 
-  return function LazyLoadedComponent(props: P) {
+  return function LazyLoadedComponent(props: Record<string, unknown>) {
     return (
       <ProgressiveLoader fallback={fallback || <SkeletonList />}>
         <LazyComponent {...props} />
