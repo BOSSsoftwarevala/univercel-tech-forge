@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Sidebar from "@/components/layout/Sidebar";
 import { RnDTopBar } from "@/components/rnd/RnDTopBar";
 import { FutureLab } from "@/components/rnd/FutureLab";
 import { PrototypeBuilder } from "@/components/rnd/PrototypeBuilder";
@@ -9,6 +8,7 @@ import { FeedbackPortal } from "@/components/rnd/FeedbackPortal";
 import { DecisionBoard } from "@/components/rnd/DecisionBoard";
 import { RnDNotifications } from "@/components/rnd/RnDNotifications";
 import { RnDWallet } from "@/components/rnd/RnDWallet";
+import { RnDSidebar } from "@/components/rnd/RnDSidebar";
 import { motion } from "framer-motion";
 
 const RnDDashboard = () => {
@@ -84,11 +84,11 @@ const RnDDashboard = () => {
               <stop offset="100%" stopColor="#06b6d4" />
             </linearGradient>
           </defs>
-        </svg>
-      </div>
+      </svg>
+    </div>
 
-      <Sidebar />
-      
+    <RnDSidebar />
+    
       <main className="flex-1 flex flex-col relative z-10">
         <RnDTopBar activeTab={activeTab} onTabChange={setActiveTab} />
         
