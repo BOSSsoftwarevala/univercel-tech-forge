@@ -8,6 +8,8 @@ import Dashboard from "./pages/Index";
 import FranchiseManagement from "./pages/FranchiseManagement";
 import FranchiseLanding from "./pages/FranchiseLanding";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
+import ResellerLanding from "./pages/ResellerLanding";
+import ResellerDashboard from "./pages/ResellerDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/franchise" element={<FranchiseManagement />} />
           <Route path="/franchise-program" element={<FranchiseLanding />} />
           <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
+          <Route path="/reseller-program" element={<ResellerLanding />} />
+          <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
