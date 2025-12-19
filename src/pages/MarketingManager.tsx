@@ -10,6 +10,7 @@ import PerformanceAnalyticsHub from "@/components/marketing/PerformanceAnalytics
 import ContentCreativeLibrary from "@/components/marketing/ContentCreativeLibrary";
 import TerritoryIntelligence from "@/components/marketing/TerritoryIntelligence";
 import MarketingNotifications from "@/components/marketing/MarketingNotifications";
+import AICampaignOptimizer from "@/components/marketing/AICampaignOptimizer";
 
 const MarketingManager = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -45,6 +46,8 @@ const MarketingManager = () => {
         return <ContentCreativeLibrary />;
       case "territory":
         return <TerritoryIntelligence fullView />;
+      case "ai-optimizer":
+        return <AICampaignOptimizer />;
       default:
         return <CampaignCommandCenter />;
     }

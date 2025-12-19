@@ -9,7 +9,8 @@ import {
   FolderOpen, 
   Globe,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Brain
 } from "lucide-react";
 
 interface MarketingSidebarProps {
@@ -21,6 +22,7 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "campaigns", label: "Campaigns", icon: Rocket },
+    { id: "ai-optimizer", label: "AI Optimizer", icon: Brain },
     { id: "leads", label: "Lead Engine", icon: TrendingUp },
     { id: "influencers", label: "Influencer Hub", icon: Users },
     { id: "automation", label: "Automation", icon: Zap },
