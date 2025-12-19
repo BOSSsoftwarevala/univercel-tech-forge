@@ -1525,6 +1525,723 @@ export type Database = {
           },
         ]
       }
+      influencer_accounts: {
+        Row: {
+          city: string | null
+          commission_tier: string | null
+          country: string | null
+          cpa_rate: number | null
+          cpc_rate: number | null
+          cpl_rate: number | null
+          created_at: string
+          email: string
+          fraud_score: number | null
+          full_name: string
+          id: string
+          is_suspended: boolean | null
+          joined_at: string | null
+          kyc_documents: Json | null
+          kyc_status: string | null
+          masked_email: string | null
+          masked_phone: string | null
+          phone: string | null
+          region: string | null
+          social_platforms: Json | null
+          status: string | null
+          suspended_at: string | null
+          suspension_reason: string | null
+          total_clicks: number | null
+          total_conversions: number | null
+          total_earned: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          commission_tier?: string | null
+          country?: string | null
+          cpa_rate?: number | null
+          cpc_rate?: number | null
+          cpl_rate?: number | null
+          created_at?: string
+          email: string
+          fraud_score?: number | null
+          full_name: string
+          id?: string
+          is_suspended?: boolean | null
+          joined_at?: string | null
+          kyc_documents?: Json | null
+          kyc_status?: string | null
+          masked_email?: string | null
+          masked_phone?: string | null
+          phone?: string | null
+          region?: string | null
+          social_platforms?: Json | null
+          status?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          total_clicks?: number | null
+          total_conversions?: number | null
+          total_earned?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          commission_tier?: string | null
+          country?: string | null
+          cpa_rate?: number | null
+          cpc_rate?: number | null
+          cpl_rate?: number | null
+          created_at?: string
+          email?: string
+          fraud_score?: number | null
+          full_name?: string
+          id?: string
+          is_suspended?: boolean | null
+          joined_at?: string | null
+          kyc_documents?: Json | null
+          kyc_status?: string | null
+          masked_email?: string | null
+          masked_phone?: string | null
+          phone?: string | null
+          region?: string | null
+          social_platforms?: Json | null
+          status?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          total_clicks?: number | null
+          total_conversions?: number | null
+          total_earned?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      influencer_audit_trail: {
+        Row: {
+          action: string
+          action_type: string
+          created_at: string
+          details: string | null
+          id: string
+          influencer_id: string
+          ip_address: string | null
+          metadata: Json | null
+          performed_by: string | null
+          performer_role: Database["public"]["Enums"]["app_role"] | null
+        }
+        Insert: {
+          action: string
+          action_type: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          influencer_id: string
+          ip_address?: string | null
+          metadata?: Json | null
+          performed_by?: string | null
+          performer_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Update: {
+          action?: string
+          action_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          influencer_id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          performed_by?: string | null
+          performer_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_audit_trail_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_campaign_map: {
+        Row: {
+          achieved_clicks: number | null
+          achieved_conversions: number | null
+          assigned_by: string | null
+          bonus_amount: number | null
+          campaign_name: string
+          campaign_type: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          influencer_id: string
+          product_category: string | null
+          start_date: string
+          status: string | null
+          target_clicks: number | null
+          target_conversions: number | null
+        }
+        Insert: {
+          achieved_clicks?: number | null
+          achieved_conversions?: number | null
+          assigned_by?: string | null
+          bonus_amount?: number | null
+          campaign_name: string
+          campaign_type?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          influencer_id: string
+          product_category?: string | null
+          start_date: string
+          status?: string | null
+          target_clicks?: number | null
+          target_conversions?: number | null
+        }
+        Update: {
+          achieved_clicks?: number | null
+          achieved_conversions?: number | null
+          assigned_by?: string | null
+          bonus_amount?: number | null
+          campaign_name?: string
+          campaign_type?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          influencer_id?: string
+          product_category?: string | null
+          start_date?: string
+          status?: string | null
+          target_clicks?: number | null
+          target_conversions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_campaign_map_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_click_logs: {
+        Row: {
+          browser: string | null
+          campaign_id: string | null
+          city: string | null
+          clicked_at: string
+          country: string | null
+          device_type: string | null
+          fraud_reason: string | null
+          fraud_score: number | null
+          id: string
+          influencer_id: string
+          ip_address: string | null
+          is_bot: boolean | null
+          is_fraud: boolean | null
+          is_unique: boolean | null
+          tracking_link: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          browser?: string | null
+          campaign_id?: string | null
+          city?: string | null
+          clicked_at?: string
+          country?: string | null
+          device_type?: string | null
+          fraud_reason?: string | null
+          fraud_score?: number | null
+          id?: string
+          influencer_id: string
+          ip_address?: string | null
+          is_bot?: boolean | null
+          is_fraud?: boolean | null
+          is_unique?: boolean | null
+          tracking_link: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          browser?: string | null
+          campaign_id?: string | null
+          city?: string | null
+          clicked_at?: string
+          country?: string | null
+          device_type?: string | null
+          fraud_reason?: string | null
+          fraud_score?: number | null
+          id?: string
+          influencer_id?: string
+          ip_address?: string | null
+          is_bot?: boolean | null
+          is_fraud?: boolean | null
+          is_unique?: boolean | null
+          tracking_link?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_click_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_campaign_map"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_click_logs_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_conversion_logs: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          campaign_id: string | null
+          click_id: string | null
+          commission_amount: number
+          commission_rate: number
+          commission_type: string | null
+          conversion_type: string | null
+          created_at: string
+          credited_at: string | null
+          id: string
+          influencer_id: string
+          product_category: string | null
+          sale_amount: number | null
+          status: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          campaign_id?: string | null
+          click_id?: string | null
+          commission_amount: number
+          commission_rate: number
+          commission_type?: string | null
+          conversion_type?: string | null
+          created_at?: string
+          credited_at?: string | null
+          id?: string
+          influencer_id: string
+          product_category?: string | null
+          sale_amount?: number | null
+          status?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          campaign_id?: string | null
+          click_id?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          commission_type?: string | null
+          conversion_type?: string | null
+          created_at?: string
+          credited_at?: string | null
+          id?: string
+          influencer_id?: string
+          product_category?: string | null
+          sale_amount?: number | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_conversion_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_campaign_map"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_conversion_logs_click_id_fkey"
+            columns: ["click_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_click_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_conversion_logs_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_payout_requests: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          bank_details: Json | null
+          created_at: string
+          id: string
+          influencer_id: string
+          payment_method: string | null
+          processed_at: string | null
+          rejection_reason: string | null
+          requested_at: string | null
+          status: string | null
+          transaction_ref: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          bank_details?: Json | null
+          created_at?: string
+          id?: string
+          influencer_id: string
+          payment_method?: string | null
+          processed_at?: string | null
+          rejection_reason?: string | null
+          requested_at?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          bank_details?: Json | null
+          created_at?: string
+          id?: string
+          influencer_id?: string
+          payment_method?: string | null
+          processed_at?: string | null
+          rejection_reason?: string | null
+          requested_at?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_payout_requests_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_performance_metrics: {
+        Row: {
+          bot_clicks: number | null
+          conversion_rate: number | null
+          conversions: number | null
+          country_breakdown: Json | null
+          created_at: string
+          earnings: number | null
+          fraud_clicks: number | null
+          fraud_score: number | null
+          id: string
+          influencer_id: string
+          metric_date: string
+          platform_breakdown: Json | null
+          tier_progress: number | null
+          total_clicks: number | null
+          unique_clicks: number | null
+        }
+        Insert: {
+          bot_clicks?: number | null
+          conversion_rate?: number | null
+          conversions?: number | null
+          country_breakdown?: Json | null
+          created_at?: string
+          earnings?: number | null
+          fraud_clicks?: number | null
+          fraud_score?: number | null
+          id?: string
+          influencer_id: string
+          metric_date: string
+          platform_breakdown?: Json | null
+          tier_progress?: number | null
+          total_clicks?: number | null
+          unique_clicks?: number | null
+        }
+        Update: {
+          bot_clicks?: number | null
+          conversion_rate?: number | null
+          conversions?: number | null
+          country_breakdown?: Json | null
+          created_at?: string
+          earnings?: number | null
+          fraud_clicks?: number | null
+          fraud_score?: number | null
+          id?: string
+          influencer_id?: string
+          metric_date?: string
+          platform_breakdown?: Json | null
+          tier_progress?: number | null
+          total_clicks?: number | null
+          unique_clicks?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_performance_metrics_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_referral_links: {
+        Row: {
+          campaign_id: string | null
+          conversions: number | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          influencer_id: string
+          is_active: boolean | null
+          original_url: string
+          product_category: string | null
+          short_code: string
+          total_clicks: number | null
+          tracking_url: string
+          unique_clicks: number | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          conversions?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          influencer_id: string
+          is_active?: boolean | null
+          original_url: string
+          product_category?: string | null
+          short_code: string
+          total_clicks?: number | null
+          tracking_url: string
+          unique_clicks?: number | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          conversions?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          influencer_id?: string
+          is_active?: boolean | null
+          original_url?: string
+          product_category?: string | null
+          short_code?: string
+          total_clicks?: number | null
+          tracking_url?: string
+          unique_clicks?: number | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_referral_links_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_campaign_map"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_referral_links_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_support_tickets: {
+        Row: {
+          assigned_to: string | null
+          attachments: Json | null
+          category: string | null
+          created_at: string
+          description: string
+          escalated_to: string | null
+          escalation_level: number | null
+          id: string
+          influencer_id: string
+          priority: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          subject: string
+          ticket_number: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          attachments?: Json | null
+          category?: string | null
+          created_at?: string
+          description: string
+          escalated_to?: string | null
+          escalation_level?: number | null
+          id?: string
+          influencer_id: string
+          priority?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          subject: string
+          ticket_number: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          attachments?: Json | null
+          category?: string | null
+          created_at?: string
+          description?: string
+          escalated_to?: string | null
+          escalation_level?: number | null
+          id?: string
+          influencer_id?: string
+          priority?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          subject?: string
+          ticket_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_support_tickets_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_wallet: {
+        Row: {
+          available_balance: number | null
+          created_at: string
+          id: string
+          influencer_id: string
+          last_payout_at: string | null
+          pending_balance: number | null
+          total_earned: number | null
+          total_penalties: number | null
+          total_withdrawn: number | null
+          updated_at: string
+        }
+        Insert: {
+          available_balance?: number | null
+          created_at?: string
+          id?: string
+          influencer_id: string
+          last_payout_at?: string | null
+          pending_balance?: number | null
+          total_earned?: number | null
+          total_penalties?: number | null
+          total_withdrawn?: number | null
+          updated_at?: string
+        }
+        Update: {
+          available_balance?: number | null
+          created_at?: string
+          id?: string
+          influencer_id?: string
+          last_payout_at?: string | null
+          pending_balance?: number | null
+          total_earned?: number | null
+          total_penalties?: number | null
+          total_withdrawn?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_wallet_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: true
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_wallet_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          influencer_id: string
+          reference_id: string | null
+          reference_type: string | null
+          status: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          influencer_id: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          influencer_id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_wallet_ledger_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -3058,11 +3775,13 @@ export type Database = {
       can_manage_demos: { Args: { _user_id: string }; Returns: boolean }
       can_manage_developers: { Args: { _user_id: string }; Returns: boolean }
       can_manage_franchises: { Args: { _user_id: string }; Returns: boolean }
+      can_manage_influencers: { Args: { _user_id: string }; Returns: boolean }
       can_manage_leads: { Args: { _user_id: string }; Returns: boolean }
       can_manage_resellers: { Args: { _user_id: string }; Returns: boolean }
       can_view_leads: { Args: { _user_id: string }; Returns: boolean }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
       get_franchise_id: { Args: { _user_id: string }; Returns: string }
+      get_influencer_id: { Args: { _user_id: string }; Returns: string }
       get_reseller_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -3072,6 +3791,7 @@ export type Database = {
         Returns: boolean
       }
       is_franchise: { Args: { _user_id: string }; Returns: boolean }
+      is_influencer: { Args: { _user_id: string }; Returns: boolean }
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -3083,6 +3803,8 @@ export type Database = {
         | "client"
         | "prime"
         | "developer"
+        | "influencer"
+        | "marketing_manager"
       demo_status: "active" | "inactive" | "maintenance" | "down"
       demo_tech_stack:
         | "php"
@@ -3258,6 +3980,8 @@ export const Constants = {
         "client",
         "prime",
         "developer",
+        "influencer",
+        "marketing_manager",
       ],
       demo_status: ["active", "inactive", "maintenance", "down"],
       demo_tech_stack: [

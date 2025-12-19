@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Link2, Megaphone, Video, Palette, 
   Users, Wallet, Bell, Sparkles, MousePointer, Shield,
-  Image, Trophy, PieChart, FileText, GraduationCap, Gift
+  Image, Trophy, PieChart, FileText, GraduationCap, Gift,
+  HeadphonesIcon, BarChart3
 } from 'lucide-react';
 import InfluencerTopBar from '@/components/influencer/InfluencerTopBar';
 import InfluencerMetrics from '@/components/influencer/InfluencerMetrics';
@@ -22,11 +23,15 @@ import AudienceInsights from '@/components/influencer/AudienceInsights';
 import CompliancePolicy from '@/components/influencer/CompliancePolicy';
 import TrainingAcademy from '@/components/influencer/TrainingAcademy';
 import OfferPromoCenter from '@/components/influencer/OfferPromoCenter';
+import InfluencerSupportTickets from '@/components/influencer/InfluencerSupportTickets';
+import InfluencerWalletScreen from '@/components/influencer/InfluencerWalletScreen';
+import InfluencerPerformanceRating from '@/components/influencer/InfluencerPerformanceRating';
+import InfluencerCampaignHub from '@/components/influencer/InfluencerCampaignHub';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'create-link', label: 'Create Link', icon: Link2 },
-  { id: 'campaigns', label: 'Campaign Manager', icon: Megaphone },
+  { id: 'campaigns', label: 'Campaign Hub', icon: Megaphone },
   { id: 'click-tracker', label: 'Live Clicks', icon: MousePointer },
   { id: 'fraud-guard', label: 'AI Fraud Guard', icon: Shield, badge: 'AI' },
   { id: 'videos', label: 'Short Videos / Reels', icon: Video },
@@ -35,7 +40,9 @@ const menuItems = [
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
   { id: 'audience', label: 'Audience Insights', icon: PieChart },
   { id: 'leads', label: 'Leads & Conversion', icon: Users },
-  { id: 'wallet', label: 'Wallet', icon: Wallet },
+  { id: 'wallet', label: 'Wallet & Payouts', icon: Wallet },
+  { id: 'performance', label: 'Performance', icon: BarChart3 },
+  { id: 'support', label: 'Support', icon: HeadphonesIcon },
   { id: 'offers', label: 'Offers & Promos', icon: Gift },
   { id: 'compliance', label: 'Compliance', icon: FileText },
   { id: 'training', label: 'Training Academy', icon: GraduationCap },
@@ -50,7 +57,7 @@ const InfluencerDashboard = () => {
     switch (activeSection) {
       case 'dashboard': return <InfluencerMetrics />;
       case 'create-link': return <LinkCreator />;
-      case 'campaigns': return <CampaignManager />;
+      case 'campaigns': return <InfluencerCampaignHub />;
       case 'click-tracker': return <LiveClickTracker />;
       case 'fraud-guard': return <AIFraudGuard />;
       case 'videos': return <VideoReelsManager />;
@@ -58,8 +65,10 @@ const InfluencerDashboard = () => {
       case 'assets': return <VisualAssetLibrary />;
       case 'leaderboard': return <LeaderboardRewards />;
       case 'audience': return <AudienceInsights />;
-      case 'leads':
-      case 'wallet': return <LeadsWallet activeTab={activeSection} />;
+      case 'leads': return <LeadsWallet activeTab={activeSection} />;
+      case 'wallet': return <InfluencerWalletScreen />;
+      case 'performance': return <InfluencerPerformanceRating />;
+      case 'support': return <InfluencerSupportTickets />;
       case 'offers': return <OfferPromoCenter />;
       case 'compliance': return <CompliancePolicy />;
       case 'training': return <TrainingAcademy />;
