@@ -8,6 +8,28 @@ import Homepage from "./pages/Homepage";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Index";
 import CategoryOnboarding from "./pages/CategoryOnboarding";
+import NotFound from "./pages/NotFound";
+
+// Auth Pages
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Logout from "./pages/auth/Logout";
+import OTPVerify from "./pages/auth/OTPVerify";
+import DeviceVerify from "./pages/auth/DeviceVerify";
+import IPVerify from "./pages/auth/IPVerify";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import AccountSuspension from "./pages/auth/AccountSuspension";
+import AccessDenied from "./pages/auth/AccessDenied";
+
+// Super Admin Pages
+import SuperAdminDashboard from "./pages/super-admin/Dashboard";
+import LiveTracking from "./pages/super-admin/LiveTracking";
+import RoleManager from "./pages/super-admin/RoleManager";
+import UserManager from "./pages/super-admin/UserManager";
+import PermissionMatrix from "./pages/super-admin/PermissionMatrix";
+import SecurityCenter from "./pages/super-admin/SecurityCenter";
+
+// Existing Pages
 import FranchiseManagement from "./pages/FranchiseManagement";
 import FranchiseLanding from "./pages/FranchiseLanding";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
@@ -24,7 +46,6 @@ import RnDDashboard from "./pages/RnDDashboard";
 import ClientSuccessDashboard from "./pages/ClientSuccessDashboard";
 import PerformanceManager from "./pages/PerformanceManager";
 import FinanceManager from "./pages/FinanceManager";
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import ProductDemoManager from "./pages/ProductDemoManager";
 import PrimeUserDashboard from "./pages/PrimeUserDashboard";
 import LegalComplianceManager from "./pages/LegalComplianceManager";
@@ -37,11 +58,10 @@ import APIIntegrationDashboard from "./pages/APIIntegrationDashboard";
 import ApplyPortal from "./pages/ApplyPortal";
 import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
-import UnifiedSecurityCenter from "./components/security/UnifiedSecurityCenter";
 import DomainProtection from "./components/security/DomainProtection";
 import PendingItemsSuggestion from "./components/shared/PendingItemsSuggestion";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
-import NotFound from "./pages/NotFound";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -55,44 +75,86 @@ const App = () => (
           <BrowserRouter>
             <FloatingAIChatbotWrapper />
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<Homepage />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
+              <Route path="/apply" element={<ApplyPortal />} />
+
+              {/* Global Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/logout" element={<Logout />} />
+              <Route path="/otp-verify" element={<OTPVerify />} />
+              <Route path="/device-verify" element={<DeviceVerify />} />
+              <Route path="/ip-verify" element={<IPVerify />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/account-suspension" element={<AccountSuspension />} />
+              <Route path="/access-denied" element={<AccessDenied />} />
+
+              {/* Super Admin Routes */}
+              <Route path="/super-admin" element={<SuperAdminDashboard />} />
+              <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+              <Route path="/super-admin/live-tracking" element={<LiveTracking />} />
+              <Route path="/super-admin/role-manager" element={<RoleManager />} />
+              <Route path="/super-admin/user-manager" element={<UserManager />} />
+              <Route path="/super-admin/permission-matrix" element={<PermissionMatrix />} />
+              <Route path="/super-admin/security-center" element={<SecurityCenter />} />
+              <Route path="/super-admin/demo-manager" element={<ProductDemoManager />} />
+              <Route path="/super-admin/system-settings" element={<SystemSettings />} />
+
+              {/* Franchise Routes */}
               <Route path="/franchise" element={<FranchiseManagement />} />
+              <Route path="/franchise/dashboard" element={<FranchiseDashboard />} />
               <Route path="/franchise-program" element={<FranchiseLanding />} />
               <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
+
+              {/* Reseller Routes */}
+              <Route path="/reseller" element={<ResellerDashboard />} />
+              <Route path="/reseller/dashboard" element={<ResellerDashboard />} />
               <Route path="/reseller-program" element={<ResellerLanding />} />
               <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
-              <Route path="/reseller" element={<ResellerDashboard />} />
-              <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
+
+              {/* Developer Routes */}
               <Route path="/developer" element={<DeveloperDashboard />} />
-              <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
+              <Route path="/developer/dashboard" element={<DeveloperDashboard />} />
+              <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
+
+              {/* Influencer Routes */}
               <Route path="/influencer" element={<InfluencerDashboard />} />
+              <Route path="/influencer/dashboard" element={<InfluencerDashboard />} />
+              <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
               <Route path="/influencer-manager" element={<InfluencerManager />} />
-              <Route path="/support-dashboard" element={<SupportDashboard />} />
-              <Route path="/seo-dashboard" element={<SEODashboard />} />
+
+              {/* Prime User Routes */}
+              <Route path="/prime" element={<PrimeUserDashboard />} />
+              <Route path="/prime/dashboard" element={<PrimeUserDashboard />} />
+              <Route path="/prime-user" element={<PrimeUserDashboard />} />
+
+              {/* Manager Routes */}
               <Route path="/lead-manager" element={<LeadManager />} />
               <Route path="/task-manager" element={<TaskManager />} />
-              <Route path="/rnd-dashboard" element={<RnDDashboard />} />
-              <Route path="/client-success" element={<ClientSuccessDashboard />} />
-              <Route path="/performance" element={<PerformanceManager />} />
-              <Route path="/finance" element={<FinanceManager />} />
-              <Route path="/super-admin" element={<SuperAdminDashboard />} />
               <Route path="/demo-manager" element={<ProductDemoManager />} />
-              <Route path="/prime-user" element={<PrimeUserDashboard />} />
+              <Route path="/finance" element={<FinanceManager />} />
               <Route path="/legal" element={<LegalComplianceManager />} />
               <Route path="/marketing" element={<MarketingManager />} />
+              <Route path="/performance" element={<PerformanceManager />} />
+              <Route path="/client-success" element={<ClientSuccessDashboard />} />
+              <Route path="/rnd-dashboard" element={<RnDDashboard />} />
+              <Route path="/seo-dashboard" element={<SEODashboard />} />
+              <Route path="/support-dashboard" element={<SupportDashboard />} />
               <Route path="/sales-support" element={<SalesSupportDashboard />} />
               <Route path="/hr-dashboard" element={<HRDashboard />} />
+
+              {/* System Routes */}
               <Route path="/system-settings" element={<SystemSettings />} />
               <Route path="/buzzer-console" element={<NotificationBuzzerConsole />} />
               <Route path="/api-integrations" element={<APIIntegrationDashboard />} />
-              <Route path="/apply" element={<ApplyPortal />} />
               <Route path="/internal-chat" element={<InternalChat />} />
               <Route path="/personal-chat" element={<PersonalChat />} />
-              <Route path="/security-center" element={<UnifiedSecurityCenter />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+              {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
