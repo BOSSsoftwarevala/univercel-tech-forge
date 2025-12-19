@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkles, Rocket, Users, Code, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import aiAndIHero from '@/assets/ai-and-i-hero.jpg';
 
 const FuturisticHero = () => {
   const ctaButtons = [
@@ -42,14 +43,26 @@ const FuturisticHero = () => {
         </svg>
       </div>
 
-      {/* Hologram globe background */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-10">
-        <div className="w-full h-full rounded-full border border-[hsl(210,100%,55%)] animate-rotate-slow" 
-             style={{ boxShadow: '0 0 60px hsl(210 100% 55% / 0.3)' }}>
-          <div className="absolute inset-8 rounded-full border border-[hsl(210,100%,55%)] opacity-50 animate-rotate-slow"
-               style={{ animationDirection: 'reverse', animationDuration: '30s' }} />
-          <div className="absolute inset-16 rounded-full border border-[hsl(210,100%,55%)] opacity-30" />
-        </div>
+      {/* AI and I Hero Image */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] lg:w-[650px] h-[600px] lg:h-[750px] hidden md:block">
+        <motion.div
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="relative w-full h-full"
+        >
+          <img 
+            src={aiAndIHero} 
+            alt="AI and I - Can Make a Difference" 
+            className="w-full h-full object-contain object-right opacity-90"
+            style={{ 
+              clipPath: 'inset(8% 0 0 0)',
+              filter: 'brightness(1.1) contrast(1.05)'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[hsl(220,20%,4%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,20%,4%)] via-transparent to-transparent opacity-60" />
+        </motion.div>
       </div>
 
       <div className="container relative z-10 px-4 mx-auto">
