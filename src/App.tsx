@@ -7,6 +7,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import Homepage from "./pages/Homepage";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Index";
+import CategoryOnboarding from "./pages/CategoryOnboarding";
 import FranchiseManagement from "./pages/FranchiseManagement";
 import FranchiseLanding from "./pages/FranchiseLanding";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/" element={<Homepage />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/onboard/:category" element={<CategoryOnboarding />} />
           <Route path="/franchise" element={<FranchiseManagement />} />
           <Route path="/franchise-program" element={<FranchiseLanding />} />
           <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
