@@ -12,6 +12,7 @@ import ResellerLanding from "./pages/ResellerLanding";
 import ResellerDashboard from "./pages/ResellerDashboard";
 import DeveloperDashboard from "./pages/DeveloperDashboard";
 import InfluencerDashboard from "./pages/InfluencerDashboard";
+import InfluencerManager from "./pages/InfluencerManager";
 import SupportDashboard from "./pages/SupportDashboard";
 import SEODashboard from "./pages/SEODashboard";
 import LeadManager from "./pages/LeadManager";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
           <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
           <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
+          <Route path="/influencer-manager" element={<InfluencerManager />} />
           <Route path="/support-dashboard" element={<SupportDashboard />} />
           <Route path="/seo-dashboard" element={<SEODashboard />} />
           <Route path="/lead-manager" element={<LeadManager />} />
