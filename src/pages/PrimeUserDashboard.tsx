@@ -25,6 +25,10 @@ import EmergencyChannel from "@/components/prime-user/EmergencyChannel";
 import UsageAnalytics from "@/components/prime-user/UsageAnalytics";
 import AnnouncementFeed from "@/components/prime-user/AnnouncementFeed";
 import UpgradeStore from "@/components/prime-user/UpgradeStore";
+import SLATimerPanel from "@/components/prime-user/SLATimerPanel";
+import PrimeHostingStatus from "@/components/prime-user/PrimeHostingStatus";
+import PrimeSubscriptionPanel from "@/components/prime-user/PrimeSubscriptionPanel";
+import UrgentHelpButton from "@/components/prime-user/UrgentHelpButton";
 
 const PrimeUserDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -48,19 +52,20 @@ const PrimeUserDashboard = () => {
       case "support": return <PremiumSupportCenter />;
       case "features": return <FeatureRequestBoard />;
       case "demos": return <VIPDemoAccess />;
-      case "uptime": return <UptimeMonitor />;
+      case "uptime": return <PrimeHostingStatus />;
       case "ai-interpreter": return <AIRequirementInterpreter />;
       case "training": return <TrainingHub />;
       case "emergency": return <EmergencyChannel />;
       case "analytics": return <UsageAnalytics />;
       case "announcements": return <AnnouncementFeed />;
-      case "store": return <UpgradeStore />;
+      case "store": return <PrimeSubscriptionPanel />;
       case "milestones": return <ProjectMilestones />;
       case "chat": return <AccountManagerChat />;
       case "documents": return <DocumentTracker />;
       case "wallet": return <WalletHistory />;
       case "bugs": return <BugChangeTracker />;
       case "downloads": return <DownloadArea />;
+      case "sla": return <SLATimerPanel />;
       default: return <PriorityTicketPanel />;
     }
   };
@@ -86,6 +91,7 @@ const PrimeUserDashboard = () => {
           </main>
         </div>
         <PrimeNotifications />
+        <UrgentHelpButton />
       </motion.div>
     </>
   );

@@ -14,6 +14,106 @@ export type Database = {
   }
   public: {
     Tables: {
+      dedicated_support_messages: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          is_system_message: boolean | null
+          message: string
+          read_at: string | null
+          sender_id: string
+          sender_masked_name: string | null
+          sender_role: Database["public"]["Enums"]["app_role"]
+          thread_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_system_message?: boolean | null
+          message: string
+          read_at?: string | null
+          sender_id: string
+          sender_masked_name?: string | null
+          sender_role: Database["public"]["Enums"]["app_role"]
+          thread_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_system_message?: boolean | null
+          message?: string
+          read_at?: string | null
+          sender_id?: string
+          sender_masked_name?: string | null
+          sender_role?: Database["public"]["Enums"]["app_role"]
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedicated_support_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "dedicated_support_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dedicated_support_threads: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          id: string
+          is_urgent: boolean | null
+          last_message_at: string | null
+          participant_developer_id: string | null
+          participant_masked_name: string | null
+          prime_user_id: string
+          status: string | null
+          subject: string
+          thread_type: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          id?: string
+          is_urgent?: boolean | null
+          last_message_at?: string | null
+          participant_developer_id?: string | null
+          participant_masked_name?: string | null
+          prime_user_id: string
+          status?: string | null
+          subject: string
+          thread_type?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          id?: string
+          is_urgent?: boolean | null
+          last_message_at?: string | null
+          participant_developer_id?: string | null
+          participant_masked_name?: string | null
+          prime_user_id?: string
+          status?: string | null
+          subject?: string
+          thread_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedicated_support_threads_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -261,6 +361,57 @@ export type Database = {
             columns: ["developer_id"]
             isOneToOne: false
             referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      developer_assignment_priority: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          assignment_type: string | null
+          created_at: string
+          developer_id: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          prime_user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_type?: string | null
+          created_at?: string
+          developer_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          prime_user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_type?: string | null
+          created_at?: string
+          developer_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          prime_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_assignment_priority_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "developers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "developer_assignment_priority_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2849,6 +3000,402 @@ export type Database = {
           },
         ]
       }
+      prime_feature_access: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          feature_name: string
+          feature_type: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          is_active: boolean | null
+          prime_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          feature_name: string
+          feature_type?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          prime_user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          feature_name?: string
+          feature_type?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          prime_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_feature_access_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prime_hosting_status: {
+        Row: {
+          allocated_resources: Json | null
+          cdn_enabled: boolean | null
+          created_at: string
+          custom_domain: string | null
+          hosting_tier: string | null
+          id: string
+          last_check_at: string | null
+          prime_user_id: string
+          ssl_enabled: boolean | null
+          status: string | null
+          updated_at: string
+          uptime_percentage: number | null
+        }
+        Insert: {
+          allocated_resources?: Json | null
+          cdn_enabled?: boolean | null
+          created_at?: string
+          custom_domain?: string | null
+          hosting_tier?: string | null
+          id?: string
+          last_check_at?: string | null
+          prime_user_id: string
+          ssl_enabled?: boolean | null
+          status?: string | null
+          updated_at?: string
+          uptime_percentage?: number | null
+        }
+        Update: {
+          allocated_resources?: Json | null
+          cdn_enabled?: boolean | null
+          created_at?: string
+          custom_domain?: string | null
+          hosting_tier?: string | null
+          id?: string
+          last_check_at?: string | null
+          prime_user_id?: string
+          ssl_enabled?: boolean | null
+          status?: string | null
+          updated_at?: string
+          uptime_percentage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_hosting_status_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prime_performance_reports: {
+        Row: {
+          avg_resolution_hours: number | null
+          compensations_received: number | null
+          created_at: string
+          developer_assignments: number | null
+          generated_at: string | null
+          id: string
+          prime_user_id: string
+          report_period_end: string
+          report_period_start: string
+          satisfaction_avg: number | null
+          sla_compliance_rate: number | null
+          support_threads: number | null
+          tickets_resolved: number | null
+          total_tickets: number | null
+        }
+        Insert: {
+          avg_resolution_hours?: number | null
+          compensations_received?: number | null
+          created_at?: string
+          developer_assignments?: number | null
+          generated_at?: string | null
+          id?: string
+          prime_user_id: string
+          report_period_end: string
+          report_period_start: string
+          satisfaction_avg?: number | null
+          sla_compliance_rate?: number | null
+          support_threads?: number | null
+          tickets_resolved?: number | null
+          total_tickets?: number | null
+        }
+        Update: {
+          avg_resolution_hours?: number | null
+          compensations_received?: number | null
+          created_at?: string
+          developer_assignments?: number | null
+          generated_at?: string | null
+          id?: string
+          prime_user_id?: string
+          report_period_end?: string
+          report_period_start?: string
+          satisfaction_avg?: number | null
+          sla_compliance_rate?: number | null
+          support_threads?: number | null
+          tickets_resolved?: number | null
+          total_tickets?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_performance_reports_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prime_upgrade_history: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          new_tier: string
+          payment_method: string | null
+          previous_tier: string | null
+          prime_user_id: string
+          processed_by: string | null
+          reason: string | null
+          transaction_ref: string | null
+          upgrade_type: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          new_tier: string
+          payment_method?: string | null
+          previous_tier?: string | null
+          prime_user_id: string
+          processed_by?: string | null
+          reason?: string | null
+          transaction_ref?: string | null
+          upgrade_type?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          new_tier?: string
+          payment_method?: string | null
+          previous_tier?: string | null
+          prime_user_id?: string
+          processed_by?: string | null
+          reason?: string | null
+          transaction_ref?: string | null
+          upgrade_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_upgrade_history_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prime_user_profiles: {
+        Row: {
+          auto_renewal: boolean | null
+          created_at: string
+          dedicated_developer_id: string | null
+          downgrade_reason: string | null
+          email: string
+          full_name: string
+          grace_period_days: number | null
+          id: string
+          masked_email: string | null
+          masked_phone: string | null
+          phone: string | null
+          priority_level: number | null
+          region: string | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          subscription_status: string | null
+          subscription_tier: string | null
+          two_factor_enabled: boolean | null
+          updated_at: string
+          user_id: string
+          vip_badge_enabled: boolean | null
+        }
+        Insert: {
+          auto_renewal?: boolean | null
+          created_at?: string
+          dedicated_developer_id?: string | null
+          downgrade_reason?: string | null
+          email: string
+          full_name: string
+          grace_period_days?: number | null
+          id?: string
+          masked_email?: string | null
+          masked_phone?: string | null
+          phone?: string | null
+          priority_level?: number | null
+          region?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          two_factor_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+          vip_badge_enabled?: boolean | null
+        }
+        Update: {
+          auto_renewal?: boolean | null
+          created_at?: string
+          dedicated_developer_id?: string | null
+          downgrade_reason?: string | null
+          email?: string
+          full_name?: string
+          grace_period_days?: number | null
+          id?: string
+          masked_email?: string | null
+          masked_phone?: string | null
+          phone?: string | null
+          priority_level?: number | null
+          region?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          two_factor_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+          vip_badge_enabled?: boolean | null
+        }
+        Relationships: []
+      }
+      prime_wallet_usage: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          payment_method: string | null
+          prime_user_id: string
+          reference_id: string | null
+          reference_type: string | null
+          status: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          prime_user_id: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          prime_user_id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_wallet_usage_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      priority_ticket_logs: {
+        Row: {
+          assigned_developer_id: string | null
+          created_at: string
+          description: string | null
+          escalated_to: string | null
+          escalation_reason: string | null
+          id: string
+          prime_user_id: string
+          priority_level: number | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          satisfaction_rating: number | null
+          sla_deadline: string | null
+          sla_target_hours: number | null
+          status: string | null
+          subject: string
+          ticket_type: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_developer_id?: string | null
+          created_at?: string
+          description?: string | null
+          escalated_to?: string | null
+          escalation_reason?: string | null
+          id?: string
+          prime_user_id: string
+          priority_level?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          satisfaction_rating?: number | null
+          sla_deadline?: string | null
+          sla_target_hours?: number | null
+          status?: string | null
+          subject: string
+          ticket_type: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_developer_id?: string | null
+          created_at?: string
+          description?: string | null
+          escalated_to?: string | null
+          escalation_reason?: string | null
+          id?: string
+          prime_user_id?: string
+          priority_level?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          satisfaction_rating?: number | null
+          sla_deadline?: string | null
+          sla_target_hours?: number | null
+          status?: string | null
+          subject?: string
+          ticket_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "priority_ticket_logs_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rental_assign: {
         Row: {
           assigned_by: string
@@ -3643,6 +4190,66 @@ export type Database = {
           },
         ]
       }
+      sla_monitoring: {
+        Row: {
+          actual_hours: number | null
+          breach_reason: string | null
+          compensation_amount: number | null
+          compensation_credited: boolean | null
+          created_at: string
+          id: string
+          prime_user_id: string
+          sla_met: boolean | null
+          sla_type: string
+          target_hours: number
+          task_id: string | null
+          ticket_id: string | null
+        }
+        Insert: {
+          actual_hours?: number | null
+          breach_reason?: string | null
+          compensation_amount?: number | null
+          compensation_credited?: boolean | null
+          created_at?: string
+          id?: string
+          prime_user_id: string
+          sla_met?: boolean | null
+          sla_type: string
+          target_hours?: number
+          task_id?: string | null
+          ticket_id?: string | null
+        }
+        Update: {
+          actual_hours?: number | null
+          breach_reason?: string | null
+          compensation_amount?: number | null
+          compensation_credited?: boolean | null
+          created_at?: string
+          id?: string
+          prime_user_id?: string
+          sla_met?: boolean | null
+          sla_type?: string
+          target_hours?: number
+          task_id?: string | null
+          ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sla_monitoring_prime_user_id_fkey"
+            columns: ["prime_user_id"]
+            isOneToOne: false
+            referencedRelation: "prime_user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sla_monitoring_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "priority_ticket_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_logs: {
         Row: {
           action: string
@@ -3777,11 +4384,13 @@ export type Database = {
       can_manage_franchises: { Args: { _user_id: string }; Returns: boolean }
       can_manage_influencers: { Args: { _user_id: string }; Returns: boolean }
       can_manage_leads: { Args: { _user_id: string }; Returns: boolean }
+      can_manage_prime_users: { Args: { _user_id: string }; Returns: boolean }
       can_manage_resellers: { Args: { _user_id: string }; Returns: boolean }
       can_view_leads: { Args: { _user_id: string }; Returns: boolean }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
       get_franchise_id: { Args: { _user_id: string }; Returns: string }
       get_influencer_id: { Args: { _user_id: string }; Returns: string }
+      get_prime_user_id: { Args: { _user_id: string }; Returns: string }
       get_reseller_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -3792,6 +4401,7 @@ export type Database = {
       }
       is_franchise: { Args: { _user_id: string }; Returns: boolean }
       is_influencer: { Args: { _user_id: string }; Returns: boolean }
+      is_prime_user: { Args: { _user_id: string }; Returns: boolean }
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -3805,6 +4415,7 @@ export type Database = {
         | "developer"
         | "influencer"
         | "marketing_manager"
+        | "client_success"
       demo_status: "active" | "inactive" | "maintenance" | "down"
       demo_tech_stack:
         | "php"
@@ -3982,6 +4593,7 @@ export const Constants = {
         "developer",
         "influencer",
         "marketing_manager",
+        "client_success",
       ],
       demo_status: ["active", "inactive", "maintenance", "down"],
       demo_tech_stack: [
