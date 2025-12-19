@@ -10,6 +10,7 @@ import {
   Zap,
   Crown
 } from "lucide-react";
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 interface AdminSidebarProps {
   activeView: string;
@@ -36,16 +37,14 @@ const AdminSidebar = ({ activeView, onViewChange }: AdminSidebarProps) => {
       {/* Logo Section */}
       <div className="p-4 border-b border-border/30">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary via-neon-purple to-neon-teal flex items-center justify-center relative">
-            <Crown className="w-6 h-6 text-primary-foreground" />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/50 to-transparent animate-pulse" />
-          </div>
-          <div>
-            <div className="font-mono font-bold text-sm text-foreground">SOFTWARE VALA</div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
-              <span className="text-[10px] text-neon-green uppercase tracking-widest font-mono">Super Admin</span>
-            </div>
+          <img 
+            src={softwareValaLogo} 
+            alt="Software Vala" 
+            className="h-10 w-auto object-contain"
+          />
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
+            <span className="text-[10px] text-neon-green uppercase tracking-widest font-mono">Super Admin</span>
           </div>
         </div>
       </div>

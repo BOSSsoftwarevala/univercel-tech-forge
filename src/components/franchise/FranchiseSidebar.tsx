@@ -15,7 +15,6 @@ import {
   Package,
   Megaphone,
   FileText,
-  Zap,
   BarChart3,
   Globe,
   Scale,
@@ -23,6 +22,7 @@ import {
   Star,
   Activity
 } from 'lucide-react';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -66,11 +66,15 @@ export const FranchiseSidebar = ({
         <div className="p-4 border-b border-[hsl(200,80%,40%)]/20">
           <div className="flex items-center gap-3">
             <motion.div 
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(200,80%,50%)] to-[hsl(180,70%,45%)] flex items-center justify-center cursor-pointer shadow-lg shadow-[hsl(200,80%,50%)]/20"
+              className="cursor-pointer"
               whileHover={{ scale: 1.05 }}
               onClick={() => navigate('/')}
             >
-              <Zap className="w-5 h-5 text-white" />
+              <img 
+                src={softwareValaLogo} 
+                alt="Software Vala" 
+                className={`${collapsed ? 'h-8' : 'h-10'} w-auto object-contain`}
+              />
             </motion.div>
             <AnimatePresence>
               {!collapsed && (
@@ -79,7 +83,6 @@ export const FranchiseSidebar = ({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
                 >
-                  <p className="font-bold text-sm text-white tracking-wide">SOFTWARE VALA</p>
                   <p className="text-[10px] text-[hsl(200,80%,60%)]">Franchise Portal</p>
                 </motion.div>
               )}

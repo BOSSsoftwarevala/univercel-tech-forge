@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Zap, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 const FranchiseLandingFooter = () => {
   return (
@@ -13,13 +14,12 @@ const FranchiseLandingFooter = () => {
             viewport={{ once: true }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-neon-teal flex items-center justify-center">
-                <Zap className="w-5 h-5 text-background" />
-              </div>
-              <div>
-                <h3 className="font-mono font-bold text-lg text-foreground">SOFTWARE VALA</h3>
-                <p className="text-xs text-primary">Franchise Program</p>
-              </div>
+              <img 
+                src={softwareValaLogo} 
+                alt="Software Vala" 
+                className="h-10 w-auto object-contain"
+              />
+              <p className="text-xs text-primary">Franchise Program</p>
             </div>
             <p className="text-sm text-muted-foreground">
               Empowering entrepreneurs with AI-powered tech business opportunities.
