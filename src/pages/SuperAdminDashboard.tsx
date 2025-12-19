@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AdminSidebarFull from "@/components/admin/AdminSidebarFull";
 import AdminTopBar from "@/components/admin/AdminTopBar";
@@ -19,6 +19,8 @@ import DeveloperTaskOrchestration from "@/components/admin/DeveloperTaskOrchestr
 import PerformanceScoringAI from "@/components/admin/PerformanceScoringAI";
 import ComplianceLegalShield from "@/components/admin/ComplianceLegalShield";
 import EmergencyBuzzerControls from "@/components/admin/EmergencyBuzzerControls";
+import HeaderAlertStack from "@/components/shared/HeaderAlertStack";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 type AdminView =
   | "overview"
@@ -50,9 +52,73 @@ type AdminView =
   | "prime-users"
   | "settings";
 
+// Sample notifications for demo
+const sampleNotifications: NotificationAlert[] = [
+  {
+    id: '1',
+    type: 'priority',
+    message: 'New lead unassigned for 8 minutes - Mumbai Region',
+    timestamp: new Date(Date.now() - 2 * 60000),
+    eventType: 'LEAD ACTIVITY',
+    actionLabel: 'Assign Now',
+    isBuzzer: true,
+    roleTarget: ['lead_manager', 'franchise', 'super_admin'],
+  },
+  {
+    id: '2',
+    type: 'danger',
+    message: 'Demo server "ERP Pro" is offline - Action required',
+    timestamp: new Date(Date.now() - 5 * 60000),
+    eventType: 'DEMO OFFLINE',
+    actionLabel: 'View Status',
+    isBuzzer: true,
+    roleTarget: ['demo_manager', 'super_admin'],
+  },
+  {
+    id: '3',
+    type: 'warning',
+    message: 'Developer DEV-042 has not accepted task for 15 minutes',
+    timestamp: new Date(Date.now() - 15 * 60000),
+    eventType: 'DEVELOPER DELAY',
+    actionLabel: 'Escalate',
+    roleTarget: ['super_admin'],
+  },
+  {
+    id: '4',
+    type: 'success',
+    message: 'Payment of ₹1,25,000 received from Prime Client #287',
+    timestamp: new Date(Date.now() - 30 * 60000),
+    eventType: 'PAYMENT SUCCESS',
+    roleTarget: ['finance', 'super_admin'],
+  },
+  {
+    id: '5',
+    type: 'info',
+    message: 'VIP Ticket #VIP-1842 requires immediate attention',
+    timestamp: new Date(Date.now() - 3 * 60000),
+    eventType: 'VIP PRIORITY',
+    actionLabel: 'View Ticket',
+    isBuzzer: true,
+    roleTarget: ['support', 'super_admin'],
+  },
+];
+
 const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState<AdminView>("live-control");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationAlert[]>(sampleNotifications);
+
+  const handleDismissNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id && !n.isBuzzer));
+  };
+
+  const handleNotificationAction = (id: string) => {
+    // Handle action and remove notification
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  // Filter priority alerts for the stack
+  const stackAlerts = notifications.filter(n => n.type === 'priority' || n.type === 'danger').slice(0, 3);
 
   const renderContent = () => {
     switch (activeView) {
@@ -113,7 +179,12 @@ const SuperAdminDashboard = () => {
       <AdminSidebarFull activeView={activeView} onViewChange={setActiveView} />
       
       <div className="flex-1 flex flex-col ml-64">
-        <AdminTopBar onNotificationsClick={() => setShowNotifications(true)} />
+        <AdminTopBar 
+          onNotificationsClick={() => setShowNotifications(true)}
+          notifications={notifications}
+          onDismissNotification={handleDismissNotification}
+          onNotificationAction={handleNotificationAction}
+        />
         
         <main className="flex-1 p-6 overflow-auto">
           <AnimatePresence mode="wait">
@@ -129,6 +200,15 @@ const SuperAdminDashboard = () => {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Header Alert Stack for Priority Notifications */}
+      {stackAlerts.length > 0 && (
+        <HeaderAlertStack
+          alerts={stackAlerts}
+          onDismiss={handleDismissNotification}
+          onAction={handleNotificationAction}
+        />
+      )}
 
       <AdminNotifications 
         open={showNotifications} 
