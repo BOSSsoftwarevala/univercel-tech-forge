@@ -1,9 +1,7 @@
 import { motion } from "framer-motion";
 import { 
-  Bell, 
   Search, 
   Settings, 
-  Shield, 
   Users, 
   Activity,
   Zap,
@@ -11,14 +9,19 @@ import {
   Server,
   Bot,
   MessageSquare,
-  Wallet
+  Wallet,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 interface AdminTopBarProps {
   onNotificationsClick: () => void;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
 const liveMetrics = [
@@ -28,9 +31,12 @@ const liveMetrics = [
   { label: "Regions Online", value: "12/12", icon: Globe, color: "text-neon-teal" },
 ];
 
-const AdminTopBar = ({ onNotificationsClick }: AdminTopBarProps) => {
-  const [buzzerActive, setBuzzerActive] = useState(true);
-
+const AdminTopBar = ({ 
+  onNotificationsClick,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: AdminTopBarProps) => {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -116,30 +122,13 @@ const AdminTopBar = ({ onNotificationsClick }: AdminTopBarProps) => {
           <span className="text-xs font-mono text-neon-green">SECURE</span>
         </div>
 
-        {/* Notifications with Buzzer State */}
-        <motion.div
-          animate={buzzerActive ? { 
-            boxShadow: [
-              "0 0 0 0 rgba(239, 68, 68, 0)",
-              "0 0 0 8px rgba(239, 68, 68, 0.3)",
-              "0 0 0 0 rgba(239, 68, 68, 0)"
-            ]
-          } : {}}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="rounded-lg"
-        >
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNotificationsClick}
-            className={`relative ${buzzerActive ? "bg-destructive/20 border border-destructive/50" : ""}`}
-          >
-            <Bell className={`w-5 h-5 ${buzzerActive ? "text-destructive animate-pulse" : ""}`} />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] rounded-full flex items-center justify-center font-mono">
-              7
-            </span>
-          </Button>
-        </motion.div>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="super_admin"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         {/* Settings */}
         <Button variant="ghost" size="icon">
