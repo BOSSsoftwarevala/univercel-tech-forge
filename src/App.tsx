@@ -18,6 +18,7 @@ import LeadManager from "./pages/LeadManager";
 import TaskManager from "./pages/TaskManager";
 import RnDDashboard from "./pages/RnDDashboard";
 import ClientSuccessDashboard from "./pages/ClientSuccessDashboard";
+import PerformanceManager from "./pages/PerformanceManager";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/task-manager" element={<TaskManager />} />
           <Route path="/rnd-dashboard" element={<RnDDashboard />} />
           <Route path="/client-success" element={<ClientSuccessDashboard />} />
+          <Route path="/performance" element={<PerformanceManager />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
