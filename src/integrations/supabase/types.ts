@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          id: string
+          meta_json: Json | null
+          module: string
+          role: Database["public"]["Enums"]["app_role"] | null
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          id?: string
+          meta_json?: Json | null
+          module: string
+          role?: Database["public"]["Enums"]["app_role"] | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          id?: string
+          meta_json?: Json | null
+          module?: string
+          role?: Database["public"]["Enums"]["app_role"] | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       buzzer_queue: {
         Row: {
           accepted_at: string | null
@@ -69,6 +99,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      chat_messages: {
+        Row: {
+          cannot_delete: boolean | null
+          cannot_edit: boolean | null
+          language: string | null
+          masked_sender: string | null
+          message_id: string
+          message_text: string
+          sender_id: string | null
+          thread_id: string | null
+          timestamp: string
+          translated_text: string | null
+        }
+        Insert: {
+          cannot_delete?: boolean | null
+          cannot_edit?: boolean | null
+          language?: string | null
+          masked_sender?: string | null
+          message_id?: string
+          message_text: string
+          sender_id?: string | null
+          thread_id?: string | null
+          timestamp?: string
+          translated_text?: string | null
+        }
+        Update: {
+          cannot_delete?: boolean | null
+          cannot_edit?: boolean | null
+          language?: string | null
+          masked_sender?: string | null
+          message_id?: string
+          message_text?: string
+          sender_id?: string | null
+          thread_id?: string | null
+          timestamp?: string
+          translated_text?: string | null
+        }
+        Relationships: []
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          is_active: boolean | null
+          related_lead: string | null
+          related_role: Database["public"]["Enums"]["app_role"] | null
+          related_task: string | null
+          thread_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          is_active?: boolean | null
+          related_lead?: string | null
+          related_role?: Database["public"]["Enums"]["app_role"] | null
+          related_task?: string | null
+          thread_id?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          is_active?: boolean | null
+          related_lead?: string | null
+          related_role?: Database["public"]["Enums"]["app_role"] | null
+          related_task?: string | null
+          thread_id?: string
+        }
+        Relationships: []
       }
       chat_user_status: {
         Row: {
@@ -910,6 +1009,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dev_performance: {
+        Row: {
+          dev_id: string | null
+          final_score: number | null
+          record_id: string
+          score_behavior: number | null
+          score_delivery: number | null
+          score_speed: number | null
+          task_id: string | null
+          timestamp: string
+        }
+        Insert: {
+          dev_id?: string | null
+          final_score?: number | null
+          record_id?: string
+          score_behavior?: number | null
+          score_delivery?: number | null
+          score_speed?: number | null
+          task_id?: string | null
+          timestamp?: string
+        }
+        Update: {
+          dev_id?: string | null
+          final_score?: number | null
+          record_id?: string
+          score_behavior?: number | null
+          score_delivery?: number | null
+          score_speed?: number | null
+          task_id?: string | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
+      dev_timer: {
+        Row: {
+          created_at: string
+          dev_id: string | null
+          pause_timestamp: string | null
+          start_timestamp: string | null
+          stop_timestamp: string | null
+          task_id: string | null
+          timer_id: string
+          total_seconds: number | null
+        }
+        Insert: {
+          created_at?: string
+          dev_id?: string | null
+          pause_timestamp?: string | null
+          start_timestamp?: string | null
+          stop_timestamp?: string | null
+          task_id?: string | null
+          timer_id?: string
+          total_seconds?: number | null
+        }
+        Update: {
+          created_at?: string
+          dev_id?: string | null
+          pause_timestamp?: string | null
+          start_timestamp?: string | null
+          stop_timestamp?: string | null
+          task_id?: string | null
+          timer_id?: string
+          total_seconds?: number | null
+        }
+        Relationships: []
       }
       developer_activity_logs: {
         Row: {
@@ -2263,6 +2428,87 @@ export type Database = {
           },
         ]
       }
+      fraud_alerts: {
+        Row: {
+          alert_id: string
+          flagged_by_ai: boolean | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string | null
+          status: string | null
+          timestamp: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          alert_id?: string
+          flagged_by_ai?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          status?: string | null
+          timestamp?: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          alert_id?: string
+          flagged_by_ai?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          status?: string | null
+          timestamp?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      incidents: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          incident_id: string
+          reported_by: string | null
+          resolution: string | null
+          resolved_at: string | null
+          severity: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          incident_id?: string
+          reported_by?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          incident_id?: string
+          reported_by?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       influencer_accounts: {
         Row: {
           city: string | null
@@ -3099,6 +3345,102 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount: number
+          currency: string | null
+          invoice_id: string
+          invoice_number: string | null
+          pdf_link: string | null
+          status: string | null
+          tax: number | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          currency?: string | null
+          invoice_id?: string
+          invoice_number?: string | null
+          pdf_link?: string | null
+          status?: string | null
+          tax?: number | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          currency?: string | null
+          invoice_id?: string
+          invoice_number?: string | null
+          pdf_link?: string | null
+          status?: string | null
+          tax?: number | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ip_locks: {
+        Row: {
+          created_at: string
+          device: string | null
+          ip: string
+          lock_id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          ip: string
+          lock_id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          ip?: string
+          lock_id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kyc_documents: {
+        Row: {
+          doc_file: string | null
+          doc_type: string
+          kyc_id: string
+          rejection_reason: string | null
+          status: string | null
+          timestamp: string
+          user_id: string
+          verified_by: string | null
+        }
+        Insert: {
+          doc_file?: string | null
+          doc_type: string
+          kyc_id?: string
+          rejection_reason?: string | null
+          status?: string | null
+          timestamp?: string
+          user_id: string
+          verified_by?: string | null
+        }
+        Update: {
+          doc_file?: string | null
+          doc_type?: string
+          kyc_id?: string
+          rejection_reason?: string | null
+          status?: string | null
+          timestamp?: string
+          user_id?: string
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       lead_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -3213,6 +3555,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lead_conversions: {
+        Row: {
+          commission: number | null
+          conversion_id: string
+          converted_by: string | null
+          lead_id: string | null
+          product_id: string | null
+          revenue: number | null
+          timestamp: string
+        }
+        Insert: {
+          commission?: number | null
+          conversion_id?: string
+          converted_by?: string | null
+          lead_id?: string | null
+          product_id?: string | null
+          revenue?: number | null
+          timestamp?: string
+        }
+        Update: {
+          commission?: number | null
+          conversion_id?: string
+          converted_by?: string | null
+          lead_id?: string | null
+          product_id?: string | null
+          revenue?: number | null
+          timestamp?: string
+        }
+        Relationships: []
       }
       lead_escalations: {
         Row: {
@@ -3765,6 +4137,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payout_requests: {
+        Row: {
+          amount: number
+          bank_details: Json | null
+          payment_method: string | null
+          payout_id: string
+          processed_by: string | null
+          status: string | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bank_details?: Json | null
+          payment_method?: string | null
+          payout_id?: string
+          processed_by?: string | null
+          status?: string | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bank_details?: Json | null
+          payment_method?: string | null
+          payout_id?: string
+          processed_by?: string | null
+          status?: string | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       performance_scores: {
         Row: {
@@ -4358,6 +4763,78 @@ export type Database = {
           },
         ]
       }
+      product_versions: {
+        Row: {
+          changes_notes: string | null
+          created_at: string
+          product_id: string | null
+          release_date: string | null
+          version_id: string
+          version_number: string
+        }
+        Insert: {
+          changes_notes?: string | null
+          created_at?: string
+          product_id?: string | null
+          release_date?: string | null
+          version_id?: string
+          version_number: string
+        }
+        Update: {
+          changes_notes?: string | null
+          created_at?: string
+          product_id?: string | null
+          release_date?: string | null
+          version_id?: string
+          version_number?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          features_json: Json | null
+          is_active: boolean | null
+          lifetime_price: number | null
+          monthly_price: number | null
+          pricing_model: string | null
+          product_id: string
+          product_name: string
+          tech_stack: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          features_json?: Json | null
+          is_active?: boolean | null
+          lifetime_price?: number | null
+          monthly_price?: number | null
+          pricing_model?: string | null
+          product_id?: string
+          product_name: string
+          tech_stack?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          features_json?: Json | null
+          is_active?: boolean | null
+          lifetime_price?: number | null
+          monthly_price?: number | null
+          pricing_model?: string | null
+          product_id?: string
+          product_name?: string
+          tech_stack?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       promise_logs: {
         Row: {
           acknowledged_at: string | null
@@ -4593,6 +5070,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      research_suggestions: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          submitted_by: string | null
+          suggestion_id: string
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          suggestion_id?: string
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          suggestion_id?: string
+          title?: string
+        }
+        Relationships: []
       }
       reseller_accounts: {
         Row: {
@@ -5341,6 +5854,87 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          module_name: string
+          permission_name: string
+          role_name: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          module_name: string
+          permission_name: string
+          role_name: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          module_name?: string
+          permission_name?: string
+          role_name?: string
+        }
+        Relationships: []
+      }
+      roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          is_active: boolean | null
+          role_id: string
+          role_name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          is_active?: boolean | null
+          role_id?: string
+          role_name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          is_active?: boolean | null
+          role_id?: string
+          role_name?: string
+        }
+        Relationships: []
+      }
+      security_logs: {
+        Row: {
+          device: string | null
+          event_details: string | null
+          event_type: string
+          ip: string | null
+          log_id: string
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          device?: string | null
+          event_details?: string | null
+          event_type: string
+          ip?: string | null
+          log_id?: string
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          device?: string | null
+          event_details?: string | null
+          event_type?: string
+          ip?: string | null
+          log_id?: string
+          timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sla_monitoring: {
         Row: {
           actual_hours: number | null
@@ -5401,6 +5995,69 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          activated_at: string | null
+          amount: number | null
+          created_at: string
+          expired_at: string | null
+          plan: string
+          status: string | null
+          sub_id: string
+          user_id: string
+          validity: number | null
+        }
+        Insert: {
+          activated_at?: string | null
+          amount?: number | null
+          created_at?: string
+          expired_at?: string | null
+          plan: string
+          status?: string | null
+          sub_id?: string
+          user_id: string
+          validity?: number | null
+        }
+        Update: {
+          activated_at?: string | null
+          amount?: number | null
+          created_at?: string
+          expired_at?: string | null
+          plan?: string
+          status?: string | null
+          sub_id?: string
+          user_id?: string
+          validity?: number | null
+        }
+        Relationships: []
+      }
+      system_health: {
+        Row: {
+          id: string
+          metric: string
+          status: string | null
+          timestamp: string
+          unit: string | null
+          value: number | null
+        }
+        Insert: {
+          id?: string
+          metric: string
+          status?: string | null
+          timestamp?: string
+          unit?: string | null
+          value?: number | null
+        }
+        Update: {
+          id?: string
+          metric?: string
+          status?: string | null
+          timestamp?: string
+          unit?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       task_logs: {
         Row: {
           action: string
@@ -5454,6 +6111,129 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tasks: {
+        Row: {
+          assigned_to_dev: string | null
+          created_at: string
+          created_by: string | null
+          difficulty: string | null
+          end_time: string | null
+          lead_id: string | null
+          priority: string | null
+          product_id: string | null
+          promised_time: string | null
+          remarks: string | null
+          start_time: string | null
+          status: string | null
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to_dev?: string | null
+          created_at?: string
+          created_by?: string | null
+          difficulty?: string | null
+          end_time?: string | null
+          lead_id?: string | null
+          priority?: string | null
+          product_id?: string | null
+          promised_time?: string | null
+          remarks?: string | null
+          start_time?: string | null
+          status?: string | null
+          task_id?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to_dev?: string | null
+          created_at?: string
+          created_by?: string | null
+          difficulty?: string | null
+          end_time?: string | null
+          lead_id?: string | null
+          priority?: string | null
+          product_id?: string | null
+          promised_time?: string | null
+          remarks?: string | null
+          start_time?: string | null
+          status?: string | null
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      training_logs: {
+        Row: {
+          certificate_url: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          module: string
+          progress: number | null
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module: string
+          progress?: number | null
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          certificate_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module?: string
+          progress?: number | null
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          reference: string | null
+          related_role: Database["public"]["Enums"]["app_role"] | null
+          related_sale: string | null
+          related_user: string | null
+          status: string | null
+          timestamp: string
+          transaction_id: string
+          type: string
+          wallet_id: string | null
+        }
+        Insert: {
+          amount: number
+          reference?: string | null
+          related_role?: Database["public"]["Enums"]["app_role"] | null
+          related_sale?: string | null
+          related_user?: string | null
+          status?: string | null
+          timestamp?: string
+          transaction_id?: string
+          type: string
+          wallet_id?: string | null
+        }
+        Update: {
+          amount?: number
+          reference?: string | null
+          related_role?: Database["public"]["Enums"]["app_role"] | null
+          related_sale?: string | null
+          related_user?: string | null
+          status?: string | null
+          timestamp?: string
+          transaction_id?: string
+          type?: string
+          wallet_id?: string | null
+        }
+        Relationships: []
       }
       uptime_logs: {
         Row: {
@@ -5520,6 +6300,33 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      wallets: {
+        Row: {
+          balance: number | null
+          created_at: string
+          currency: string | null
+          updated_at: string
+          user_id: string
+          wallet_id: string
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string
+          currency?: string | null
+          updated_at?: string
+          user_id: string
+          wallet_id?: string
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string
+          currency?: string | null
+          updated_at?: string
+          user_id?: string
+          wallet_id?: string
         }
         Relationships: []
       }
