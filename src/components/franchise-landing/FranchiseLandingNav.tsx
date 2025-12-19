@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Zap } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 const navItems = [
   { label: 'Benefits', href: '#benefits' },
@@ -29,16 +30,12 @@ const FranchiseLandingNav = () => {
             onClick={() => navigate('/')}
             whileHover={{ scale: 1.02 }}
           >
-            <div className="relative">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-neon-teal flex items-center justify-center">
-                <Zap className="w-6 h-6 text-background" />
-              </div>
-              <div className="absolute inset-0 rounded-xl bg-primary/50 blur-xl -z-10" />
-            </div>
-            <div>
-              <h1 className="font-mono font-bold text-xl text-foreground">SOFTWARE VALA</h1>
-              <p className="text-[10px] text-primary tracking-[0.2em] uppercase">Franchise Program</p>
-            </div>
+            <img 
+              src={softwareValaLogo} 
+              alt="Software Vala" 
+              className="h-12 w-auto object-contain"
+            />
+            <p className="text-[10px] text-primary tracking-[0.2em] uppercase">Franchise Program</p>
           </motion.div>
 
           <div className="hidden lg:flex items-center gap-1">

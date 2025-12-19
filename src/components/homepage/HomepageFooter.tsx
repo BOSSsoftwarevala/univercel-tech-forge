@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { 
-  Zap, 
   Facebook, 
   Twitter, 
   Instagram, 
@@ -10,6 +9,7 @@ import {
   Phone,
   MapPin
 } from 'lucide-react';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 const footerLinks = {
   products: ['POS System', 'School ERP', 'Hospital Management', 'Real Estate CRM', 'HRMS'],
@@ -43,16 +43,11 @@ const HomepageFooter = () => {
               className="mb-6"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-neon-teal flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-background" />
-                  </div>
-                  <div className="absolute inset-0 rounded-xl bg-primary/30 blur-xl -z-10" />
-                </div>
-                <div>
-                  <h3 className="font-mono font-bold text-xl text-foreground">SOFTWARE VALA</h3>
-                  <p className="text-xs text-primary tracking-[0.3em] uppercase">AI Powered</p>
-                </div>
+                <img 
+                  src={softwareValaLogo} 
+                  alt="Software Vala" 
+                  className="h-12 w-auto object-contain"
+                />
               </div>
               <p className="text-muted-foreground max-w-sm mb-6">
                 Empowering businesses with next-generation AI solutions. 

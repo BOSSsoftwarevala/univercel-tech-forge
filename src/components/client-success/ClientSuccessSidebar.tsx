@@ -9,9 +9,9 @@ import {
   Bell, 
   BarChart3, 
   User,
-  Zap,
   Lightbulb
 } from "lucide-react";
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -34,15 +34,12 @@ export const ClientSuccessSidebar = () => {
       {/* Logo */}
       <div className="p-6 border-b border-teal-100">
         <div className="flex items-center gap-3">
-          <motion.div 
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-amber-500 flex items-center justify-center shadow-lg"
-            animate={{ boxShadow: ["0 4px 20px rgba(20, 184, 166, 0.2)", "0 4px 30px rgba(20, 184, 166, 0.4)", "0 4px 20px rgba(20, 184, 166, 0.2)"] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Zap className="w-5 h-5 text-white" />
-          </motion.div>
+          <img 
+            src={softwareValaLogo} 
+            alt="Software Vala" 
+            className="h-10 w-auto object-contain"
+          />
           <div>
-            <p className="font-bold text-slate-800 text-sm">SOFTWARE VALA</p>
             <p className="text-xs text-teal-600">Client Success</p>
           </div>
         </div>

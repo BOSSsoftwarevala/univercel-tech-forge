@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Users, Monitor, Wallet, MapPin,
   GraduationCap, TrendingUp, AlertTriangle, Settings,
-  ChevronLeft, ChevronRight, Target, Zap, FileText
+  ChevronLeft, ChevronRight, Target, FileText
 } from 'lucide-react';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 import FranchiseDash from '@/components/franchise/FranchiseDash';
 import FranchiseLeadConsole from '@/components/franchise/FranchiseLeadConsole';
 import FranchiseDemoPanel from '@/components/franchise/FranchiseDemoPanel';
@@ -66,13 +67,12 @@ const FranchiseDashboard = () => {
       {/* Top Bar */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900/80 backdrop-blur-xl border-b border-indigo-500/20 z-50 flex items-center justify-between px-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-white">SOFTWARE VALA</h1>
-            <p className="text-xs text-indigo-400">Franchise Portal</p>
-          </div>
+          <img 
+            src={softwareValaLogo} 
+            alt="Software Vala" 
+            className="h-10 w-auto object-contain"
+          />
+          <p className="text-xs text-indigo-400">Franchise Portal</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30">

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 type FinanceView = 
   | "revenue" 
@@ -63,10 +64,11 @@ const FinanceSidebar = ({ activeView, onViewChange }: FinanceSidebarProps) => {
     <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <DollarSign className="w-6 h-6 text-emerald-600" />
-          SOFTWARE VALA
-        </h1>
+        <img 
+          src={softwareValaLogo} 
+          alt="Software Vala" 
+          className="h-10 w-auto object-contain mb-1"
+        />
         <p className="text-xs text-slate-500 mt-1">Finance Manager</p>
       </div>
 
