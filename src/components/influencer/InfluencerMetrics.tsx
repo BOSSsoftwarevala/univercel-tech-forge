@@ -62,12 +62,14 @@ const InfluencerMetrics = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Performance Dashboard</h2>
-          <p className="text-slate-400 mt-1">Real-time analytics & insights</p>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+            Welcome, Influencer! 🌟
+          </h2>
+          <p className="text-slate-400 mt-1">Your real-time performance analytics & insights</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
-          <Zap className="w-4 h-4 text-emerald-400" />
-          <span className="text-sm text-emerald-400">Top 5% Performer</span>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-500/10 border border-violet-500/30">
+          <Zap className="w-4 h-4 text-violet-400" />
+          <span className="text-sm text-violet-400">Top 5% Performer</span>
         </div>
       </div>
 

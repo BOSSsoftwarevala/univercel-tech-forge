@@ -113,6 +113,7 @@ const App = () => (
               <Route path="/access-denied" element={<AccessDenied />} />
 
               {/* Super Admin Routes */}
+              <Route path="/admin" element={<SuperAdminCommandCenter />} />
               <Route path="/super-admin" element={<SuperAdminCommandCenter />} />
               <Route path="/super-admin/dashboard" element={<SuperAdminCommandCenter />} />
               <Route path="/super-admin/command-center" element={<SuperAdminCommandCenter />} />
