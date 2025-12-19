@@ -22,6 +22,7 @@ import PerformanceManager from "./pages/PerformanceManager";
 import FinanceManager from "./pages/FinanceManager";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import ProductDemoManager from "./pages/ProductDemoManager";
+import PrimeUserDashboard from "./pages/PrimeUserDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/finance" element={<FinanceManager />} />
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/demo-manager" element={<ProductDemoManager />} />
+          <Route path="/prime-user" element={<PrimeUserDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
