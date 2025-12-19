@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import HomepageNavbar from '@/components/homepage/HomepageNavbar';
 import HeroSection from '@/components/homepage/HeroSection';
 import FeaturesGrid from '@/components/homepage/FeaturesGrid';
+import GlobalReach from '@/components/homepage/GlobalReach';
 import IndustryModules from '@/components/homepage/IndustryModules';
 import HologramInfographic from '@/components/homepage/HologramInfographic';
 import TestimonialsSection from '@/components/homepage/TestimonialsSection';
@@ -23,6 +24,9 @@ const Homepage = () => {
       
       {/* Features Grid */}
       <FeaturesGrid />
+      
+      {/* Global Reach */}
+      <GlobalReach />
       
       {/* Hologram Infographic */}
       <HologramInfographic />
