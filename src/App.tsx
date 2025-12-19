@@ -38,8 +38,8 @@ import ApplyPortal from "./pages/ApplyPortal";
 import InternalChat from "./pages/InternalChat";
 import UnifiedSecurityCenter from "./components/security/UnifiedSecurityCenter";
 import DomainProtection from "./components/security/DomainProtection";
+import PendingItemsSuggestion from "./components/shared/PendingItemsSuggestion";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -49,6 +49,7 @@ const App = () => (
         <DomainProtection>
           <Toaster />
           <Sonner />
+          <PendingItemsSuggestion />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Homepage />} />
