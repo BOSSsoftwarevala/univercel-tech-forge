@@ -29,6 +29,22 @@ import UserManager from "./pages/super-admin/UserManager";
 import PermissionMatrix from "./pages/super-admin/PermissionMatrix";
 import SecurityCenter from "./pages/super-admin/SecurityCenter";
 
+// Franchise Layout & Pages
+import FranchiseLayout from "./components/layouts/FranchiseLayout";
+import FranchiseDashboardPage from "./pages/franchise/Dashboard";
+import FranchiseProfile from "./pages/franchise/Profile";
+import FranchiseWalletPage from "./pages/franchise/Wallet";
+import FranchiseLeadBoardPage from "./pages/franchise/LeadBoard";
+import FranchiseAssignLead from "./pages/franchise/AssignLead";
+import FranchiseDemoRequest from "./pages/franchise/DemoRequest";
+import FranchiseDemoLibraryPage from "./pages/franchise/DemoLibrary";
+import FranchiseSalesCenter from "./pages/franchise/SalesCenter";
+import FranchisePerformancePage from "./pages/franchise/Performance";
+import FranchiseSupportTicket from "./pages/franchise/SupportTicket";
+import FranchiseInternalChatPage from "./pages/franchise/InternalChat";
+import FranchiseTrainingCenter from "./pages/franchise/TrainingCenter";
+import FranchiseSecurityPanel from "./pages/franchise/SecurityPanel";
+
 // Existing Pages
 import FranchiseManagement from "./pages/FranchiseManagement";
 import FranchiseLanding from "./pages/FranchiseLanding";
@@ -105,8 +121,20 @@ const App = () => (
               <Route path="/super-admin/system-settings" element={<SystemSettings />} />
 
               {/* Franchise Routes */}
-              <Route path="/franchise" element={<FranchiseManagement />} />
-              <Route path="/franchise/dashboard" element={<FranchiseDashboard />} />
+              <Route path="/franchise" element={<FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout>} />
+              <Route path="/franchise/dashboard" element={<FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout>} />
+              <Route path="/franchise/profile" element={<FranchiseLayout><FranchiseProfile /></FranchiseLayout>} />
+              <Route path="/franchise/wallet" element={<FranchiseLayout><FranchiseWalletPage /></FranchiseLayout>} />
+              <Route path="/franchise/lead-board" element={<FranchiseLayout><FranchiseLeadBoardPage /></FranchiseLayout>} />
+              <Route path="/franchise/assign-lead" element={<FranchiseLayout><FranchiseAssignLead /></FranchiseLayout>} />
+              <Route path="/franchise/demo-request" element={<FranchiseLayout><FranchiseDemoRequest /></FranchiseLayout>} />
+              <Route path="/franchise/demo-library" element={<FranchiseLayout><FranchiseDemoLibraryPage /></FranchiseLayout>} />
+              <Route path="/franchise/sales-center" element={<FranchiseLayout><FranchiseSalesCenter /></FranchiseLayout>} />
+              <Route path="/franchise/performance" element={<FranchiseLayout><FranchisePerformancePage /></FranchiseLayout>} />
+              <Route path="/franchise/support-ticket" element={<FranchiseLayout><FranchiseSupportTicket /></FranchiseLayout>} />
+              <Route path="/franchise/internal-chat" element={<FranchiseLayout><FranchiseInternalChatPage /></FranchiseLayout>} />
+              <Route path="/franchise/training-center" element={<FranchiseLayout><FranchiseTrainingCenter /></FranchiseLayout>} />
+              <Route path="/franchise/security-panel" element={<FranchiseLayout><FranchiseSecurityPanel /></FranchiseLayout>} />
               <Route path="/franchise-program" element={<FranchiseLanding />} />
               <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
 
