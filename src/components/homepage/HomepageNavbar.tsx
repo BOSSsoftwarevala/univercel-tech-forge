@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Globe, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import softwareValaLogo from '@/assets/software-vala-logo.png';
+import softwareValaLogo from '@/assets/software-vala-logo-hq-transparent.png';
 const navItems = [
   { label: 'Products', href: '#products' },
   { label: 'Demo', href: '#demo' },
@@ -33,8 +33,8 @@ const HomepageNavbar = () => {
           >
             <img 
               src={softwareValaLogo} 
-              alt="Software Vala - The Name of Trust" 
-              className="h-14 md:h-16 w-auto object-contain"
+              alt="Software Vala logo - The Name of Trust" 
+              className="h-10 sm:h-12 md:h-14 w-auto max-w-[240px] object-contain"
             />
           </motion.div>
 
