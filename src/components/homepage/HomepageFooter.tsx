@@ -1,13 +1,12 @@
 import { motion } from 'framer-motion';
 import { 
   Facebook, 
-  Twitter, 
   Instagram, 
-  Linkedin, 
   Youtube,
   Mail,
   Phone,
-  MapPin
+  Globe,
+  MessageCircle
 } from 'lucide-react';
 import softwareValaLogo from '@/assets/software-vala-logo.png';
 
@@ -19,11 +18,10 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: <Facebook className="w-5 h-5" />, href: '#', label: 'Facebook' },
-  { icon: <Twitter className="w-5 h-5" />, href: '#', label: 'Twitter' },
-  { icon: <Instagram className="w-5 h-5" />, href: '#', label: 'Instagram' },
-  { icon: <Linkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn' },
-  { icon: <Youtube className="w-5 h-5" />, href: '#', label: 'YouTube' }
+  { icon: <Facebook className="w-5 h-5" />, href: 'https://facebook.com/share/1HpGSvExis', label: 'Facebook' },
+  { icon: <Instagram className="w-5 h-5" />, href: 'https://instagram.com/new_software_vala', label: 'Instagram' },
+  { icon: <MessageCircle className="w-5 h-5" />, href: 'https://wa.me/918348838383', label: 'WhatsApp' },
+  { icon: <Youtube className="w-5 h-5" />, href: 'https://youtube.com/@softwarevala', label: 'YouTube' }
 ];
 
 const HomepageFooter = () => {
@@ -49,6 +47,7 @@ const HomepageFooter = () => {
                   className="h-12 w-auto object-contain"
                 />
               </div>
+              <p className="text-primary font-semibold text-lg mb-1">The Name of Trust</p>
               <p className="text-muted-foreground max-w-sm mb-6">
                 Empowering businesses with next-generation AI solutions. 
                 Join the enterprise ecosystem revolution.
@@ -56,17 +55,27 @@ const HomepageFooter = () => {
 
               {/* Contact Info */}
               <div className="space-y-3">
-                <a href="mailto:contact@softwarevala.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:hellosoftwarevala@gmail.com" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
                   <Mail className="w-4 h-4" />
-                  <span className="text-sm">contact@softwarevala.com</span>
+                  <span className="text-sm">hellosoftwarevala@gmail.com</span>
                 </a>
-                <a href="tel:+919876543210" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
-                  <Phone className="w-4 h-4" />
-                  <span className="text-sm">+91 98765 43210</span>
-                </a>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span className="text-sm">Mumbai, India</span>
+                <div className="flex flex-col gap-1">
+                  <a href="https://wa.me/918768878787" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                    <Phone className="w-4 h-4" />
+                    <span className="text-sm">+91-8768878787</span>
+                  </a>
+                  <a href="https://wa.me/918348838383" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors pl-7">
+                    <span className="text-sm">+91-8348838383</span>
+                  </a>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <a href="https://softwarevala.net" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                    <Globe className="w-4 h-4" />
+                    <span className="text-sm">softwarevala.net (Online)</span>
+                  </a>
+                  <a href="https://erpvala.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors pl-7">
+                    <span className="text-sm">erpvala.com (Offline)</span>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -149,10 +158,10 @@ const HomepageFooter = () => {
           className="text-center pt-8 border-t border-border/20"
         >
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Software Vala. All rights reserved.
+            © {new Date().getFullYear()} SOFTWARE VALA™. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground/60 mt-2">
-            Powered by AI • Built for Enterprise • Designed for Success
+            The Name of Trust • Powered by AI • Built for Enterprise
           </p>
         </motion.div>
       </div>
