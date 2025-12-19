@@ -26,6 +26,7 @@ import ProductDemoManager from "./pages/ProductDemoManager";
 import PrimeUserDashboard from "./pages/PrimeUserDashboard";
 import LegalComplianceManager from "./pages/LegalComplianceManager";
 import MarketingManager from "./pages/MarketingManager";
+import SalesSupportDashboard from "./pages/SalesSupportDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
           <Route path="/prime-user" element={<PrimeUserDashboard />} />
           <Route path="/legal" element={<LegalComplianceManager />} />
           <Route path="/marketing" element={<MarketingManager />} />
+          <Route path="/sales-support" element={<SalesSupportDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
