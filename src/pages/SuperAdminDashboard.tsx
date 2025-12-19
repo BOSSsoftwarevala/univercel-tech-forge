@@ -22,6 +22,7 @@ import EmergencyBuzzerControls from "@/components/admin/EmergencyBuzzerControls"
 import HeaderAlertStack from "@/components/shared/HeaderAlertStack";
 import LiveAlertGrid from "@/components/admin/LiveAlertGrid";
 import FloatingChatButton from "@/components/admin/FloatingChatButton";
+import WelcomeBoss from "@/components/admin/WelcomeBoss";
 import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 type AdminView =
@@ -127,6 +128,9 @@ const SuperAdminDashboard = () => {
       case "live-control":
         return (
           <div className="space-y-6">
+            {/* Welcome Boss Title */}
+            <WelcomeBoss disabled={showNotifications} />
+            
             {/* Live Alert Grid - 2x2 */}
             <LiveAlertGrid />
             
