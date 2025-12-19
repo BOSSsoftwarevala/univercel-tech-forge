@@ -1,0 +1,117 @@
+import { motion } from "framer-motion";
+import { 
+  Bell, 
+  Search, 
+  Settings, 
+  Globe, 
+  Monitor,
+  Activity,
+  Users,
+  Zap,
+  RefreshCw
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+interface DemoManagerTopBarProps {
+  onNotificationsClick: () => void;
+}
+
+const liveMetrics = [
+  { label: "Active Demos", value: "47", icon: Monitor, color: "text-neon-green" },
+  { label: "Live Visitors", value: "1,842", icon: Users, color: "text-neon-teal" },
+  { label: "Avg Load Time", value: "1.2s", icon: Zap, color: "text-neon-cyan" },
+  { label: "Regions", value: "12", icon: Globe, color: "text-primary" },
+];
+
+const DemoManagerTopBar = ({ onNotificationsClick }: DemoManagerTopBarProps) => {
+  return (
+    <motion.header
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="h-16 glass-panel border-b border-border/30 px-6 flex items-center justify-between sticky top-0 z-40"
+    >
+      {/* Left Section - Search */}
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search demos, categories, products..."
+            className="w-80 pl-10 bg-secondary/50 border-border/50 focus:border-neon-teal/50"
+          />
+        </div>
+      </div>
+
+      {/* Center Section - Live Metrics */}
+      <div className="flex items-center gap-6">
+        {liveMetrics.map((metric, index) => {
+          const Icon = metric.icon;
+          return (
+            <motion.div
+              key={metric.label}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="flex items-center gap-2"
+            >
+              <Icon className={`w-4 h-4 ${metric.color}`} />
+              <div>
+                <div className={`text-sm font-mono font-bold ${metric.color}`}>
+                  {metric.value}
+                </div>
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wider">
+                  {metric.label}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Right Section - Actions */}
+      <div className="flex items-center gap-3">
+        {/* Refresh Status */}
+        <Button variant="ghost" size="icon" className="text-neon-teal hover:text-neon-teal">
+          <RefreshCw className="w-4 h-4" />
+        </Button>
+
+        {/* System Health */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neon-green/10 border border-neon-green/30">
+          <Activity className="w-4 h-4 text-neon-green animate-pulse" />
+          <span className="text-xs font-mono text-neon-green">99.9% UPTIME</span>
+        </div>
+
+        {/* Notifications */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onNotificationsClick}
+          className="relative"
+        >
+          <Bell className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-neon-orange text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-mono">
+            5
+          </span>
+        </Button>
+
+        {/* Settings */}
+        <Button variant="ghost" size="icon">
+          <Settings className="w-5 h-5" />
+        </Button>
+
+        {/* Manager Avatar */}
+        <div className="flex items-center gap-3 pl-3 border-l border-border/50">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-neon-teal to-neon-green flex items-center justify-center">
+            <Monitor className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <div>
+            <div className="text-sm font-medium">Demo Manager</div>
+            <div className="text-[10px] text-neon-teal font-mono">FULL ACCESS</div>
+          </div>
+        </div>
+      </div>
+    </motion.header>
+  );
+};
+
+export default DemoManagerTopBar;
