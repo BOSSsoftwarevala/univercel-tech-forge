@@ -176,6 +176,7 @@ const App = () => (
               <Route path="/client-success" element={<ClientSuccessDashboard />} />
               <Route path="/rnd-dashboard" element={<RnDDashboard />} />
               <Route path="/seo-dashboard" element={<SEODashboard />} />
+              <Route path="/support" element={<SupportDashboard />} />
               <Route path="/support-dashboard" element={<SupportDashboard />} />
               <Route path="/sales-support" element={<SalesSupportDashboard />} />
               <Route path="/hr-dashboard" element={<HRDashboard />} />
