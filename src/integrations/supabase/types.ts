@@ -224,6 +224,485 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          action_taken: string | null
+          alert_type: string
+          auto_escalate_at: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          lead_id: string
+          message: string
+          requires_action: boolean | null
+          severity: string | null
+          target_roles: Database["public"]["Enums"]["app_role"][] | null
+          target_users: string[] | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          alert_type: string
+          auto_escalate_at?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          lead_id: string
+          message: string
+          requires_action?: boolean | null
+          severity?: string | null
+          target_roles?: Database["public"]["Enums"]["app_role"][] | null
+          target_users?: string[] | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          alert_type?: string
+          auto_escalate_at?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          lead_id?: string
+          message?: string
+          requires_action?: boolean | null
+          severity?: string | null
+          target_roles?: Database["public"]["Enums"]["app_role"][] | null
+          target_users?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_alerts_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_assignments: {
+        Row: {
+          accepted_at: string | null
+          assigned_by: string
+          assigned_role: Database["public"]["Enums"]["app_role"]
+          assigned_to: string
+          assignment_score: number | null
+          auto_assigned: boolean | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          lead_id: string
+          reason: string | null
+          rejected_at: string | null
+          rejection_reason: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          assigned_by: string
+          assigned_role: Database["public"]["Enums"]["app_role"]
+          assigned_to: string
+          assignment_score?: number | null
+          auto_assigned?: boolean | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          lead_id: string
+          reason?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          assigned_by?: string
+          assigned_role?: Database["public"]["Enums"]["app_role"]
+          assigned_to?: string
+          assignment_score?: number | null
+          auto_assigned?: boolean | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          lead_id?: string
+          reason?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_assignments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_escalations: {
+        Row: {
+          auto_escalated: boolean | null
+          created_at: string
+          escalated_from: string | null
+          escalated_to: string | null
+          escalated_to_role: Database["public"]["Enums"]["app_role"] | null
+          escalation_level: number | null
+          id: string
+          idle_minutes: number | null
+          is_resolved: boolean | null
+          lead_id: string
+          reason: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          auto_escalated?: boolean | null
+          created_at?: string
+          escalated_from?: string | null
+          escalated_to?: string | null
+          escalated_to_role?: Database["public"]["Enums"]["app_role"] | null
+          escalation_level?: number | null
+          id?: string
+          idle_minutes?: number | null
+          is_resolved?: boolean | null
+          lead_id: string
+          reason: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          auto_escalated?: boolean | null
+          created_at?: string
+          escalated_from?: string | null
+          escalated_to?: string | null
+          escalated_to_role?: Database["public"]["Enums"]["app_role"] | null
+          escalation_level?: number | null
+          id?: string
+          idle_minutes?: number | null
+          is_resolved?: boolean | null
+          lead_id?: string
+          reason?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_escalations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_follow_ups: {
+        Row: {
+          ai_suggested_message: string | null
+          assigned_to: string
+          completed_at: string | null
+          created_at: string
+          follow_up_type: string
+          id: string
+          is_completed: boolean | null
+          lead_id: string
+          notes: string | null
+          outcome: string | null
+          reminder_sent: boolean | null
+          scheduled_at: string
+        }
+        Insert: {
+          ai_suggested_message?: string | null
+          assigned_to: string
+          completed_at?: string | null
+          created_at?: string
+          follow_up_type: string
+          id?: string
+          is_completed?: boolean | null
+          lead_id: string
+          notes?: string | null
+          outcome?: string | null
+          reminder_sent?: boolean | null
+          scheduled_at: string
+        }
+        Update: {
+          ai_suggested_message?: string | null
+          assigned_to?: string
+          completed_at?: string | null
+          created_at?: string
+          follow_up_type?: string
+          id?: string
+          is_completed?: boolean | null
+          lead_id?: string
+          notes?: string | null
+          outcome?: string | null
+          reminder_sent?: boolean | null
+          scheduled_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_follow_ups_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_logs: {
+        Row: {
+          action: string
+          action_type: string
+          created_at: string
+          details: string | null
+          id: string
+          lead_id: string
+          metadata: Json | null
+          new_value: string | null
+          old_value: string | null
+          performed_by: string | null
+          performer_role: Database["public"]["Enums"]["app_role"] | null
+        }
+        Insert: {
+          action: string
+          action_type: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          lead_id: string
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          performed_by?: string | null
+          performer_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Update: {
+          action?: string
+          action_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          lead_id?: string
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          performed_by?: string | null
+          performer_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_scores: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          factors: Json | null
+          id: string
+          lead_id: string
+          model_version: string | null
+          score: number
+          score_type: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          factors?: Json | null
+          id?: string
+          lead_id: string
+          model_version?: string | null
+          score: number
+          score_type: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          factors?: Json | null
+          id?: string
+          lead_id?: string
+          model_version?: string | null
+          score?: number
+          score_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_scores_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_sources: {
+        Row: {
+          campaign_id: string | null
+          conversion_rate: number | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          reference_id: string | null
+          referrer_name: string | null
+          referrer_role: Database["public"]["Enums"]["app_role"] | null
+          total_leads: number | null
+          type: Database["public"]["Enums"]["lead_source_type"]
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          conversion_rate?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          reference_id?: string | null
+          referrer_name?: string | null
+          referrer_role?: Database["public"]["Enums"]["app_role"] | null
+          total_leads?: number | null
+          type: Database["public"]["Enums"]["lead_source_type"]
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          conversion_rate?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          reference_id?: string | null
+          referrer_name?: string | null
+          referrer_role?: Database["public"]["Enums"]["app_role"] | null
+          total_leads?: number | null
+          type?: Database["public"]["Enums"]["lead_source_type"]
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          ai_score: number | null
+          assigned_at: string | null
+          assigned_role: Database["public"]["Enums"]["app_role"] | null
+          assigned_to: string | null
+          budget_range: string | null
+          city: string | null
+          closed_at: string | null
+          closed_reason: string | null
+          company: string | null
+          conversion_probability: number | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          duplicate_of: string | null
+          email: string
+          id: string
+          industry: Database["public"]["Enums"]["lead_industry"] | null
+          is_duplicate: boolean | null
+          last_contact_at: string | null
+          masked_email: string | null
+          masked_phone: string | null
+          name: string
+          next_follow_up: string | null
+          phone: string
+          priority: Database["public"]["Enums"]["lead_priority"] | null
+          region: string | null
+          requirements: string | null
+          source: Database["public"]["Enums"]["lead_source_type"]
+          source_reference_id: string | null
+          status: Database["public"]["Enums"]["lead_status_type"]
+          updated_at: string
+        }
+        Insert: {
+          ai_score?: number | null
+          assigned_at?: string | null
+          assigned_role?: Database["public"]["Enums"]["app_role"] | null
+          assigned_to?: string | null
+          budget_range?: string | null
+          city?: string | null
+          closed_at?: string | null
+          closed_reason?: string | null
+          company?: string | null
+          conversion_probability?: number | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          duplicate_of?: string | null
+          email: string
+          id?: string
+          industry?: Database["public"]["Enums"]["lead_industry"] | null
+          is_duplicate?: boolean | null
+          last_contact_at?: string | null
+          masked_email?: string | null
+          masked_phone?: string | null
+          name: string
+          next_follow_up?: string | null
+          phone: string
+          priority?: Database["public"]["Enums"]["lead_priority"] | null
+          region?: string | null
+          requirements?: string | null
+          source?: Database["public"]["Enums"]["lead_source_type"]
+          source_reference_id?: string | null
+          status?: Database["public"]["Enums"]["lead_status_type"]
+          updated_at?: string
+        }
+        Update: {
+          ai_score?: number | null
+          assigned_at?: string | null
+          assigned_role?: Database["public"]["Enums"]["app_role"] | null
+          assigned_to?: string | null
+          budget_range?: string | null
+          city?: string | null
+          closed_at?: string | null
+          closed_reason?: string | null
+          company?: string | null
+          conversion_probability?: number | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          duplicate_of?: string | null
+          email?: string
+          id?: string
+          industry?: Database["public"]["Enums"]["lead_industry"] | null
+          is_duplicate?: boolean | null
+          last_contact_at?: string | null
+          masked_email?: string | null
+          masked_phone?: string | null
+          name?: string
+          next_follow_up?: string | null
+          phone?: string
+          priority?: Database["public"]["Enums"]["lead_priority"] | null
+          region?: string | null
+          requirements?: string | null
+          source?: Database["public"]["Enums"]["lead_source_type"]
+          source_reference_id?: string | null
+          status?: Database["public"]["Enums"]["lead_status_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rental_assign: {
         Row: {
           assigned_by: string
@@ -346,6 +825,8 @@ export type Database = {
     Functions: {
       can_access_demos: { Args: { _user_id: string }; Returns: boolean }
       can_manage_demos: { Args: { _user_id: string }; Returns: boolean }
+      can_manage_leads: { Args: { _user_id: string }; Returns: boolean }
+      can_view_leads: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -373,6 +854,36 @@ export type Database = {
         | "angular"
         | "vue"
         | "other"
+      lead_industry:
+        | "retail"
+        | "healthcare"
+        | "finance"
+        | "education"
+        | "real_estate"
+        | "manufacturing"
+        | "hospitality"
+        | "logistics"
+        | "technology"
+        | "other"
+      lead_priority: "hot" | "warm" | "cold"
+      lead_source_type:
+        | "website"
+        | "demo"
+        | "influencer"
+        | "reseller"
+        | "referral"
+        | "social"
+        | "direct"
+        | "other"
+      lead_status_type:
+        | "new"
+        | "assigned"
+        | "contacted"
+        | "follow_up"
+        | "qualified"
+        | "negotiation"
+        | "closed_won"
+        | "closed_lost"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -519,6 +1030,39 @@ export const Constants = {
         "angular",
         "vue",
         "other",
+      ],
+      lead_industry: [
+        "retail",
+        "healthcare",
+        "finance",
+        "education",
+        "real_estate",
+        "manufacturing",
+        "hospitality",
+        "logistics",
+        "technology",
+        "other",
+      ],
+      lead_priority: ["hot", "warm", "cold"],
+      lead_source_type: [
+        "website",
+        "demo",
+        "influencer",
+        "reseller",
+        "referral",
+        "social",
+        "direct",
+        "other",
+      ],
+      lead_status_type: [
+        "new",
+        "assigned",
+        "contacted",
+        "follow_up",
+        "qualified",
+        "negotiation",
+        "closed_won",
+        "closed_lost",
       ],
     },
   },
