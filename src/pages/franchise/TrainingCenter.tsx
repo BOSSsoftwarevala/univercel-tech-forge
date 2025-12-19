@@ -186,7 +186,7 @@ const FranchiseTrainingCenter = () => {
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold text-white">{course.title}</h3>
                             {course.certificate && (
-                              <Award className="w-4 h-4 text-amber-400" title="Certificate available" />
+                              <Award className="w-4 h-4 text-amber-400" />
                             )}
                           </div>
                           <p className="text-sm text-slate-400 mb-3">{course.description}</p>
