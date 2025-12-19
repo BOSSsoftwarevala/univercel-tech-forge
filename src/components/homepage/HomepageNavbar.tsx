@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Globe, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import softwareValaLogo from '@/assets/software-vala-logo.jpg';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 const navItems = [
   { label: 'Products', href: '#products' },
   { label: 'Demo', href: '#demo' },
