@@ -142,49 +142,47 @@ const GlobalNotificationHeader = ({
   };
 
   return (
-    <div className="flex items-center gap-3">
-      {/* Role Badge */}
-      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r ${getRoleBadgeColor(userRole)} shadow-lg`}>
-        <Shield className="w-3.5 h-3.5 text-white" />
-        <span className="text-xs font-bold text-white uppercase tracking-wide">
+    <div className="flex items-center gap-2">
+      {/* Role Badge - Compact */}
+      <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md bg-gradient-to-r ${getRoleBadgeColor(userRole)} shadow-md`}>
+        <Shield className="w-3 h-3 text-white" />
+        <span className="text-[10px] font-bold text-white uppercase tracking-wide">
           {userRole.replace('_', ' ')}
         </span>
       </div>
 
-      {/* Promise Button (Developer Only) */}
-      {showPromiseButton && (
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onPromiseClick}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-            promiseState === 'active'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
-              : promiseState === 'pending'
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50 animate-pulse'
-              : 'bg-slate-800/50 text-slate-300 border border-slate-700/50 hover:border-cyan-500/50'
-          }`}
-        >
-          <Handshake className="w-4 h-4" />
-          <span>
-            {promiseState === 'active' ? 'Promise Active' : promiseState === 'pending' ? 'Accept & Promise' : 'No Task'}
-          </span>
-        </motion.button>
-      )}
+      {/* Promise Button - Always Visible, Compact */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onPromiseClick}
+        className={`flex items-center gap-1.5 px-2 py-1 rounded-md font-medium text-[10px] transition-all ${
+          promiseState === 'active'
+            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+            : promiseState === 'pending'
+            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50 animate-pulse'
+            : 'bg-slate-800/50 text-slate-300 border border-slate-700/50 hover:border-cyan-500/50'
+        }`}
+      >
+        <Handshake className="w-3 h-3" />
+        <span className="hidden sm:inline">
+          {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
+        </span>
+      </motion.button>
 
-      {/* Live Counter */}
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50">
+      {/* Live Counter - Compact */}
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-800/50 border border-slate-700/50">
         <motion.div
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-2 h-2 bg-emerald-400 rounded-full"
+          className="w-1.5 h-1.5 bg-emerald-400 rounded-full"
         />
-        <span className="text-xs font-medium text-slate-400">
-          <span className="text-emerald-400 font-bold">{unresolvedCount}</span> unresolved
+        <span className="text-[10px] font-medium text-slate-400">
+          <span className="text-emerald-400 font-bold">{unresolvedCount}</span>
         </span>
       </div>
 
-      {/* Emergency Beacon (Buzzer) */}
+      {/* Emergency Beacon (Buzzer) - Compact */}
       <AnimatePresence>
         {buzzerActive && (
           <motion.div
@@ -195,41 +193,41 @@ const GlobalNotificationHeader = ({
           >
             <motion.button
               animate={{ 
-                scale: [1, 1.1, 1],
+                scale: [1, 1.05, 1],
                 boxShadow: [
                   '0 0 0 0 rgba(239, 68, 68, 0.7)',
-                  '0 0 0 10px rgba(239, 68, 68, 0)',
+                  '0 0 0 6px rgba(239, 68, 68, 0)',
                   '0 0 0 0 rgba(239, 68, 68, 0)'
                 ]
               }}
               transition={{ duration: 1, repeat: Infinity }}
               onClick={() => setIsDropdownOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 border-2 border-red-500 text-red-400"
+              className="flex items-center gap-1 px-2 py-1 rounded-md bg-red-500/20 border border-red-500 text-red-400"
             >
-              <Siren className="w-5 h-5 animate-pulse" />
-              <span className="font-bold text-sm">BUZZER</span>
-              <Badge className="bg-red-500 text-white text-xs px-1.5">{buzzerNotifications.length}</Badge>
+              <Siren className="w-3.5 h-3.5 animate-pulse" />
+              <span className="font-bold text-[10px]">BUZZER</span>
+              <Badge className="bg-red-500 text-white text-[9px] px-1 h-4">{buzzerNotifications.length}</Badge>
             </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mute Toggle */}
+      {/* Mute Toggle - Compact */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsMuted(!isMuted)}
-        className={`p-2.5 rounded-lg transition-all ${
+        className={`p-1.5 rounded-md transition-all ${
           isMuted 
             ? 'bg-slate-700/50 text-slate-500' 
             : 'bg-slate-800/50 text-slate-400 hover:text-white'
         }`}
-        title={isMuted ? 'Unmute alerts' : 'Mute alerts (buzzer still active)'}
+        title={isMuted ? 'Unmute alerts' : 'Mute alerts'}
       >
-        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
       </motion.button>
 
-      {/* Chat Button with Software Vala Logo */}
+      {/* Chat Button with Software Vala Logo - Compact */}
       <motion.button
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
@@ -237,7 +235,7 @@ const GlobalNotificationHeader = ({
         className="relative"
         title="Personal Chat"
       >
-        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-500/50 hover:border-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/25">
+        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-500/50 hover:border-emerald-400 transition-all shadow-md hover:shadow-emerald-500/25">
           <img 
             src={softwareValaLogo} 
             alt="Chat" 
@@ -248,27 +246,27 @@ const GlobalNotificationHeader = ({
           <motion.span
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-emerald-500 rounded-full text-xs font-bold text-white flex items-center justify-center"
+            className="absolute -top-1 -right-1 min-w-4 h-4 px-0.5 bg-emerald-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
           >
-            {unreadChatCount > 99 ? '99+' : unreadChatCount}
+            {unreadChatCount > 9 ? '9+' : unreadChatCount}
           </motion.span>
         )}
       </motion.button>
 
-      {/* Notification Bell */}
+      {/* Notification Bell - Compact */}
       <div className="relative">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="relative p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all"
+          className="relative p-1.5 rounded-md bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all"
         >
-          <Bell className="w-5 h-5 text-slate-400" />
+          <Bell className="w-4 h-4 text-slate-400" />
           {unresolvedCount > 0 && (
             <motion.span
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-cyan-500 rounded-full text-xs font-bold text-white flex items-center justify-center"
+              className="absolute -top-1 -right-1 min-w-4 h-4 px-0.5 bg-cyan-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
             >
               {unresolvedCount > 99 ? '99+' : unresolvedCount}
             </motion.span>
