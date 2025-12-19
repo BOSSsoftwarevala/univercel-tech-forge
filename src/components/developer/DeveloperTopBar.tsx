@@ -1,15 +1,25 @@
 import { motion } from 'framer-motion';
-import { Bell, Bot, Radio, User, Timer } from 'lucide-react';
+import { Bot, User, Timer } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import GlobalNotificationHeader from '@/components/shared/GlobalNotificationHeader';
+import type { NotificationAlert } from '@/components/shared/GlobalNotificationHeader';
 
 interface DeveloperTopBarProps {
   onNotificationClick: () => void;
   onAIClick: () => void;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
-const DeveloperTopBar = ({ onNotificationClick, onAIClick }: DeveloperTopBarProps) => {
+const DeveloperTopBar = ({ 
+  onNotificationClick, 
+  onAIClick,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: DeveloperTopBarProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [hasNotifications, setHasNotifications] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -84,22 +94,14 @@ const DeveloperTopBar = ({ onNotificationClick, onAIClick }: DeveloperTopBarProp
           />
         </motion.button>
 
-        {/* Notification Bell */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onNotificationClick}
-          className="relative p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all"
-        >
-          <Bell className="w-5 h-5 text-slate-400" />
-          {hasNotifications && (
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="absolute top-1 right-1 w-2.5 h-2.5 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400/50"
-            />
-          )}
-        </motion.button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="developer"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+          showPromiseButton={true}
+        />
       </div>
     </motion.header>
   );

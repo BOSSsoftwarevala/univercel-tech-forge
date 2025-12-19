@@ -1,14 +1,25 @@
 import { motion } from 'framer-motion';
-import { Bell, Search, Menu, X, Bot, AlertTriangle, Award, User, Wallet } from 'lucide-react';
+import { Search, Menu, X, Bot, AlertTriangle, Award, User, Wallet } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import GlobalNotificationHeader from '@/components/shared/GlobalNotificationHeader';
+import type { NotificationAlert } from '@/components/shared/GlobalNotificationHeader';
 
 interface ResellerTopBarProps {
   onMobileMenuToggle: () => void;
   mobileMenuOpen: boolean;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
-export const ResellerTopBar = ({ onMobileMenuToggle, mobileMenuOpen }: ResellerTopBarProps) => {
+export const ResellerTopBar = ({ 
+  onMobileMenuToggle, 
+  mobileMenuOpen,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: ResellerTopBarProps) => {
   return (
     <header className="sticky top-0 z-30 bg-[hsl(220,55%,6%)]/80 backdrop-blur-xl border-b border-[hsl(200,80%,40%)]/20">
       <div className="flex items-center justify-between px-4 lg:px-6 h-16">
@@ -80,11 +91,13 @@ export const ResellerTopBar = ({ onMobileMenuToggle, mobileMenuOpen }: ResellerT
             <span className="text-sm text-white font-medium">₹85K</span>
           </div>
 
-          {/* Notifications */}
-          <button className="relative p-2 rounded-lg bg-[hsl(220,50%,12%)]/60 text-[hsl(220,20%,65%)] hover:text-white transition-colors">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[hsl(0,80%,55%)]" />
-          </button>
+          {/* Global Notification Header */}
+          <GlobalNotificationHeader
+            userRole="reseller"
+            notifications={notifications}
+            onDismiss={onDismissNotification}
+            onAction={onNotificationAction}
+          />
 
           {/* Avatar */}
           <div className="flex items-center gap-3 pl-3 border-l border-[hsl(200,80%,40%)]/20">

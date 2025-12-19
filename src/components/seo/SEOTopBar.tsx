@@ -1,15 +1,23 @@
 import { motion } from "framer-motion";
-import { Globe, Search, Bell, Settings, Sparkles, Activity } from "lucide-react";
-import { useState } from "react";
+import { Globe, Search, Settings, Sparkles, Activity } from "lucide-react";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 interface SEOTopBarProps {
   onAIClick: () => void;
   activeRegion: string;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
-const SEOTopBar = ({ onAIClick, activeRegion }: SEOTopBarProps) => {
-  const [hasNotifications] = useState(true);
-
+const SEOTopBar = ({ 
+  onAIClick, 
+  activeRegion,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: SEOTopBarProps) => {
   const regionLabels: Record<string, string> = {
     global: "🌍 Global",
     africa: "🌍 Africa Mode",
@@ -97,20 +105,13 @@ const SEOTopBar = ({ onAIClick, activeRegion }: SEOTopBarProps) => {
           <Sparkles className="w-5 h-5 text-cyan-400" />
         </motion.button>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative p-2 bg-slate-800/50 rounded-lg border border-slate-700 hover:border-cyan-500/30 transition-colors"
-        >
-          <Bell className="w-5 h-5 text-slate-400" />
-          {hasNotifications && (
-            <motion.span
-              className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          )}
-        </motion.button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="seo"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         <motion.button
           whileHover={{ scale: 1.05 }}

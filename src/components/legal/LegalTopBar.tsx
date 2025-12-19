@@ -1,9 +1,21 @@
 import { motion } from "framer-motion";
-import { Bell, Search, Settings, Scale, AlertTriangle, FileCheck, Clock, Shield } from "lucide-react";
+import { Search, Settings, Scale, AlertTriangle, FileCheck, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
-const LegalTopBar = () => {
+interface LegalTopBarProps {
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
+}
+
+const LegalTopBar = ({
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: LegalTopBarProps) => {
   const metrics = [
     { label: "Active Agreements", value: "147", icon: FileCheck, color: "text-emerald-400", bg: "bg-emerald-500/10" },
     { label: "Pending Signatures", value: "23", icon: Clock, color: "text-amber-400", bg: "bg-amber-500/10" },
@@ -59,16 +71,13 @@ const LegalTopBar = () => {
           />
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative w-10 h-10 rounded-xl bg-stone-800/50 border border-stone-700/50 flex items-center justify-center text-stone-400 hover:text-amber-500 transition-colors"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
-            5
-          </span>
-        </motion.button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="legal"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         <motion.button
           whileHover={{ scale: 1.05 }}

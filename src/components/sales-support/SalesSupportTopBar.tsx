@@ -1,10 +1,22 @@
 import { motion } from "framer-motion";
-import { Search, Bell, Phone, MessageCircle, User, ChevronDown, Zap } from "lucide-react";
+import { Search, Phone, MessageCircle, User, ChevronDown, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
-const SalesSupportTopBar = () => {
+interface SalesSupportTopBarProps {
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
+}
+
+const SalesSupportTopBar = ({
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: SalesSupportTopBarProps) => {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -33,10 +45,14 @@ const SalesSupportTopBar = () => {
           <MessageCircle className="w-5 h-5" />
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
         </Button>
-        <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-cyan-300">
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">7</span>
-        </Button>
+        
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="support"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
         
         <div className="h-8 w-px bg-slate-700 mx-2" />
         

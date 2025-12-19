@@ -1,9 +1,20 @@
 import { motion } from "framer-motion";
-import { Bell, Search, Settings, Crown, Clock, Shield } from "lucide-react";
+import { Search, Settings, Crown, Clock, Shield } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
-const PrimeUserTopBar = () => {
+interface PrimeUserTopBarProps {
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
+}
+
+const PrimeUserTopBar = ({
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: PrimeUserTopBarProps) => {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -63,17 +74,13 @@ const PrimeUserTopBar = () => {
           />
         </div>
 
-        {/* Notifications */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative w-10 h-10 rounded-xl bg-stone-800/50 border border-stone-700/50 flex items-center justify-center text-stone-400 hover:text-amber-400 transition-colors"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-stone-900 text-xs font-bold flex items-center justify-center">
-            3
-          </span>
-        </motion.button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="prime"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         {/* Settings */}
         <motion.button

@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { 
-  Bell, 
   Search, 
   Settings, 
   Globe, 
@@ -12,9 +11,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 interface DemoManagerTopBarProps {
   onNotificationsClick: () => void;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
 const liveMetrics = [
@@ -24,7 +28,12 @@ const liveMetrics = [
   { label: "Regions", value: "12", icon: Globe, color: "text-primary" },
 ];
 
-const DemoManagerTopBar = ({ onNotificationsClick }: DemoManagerTopBarProps) => {
+const DemoManagerTopBar = ({ 
+  onNotificationsClick,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: DemoManagerTopBarProps) => {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -81,18 +90,13 @@ const DemoManagerTopBar = ({ onNotificationsClick }: DemoManagerTopBarProps) => 
           <span className="text-xs font-mono text-neon-green">99.9% UPTIME</span>
         </div>
 
-        {/* Notifications */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onNotificationsClick}
-          className="relative"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-neon-orange text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-mono">
-            5
-          </span>
-        </Button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="demo_manager"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         {/* Settings */}
         <Button variant="ghost" size="icon">

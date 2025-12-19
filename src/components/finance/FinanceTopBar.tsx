@@ -1,13 +1,22 @@
-import { Bell, Search, TrendingUp, TrendingDown, DollarSign, CreditCard, AlertTriangle, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, TrendingUp, TrendingDown, DollarSign, CreditCard, AlertTriangle, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
+import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 interface FinanceTopBarProps {
   onNotificationsClick: () => void;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
-const FinanceTopBar = ({ onNotificationsClick }: FinanceTopBarProps) => {
+const FinanceTopBar = ({ 
+  onNotificationsClick,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: FinanceTopBarProps) => {
   const metrics = [
     {
       label: "Total Revenue",
@@ -84,17 +93,13 @@ const FinanceTopBar = ({ onNotificationsClick }: FinanceTopBarProps) => {
           />
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onNotificationsClick}
-          className="relative"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
-            5
-          </span>
-        </Button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="finance"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         <div className="flex items-center gap-2 pl-4 border-l border-slate-200 dark:border-slate-700">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-sm font-medium">

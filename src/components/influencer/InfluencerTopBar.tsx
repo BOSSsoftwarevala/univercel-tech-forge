@@ -1,15 +1,25 @@
 import { motion } from 'framer-motion';
-import { Bell, Sparkles, User, Settings, TrendingUp } from 'lucide-react';
+import { Sparkles, User, Settings, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import GlobalNotificationHeader from '@/components/shared/GlobalNotificationHeader';
+import type { NotificationAlert } from '@/components/shared/GlobalNotificationHeader';
 
 interface InfluencerTopBarProps {
   onNotificationClick: () => void;
   onAIClick: () => void;
+  notifications?: NotificationAlert[];
+  onDismissNotification?: (id: string) => void;
+  onNotificationAction?: (id: string) => void;
 }
 
-const InfluencerTopBar = ({ onNotificationClick, onAIClick }: InfluencerTopBarProps) => {
+const InfluencerTopBar = ({ 
+  onNotificationClick, 
+  onAIClick,
+  notifications = [],
+  onDismissNotification = () => {},
+  onNotificationAction = () => {}
+}: InfluencerTopBarProps) => {
   const [earnings, setEarnings] = useState(45280);
-  const [hasNotifications, setHasNotifications] = useState(true);
 
   // Simulate live earnings pulse
   useEffect(() => {
@@ -92,22 +102,13 @@ const InfluencerTopBar = ({ onNotificationClick, onAIClick }: InfluencerTopBarPr
           />
         </motion.button>
 
-        {/* Notification Bell */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onNotificationClick}
-          className="relative p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-violet-500/30 transition-all"
-        >
-          <Bell className="w-5 h-5 text-slate-400" />
-          {hasNotifications && (
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="absolute top-1 right-1 w-2.5 h-2.5 bg-violet-400 rounded-full shadow-lg shadow-violet-400/50"
-            />
-          )}
-        </motion.button>
+        {/* Global Notification Header */}
+        <GlobalNotificationHeader
+          userRole="influencer"
+          notifications={notifications}
+          onDismiss={onDismissNotification}
+          onAction={onNotificationAction}
+        />
 
         {/* Settings */}
         <motion.button
