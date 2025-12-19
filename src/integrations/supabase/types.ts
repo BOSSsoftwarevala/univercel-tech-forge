@@ -2179,6 +2179,753 @@ export type Database = {
           },
         ]
       }
+      reseller_accounts: {
+        Row: {
+          address: string | null
+          certification_date: string | null
+          certification_score: number | null
+          city: string | null
+          commission_rate: number | null
+          country: string | null
+          created_at: string
+          email: string
+          franchise_id: string | null
+          full_name: string
+          id: string
+          joined_at: string | null
+          kyc_documents: Json | null
+          kyc_status: string | null
+          language_preference: string | null
+          last_active_at: string | null
+          masked_email: string | null
+          masked_phone: string | null
+          phone: string
+          pincode: string | null
+          reseller_code: string
+          sales_target_monthly: number | null
+          state: string | null
+          status: string | null
+          total_leads_converted: number | null
+          total_sales: number | null
+          training_completed: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          certification_date?: string | null
+          certification_score?: number | null
+          city?: string | null
+          commission_rate?: number | null
+          country?: string | null
+          created_at?: string
+          email: string
+          franchise_id?: string | null
+          full_name: string
+          id?: string
+          joined_at?: string | null
+          kyc_documents?: Json | null
+          kyc_status?: string | null
+          language_preference?: string | null
+          last_active_at?: string | null
+          masked_email?: string | null
+          masked_phone?: string | null
+          phone: string
+          pincode?: string | null
+          reseller_code: string
+          sales_target_monthly?: number | null
+          state?: string | null
+          status?: string | null
+          total_leads_converted?: number | null
+          total_sales?: number | null
+          training_completed?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          certification_date?: string | null
+          certification_score?: number | null
+          city?: string | null
+          commission_rate?: number | null
+          country?: string | null
+          created_at?: string
+          email?: string
+          franchise_id?: string | null
+          full_name?: string
+          id?: string
+          joined_at?: string | null
+          kyc_documents?: Json | null
+          kyc_status?: string | null
+          language_preference?: string | null
+          last_active_at?: string | null
+          masked_email?: string | null
+          masked_phone?: string | null
+          phone?: string
+          pincode?: string | null
+          reseller_code?: string
+          sales_target_monthly?: number | null
+          state?: string | null
+          status?: string | null
+          total_leads_converted?: number | null
+          total_sales?: number | null
+          training_completed?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_accounts_franchise_id_fkey"
+            columns: ["franchise_id"]
+            isOneToOne: false
+            referencedRelation: "franchise_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_activity_logs: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          device_info: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          reseller_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          reseller_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          reseller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_activity_logs_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_commissions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          bonus_amount: number | null
+          commission_amount: number
+          commission_rate: number
+          commission_type: string
+          created_at: string
+          credited_at: string | null
+          description: string | null
+          id: string
+          lead_id: string | null
+          metadata: Json | null
+          reseller_id: string
+          sale_amount: number
+          status: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bonus_amount?: number | null
+          commission_amount: number
+          commission_rate: number
+          commission_type: string
+          created_at?: string
+          credited_at?: string | null
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          reseller_id: string
+          sale_amount: number
+          status?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bonus_amount?: number | null
+          commission_amount?: number
+          commission_rate?: number
+          commission_type?: string
+          created_at?: string
+          credited_at?: string | null
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          reseller_id?: string
+          sale_amount?: number
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_commissions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_commissions_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_demo_clicks: {
+        Row: {
+          ai_fraud_score: number | null
+          browser: string | null
+          city: string | null
+          clicked_at: string | null
+          converted: boolean | null
+          country: string | null
+          demo_id: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          is_fake_click: boolean | null
+          lead_id: string | null
+          referrer: string | null
+          reseller_id: string
+          session_duration: number | null
+          tracking_id: string
+        }
+        Insert: {
+          ai_fraud_score?: number | null
+          browser?: string | null
+          city?: string | null
+          clicked_at?: string | null
+          converted?: boolean | null
+          country?: string | null
+          demo_id?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_fake_click?: boolean | null
+          lead_id?: string | null
+          referrer?: string | null
+          reseller_id: string
+          session_duration?: number | null
+          tracking_id: string
+        }
+        Update: {
+          ai_fraud_score?: number | null
+          browser?: string | null
+          city?: string | null
+          clicked_at?: string | null
+          converted?: boolean | null
+          country?: string | null
+          demo_id?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_fake_click?: boolean | null
+          lead_id?: string | null
+          referrer?: string | null
+          reseller_id?: string
+          session_duration?: number | null
+          tracking_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_demo_clicks_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_demo_clicks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_demo_clicks_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_escalations: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          description: string
+          escalated_to: string | null
+          escalated_to_role: string | null
+          escalation_type: string
+          id: string
+          lead_id: string | null
+          priority: string | null
+          reseller_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          subject: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          description: string
+          escalated_to?: string | null
+          escalated_to_role?: string | null
+          escalation_type: string
+          id?: string
+          lead_id?: string | null
+          priority?: string | null
+          reseller_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          subject: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          description?: string
+          escalated_to?: string | null
+          escalated_to_role?: string | null
+          escalation_type?: string
+          id?: string
+          lead_id?: string | null
+          priority?: string | null
+          reseller_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_escalations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_escalations_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_leads: {
+        Row: {
+          ai_notes: string | null
+          assigned_at: string | null
+          city: string | null
+          commission_earned: number | null
+          conversion_probability: number | null
+          converted_at: string | null
+          created_at: string
+          demo_clicked_at: string | null
+          demo_link_id: string | null
+          demo_requested: boolean | null
+          follow_up_count: number | null
+          franchise_id: string | null
+          id: string
+          industry: string | null
+          last_follow_up: string | null
+          lead_name: string
+          lead_score: number | null
+          masked_contact: string | null
+          next_follow_up: string | null
+          original_lead_id: string | null
+          priority: string | null
+          region: string | null
+          reseller_id: string
+          sale_value: number | null
+          status: string | null
+        }
+        Insert: {
+          ai_notes?: string | null
+          assigned_at?: string | null
+          city?: string | null
+          commission_earned?: number | null
+          conversion_probability?: number | null
+          converted_at?: string | null
+          created_at?: string
+          demo_clicked_at?: string | null
+          demo_link_id?: string | null
+          demo_requested?: boolean | null
+          follow_up_count?: number | null
+          franchise_id?: string | null
+          id?: string
+          industry?: string | null
+          last_follow_up?: string | null
+          lead_name: string
+          lead_score?: number | null
+          masked_contact?: string | null
+          next_follow_up?: string | null
+          original_lead_id?: string | null
+          priority?: string | null
+          region?: string | null
+          reseller_id: string
+          sale_value?: number | null
+          status?: string | null
+        }
+        Update: {
+          ai_notes?: string | null
+          assigned_at?: string | null
+          city?: string | null
+          commission_earned?: number | null
+          conversion_probability?: number | null
+          converted_at?: string | null
+          created_at?: string
+          demo_clicked_at?: string | null
+          demo_link_id?: string | null
+          demo_requested?: boolean | null
+          follow_up_count?: number | null
+          franchise_id?: string | null
+          id?: string
+          industry?: string | null
+          last_follow_up?: string | null
+          lead_name?: string
+          lead_score?: number | null
+          masked_contact?: string | null
+          next_follow_up?: string | null
+          original_lead_id?: string | null
+          priority?: string | null
+          region?: string | null
+          reseller_id?: string
+          sale_value?: number | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_leads_franchise_id_fkey"
+            columns: ["franchise_id"]
+            isOneToOne: false
+            referencedRelation: "franchise_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_leads_original_lead_id_fkey"
+            columns: ["original_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_leads_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_payouts: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          bank_details: Json | null
+          created_at: string
+          id: string
+          notes: string | null
+          payment_method: string | null
+          payout_type: string
+          processed_at: string | null
+          requested_at: string | null
+          reseller_id: string
+          status: string | null
+          transaction_ref: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          bank_details?: Json | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payout_type: string
+          processed_at?: string | null
+          requested_at?: string | null
+          reseller_id: string
+          status?: string | null
+          transaction_ref?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          bank_details?: Json | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payout_type?: string
+          processed_at?: string | null
+          requested_at?: string | null
+          reseller_id?: string
+          status?: string | null
+          transaction_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_payouts_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_territory_map: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          created_at: string
+          franchise_id: string | null
+          id: string
+          is_active: boolean | null
+          is_primary: boolean | null
+          reseller_id: string
+          territory_code: string | null
+          territory_name: string
+          territory_type: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string
+          franchise_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          reseller_id: string
+          territory_code?: string | null
+          territory_name: string
+          territory_type: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string
+          franchise_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          reseller_id?: string
+          territory_code?: string | null
+          territory_name?: string
+          territory_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_territory_map_franchise_id_fkey"
+            columns: ["franchise_id"]
+            isOneToOne: false
+            referencedRelation: "franchise_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_territory_map_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_training: {
+        Row: {
+          ai_feedback: string | null
+          attempts: number | null
+          certificate_issued: boolean | null
+          certificate_url: string | null
+          completed_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          max_score: number | null
+          module_name: string
+          module_type: string | null
+          passed: boolean | null
+          reseller_id: string
+          score: number
+        }
+        Insert: {
+          ai_feedback?: string | null
+          attempts?: number | null
+          certificate_issued?: boolean | null
+          certificate_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          max_score?: number | null
+          module_name: string
+          module_type?: string | null
+          passed?: boolean | null
+          reseller_id: string
+          score: number
+        }
+        Update: {
+          ai_feedback?: string | null
+          attempts?: number | null
+          certificate_issued?: boolean | null
+          certificate_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          max_score?: number | null
+          module_name?: string
+          module_type?: string | null
+          passed?: boolean | null
+          reseller_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_training_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_wallet: {
+        Row: {
+          available_balance: number
+          created_at: string
+          id: string
+          last_payout_at: string | null
+          pending_balance: number
+          reseller_id: string
+          total_bonus: number
+          total_earned: number
+          total_withdrawn: number
+          updated_at: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string
+          id?: string
+          last_payout_at?: string | null
+          pending_balance?: number
+          reseller_id: string
+          total_bonus?: number
+          total_earned?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string
+          id?: string
+          last_payout_at?: string | null
+          pending_balance?: number
+          reseller_id?: string
+          total_bonus?: number
+          total_earned?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_wallet_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: true
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          reseller_id: string
+          status: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          reseller_id: string
+          status?: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          reseller_id?: string
+          status?: string | null
+          transaction_type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_wallet_transactions_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "reseller_wallet"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_logs: {
         Row: {
           action: string
@@ -2312,9 +3059,11 @@ export type Database = {
       can_manage_developers: { Args: { _user_id: string }; Returns: boolean }
       can_manage_franchises: { Args: { _user_id: string }; Returns: boolean }
       can_manage_leads: { Args: { _user_id: string }; Returns: boolean }
+      can_manage_resellers: { Args: { _user_id: string }; Returns: boolean }
       can_view_leads: { Args: { _user_id: string }; Returns: boolean }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
       get_franchise_id: { Args: { _user_id: string }; Returns: string }
+      get_reseller_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2323,6 +3072,7 @@ export type Database = {
         Returns: boolean
       }
       is_franchise: { Args: { _user_id: string }; Returns: boolean }
+      is_reseller: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:

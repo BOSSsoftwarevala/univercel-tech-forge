@@ -26,6 +26,8 @@ import { CustomerChatMasked } from '@/components/reseller/CustomerChatMasked';
 import { MarketingToolkit } from '@/components/reseller/MarketingToolkit';
 import { ResellerPerformanceBoard } from '@/components/reseller/ResellerPerformanceBoard';
 import { MicroTrainingLessons } from '@/components/reseller/MicroTrainingLessons';
+import ResellerEscalations from '@/components/reseller/ResellerEscalations';
+import ResellerTargets from '@/components/reseller/ResellerTargets';
 import { Badge } from '@/components/ui/badge';
 
 // Command Overview Dashboard
