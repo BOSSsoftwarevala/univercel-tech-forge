@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Building2, 
   Users, 
@@ -34,6 +35,7 @@ interface MenuItem {
   badge?: string | number;
   badgeColor?: string;
   children?: MenuItem[];
+  path?: string;
 }
 
 interface SidebarProps {
@@ -43,13 +45,14 @@ interface SidebarProps {
 }
 
 const menuItems: MenuItem[] = [
-  { id: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> },
+  { id: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" />, path: '/' },
   { 
     id: 'franchise', 
     label: 'Franchise Management', 
     icon: <Building2 className="w-4 h-4" />,
     badge: 42,
-    badgeColor: 'bg-neon-cyan/20 text-neon-cyan'
+    badgeColor: 'bg-neon-cyan/20 text-neon-cyan',
+    path: '/franchise'
   },
   { 
     id: 'reseller', 
@@ -110,11 +113,31 @@ const menuItems: MenuItem[] = [
 
 const Sidebar = ({ activeItem, onItemClick, collapsed }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleExpand = (id: string) => {
     setExpandedItems(prev => 
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
+  };
+
+  const handleItemClick = (item: MenuItem) => {
+    if (item.children) {
+      toggleExpand(item.id);
+    } else {
+      onItemClick(item.id);
+      if (item.path) {
+        navigate(item.path);
+      }
+    }
+  };
+
+  const isActive = (item: MenuItem) => {
+    if (item.path) {
+      return location.pathname === item.path;
+    }
+    return activeItem === item.id;
   };
 
   return (
@@ -156,14 +179,8 @@ const Sidebar = ({ activeItem, onItemClick, collapsed }: SidebarProps) => {
             transition={{ delay: index * 0.02 }}
           >
             <button
-              onClick={() => {
-                if (item.children) {
-                  toggleExpand(item.id);
-                } else {
-                  onItemClick(item.id);
-                }
-              }}
-              className={`w-full ${activeItem === item.id ? 'sidebar-item-active' : 'sidebar-item'}`}
+              onClick={() => handleItemClick(item)}
+              className={`w-full ${isActive(item) ? 'sidebar-item-active' : 'sidebar-item'}`}
             >
               <div className="flex-shrink-0">{item.icon}</div>
               
