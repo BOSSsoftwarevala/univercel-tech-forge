@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Bell, 
   AlertTriangle, 
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'danger' | 'priority';
 
@@ -86,9 +88,11 @@ const GlobalNotificationHeader = ({
   onPromiseClick,
   promiseState = 'idle'
 }: GlobalNotificationHeaderProps) => {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [buzzerActive, setBuzzerActive] = useState(false);
+  const [unreadChatCount] = useState(3); // Mock unread chat count
 
   // Filter notifications based on role
   const filteredNotifications = notifications.filter(n => {
@@ -223,6 +227,32 @@ const GlobalNotificationHeader = ({
         title={isMuted ? 'Unmute alerts' : 'Mute alerts (buzzer still active)'}
       >
         {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+      </motion.button>
+
+      {/* Chat Button with Software Vala Logo */}
+      <motion.button
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate('/personal-chat')}
+        className="relative"
+        title="Personal Chat"
+      >
+        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-500/50 hover:border-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/25">
+          <img 
+            src={softwareValaLogo} 
+            alt="Chat" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        {unreadChatCount > 0 && (
+          <motion.span
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-emerald-500 rounded-full text-xs font-bold text-white flex items-center justify-center"
+          >
+            {unreadChatCount > 99 ? '99+' : unreadChatCount}
+          </motion.span>
+        )}
       </motion.button>
 
       {/* Notification Bell */}
