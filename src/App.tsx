@@ -20,6 +20,7 @@ import RnDDashboard from "./pages/RnDDashboard";
 import ClientSuccessDashboard from "./pages/ClientSuccessDashboard";
 import PerformanceManager from "./pages/PerformanceManager";
 import FinanceManager from "./pages/FinanceManager";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/client-success" element={<ClientSuccessDashboard />} />
           <Route path="/performance" element={<PerformanceManager />} />
           <Route path="/finance" element={<FinanceManager />} />
+          <Route path="/super-admin" element={<SuperAdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
