@@ -36,6 +36,7 @@ import NotificationBuzzerConsole from "./pages/NotificationBuzzerConsole";
 import APIIntegrationDashboard from "./pages/APIIntegrationDashboard";
 import ApplyPortal from "./pages/ApplyPortal";
 import InternalChat from "./pages/InternalChat";
+import PersonalChat from "./pages/PersonalChat";
 import UnifiedSecurityCenter from "./components/security/UnifiedSecurityCenter";
 import DomainProtection from "./components/security/DomainProtection";
 import PendingItemsSuggestion from "./components/shared/PendingItemsSuggestion";
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="/api-integrations" element={<APIIntegrationDashboard />} />
               <Route path="/apply" element={<ApplyPortal />} />
               <Route path="/internal-chat" element={<InternalChat />} />
+              <Route path="/personal-chat" element={<PersonalChat />} />
               <Route path="/security-center" element={<UnifiedSecurityCenter />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

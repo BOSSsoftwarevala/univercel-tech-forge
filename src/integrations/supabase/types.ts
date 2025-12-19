@@ -3668,6 +3668,41 @@ export type Database = {
         }
         Relationships: []
       }
+      message_approval_queue: {
+        Row: {
+          assigned_admin: string | null
+          created_at: string | null
+          id: string
+          message_id: string
+          notes: string | null
+          priority: string | null
+        }
+        Insert: {
+          assigned_admin?: string | null
+          created_at?: string | null
+          id?: string
+          message_id: string
+          notes?: string | null
+          priority?: string | null
+        }
+        Update: {
+          assigned_admin?: string | null
+          created_at?: string | null
+          id?: string
+          message_id?: string
+          notes?: string | null
+          priority?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_approval_queue_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "personal_chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payout_records: {
         Row: {
           amount: number
@@ -3823,6 +3858,107 @@ export type Database = {
           read_access?: boolean | null
           role?: Database["public"]["Enums"]["app_role"]
           write_access?: boolean | null
+        }
+        Relationships: []
+      }
+      personal_chat_messages: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          content: string | null
+          created_at: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          is_read: boolean | null
+          message_type: string | null
+          read_at: string | null
+          receiver_id: string
+          rejection_reason: string | null
+          sender_id: string
+          status: string | null
+          thread_id: string
+          updated_at: string | null
+          voice_duration: number | null
+          voice_url: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          content?: string | null
+          created_at?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_type?: string | null
+          read_at?: string | null
+          receiver_id: string
+          rejection_reason?: string | null
+          sender_id: string
+          status?: string | null
+          thread_id: string
+          updated_at?: string | null
+          voice_duration?: number | null
+          voice_url?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          content?: string | null
+          created_at?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_type?: string | null
+          read_at?: string | null
+          receiver_id?: string
+          rejection_reason?: string | null
+          sender_id?: string
+          status?: string | null
+          thread_id?: string
+          updated_at?: string | null
+          voice_duration?: number | null
+          voice_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "personal_chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      personal_chat_threads: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_message_at: string | null
+          participant_one: string
+          participant_two: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_message_at?: string | null
+          participant_one: string
+          participant_two: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_message_at?: string | null
+          participant_one?: string
+          participant_two?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
