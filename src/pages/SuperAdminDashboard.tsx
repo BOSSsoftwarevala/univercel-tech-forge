@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminSidebarFull from "@/components/admin/AdminSidebarFull";
 import AdminTopBar from "@/components/admin/AdminTopBar";
 import ModuleOverview from "@/components/admin/ModuleOverview";
 import RoleAccessControl from "@/components/admin/RoleAccessControl";
@@ -10,6 +10,13 @@ import ActivityMonitor from "@/components/admin/ActivityMonitor";
 import GlobalMetrics from "@/components/admin/GlobalMetrics";
 import SecurityCenter from "@/components/admin/SecurityCenter";
 import AdminNotifications from "@/components/admin/AdminNotifications";
+import GlobalLiveControlCenter from "@/components/admin/GlobalLiveControlCenter";
+import WalletFinanceConsole from "@/components/admin/WalletFinanceConsole";
+import LeadDistributionHub from "@/components/admin/LeadDistributionHub";
+import DeveloperTaskOrchestration from "@/components/admin/DeveloperTaskOrchestration";
+import PerformanceScoringAI from "@/components/admin/PerformanceScoringAI";
+import ComplianceLegalShield from "@/components/admin/ComplianceLegalShield";
+import EmergencyBuzzerControls from "@/components/admin/EmergencyBuzzerControls";
 
 type AdminView = 
   | "overview"
@@ -18,30 +25,51 @@ type AdminView =
   | "health"
   | "activity"
   | "metrics"
-  | "security";
+  | "security"
+  | "live-control"
+  | "wallet-finance"
+  | "lead-distribution"
+  | "dev-orchestration"
+  | "performance-ai"
+  | "compliance"
+  | "emergency";
 
 const SuperAdminDashboard = () => {
-  const [activeView, setActiveView] = useState<AdminView>("overview");
+  const [activeView, setActiveView] = useState<AdminView>("live-control");
   const [showNotifications, setShowNotifications] = useState(false);
 
   const renderContent = () => {
     switch (activeView) {
+      case "live-control":
+        return <GlobalLiveControlCenter />;
       case "overview":
         return <ModuleOverview />;
+      case "lead-distribution":
+        return <LeadDistributionHub />;
+      case "dev-orchestration":
+        return <DeveloperTaskOrchestration />;
+      case "wallet-finance":
+        return <WalletFinanceConsole />;
+      case "performance-ai":
+        return <PerformanceScoringAI />;
       case "roles":
         return <RoleAccessControl />;
       case "users":
         return <UserManagement />;
+      case "compliance":
+        return <ComplianceLegalShield />;
+      case "security":
+        return <SecurityCenter />;
+      case "emergency":
+        return <EmergencyBuzzerControls />;
       case "health":
         return <SystemHealth />;
       case "activity":
         return <ActivityMonitor />;
       case "metrics":
         return <GlobalMetrics />;
-      case "security":
-        return <SecurityCenter />;
       default:
-        return <ModuleOverview />;
+        return <GlobalLiveControlCenter />;
     }
   };
 
@@ -54,7 +82,7 @@ const SuperAdminDashboard = () => {
         <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-neon-teal/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
       </div>
 
-      <AdminSidebar activeView={activeView} onViewChange={setActiveView} />
+      <AdminSidebarFull activeView={activeView} onViewChange={setActiveView} />
       
       <div className="flex-1 flex flex-col ml-64">
         <AdminTopBar onNotificationsClick={() => setShowNotifications(true)} />
