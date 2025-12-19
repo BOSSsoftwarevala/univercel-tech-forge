@@ -70,6 +70,113 @@ export type Database = {
           },
         ]
       }
+      chat_user_status: {
+        Row: {
+          id: string
+          is_muted: boolean | null
+          is_online: boolean | null
+          last_active_channel: string | null
+          last_seen: string | null
+          mute_reason: string | null
+          muted_until: string | null
+          updated_at: string | null
+          user_id: string
+          violation_count: number | null
+        }
+        Insert: {
+          id?: string
+          is_muted?: boolean | null
+          is_online?: boolean | null
+          last_active_channel?: string | null
+          last_seen?: string | null
+          mute_reason?: string | null
+          muted_until?: string | null
+          updated_at?: string | null
+          user_id: string
+          violation_count?: number | null
+        }
+        Update: {
+          id?: string
+          is_muted?: boolean | null
+          is_online?: boolean | null
+          last_active_channel?: string | null
+          last_seen?: string | null
+          mute_reason?: string | null
+          muted_until?: string | null
+          updated_at?: string | null
+          user_id?: string
+          violation_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_user_status_last_active_channel_fkey"
+            columns: ["last_active_channel"]
+            isOneToOne: false
+            referencedRelation: "internal_chat_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_violations: {
+        Row: {
+          action_taken: string | null
+          channel_id: string | null
+          created_at: string | null
+          description: string | null
+          detected_content: string | null
+          id: string
+          message_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          user_id: string
+          violation_level: number | null
+          violation_type: string
+        }
+        Insert: {
+          action_taken?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          detected_content?: string | null
+          id?: string
+          message_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          user_id: string
+          violation_level?: number | null
+          violation_type: string
+        }
+        Update: {
+          action_taken?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          detected_content?: string | null
+          id?: string
+          message_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          user_id?: string
+          violation_level?: number | null
+          violation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_violations_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "internal_chat_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_violations_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "internal_chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dedicated_support_messages: {
         Row: {
           attachments: Json | null
@@ -2869,6 +2976,125 @@ export type Database = {
             columns: ["influencer_id"]
             isOneToOne: false
             referencedRelation: "influencer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_chat_channels: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          channel_type: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          frozen_at: string | null
+          frozen_by: string | null
+          id: string
+          is_active: boolean | null
+          is_approved: boolean | null
+          is_frozen: boolean | null
+          name: string
+          target_roles: Database["public"]["Enums"]["app_role"][] | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          channel_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          frozen_at?: string | null
+          frozen_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_approved?: boolean | null
+          is_frozen?: boolean | null
+          name: string
+          target_roles?: Database["public"]["Enums"]["app_role"][] | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          channel_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          frozen_at?: string | null
+          frozen_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_approved?: boolean | null
+          is_frozen?: boolean | null
+          name?: string
+          target_roles?: Database["public"]["Enums"]["app_role"][] | null
+        }
+        Relationships: []
+      }
+      internal_chat_messages: {
+        Row: {
+          channel_id: string
+          content: string
+          created_at: string | null
+          flag_reason: string | null
+          flagged_by: string | null
+          id: string
+          is_flagged: boolean | null
+          is_masked: boolean | null
+          is_visible: boolean | null
+          message_type: string
+          original_content: string | null
+          read_by: string[] | null
+          sender_id: string
+          sender_masked_name: string
+          sender_region: string | null
+          sender_role: Database["public"]["Enums"]["app_role"]
+          voice_transcript: string | null
+        }
+        Insert: {
+          channel_id: string
+          content: string
+          created_at?: string | null
+          flag_reason?: string | null
+          flagged_by?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          is_masked?: boolean | null
+          is_visible?: boolean | null
+          message_type?: string
+          original_content?: string | null
+          read_by?: string[] | null
+          sender_id: string
+          sender_masked_name: string
+          sender_region?: string | null
+          sender_role: Database["public"]["Enums"]["app_role"]
+          voice_transcript?: string | null
+        }
+        Update: {
+          channel_id?: string
+          content?: string
+          created_at?: string | null
+          flag_reason?: string | null
+          flagged_by?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          is_masked?: boolean | null
+          is_visible?: boolean | null
+          message_type?: string
+          original_content?: string | null
+          read_by?: string[] | null
+          sender_id?: string
+          sender_masked_name?: string
+          sender_region?: string | null
+          sender_role?: Database["public"]["Enums"]["app_role"]
+          voice_transcript?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_chat_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "internal_chat_channels"
             referencedColumns: ["id"]
           },
         ]
