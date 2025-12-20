@@ -74,12 +74,21 @@ const DeveloperNotifications = ({ onClose }: DeveloperNotificationsProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 400 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 400 }}
-      className="fixed right-0 top-16 bottom-0 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-cyan-500/20 z-50"
-    >
+    <>
+      {/* Backdrop - click to close */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 z-40"
+      />
+      <motion.div
+        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+        className="fixed right-4 top-20 w-96 max-h-[70vh] bg-slate-900 backdrop-blur-xl border border-cyan-500/20 rounded-xl shadow-2xl shadow-cyan-500/10 z-50 overflow-hidden"
+      >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
         <div className="flex items-center gap-3">
@@ -98,7 +107,7 @@ const DeveloperNotifications = ({ onClose }: DeveloperNotificationsProps) => {
       </div>
 
       {/* Notifications List */}
-      <div className="overflow-auto max-h-[calc(100vh-130px)]">
+      <div className="overflow-auto max-h-[40vh]">
         {notifications.map((notification, index) => {
           const Icon = notification.icon;
           return (
@@ -134,12 +143,13 @@ const DeveloperNotifications = ({ onClose }: DeveloperNotificationsProps) => {
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700/50 bg-slate-900/95">
-        <button className="w-full py-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-400 text-sm hover:border-cyan-500/30 hover:text-cyan-400 transition-all">
+      <div className="p-3 border-t border-slate-700/50 bg-slate-900">
+        <button className="w-full py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-400 text-sm hover:border-cyan-500/30 hover:text-cyan-400 transition-all">
           Mark all as read
         </button>
       </div>
     </motion.div>
+    </>
   );
 };
 
