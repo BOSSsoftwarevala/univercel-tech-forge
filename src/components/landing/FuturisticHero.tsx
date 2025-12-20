@@ -99,7 +99,7 @@ const FuturisticHero = () => {
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-slate-300 mb-10 max-w-2xl">
-            AI-Driven, Multi-Role, Masked & Secure Business Ecosystem.
+            AI + You = Infinite Possibilities
           </p>
 
           {/* CTA Buttons */}
