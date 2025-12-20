@@ -47,7 +47,7 @@ const AIAssistantPanel = ({ isOpen, onClose, embedded = false }: AIAssistantPane
   };
 
   const content = (
-    <div className={`flex flex-col ${embedded ? 'h-[calc(100vh-200px)]' : 'h-full'}`}>
+    <div className={`flex flex-col ${embedded ? 'h-[calc(100vh-200px)]' : 'h-[65vh]'}`}>
       {/* Header */}
       {!embedded && (
         <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
@@ -185,14 +185,24 @@ const AIAssistantPanel = ({ isOpen, onClose, embedded = false }: AIAssistantPane
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 400 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 400 }}
-      className="fixed right-0 top-16 bottom-0 w-96 bg-slate-900/95 backdrop-blur-xl border-l border-cyan-500/20 z-50 flex flex-col"
-    >
-      {content}
-    </motion.div>
+    <>
+      {/* Backdrop - click to close */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 z-40"
+      />
+      <motion.div
+        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+        className="fixed right-4 top-20 w-[420px] max-h-[70vh] bg-slate-900 backdrop-blur-xl border border-cyan-500/20 rounded-xl shadow-2xl shadow-cyan-500/10 z-50 flex flex-col overflow-hidden"
+      >
+        {content}
+      </motion.div>
+    </>
   );
 };
 
