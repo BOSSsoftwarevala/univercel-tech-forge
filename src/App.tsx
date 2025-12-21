@@ -170,6 +170,7 @@ const App = () => (
               <Route path="/lead-manager" element={<LeadManager />} />
               <Route path="/task-manager" element={<TaskManager />} />
               <Route path="/demo-manager" element={<ProductDemoManager />} />
+              <Route path="/demo" element={<ProductDemoManager />} />
               <Route path="/finance" element={<FinanceManager />} />
               <Route path="/legal" element={<LegalComplianceManager />} />
               <Route path="/marketing" element={<MarketingManager />} />
