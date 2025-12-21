@@ -7,10 +7,11 @@ import {
   Crown, Users, Building2, Store, Code2, Zap, Star, Target,
   ListTodo, Package, Wallet, HeadphonesIcon, TrendingUp, Brain,
   Activity, Globe, Shield, Scale, Search, UserPlus, MessageSquare,
-  Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight
+  Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight, ScanLine
 } from 'lucide-react';
 import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { LucideIcon } from 'lucide-react';
+import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
 
 // Role status data
 const roleStatuses: Array<{
@@ -242,12 +243,21 @@ const HeaderStatCard = ({
 
 const SuperAdminCommandCenter = () => {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showAudit, setShowAudit] = useState(false);
   const [liveStats, setLiveStats] = useState({
     totalLeads: 4523,
     activeDevelopers: 47,
     demosOnline: 156,
     totalRevenue: 12450000,
   });
+
+  // Auto-trigger audit after welcome
+  useEffect(() => {
+    if (!showWelcome) {
+      const timer = setTimeout(() => setShowAudit(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [showWelcome]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowWelcome(false), 2500);
@@ -267,6 +277,9 @@ const SuperAdminCommandCenter = () => {
 
   return (
     <DashboardLayout roleOverride="super_admin">
+      {/* System Audit Popup */}
+      <SystemAuditPopup isVisible={showAudit} onClose={() => setShowAudit(false)} />
+      
       {/* Welcome Animation Overlay */}
       <AnimatePresence>
         {showWelcome && (
@@ -358,6 +371,15 @@ const SuperAdminCommandCenter = () => {
                 <Activity className="h-3 w-3 mr-1.5 animate-pulse" />
                 LIVE
               </Badge>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2 border-teal-500/30 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20"
+                onClick={() => setShowAudit(true)}
+              >
+                <ScanLine className="w-4 h-4" />
+                Run Audit
+              </Button>
               <Button variant="outline" size="sm" className="gap-2 border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700">
                 <RefreshCw className="w-4 h-4" />
                 Refresh
