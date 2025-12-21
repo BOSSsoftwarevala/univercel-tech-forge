@@ -155,6 +155,11 @@ const App = () => (
               <Route path="/franchise/internal-chat" element={<FranchiseLayout><FranchiseInternalChatPage /></FranchiseLayout>} />
               <Route path="/franchise/training-center" element={<FranchiseLayout><FranchiseTrainingCenter /></FranchiseLayout>} />
               <Route path="/franchise/security-panel" element={<FranchiseLayout><FranchiseSecurityPanel /></FranchiseLayout>} />
+              <Route path="/franchise/seo-services" element={<FranchiseLayout><FranchiseSEOServices /></FranchiseLayout>} />
+              <Route path="/franchise/team-management" element={<FranchiseLayout><FranchiseTeamManagement /></FranchiseLayout>} />
+              <Route path="/franchise/crm" element={<FranchiseLayout><FranchiseCRM /></FranchiseLayout>} />
+              <Route path="/franchise/hrm" element={<FranchiseLayout><FranchiseHRM /></FranchiseLayout>} />
+              <Route path="/franchise/lead-activity" element={<FranchiseLayout><FranchiseLeadActivity /></FranchiseLayout>} />
               <Route path="/franchise-program" element={<FranchiseLanding />} />
               <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
 
