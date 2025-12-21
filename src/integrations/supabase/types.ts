@@ -3185,6 +3185,54 @@ export type Database = {
           },
         ]
       }
+      festival_calendar: {
+        Row: {
+          country_codes: string[] | null
+          created_at: string | null
+          day: number
+          default_discount: number | null
+          description: string | null
+          duration_days: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          month: number
+          name: string
+          theme_primary: string | null
+          theme_secondary: string | null
+        }
+        Insert: {
+          country_codes?: string[] | null
+          created_at?: string | null
+          day: number
+          default_discount?: number | null
+          description?: string | null
+          duration_days?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          month: number
+          name: string
+          theme_primary?: string | null
+          theme_secondary?: string | null
+        }
+        Update: {
+          country_codes?: string[] | null
+          created_at?: string | null
+          day?: number
+          default_discount?: number | null
+          description?: string | null
+          duration_days?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          month?: number
+          name?: string
+          theme_primary?: string | null
+          theme_secondary?: string | null
+        }
+        Relationships: []
+      }
       franchise_accounts: {
         Row: {
           address: string | null
@@ -3941,6 +3989,72 @@ export type Database = {
           status?: string | null
           unfreeze_date?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      global_offers: {
+        Row: {
+          banner_text: string | null
+          country_code: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discount_percentage: number
+          end_date: string
+          event_name: string | null
+          event_type: Database["public"]["Enums"]["offer_event_type"]
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_auto_detected: boolean | null
+          start_date: string
+          theme_accent_color: string | null
+          theme_primary_color: string | null
+          theme_secondary_color: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          banner_text?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_percentage?: number
+          end_date: string
+          event_name?: string | null
+          event_type?: Database["public"]["Enums"]["offer_event_type"]
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_auto_detected?: boolean | null
+          start_date: string
+          theme_accent_color?: string | null
+          theme_primary_color?: string | null
+          theme_secondary_color?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          banner_text?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_percentage?: number
+          end_date?: string
+          event_name?: string | null
+          event_type?: Database["public"]["Enums"]["offer_event_type"]
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_auto_detected?: boolean | null
+          start_date?: string
+          theme_accent_color?: string | null
+          theme_primary_color?: string | null
+          theme_secondary_color?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -8855,6 +8969,54 @@ export type Database = {
           },
         ]
       }
+      sports_events: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          default_discount: number | null
+          end_date: string
+          id: string
+          is_active: boolean | null
+          name: string
+          sport_type: string
+          start_date: string
+          team1_color: string | null
+          team1_name: string | null
+          team2_color: string | null
+          team2_name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          default_discount?: number | null
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          sport_type: string
+          start_date: string
+          team1_color?: string | null
+          team1_name?: string | null
+          team2_color?: string | null
+          team2_name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          default_discount?: number | null
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          sport_type?: string
+          start_date?: string
+          team1_color?: string | null
+          team1_name?: string | null
+          team2_color?: string | null
+          team2_name?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           activated_at: string | null
@@ -9955,6 +10117,7 @@ export type Database = {
         | "negotiation"
         | "closed_won"
         | "closed_lost"
+      offer_event_type: "festival" | "sports" | "custom"
       promise_status:
         | "assigned"
         | "promised"
@@ -10168,6 +10331,7 @@ export const Constants = {
         "closed_won",
         "closed_lost",
       ],
+      offer_event_type: ["festival", "sports", "custom"],
       promise_status: [
         "assigned",
         "promised",

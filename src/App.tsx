@@ -7,6 +7,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import { AnimationProvider } from "./contexts/AnimationContext";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
+import GlobalOfferPopup from "@/components/offers/GlobalOfferPopup";
 import Homepage from "./pages/Homepage";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
