@@ -55,11 +55,10 @@ const PendingItemsSuggestion = () => {
     {
       id: 'email-notifications',
       title: 'Email Notifications',
-      description: 'Activity approval emails to hellosoftwarevala@gmail.com',
-      status: 'pending',
+      description: 'Activity approval emails configured',
+      status: 'completed',
       category: 'email',
       icon: <Mail className="w-3 h-3" />,
-      action: 'Setup Required',
     },
     {
       id: 'buzzer-system',

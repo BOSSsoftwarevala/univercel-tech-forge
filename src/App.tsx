@@ -77,7 +77,6 @@ import ApplyPortal from "./pages/ApplyPortal";
 import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
 import DomainProtection from "./components/security/DomainProtection";
-import PendingItemsSuggestion from "./components/shared/PendingItemsSuggestion";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
 import DemoCredentials from "./pages/DemoCredentials";
@@ -91,7 +90,6 @@ const App = () => (
         <DomainProtection>
           <Toaster />
           <Sonner />
-          <PendingItemsSuggestion />
           <BrowserRouter>
             <FloatingAIChatbotWrapper />
             <Routes>
