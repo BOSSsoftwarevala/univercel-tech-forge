@@ -46,6 +46,11 @@ import FranchiseSupportTicket from "./pages/franchise/SupportTicket";
 import FranchiseInternalChatPage from "./pages/franchise/InternalChat";
 import FranchiseTrainingCenter from "./pages/franchise/TrainingCenter";
 import FranchiseSecurityPanel from "./pages/franchise/SecurityPanel";
+import FranchiseSEOServices from "./pages/franchise/SEOServices";
+import FranchiseTeamManagement from "./pages/franchise/TeamManagement";
+import FranchiseCRM from "./pages/franchise/CRM";
+import FranchiseHRM from "./pages/franchise/HRM";
+import FranchiseLeadActivity from "./pages/franchise/LeadActivity";
 
 // Existing Pages
 import FranchiseManagement from "./pages/FranchiseManagement";
