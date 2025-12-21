@@ -146,49 +146,49 @@ const App = () => (
               <Route path="/super-admin/ai-billing" element={<RequireRole allowed={["super_admin"]}><AIBillingDashboard /></RequireRole>} />
 
               {/* Franchise Routes */}
-              <Route path="/franchise" element={<FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout>} />
-              <Route path="/franchise/dashboard" element={<FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout>} />
-              <Route path="/franchise/profile" element={<FranchiseLayout><FranchiseProfile /></FranchiseLayout>} />
-              <Route path="/franchise/wallet" element={<FranchiseLayout><FranchiseWalletPage /></FranchiseLayout>} />
-              <Route path="/franchise/lead-board" element={<FranchiseLayout><FranchiseLeadBoardPage /></FranchiseLayout>} />
-              <Route path="/franchise/assign-lead" element={<FranchiseLayout><FranchiseAssignLead /></FranchiseLayout>} />
-              <Route path="/franchise/demo-request" element={<FranchiseLayout><FranchiseDemoRequest /></FranchiseLayout>} />
-              <Route path="/franchise/demo-library" element={<FranchiseLayout><FranchiseDemoLibraryPage /></FranchiseLayout>} />
-              <Route path="/franchise/sales-center" element={<FranchiseLayout><FranchiseSalesCenter /></FranchiseLayout>} />
-              <Route path="/franchise/performance" element={<FranchiseLayout><FranchisePerformancePage /></FranchiseLayout>} />
-              <Route path="/franchise/support-ticket" element={<FranchiseLayout><FranchiseSupportTicket /></FranchiseLayout>} />
-              <Route path="/franchise/internal-chat" element={<FranchiseLayout><FranchiseInternalChatPage /></FranchiseLayout>} />
-              <Route path="/franchise/training-center" element={<FranchiseLayout><FranchiseTrainingCenter /></FranchiseLayout>} />
-              <Route path="/franchise/security-panel" element={<FranchiseLayout><FranchiseSecurityPanel /></FranchiseLayout>} />
-              <Route path="/franchise/seo-services" element={<FranchiseLayout><FranchiseSEOServices /></FranchiseLayout>} />
-              <Route path="/franchise/team-management" element={<FranchiseLayout><FranchiseTeamManagement /></FranchiseLayout>} />
-              <Route path="/franchise/crm" element={<FranchiseLayout><FranchiseCRM /></FranchiseLayout>} />
-              <Route path="/franchise/hrm" element={<FranchiseLayout><FranchiseHRM /></FranchiseLayout>} />
-              <Route path="/franchise/lead-activity" element={<FranchiseLayout><FranchiseLeadActivity /></FranchiseLayout>} />
+              <Route path="/franchise" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/dashboard" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/profile" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseProfile /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/wallet" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseWalletPage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/lead-board" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseLeadBoardPage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/assign-lead" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseAssignLead /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/demo-request" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDemoRequest /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/demo-library" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDemoLibraryPage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/sales-center" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseSalesCenter /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/performance" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchisePerformancePage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/support-ticket" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseSupportTicket /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/internal-chat" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseInternalChatPage /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/training-center" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseTrainingCenter /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/security-panel" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseSecurityPanel /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/seo-services" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseSEOServices /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/team-management" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseTeamManagement /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/crm" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseCRM /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/hrm" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseHRM /></FranchiseLayout></RequireRole>} />
+              <Route path="/franchise/lead-activity" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseLeadActivity /></FranchiseLayout></RequireRole>} />
               <Route path="/franchise-program" element={<FranchiseLanding />} />
-              <Route path="/franchise-dashboard" element={<FranchiseDashboard />} />
+              <Route path="/franchise-dashboard" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseDashboard /></RequireRole>} />
 
               {/* Reseller Routes */}
-              <Route path="/reseller" element={<ResellerDashboard />} />
-              <Route path="/reseller/dashboard" element={<ResellerDashboard />} />
+              <Route path="/reseller" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
+              <Route path="/reseller/dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
               <Route path="/reseller-program" element={<ResellerLanding />} />
-              <Route path="/reseller-dashboard" element={<ResellerDashboard />} />
+              <Route path="/reseller-dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
 
               {/* Developer Routes */}
-              <Route path="/developer" element={<DeveloperDashboard />} />
-              <Route path="/developer/dashboard" element={<DeveloperDashboard />} />
-              <Route path="/developer-dashboard" element={<DeveloperDashboard />} />
+              <Route path="/developer" element={<RequireRole allowed={["developer", "super_admin"]}><DeveloperDashboard /></RequireRole>} />
+              <Route path="/developer/dashboard" element={<RequireRole allowed={["developer", "super_admin"]}><DeveloperDashboard /></RequireRole>} />
+              <Route path="/developer-dashboard" element={<RequireRole allowed={["developer", "super_admin"]}><DeveloperDashboard /></RequireRole>} />
 
               {/* Influencer Routes */}
-              <Route path="/influencer" element={<InfluencerDashboard />} />
-              <Route path="/influencer/dashboard" element={<InfluencerDashboard />} />
-              <Route path="/influencer-dashboard" element={<InfluencerDashboard />} />
-              <Route path="/influencer-manager" element={<InfluencerManager />} />
+              <Route path="/influencer" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerDashboard /></RequireRole>} />
+              <Route path="/influencer/dashboard" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerDashboard /></RequireRole>} />
+              <Route path="/influencer-dashboard" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerDashboard /></RequireRole>} />
+              <Route path="/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
 
               {/* Prime User Routes */}
-              <Route path="/prime" element={<PrimeUserDashboard />} />
-              <Route path="/prime/dashboard" element={<PrimeUserDashboard />} />
-              <Route path="/prime-user" element={<PrimeUserDashboard />} />
+              <Route path="/prime" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
+              <Route path="/prime/dashboard" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
+              <Route path="/prime-user" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
 
               {/* Manager Routes */}
               <Route path="/lead-manager" element={<LeadManager />} />
