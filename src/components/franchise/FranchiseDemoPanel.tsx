@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Monitor, Play, Clock, CheckCircle2, AlertTriangle,
-  ExternalLink, Calendar, Users, Eye, Share2
+  ShoppingCart, Heart, Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -16,6 +16,8 @@ interface Demo {
   maskedUrl: string;
   uptime: number;
   lastUsed: string;
+  isFavorite?: boolean;
+  inCart?: boolean;
 }
 
 interface DemoRequest {
@@ -29,11 +31,11 @@ interface DemoRequest {
 }
 
 const FranchiseDemoPanel = () => {
-  const [demos] = useState<Demo[]>([
-    { id: '1', title: 'E-Commerce Platform', category: 'Retail', techStack: ['PHP', 'MySQL'], status: 'available', maskedUrl: 'demo.sv****/ecom', uptime: 99.8, lastUsed: '2 hours ago' },
-    { id: '2', title: 'Hospital Management', category: 'Healthcare', techStack: ['Node.js', 'MongoDB'], status: 'assigned', maskedUrl: 'demo.sv****/hms', uptime: 99.5, lastUsed: '5 hours ago' },
-    { id: '3', title: 'School ERP', category: 'Education', techStack: ['Java', 'PostgreSQL'], status: 'in_use', maskedUrl: 'demo.sv****/school', uptime: 99.9, lastUsed: 'Now' },
-    { id: '4', title: 'CRM Solution', category: 'Finance', techStack: ['React', 'Node.js'], status: 'available', maskedUrl: 'demo.sv****/crm', uptime: 99.7, lastUsed: '1 day ago' },
+  const [demos, setDemos] = useState<Demo[]>([
+    { id: '1', title: 'E-Commerce Platform', category: 'Retail', techStack: ['PHP', 'MySQL'], status: 'available', maskedUrl: 'demo.sv****/ecom', uptime: 99.8, lastUsed: '2 hours ago', isFavorite: false, inCart: false },
+    { id: '2', title: 'Hospital Management', category: 'Healthcare', techStack: ['Node.js', 'MongoDB'], status: 'assigned', maskedUrl: 'demo.sv****/hms', uptime: 99.5, lastUsed: '5 hours ago', isFavorite: true, inCart: false },
+    { id: '3', title: 'School ERP', category: 'Education', techStack: ['Java', 'PostgreSQL'], status: 'in_use', maskedUrl: 'demo.sv****/school', uptime: 99.9, lastUsed: 'Now', isFavorite: false, inCart: true },
+    { id: '4', title: 'CRM Solution', category: 'Finance', techStack: ['React', 'Node.js'], status: 'available', maskedUrl: 'demo.sv****/crm', uptime: 99.7, lastUsed: '1 day ago', isFavorite: false, inCart: false },
   ]);
 
   const [demoRequests, setDemoRequests] = useState<DemoRequest[]>([
@@ -42,18 +44,28 @@ const FranchiseDemoPanel = () => {
     { id: '3', leadName: 'Amit Patel', demoId: '3', demoTitle: 'School ERP', requestedAt: '1 day ago', status: 'rejected' },
   ]);
 
-  const handleRequestDemo = (demoId: string, demoTitle: string) => {
+  const handleAddToCart = (demoId: string, demoTitle: string) => {
+    setDemos(prev => prev.map(d => d.id === demoId ? { ...d, inCart: !d.inCart } : d));
+    const demo = demos.find(d => d.id === demoId);
     toast({
-      title: "Demo Request Sent",
-      description: `Request for "${demoTitle}" has been sent for approval.`,
+      title: demo?.inCart ? "Removed from Cart" : "Added to Cart",
+      description: `"${demoTitle}" ${demo?.inCart ? 'removed from' : 'added to'} your cart.`,
     });
   };
 
-  const handleShareDemo = (demo: Demo) => {
-    navigator.clipboard.writeText(`https://${demo.maskedUrl}`);
+  const handlePlayDemo = (demoId: string, demoTitle: string) => {
     toast({
-      title: "Link Copied",
-      description: "Masked demo link copied to clipboard.",
+      title: "Opening Demo",
+      description: `Launching "${demoTitle}" demo...`,
+    });
+  };
+
+  const handleToggleFavorite = (demoId: string, demoTitle: string) => {
+    setDemos(prev => prev.map(d => d.id === demoId ? { ...d, isFavorite: !d.isFavorite } : d));
+    const demo = demos.find(d => d.id === demoId);
+    toast({
+      title: demo?.isFavorite ? "Removed from Favorites" : "Added to Favorites",
+      description: `"${demoTitle}" ${demo?.isFavorite ? 'removed from' : 'added to'} favorites.`,
     });
   };
 
@@ -134,21 +146,30 @@ const FranchiseDemoPanel = () => {
 
               <div className="flex gap-2">
                 <Button
-                  onClick={() => handleRequestDemo(demo.id, demo.title)}
+                  onClick={() => handleAddToCart(demo.id, demo.title)}
                   size="sm"
-                  className="flex-1 bg-indigo-500 hover:bg-indigo-600"
-                  disabled={demo.status === 'in_use'}
+                  variant={demo.inCart ? "secondary" : "default"}
+                  className={demo.inCart ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30" : "bg-indigo-500 hover:bg-indigo-600"}
                 >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Request
+                  <ShoppingCart className="w-4 h-4 mr-1" />
+                  {demo.inCart ? 'In Cart' : 'Add'}
                 </Button>
                 <Button
-                  onClick={() => handleShareDemo(demo)}
-                  variant="outline"
+                  onClick={() => handlePlayDemo(demo.id, demo.title)}
                   size="sm"
-                  className="border-slate-600"
+                  variant="outline"
+                  className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <Play className="w-4 h-4 mr-1" />
+                  Demo
+                </Button>
+                <Button
+                  onClick={() => handleToggleFavorite(demo.id, demo.title)}
+                  variant="ghost"
+                  size="sm"
+                  className={demo.isFavorite ? "text-rose-400 hover:text-rose-300" : "text-slate-400 hover:text-rose-400"}
+                >
+                  <Heart className={`w-4 h-4 ${demo.isFavorite ? 'fill-current' : ''}`} />
                 </Button>
               </div>
             </motion.div>
