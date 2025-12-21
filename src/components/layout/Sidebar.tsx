@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Building2, 
   Users, 
@@ -24,8 +25,10 @@ import {
   Globe,
   ChevronDown,
   ChevronRight,
-  LayoutDashboard
+  LayoutDashboard,
+  LogOut
 } from 'lucide-react';
+import { toast } from 'sonner';
 import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 interface MenuItem {
@@ -115,6 +118,13 @@ const Sidebar = ({ activeItem, onItemClick, collapsed }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logged out successfully');
+    navigate('/auth');
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedItems(prev => 
@@ -171,7 +181,7 @@ const Sidebar = ({ activeItem, onItemClick, collapsed }: SidebarProps) => {
       </div>
 
       {/* Menu Items */}
-      <div className="overflow-y-auto h-[calc(100%-80px)] py-3 px-2 space-y-1">
+      <div className="overflow-y-auto h-[calc(100%-140px)] py-3 px-2 space-y-1">
         {menuItems.map((item, index) => (
           <motion.div
             key={item.id}
@@ -235,6 +245,28 @@ const Sidebar = ({ activeItem, onItemClick, collapsed }: SidebarProps) => {
             </AnimatePresence>
           </motion.div>
         ))}
+      </div>
+
+      {/* Logout Button */}
+      <div className="absolute bottom-0 left-0 right-0 p-2 border-t border-border/30 bg-background/80 backdrop-blur-sm">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-all"
+        >
+          <LogOut className="w-4 h-4" />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-sm font-medium"
+              >
+                Logout
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
     </motion.aside>
   );

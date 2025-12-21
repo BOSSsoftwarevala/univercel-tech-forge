@@ -1,10 +1,13 @@
 import { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 import {
   LayoutDashboard, User, Wallet, Users, UserPlus, Play, Library,
   TrendingUp, BarChart3, HeadphonesIcon, MessageSquare, GraduationCap,
-  Shield, Bell, Settings, Store
+  Shield, Bell, Settings, Store, LogOut, Search, UsersRound, 
+  ClipboardList, Activity, Building2
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -19,10 +22,15 @@ const menuItems = [
   { icon: Wallet, label: 'Wallet & Commission', path: '/franchise/wallet', badge: '₹1.2L' },
   { icon: Users, label: 'Lead Board', path: '/franchise/lead-board', badge: '28' },
   { icon: UserPlus, label: 'Assign Lead', path: '/franchise/assign-lead' },
+  { icon: Activity, label: 'Lead Activity Tracker', path: '/franchise/lead-activity' },
   { icon: Play, label: 'Demo Request', path: '/franchise/demo-request' },
   { icon: Library, label: 'Demo Library', path: '/franchise/demo-library' },
   { icon: TrendingUp, label: 'Sales Center', path: '/franchise/sales-center' },
   { icon: BarChart3, label: 'Performance', path: '/franchise/performance' },
+  { icon: Search, label: 'SEO Services', path: '/franchise/seo-services', badge: 'New' },
+  { icon: UsersRound, label: 'Team Management', path: '/franchise/team-management' },
+  { icon: ClipboardList, label: 'CRM', path: '/franchise/crm' },
+  { icon: Building2, label: 'HRM', path: '/franchise/hrm' },
   { icon: HeadphonesIcon, label: 'Support Ticket', path: '/franchise/support-ticket' },
   { icon: MessageSquare, label: 'Internal Chat', path: '/franchise/internal-chat', badge: 'New' },
   { icon: GraduationCap, label: 'Training Center', path: '/franchise/training-center' },
@@ -31,7 +39,14 @@ const menuItems = [
 
 const FranchiseLayout = ({ children }: FranchiseLayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logged out successfully');
+    navigate('/auth');
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 flex">
       {/* Sidebar */}
@@ -115,6 +130,15 @@ const FranchiseLayout = ({ children }: FranchiseLayoutProps) => {
           >
             ← Back to Main Dashboard
           </Link>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors text-sm"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       </aside>
 
