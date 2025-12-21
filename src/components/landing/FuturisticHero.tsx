@@ -13,7 +13,7 @@ const FuturisticHero = () => {
   ];
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 py-8 sm:py-12 lg:py-16">
       {/* Background - Deep charcoal with circuit pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-[hsl(220,20%,6%)] via-[hsl(220,25%,4%)] to-[hsl(220,30%,2%)]" />
       
@@ -43,71 +43,69 @@ const FuturisticHero = () => {
         </svg>
       </div>
 
-      {/* AI and I Hero Image - Centered */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="relative w-full h-full max-w-4xl mx-auto flex items-center justify-center"
-        >
-          <img 
-            src={heroAiWoman} 
-            alt="AI and I - Can Make a Difference" 
-            className="w-full h-full object-contain"
-            style={{ 
-              filter: 'brightness(1.05) contrast(1.02)'
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,20%,4%)] via-transparent to-[hsl(220,20%,4%)] opacity-60" />
-          <div className="absolute inset-0 bg-gradient-to-l from-[hsl(220,20%,4%)] via-transparent to-[hsl(220,20%,4%)] opacity-40" />
-        </motion.div>
-      </div>
+      {/* Hero Image - Responsive sizing */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="relative z-10 w-full max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto flex-shrink-0"
+      >
+        <img 
+          src={heroAiWoman} 
+          alt="AI and I - Can Make a Difference" 
+          className="w-full h-auto object-contain"
+          style={{ 
+            filter: 'brightness(1.05) contrast(1.02)'
+          }}
+        />
+        {/* Gradient overlays for blending */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,20%,4%)] via-transparent to-transparent opacity-70 pointer-events-none" />
+      </motion.div>
 
-      <div className="container relative z-10 px-4 mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-4xl text-center mx-auto mt-[60vh]"
-        >
-
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap gap-4 justify-center">
-            {ctaButtons.map((btn, index) => (
-              <motion.div
-                key={btn.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + index * 0.1 }}
+      {/* CTA Buttons - Below image */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="relative z-10 w-full max-w-4xl mx-auto mt-6 sm:mt-8 lg:mt-10"
+      >
+        <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4 justify-center">
+          {ctaButtons.map((btn, index) => (
+            <motion.div
+              key={btn.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 + index * 0.1 }}
+            >
+              <Link
+                to={btn.href}
+                className={`
+                  group relative inline-flex items-center gap-1.5 sm:gap-2 
+                  px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 
+                  rounded-lg sm:rounded-xl 
+                  text-xs sm:text-sm lg:text-base font-semibold
+                  transition-all duration-300 overflow-hidden whitespace-nowrap
+                  ${btn.variant === 'primary' 
+                    ? 'bg-gradient-to-r from-[hsl(210,100%,55%)] to-[hsl(187,100%,50%)] text-white shadow-[0_0_20px_hsl(210_100%_55%/0.3)] sm:shadow-[0_0_30px_hsl(210_100%_55%/0.4)]' 
+                    : btn.variant === 'gold'
+                    ? 'bg-transparent border border-[hsl(45,100%,50%)] sm:border-2 text-[hsl(45,100%,50%)] hover:bg-[hsl(45,100%,50%)/0.1] shadow-[0_0_15px_hsl(45_100%_50%/0.2)] sm:shadow-[0_0_20px_hsl(45_100%_50%/0.3)]'
+                    : 'bg-transparent border border-[hsl(210,100%,55%)/0.5] sm:border-2 text-[hsl(210,100%,55%)] hover:border-[hsl(210,100%,55%)] hover:bg-[hsl(210,100%,55%)/0.1]'
+                  }
+                  hover:scale-105 active:scale-95
+                `}
               >
-                <Link
-                  to={btn.href}
-                  className={`
-                    group relative inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold
-                    transition-all duration-300 overflow-hidden
-                    ${btn.variant === 'primary' 
-                      ? 'bg-gradient-to-r from-[hsl(210,100%,55%)] to-[hsl(187,100%,50%)] text-white shadow-[0_0_30px_hsl(210_100%_55%/0.4)]' 
-                      : btn.variant === 'gold'
-                      ? 'bg-transparent border-2 border-[hsl(45,100%,50%)] text-[hsl(45,100%,50%)] hover:bg-[hsl(45,100%,50%)/0.1] shadow-[0_0_20px_hsl(45_100%_50%/0.3)]'
-                      : 'bg-transparent border-2 border-[hsl(210,100%,55%)/0.5] text-[hsl(210,100%,55%)] hover:border-[hsl(210,100%,55%)] hover:bg-[hsl(210,100%,55%)/0.1]'
-                    }
-                    hover:scale-105 active:scale-95
-                  `}
-                >
-                  <btn.icon className="w-5 h-5" />
-                  {btn.label}
-                  
-                  {/* Glow effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                                  bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-200%] 
-                                  group-hover:translate-x-[200%] transition-transform duration-700" />
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+                <btn.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
+                {btn.label}
+                
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                                bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-200%] 
+                                group-hover:translate-x-[200%] transition-transform duration-700" />
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
     </section>
   );
 };
