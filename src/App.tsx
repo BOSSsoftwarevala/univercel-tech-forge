@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import RequireRole from "@/components/auth/RequireRole";
+import RequireAuth from "@/components/auth/RequireAuth";
 import Homepage from "./pages/Homepage";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -20,8 +21,11 @@ import DeviceVerify from "./pages/auth/DeviceVerify";
 import IPVerify from "./pages/auth/IPVerify";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import ChangePassword from "./pages/auth/ChangePassword";
 import AccountSuspension from "./pages/auth/AccountSuspension";
 import AccessDenied from "./pages/auth/AccessDenied";
+
+import SettingsPage from "./pages/Settings";
 
 // Super Admin Pages
 import SuperAdminDashboard from "./pages/super-admin/Dashboard";
@@ -105,6 +109,8 @@ const App = () => (
               <Route path="/" element={<Homepage />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
+              <Route path="/change-password" element={<RequireAuth><ChangePassword /></RequireAuth>} />
               <Route path="/onboard" element={<Homepage />} />
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
               <Route path="/apply" element={<ApplyPortal />} />

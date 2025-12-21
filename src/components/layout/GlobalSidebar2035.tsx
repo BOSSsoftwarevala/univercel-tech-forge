@@ -53,15 +53,14 @@ const roleNavItems = [
   { icon: Monitor, label: 'Demo Manager', path: '/demos', accent: 'text-teal-400' },
   { icon: UserPlus, label: 'HR/Hiring', path: '/hr', accent: 'text-indigo-400' },
   { icon: Scale, label: 'Legal/Compliance', path: '/legal', accent: 'text-slate-400' },
-  { icon: Shield, label: 'API/Security', path: '/security', accent: 'text-red-500' },
-  { icon: Bot, label: 'ChatBot', path: '/chatbot', accent: 'text-sky-400' },
-  { icon: CreditCard, label: 'Wallet', path: '/wallet', accent: 'text-green-500' },
+  { icon: Shield, label: 'API Integrations', path: '/api-integrations', accent: 'text-red-500' },
+  { icon: Bot, label: 'AI Console', path: '/ai-console', accent: 'text-sky-400' },
   { icon: Settings, label: 'Settings', path: '/settings', accent: 'text-gray-400' },
 ];
 
 // Map roles to their allowed paths
 const rolePathMap: Record<string, string[]> = {
-  super_admin: roleNavItems.map(item => item.path), // Super admin sees all
+  super_admin: roleNavItems.map((item) => item.path),
   franchise: ['/franchise', '/settings'],
   reseller: ['/reseller', '/settings'],
   developer: ['/developer', '/settings'],
@@ -76,10 +75,12 @@ const rolePathMap: Record<string, string[]> = {
   marketing_manager: ['/marketing', '/settings'],
   demo_manager: ['/demos', '/settings'],
   hr_manager: ['/hr', '/settings'],
-  legal_manager: ['/legal', '/settings'],
+  legal_compliance: ['/legal', '/settings'],
   seo_manager: ['/seo', '/settings'],
-  support_manager: ['/support', '/settings'],
+  support: ['/support', '/settings'],
   sales_manager: ['/sales', '/settings'],
+  ai_manager: ['/ai-console', '/settings'],
+  api_security: ['/api-integrations', '/settings'],
 };
 
 const GlobalSidebar2035 = ({ collapsed, onToggle, lowDataMode }: SidebarProps) => {
