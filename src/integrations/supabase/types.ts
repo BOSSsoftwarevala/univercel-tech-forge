@@ -214,6 +214,74 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_room_messages: {
+        Row: {
+          created_at: string | null
+          delete_blocked: boolean | null
+          edit_blocked: boolean | null
+          id: string
+          masked_sender_name: string | null
+          message_text: string
+          room_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          delete_blocked?: boolean | null
+          edit_blocked?: boolean | null
+          id?: string
+          masked_sender_name?: string | null
+          message_text: string
+          room_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string | null
+          delete_blocked?: boolean | null
+          edit_blocked?: boolean | null
+          id?: string
+          masked_sender_name?: string | null
+          message_text?: string
+          room_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_room_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_rooms: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          is_active: boolean | null
+          purpose: string | null
+          room_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_active?: boolean | null
+          purpose?: string | null
+          room_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_active?: boolean | null
+          purpose?: string | null
+          room_type?: string | null
+        }
+        Relationships: []
+      }
       chat_threads: {
         Row: {
           created_at: string
@@ -4100,6 +4168,36 @@ export type Database = {
         }
         Relationships: []
       }
+      login_history: {
+        Row: {
+          attempt_status: string | null
+          created_at: string | null
+          device_info: string | null
+          failure_reason: string | null
+          id: string
+          ip_address: string | null
+          user_id: string
+        }
+        Insert: {
+          attempt_status?: string | null
+          created_at?: string | null
+          device_info?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          user_id: string
+        }
+        Update: {
+          attempt_status?: string | null
+          created_at?: string | null
+          device_info?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketing_campaigns: {
         Row: {
           budget: number | null
@@ -4151,6 +4249,66 @@ export type Database = {
           start_date?: string | null
           status?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      masked_identities: {
+        Row: {
+          created_at: string | null
+          id: string
+          masked_email: string
+          masked_phone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          masked_email: string
+          masked_phone?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          masked_email?: string
+          masked_phone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      master_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string | null
+          user_id: string | null
+          user_role: Database["public"]["Enums"]["app_role"] | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_id?: string | null
+          user_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_id?: string | null
+          user_role?: Database["public"]["Enums"]["app_role"] | null
         }
         Relationships: []
       }
@@ -6082,6 +6240,36 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_keywords: {
+        Row: {
+          created_at: string | null
+          current_rank: number | null
+          id: string
+          keyword: string
+          module: string
+          region: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_rank?: number | null
+          id?: string
+          keyword: string
+          module: string
+          region?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_rank?: number | null
+          id?: string
+          keyword?: string
+          module?: string
+          region?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       seo_manager: {
         Row: {
           created_at: string
@@ -6241,6 +6429,30 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_public: boolean | null
+          setting_key: string
+          setting_value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          setting_key: string
+          setting_value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          setting_key?: string
+          setting_value?: string | null
+        }
+        Relationships: []
+      }
       task_logs: {
         Row: {
           action: string
@@ -6294,6 +6506,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      task_timers: {
+        Row: {
+          created_at: string | null
+          developer_id: string
+          end_time: string | null
+          id: string
+          is_paused: boolean | null
+          start_time: string | null
+          status: string | null
+          task_id: string
+          total_seconds: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          developer_id: string
+          end_time?: string | null
+          id?: string
+          is_paused?: boolean | null
+          start_time?: string | null
+          status?: string | null
+          task_id: string
+          total_seconds?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          developer_id?: string
+          end_time?: string | null
+          id?: string
+          is_paused?: boolean | null
+          start_time?: string | null
+          status?: string | null
+          task_id?: string
+          total_seconds?: number | null
+        }
+        Relationships: []
       }
       tasks: {
         Row: {
@@ -6577,6 +6825,48 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          device_info: string | null
+          force_logout_flag: boolean | null
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          location: string | null
+          login_at: string | null
+          logout_at: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          device_info?: string | null
+          force_logout_flag?: boolean | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          location?: string | null
+          login_at?: string | null
+          logout_at?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          device_info?: string | null
+          force_logout_flag?: boolean | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          location?: string | null
+          login_at?: string | null
+          logout_at?: string | null
           user_id?: string
         }
         Relationships: []
