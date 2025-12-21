@@ -224,13 +224,13 @@ const App = () => (
               <Route path="/ai/*" element={<AIOptimizationConsole />} />
 
               {/* System Routes */}
-              <Route path="/system-settings" element={<SystemSettings />} />
-              <Route path="/buzzer-console" element={<NotificationBuzzerConsole />} />
-              <Route path="/api-integrations" element={<APIIntegrationDashboard />} />
+              <Route path="/system-settings" element={<RequireRole allowed={["super_admin"]}><SystemSettings /></RequireRole>} />
+              <Route path="/buzzer-console" element={<RequireRole allowed={["super_admin"]}><NotificationBuzzerConsole /></RequireRole>} />
+              <Route path="/api-integrations" element={<RequireRole allowed={["api_security", "super_admin"]}><APIIntegrationDashboard /></RequireRole>} />
               <Route path="/internal-chat" element={<InternalChat />} />
               <Route path="/personal-chat" element={<PersonalChat />} />
               <Route path="/ai-console" element={<AIOptimizationConsole />} />
-              <Route path="/demo-credentials" element={<DemoCredentials />} />
+              <Route path="/demo-credentials" element={<RequireRole allowed={["super_admin"]}><DemoCredentials /></RequireRole>} />
 
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />

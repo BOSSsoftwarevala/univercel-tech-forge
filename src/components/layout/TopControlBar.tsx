@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Activity, 
-  Users, 
-  DollarSign, 
-  Bell, 
-  Shield, 
-  Volume2, 
+import { useAuth } from '@/hooks/useAuth';
+import {
+  Activity,
+  Users,
+  DollarSign,
+  Bell,
+  Shield,
+  Volume2,
   VolumeX,
   AlertTriangle,
   Server,
@@ -16,7 +17,7 @@ import {
   Bot,
   Radio,
   Lock,
-  Unlock
+  Unlock,
 } from 'lucide-react';
 
 interface StatusItem {
@@ -29,6 +30,9 @@ interface StatusItem {
 
 const TopControlBar = () => {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
+  const isSuperAdmin = userRole === 'super_admin';
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFrozen, setIsFrozen] = useState(false);
   const [noiseReduction, setNoiseReduction] = useState(false);
@@ -40,27 +44,69 @@ const TopControlBar = () => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
       // Simulate live data
-      setLiveUsers(prev => prev + Math.floor(Math.random() * 10 - 5));
-      setRevenue(prev => prev + Math.floor(Math.random() * 100));
+      setLiveUsers((prev) => prev + Math.floor(Math.random() * 10 - 5));
+      setRevenue((prev) => prev + Math.floor(Math.random() * 100));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
   const statusItems: StatusItem[] = [
-    { label: 'System', status: 'online', icon: <Server className="w-3.5 h-3.5" />, path: '/super-admin/system-settings' },
-    { label: 'Demo', status: 'online', icon: <Activity className="w-3.5 h-3.5" />, path: '/super-admin/demo-manager' },
-    { label: 'API', status: 'warning', icon: <Radio className="w-3.5 h-3.5" />, path: '/api-integration' },
-    { label: 'AI', status: 'online', icon: <Bot className="w-3.5 h-3.5" />, path: '/super-admin/ai-billing' },
-    { label: 'Wallet', status: 'online', icon: <Wallet className="w-3.5 h-3.5" />, path: '/super-admin/finance-center' },
-    { label: 'Server', status: 'online', icon: <Cpu className="w-3.5 h-3.5" />, path: '/super-admin/system-settings' },
+    ...(isSuperAdmin
+      ? ([
+          {
+            label: 'System',
+            status: 'online',
+            icon: <Server className="w-3.5 h-3.5" />,
+            path: '/super-admin/system-settings',
+          },
+          {
+            label: 'Demo',
+            status: 'online',
+            icon: <Activity className="w-3.5 h-3.5" />,
+            path: '/super-admin/demo-manager',
+          },
+        ] as StatusItem[])
+      : []),
+    {
+      label: 'API',
+      status: 'warning',
+      icon: <Radio className="w-3.5 h-3.5" />,
+      path: '/api-integrations',
+    },
+    ...(isSuperAdmin
+      ? ([
+          {
+            label: 'AI',
+            status: 'online',
+            icon: <Bot className="w-3.5 h-3.5" />,
+            path: '/super-admin/ai-billing',
+          },
+          {
+            label: 'Wallet',
+            status: 'online',
+            icon: <Wallet className="w-3.5 h-3.5" />,
+            path: '/super-admin/finance-center',
+          },
+          {
+            label: 'Server',
+            status: 'online',
+            icon: <Cpu className="w-3.5 h-3.5" />,
+            path: '/super-admin/system-settings',
+          },
+        ] as StatusItem[])
+      : []),
   ];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: StatusItem['status']) => {
     switch (status) {
-      case 'online': return 'status-dot-online';
-      case 'warning': return 'status-dot-warning';
-      case 'critical': return 'status-dot-critical';
-      default: return 'status-dot-online';
+      case 'online':
+        return 'status-dot-online';
+      case 'warning':
+        return 'status-dot-warning';
+      case 'critical':
+        return 'status-dot-critical';
+      default:
+        return 'status-dot-online';
     }
   };
 
@@ -179,10 +225,12 @@ const TopControlBar = () => {
         </motion.button>
 
         {/* Super Admin Badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 glass-panel-glow rounded-lg">
-          <Shield className="w-4 h-4 text-primary" />
-          <span className="text-xs font-semibold text-primary">SUPER ADMIN</span>
-        </div>
+        {isSuperAdmin && (
+          <div className="flex items-center gap-2 px-3 py-1.5 glass-panel-glow rounded-lg">
+            <Shield className="w-4 h-4 text-primary" />
+            <span className="text-xs font-semibold text-primary">SUPER ADMIN</span>
+          </div>
+        )}
       </div>
     </motion.header>
   );

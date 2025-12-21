@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Crown, 
-  Building2, 
-  Users, 
-  Code2, 
-  Megaphone, 
+import {
+  Crown,
+  Building2,
+  Users,
+  Code2,
+  Megaphone,
   Star,
   Target,
   ListTodo,
@@ -24,10 +24,11 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -60,6 +61,11 @@ const roleNavItems = [
 
 const GlobalSidebar2035 = ({ collapsed, onToggle, lowDataMode }: SidebarProps) => {
   const location = useLocation();
+  const { userRole } = useAuth();
+
+  const filteredItems = roleNavItems.filter(
+    (item) => item.path !== '/super-admin' || userRole === 'super_admin'
+  );
 
   return (
     <motion.aside
@@ -101,10 +107,9 @@ const GlobalSidebar2035 = ({ collapsed, onToggle, lowDataMode }: SidebarProps) =
       <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-white/10">
         <TooltipProvider delayDuration={0}>
           <ul className="space-y-1 px-2">
-            {roleNavItems.map((item) => {
+            {filteredItems.map((item) => {
               const isActive = location.pathname.startsWith(item.path);
               const Icon = item.icon;
-              
               return (
                 <li key={item.path}>
                   <Tooltip>
