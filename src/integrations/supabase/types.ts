@@ -170,6 +170,354 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_billing_qr_codes: {
+        Row: {
+          base_cost_total: number
+          created_at: string
+          data_payload: Json
+          expires_at: string
+          final_cost_total: number
+          id: string
+          is_valid: boolean | null
+          last_refreshed_at: string | null
+          management_fee_total: number
+          period_end: string | null
+          period_start: string | null
+          qr_code: string
+          qr_type: string
+          statement_id: string | null
+          usage_id: string | null
+        }
+        Insert: {
+          base_cost_total: number
+          created_at?: string
+          data_payload: Json
+          expires_at?: string
+          final_cost_total: number
+          id?: string
+          is_valid?: boolean | null
+          last_refreshed_at?: string | null
+          management_fee_total: number
+          period_end?: string | null
+          period_start?: string | null
+          qr_code: string
+          qr_type?: string
+          statement_id?: string | null
+          usage_id?: string | null
+        }
+        Update: {
+          base_cost_total?: number
+          created_at?: string
+          data_payload?: Json
+          expires_at?: string
+          final_cost_total?: number
+          id?: string
+          is_valid?: boolean | null
+          last_refreshed_at?: string | null
+          management_fee_total?: number
+          period_end?: string | null
+          period_start?: string | null
+          qr_code?: string
+          qr_type?: string
+          statement_id?: string | null
+          usage_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_billing_qr_codes_usage_id_fkey"
+            columns: ["usage_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_billing_statements: {
+        Row: {
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          period_type: string
+          processed_at: string | null
+          qr_code_id: string | null
+          statement_number: string
+          status: string | null
+          total_base_cost: number
+          total_final_cost: number
+          total_management_fee: number
+          total_requests: number | null
+          total_tokens: number | null
+          usage_breakdown: Json | null
+          wallet_transaction_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          period_type?: string
+          processed_at?: string | null
+          qr_code_id?: string | null
+          statement_number?: string
+          status?: string | null
+          total_base_cost?: number
+          total_final_cost?: number
+          total_management_fee?: number
+          total_requests?: number | null
+          total_tokens?: number | null
+          usage_breakdown?: Json | null
+          wallet_transaction_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          processed_at?: string | null
+          qr_code_id?: string | null
+          statement_number?: string
+          status?: string | null
+          total_base_cost?: number
+          total_final_cost?: number
+          total_management_fee?: number
+          total_requests?: number | null
+          total_tokens?: number | null
+          usage_breakdown?: Json | null
+          wallet_transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_billing_statements_qr_code_id_fkey"
+            columns: ["qr_code_id"]
+            isOneToOne: false
+            referencedRelation: "ai_billing_qr_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_efficiency_scores: {
+        Row: {
+          avg_cost_per_request: number | null
+          comparison_to_market: number | null
+          created_at: string
+          efficiency_score: number | null
+          id: string
+          module: Database["public"]["Enums"]["ai_module"]
+          period_end: string
+          period_start: string
+          total_cost: number | null
+          total_requests: number | null
+        }
+        Insert: {
+          avg_cost_per_request?: number | null
+          comparison_to_market?: number | null
+          created_at?: string
+          efficiency_score?: number | null
+          id?: string
+          module: Database["public"]["Enums"]["ai_module"]
+          period_end: string
+          period_start: string
+          total_cost?: number | null
+          total_requests?: number | null
+        }
+        Update: {
+          avg_cost_per_request?: number | null
+          comparison_to_market?: number | null
+          created_at?: string
+          efficiency_score?: number | null
+          id?: string
+          module?: Database["public"]["Enums"]["ai_module"]
+          period_end?: string
+          period_start?: string
+          total_cost?: number | null
+          total_requests?: number | null
+        }
+        Relationships: []
+      }
+      ai_fraud_detection: {
+        Row: {
+          created_at: string
+          details: Json | null
+          detection_type: string
+          id: string
+          is_resolved: boolean | null
+          related_qr_id: string | null
+          related_usage_id: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          detection_type: string
+          id?: string
+          is_resolved?: boolean | null
+          related_qr_id?: string | null
+          related_usage_id?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          detection_type?: string
+          id?: string
+          is_resolved?: boolean | null
+          related_qr_id?: string | null
+          related_usage_id?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_fraud_detection_related_qr_id_fkey"
+            columns: ["related_qr_id"]
+            isOneToOne: false
+            referencedRelation: "ai_billing_qr_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_fraud_detection_related_usage_id_fkey"
+            columns: ["related_usage_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_qr_scan_logs: {
+        Row: {
+          alert_reason: string | null
+          alert_triggered: boolean | null
+          created_at: string
+          device_fingerprint: string | null
+          id: string
+          ip_address: string | null
+          is_duplicate: boolean | null
+          is_valid_scan: boolean | null
+          qr_code_id: string | null
+          scan_type: string | null
+          scanned_by: string
+          scanner_role: Database["public"]["Enums"]["app_role"]
+          user_agent: string | null
+          watermark_applied: boolean | null
+        }
+        Insert: {
+          alert_reason?: string | null
+          alert_triggered?: boolean | null
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          is_duplicate?: boolean | null
+          is_valid_scan?: boolean | null
+          qr_code_id?: string | null
+          scan_type?: string | null
+          scanned_by: string
+          scanner_role: Database["public"]["Enums"]["app_role"]
+          user_agent?: string | null
+          watermark_applied?: boolean | null
+        }
+        Update: {
+          alert_reason?: string | null
+          alert_triggered?: boolean | null
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          is_duplicate?: boolean | null
+          is_valid_scan?: boolean | null
+          qr_code_id?: string | null
+          scan_type?: string | null
+          scanned_by?: string
+          scanner_role?: Database["public"]["Enums"]["app_role"]
+          user_agent?: string | null
+          watermark_applied?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_qr_scan_logs_qr_code_id_fkey"
+            columns: ["qr_code_id"]
+            isOneToOne: false
+            referencedRelation: "ai_billing_qr_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_usage_logs: {
+        Row: {
+          base_cost: number
+          created_at: string
+          final_cost: number | null
+          id: string
+          is_billed: boolean | null
+          management_fee: number | null
+          management_fee_percent: number
+          module: Database["public"]["Enums"]["ai_module"]
+          processed_at: string | null
+          provider: Database["public"]["Enums"]["ai_provider"]
+          purpose: string | null
+          qr_code_id: string | null
+          request_count: number | null
+          tokens_used: number | null
+          usage_id: string
+          user_id: string
+          user_role: Database["public"]["Enums"]["app_role"]
+          wallet_transaction_id: string | null
+        }
+        Insert: {
+          base_cost?: number
+          created_at?: string
+          final_cost?: number | null
+          id?: string
+          is_billed?: boolean | null
+          management_fee?: number | null
+          management_fee_percent?: number
+          module: Database["public"]["Enums"]["ai_module"]
+          processed_at?: string | null
+          provider?: Database["public"]["Enums"]["ai_provider"]
+          purpose?: string | null
+          qr_code_id?: string | null
+          request_count?: number | null
+          tokens_used?: number | null
+          usage_id?: string
+          user_id: string
+          user_role: Database["public"]["Enums"]["app_role"]
+          wallet_transaction_id?: string | null
+        }
+        Update: {
+          base_cost?: number
+          created_at?: string
+          final_cost?: number | null
+          id?: string
+          is_billed?: boolean | null
+          management_fee?: number | null
+          management_fee_percent?: number
+          module?: Database["public"]["Enums"]["ai_module"]
+          processed_at?: string | null
+          provider?: Database["public"]["Enums"]["ai_provider"]
+          purpose?: string | null
+          qr_code_id?: string | null
+          request_count?: number | null
+          tokens_used?: number | null
+          usage_id?: string
+          user_id?: string
+          user_role?: Database["public"]["Enums"]["app_role"]
+          wallet_transaction_id?: string | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           api_key_hash: string
@@ -9533,6 +9881,16 @@ export type Database = {
       }
     }
     Enums: {
+      ai_module:
+        | "seo"
+        | "chatbot"
+        | "dev_assist"
+        | "ocr"
+        | "image_gen"
+        | "translation"
+        | "analytics"
+        | "other"
+      ai_provider: "openai" | "gemini" | "claude" | "lovable_ai" | "other"
       app_role:
         | "super_admin"
         | "demo_manager"
@@ -9730,6 +10088,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ai_module: [
+        "seo",
+        "chatbot",
+        "dev_assist",
+        "ocr",
+        "image_gen",
+        "translation",
+        "analytics",
+        "other",
+      ],
+      ai_provider: ["openai", "gemini", "claude", "lovable_ai", "other"],
       app_role: [
         "super_admin",
         "demo_manager",
