@@ -87,28 +87,6 @@ const FuturisticHero = () => {
         transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
       />
 
-      {/* Floating Geometric Shapes - Hidden on small screens, positioned away from edges */}
-      <div className="absolute inset-0 z-[4] pointer-events-none overflow-hidden hidden md:block">
-        <motion.div
-          className="absolute top-32 left-[15%] w-24 h-24 lg:w-32 lg:h-32 border border-[hsl(210,100%,55%)/0.2] rounded-full"
-          animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="absolute bottom-40 right-[15%] w-20 h-20 lg:w-24 lg:h-24 border border-[hsl(45,100%,50%)/0.15]"
-          style={{ transform: 'rotate(45deg)' }}
-          animate={{ rotate: [45, 405] }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="absolute top-1/3 right-[20%] w-12 h-12 lg:w-16 lg:h-16 border-2 border-[hsl(187,100%,50%)/0.15]"
-          animate={{ 
-            rotate: [0, 90, 180, 270, 360],
-            borderRadius: ['0%', '50%', '0%', '50%', '0%']
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-        />
-      </div>
 
       {/* Content Container */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-end min-h-screen pb-12 sm:pb-16 lg:pb-20">
