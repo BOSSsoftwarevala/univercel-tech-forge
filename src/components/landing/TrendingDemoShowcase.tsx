@@ -80,27 +80,27 @@ const TrendingDemoShowcase = () => {
   };
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-20 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-[hsl(220,25%,3%)]" />
       
       {/* Neon track lines */}
       <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-[hsl(210,100%,55%)/0.3] to-transparent" />
 
-      <div className="container relative mx-auto px-4">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex items-center justify-between mb-10"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-10"
         >
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
-              <Zap className="w-8 h-8 text-[hsl(210,100%,55%)]" />
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-2 sm:gap-3">
+              <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-[hsl(210,100%,55%)]" />
               Trending Demos
             </h2>
-            <p className="text-slate-400">Most popular demos this week</p>
+            <p className="text-sm sm:text-base text-slate-400">Most popular demos this week</p>
           </div>
           
           {/* Navigation */}
@@ -126,11 +126,11 @@ const TrendingDemoShowcase = () => {
           </div>
         </motion.div>
 
-        {/* Carousel */}
-        <div className="overflow-hidden">
+        {/* Carousel - horizontal scroll on mobile, animated on desktop */}
+        <div className="overflow-x-auto sm:overflow-hidden scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
           <motion.div
-            className="flex gap-6"
-            animate={{ x: -currentIndex * (100 / visibleDemos + 1.5) + '%' }}
+            className="flex gap-4 sm:gap-6 sm:touch-none"
+            animate={{ x: typeof window !== 'undefined' && window.innerWidth >= 640 ? -currentIndex * (100 / visibleDemos + 1.5) + '%' : 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             {demos.map((demo, index) => (
@@ -140,14 +140,14 @@ const TrendingDemoShowcase = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="flex-shrink-0 w-[calc(25%-18px)] min-w-[280px]"
+                className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)]"
               >
                 <div className="group relative rounded-2xl overflow-hidden
                               bg-[hsl(220,20%,8%)] border border-[hsl(210,100%,55%)/0.2]
                               hover:border-[hsl(210,100%,55%)/0.6] transition-all duration-300
                               hover:shadow-[0_0_40px_hsl(210_100%_55%/0.2)]">
                   {/* Image */}
-                  <div className="relative h-44 overflow-hidden">
+                  <div className="relative h-36 sm:h-44 overflow-hidden">
                     <img
                       src={demo.image}
                       alt={demo.title}
@@ -211,8 +211,8 @@ const TrendingDemoShowcase = () => {
           </motion.div>
         </div>
 
-        {/* Track dots */}
-        <div className="flex justify-center gap-2 mt-8">
+        {/* Track dots - hidden on mobile where scrolling is used */}
+        <div className="hidden sm:flex justify-center gap-2 mt-6 sm:mt-8">
           {Array.from({ length: maxIndex + 1 }).map((_, i) => (
             <button
               key={i}

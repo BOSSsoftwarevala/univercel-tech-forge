@@ -63,7 +63,7 @@ const ApplyHub = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220,25%,4%)] to-[hsl(220,20%,6%)]" />
       
@@ -81,7 +81,7 @@ const ApplyHub = () => {
         </svg>
       </div>
 
-      <div className="container relative mx-auto px-4">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -95,20 +95,20 @@ const ApplyHub = () => {
             <span className="text-sm font-medium text-[hsl(45,100%,50%)]">Choose Your Path</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4"
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4"
               style={{ textShadow: '0 0 40px hsl(210 100% 55% / 0.3)' }}>
             Begin Your Journey With{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(210,100%,55%)] to-[hsl(187,100%,50%)]">
               Software Vala
             </span>
           </h2>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto px-4">
             Select a Path. AI Guides You Forward.
           </p>
         </motion.div>
 
         {/* Apply Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
           {applyCards.map((card, index) => (
             <motion.div
               key={card.id}
@@ -200,14 +200,15 @@ const ApplyHub = () => {
           viewport={{ once: true }}
           className="mt-12 text-center"
         >
-          <button className="inline-flex items-center gap-3 px-8 py-4 rounded-xl
+          <button className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl
                            bg-gradient-to-r from-[hsl(210,100%,55%)/0.2] to-[hsl(187,100%,50%)/0.2]
                            border border-[hsl(210,100%,55%)/0.5] text-white font-medium
                            hover:border-[hsl(210,100%,55%)] hover:shadow-[0_0_30px_hsl(210_100%_55%/0.3)]
-                           transition-all duration-300">
-            <Brain className="w-5 h-5 text-[hsl(210,100%,55%)]" />
-            AI Eligibility Check — Find Your Best Role
-            <Sparkles className="w-5 h-5 text-[hsl(45,100%,50%)]" />
+                           transition-all duration-300 text-sm sm:text-base">
+            <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-[hsl(210,100%,55%)]" />
+            <span className="hidden sm:inline">AI Eligibility Check — Find Your Best Role</span>
+            <span className="sm:hidden">AI Eligibility Check</span>
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[hsl(45,100%,50%)]" />
           </button>
         </motion.div>
       </div>

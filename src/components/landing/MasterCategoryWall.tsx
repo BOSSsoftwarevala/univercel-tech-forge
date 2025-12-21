@@ -61,11 +61,11 @@ const MasterCategoryWall = () => {
   };
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-20 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220,20%,6%)] to-[hsl(220,25%,4%)]" />
 
-      <div className="container relative mx-auto px-4">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -73,16 +73,16 @@ const MasterCategoryWall = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
             Master <span className="text-[hsl(210,100%,55%)]">Category Wall</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto px-4">
             40+ industry solutions. Click to explore demos and start your journey.
           </p>
         </motion.div>
 
         {/* 4-Column Category Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           {categories.map((category, index) => (
             <motion.div
               key={category.slug}
@@ -97,7 +97,7 @@ const MasterCategoryWall = () => {
               <div 
                 onClick={() => handleCategoryClick(category.slug)}
                 className={`
-                  relative p-5 rounded-xl cursor-pointer transition-all duration-300
+                  relative p-3 sm:p-4 md:p-5 rounded-xl cursor-pointer transition-all duration-300
                   bg-[hsl(220,20%,8%)] border-2 border-[hsl(210,100%,55%)/0.3]
                   hover:border-[hsl(210,100%,55%)/0.8] hover:bg-[hsl(220,20%,10%)]
                   ${expandedCategory === category.slug ? 'shadow-[0_0_40px_hsl(210_100%_55%/0.3)]' : ''}
@@ -105,17 +105,17 @@ const MasterCategoryWall = () => {
               >
                 {/* Icon with neon glow */}
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
                                 bg-[hsl(210,100%,55%)/0.1] border border-[hsl(210,100%,55%)/0.3]
                                 group-hover:bg-[hsl(210,100%,55%)/0.2] transition-colors">
-                    <category.icon className="w-6 h-6 text-[hsl(210,100%,55%)]"
+                    <category.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[hsl(210,100%,55%)]"
                                    style={{ filter: 'drop-shadow(0 0 8px hsl(210 100% 55% / 0.6))' }} />
                   </div>
                 </div>
 
                 {/* Name with gold underline */}
-                <h3 className="font-semibold text-white text-sm mb-2 group-hover:text-[hsl(210,100%,55%)] transition-colors
-                             border-b border-[hsl(45,100%,50%)/0.3] pb-2">
+                <h3 className="font-semibold text-white text-xs sm:text-sm mb-2 group-hover:text-[hsl(210,100%,55%)] transition-colors
+                             border-b border-[hsl(45,100%,50%)/0.3] pb-2 line-clamp-1">
                   {category.name}
                 </h3>
 

@@ -336,7 +336,7 @@ const WorldMapPanel = () => {
   };
 
   return (
-    <section className="relative w-full min-h-[80vh] bg-background overflow-hidden">
+    <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] bg-background overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-graphite-dark via-background to-sapphire/10" />
       <div 
@@ -348,36 +348,36 @@ const WorldMapPanel = () => {
         }}
       />
 
-      <div className="relative z-10 container mx-auto px-6 py-8">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col gap-4 mb-4 sm:mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <Globe className="w-7 h-7 text-primary" />
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 sm:gap-3 flex-wrap">
+              <Globe className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
               Global Network
-              <Badge className="bg-primary/20 text-primary border border-primary/30">
+              <Badge className="bg-primary/20 text-primary border border-primary/30 text-xs sm:text-sm">
                 {branches.filter(b => b.status === "active").length} Active Regions
               </Badge>
             </h2>
-            <div className="h-0.5 w-48 bg-gradient-to-r from-primary via-neon-teal to-transparent mt-2" />
+            <div className="h-0.5 w-32 sm:w-48 bg-gradient-to-r from-primary via-neon-teal to-transparent mt-2" />
           </div>
 
-          {/* Search Bar */}
-          <div className="flex items-center gap-4">
-            <div className="relative">
+          {/* Search Bar - Hidden on mobile for cleaner UI */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search country or branch code"
+                placeholder="Search country..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 pl-10 bg-card/60 border-border/50 focus:border-primary"
+                className="w-40 sm:w-52 md:w-64 pl-10 bg-card/60 border-border/50 focus:border-primary text-sm"
               />
             </div>
 
             {/* AI Predict Mode Toggle */}
-            <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-card/60 border border-border/30">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 rounded-lg bg-card/60 border border-border/30">
               <Brain className="w-4 h-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Predict Growth</span>
+              <span className="text-xs sm:text-sm text-muted-foreground hidden xs:inline">Predict</span>
               <Switch
                 checked={aiPredictMode}
                 onCheckedChange={setAiPredictMode}
@@ -387,9 +387,9 @@ const WorldMapPanel = () => {
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Map Container */}
-          <div className="flex-1 relative rounded-xl overflow-hidden border border-border/30 bg-card/30 backdrop-blur-xl">
+          <div className="flex-1 relative rounded-xl overflow-hidden border border-border/30 bg-card/30 backdrop-blur-xl min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
             {/* Zoom Controls */}
             <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
               <Button
@@ -416,7 +416,7 @@ const WorldMapPanel = () => {
               projectionConfig={{
                 scale: 140,
               }}
-              style={{ width: "100%", height: "600px" }}
+              style={{ width: "100%", height: "100%", minHeight: "300px" }}
             >
               <ZoomableGroup
                 zoom={position.zoom}

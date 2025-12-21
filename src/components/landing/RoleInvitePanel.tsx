@@ -57,7 +57,7 @@ const RoleInvitePanel = () => {
   ];
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-20 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220,25%,4%)] to-[hsl(220,20%,6%)]" />
       
@@ -75,7 +75,7 @@ const RoleInvitePanel = () => {
         </svg>
       </div>
 
-      <div className="container relative mx-auto px-4">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,16 +83,16 @@ const RoleInvitePanel = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
             Join the <span className="text-[hsl(210,100%,55%)]">Ecosystem</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto px-4">
             Choose your role and start earning. Multiple paths, one powerful platform.
           </p>
         </motion.div>
 
         {/* Role Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
           {roles.map((role, index) => (
             <motion.div
               key={role.name}

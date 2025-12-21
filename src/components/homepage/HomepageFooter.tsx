@@ -26,14 +26,14 @@ const socialLinks = [
 
 const HomepageFooter = () => {
   return (
-    <footer className="relative pt-24 pb-8 overflow-hidden">
+    <footer className="relative pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-8 overflow-hidden">
       {/* Top Border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-5 gap-12 mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-10 sm:mb-12 md:mb-16">
           {/* Brand Column */}
-          <div className="lg:col-span-2">
+          <div className="col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
