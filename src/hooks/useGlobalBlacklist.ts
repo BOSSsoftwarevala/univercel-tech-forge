@@ -219,8 +219,9 @@ export function useGlobalBlacklist() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setEntries(data || []);
-      return data || [];
+      const typedData = (data || []) as unknown as BlacklistEntry[];
+      setEntries(typedData);
+      return typedData;
     } catch (error) {
       console.error('Failed to fetch blacklist entries:', error);
       return [];
@@ -382,6 +383,9 @@ export function useGlobalBlacklist() {
       else if (score > 60) riskLevel = 'high_risk';
       else if (score > 30) riskLevel = 'watch';
 
+      const factors = riskData?.factors;
+      const behaviorFlags: string[] = Array.isArray(factors) ? factors.filter((f): f is string => typeof f === 'string') : [];
+
       return {
         user_id: userId,
         email_hint: '***@***.com',
@@ -389,7 +393,7 @@ export function useGlobalBlacklist() {
         risk_score: score,
         risk_level: riskLevel,
         device_count: devices?.length || 0,
-        ip_locations: locations?.map(l => `${l.city}, ${l.country}`) || [],
+        ip_locations: locations?.map(l => `${l.city}, ${l.country_code}`) || [],
         blacklist_matches: blacklistCount,
         whitelist_status: false,
         payment_history: {
@@ -397,7 +401,7 @@ export function useGlobalBlacklist() {
           chargebacks: 0,
           refunds: 0,
         },
-        behavior_flags: riskData?.factors || [],
+        behavior_flags: behaviorFlags,
         last_activity: locations?.[0]?.created_at || new Date().toISOString(),
       };
     } catch (error) {
