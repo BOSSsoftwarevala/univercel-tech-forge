@@ -59,13 +59,40 @@ const roleNavItems = [
   { icon: Settings, label: 'Settings', path: '/settings', accent: 'text-gray-400' },
 ];
 
+// Map roles to their allowed paths
+const rolePathMap: Record<string, string[]> = {
+  super_admin: roleNavItems.map(item => item.path), // Super admin sees all
+  franchise: ['/franchise', '/settings'],
+  reseller: ['/reseller', '/settings'],
+  developer: ['/developer', '/settings'],
+  influencer: ['/influencer', '/settings'],
+  prime: ['/prime', '/settings'],
+  lead_manager: ['/leads', '/settings'],
+  task_manager: ['/tasks', '/settings'],
+  rnd_manager: ['/rnd', '/settings'],
+  client_success: ['/clients', '/settings'],
+  performance_manager: ['/performance', '/settings'],
+  finance_manager: ['/finance', '/settings'],
+  marketing_manager: ['/marketing', '/settings'],
+  demo_manager: ['/demos', '/settings'],
+  hr_manager: ['/hr', '/settings'],
+  legal_manager: ['/legal', '/settings'],
+  seo_manager: ['/seo', '/settings'],
+  support_manager: ['/support', '/settings'],
+  sales_manager: ['/sales', '/settings'],
+};
+
 const GlobalSidebar2035 = ({ collapsed, onToggle, lowDataMode }: SidebarProps) => {
   const location = useLocation();
   const { userRole } = useAuth();
 
-  const filteredItems = roleNavItems.filter(
-    (item) => item.path !== '/super-admin' || userRole === 'super_admin'
-  );
+  // Get allowed paths for current user role
+  const allowedPaths = userRole ? (rolePathMap[userRole] || ['/settings']) : [];
+  
+  const filteredItems = roleNavItems.filter((item) => {
+    if (userRole === 'super_admin') return true; // Super admin sees everything
+    return allowedPaths.includes(item.path);
+  });
 
   return (
     <motion.aside
