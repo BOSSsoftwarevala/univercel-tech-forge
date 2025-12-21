@@ -178,6 +178,8 @@ const App = () => (
               <Route path="/enterprise/marketing/*" element={<MarketingManager />} />
               <Route path="/performance" element={<PerformanceManager />} />
               <Route path="/rnd-dashboard" element={<RnDDashboard />} />
+              <Route path="/hr" element={<HRDashboard />} />
+              <Route path="/hr/*" element={<HRDashboard />} />
               <Route path="/seo" element={<SEODashboard />} />
               <Route path="/seo/*" element={<SEODashboard />} />
               <Route path="/seo-dashboard" element={<SEODashboard />} />
