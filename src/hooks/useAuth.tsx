@@ -61,12 +61,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .select('role')
         .eq('user_id', userId)
         .maybeSingle();
-      
-      if (data && !error) {
+
+      if (data?.role && !error) {
         setUserRole(data.role as AppRole);
+        return;
+      }
+
+      // If missing (common when RLS blocks client insert), try to initialize from auth metadata.
+      const metaRole = (user?.user_metadata as any)?.role as string | undefined;
+      if (metaRole) {
+        const { data: fnData, error: fnErr } = await supabase.functions.invoke('role-init', {
+          body: { role: metaRole },
+        });
+
+        if (!fnErr && (fnData as any)?.data?.role) {
+          setUserRole(((fnData as any).data.role) as AppRole);
+        }
       }
     } catch (err) {
-      console.error('Error fetching user role');
+      console.error('Error fetching user role', err);
     }
   };
 
@@ -90,11 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Create role entry and role-specific profile
       if (data.user) {
-        // Insert user role
-        await supabase.from('user_roles').insert({
-          user_id: data.user.id,
-          role: role
-        });
+        // Initialize role via backend function (prevents client-side role escalation and avoids RLS issues)
+        await supabase.functions.invoke('role-init', { body: { role } });
 
         // Create role-specific profile
         await createRoleProfile(data.user.id, role, email, fullName);
