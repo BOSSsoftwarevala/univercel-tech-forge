@@ -52,7 +52,7 @@ const mockMessages: ChatMessage[] = [
     id: '2',
     senderId: 'sa-001',
     senderRole: 'super_admin',
-    senderMaskedName: 'SA-****-7842',
+    senderMaskedName: '👑 BOSS-01',
     message: 'Team, we have a high-priority lead waiting. Who can handle it?',
     timestamp: '10:05 AM'
   },
@@ -60,7 +60,7 @@ const mockMessages: ChatMessage[] = [
     id: '3',
     senderId: 'dev-042',
     senderRole: 'developer',
-    senderMaskedName: 'DEV-****-3921',
+    senderMaskedName: 'EMP-042',
     message: 'I\'m currently on a task. Will be free in 2 hours.',
     timestamp: '10:06 AM'
   },
@@ -68,7 +68,7 @@ const mockMessages: ChatMessage[] = [
     id: '4',
     senderId: 'lm-015',
     senderRole: 'lead_manager',
-    senderMaskedName: 'LM-****-8845',
+    senderMaskedName: 'EMP-015',
     message: 'I can take it. Assigning to myself now.',
     timestamp: '10:07 AM'
   },

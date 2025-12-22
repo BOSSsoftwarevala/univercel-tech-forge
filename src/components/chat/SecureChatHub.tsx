@@ -187,12 +187,12 @@ const mockMessages: Message[] = [
 ];
 
 const mockOnlineUsers: OnlineUser[] = [
-  { id: "1", role: "super_admin", maskedName: "A***", region: "India", isOnline: true, isMuted: false, sentimentAvg: "positive", violationCount: 0 },
-  { id: "2", role: "developer", maskedName: "R***", region: "East Africa", isOnline: true, isMuted: false, sentimentAvg: "neutral", violationCount: 0 },
-  { id: "3", role: "sales", maskedName: "S***", region: "UAE", isOnline: true, isMuted: false, sentimentAvg: "positive", violationCount: 0 },
-  { id: "4", role: "support", maskedName: "M***", region: "UK", isOnline: false, isMuted: false, sentimentAvg: "neutral", violationCount: 1 },
-  { id: "5", role: "franchise", maskedName: "K***", region: "Kenya", isOnline: true, isMuted: true, sentimentAvg: "negative", violationCount: 2 },
-  { id: "6", role: "finance", maskedName: "J***", region: "Singapore", isOnline: true, isMuted: false, sentimentAvg: "neutral", violationCount: 0 },
+  { id: "1", role: "super_admin", maskedName: "👑 BOSS-01", region: "India", isOnline: true, isMuted: false, sentimentAvg: "positive", violationCount: 0 },
+  { id: "2", role: "developer", maskedName: "EMP-042", region: "East Africa", isOnline: true, isMuted: false, sentimentAvg: "neutral", violationCount: 0 },
+  { id: "3", role: "sales", maskedName: "SLS-00123", region: "UAE", isOnline: true, isMuted: false, sentimentAvg: "positive", violationCount: 0 },
+  { id: "4", role: "support", maskedName: "SUP-00456", region: "UK", isOnline: false, isMuted: false, sentimentAvg: "neutral", violationCount: 1 },
+  { id: "5", role: "franchise", maskedName: "FRN-0789", region: "Kenya", isOnline: true, isMuted: true, sentimentAvg: "negative", violationCount: 2 },
+  { id: "6", role: "finance", maskedName: "MGT-02", region: "Singapore", isOnline: true, isMuted: false, sentimentAvg: "neutral", violationCount: 0 },
 ];
 
 const SecureChatHub = () => {

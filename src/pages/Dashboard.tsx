@@ -33,10 +33,10 @@ const Dashboard = () => {
       return () => clearTimeout(timeout);
     }
 
-    // Role-based routing
+    // Role-based routing - Complete mapping for all 19+ roles
     const roleRoutes: Record<string, string> = {
       super_admin: '/super-admin',
-      admin: '/admin',
+      admin: '/super-admin', // Admin falls back to super-admin
       developer: '/developer',
       franchise: '/franchise',
       reseller: '/reseller',
@@ -44,17 +44,17 @@ const Dashboard = () => {
       prime: '/prime',
       lead_manager: '/lead-manager',
       task_manager: '/task-manager',
-      support_manager: '/support',
+      support: '/support',
       seo_manager: '/seo',
       finance_manager: '/finance',
       hr_manager: '/hr',
-      legal_manager: '/legal',
+      legal_compliance: '/legal',
       marketing_manager: '/marketing',
-      sales_manager: '/sales',
       client_success: '/client-success',
       rnd_manager: '/rnd-dashboard',
       performance_manager: '/performance',
       demo_manager: '/demo-manager',
+      ai_manager: '/ai-console',
       client: '/prime', // Default clients to prime dashboard
     };
 
