@@ -16,8 +16,22 @@ import {
   Crown,
   Power,
   RefreshCw,
-  Activity
+  Activity,
+  ChevronDown,
+  LayoutDashboard,
+  Megaphone,
+  Monitor,
+  UserCog,
+  Settings
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
 import { LiveReportsDashboard } from '@/components/live-reports/LiveReportsDashboard';
 import {
@@ -272,6 +286,42 @@ const MasterAdminDashboard = () => {
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Module Switcher Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 gap-2">
+                  <LayoutDashboard className="w-4 h-4" />
+                  Switch Module
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#12121a] border-gray-800 w-56">
+                <DropdownMenuLabel className="text-gray-400">Admin Modules</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-800" />
+                <DropdownMenuItem onClick={() => navigate('/super-admin')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Super Admin
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/demo-manager')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                  <Monitor className="w-4 h-4 mr-2" />
+                  Demo Manager
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/leads')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                  <Megaphone className="w-4 h-4 mr-2" />
+                  Leads
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/developer-dashboard')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                  <UserCog className="w-4 h-4 mr-2" />
+                  Developer Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-800" />
+                <DropdownMenuItem onClick={() => navigate('/settings')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button variant="outline" onClick={fetchUsers} disabled={loading} size="sm" className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
