@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Activity, 
@@ -12,6 +12,7 @@ import {
   Cpu,
   Search
 } from 'lucide-react';
+import { useRegionDetection } from '@/hooks/useRegionDetection';
 import GlobalNotificationHeader from './GlobalNotificationHeader';
 import HeaderAlertStack from './HeaderAlertStack';
 import type { NotificationAlert } from './GlobalNotificationHeader';
@@ -56,6 +57,7 @@ const UnifiedTopBar = ({
 }: UnifiedTopBarProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
+  const { formatTime, formatDate } = useRegionDetection();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -159,10 +161,10 @@ const UnifiedTopBar = ({
           {/* Time */}
           <div className="text-center">
             <div className={`font-mono text-lg bg-gradient-to-r ${accentColors[accentColor]} bg-clip-text text-transparent`}>
-              {currentTime.toLocaleTimeString('en-US', { hour12: false })}
+              {formatTime(currentTime)}
             </div>
             <div className="text-[10px] text-slate-500 uppercase tracking-wider">
-              {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+              {formatDate(currentTime, { weekday: 'short', month: 'short', day: 'numeric' })}
             </div>
           </div>
 

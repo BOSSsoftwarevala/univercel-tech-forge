@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useRegionDetection } from '@/hooks/useRegionDetection';
 import {
   Activity,
   Users,
@@ -31,6 +32,7 @@ interface StatusItem {
 const TopControlBar = () => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
+  const { formatTime, formatDate, getLocale } = useRegionDetection();
   const isSuperAdmin = userRole === 'super_admin';
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -151,10 +153,10 @@ const TopControlBar = () => {
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-8">
         <div className="text-center">
           <div className="font-mono text-lg neon-text">
-            {currentTime.toLocaleTimeString('en-US', { hour12: false })}
+            {formatTime(currentTime)}
           </div>
           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
-            {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            {formatDate(currentTime, { weekday: 'short', month: 'short', day: 'numeric' })}
           </div>
         </div>
 

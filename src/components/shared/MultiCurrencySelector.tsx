@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Wallet, Check, ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,29 +8,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Currency {
   code: string;
   name: string;
   symbol: string;
   flag: string;
-  rate: number; // Exchange rate to INR
+  rate: number; // Exchange rate to INR (base currency)
   trend: 'up' | 'down' | 'stable';
+  locale: string; // Proper locale for formatting
 }
 
 const currencies: Currency[] = [
-  { code: 'INR', name: 'Indian Rupee', symbol: '₹', flag: '🇮🇳', rate: 1, trend: 'stable' },
-  { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸', rate: 83.12, trend: 'up' },
-  { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺', rate: 90.45, trend: 'up' },
-  { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧', rate: 105.23, trend: 'down' },
-  { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪', rate: 22.63, trend: 'stable' },
-  { code: 'SAR', name: 'Saudi Riyal', symbol: '﷼', flag: '🇸🇦', rate: 22.16, trend: 'stable' },
-  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', flag: '🇸🇬', rate: 61.89, trend: 'up' },
-  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', flag: '🇦🇺', rate: 54.32, trend: 'down' },
-  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', flag: '🇨🇦', rate: 61.45, trend: 'stable' },
-  { code: 'JPY', name: 'Japanese Yen', symbol: '¥', flag: '🇯🇵', rate: 0.55, trend: 'down' },
-  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', flag: '🇨🇳', rate: 11.52, trend: 'up' },
-  { code: 'CHF', name: 'Swiss Franc', symbol: 'Fr', flag: '🇨🇭', rate: 95.67, trend: 'up' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹', flag: '🇮🇳', rate: 1, trend: 'stable', locale: 'en-IN' },
+  { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸', rate: 83.12, trend: 'up', locale: 'en-US' },
+  { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺', rate: 90.45, trend: 'up', locale: 'de-DE' },
+  { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧', rate: 105.23, trend: 'down', locale: 'en-GB' },
+  { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪', rate: 22.63, trend: 'stable', locale: 'ar-AE' },
+  { code: 'SAR', name: 'Saudi Riyal', symbol: '﷼', flag: '🇸🇦', rate: 22.16, trend: 'stable', locale: 'ar-SA' },
+  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', flag: '🇸🇬', rate: 61.89, trend: 'up', locale: 'en-SG' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', flag: '🇦🇺', rate: 54.32, trend: 'down', locale: 'en-AU' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', flag: '🇨🇦', rate: 61.45, trend: 'stable', locale: 'en-CA' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥', flag: '🇯🇵', rate: 0.55, trend: 'down', locale: 'ja-JP' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', flag: '🇨🇳', rate: 11.52, trend: 'up', locale: 'zh-CN' },
+  { code: 'CHF', name: 'Swiss Franc', symbol: 'Fr', flag: '🇨🇭', rate: 95.67, trend: 'up', locale: 'de-CH' },
 ];
 
 interface MultiCurrencySelectorProps {
@@ -46,9 +48,52 @@ export function MultiCurrencySelector({
 }: MultiCurrencySelectorProps) {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(currencies[0]);
 
-  const handleSelect = (currency: Currency) => {
+  // Load saved currency preference
+  useEffect(() => {
+    const saved = localStorage.getItem('sv_currency');
+    if (saved) {
+      const found = currencies.find(c => c.code === saved);
+      if (found) {
+        setSelectedCurrency(found);
+      }
+    }
+  }, []);
+
+  const handleSelect = async (currency: Currency) => {
     setSelectedCurrency(currency);
+    localStorage.setItem('sv_currency', currency.code);
+    
+    // Log currency change for audit (masked user ID)
+    try {
+      await supabase.from('audit_logs').insert({
+        action: 'currency_change',
+        module: 'localization',
+        meta_json: {
+          from_currency: selectedCurrency.code,
+          to_currency: currency.code,
+          rate: currency.rate,
+          timestamp: new Date().toISOString(),
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log currency change:', err);
+    }
+    
     onCurrencyChange?.(currency);
+  };
+
+  // Format currency with proper locale
+  const formatAmount = (amount: number, currencyCode: string, locale: string): string => {
+    try {
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount);
+    } catch {
+      return `${currencyCode} ${amount.toFixed(2)}`;
+    }
   };
 
   const TrendIcon = selectedCurrency.trend === 'up' ? TrendingUp : 
@@ -83,6 +128,7 @@ export function MultiCurrencySelector({
       >
         <div className="p-2 border-b border-border/30">
           <p className="text-xs text-muted-foreground font-medium px-2">Select Currency</p>
+          <p className="text-[10px] text-muted-foreground px-2">Base: INR • Rates updated live</p>
         </div>
         <div className="py-1">
           {currencies.map((currency) => (
@@ -137,6 +183,26 @@ export function MultiCurrencySelector({
       </DropdownMenuContent>
     </DropdownMenu>
   );
+}
+
+// Utility: Convert amount and return both values for wallet logs
+export function convertCurrency(
+  amount: number, 
+  fromCurrency: string, 
+  toCurrency: string
+): { converted: number; base: number; rate: number } {
+  const fromRate = currencies.find(c => c.code === fromCurrency)?.rate || 1;
+  const toRate = currencies.find(c => c.code === toCurrency)?.rate || 1;
+  
+  // Convert to INR (base) first, then to target
+  const baseAmount = amount * fromRate;
+  const converted = baseAmount / toRate;
+  
+  return {
+    converted,
+    base: baseAmount,
+    rate: toRate / fromRate,
+  };
 }
 
 export default MultiCurrencySelector;

@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useRegionDetection } from '@/hooks/useRegionDetection';
 
 interface FooterProps {
   lowDataMode: boolean;
@@ -29,6 +30,7 @@ const GlobalFooter2035 = ({ lowDataMode, onDataModeToggle }: FooterProps) => {
     effectiveType: '4g',
     downlink: 10
   });
+  const { formatTime, formatDate } = useRegionDetection();
 
   // Update time
   useEffect(() => {
@@ -58,24 +60,6 @@ const GlobalFooter2035 = ({ lowDataMode, onDataModeToggle }: FooterProps) => {
       };
     }
   }, []);
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false 
-    });
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short',
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
 
   const getNetworkColor = () => {
     if (!networkStatus.online) return 'text-red-400';
@@ -183,7 +167,7 @@ const GlobalFooter2035 = ({ lowDataMode, onDataModeToggle }: FooterProps) => {
           <div className="font-mono">
             <span className="text-foreground">{formatTime(currentTime)}</span>
             <span className="text-muted-foreground ml-2 hidden sm:inline">
-              {formatDate(currentTime)}
+              {formatDate(currentTime, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
         </div>

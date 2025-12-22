@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Check, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,34 +8,49 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Language {
   code: string;
   name: string;
   nativeName: string;
   flag: string;
+  isRTL: boolean;
 }
 
 const languages: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
-  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', flag: '🇮🇳' },
-  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳' },
-  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', flag: '🇮🇳' },
-  { code: 'mr', name: 'Marathi', nativeName: 'मराठी', flag: '🇮🇳' },
-  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', flag: '🇮🇳' },
-  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', flag: '🇮🇳' },
-  { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', flag: '🇮🇳' },
-  { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
-  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' },
-  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
-  { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷' },
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸', isRTL: false },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', isRTL: false },
+  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', flag: '🇮🇳', isRTL: false },
+  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳', isRTL: false },
+  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', flag: '🇮🇳', isRTL: false },
+  { code: 'mr', name: 'Marathi', nativeName: 'मराठी', flag: '🇮🇳', isRTL: false },
+  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', flag: '🇮🇳', isRTL: false },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', flag: '🇮🇳', isRTL: false },
+  { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', flag: '🇮🇳', isRTL: false },
+  { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', flag: '🇮🇳', isRTL: false },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', isRTL: true },
+  { code: 'he', name: 'Hebrew', nativeName: 'עברית', flag: '🇮🇱', isRTL: true },
+  { code: 'fa', name: 'Persian', nativeName: 'فارسی', flag: '🇮🇷', isRTL: true },
+  { code: 'ur', name: 'Urdu', nativeName: 'اردو', flag: '🇵🇰', isRTL: true },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', isRTL: false },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', isRTL: false },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', isRTL: false },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷', isRTL: false },
+  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', isRTL: false },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵', isRTL: false },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', isRTL: false },
+  { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷', isRTL: false },
+];
+
+// Regex patterns for masked IDs that should NOT be translated
+const MASKED_ID_PATTERNS = [
+  /^[A-Z]{2,4}-\*{3,4}-\d{4}$/,  // SA-****-7842
+  /^[A-Z]{2,4}-\d{4}$/,          // EMP-042
+  /^USR-[A-Z0-9]{4}\*{3}$/,      // USR-XXXX***
+  /^BOSS-\d{2}$/,                // BOSS-01
+  /^vala\([a-z]+\)\d{4}$/,       // vala(sales)4771
+  /^[A-Z]+-[A-Z0-9]+-[A-Z0-9]+$/, // Generic masked format
 ];
 
 interface MultiLanguageSelectorProps {
@@ -46,8 +61,44 @@ interface MultiLanguageSelectorProps {
 export function MultiLanguageSelector({ compact = false, onLanguageChange }: MultiLanguageSelectorProps) {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(languages[0]);
 
-  const handleSelect = (language: Language) => {
+  // Load saved language preference
+  useEffect(() => {
+    const saved = localStorage.getItem('sv_language');
+    if (saved) {
+      const found = languages.find(l => l.code === saved);
+      if (found) {
+        setSelectedLanguage(found);
+        applyRTL(found.isRTL);
+      }
+    }
+  }, []);
+
+  const applyRTL = (isRTL: boolean) => {
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.lang = selectedLanguage.code;
+  };
+
+  const handleSelect = async (language: Language) => {
     setSelectedLanguage(language);
+    applyRTL(language.isRTL);
+    localStorage.setItem('sv_language', language.code);
+    
+    // Log language change for audit (masked user ID)
+    try {
+      await supabase.from('audit_logs').insert({
+        action: 'language_change',
+        module: 'localization',
+        meta_json: {
+          from_lang: selectedLanguage.code,
+          to_lang: language.code,
+          is_rtl: language.isRTL,
+          timestamp: new Date().toISOString(),
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log language change:', err);
+    }
+    
     onLanguageChange?.(language);
   };
 
@@ -64,6 +115,9 @@ export function MultiLanguageSelector({ compact = false, onLanguageChange }: Mul
             <>
               <span className="text-sm">{selectedLanguage.flag}</span>
               <span className="text-sm font-medium">{selectedLanguage.code.toUpperCase()}</span>
+              {selectedLanguage.isRTL && (
+                <span className="text-[10px] text-muted-foreground">(RTL)</span>
+              )}
             </>
           )}
           <ChevronDown className="w-3 h-3 opacity-50" />
@@ -86,7 +140,12 @@ export function MultiLanguageSelector({ compact = false, onLanguageChange }: Mul
               <div className="flex items-center gap-3">
                 <span className="text-lg">{language.flag}</span>
                 <div>
-                  <p className="text-sm font-medium">{language.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">{language.name}</p>
+                    {language.isRTL && (
+                      <span className="text-[10px] px-1 py-0.5 rounded bg-primary/10 text-primary">RTL</span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">{language.nativeName}</p>
                 </div>
               </div>
@@ -105,6 +164,32 @@ export function MultiLanguageSelector({ compact = false, onLanguageChange }: Mul
       </DropdownMenuContent>
     </DropdownMenu>
   );
+}
+
+// Utility function to check if text contains masked ID (should not be translated)
+export function containsMaskedId(text: string): boolean {
+  const words = text.split(/\s+/);
+  return words.some(word => MASKED_ID_PATTERNS.some(pattern => pattern.test(word)));
+}
+
+// Utility function to preserve masked IDs during translation
+export function preserveMaskedIds(originalText: string, translatedText: string): string {
+  const words = originalText.split(/\s+/);
+  const maskedIds = words.filter(word => MASKED_ID_PATTERNS.some(pattern => pattern.test(word)));
+  
+  if (maskedIds.length === 0) return translatedText;
+  
+  // Replace any potentially translated masked IDs back to original
+  let result = translatedText;
+  maskedIds.forEach(maskedId => {
+    // Check if the masked ID is missing from translation
+    if (!result.includes(maskedId)) {
+      // Append it to maintain audit trail
+      result = result + ` [${maskedId}]`;
+    }
+  });
+  
+  return result;
 }
 
 export default MultiLanguageSelector;

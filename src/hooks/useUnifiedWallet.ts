@@ -194,13 +194,42 @@ export function useUnifiedWallet() {
     }
   }, [user, userRole, wallet, fetchWallet]);
 
-  const formatCurrency = useCallback((amount: number) => {
-    return new Intl.NumberFormat('en-IN', { 
-      style: 'currency', 
-      currency: wallet?.currency || 'INR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
+  // Format currency with proper locale based on wallet currency
+  const formatCurrency = useCallback((amount: number, showBaseValue = false, baseCurrency = 'INR', conversionRate = 1) => {
+    const currency = wallet?.currency || 'INR';
+    
+    // Currency to locale mapping
+    const currencyLocale: Record<string, string> = {
+      INR: 'en-IN', USD: 'en-US', GBP: 'en-GB', EUR: 'de-DE',
+      AED: 'ar-AE', SAR: 'ar-SA', SGD: 'en-SG', AUD: 'en-AU',
+      CAD: 'en-CA', JPY: 'ja-JP', CNY: 'zh-CN',
+    };
+    
+    const locale = currencyLocale[currency] || 'en-US';
+    
+    try {
+      const formatted = new Intl.NumberFormat(locale, { 
+        style: 'currency', 
+        currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount);
+      
+      // Optionally show base value for audit purposes
+      if (showBaseValue && currency !== baseCurrency && conversionRate !== 1) {
+        const baseAmount = amount / conversionRate;
+        const baseFormatted = new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: baseCurrency,
+          minimumFractionDigits: 2,
+        }).format(baseAmount);
+        return `${formatted} (${baseFormatted})`;
+      }
+      
+      return formatted;
+    } catch {
+      return `${currency} ${amount.toFixed(2)}`;
+    }
   }, [wallet?.currency]);
 
   const getWithdrawalLimits = useCallback(() => {

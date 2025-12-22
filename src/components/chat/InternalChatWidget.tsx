@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { preserveMaskedIds, containsMaskedId } from '@/components/shared/MultiLanguageSelector';
 
 interface ChatWidgetProps {
   isOpen: boolean;
@@ -36,6 +37,8 @@ interface ChatMessage {
   message: string;
   timestamp: string;
   isSystem?: boolean;
+  originalMessage?: string;  // Store original for audit
+  isTranslated?: boolean;
 }
 
 const mockMessages: ChatMessage[] = [
@@ -74,11 +77,29 @@ const mockMessages: ChatMessage[] = [
   },
 ];
 
+// Simulate translation (in real app, this would call AI translation service)
+const translateMessage = async (text: string, targetLang: string): Promise<string> => {
+  // Never translate masked IDs
+  if (containsMaskedId(text)) {
+    // In real implementation, send text minus masked IDs for translation
+    // For now, return original to prevent accidental translation of IDs
+    return text;
+  }
+  
+  // Simulate async translation
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // In production, this would call an AI translation API
+  // For demo, return original text with indicator
+  return text;
+};
+
 const InternalChatWidget = ({ isOpen, onClose, lowDataMode }: ChatWidgetProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
   const [newMessage, setNewMessage] = useState('');
   const [autoTranslate, setAutoTranslate] = useState(true);
   const [minimized, setMinimized] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState('en');
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -99,21 +120,22 @@ const InternalChatWidget = ({ isOpen, onClose, lowDataMode }: ChatWidgetProps) =
     }
   };
 
-  const handleSend = () => {
+  const handleSend = useCallback(async () => {
     if (!newMessage.trim()) return;
     
     const msg: ChatMessage = {
       id: Date.now().toString(),
       senderId: 'you',
       senderRole: 'super_admin',
-      senderMaskedName: 'SA-****-7842',
+      senderMaskedName: 'SA-****-7842',  // Masked ID preserved
       message: newMessage,
+      originalMessage: newMessage,  // Store original for audit
       timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
     
     setMessages(prev => [...prev, msg]);
     setNewMessage('');
-  };
+  }, [newMessage]);
 
   return (
     <AnimatePresence>
