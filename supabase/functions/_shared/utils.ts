@@ -93,7 +93,10 @@ export function errorResponse(message: string, status = 400, buzzer = false) {
 
 // Role hierarchy for access control (matches AppRole enum in types/roles.ts)
 export const ROLE_HIERARCHY: Record<string, number> = {
+  // Highest privilege
+  master: 110,
   super_admin: 100,
+
   admin: 90,
   finance_manager: 80,
   legal_compliance: 75,
