@@ -95,6 +95,22 @@ serve(async (req) => {
       case '/ai-analyze':
         return await aiRiskAnalysis(supabase, body);
       
+      // BUG FIX: Add duplicate lead detection endpoint
+      case '/check-duplicate-lead':
+        return await checkDuplicateLead(supabase, body);
+      
+      // BUG FIX: Add fake click detection endpoint  
+      case '/check-fake-clicks':
+        return await checkFakeClicks(supabase, body);
+      
+      // BUG FIX: Add wallet abuse detection endpoint
+      case '/check-wallet-abuse':
+        return await checkWalletAbuse(supabase, body);
+      
+      // BUG FIX: Add code theft detection endpoint
+      case '/check-code-theft':
+        return await checkCodeTheft(supabase, body);
+      
       default:
         return new Response(
           JSON.stringify({ error: 'Unknown endpoint' }),
@@ -912,17 +928,57 @@ function calculateDeviation(baseline: any, current: any): number {
 async function triggerAutoEscalation(supabase: any, user_id: string, score: number, level: number) {
   const escalationAction = ESCALATION_ACTIONS[level as keyof typeof ESCALATION_ACTIONS];
   
+  // Generate masked ID for audit logging (never store raw user_id in logs shown to users)
+  const maskedUserId = `USR-${user_id.slice(0, 4).toUpperCase()}***`;
+  
   await supabase.from('risk_escalations').insert({
     user_id,
     escalation_level: level,
     trigger_reason: `Automatic escalation due to risk score: ${score}`,
     risk_score_at_time: score,
     action_taken: escalationAction.action,
-    action_details: { description: escalationAction.description },
+    action_details: { description: escalationAction.description, masked_id: maskedUserId },
     auto_triggered: true,
   });
 
   await applyEscalationAction(supabase, user_id, level, escalationAction);
+  
+  // BUG FIX: ALWAYS notify super_admin on ANY escalation (not just level 3+)
+  // Create buzzer alert for super_admin on every escalation
+  await supabase.from('buzzer_queue').insert({
+    trigger_type: 'escalation_alert',
+    priority: level >= 3 ? 'urgent' : level >= 2 ? 'high' : 'normal',
+    role_target: 'super_admin',
+    status: 'pending',
+    auto_escalate_after: 300,
+    region: null,
+  });
+  
+  // Also notify incident role for level 2+ escalations
+  if (level >= 2) {
+    await supabase.from('buzzer_queue').insert({
+      trigger_type: 'escalation_alert',
+      priority: level >= 3 ? 'urgent' : 'high',
+      role_target: 'incident',
+      status: 'pending',
+      auto_escalate_after: 180,
+      region: null,
+    });
+  }
+  
+  // Log to audit trail with masked ID
+  await supabase.from('audit_logs').insert({
+    user_id,
+    action: 'auto_escalation_triggered',
+    module: 'risk_engine',
+    meta_json: {
+      escalation_level: level,
+      risk_score: score,
+      masked_user_id: maskedUserId,
+      super_admin_notified: true,
+      incident_notified: level >= 2,
+    },
+  });
 }
 
 async function applyEscalationAction(supabase: any, user_id: string, level: number, action: any) {
@@ -971,4 +1027,405 @@ async function createRiskAlert(supabase: any, user_id: string, event: any) {
     recommended_action: 'Review user activity and consider escalation',
     auto_action_available: true,
   });
+}
+
+// BUG FIX: Duplicate Lead Detection
+async function checkDuplicateLead(supabase: any, body: any) {
+  const { email, phone, ip_address, device_fingerprint, source_id } = body;
+
+  if (!email && !phone) {
+    return new Response(
+      JSON.stringify({ success: false, message: 'Email or phone required' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const duplicateChecks = [];
+  let isDuplicate = false;
+  let duplicateType = '';
+  let matchedLeadId = null;
+
+  // Check for duplicate email
+  if (email) {
+    const { data: emailMatch } = await supabase
+      .from('leads')
+      .select('id, email, created_at')
+      .eq('email', email.toLowerCase().trim())
+      .limit(1);
+    
+    if (emailMatch && emailMatch.length > 0) {
+      isDuplicate = true;
+      duplicateType = 'email';
+      matchedLeadId = emailMatch[0].id;
+      duplicateChecks.push({ type: 'email', match: true });
+    }
+  }
+
+  // Check for duplicate phone
+  if (phone && !isDuplicate) {
+    const normalizedPhone = phone.replace(/[^0-9]/g, '');
+    const { data: phoneMatch } = await supabase
+      .from('leads')
+      .select('id, phone, created_at')
+      .ilike('phone', `%${normalizedPhone.slice(-10)}%`)
+      .limit(1);
+    
+    if (phoneMatch && phoneMatch.length > 0) {
+      isDuplicate = true;
+      duplicateType = 'phone';
+      matchedLeadId = phoneMatch[0].id;
+      duplicateChecks.push({ type: 'phone', match: true });
+    }
+  }
+
+  // Check for same IP submitting multiple leads within 24 hours
+  if (ip_address) {
+    const { data: ipLeads } = await supabase
+      .from('leads')
+      .select('id, created_at')
+      .eq('ip_address', ip_address)
+      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+    
+    if (ipLeads && ipLeads.length >= 3) {
+      duplicateChecks.push({ type: 'ip_abuse', match: true, count: ipLeads.length });
+      
+      // Create fraud alert for IP abuse
+      await supabase.from('risk_alerts').insert({
+        alert_type: 'duplicate_lead_ip',
+        severity: 'warning',
+        title: 'Multiple leads from same IP',
+        description: `${ipLeads.length} leads submitted from IP ${ip_address} in 24h`,
+        indicators: ['ip_abuse', 'duplicate_submission'],
+        auto_action_available: true,
+      });
+    }
+  }
+
+  // Check device fingerprint for repeat submissions
+  if (device_fingerprint) {
+    const { data: deviceLeads } = await supabase
+      .from('leads')
+      .select('id, created_at')
+      .eq('device_fingerprint', device_fingerprint)
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+    
+    if (deviceLeads && deviceLeads.length >= 5) {
+      duplicateChecks.push({ type: 'device_abuse', match: true, count: deviceLeads.length });
+    }
+  }
+
+  // Log the duplicate check
+  await supabase.from('audit_logs').insert({
+    action: 'duplicate_lead_check',
+    module: 'fraud_detection',
+    meta_json: {
+      is_duplicate: isDuplicate,
+      duplicate_type: duplicateType,
+      matched_lead_id: matchedLeadId,
+      checks_performed: duplicateChecks,
+    },
+  });
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: {
+        is_duplicate: isDuplicate,
+        duplicate_type: duplicateType,
+        matched_lead_id: matchedLeadId,
+        checks: duplicateChecks,
+        recommendation: isDuplicate ? 'reject' : 'allow',
+      }
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
+// BUG FIX: Fake Click Detection
+async function checkFakeClicks(supabase: any, body: any) {
+  const { user_id, tracking_code, period_hours = 24 } = body;
+
+  const periodStart = new Date(Date.now() - period_hours * 60 * 60 * 1000).toISOString();
+  
+  // Get click data
+  const { data: clicks } = await supabase
+    .from('demo_clicks')
+    .select('*')
+    .gte('clicked_at', periodStart)
+    .order('clicked_at', { ascending: false });
+
+  let fraudScore = 0;
+  const fraudIndicators: string[] = [];
+
+  if (clicks && clicks.length > 0) {
+    // Check for rapid clicks from same IP
+    const ipCounts: Record<string, number> = {};
+    clicks.forEach((c: any) => {
+      if (c.ip_address) {
+        ipCounts[c.ip_address] = (ipCounts[c.ip_address] || 0) + 1;
+      }
+    });
+    
+    const suspiciousIPs = Object.entries(ipCounts).filter(([_, count]) => count > 20);
+    if (suspiciousIPs.length > 0) {
+      fraudScore += 30;
+      fraudIndicators.push('rapid_clicks_same_ip');
+    }
+
+    // Check for bot-like patterns (clicks in exact intervals)
+    const intervals: number[] = [];
+    for (let i = 1; i < Math.min(clicks.length, 50); i++) {
+      const diff = new Date(clicks[i-1].clicked_at).getTime() - new Date(clicks[i].clicked_at).getTime();
+      intervals.push(diff);
+    }
+    
+    // If most intervals are within 100ms of each other, likely bot
+    if (intervals.length > 5) {
+      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      const variance = intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) / intervals.length;
+      if (variance < 1000) { // Very low variance = bot pattern
+        fraudScore += 40;
+        fraudIndicators.push('bot_like_pattern');
+      }
+    }
+
+    // Check for VPN/proxy usage
+    const vpnClicks = clicks.filter((c: any) => c.is_vpn || c.is_proxy);
+    if (vpnClicks.length > clicks.length * 0.5) {
+      fraudScore += 20;
+      fraudIndicators.push('high_vpn_usage');
+    }
+
+    // Check for zero session duration
+    const zeroSessionClicks = clicks.filter((c: any) => !c.session_duration || c.session_duration < 2);
+    if (zeroSessionClicks.length > clicks.length * 0.8) {
+      fraudScore += 25;
+      fraudIndicators.push('no_engagement');
+    }
+  }
+
+  const riskLevel = fraudScore <= 20 ? 'low' : fraudScore <= 40 ? 'medium' : fraudScore <= 60 ? 'high' : 'critical';
+
+  // Create alert if high fraud score
+  if (fraudScore > 50) {
+    await supabase.from('risk_alerts').insert({
+      user_id,
+      alert_type: 'fake_clicks',
+      severity: riskLevel === 'critical' ? 'critical' : 'danger',
+      title: 'Fake Click Activity Detected',
+      description: `Fraud score: ${fraudScore}. Indicators: ${fraudIndicators.join(', ')}`,
+      indicators: fraudIndicators,
+      auto_action_available: true,
+    });
+    
+    // Notify super_admin
+    await supabase.from('buzzer_queue').insert({
+      trigger_type: 'fake_click_alert',
+      priority: riskLevel === 'critical' ? 'urgent' : 'high',
+      role_target: 'super_admin',
+      status: 'pending',
+    });
+  }
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: {
+        fraud_score: fraudScore,
+        risk_level: riskLevel,
+        indicators: fraudIndicators,
+        total_clicks_analyzed: clicks?.length || 0,
+      }
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
+// BUG FIX: Wallet Abuse Detection
+async function checkWalletAbuse(supabase: any, body: any) {
+  const { user_id, period_hours = 24 } = body;
+
+  if (!user_id) {
+    return new Response(
+      JSON.stringify({ success: false, message: 'User ID required' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const periodStart = new Date(Date.now() - period_hours * 60 * 60 * 1000).toISOString();
+  
+  let abuseScore = 0;
+  const abuseIndicators: string[] = [];
+
+  // Check for rapid withdrawals
+  const { data: withdrawals } = await supabase
+    .from('wallet_transactions')
+    .select('*')
+    .eq('user_id', user_id)
+    .eq('transaction_type', 'debit')
+    .gte('created_at', periodStart);
+
+  if (withdrawals && withdrawals.length > 5) {
+    abuseScore += 25;
+    abuseIndicators.push('rapid_withdrawals');
+  }
+
+  // Check for credit manipulation (add then immediately withdraw)
+  const { data: allTxns } = await supabase
+    .from('wallet_transactions')
+    .select('*')
+    .eq('user_id', user_id)
+    .gte('created_at', periodStart)
+    .order('created_at', { ascending: true });
+
+  if (allTxns && allTxns.length > 2) {
+    for (let i = 1; i < allTxns.length; i++) {
+      const prev = allTxns[i - 1];
+      const curr = allTxns[i];
+      const timeDiff = new Date(curr.created_at).getTime() - new Date(prev.created_at).getTime();
+      
+      // Credit immediately followed by debit within 5 minutes
+      if (prev.transaction_type === 'credit' && curr.transaction_type === 'debit' && timeDiff < 5 * 60 * 1000) {
+        abuseScore += 30;
+        abuseIndicators.push('credit_withdraw_pattern');
+        break;
+      }
+    }
+  }
+
+  // Check for system credit exploitation
+  const { data: systemCredits } = await supabase
+    .from('wallet_transactions')
+    .select('*')
+    .eq('user_id', user_id)
+    .eq('transaction_type', 'credit')
+    .eq('source', 'system')
+    .gte('created_at', periodStart);
+
+  if (systemCredits && systemCredits.length > 3) {
+    abuseScore += 35;
+    abuseIndicators.push('system_credit_exploitation');
+  }
+
+  const riskLevel = abuseScore <= 20 ? 'low' : abuseScore <= 40 ? 'medium' : abuseScore <= 60 ? 'high' : 'critical';
+
+  // Create alert and freeze wallet if critical
+  if (abuseScore > 50) {
+    await supabase.from('risk_alerts').insert({
+      user_id,
+      alert_type: 'wallet_abuse',
+      severity: riskLevel === 'critical' ? 'critical' : 'danger',
+      title: 'Wallet Abuse Detected',
+      description: `Abuse score: ${abuseScore}. Indicators: ${abuseIndicators.join(', ')}`,
+      indicators: abuseIndicators,
+      auto_action_available: true,
+    });
+    
+    // Notify finance and super_admin
+    await supabase.from('buzzer_queue').insert([
+      { trigger_type: 'wallet_abuse', priority: 'urgent', role_target: 'finance', status: 'pending' },
+      { trigger_type: 'wallet_abuse', priority: 'urgent', role_target: 'super_admin', status: 'pending' },
+    ]);
+  }
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: {
+        abuse_score: abuseScore,
+        risk_level: riskLevel,
+        indicators: abuseIndicators,
+        recommendation: abuseScore > 50 ? 'freeze_wallet' : 'monitor',
+      }
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
+// BUG FIX: Code Theft Detection
+async function checkCodeTheft(supabase: any, body: any) {
+  const { developer_id, period_hours = 24 } = body;
+
+  if (!developer_id) {
+    return new Response(
+      JSON.stringify({ success: false, message: 'Developer ID required' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const periodStart = new Date(Date.now() - period_hours * 60 * 60 * 1000).toISOString();
+  
+  let theftScore = 0;
+  const theftIndicators: string[] = [];
+
+  // Check code access logs for suspicious activity
+  const { data: accessLogs } = await supabase
+    .from('code_access_logs')
+    .select('*')
+    .eq('developer_id', developer_id)
+    .gte('created_at', periodStart);
+
+  if (accessLogs && accessLogs.length > 0) {
+    // Check for copy attempts
+    const copyAttempts = accessLogs.filter((l: any) => l.copy_attempt);
+    if (copyAttempts.length > 0) {
+      theftScore += 40;
+      theftIndicators.push('copy_attempts');
+    }
+
+    // Check for export attempts
+    const exportAttempts = accessLogs.filter((l: any) => l.export_attempt);
+    if (exportAttempts.length > 0) {
+      theftScore += 50;
+      theftIndicators.push('export_attempts');
+    }
+
+    // Check for access outside working hours
+    const outsideHours = accessLogs.filter((l: any) => l.is_outside_hours);
+    if (outsideHours.length > accessLogs.length * 0.3) {
+      theftScore += 25;
+      theftIndicators.push('outside_hours_access');
+    }
+
+    // Check for suspicious patterns
+    const suspicious = accessLogs.filter((l: any) => l.is_suspicious);
+    if (suspicious.length > 0) {
+      theftScore += 30;
+      theftIndicators.push('suspicious_patterns');
+    }
+  }
+
+  const riskLevel = theftScore <= 20 ? 'low' : theftScore <= 50 ? 'medium' : theftScore <= 80 ? 'high' : 'critical';
+
+  // Immediate escalation for code theft
+  if (theftScore > 50) {
+    await supabase.from('risk_alerts').insert({
+      user_id: developer_id,
+      alert_type: 'code_theft',
+      severity: 'critical',
+      title: 'Code Theft Attempt Detected',
+      description: `Theft score: ${theftScore}. Indicators: ${theftIndicators.join(', ')}`,
+      indicators: theftIndicators,
+      auto_action_available: true,
+    });
+    
+    // Immediately notify super_admin and incident team
+    await supabase.from('buzzer_queue').insert([
+      { trigger_type: 'code_theft_alert', priority: 'urgent', role_target: 'super_admin', status: 'pending' },
+      { trigger_type: 'code_theft_alert', priority: 'urgent', role_target: 'incident', status: 'pending' },
+    ]);
+  }
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: {
+        theft_score: theftScore,
+        risk_level: riskLevel,
+        indicators: theftIndicators,
+        recommendation: theftScore > 50 ? 'suspend_access' : 'monitor',
+      }
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
 }

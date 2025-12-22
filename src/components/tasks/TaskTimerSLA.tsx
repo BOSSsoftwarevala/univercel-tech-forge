@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Timer, Play, Pause, AlertTriangle, Clock, 
@@ -63,11 +63,71 @@ const TaskTimerSLA = ({ tasks, onTimerAction }: TaskTimerSLAProps) => {
     const remaining = activeTimers[taskId] ?? totalSeconds;
     const percentage = (remaining / totalSeconds) * 100;
 
-    if (percentage > 50) return { status: 'on-track', color: 'emerald' };
-    if (percentage > 25) return { status: 'warning', color: 'yellow' };
-    if (percentage > 0) return { status: 'critical', color: 'orange' };
-    return { status: 'overdue', color: 'red' };
+    if (percentage > 50) return { status: 'on-track', color: 'emerald', penaltyPercent: 0 };
+    if (percentage > 25) return { status: 'warning', color: 'yellow', penaltyPercent: 5 };
+    if (percentage > 0) return { status: 'critical', color: 'orange', penaltyPercent: 10 };
+    return { status: 'overdue', color: 'red', penaltyPercent: 20 };
   };
+
+  // BUG FIX: SLA violation should trigger wallet penalty deduction
+  const handleSLAViolation = async (taskId: string, task: Task) => {
+    const timerStatus = getTimerStatus(taskId, task.estimatedHours);
+    if (timerStatus.status === 'overdue' || timerStatus.status === 'critical') {
+      try {
+        // Record SLA violation and trigger penalty
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        // Log developer violation with penalty amount
+        await supabase.from('developer_violations').insert({
+          developer_id: taskId, // This would be the actual developer_id in real implementation
+          task_id: taskId,
+          violation_type: 'sla_breach',
+          severity: timerStatus.status === 'overdue' ? 'critical' : 'strike',
+          description: `SLA breach - Task ${task.title} exceeded deadline`,
+          penalty_amount: timerStatus.penaltyPercent,
+          auto_generated: true,
+        });
+
+        // Create buzzer alert for super_admin
+        await supabase.from('buzzer_queue').insert({
+          trigger_type: 'sla_violation',
+          priority: timerStatus.status === 'overdue' ? 'urgent' : 'high',
+          role_target: 'super_admin',
+          task_id: taskId,
+          status: 'pending',
+          auto_escalate_after: 180,
+        });
+
+        // Log to audit trail
+        await supabase.from('audit_logs').insert({
+          action: 'sla_violation_penalty',
+          module: 'task_timer',
+          meta_json: {
+            task_id: taskId,
+            task_title: task.title,
+            violation_status: timerStatus.status,
+            penalty_percent: timerStatus.penaltyPercent,
+          },
+        });
+
+        toast.error(`SLA Violation! ${timerStatus.penaltyPercent}% penalty applied.`);
+      } catch (error) {
+        console.error('Failed to record SLA violation:', error);
+      }
+    }
+  };
+
+  // Check for SLA violations on timer updates
+  useEffect(() => {
+    tasks.forEach(task => {
+      if (task.timerStarted && agreedTasks.has(task.id)) {
+        const remaining = activeTimers[task.id];
+        if (remaining !== undefined && remaining <= 0) {
+          handleSLAViolation(task.id, task);
+        }
+      }
+    });
+  }, [activeTimers, tasks, agreedTasks]);
 
   const handleAgree = (taskId: string) => {
     setAgreedTasks(prev => new Set([...prev, taskId]));

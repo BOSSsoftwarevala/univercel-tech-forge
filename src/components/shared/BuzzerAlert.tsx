@@ -46,6 +46,21 @@ const BuzzerAlert: React.FC<BuzzerAlertProps> = ({
 
   const pendingBuzzers = buzzers.filter(b => b.status === 'pending');
   const urgentCount = pendingBuzzers.filter(b => b.priority === 'urgent').length;
+  const highPriorityCount = pendingBuzzers.filter(b => b.priority === 'urgent' || b.priority === 'high').length;
+
+  // BUG FIX: Block interaction until urgent/high priority alerts are acknowledged
+  // This prevents users from dismissing critical alerts without accepting them
+  useEffect(() => {
+    if (highPriorityCount > 0) {
+      // Add class to body to indicate blocking state
+      document.body.classList.add('buzzer-blocking');
+    } else {
+      document.body.classList.remove('buzzer-blocking');
+    }
+    return () => {
+      document.body.classList.remove('buzzer-blocking');
+    };
+  }, [highPriorityCount]);
 
   // Play buzzer sound for urgent alerts
   useEffect(() => {
@@ -53,8 +68,9 @@ const BuzzerAlert: React.FC<BuzzerAlertProps> = ({
       setAudioPlaying(true);
       // In production, you'd play an actual sound here
       const interval = setInterval(() => {
-        toast.warning('Urgent buzzer alert!', {
+        toast.warning('Urgent buzzer alert! Action required.', {
           icon: <AlertTriangle className="w-4 h-4 text-red-400" />,
+          duration: Infinity, // Don't auto-dismiss urgent notifications
         });
       }, 10000);
 
@@ -74,6 +90,18 @@ const BuzzerAlert: React.FC<BuzzerAlertProps> = ({
     } catch (error) {
       toast.error('Failed to accept buzzer');
     }
+  };
+
+  // BUG FIX: Prevent dismissing urgent/high priority alerts - must be accepted
+  const handleDismiss = (buzzerId: string) => {
+    const buzzer = buzzers.find(b => b.id === buzzerId);
+    if (buzzer && (buzzer.priority === 'urgent' || buzzer.priority === 'high')) {
+      toast.error('High priority alerts cannot be dismissed. Please accept the alert.', {
+        icon: <AlertTriangle className="w-4 h-4 text-red-400" />,
+      });
+      return;
+    }
+    onDismiss(buzzerId);
   };
 
   if (showInline) {
@@ -139,14 +167,17 @@ const BuzzerAlert: React.FC<BuzzerAlertProps> = ({
                   >
                     <CheckCircle className="w-3 h-3" />
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onDismiss(buzzer.id)}
-                    className="text-slate-400 hover:text-slate-300 h-7 px-2"
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
+                  {/* Only show dismiss button for low/normal priority - urgent/high must be accepted */}
+                  {buzzer.priority !== 'urgent' && buzzer.priority !== 'high' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDismiss(buzzer.id)}
+                      className="text-slate-400 hover:text-slate-300 h-7 px-2"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
