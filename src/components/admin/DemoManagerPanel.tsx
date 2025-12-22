@@ -255,7 +255,7 @@ export default function DemoManagerPanel() {
             <DialogTrigger asChild>
               <Button onClick={() => {
                 setEditingDemo(null);
-                setFormData({ name: '', url: '', description: '', is_active: true });
+                setFormData({ title: '', url: '', description: '', category: 'general' });
               }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Demo
@@ -267,11 +267,11 @@ export default function DemoManagerPanel() {
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Name</Label>
+                  <Label>Title</Label>
                   <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Demo name"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Demo title"
                   />
                 </div>
                 <div className="space-y-2">
@@ -290,12 +290,13 @@ export default function DemoManagerPanel() {
                     placeholder="Demo description"
                   />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={formData.is_active}
-                    onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
+                <div className="space-y-2">
+                  <Label>Category</Label>
+                  <Input
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="general"
                   />
-                  <Label>Active</Label>
                 </div>
                 <Button onClick={handleSaveDemo} className="w-full">
                   {editingDemo ? 'Update Demo' : 'Create Demo'}
@@ -349,13 +350,11 @@ export default function DemoManagerPanel() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold">{demo.name}</h3>
+                        <h3 className="font-semibold">{demo.title}</h3>
                         {getStatusBadge(demo.status)}
-                        {!demo.is_active && (
-                          <Badge variant="outline" className="text-muted-foreground">
-                            Disabled
-                          </Badge>
-                        )}
+                        <Badge variant="outline" className="text-muted-foreground">
+                          {demo.category}
+                        </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{demo.description}</p>
                       <a
@@ -384,10 +383,10 @@ export default function DemoManagerPanel() {
                         onClick={() => {
                           setEditingDemo(demo);
                           setFormData({
-                            name: demo.name,
+                            title: demo.title,
                             url: demo.url,
                             description: demo.description || '',
-                            is_active: demo.is_active
+                            category: demo.category || 'general'
                           });
                           setShowAddDialog(true);
                         }}
