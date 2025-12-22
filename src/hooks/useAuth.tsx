@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
-// Privileged roles that get direct access without approval
+// Only master and super_admin get direct access
 const PRIVILEGED_ROLES: string[] = ['master', 'super_admin'];
 
 interface AuthContextType {
@@ -15,10 +15,14 @@ interface AuthContextType {
   userRole: AppRole | null;
   approvalStatus: 'pending' | 'approved' | 'rejected' | null;
   isPrivileged: boolean;
+  isMaster: boolean;
+  isSuperAdmin: boolean;
+  wasForceLoggedOut: boolean;
   signUp: (email: string, password: string, role: AppRole, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshApprovalStatus: () => Promise<void>;
+  forceLogoutUser: (targetUserId: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,9 +33,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<AppRole | null>(null);
   const [approvalStatus, setApprovalStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null);
+  const [wasForceLoggedOut, setWasForceLoggedOut] = useState(false);
 
-  // Computed property: is the user privileged (master/super_admin)?
+  // Computed properties
   const isPrivileged = userRole ? PRIVILEGED_ROLES.includes(userRole) : false;
+  const isMaster = userRole === 'master';
+  const isSuperAdmin = userRole === 'super_admin';
+
+  // Check if user was force logged out
+  const checkForceLogout = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('check_force_logout', { 
+        check_user_id: userId 
+      });
+      
+      if (!error && data) {
+        // User was force logged out - sign them out
+        console.log('[Auth] User was force logged out at:', data);
+        setWasForceLoggedOut(true);
+        await supabase.auth.signOut();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('[Auth] Error checking force logout:', err);
+      return false;
+    }
+  }, []);
+
+  // Clear force logout flag when user signs in
+  const clearForceLogout = useCallback(async (userId: string) => {
+    try {
+      await supabase.rpc('clear_force_logout', { clear_user_id: userId });
+      setWasForceLoggedOut(false);
+    } catch (err) {
+      console.error('[Auth] Error clearing force logout:', err);
+    }
+  }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -40,7 +78,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer fetching user role to prevent deadlock
         if (session?.user) {
           setTimeout(() => {
             fetchUserRoleAndStatus(session.user.id);
@@ -65,13 +102,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Periodic force logout check for non-master users
+  useEffect(() => {
+    if (!user || isMaster) return;
+
+    const checkInterval = setInterval(() => {
+      checkForceLogout(user.id);
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(checkInterval);
+  }, [user, isMaster, checkForceLogout]);
+
   const fetchUserRoleAndStatus = async (userId: string) => {
     try {
       console.log('[Auth] Fetching role and approval status for user:', userId);
       
       const { data, error } = await supabase
         .from('user_roles')
-        .select('role, approval_status')
+        .select('role, approval_status, force_logged_out_at')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -81,6 +129,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (data) {
+        // Check if force logged out
+        if (data.force_logged_out_at) {
+          console.log('[Auth] User was force logged out');
+          setWasForceLoggedOut(true);
+          await supabase.auth.signOut();
+          return;
+        }
+
         console.log('[Auth] Role data:', data);
         setUserRole(data.role as AppRole);
         setApprovalStatus(data.approval_status as 'pending' | 'approved' | 'rejected');
@@ -146,10 +202,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Create role entry and role-specific profile
       if (data.user) {
-        // Initialize role via backend function (prevents client-side role escalation and avoids RLS issues)
+        // Initialize role via backend function
         await supabase.functions.invoke('role-init', { body: { role } });
-
-        // Create role-specific profile
         await createRoleProfile(data.user.id, role, email, fullName);
       }
 
@@ -209,7 +263,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           masked_email: maskedEmail
         });
         break;
-      // Other roles can be added by super_admin
       default:
         break;
     }
@@ -217,11 +270,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
+      
       if (error) throw error;
+      
+      // Clear force logout flag on successful sign in
+      if (data.user) {
+        await clearForceLogout(data.user.id);
+      }
+      
       return { error: null };
     } catch (error) {
       return { error: error as Error };
@@ -234,6 +294,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setUserRole(null);
     setApprovalStatus(null);
+    setWasForceLoggedOut(false);
+  };
+
+  // Master Admin only: Force logout a user
+  const forceLogoutUser = async (targetUserId: string): Promise<{ error: Error | null }> => {
+    try {
+      if (!isMaster || !user) {
+        throw new Error('Only Master Admin can force logout users');
+      }
+
+      const { error } = await supabase.rpc('force_logout_user', {
+        target_user_id: targetUserId,
+        admin_user_id: user.id
+      });
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   return (
@@ -244,10 +324,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       userRole, 
       approvalStatus,
       isPrivileged,
+      isMaster,
+      isSuperAdmin,
+      wasForceLoggedOut,
       signUp, 
       signIn, 
       signOut,
-      refreshApprovalStatus
+      refreshApprovalStatus,
+      forceLogoutUser
     }}>
       {children}
     </AuthContext.Provider>
