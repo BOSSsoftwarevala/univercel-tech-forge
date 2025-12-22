@@ -32,90 +32,33 @@ const BootstrapAdmins = () => {
     const bootstrapResults: any[] = [];
 
     try {
-      // Create Master Admin
-      const { data: masterData, error: masterError } = await supabase.auth.signUp({
-        email: masterEmail,
-        password: masterPassword,
-        options: {
-          data: {
-            full_name: 'Master Admin',
-            role: 'master'
-          }
-        }
+      const { data, error } = await supabase.functions.invoke('bootstrap-admins', {
+        body: {},
       });
 
-      if (masterError) {
-        if (masterError.message.includes('already registered')) {
-          bootstrapResults.push({ email: masterEmail, status: 'exists', message: 'Already registered - try logging in' });
-        } else {
-          bootstrapResults.push({ email: masterEmail, status: 'error', message: masterError.message });
-        }
-      } else if (masterData.user) {
-        // Insert role directly
-        const { error: roleError } = await supabase.from('user_roles').upsert({
-          user_id: masterData.user.id,
-          role: 'master',
-          approval_status: 'approved',
-          approved_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
-
-        if (roleError) {
-          bootstrapResults.push({ email: masterEmail, status: 'partial', message: 'User created but role assignment failed: ' + roleError.message });
-        } else {
-          bootstrapResults.push({ email: masterEmail, status: 'success', message: 'Master Admin created successfully!' });
-        }
+      if (error) {
+        bootstrapResults.push({ email: 'system', status: 'error', message: error.message });
+        throw error;
       }
 
-      // Sign out before creating next user
-      await supabase.auth.signOut();
-
-      // Create Super Admin
-      const { data: superData, error: superError } = await supabase.auth.signUp({
-        email: superAdminEmail,
-        password: superAdminPassword,
-        options: {
-          data: {
-            full_name: 'Super Admin',
-            role: 'super_admin'
-          }
-        }
+      const fnResults = (data as any)?.results ?? [];
+      fnResults.forEach((r: any) => {
+        bootstrapResults.push({
+          email: r.email,
+          status: r.error ? 'error' : 'success',
+          message: r.error ? r.error : `${r.action} (${r.role})`,
+        });
       });
-
-      if (superError) {
-        if (superError.message.includes('already registered')) {
-          bootstrapResults.push({ email: superAdminEmail, status: 'exists', message: 'Already registered - try logging in' });
-        } else {
-          bootstrapResults.push({ email: superAdminEmail, status: 'error', message: superError.message });
-        }
-      } else if (superData.user) {
-        const { error: roleError } = await supabase.from('user_roles').upsert({
-          user_id: superData.user.id,
-          role: 'super_admin',
-          approval_status: 'approved',
-          approved_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
-
-        if (roleError) {
-          bootstrapResults.push({ email: superAdminEmail, status: 'partial', message: 'User created but role assignment failed: ' + roleError.message });
-        } else {
-          bootstrapResults.push({ email: superAdminEmail, status: 'success', message: 'Super Admin created successfully!' });
-        }
-      }
-
-      // Sign out after creation
-      await supabase.auth.signOut();
 
       setResults(bootstrapResults);
-      
-      const hasSuccess = bootstrapResults.some(r => r.status === 'success');
-      if (hasSuccess) {
-        toast.success('Admin accounts created! You can now log in.');
-      }
+      toast.success('Bootstrap complete. You can now log in as Master or Super Admin.');
 
     } catch (error: any) {
-      toast.error('Bootstrap failed: ' + error.message);
-      bootstrapResults.push({ email: 'system', status: 'error', message: error.message });
-      setResults(bootstrapResults);
+      toast.error('Bootstrap failed: ' + (error?.message || 'Unknown error'));
+      if (bootstrapResults.length === 0) {
+        bootstrapResults.push({ email: 'system', status: 'error', message: error?.message || 'Unknown error' });
+        setResults(bootstrapResults);
+      }
     } finally {
       setLoading(false);
     }

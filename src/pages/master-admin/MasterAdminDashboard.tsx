@@ -60,13 +60,13 @@ const MasterAdminDashboard = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const viewerRole = 'master';
+      const { data, error } = await supabase.rpc('get_users_for_approval', {
+        viewer_role: viewerRole,
+      });
 
       if (error) throw error;
-      setUsers(data || []);
+      setUsers((data as any) || []);
     } catch (err) {
       console.error('Error fetching users:', err);
       toast.error('Failed to fetch users');
@@ -78,16 +78,14 @@ const MasterAdminDashboard = () => {
   const handleApprove = async (userId: string) => {
     setActionLoading(userId);
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .update({ 
-          approval_status: 'approved',
-          approved_at: new Date().toISOString(),
-          approved_by: user?.id
-        })
-        .eq('user_id', userId);
+      const { data, error } = await supabase.rpc('approve_user', {
+        _target_user_id: userId,
+        _approver_id: user?.id,
+      });
 
       if (error) throw error;
+      if (!data) throw new Error('Approval failed');
+
       toast.success('User approved successfully');
       fetchUsers();
     } catch (err) {
@@ -101,16 +99,15 @@ const MasterAdminDashboard = () => {
   const handleReject = async (userId: string) => {
     setActionLoading(userId);
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .update({ 
-          approval_status: 'rejected',
-          approved_at: new Date().toISOString(),
-          approved_by: user?.id
-        })
-        .eq('user_id', userId);
+      const { data, error } = await supabase.rpc('reject_user', {
+        _target_user_id: userId,
+        _rejector_id: user?.id,
+        _reason: null,
+      });
 
       if (error) throw error;
+      if (!data) throw new Error('Rejection failed');
+
       toast.success('User rejected');
       fetchUsers();
     } catch (err) {
