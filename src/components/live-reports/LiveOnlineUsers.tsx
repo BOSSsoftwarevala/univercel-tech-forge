@@ -15,17 +15,17 @@ interface LiveOnlineUsersProps {
 }
 
 const roleColors: Record<string, string> = {
-  master: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  super_admin: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
-  admin: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  developer: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  demo_manager: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
-  franchise: 'bg-green-500/20 text-green-400 border-green-500/30',
-  reseller: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  influencer: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-  client_success: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  prime: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  client: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+  master: 'bg-gradient-to-r from-purple-500 to-violet-600 text-white border-0',
+  super_admin: 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white border-0',
+  admin: 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0',
+  developer: 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white border-0',
+  demo_manager: 'bg-gradient-to-r from-teal-400 to-green-500 text-white border-0',
+  franchise: 'bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0',
+  reseller: 'bg-gradient-to-r from-lime-400 to-green-500 text-white border-0',
+  influencer: 'bg-gradient-to-r from-pink-400 to-rose-500 text-white border-0',
+  client_success: 'bg-gradient-to-r from-orange-400 to-amber-500 text-white border-0',
+  prime: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white border-0',
+  client: 'bg-gradient-to-r from-slate-400 to-gray-500 text-white border-0',
 };
 
 export function LiveOnlineUsers({ users, maxHeight = '400px' }: LiveOnlineUsersProps) {
@@ -46,17 +46,17 @@ export function LiveOnlineUsers({ users, maxHeight = '400px' }: LiveOnlineUsersP
   };
 
   return (
-    <Card className="bg-card/50 border-border/50">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Monitor className="w-5 h-5 text-primary" />
+    <Card className="bg-[#12121a] border-gray-800/50 shadow-xl h-full">
+      <CardHeader className="pb-3 border-b border-gray-800/50">
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <Monitor className="w-5 h-5 text-lime-400" />
           Live User Status
-          <Badge variant="outline" className="ml-auto bg-green-500/20 text-green-400 border-green-500/30">
+          <Badge className="ml-auto bg-gradient-to-r from-lime-400 to-green-500 text-white border-0">
             {users.filter(u => u.is_online).length} Online
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <ScrollArea className="w-full" style={{ maxHeight }}>
           <div className="space-y-2 pr-4">
             {sortedUsers.map((user, index) => {
@@ -71,8 +71,8 @@ export function LiveOnlineUsers({ users, maxHeight = '400px' }: LiveOnlineUsersP
                   transition={{ delay: index * 0.02 }}
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-xl",
-                    "bg-muted/20 border border-border/50",
-                    "hover:bg-muted/30 transition-colors"
+                    "bg-[#1a1a2e] border border-gray-800/50",
+                    "hover:border-gray-700 transition-all duration-200"
                   )}
                 >
                   {/* Status Indicator */}
@@ -82,21 +82,20 @@ export function LiveOnlineUsers({ users, maxHeight = '400px' }: LiveOnlineUsersP
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <Badge 
-                        variant="outline" 
                         className={cn(
-                          "text-xs border",
+                          "text-xs",
                           roleColors[user.user_role] || 'bg-gray-500/20 text-gray-400'
                         )}
                       >
                         {user.user_role.replace('_', ' ').toUpperCase()}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-gray-500">
                         {getStatusLabel(status)}
                       </span>
                     </div>
 
                     {user.current_page && (
-                      <p className="text-xs text-muted-foreground mt-1 truncate flex items-center gap-1">
+                      <p className="text-xs text-gray-500 mt-1 truncate flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
                         {user.current_page}
                       </p>
@@ -106,12 +105,12 @@ export function LiveOnlineUsers({ users, maxHeight = '400px' }: LiveOnlineUsersP
                   {/* Session Duration / Last Seen */}
                   <div className="text-right shrink-0">
                     {sessionDuration ? (
-                      <div className="flex items-center gap-1 text-sm font-medium text-green-400">
+                      <div className="flex items-center gap-1 text-sm font-medium text-lime-400">
                         <Clock className="w-3 h-3" />
                         {sessionDuration}
                       </div>
                     ) : (
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-gray-500">
                         {formatDistanceToNow(new Date(user.last_seen_at), { addSuffix: true })}
                       </p>
                     )}
@@ -121,7 +120,7 @@ export function LiveOnlineUsers({ users, maxHeight = '400px' }: LiveOnlineUsersP
             })}
 
             {users.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-gray-500">
                 No users found
               </div>
             )}

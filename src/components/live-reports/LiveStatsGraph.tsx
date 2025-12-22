@@ -47,23 +47,8 @@ export function LiveStatsGraph({ logs, title = "Activity Timeline" }: LiveStatsG
       .slice(0, 8);
   };
 
-  // Process logs by role
-  const processLogsByRole = () => {
-    const roleData: Record<string, number> = {};
-    
-    logs.forEach(log => {
-      const role = log.user_role.replace('_', ' ').toUpperCase();
-      roleData[role] = (roleData[role] || 0) + 1;
-    });
-
-    return Object.entries(roleData)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  };
-
   const timelineData = processLogsForChart();
   const actionData = processLogsByAction();
-  const roleData = processLogsByRole();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -73,51 +58,52 @@ export function LiveStatsGraph({ logs, title = "Activity Timeline" }: LiveStatsG
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Card className="bg-card/50 border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
+        <Card className="bg-[#12121a] border-gray-800/50 shadow-xl">
+          <CardHeader className="pb-2 border-b border-gray-800/50">
+            <CardTitle className="text-lg flex items-center gap-2 text-white">
+              <TrendingUp className="w-5 h-5 text-amber-400" />
               {title}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={timelineData}>
                   <defs>
                     <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#a3e635" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#a3e635" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
                   <XAxis 
                     dataKey="hour" 
-                    stroke="hsl(var(--muted-foreground))" 
+                    stroke="#666" 
                     fontSize={12}
                     tickLine={false}
                   />
                   <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
+                    stroke="#666" 
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      backgroundColor: '#1a1a2e',
+                      border: '1px solid #333',
+                      borderRadius: '12px',
+                      color: '#fff'
                     }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="total" 
-                    stroke="hsl(var(--primary))" 
+                    stroke="#f59e0b" 
                     fillOpacity={1} 
                     fill="url(#colorTotal)" 
                     strokeWidth={2}
@@ -125,7 +111,7 @@ export function LiveStatsGraph({ logs, title = "Activity Timeline" }: LiveStatsG
                   <Area 
                     type="monotone" 
                     dataKey="success" 
-                    stroke="#22c55e" 
+                    stroke="#a3e635" 
                     fillOpacity={1} 
                     fill="url(#colorSuccess)" 
                     strokeWidth={2}
@@ -143,37 +129,44 @@ export function LiveStatsGraph({ logs, title = "Activity Timeline" }: LiveStatsG
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="bg-card/50 border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="w-5 h-5 text-cyan-400" />
+        <Card className="bg-[#12121a] border-gray-800/50 shadow-xl">
+          <CardHeader className="pb-2 border-b border-gray-800/50">
+            <CardTitle className="text-lg flex items-center gap-2 text-white">
+              <Activity className="w-5 h-5 text-violet-400" />
               Activities by Type
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={actionData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#8b5cf6"/>
+                      <stop offset="100%" stopColor="#a78bfa"/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
+                  <XAxis type="number" stroke="#666" fontSize={12} />
                   <YAxis 
                     type="category" 
                     dataKey="name" 
-                    stroke="hsl(var(--muted-foreground))" 
+                    stroke="#666" 
                     fontSize={10}
                     width={80}
                     tickLine={false}
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      backgroundColor: '#1a1a2e',
+                      border: '1px solid #333',
+                      borderRadius: '12px',
+                      color: '#fff'
                     }}
                   />
                   <Bar 
                     dataKey="value" 
-                    fill="hsl(var(--primary))" 
+                    fill="url(#barGradient)" 
                     radius={[0, 4, 4, 0]}
                   />
                 </BarChart>
