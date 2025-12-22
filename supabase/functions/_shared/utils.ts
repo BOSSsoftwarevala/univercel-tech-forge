@@ -1,11 +1,16 @@
 // Shared utilities for Software Vala API
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// CORS headers for all responses
+// CORS headers for all responses with security hardening
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-device-id, x-client-ip",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Cache-Control": "no-store, no-cache, must-revalidate",
 };
 
 // Initialize Supabase client with service role
@@ -302,6 +307,33 @@ export function validateRequired(data: Record<string, any>, fields: string[]): s
     }
   }
   return null;
+}
+
+// Sanitize string input to prevent XSS/injection attacks
+export function sanitizeInput(input: string): string {
+  if (typeof input !== 'string') return '';
+  return input
+    .replace(/[<>]/g, '') // Remove HTML tags
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+=/gi, '') // Remove event handlers
+    .trim()
+    .slice(0, 10000); // Limit length
+}
+
+// Validate and sanitize UUID format
+export function isValidUUID(uuid: string): boolean {
+  if (typeof uuid !== 'string') return false;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+// Validate numeric input
+export function isValidNumber(value: any, min?: number, max?: number): boolean {
+  const num = Number(value);
+  if (isNaN(num)) return false;
+  if (min !== undefined && num < min) return false;
+  if (max !== undefined && num > max) return false;
+  return true;
 }
 
 // Parse request with common headers

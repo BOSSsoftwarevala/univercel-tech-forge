@@ -38,6 +38,70 @@ const logs = [
   { type: 'success', message: 'Tests passed: 24/24', time: '10:25:01' },
 ];
 
+// XSS-safe syntax highlighting - renders React elements instead of dangerouslySetInnerHTML
+const renderSyntaxHighlightedLine = (line: string) => {
+  // Keywords to highlight
+  const keywords = ['import', 'from', 'const', 'return', 'useEffect', 'useState', 'let', 'var', 'function', 'export', 'default'];
+  
+  const parts: { text: string; type: 'keyword' | 'string' | 'comment' | 'normal' }[] = [];
+  let remaining = line;
+  let idx = 0;
+  
+  while (remaining.length > 0) {
+    // Check for comments first
+    const commentMatch = remaining.match(/^(\/\/.*)$/);
+    if (commentMatch) {
+      parts.push({ text: commentMatch[1], type: 'comment' });
+      break;
+    }
+    
+    // Check for JSX comments
+    const jsxCommentMatch = remaining.match(/^(\{\/\*.*\*\/\})/);
+    if (jsxCommentMatch) {
+      parts.push({ text: jsxCommentMatch[1], type: 'comment' });
+      remaining = remaining.slice(jsxCommentMatch[1].length);
+      continue;
+    }
+    
+    // Check for strings
+    const stringMatch = remaining.match(/^(".*?"|'.*?'|`.*?`)/);
+    if (stringMatch) {
+      parts.push({ text: stringMatch[1], type: 'string' });
+      remaining = remaining.slice(stringMatch[1].length);
+      continue;
+    }
+    
+    // Check for keywords
+    let foundKeyword = false;
+    for (const kw of keywords) {
+      if (remaining.startsWith(kw) && (remaining.length === kw.length || !/\w/.test(remaining[kw.length]))) {
+        parts.push({ text: kw, type: 'keyword' });
+        remaining = remaining.slice(kw.length);
+        foundKeyword = true;
+        break;
+      }
+    }
+    if (foundKeyword) continue;
+    
+    // Normal character
+    const lastPart = parts[parts.length - 1];
+    if (lastPart && lastPart.type === 'normal') {
+      lastPart.text += remaining[0];
+    } else {
+      parts.push({ text: remaining[0], type: 'normal' });
+    }
+    remaining = remaining.slice(1);
+    idx++;
+  }
+  
+  return parts.map((part, i) => {
+    const className = part.type === 'keyword' ? 'text-purple-400' :
+                      part.type === 'string' ? 'text-emerald-400' :
+                      part.type === 'comment' ? 'text-slate-500' : '';
+    return className ? <span key={i} className={className}>{part.text}</span> : part.text;
+  });
+};
+
 const CodingView = () => {
   const [currentLine, setCurrentLine] = useState(0);
   const [visibleCode, setVisibleCode] = useState<string[]>([]);
@@ -110,15 +174,9 @@ const CodingView = () => {
                 >
                   <span className="w-8 text-slate-600 select-none">{index + 1}</span>
                   <pre className="text-slate-300">
-                    <code
-                      dangerouslySetInnerHTML={{
-                        __html: line
-                          .replace(/(import|from|const|return|useEffect|useState)/g, '<span class="text-purple-400">$1</span>')
-                          .replace(/(".*?")/g, '<span class="text-emerald-400">$1</span>')
-                          .replace(/(\/\/.*)/g, '<span class="text-slate-500">$1</span>')
-                          .replace(/(\{\/\*.*\*\/\})/g, '<span class="text-slate-500">$1</span>')
-                      }}
-                    />
+                    <code>
+                      {renderSyntaxHighlightedLine(line)}
+                    </code>
                   </pre>
                 </motion.div>
               ))}

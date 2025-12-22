@@ -4,6 +4,7 @@ import {
   errorResponse,
   validateRequired,
   maskName,
+  sanitizeInput,
 } from "../_shared/utils.ts";
 import { withAuth, RequestContext } from "../_shared/middleware.ts";
 
@@ -29,11 +30,15 @@ serve(async (req: Request) => {
       // Create masked sender name
       const maskedSender = `${user.role.toUpperCase()}-${user.userId.slice(0, 4)}`;
 
+      // Sanitize message text to prevent XSS
+      const sanitizedMessage = sanitizeInput(body.message_text);
+      if (!sanitizedMessage) return errorResponse("Message cannot be empty");
+
       const { data, error } = await supabaseAdmin.from("chat_messages").insert({
         thread_id: body.thread_id,
         sender_id: user.userId,
         masked_sender: maskedSender,
-        message_text: body.message_text,
+        message_text: sanitizedMessage,
         language: body.language || "en",
         cannot_edit: true,
         cannot_delete: true,
