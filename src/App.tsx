@@ -86,6 +86,7 @@ import ClientSuccessDashboard from "./pages/ClientSuccessDashboard";
 import PerformanceManager from "./pages/PerformanceManager";
 import FinanceManager from "./pages/FinanceManager";
 import ProductDemoManager from "./pages/ProductDemoManager";
+import DemoManagerDashboard from "./pages/DemoManagerDashboard";
 import PrimeUserDashboard from "./pages/PrimeUserDashboard";
 import LegalComplianceManager from "./pages/LegalComplianceManager";
 import MarketingManager from "./pages/MarketingManager";
@@ -220,7 +221,8 @@ const App = () => (
               <Route path="/leads/*" element={<RequireRole allowed={["lead_manager", "super_admin"]}><LeadManager /></RequireRole>} />
               <Route path="/task-manager" element={<RequireRole allowed={["task_manager", "super_admin"]}><TaskManager /></RequireRole>} />
               <Route path="/tasks/*" element={<RequireRole allowed={["task_manager", "super_admin"]}><TaskManager /></RequireRole>} />
-              <Route path="/demo-manager" element={<RequireRole allowed={["demo_manager", "super_admin"]}><ProductDemoManager /></RequireRole>} />
+              <Route path="/demo-manager" element={<RequireRole allowed={["demo_manager", "super_admin", "master"]}><DemoManagerDashboard /></RequireRole>} />
+              <Route path="/demo-manager/*" element={<RequireRole allowed={["demo_manager", "super_admin", "master"]}><DemoManagerDashboard /></RequireRole>} />
               <Route path="/demo" element={<RequireRole allowed={["demo_manager", "franchise", "reseller", "super_admin"]}><ProductDemoManager /></RequireRole>} />
               <Route path="/demos/*" element={<RequireRole allowed={["demo_manager", "franchise", "reseller", "super_admin"]}><ProductDemoManager /></RequireRole>} />
               <Route path="/finance" element={<RequireRole allowed={["finance_manager", "super_admin"]}><FinanceManager /></RequireRole>} />
