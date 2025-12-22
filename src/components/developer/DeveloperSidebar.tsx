@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, ListTodo, Timer, MessageSquare, 
-  Code2, TrendingUp, Wallet, Bell, Zap, Settings,
-  ChevronLeft, ChevronRight
+  Code2, TrendingUp, Wallet, Zap, Settings,
+  ChevronLeft, ChevronRight, LogOut, Lock
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface DeveloperSidebarProps {
   activeSection: string;
@@ -23,6 +26,14 @@ const menuItems = [
 
 const DeveloperSidebar = ({ activeSection, onSectionChange }: DeveloperSidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
 
   return (
     <motion.aside
@@ -133,11 +144,28 @@ const DeveloperSidebar = ({ activeSection, onSectionChange }: DeveloperSidebarPr
         </div>
       )}
 
-      {/* Settings Button */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}>
+      {/* Settings & Logout */}
+      <div className="absolute bottom-4 left-4 right-4 space-y-2">
+        <button 
+          onClick={() => navigate('/change-password')}
+          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}
+        >
+          <Lock className="w-5 h-5" />
+          {!collapsed && <span className="font-medium">Change Password</span>}
+        </button>
+        <button 
+          onClick={() => navigate('/settings')}
+          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}
+        >
           <Settings className="w-5 h-5" />
           {!collapsed && <span className="font-medium">Settings</span>}
+        </button>
+        <button 
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all ${collapsed ? 'justify-center' : ''}`}
+        >
+          <LogOut className="w-5 h-5" />
+          {!collapsed && <span className="font-medium">Logout</span>}
         </button>
       </div>
     </motion.aside>

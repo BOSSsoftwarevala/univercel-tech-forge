@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Inbox, AlertCircle, MessageCircle, 
-  ArrowUpRight, BookOpen, BarChart3, Heart, FileText, Sparkles
+  ArrowUpRight, BookOpen, BarChart3, Heart, FileText, Settings, LogOut, Lock
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 import SupportTopBar from '@/components/support/SupportTopBar';
 import SupportMetrics from '@/components/support/SupportMetrics';
 import TicketInbox from '@/components/support/TicketInbox';
@@ -29,6 +32,14 @@ const SupportDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -134,8 +145,8 @@ const SupportDashboard = () => {
             ))}
           </nav>
 
-          {/* Sidebar Footer - Wellness Check */}
-          <div className="absolute bottom-6 left-5 right-5">
+          {/* Sidebar Footer */}
+          <div className="absolute bottom-6 left-5 right-5 space-y-3">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -161,6 +172,31 @@ const SupportDashboard = () => {
                 <span className="text-xs text-teal-400">85%</span>
               </div>
             </motion.div>
+            
+            {/* Settings & Logout */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate('/change-password')}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-teal-500/20 text-teal-300 text-sm hover:bg-slate-800 transition-colors"
+              >
+                <Lock className="w-4 h-4" />
+                Password
+              </button>
+              <button
+                onClick={() => navigate('/settings')}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-teal-500/20 text-teal-300 text-sm hover:bg-slate-800 transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                Settings
+              </button>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
           </div>
         </motion.aside>
 

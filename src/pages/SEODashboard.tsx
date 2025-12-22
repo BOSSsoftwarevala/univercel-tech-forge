@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Globe, Search, BarChart3, Link2, FileText, Shield, 
   Wallet, Zap, Target, TrendingUp, Bell,
-  Sparkles, Map, Share2, AlertTriangle, FileCode, 
-  Database, Calendar, MousePointer, Eye, Rocket
+  Sparkles, Map, Share2, FileCode, 
+  Database, Calendar, MousePointer, Eye, Rocket, Settings, LogOut, Lock
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 import SEOTopBar from "@/components/seo/SEOTopBar";
 import SEOMetrics from "@/components/seo/SEOMetrics";
 import KeywordManager from "@/components/seo/KeywordManager";
@@ -32,6 +35,14 @@ const SEODashboard = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [activeRegion, setActiveRegion] = useState<"global" | "africa" | "asia" | "middleeast">("global");
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
 
   const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -126,9 +137,19 @@ const SEODashboard = () => {
               <Zap className="w-4 h-4" />
               Run Optimization
             </motion.button>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-2 px-4 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-sm font-medium text-cyan-300 flex items-center justify-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              1-Click Blog
+            <div className="flex gap-2">
+              <motion.button onClick={() => navigate('/change-password')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1 py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-sm font-medium text-cyan-300 flex items-center justify-center gap-2">
+                <Lock className="w-4 h-4" />
+                Password
+              </motion.button>
+              <motion.button onClick={() => navigate('/settings')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1 py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-sm font-medium text-cyan-300 flex items-center justify-center gap-2">
+                <Settings className="w-4 h-4" />
+                Settings
+              </motion.button>
+            </div>
+            <motion.button onClick={handleLogout} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-2 px-4 bg-red-500/10 border border-red-500/30 rounded-lg text-sm font-medium text-red-400 flex items-center justify-center gap-2">
+              <LogOut className="w-4 h-4" />
+              Logout
             </motion.button>
           </div>
         </motion.aside>
