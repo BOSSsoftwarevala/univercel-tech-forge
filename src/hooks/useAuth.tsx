@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
@@ -35,6 +35,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [approvalStatus, setApprovalStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null);
   const [wasForceLoggedOut, setWasForceLoggedOut] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false); // Cache flag
+
+  // Prevent race condition: SIGNED_IN event role fetch can run before we clear force-logout flag.
+  const pendingSignInRef = useRef(false);
+
 
   // Computed properties
   const isPrivileged = userRole ? PRIVILEGED_ROLES.includes(userRole) : false;
@@ -75,7 +79,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
+        // If this SIGNED_IN came from our own signIn() call, we will fetch role
+        // after clearing any force-logout flag to avoid an immediate signOut race.
+        if (event === 'SIGNED_IN' && pendingSignInRef.current) {
+          return;
+        }
+
         // Only fetch role on SIGNED_IN event or if not already checked
         if (session?.user && (event === 'SIGNED_IN' || !roleChecked)) {
           setTimeout(() => {
@@ -262,22 +272,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    pendingSignInRef.current = true;
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
-      
+
       if (error) throw error;
-      
-      // Clear force logout flag on successful sign in
+
+      // Clear force logout flag on successful sign in BEFORE role/status fetch
       if (data.user) {
         await clearForceLogout(data.user.id);
+        await fetchUserRoleAndStatus(data.user.id);
       }
-      
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
+    } finally {
+      pendingSignInRef.current = false;
     }
   };
 
