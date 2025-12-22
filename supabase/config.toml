@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.api-email]
 verify_jwt = false
+
+[functions.api-health]
+verify_jwt = false
+
+[functions.api-backup]
+verify_jwt = false
