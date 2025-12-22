@@ -231,6 +231,52 @@ const UserManagement = () => {
     }
   };
 
+  const handleApproveUser = async (user: UserData) => {
+    setActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ 
+          approval_status: 'approved',
+          approved_at: new Date().toISOString()
+        })
+        .eq('user_id', user.user_id);
+
+      if (error) throw error;
+
+      toast.success('User approved successfully');
+      fetchUsers();
+    } catch (err: any) {
+      console.error('Error approving user:', err);
+      toast.error(err.message || 'Failed to approve user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRejectUser = async (user: UserData) => {
+    setActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ 
+          approval_status: 'rejected',
+          rejection_reason: 'Rejected by admin'
+        })
+        .eq('user_id', user.user_id);
+
+      if (error) throw error;
+
+      toast.success('User rejected');
+      fetchUsers();
+    } catch (err: any) {
+      console.error('Error rejecting user:', err);
+      toast.error(err.message || 'Failed to reject user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setNewUserEmail("");
     setNewUserPassword("");
@@ -448,31 +494,57 @@ const UserManagement = () => {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => openEditDialog(user)}>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit Role
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Lock className="w-4 h-4 mr-2" />
-                          Reset Password
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-destructive"
-                          onClick={() => openDeleteDialog(user)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete User
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center justify-end gap-2">
+                      {user.approval_status === 'pending' && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border-neon-green/30"
+                            onClick={() => handleApproveUser(user)}
+                            disabled={actionLoading}
+                          >
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 bg-destructive/10 hover:bg-destructive/20 text-destructive border-destructive/30"
+                            onClick={() => handleRejectUser(user)}
+                            disabled={actionLoading}
+                          >
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => openEditDialog(user)}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Role
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Lock className="w-4 h-4 mr-2" />
+                            Reset Password
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => openDeleteDialog(user)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
