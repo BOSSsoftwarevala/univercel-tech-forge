@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { 
   Shield, 
   Users, 
@@ -261,22 +262,22 @@ const MasterAdminDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <Crown className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-[#0a0a0f] p-4">
+      <div className="max-w-7xl mx-auto space-y-4">
+        {/* Header - Compact */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <Crown className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Master Admin Control Center</h1>
-              <p className="text-gray-400">Complete system oversight and user management</p>
+              <h1 className="text-xl font-bold text-white">Master Admin Control Center</h1>
+              <p className="text-sm text-gray-500">Complete system oversight and user management</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 flex-wrap">
-            <Button variant="outline" onClick={fetchUsers} disabled={loading} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button variant="outline" onClick={fetchUsers} disabled={loading} className="h-9 bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -286,7 +287,7 @@ const MasterAdminDashboard = () => {
                 <Button 
                   variant="destructive" 
                   disabled={forceLogoutAllLoading || nonMasterUsers.length === 0}
-                  className="bg-gradient-to-r from-red-500 to-rose-600 border-0"
+                  className="h-9 bg-gradient-to-r from-red-500 to-rose-600 border-0"
                 >
                   <Power className="w-4 h-4 mr-2" />
                   Force Logout All ({nonMasterUsers.length})
@@ -309,86 +310,39 @@ const MasterAdminDashboard = () => {
               </AlertDialogContent>
             </AlertDialog>
             
-            <Button variant="outline" onClick={() => navigate('/super-admin')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
+            <Button variant="outline" onClick={() => navigate('/super-admin')} className="h-9 bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
               <Shield className="w-4 h-4 mr-2" />
-              Super Admin Panel
+              Super Admin
             </Button>
-            <Button variant="outline" onClick={handleLogout} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
+            <Button variant="outline" onClick={handleLogout} className="h-9 bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
           </div>
         </div>
 
-        {/* Stats Cards - Colorful gradient style */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-amber-400 to-orange-500">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-white/70 mb-1">Total Users</p>
-                <p className="text-3xl font-bold text-white">{users.length}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-white/20">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-violet-400 to-purple-600">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-white/70 mb-1">Pending Approval</p>
-                <p className="text-3xl font-bold text-white">{pendingUsers.length}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-white/20">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-lime-300 to-green-500">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-white/70 mb-1">Approved</p>
-                <p className="text-3xl font-bold text-white">{approvedUsers.length}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-white/20">
-                <CheckCircle className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-rose-400 to-pink-600">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-white/70 mb-1">Rejected</p>
-                <p className="text-3xl font-bold text-white">{rejectedUsers.length}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-white/20">
-                <XCircle className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </div>
+        {/* Stats Cards - Single Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard title="Total Users" value={users.length} icon={<Users className="w-5 h-5 text-white" />} gradient="from-amber-400 to-orange-500" />
+          <StatCard title="Pending Approval" value={pendingUsers.length} icon={<Clock className="w-5 h-5 text-white" />} gradient="from-violet-400 to-purple-600" />
+          <StatCard title="Approved" value={approvedUsers.length} icon={<CheckCircle className="w-5 h-5 text-white" />} gradient="from-lime-400 to-green-500" />
+          <StatCard title="Rejected" value={rejectedUsers.length} icon={<XCircle className="w-5 h-5 text-white" />} gradient="from-rose-400 to-pink-600" />
         </div>
 
-        {/* Alert for pending users */}
+        {/* Alert for pending users - Compact */}
         {pendingUsers.length > 0 && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-center gap-3">
-            <AlertTriangle className="w-6 h-6 text-amber-400" />
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-3 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
             <div>
-              <p className="font-medium text-white">{pendingUsers.length} user(s) awaiting approval</p>
-              <p className="text-sm text-gray-400">Review and approve or reject pending accounts</p>
+              <p className="font-medium text-white text-sm">{pendingUsers.length} user(s) awaiting approval</p>
+              <p className="text-xs text-gray-400">Review and approve or reject pending accounts</p>
             </div>
           </div>
         )}
 
         {/* User Management Tabs */}
         <Tabs defaultValue="live-reports" className="w-full">
-          <TabsList className="bg-[#1a1a2e] border border-gray-800">
+          <TabsList className="bg-[#1a1a2e] border border-gray-800 h-10">
             <TabsTrigger value="live-reports" className="gap-2">
               <Activity className="w-4 h-4" />
               Live Reports
@@ -491,5 +445,23 @@ const MasterAdminDashboard = () => {
     </div>
   );
 };
+
+// Stat Card Component
+function StatCard({ title, value, icon, gradient }: { title: string; value: number; icon: React.ReactNode; gradient: string }) {
+  return (
+    <div className={cn("relative overflow-hidden rounded-xl p-4 bg-gradient-to-br", gradient)}>
+      <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="relative flex items-center justify-between">
+        <div>
+          <p className="text-xs text-white/70 mb-0.5">{title}</p>
+          <p className="text-2xl font-bold text-white">{value}</p>
+        </div>
+        <div className="p-2.5 rounded-lg bg-white/20">
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default MasterAdminDashboard;
