@@ -10121,6 +10121,7 @@ export type Database = {
       is_influencer: { Args: { _user_id: string }; Returns: boolean }
       is_prime_user: { Args: { _user_id: string }; Returns: boolean }
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
       is_user_approved: { Args: { _user_id: string }; Returns: boolean }
       log_activity: {
         Args: {
