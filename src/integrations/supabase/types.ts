@@ -9946,6 +9946,7 @@ export type Database = {
         Args: { _approver_id: string; _target_user_id: string }
         Returns: boolean
       }
+      authorize_role_access: { Args: { _user_id: string }; Returns: boolean }
       calculate_regional_tax: {
         Args: {
           p_amount: number
