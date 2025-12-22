@@ -1,13 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Users, 
   Search, 
-  Filter, 
   UserPlus, 
   MoreHorizontal,
   Shield,
-  Mail,
   Calendar,
   Activity,
   CheckCircle,
@@ -16,11 +14,13 @@ import {
   Edit,
   Trash2,
   Lock,
-  Eye
+  Eye,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -43,58 +43,234 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Database } from "@/integrations/supabase/types";
 
-interface User {
+type AppRole = Database['public']['Enums']['app_role'];
+
+interface UserData {
   id: string;
-  name: string;
-  email: string;
+  user_id: string;
   role: string;
-  status: "active" | "inactive" | "pending";
-  lastActive: string;
-  joinedDate: string;
-  tasks: number;
+  approval_status: string;
+  created_at: string;
+  email?: string;
+  full_name?: string;
 }
 
-const users: User[] = [
-  { id: "1", name: "Rajesh Kumar", email: "rajesh@softwarevala.com", role: "Super Admin", status: "active", lastActive: "2 min ago", joinedDate: "Jan 2024", tasks: 0 },
-  { id: "2", name: "Priya Sharma", email: "priya@softwarevala.com", role: "Finance Manager", status: "active", lastActive: "5 min ago", joinedDate: "Feb 2024", tasks: 12 },
-  { id: "3", name: "Amit Patel", email: "amit@softwarevala.com", role: "Developer", status: "active", lastActive: "1 hour ago", joinedDate: "Mar 2024", tasks: 8 },
-  { id: "4", name: "Sneha Reddy", email: "sneha@softwarevala.com", role: "Support Agent", status: "active", lastActive: "30 min ago", joinedDate: "Mar 2024", tasks: 23 },
-  { id: "5", name: "Vikram Singh", email: "vikram@softwarevala.com", role: "Sales Manager", status: "active", lastActive: "15 min ago", joinedDate: "Apr 2024", tasks: 15 },
-  { id: "6", name: "Ananya Gupta", email: "ananya@softwarevala.com", role: "SEO Specialist", status: "pending", lastActive: "Never", joinedDate: "Dec 2024", tasks: 0 },
-  { id: "7", name: "Rahul Mehta", email: "rahul@softwarevala.com", role: "Franchise Owner", status: "active", lastActive: "3 hours ago", joinedDate: "Jan 2024", tasks: 7 },
-  { id: "8", name: "Kavitha Nair", email: "kavitha@softwarevala.com", role: "Reseller", status: "inactive", lastActive: "2 days ago", joinedDate: "Feb 2024", tasks: 4 },
-  { id: "9", name: "Deepak Joshi", email: "deepak@softwarevala.com", role: "Developer", status: "active", lastActive: "45 min ago", joinedDate: "May 2024", tasks: 19 },
-  { id: "10", name: "Maya Pillai", email: "maya@softwarevala.com", role: "Influencer", status: "active", lastActive: "20 min ago", joinedDate: "Jun 2024", tasks: 11 },
+const AVAILABLE_ROLES: AppRole[] = [
+  'super_admin',
+  'admin',
+  'developer',
+  'franchise',
+  'reseller',
+  'influencer',
+  'prime',
+  'client',
+  'demo_manager',
+  'client_success',
+  'finance_manager',
+  'marketing_manager',
+  'hr_manager',
+  'lead_manager',
+  'task_manager',
+  'ai_manager',
+  'api_security'
 ];
 
 const UserManagement = () => {
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  
+  // Dialog states
+  const [addUserOpen, setAddUserOpen] = useState(false);
+  const [editUserOpen, setEditUserOpen] = useState(false);
+  const [deleteUserOpen, setDeleteUserOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  
+  // Form states
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [newUserName, setNewUserName] = useState("");
+  const [newUserRole, setNewUserRole] = useState<AppRole>("developer");
+  const [editRole, setEditRole] = useState<AppRole>("developer");
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('get_users_for_approval', {
+        viewer_role: 'super_admin'
+      });
+
+      if (error) throw error;
+      setUsers((data as UserData[]) || []);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      toast.error('Failed to fetch users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddUser = async () => {
+    if (!newUserEmail || !newUserPassword || !newUserName) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      // Create user via Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: newUserPassword,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: newUserName,
+            role: newUserRole
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      // Create role entry
+      if (data.user) {
+        await supabase.functions.invoke('role-init', { body: { role: newUserRole } });
+      }
+
+      toast.success('User created successfully');
+      setAddUserOpen(false);
+      resetForm();
+      fetchUsers();
+    } catch (err: any) {
+      console.error('Error creating user:', err);
+      toast.error(err.message || 'Failed to create user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEditUser = async () => {
+    if (!selectedUser) return;
+
+    setActionLoading(true);
+    try {
+      // Update role in user_roles table
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ role: editRole as AppRole })
+        .eq('user_id', selectedUser.user_id);
+
+      if (error) throw error;
+
+      toast.success('User role updated successfully');
+      setEditUserOpen(false);
+      setSelectedUser(null);
+      fetchUsers();
+    } catch (err: any) {
+      console.error('Error updating user:', err);
+      toast.error(err.message || 'Failed to update user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+
+    setActionLoading(true);
+    try {
+      // Delete from user_roles
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', selectedUser.user_id);
+
+      if (roleError) throw roleError;
+
+      toast.success('User deleted successfully');
+      setDeleteUserOpen(false);
+      setSelectedUser(null);
+      fetchUsers();
+    } catch (err: any) {
+      console.error('Error deleting user:', err);
+      toast.error(err.message || 'Failed to delete user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setNewUserEmail("");
+    setNewUserPassword("");
+    setNewUserName("");
+    setNewUserRole("developer");
+  };
+
+  const openEditDialog = (user: UserData) => {
+    setSelectedUser(user);
+    setEditRole(user.role as AppRole);
+    setEditUserOpen(true);
+  };
+
+  const openDeleteDialog = (user: UserData) => {
+    setSelectedUser(user);
+    setDeleteUserOpen(true);
+  };
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = user.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         user.role.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || user.approval_status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
   });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "active":
+      case "approved":
         return (
           <Badge className="bg-neon-green/20 text-neon-green border-neon-green/50">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Active
+            Approved
           </Badge>
         );
-      case "inactive":
+      case "rejected":
         return (
-          <Badge className="bg-muted text-muted-foreground border-border">
+          <Badge className="bg-destructive/20 text-destructive border-destructive/50">
             <XCircle className="w-3 h-3 mr-1" />
-            Inactive
+            Rejected
           </Badge>
         );
       case "pending":
@@ -111,18 +287,25 @@ const UserManagement = () => {
 
   const getRoleColor = (role: string) => {
     const colors: Record<string, string> = {
-      "Super Admin": "text-primary",
-      "Finance Manager": "text-neon-teal",
-      "Developer": "text-neon-purple",
-      "Support Agent": "text-neon-red",
-      "Sales Manager": "text-neon-orange",
-      "SEO Specialist": "text-neon-blue",
-      "Franchise Owner": "text-neon-cyan",
-      "Reseller": "text-neon-green",
-      "Influencer": "text-neon-purple",
+      "super_admin": "text-primary",
+      "master": "text-amber-400",
+      "finance_manager": "text-neon-teal",
+      "developer": "text-neon-purple",
+      "support_agent": "text-neon-red",
+      "demo_manager": "text-neon-orange",
+      "seo_specialist": "text-neon-blue",
+      "franchise": "text-neon-cyan",
+      "reseller": "text-neon-green",
+      "influencer": "text-pink-400",
+      "prime": "text-amber-500",
+      "client": "text-sky-400",
     };
     return colors[role] || "text-foreground";
   };
+
+  const activeUsers = users.filter(u => u.approval_status === 'approved').length;
+  const pendingUsers = users.filter(u => u.approval_status === 'pending').length;
+  const rejectedUsers = users.filter(u => u.approval_status === 'rejected').length;
 
   return (
     <div className="space-y-6">
@@ -132,7 +315,7 @@ const UserManagement = () => {
           <h1 className="text-2xl font-mono font-bold text-foreground">User Management</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage all system users and their access</p>
         </div>
-        <Button className="command-button-primary">
+        <Button onClick={() => setAddUserOpen(true)} className="command-button-primary">
           <UserPlus className="w-4 h-4 mr-2" />
           Add New User
         </Button>
@@ -141,10 +324,10 @@ const UserManagement = () => {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: "Total Users", value: "248", icon: Users, color: "text-primary" },
-          { label: "Active Now", value: "89", icon: Activity, color: "text-neon-green" },
-          { label: "Pending Approval", value: "12", icon: Clock, color: "text-neon-orange" },
-          { label: "Inactive", value: "23", icon: XCircle, color: "text-muted-foreground" },
+          { label: "Total Users", value: users.length.toString(), icon: Users, color: "text-primary" },
+          { label: "Approved", value: activeUsers.toString(), icon: CheckCircle, color: "text-neon-green" },
+          { label: "Pending", value: pendingUsers.toString(), icon: Clock, color: "text-neon-orange" },
+          { label: "Rejected", value: rejectedUsers.toString(), icon: XCircle, color: "text-destructive" },
         ].map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -172,7 +355,7 @@ const UserManagement = () => {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search users by name or email..."
+            placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-secondary/50 border-border/50"
@@ -184,15 +367,9 @@ const UserManagement = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="Super Admin">Super Admin</SelectItem>
-            <SelectItem value="Finance Manager">Finance Manager</SelectItem>
-            <SelectItem value="Developer">Developer</SelectItem>
-            <SelectItem value="Support Agent">Support Agent</SelectItem>
-            <SelectItem value="Sales Manager">Sales Manager</SelectItem>
-            <SelectItem value="SEO Specialist">SEO Specialist</SelectItem>
-            <SelectItem value="Franchise Owner">Franchise Owner</SelectItem>
-            <SelectItem value="Reseller">Reseller</SelectItem>
-            <SelectItem value="Influencer">Influencer</SelectItem>
+            {AVAILABLE_ROLES.map(role => (
+              <SelectItem key={role} value={role}>{role.replace(/_/g, ' ')}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -201,11 +378,14 @@ const UserManagement = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={fetchUsers} disabled={loading}>
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Refresh"}
+        </Button>
       </div>
 
       {/* Users Table */}
@@ -217,90 +397,214 @@ const UserManagement = () => {
         <Table>
           <TableHeader>
             <TableRow className="border-border/30 hover:bg-transparent">
-              <TableHead className="font-mono">User</TableHead>
+              <TableHead className="font-mono">User ID</TableHead>
               <TableHead className="font-mono">Role</TableHead>
               <TableHead className="font-mono">Status</TableHead>
-              <TableHead className="font-mono">Last Active</TableHead>
               <TableHead className="font-mono">Joined</TableHead>
-              <TableHead className="font-mono text-center">Tasks</TableHead>
               <TableHead className="font-mono text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id} className="border-border/30">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/50 to-neon-purple/50 flex items-center justify-center">
-                      <span className="text-sm font-mono font-bold text-foreground">
-                        {user.name.split(" ").map(n => n[0]).join("")}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="font-medium text-foreground">{user.name}</div>
-                      <div className="text-xs text-muted-foreground">{user.email}</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Shield className={`w-4 h-4 ${getRoleColor(user.role)}`} />
-                    <span className={`font-mono text-sm ${getRoleColor(user.role)}`}>{user.role}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{getStatusBadge(user.status)}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Activity className="w-3 h-3" />
-                    {user.lastActive}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    {user.joinedDate}
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className="font-mono text-primary">{user.tasks}</span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem>
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Profile
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit User
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Shield className="w-4 h-4 mr-2" />
-                        Change Role
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Lock className="w-4 h-4 mr-2" />
-                        Reset Password
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete User
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredUsers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  No users found
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredUsers.map((user) => (
+                <TableRow key={user.id} className="border-border/30">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/50 to-neon-purple/50 flex items-center justify-center">
+                        <span className="text-sm font-mono font-bold text-foreground">
+                          {user.role[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="font-mono text-sm text-foreground">{user.user_id.slice(0, 8)}...</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Shield className={`w-4 h-4 ${getRoleColor(user.role)}`} />
+                      <span className={`font-mono text-sm ${getRoleColor(user.role)}`}>
+                        {user.role.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getStatusBadge(user.approval_status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(user.created_at).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => openEditDialog(user)}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Role
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Lock className="w-4 h-4 mr-2" />
+                          Reset Password
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => openDeleteDialog(user)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </motion.div>
+
+      {/* Add User Dialog */}
+      <Dialog open={addUserOpen} onOpenChange={setAddUserOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+            <DialogDescription>Create a new user account with role assignment</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Full Name</Label>
+              <Input
+                placeholder="Enter full name"
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                placeholder="Enter email address"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                placeholder="Enter password"
+                value={newUserPassword}
+                onChange={(e) => setNewUserPassword(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Role</Label>
+              <Select value={newUserRole} onValueChange={(v) => setNewUserRole(v as AppRole)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_ROLES.map(role => (
+                    <SelectItem key={role} value={role}>
+                      {role.replace(/_/g, ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddUserOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddUser} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Create User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={editUserOpen} onOpenChange={setEditUserOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle>Edit User Role</DialogTitle>
+            <DialogDescription>Change the role for this user</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>User ID</Label>
+              <Input value={selectedUser?.user_id || ''} disabled />
+            </div>
+            <div className="space-y-2">
+              <Label>Current Role</Label>
+              <Input value={selectedUser?.role.replace(/_/g, ' ') || ''} disabled />
+            </div>
+            <div className="space-y-2">
+              <Label>New Role</Label>
+              <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_ROLES.map(role => (
+                    <SelectItem key={role} value={role}>
+                      {role.replace(/_/g, ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditUserOpen(false)}>Cancel</Button>
+            <Button onClick={handleEditUser} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Update Role
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Confirmation */}
+      <AlertDialog open={deleteUserOpen} onOpenChange={setDeleteUserOpen}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will remove the user's role and access. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteUser}
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={actionLoading}
+            >
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
