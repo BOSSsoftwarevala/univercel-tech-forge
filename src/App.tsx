@@ -102,6 +102,8 @@ import DomainProtection from "./components/security/DomainProtection";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
 import DemoCredentials from "./pages/DemoCredentials";
+import SectorsBrowse from "./pages/SectorsBrowse";
+import SubCategoryDemos from "./pages/SubCategoryDemos";
 import { AIBillingDashboard } from "./components/ai-billing";
 
 const queryClient = new QueryClient();
@@ -130,6 +132,8 @@ const App = () => (
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
               <Route path="/apply" element={<ApplyPortal />} />
               <Route path="/bootstrap-admins" element={<BootstrapAdmins />} />
+              <Route path="/sectors" element={<SectorsBrowse />} />
+              <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
 
               {/* Global Auth Routes */}
               <Route path="/login" element={<Login />} />
