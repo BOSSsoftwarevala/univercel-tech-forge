@@ -122,12 +122,13 @@ class LightweightAPIClient {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), config.timeout);
-
-      // Adjust timeout for slow networks
+      
+      // Adjust timeout for slow networks BEFORE setting it
       const adjustedTimeout = networkInfo.quality === '2g' 
         ? (config.timeout || 30000) * 2 
-        : config.timeout;
+        : (config.timeout || 30000);
+      
+      const timeoutId = setTimeout(() => controller.abort(), adjustedTimeout);
 
       const response = await fetch(fullURL, {
         method: config.method,
