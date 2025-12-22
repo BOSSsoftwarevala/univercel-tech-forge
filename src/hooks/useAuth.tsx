@@ -5,14 +5,20 @@ import { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
+// Privileged roles that get direct access without approval
+const PRIVILEGED_ROLES: string[] = ['master', 'super_admin'];
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   userRole: AppRole | null;
+  approvalStatus: 'pending' | 'approved' | 'rejected' | null;
+  isPrivileged: boolean;
   signUp: (email: string, password: string, role: AppRole, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  refreshApprovalStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +28,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<AppRole | null>(null);
+  const [approvalStatus, setApprovalStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null);
+
+  // Computed property: is the user privileged (master/super_admin)?
+  const isPrivileged = userRole ? PRIVILEGED_ROLES.includes(userRole) : false;
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -33,10 +43,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Defer fetching user role to prevent deadlock
         if (session?.user) {
           setTimeout(() => {
-            fetchUserRole(session.user.id);
+            fetchUserRoleAndStatus(session.user.id);
           }, 0);
         } else {
           setUserRole(null);
+          setApprovalStatus(null);
         }
       }
     );
@@ -46,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchUserRole(session.user.id);
+        fetchUserRoleAndStatus(session.user.id);
       }
       setLoading(false);
     });
@@ -54,23 +65,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserRole = async (userId: string) => {
+  const fetchUserRoleAndStatus = async (userId: string) => {
     try {
-      console.log('[Auth] Fetching role for user:', userId);
+      console.log('[Auth] Fetching role and approval status for user:', userId);
       
       const { data, error } = await supabase
         .from('user_roles')
-        .select('role')
+        .select('role, approval_status')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (error) {
         console.error('[Auth] Error fetching role:', error);
+        return;
       }
 
-      if (data?.role) {
-        console.log('[Auth] Role found:', data.role);
+      if (data) {
+        console.log('[Auth] Role data:', data);
         setUserRole(data.role as AppRole);
+        setApprovalStatus(data.approval_status as 'pending' | 'approved' | 'rejected');
         return;
       }
 
@@ -90,6 +103,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (!fnErr && (fnData as any)?.data?.role) {
             console.log('[Auth] Role initialized via function:', (fnData as any).data.role);
             setUserRole(((fnData as any).data.role) as AppRole);
+            // New users start as pending unless privileged
+            const newApprovalStatus = PRIVILEGED_ROLES.includes((fnData as any).data.role) ? 'approved' : 'pending';
+            setApprovalStatus(newApprovalStatus as 'pending' | 'approved' | 'rejected');
           } else if (fnErr) {
             console.error('[Auth] Role init function error:', fnErr);
           }
@@ -100,7 +116,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.warn('[Auth] No role found in database or metadata for user:', userId);
       }
     } catch (err) {
-      console.error('[Auth] Error in fetchUserRole:', err);
+      console.error('[Auth] Error in fetchUserRoleAndStatus:', err);
+    }
+  };
+
+  const refreshApprovalStatus = async () => {
+    if (user) {
+      await fetchUserRoleAndStatus(user.id);
     }
   };
 
@@ -211,10 +233,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setSession(null);
     setUserRole(null);
+    setApprovalStatus(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, userRole, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      userRole, 
+      approvalStatus,
+      isPrivileged,
+      signUp, 
+      signIn, 
+      signOut,
+      refreshApprovalStatus
+    }}>
       {children}
     </AuthContext.Provider>
   );

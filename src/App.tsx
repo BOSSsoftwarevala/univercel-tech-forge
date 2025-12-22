@@ -26,6 +26,10 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import ChangePassword from "./pages/auth/ChangePassword";
 import AccountSuspension from "./pages/auth/AccountSuspension";
 import AccessDenied from "./pages/auth/AccessDenied";
+import PendingApproval from "./pages/auth/PendingApproval";
+
+// Public Pages
+import PublicDemos from "./pages/demos/PublicDemos";
 
 import SettingsPage from "./pages/Settings";
 
@@ -109,10 +113,12 @@ const App = () => (
               <GlobalOfferPopup />
               <FloatingAIChatbotWrapper />
             <Routes>
-              {/* Public Routes */}
+              {/* Public Routes - No login required */}
               <Route path="/" element={<Homepage />} />
+              <Route path="/demos/public" element={<PublicDemos />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/pending-approval" element={<PendingApproval />} />
               <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
               <Route path="/change-password" element={<RequireAuth><ChangePassword /></RequireAuth>} />
               <Route path="/onboard" element={<Homepage />} />
@@ -131,18 +137,18 @@ const App = () => (
               <Route path="/account-suspension" element={<AccountSuspension />} />
               <Route path="/access-denied" element={<AccessDenied />} />
 
-              {/* Super Admin Routes */}
-              <Route path="/admin" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/dashboard" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/command-center" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["super_admin"]}><LiveTracking /></RequireRole>} />
-              <Route path="/super-admin/role-manager" element={<RequireRole allowed={["super_admin"]}><RoleManager /></RequireRole>} />
-              <Route path="/super-admin/user-manager" element={<RequireRole allowed={["super_admin"]}><UserManager /></RequireRole>} />
-              <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["super_admin"]}><PermissionMatrix /></RequireRole>} />
-              <Route path="/super-admin/security-center" element={<RequireRole allowed={["super_admin"]}><SecurityCenter /></RequireRole>} />
-              <Route path="/super-admin/demo-manager" element={<RequireRole allowed={["super_admin"]}><ProductDemoManager /></RequireRole>} />
-              <Route path="/super-admin/system-settings" element={<RequireRole allowed={["super_admin"]}><SystemSettings /></RequireRole>} />
+              {/* Super Admin & Master Routes - Direct Access */}
+              <Route path="/admin" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/dashboard" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/command-center" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["master", "super_admin"]}><LiveTracking /></RequireRole>} />
+              <Route path="/super-admin/role-manager" element={<RequireRole allowed={["master", "super_admin"]}><RoleManager /></RequireRole>} />
+              <Route path="/super-admin/user-manager" element={<RequireRole allowed={["master", "super_admin"]}><UserManager /></RequireRole>} />
+              <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["master", "super_admin"]}><PermissionMatrix /></RequireRole>} />
+              <Route path="/super-admin/security-center" element={<RequireRole allowed={["master", "super_admin"]}><SecurityCenter /></RequireRole>} />
+              <Route path="/super-admin/demo-manager" element={<RequireRole allowed={["master", "super_admin"]}><ProductDemoManager /></RequireRole>} />
+              <Route path="/super-admin/system-settings" element={<RequireRole allowed={["master", "super_admin"]}><SystemSettings /></RequireRole>} />
               <Route path="/super-admin/branch-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin/lead-engine" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin/task-engine" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />

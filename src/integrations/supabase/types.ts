@@ -9739,20 +9739,32 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           id: string
+          rejection_reason: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           id?: string
+          rejection_reason?: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           id?: string
+          rejection_reason?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -9924,6 +9936,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_user: {
+        Args: { _approver_id: string; _target_user_id: string }
+        Returns: boolean
+      }
       calculate_regional_tax: {
         Args: {
           p_amount: number
@@ -9965,6 +9981,7 @@ export type Database = {
         Args: { _deadline: string; _developer_id: string }
         Returns: boolean
       }
+      has_privileged_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -9976,6 +9993,7 @@ export type Database = {
       is_influencer: { Args: { _user_id: string }; Returns: boolean }
       is_prime_user: { Args: { _user_id: string }; Returns: boolean }
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
+      is_user_approved: { Args: { _user_id: string }; Returns: boolean }
       log_compliance_audit: {
         Args: {
           p_action: string
@@ -10003,6 +10021,14 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      reject_user: {
+        Args: {
+          _reason?: string
+          _rejector_id: string
+          _target_user_id: string
+        }
+        Returns: boolean
       }
       update_risk_score: {
         Args: {
@@ -10077,6 +10103,7 @@ export type Database = {
         | "admin"
         | "api_security"
         | "r_and_d"
+        | "master"
       demo_status: "active" | "inactive" | "maintenance" | "down"
       demo_tech_stack:
         | "php"
@@ -10286,6 +10313,7 @@ export const Constants = {
         "admin",
         "api_security",
         "r_and_d",
+        "master",
       ],
       demo_status: ["active", "inactive", "maintenance", "down"],
       demo_tech_stack: [

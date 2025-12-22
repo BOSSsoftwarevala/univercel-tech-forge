@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-// Strict role-to-dashboard mapping - each role goes to its OWN dashboard only
+// Privileged roles with direct access (no approval needed)
+const PRIVILEGED_ROLES = ['master', 'super_admin'];
+
+// Strict role-to-dashboard mapping
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
+  master: '/super-admin',
   super_admin: '/super-admin',
   admin: '/super-admin',
   developer: '/developer',
@@ -12,7 +16,7 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
   reseller: '/reseller',
   influencer: '/influencer',
   prime: '/prime',
-  client: '/prime',
+  client: '/demos/public',
   lead_manager: '/lead-manager',
   task_manager: '/task-manager',
   support: '/support',
@@ -31,15 +35,20 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
 };
 
 /**
- * Role-Based Dashboard Router
- * Strictly redirects users to their OWN dashboard based on their role
- * NO cross-role redirects allowed
+ * Role-Based Dashboard Router with Approval System
+ * 
+ * Flow:
+ * 1. MASTER & SUPER_ADMIN → Direct access to their dashboard
+ * 2. Other roles with approval_status = 'approved' → Their dashboard
+ * 3. Other roles with approval_status = 'pending' → Pending approval page
+ * 4. Other roles with approval_status = 'rejected' → Pending approval page (shows rejection)
+ * 5. No role → Public demos page
  */
 const Dashboard = () => {
-  const { user, userRole, loading } = useAuth();
+  const { user, userRole, approvalStatus, loading, isPrivileged } = useAuth();
   const navigate = useNavigate();
   const hasNavigated = useRef(false);
-  const [status, setStatus] = useState<'loading' | 'fetching-role' | 'redirecting'>('loading');
+  const [status, setStatus] = useState<'loading' | 'checking' | 'redirecting'>('loading');
 
   useEffect(() => {
     // Prevent multiple navigations
@@ -51,42 +60,57 @@ const Dashboard = () => {
       return;
     }
 
-    // If no user, redirect to login
+    // If no user, redirect to public demos (not auth - allow browsing)
     if (!user) {
       hasNavigated.current = true;
-      navigate('/auth', { replace: true });
+      navigate('/demos/public', { replace: true });
       return;
     }
 
-    // If role is available, redirect immediately to the correct dashboard
-    if (userRole) {
+    setStatus('checking');
+
+    // If no role assigned yet, wait briefly then redirect to pending
+    if (!userRole) {
+      const timeoutId = setTimeout(() => {
+        if (!hasNavigated.current) {
+          console.log('[Dashboard] No role found, redirecting to pending');
+          hasNavigated.current = true;
+          navigate('/pending-approval', { replace: true });
+        }
+      }, 3000);
+      return () => clearTimeout(timeoutId);
+    }
+
+    // PRIVILEGED ROLES: Direct access
+    if (isPrivileged) {
+      const targetRoute = ROLE_DASHBOARD_MAP[userRole] || '/super-admin';
+      console.log(`[Dashboard] Privileged role: ${userRole} → ${targetRoute}`);
+      setStatus('redirecting');
+      hasNavigated.current = true;
+      navigate(targetRoute, { replace: true });
+      return;
+    }
+
+    // NON-PRIVILEGED ROLES: Check approval status
+    if (approvalStatus === 'approved') {
       const targetRoute = ROLE_DASHBOARD_MAP[userRole];
-      
       if (targetRoute) {
-        console.log(`[Dashboard Router] Role: ${userRole} → Redirecting to: ${targetRoute}`);
+        console.log(`[Dashboard] Approved ${userRole} → ${targetRoute}`);
         setStatus('redirecting');
         hasNavigated.current = true;
         navigate(targetRoute, { replace: true });
       } else {
-        console.warn(`[Dashboard Router] Unknown role: ${userRole} → Access denied`);
+        console.warn(`[Dashboard] Unknown role: ${userRole}`);
         hasNavigated.current = true;
-        navigate('/access-denied', { replace: true });
+        navigate('/demos/public', { replace: true });
       }
-      return;
+    } else {
+      // Pending or rejected - go to pending approval page
+      console.log(`[Dashboard] ${userRole} approval status: ${approvalStatus}`);
+      hasNavigated.current = true;
+      navigate('/pending-approval', { replace: true });
     }
-
-    // Role not yet loaded - wait with timeout
-    setStatus('fetching-role');
-    const timeoutId = setTimeout(() => {
-      if (!hasNavigated.current) {
-        console.warn('[Dashboard Router] Role fetch timeout → Access denied');
-        hasNavigated.current = true;
-        navigate('/access-denied', { replace: true });
-      }
-    }, 5000);
-
-    return () => clearTimeout(timeoutId);
-  }, [user, userRole, loading, navigate]);
+  }, [user, userRole, approvalStatus, loading, isPrivileged, navigate]);
 
   // Reset navigation flag when user changes (logout/login cycle)
   useEffect(() => {
@@ -97,8 +121,8 @@ const Dashboard = () => {
     switch (status) {
       case 'loading':
         return 'Authenticating...';
-      case 'fetching-role':
-        return 'Fetching your role...';
+      case 'checking':
+        return 'Checking access permissions...';
       case 'redirecting':
         return `Redirecting to ${userRole?.replace(/_/g, ' ')} dashboard...`;
       default:
@@ -115,7 +139,7 @@ const Dashboard = () => {
           <p className="text-muted-foreground mt-1">{getStatusMessage()}</p>
           {userRole && (
             <p className="text-xs text-muted-foreground/70 mt-2">
-              Role detected: {userRole}
+              Role: {userRole} | Status: {approvalStatus || 'checking'}
             </p>
           )}
         </div>
