@@ -54,6 +54,9 @@ export interface UserOnlineStatus {
   updated_at: string;
 }
 
+// Alias for backward compatibility
+export type OnlineUser = UserOnlineStatus;
+
 export type DateFilter = 'live' | 'daily' | 'weekly' | 'monthly';
 
 interface UseLiveActivityLogsOptions {
