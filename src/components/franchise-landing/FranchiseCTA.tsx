@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { MapPin, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const FranchiseCTA = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative py-24 overflow-hidden" id="apply">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,10 +103,11 @@ const FranchiseCTA = () => {
               >
                 <Button
                   size="lg"
+                  onClick={() => navigate('/apply?type=franchise')}
                   className="relative group bg-gradient-to-r from-primary to-neon-teal text-background font-semibold px-10 py-6 text-lg hover:shadow-[0_0_50px_rgba(0,240,255,0.5)] transition-all"
                 >
                   <MapPin className="w-5 h-5 mr-2" />
-                  Claim Your Location
+                  Apply for Franchise
                   <motion.span
                     className="absolute inset-0 rounded-lg bg-primary/50 blur-xl -z-10"
                     animate={{ opacity: [0.3, 0.6, 0.3] }}
@@ -115,10 +118,11 @@ const FranchiseCTA = () => {
                 <Button
                   size="lg"
                   variant="outline"
+                  onClick={() => navigate('/demos/public')}
                   className="border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary px-10 py-6 text-lg"
                 >
                   <MessageSquare className="w-5 h-5 mr-2" />
-                  Talk to AI
+                  Explore Demos
                 </Button>
               </motion.div>
 
