@@ -9980,6 +9980,10 @@ export type Database = {
         Args: { _developer_id: string }
         Returns: boolean
       }
+      force_logout_all_except_master: {
+        Args: { admin_user_id: string }
+        Returns: number
+      }
       force_logout_user: {
         Args: { admin_user_id: string; target_user_id: string }
         Returns: boolean

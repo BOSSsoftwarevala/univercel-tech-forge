@@ -48,6 +48,7 @@ const MasterAdminDashboard = () => {
   const [users, setUsers] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [forceLogoutAllLoading, setForceLogoutAllLoading] = useState(false);
 
   useEffect(() => {
     if (!isMaster) {
@@ -133,6 +134,24 @@ const MasterAdminDashboard = () => {
     }
   };
 
+  const handleForceLogoutAll = async () => {
+    setForceLogoutAllLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('force_logout_all_except_master', {
+        admin_user_id: user?.id,
+      });
+
+      if (error) throw error;
+      toast.success(`${data} user(s) have been force logged out`);
+      fetchUsers();
+    } catch (err) {
+      console.error('Error force logging out all users:', err);
+      toast.error('Failed to force logout all users');
+    } finally {
+      setForceLogoutAllLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/auth', { replace: true });
@@ -141,6 +160,7 @@ const MasterAdminDashboard = () => {
   const pendingUsers = users.filter(u => u.approval_status === 'pending');
   const approvedUsers = users.filter(u => u.approval_status === 'approved');
   const rejectedUsers = users.filter(u => u.approval_status === 'rejected');
+  const nonMasterUsers = users.filter(u => u.role !== 'master');
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -260,11 +280,39 @@ const MasterAdminDashboard = () => {
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="destructive" 
+                  disabled={forceLogoutAllLoading || nonMasterUsers.length === 0}
+                >
+                  <Power className="w-4 h-4 mr-2" />
+                  Force Logout All ({nonMasterUsers.length})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Force Logout All Users?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will immediately log out all {nonMasterUsers.length} non-Master users from all devices. 
+                    Master Admin accounts will NOT be affected.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleForceLogoutAll}>
+                    Force Logout All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            
             <Button variant="outline" onClick={() => navigate('/super-admin')}>
               <Shield className="w-4 h-4 mr-2" />
               Super Admin Panel
             </Button>
-            <Button variant="destructive" onClick={handleLogout}>
+            <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
