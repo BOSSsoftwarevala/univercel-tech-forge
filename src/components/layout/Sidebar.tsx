@@ -48,70 +48,76 @@ interface SidebarProps {
 }
 
 const menuItems: MenuItem[] = [
-  { id: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" />, path: '/' },
+  { id: 'dashboard', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" />, path: '/super-admin' },
   { 
     id: 'franchise', 
     label: 'Franchise Management', 
     icon: <Building2 className="w-4 h-4" />,
     badge: 42,
     badgeColor: 'bg-neon-cyan/20 text-neon-cyan',
-    path: '/franchise'
+    path: '/super-admin/franchise-manager'
   },
   { 
     id: 'reseller', 
     label: 'Reseller Management', 
     icon: <Users className="w-4 h-4" />,
     badge: 156,
-    badgeColor: 'bg-neon-teal/20 text-neon-teal'
+    badgeColor: 'bg-neon-teal/20 text-neon-teal',
+    path: '/super-admin/reseller-manager'
   },
   { 
     id: 'developer', 
     label: 'Developer Workforce', 
     icon: <Code2 className="w-4 h-4" />,
     badge: 28,
-    badgeColor: 'bg-neon-purple/20 text-neon-purple'
+    badgeColor: 'bg-neon-purple/20 text-neon-purple',
+    path: '/super-admin/developer-manager'
   },
   { 
     id: 'sales', 
     label: 'Sales Command Center', 
     icon: <TrendingUp className="w-4 h-4" />,
     badge: 'HOT',
-    badgeColor: 'bg-neon-orange/20 text-neon-orange'
+    badgeColor: 'bg-neon-orange/20 text-neon-orange',
+    path: '/sales-support'
   },
   { 
     id: 'support', 
     label: 'Support Command Center', 
     icon: <HeadphonesIcon className="w-4 h-4" />,
     badge: 23,
-    badgeColor: 'bg-neon-red/20 text-neon-red'
+    badgeColor: 'bg-neon-red/20 text-neon-red',
+    path: '/super-admin/support-center'
   },
-  { id: 'seo', label: 'SEO & Marketing Hub', icon: <Search className="w-4 h-4" /> },
-  { id: 'influencer', label: 'Influencer Management', icon: <Megaphone className="w-4 h-4" /> },
+  { id: 'seo', label: 'SEO & Marketing Hub', icon: <Search className="w-4 h-4" />, path: '/seo' },
+  { id: 'influencer', label: 'Influencer Management', icon: <Megaphone className="w-4 h-4" />, path: '/super-admin/influencer-manager' },
   { 
     id: 'demo', 
     label: 'Demo Manager', 
     icon: <PlayCircle className="w-4 h-4" />,
     badge: '40+',
-    badgeColor: 'bg-neon-green/20 text-neon-green'
+    badgeColor: 'bg-neon-green/20 text-neon-green',
+    path: '/demo-manager'
   },
-  { id: 'tasks', label: 'Task Manager & Timer', icon: <ListTodo className="w-4 h-4" /> },
-  { id: 'finance', label: 'Finance & Wallet Control', icon: <Wallet className="w-4 h-4" /> },
-  { id: 'client-success', label: 'Client Success Center', icon: <Heart className="w-4 h-4" /> },
-  { id: 'performance', label: 'Performance Manager', icon: <BarChart3 className="w-4 h-4" /> },
-  { id: 'talent', label: 'Talent & Training', icon: <GraduationCap className="w-4 h-4" /> },
-  { id: 'rnd', label: 'R&D Innovation Lab', icon: <Lightbulb className="w-4 h-4" /> },
+  { id: 'tasks', label: 'Task Manager & Timer', icon: <ListTodo className="w-4 h-4" />, path: '/task-manager' },
+  { id: 'finance', label: 'Finance & Wallet Control', icon: <Wallet className="w-4 h-4" />, path: '/super-admin/finance-center' },
+  { id: 'client-success', label: 'Client Success Center', icon: <Heart className="w-4 h-4" />, path: '/client-success' },
+  { id: 'performance', label: 'Performance Manager', icon: <BarChart3 className="w-4 h-4" />, path: '/performance' },
+  { id: 'talent', label: 'Talent & Training', icon: <GraduationCap className="w-4 h-4" />, path: '/hr' },
+  { id: 'rnd', label: 'R&D Innovation Lab', icon: <Lightbulb className="w-4 h-4" />, path: '/rnd-dashboard' },
   { 
     id: 'ai', 
     label: 'AI Decision Engine', 
     icon: <Bot className="w-4 h-4" />,
     badge: 'AI',
-    badgeColor: 'bg-primary/20 text-primary'
+    badgeColor: 'bg-primary/20 text-primary',
+    path: '/ai-console'
   },
-  { id: 'security', label: 'Security & Audit Logs', icon: <ShieldCheck className="w-4 h-4" /> },
-  { id: 'legal', label: 'Legal Compliance', icon: <Scale className="w-4 h-4" /> },
-  { id: 'data-masking', label: 'Data Masking & Identity', icon: <Eye className="w-4 h-4" /> },
-  { id: 'integrations', label: 'Integrations & API', icon: <Plug className="w-4 h-4" /> },
-  { id: 'language', label: 'Language & Currency', icon: <Globe className="w-4 h-4" /> },
+  { id: 'security', label: 'Security & Audit Logs', icon: <ShieldCheck className="w-4 h-4" />, path: '/super-admin/security-center' },
+  { id: 'legal', label: 'Legal Compliance', icon: <Scale className="w-4 h-4" />, path: '/legal' },
+  { id: 'data-masking', label: 'Data Masking & Identity', icon: <Eye className="w-4 h-4" />, path: '/super-admin/user-manager' },
+  { id: 'integrations', label: 'Integrations & API', icon: <Plug className="w-4 h-4" />, path: '/api-integrations' },
+  { id: 'language', label: 'Language & Currency', icon: <Globe className="w-4 h-4" />, path: '/system-settings' },
 ];
 
 const Sidebar = ({ activeItem, onItemClick, collapsed }: SidebarProps) => {
