@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userRole, setUserRole] = useState<AppRole | null>(null);
   const [approvalStatus, setApprovalStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null);
   const [wasForceLoggedOut, setWasForceLoggedOut] = useState(false);
+  const [roleChecked, setRoleChecked] = useState(false); // Cache flag
 
   // Computed properties
   const isPrivileged = userRole ? PRIVILEGED_ROLES.includes(userRole) : false;
@@ -48,15 +49,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (!error && data) {
-        // User was force logged out - sign them out
-        console.log('[Auth] User was force logged out at:', data);
         setWasForceLoggedOut(true);
         await supabase.auth.signOut();
         return true;
       }
       return false;
     } catch (err) {
-      console.error('[Auth] Error checking force logout:', err);
       return false;
     }
   }, []);
@@ -67,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await supabase.rpc('clear_force_logout', { clear_user_id: userId });
       setWasForceLoggedOut(false);
     } catch (err) {
-      console.error('[Auth] Error clearing force logout:', err);
+      // Silent fail
     }
   }, []);
 
@@ -78,13 +76,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user) {
+        // Only fetch role on SIGNED_IN event or if not already checked
+        if (session?.user && (event === 'SIGNED_IN' || !roleChecked)) {
           setTimeout(() => {
             fetchUserRoleAndStatus(session.user.id);
           }, 0);
-        } else {
+        } else if (!session) {
           setUserRole(null);
           setApprovalStatus(null);
+          setRoleChecked(false);
         }
       }
     );
@@ -93,14 +93,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
+      if (session?.user && !roleChecked) {
         fetchUserRoleAndStatus(session.user.id);
       }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [roleChecked]);
 
   // Periodic force logout check for non-master users
   useEffect(() => {
@@ -114,9 +114,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user, isMaster, checkForceLogout]);
 
   const fetchUserRoleAndStatus = async (userId: string) => {
+    // Skip if already checked and approved
+    if (roleChecked && approvalStatus === 'approved') {
+      return;
+    }
+
     try {
-      console.log('[Auth] Fetching role and approval status for user:', userId);
-      
       const { data, error } = await supabase
         .from('user_roles')
         .select('role, approval_status, force_logged_out_at')
@@ -124,55 +127,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .maybeSingle();
 
       if (error) {
-        console.error('[Auth] Error fetching role:', error);
         return;
       }
 
       if (data) {
         // Check if force logged out
         if (data.force_logged_out_at) {
-          console.log('[Auth] User was force logged out');
           setWasForceLoggedOut(true);
           await supabase.auth.signOut();
           return;
         }
 
-        console.log('[Auth] Role data:', data);
         setUserRole(data.role as AppRole);
         setApprovalStatus(data.approval_status as 'pending' | 'approved' | 'rejected');
+        setRoleChecked(true);
         return;
       }
 
-      console.log('[Auth] No role in database, checking auth metadata...');
-      
       // If missing, try to initialize from auth metadata
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       const metaRole = currentUser?.user_metadata?.role as string | undefined;
       
       if (metaRole) {
-        console.log('[Auth] Found role in metadata:', metaRole);
         try {
           const { data: fnData, error: fnErr } = await supabase.functions.invoke('role-init', {
             body: { role: metaRole },
           });
 
           if (!fnErr && (fnData as any)?.data?.role) {
-            console.log('[Auth] Role initialized via function:', (fnData as any).data.role);
             setUserRole(((fnData as any).data.role) as AppRole);
-            // New users start as pending unless privileged
             const newApprovalStatus = PRIVILEGED_ROLES.includes((fnData as any).data.role) ? 'approved' : 'pending';
             setApprovalStatus(newApprovalStatus as 'pending' | 'approved' | 'rejected');
-          } else if (fnErr) {
-            console.error('[Auth] Role init function error:', fnErr);
+            setRoleChecked(true);
           }
         } catch (fnError) {
-          console.error('[Auth] Role init function failed:', fnError);
+          // Silent fail
         }
-      } else {
-        console.warn('[Auth] No role found in database or metadata for user:', userId);
       }
     } catch (err) {
-      console.error('[Auth] Error in fetchUserRoleAndStatus:', err);
+      // Silent fail
     }
   };
 
