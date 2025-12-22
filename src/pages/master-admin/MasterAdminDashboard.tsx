@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
 import { 
   Shield, 
   Users, 
@@ -15,7 +14,6 @@ import {
   XCircle, 
   Clock, 
   Crown,
-  AlertTriangle,
   Power,
   RefreshCw,
   Activity
@@ -264,41 +262,37 @@ const MasterAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0f] p-4">
       <div className="max-w-7xl mx-auto space-y-4">
-        {/* Header - Compact */}
+        {/* Header - Clean */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <Crown className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+              <Crown className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">Master Admin Control Center</h1>
-              <p className="text-sm text-gray-500">Complete system oversight and user management</p>
-            </div>
+            <h1 className="text-lg font-bold text-white">Master Admin</h1>
           </div>
           
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" onClick={fetchUsers} disabled={loading} className="h-9 bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={fetchUsers} disabled={loading} size="sm" className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button 
                   variant="destructive" 
+                  size="sm"
                   disabled={forceLogoutAllLoading || nonMasterUsers.length === 0}
-                  className="h-9 bg-gradient-to-r from-red-500 to-rose-600 border-0"
+                  className="bg-red-500/80 hover:bg-red-600 border-0"
                 >
-                  <Power className="w-4 h-4 mr-2" />
-                  Force Logout All ({nonMasterUsers.length})
+                  <Power className="w-4 h-4 mr-1" />
+                  Logout All
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent className="bg-[#12121a] border-gray-800">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="text-white">Force Logout All Users?</AlertDialogTitle>
                   <AlertDialogDescription className="text-gray-400">
-                    This will immediately log out all {nonMasterUsers.length} non-Master users from all devices. 
-                    Master Admin accounts will NOT be affected.
+                    This will immediately log out all {nonMasterUsers.length} non-Master users.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -310,35 +304,14 @@ const MasterAdminDashboard = () => {
               </AlertDialogContent>
             </AlertDialog>
             
-            <Button variant="outline" onClick={() => navigate('/super-admin')} className="h-9 bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
-              <Shield className="w-4 h-4 mr-2" />
-              Super Admin
+            <Button variant="outline" size="sm" onClick={() => navigate('/super-admin')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+              <Shield className="w-4 h-4" />
             </Button>
-            <Button variant="outline" onClick={handleLogout} className="h-9 bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+            <Button variant="outline" size="sm" onClick={handleLogout} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>
-
-        {/* Stats Cards - Single Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatCard title="Total Users" value={users.length} icon={<Users className="w-5 h-5 text-white" />} gradient="from-amber-400 to-orange-500" />
-          <StatCard title="Pending Approval" value={pendingUsers.length} icon={<Clock className="w-5 h-5 text-white" />} gradient="from-violet-400 to-purple-600" />
-          <StatCard title="Approved" value={approvedUsers.length} icon={<CheckCircle className="w-5 h-5 text-white" />} gradient="from-lime-400 to-green-500" />
-          <StatCard title="Rejected" value={rejectedUsers.length} icon={<XCircle className="w-5 h-5 text-white" />} gradient="from-rose-400 to-pink-600" />
-        </div>
-
-        {/* Alert for pending users - Compact */}
-        {pendingUsers.length > 0 && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-3 flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
-            <div>
-              <p className="font-medium text-white text-sm">{pendingUsers.length} user(s) awaiting approval</p>
-              <p className="text-xs text-gray-400">Review and approve or reject pending accounts</p>
-            </div>
-          </div>
-        )}
 
         {/* User Management Tabs */}
         <Tabs defaultValue="live-reports" className="w-full">
@@ -445,23 +418,5 @@ const MasterAdminDashboard = () => {
     </div>
   );
 };
-
-// Stat Card Component
-function StatCard({ title, value, icon, gradient }: { title: string; value: number; icon: React.ReactNode; gradient: string }) {
-  return (
-    <div className={cn("relative overflow-hidden rounded-xl p-4 bg-gradient-to-br", gradient)}>
-      <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-      <div className="relative flex items-center justify-between">
-        <div>
-          <p className="text-xs text-white/70 mb-0.5">{title}</p>
-          <p className="text-2xl font-bold text-white">{value}</p>
-        </div>
-        <div className="p-2.5 rounded-lg bg-white/20">
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default MasterAdminDashboard;
