@@ -19,10 +19,15 @@ import {
   RefreshCw,
   Activity,
   ExternalLink,
-  Bell
+  Bell,
+  ShieldX,
+  FileText
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useDemoManagerAccess } from "@/hooks/useDemoManagerAccess";
+import { DemoReportCardsList } from "@/components/demo-manager/DemoReportCard";
+import { DemoAccessGate } from "@/components/demo-manager/DemoAccessGate";
 
 interface Demo {
   id: string;
@@ -64,6 +69,17 @@ export default function DemoManagerPanel() {
     description: '',
     category: 'general'
   });
+
+  const { 
+    isDemoManager, 
+    canAccessDemos, 
+    isLoading: accessLoading,
+    createReportCard, 
+    logUnauthorizedAttempt,
+    reportCards,
+    fetchReportCards,
+    updateWorkflowStatus
+  } = useDemoManagerAccess();
 
   const fetchDemos = async () => {
     setLoading(true);
@@ -113,7 +129,8 @@ export default function DemoManagerPanel() {
   useEffect(() => {
     fetchDemos();
     fetchDemoLogs();
-  }, []);
+    fetchReportCards();
+  }, [fetchReportCards]);
 
   useEffect(() => {
     const channel = supabase
@@ -137,7 +154,15 @@ export default function DemoManagerPanel() {
   }, []);
 
   const handleSaveDemo = async () => {
+    // Block non-demo-managers
+    if (!isDemoManager) {
+      await logUnauthorizedAttempt(editingDemo ? 'edit' : 'add', editingDemo?.id);
+      return;
+    }
+
     try {
+      const oldValues = editingDemo ? { ...editingDemo } : null;
+      
       if (editingDemo) {
         const { error } = await supabase
           .from('demos')
@@ -150,9 +175,20 @@ export default function DemoManagerPanel() {
           .eq('id', editingDemo.id);
 
         if (error) throw error;
+        
+        // Auto-create report card
+        await createReportCard({
+          demoId: editingDemo.id,
+          demoName: formData.title,
+          actionType: 'edit',
+          sector: formData.category,
+          oldValues,
+          newValues: formData
+        });
+        
         toast.success('Demo updated successfully');
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('demos')
           .insert({
             title: formData.title,
@@ -160,9 +196,22 @@ export default function DemoManagerPanel() {
             description: formData.description,
             category: formData.category,
             status: 'active'
-          });
+          })
+          .select('id')
+          .single();
 
         if (error) throw error;
+        
+        // Auto-create report card
+        await createReportCard({
+          demoId: data.id,
+          demoName: formData.title,
+          actionType: 'add',
+          sector: formData.category,
+          demoStatus: 'active',
+          newValues: formData
+        });
+        
         toast.success('Demo created successfully');
       }
 
@@ -170,12 +219,18 @@ export default function DemoManagerPanel() {
       setEditingDemo(null);
       setFormData({ title: '', url: '', description: '', category: 'general' });
       fetchDemos();
+      fetchReportCards();
     } catch (err: any) {
       toast.error(err.message || 'Failed to save demo');
     }
   };
 
-  const handleDeleteDemo = async (id: string) => {
+  const handleDeleteDemo = async (id: string, title: string) => {
+    if (!isDemoManager) {
+      await logUnauthorizedAttempt('delete', id);
+      return;
+    }
+    
     if (!confirm('Are you sure you want to delete this demo?')) return;
 
     try {
@@ -185,8 +240,17 @@ export default function DemoManagerPanel() {
         .eq('id', id);
 
       if (error) throw error;
+      
+      // Auto-create report card
+      await createReportCard({
+        demoId: id,
+        demoName: title,
+        actionType: 'delete'
+      });
+      
       toast.success('Demo deleted');
       fetchDemos();
+      fetchReportCards();
     } catch (err: any) {
       toast.error(err.message || 'Failed to delete demo');
     }
@@ -337,6 +401,7 @@ export default function DemoManagerPanel() {
       <Tabs defaultValue="demos">
         <TabsList>
           <TabsTrigger value="demos">Demos ({demos.length})</TabsTrigger>
+          <TabsTrigger value="report-cards">Report Cards ({reportCards.length})</TabsTrigger>
           <TabsTrigger value="logs">Activity Logs</TabsTrigger>
         </TabsList>
 

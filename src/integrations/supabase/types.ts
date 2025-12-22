@@ -2107,6 +2107,80 @@ export type Database = {
           },
         ]
       }
+      demo_report_cards: {
+        Row: {
+          action_timestamp: string
+          action_type: string
+          auto_registered: boolean | null
+          completion_time_seconds: number | null
+          created_at: string
+          demo_id: string | null
+          demo_name: string
+          demo_status: string | null
+          error_details: string | null
+          fix_details: string | null
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+          performed_by: string
+          performed_by_role: string
+          sector: string | null
+          sub_category: string | null
+          uptime_state: string | null
+          workflow_status: string | null
+        }
+        Insert: {
+          action_timestamp?: string
+          action_type: string
+          auto_registered?: boolean | null
+          completion_time_seconds?: number | null
+          created_at?: string
+          demo_id?: string | null
+          demo_name: string
+          demo_status?: string | null
+          error_details?: string | null
+          fix_details?: string | null
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_by: string
+          performed_by_role: string
+          sector?: string | null
+          sub_category?: string | null
+          uptime_state?: string | null
+          workflow_status?: string | null
+        }
+        Update: {
+          action_timestamp?: string
+          action_type?: string
+          auto_registered?: boolean | null
+          completion_time_seconds?: number | null
+          created_at?: string
+          demo_id?: string | null
+          demo_name?: string
+          demo_status?: string | null
+          error_details?: string | null
+          fix_details?: string | null
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_by?: string
+          performed_by_role?: string
+          sector?: string | null
+          sub_category?: string | null
+          uptime_state?: string | null
+          workflow_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_report_cards_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_technologies: {
         Row: {
           color: string | null
@@ -10075,6 +10149,22 @@ export type Database = {
       }
       check_force_logout: { Args: { check_user_id: string }; Returns: string }
       clear_force_logout: { Args: { clear_user_id: string }; Returns: boolean }
+      create_demo_report_card: {
+        Args: {
+          _action_type: string
+          _demo_id: string
+          _demo_name: string
+          _demo_status?: string
+          _error_details?: string
+          _fix_details?: string
+          _new_values?: Json
+          _old_values?: Json
+          _sector?: string
+          _sub_category?: string
+          _uptime_state?: string
+        }
+        Returns: string
+      }
       exceeds_workload_threshold: {
         Args: { _developer_id: string }
         Returns: boolean
@@ -10117,6 +10207,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_demo_manager: { Args: { _user_id?: string }; Returns: boolean }
       is_franchise: { Args: { _user_id: string }; Returns: boolean }
       is_influencer: { Args: { _user_id: string }; Returns: boolean }
       is_prime_user: { Args: { _user_id: string }; Returns: boolean }
@@ -10158,6 +10249,15 @@ export type Database = {
           p_score_before: number
           p_trigger_type: string
           p_user_id: string
+        }
+        Returns: string
+      }
+      log_unauthorized_demo_attempt: {
+        Args: {
+          _action_attempted: string
+          _demo_id?: string
+          _user_id: string
+          _user_role: string
         }
         Returns: string
       }
