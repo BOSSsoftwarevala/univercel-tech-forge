@@ -1,10 +1,30 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, rateLimitExceededResponse, addRateLimitHeaders } from "../_shared/rate-limiter.ts";
 
+// Enhanced CORS headers with security hardening
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-device-id',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Cache-Control': 'no-store, no-cache, must-revalidate',
 };
+
+// Get client IP from request
+function getClientIP(req: Request): string {
+  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+         req.headers.get('x-real-ip') ||
+         req.headers.get('cf-connecting-ip') ||
+         'unknown';
+}
+
+// Generate masked ID for audit logs
+function generateMaskedId(userId: string): string {
+  return `USR-${userId.substring(0, 4)}***`;
+}
 
 async function getUser(supabase: any, req: Request) {
   const authHeader = req.headers.get('Authorization');
@@ -22,9 +42,42 @@ async function getUserRoles(supabase: any, userId: string) {
   return data?.map((r: any) => r.role) || [];
 }
 
+// Audit log with masked ID
+async function logAuditEntry(
+  supabase: any,
+  userId: string | null,
+  role: string | null,
+  action: string,
+  meta: Record<string, any> = {}
+) {
+  try {
+    await supabase.from('audit_logs').insert({
+      user_id: userId,
+      role,
+      module: 'alerts',
+      action,
+      meta_json: {
+        ...meta,
+        masked_id: userId ? generateMaskedId(userId) : null,
+      },
+    });
+  } catch (error) {
+    console.error('Audit log failed:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting
+  const clientIP = getClientIP(req);
+  const rateLimitResult = checkRateLimit(clientIP, 'api-alerts', 'alerts');
+  
+  if (!rateLimitResult.allowed) {
+    console.warn(`[ALERTS API] Rate limit exceeded for IP: ${clientIP}`);
+    return rateLimitExceededResponse(rateLimitResult.resetIn);
   }
 
   try {
@@ -34,9 +87,10 @@ serve(async (req) => {
     );
 
     const url = new URL(req.url);
-    const path = url.pathname.replace('/api-alerts', '');
+    // Fix: Handle both path patterns
+    const path = url.pathname.replace(/^\/api-alerts/, '').replace(/^\/api\/alerts/, '');
 
-    console.log(`[ALERTS API] ${req.method} ${path}`);
+    console.log(`[ALERTS API] ${req.method} ${path} from IP: ${clientIP}`);
 
     const user = await getUser(supabase, req);
     if (!user) {
@@ -44,7 +98,10 @@ serve(async (req) => {
         success: false,
         message: "Authentication required",
         code: "AUTH_REQUIRED"
-      }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { 
+        status: 401, 
+        headers: addRateLimitHeaders({ ...corsHeaders, 'Content-Type': 'application/json' }, rateLimitResult)
+      });
     }
 
     const userRoles = await getUserRoles(supabase, user.id);

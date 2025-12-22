@@ -13,7 +13,8 @@ import { withAuth, RequestContext } from "../_shared/middleware.ts";
 
 serve(async (req: Request) => {
   const url = new URL(req.url);
-  const path = url.pathname.replace("/api/leads", "");
+  // Fix: Correct path replacement pattern to match edge function name
+  const path = url.pathname.replace(/^\/api-leads/, "").replace(/^\/api\/leads/, "");
 
   // POST /leads/create
   if (path === "/create" && req.method === "POST") {
