@@ -17,15 +17,22 @@ export class RealtimeEngine {
   private maxReconnectAttempts = 10;
   private reconnectDelay = 1000;
   private messageQueue: QueuedMessage[] = [];
+  private maxQueueSize = 100; // Prevent unbounded queue growth
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private url: string;
   private stateListeners = new Set<(state: ConnectionState) => void>();
+  private isDestroyed = false;
 
   constructor(url: string) {
     this.url = url;
   }
 
   connect(): Promise<void> {
+    if (this.isDestroyed) {
+      return Promise.reject(new Error('Engine is destroyed'));
+    }
+    
     return new Promise((resolve, reject) => {
       this.setState('connecting');
 
@@ -33,6 +40,10 @@ export class RealtimeEngine {
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
+          if (this.isDestroyed) {
+            this.ws?.close();
+            return;
+          }
           this.setState('connected');
           this.reconnectAttempts = 0;
           this.startHeartbeat();
@@ -41,6 +52,7 @@ export class RealtimeEngine {
         };
 
         this.ws.onmessage = (event) => {
+          if (this.isDestroyed) return;
           try {
             const message = JSON.parse(event.data);
             this.handleMessage(message);
@@ -50,6 +62,7 @@ export class RealtimeEngine {
         };
 
         this.ws.onclose = () => {
+          if (this.isDestroyed) return;
           this.setState('disconnected');
           this.stopHeartbeat();
           this.attemptReconnect();
@@ -57,7 +70,9 @@ export class RealtimeEngine {
 
         this.ws.onerror = (error) => {
           console.error('WebSocket error:', error);
-          reject(error);
+          if (!this.isDestroyed) {
+            reject(error);
+          }
         };
       } catch (error) {
         reject(error);
@@ -66,8 +81,15 @@ export class RealtimeEngine {
   }
 
   private setState(state: ConnectionState) {
+    if (this.isDestroyed) return;
     this.state = state;
-    this.stateListeners.forEach(listener => listener(state));
+    this.stateListeners.forEach(listener => {
+      try {
+        listener(state);
+      } catch (e) {
+        console.error('State listener error:', e);
+      }
+    });
   }
 
   onStateChange(listener: (state: ConnectionState) => void): () => void {
@@ -76,8 +98,9 @@ export class RealtimeEngine {
   }
 
   private startHeartbeat() {
+    this.stopHeartbeat(); // Clear any existing interval
     this.heartbeatInterval = setInterval(() => {
-      if (this.ws?.readyState === WebSocket.OPEN) {
+      if (this.ws?.readyState === WebSocket.OPEN && !this.isDestroyed) {
         this.ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
       }
     }, 30000);
@@ -91,6 +114,14 @@ export class RealtimeEngine {
   }
 
   private attemptReconnect() {
+    if (this.isDestroyed) return;
+    
+    // Clear any pending reconnect
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
       return;
@@ -104,10 +135,16 @@ export class RealtimeEngine {
       30000
     );
 
-    setTimeout(() => this.connect(), delay);
+    this.reconnectTimeout = setTimeout(() => {
+      if (!this.isDestroyed) {
+        this.connect();
+      }
+    }, delay);
   }
 
   private handleMessage(message: { channel?: string; event?: string; data?: unknown }) {
+    if (this.isDestroyed) return;
+    
     const { channel, event, data } = message;
     const key = `${channel}:${event}`;
     
@@ -125,7 +162,13 @@ export class RealtimeEngine {
     // Broadcast handlers
     const broadcastHandlers = this.handlers.get('*');
     if (broadcastHandlers) {
-      broadcastHandlers.forEach(handler => handler(message));
+      broadcastHandlers.forEach(handler => {
+        try {
+          handler(message);
+        } catch (e) {
+          console.error('Broadcast handler error:', e);
+        }
+      });
     }
   }
 
@@ -151,16 +194,25 @@ export class RealtimeEngine {
   }
 
   send(channel: string, event: string, data: unknown): void {
+    if (this.isDestroyed) return;
+    
     const message = { channel, event, data, timestamp: Date.now() };
 
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     } else {
+      // Limit queue size to prevent memory issues
+      if (this.messageQueue.length >= this.maxQueueSize) {
+        // Remove oldest messages
+        this.messageQueue.shift();
+      }
       this.messageQueue.push(message);
     }
   }
 
   private flushQueue() {
+    if (this.isDestroyed) return;
+    
     while (this.messageQueue.length > 0 && this.ws?.readyState === WebSocket.OPEN) {
       const message = this.messageQueue.shift();
       if (message) {
@@ -171,13 +223,31 @@ export class RealtimeEngine {
 
   disconnect() {
     this.stopHeartbeat();
+    
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    
     this.ws?.close();
     this.ws = null;
     this.setState('disconnected');
   }
 
+  destroy() {
+    this.isDestroyed = true;
+    this.disconnect();
+    this.handlers.clear();
+    this.stateListeners.clear();
+    this.messageQueue = [];
+  }
+
   getState(): ConnectionState {
     return this.state;
+  }
+  
+  getQueueSize(): number {
+    return this.messageQueue.length;
   }
 }
 
@@ -189,4 +259,11 @@ export const getRealtimeEngine = (url?: string): RealtimeEngine => {
     realtimeInstance = new RealtimeEngine(url);
   }
   return realtimeInstance!;
+};
+
+export const destroyRealtimeEngine = (): void => {
+  if (realtimeInstance) {
+    realtimeInstance.destroy();
+    realtimeInstance = null;
+  }
 };
