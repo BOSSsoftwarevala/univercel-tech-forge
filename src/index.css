@@ -326,3 +326,94 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--neon-cyan) / 0.5);
 }
+
+/* Buzzer Blocking Overlay - Blocks interaction until alert is acknowledged */
+body.buzzer-blocking::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: hsl(var(--background) / 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  pointer-events: all;
+}
+
+body.buzzer-blocking {
+  overflow: hidden;
+}
+
+/* Ensure buzzer alerts are above the blocking overlay */
+body.buzzer-blocking .buzzer-alert-container {
+  z-index: 60 !important;
+}
+
+/* Accessibility - Ensure proper focus visibility */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Keyboard navigation indicator */
+.keyboard-nav-indicator:focus-visible {
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.5);
+}
+
+/* Prevent UI elements from being blocked under alerts */
+.alert-safe-zone {
+  z-index: 45;
+  position: relative;
+}
+
+/* RTL Support for languages like Arabic, Hebrew, Urdu */
+[dir="rtl"] .sidebar-nav {
+  text-align: right;
+}
+
+[dir="rtl"] .chat-message {
+  direction: rtl;
+}
+
+[dir="rtl"] .masked-id {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+/* Responsive fixes for mobile sidebar */
+@media (max-width: 768px) {
+  .sidebar-collapsed {
+    width: 0 !important;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .sidebar-open {
+    position: fixed;
+    width: 256px;
+    z-index: 50;
+  }
+}
+
+/* Status dot consistency */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot-online {
+  background-color: hsl(var(--neon-green));
+  box-shadow: 0 0 8px hsl(var(--neon-green) / 0.6);
+}
+
+.status-dot-warning {
+  background-color: hsl(var(--neon-orange));
+  box-shadow: 0 0 8px hsl(var(--neon-orange) / 0.6);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-dot-critical {
+  background-color: hsl(var(--neon-red));
+  box-shadow: 0 0 8px hsl(var(--neon-red) / 0.6);
+  animation: pulse 0.5s ease-in-out infinite;
+}

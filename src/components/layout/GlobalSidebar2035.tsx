@@ -58,12 +58,19 @@ const roleNavItems = [
   { icon: Settings, label: 'Settings', path: '/settings', accent: 'text-gray-400' },
 ];
 
-// Map roles to their allowed paths
+// SEO Manager path (was missing)
+const seoPath = { icon: TrendingUp, label: 'SEO Manager', path: '/seo', accent: 'text-emerald-400' };
+
+// Add SEO to roleNavItems
+const allRoleNavItems = [...roleNavItems.slice(0, 10), seoPath, ...roleNavItems.slice(10)];
+
+// Map roles to their allowed paths - ensure no dead links
 const rolePathMap: Record<string, string[]> = {
-  super_admin: roleNavItems.map((item) => item.path),
+  super_admin: allRoleNavItems.map((item) => item.path),
+  admin: ['/super-admin', '/settings', '/api-integrations'],
   franchise: ['/franchise', '/settings'],
   reseller: ['/reseller', '/settings'],
-  developer: ['/developer', '/settings'],
+  developer: ['/developer', '/tasks', '/settings'],
   influencer: ['/influencer', '/settings'],
   prime: ['/prime', '/settings'],
   lead_manager: ['/leads', '/settings'],
@@ -90,7 +97,8 @@ const GlobalSidebar2035 = ({ collapsed, onToggle, lowDataMode }: SidebarProps) =
   // Get allowed paths for current user role
   const allowedPaths = userRole ? (rolePathMap[userRole] || ['/settings']) : [];
   
-  const filteredItems = roleNavItems.filter((item) => {
+  // Filter navigation items based on role - ensure RBAC compliance
+  const filteredItems = allRoleNavItems.filter((item) => {
     if (userRole === 'super_admin') return true; // Super admin sees everything
     return allowedPaths.includes(item.path);
   });

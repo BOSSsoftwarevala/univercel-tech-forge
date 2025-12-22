@@ -153,6 +153,17 @@ const generateMaskedId = (role: string, userId: string, countryCode?: string): M
         country: countryData.name,
         countryFlag: countryData.flag
       };
+    // BUG FIX: Add missing 6-digit general user role
+    case 'general':
+    case 'guest':
+      return {
+        maskedId: `GEN-${String(hash % 1000000).padStart(6, '0')}`,
+        role: 'General',
+        icon: <Users className="w-4 h-4" />,
+        color: 'text-gray-500 bg-gray-500/10',
+        country: countryData.name,
+        countryFlag: countryData.flag
+      };
     case 'prime_user':
       return {
         maskedId: `⭐ PRM-${String(hash % 10000000).padStart(7, '0')}`,
@@ -173,6 +184,7 @@ const generateMaskedId = (role: string, userId: string, countryCode?: string): M
         countryFlag: countryData.flag
       };
     default:
+      // Default to 6-digit for unknown roles
       return {
         maskedId: `OTH-${String(hash % 1000000).padStart(6, '0')}`,
         role: 'Other',

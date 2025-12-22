@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, X, Search, MessageCircle, Map, Crown, HelpCircle, Send } from 'lucide-react';
 
@@ -6,7 +6,7 @@ interface AIBrainWidgetProps {
   onSearch?: (query: string) => void;
 }
 
-const AIBrainWidget = ({ onSearch }: AIBrainWidgetProps) => {
+const AIBrainWidget = forwardRef<HTMLDivElement, AIBrainWidgetProps>(({ onSearch }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -26,7 +26,7 @@ const AIBrainWidget = ({ onSearch }: AIBrainWidgetProps) => {
   };
 
   return (
-    <>
+    <div ref={ref}>
       {/* Floating Brain Button */}
       <motion.button
         onClick={() => setIsOpen(true)}
@@ -178,8 +178,10 @@ const AIBrainWidget = ({ onSearch }: AIBrainWidgetProps) => {
           </>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
-};
+});
+
+AIBrainWidget.displayName = 'AIBrainWidget';
 
 export default AIBrainWidget;
