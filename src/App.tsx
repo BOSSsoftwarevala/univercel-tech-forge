@@ -45,6 +45,7 @@ import AuthGateway from "./pages/auth/AuthGateway";
 
 // Master Admin Pages
 import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
+import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
 
 // Franchise Layout & Pages
 import FranchiseLayout from "./components/layouts/FranchiseLayout";
@@ -127,6 +128,7 @@ const App = () => (
               <Route path="/onboard" element={<Homepage />} />
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
               <Route path="/apply" element={<ApplyPortal />} />
+              <Route path="/bootstrap-admins" element={<BootstrapAdmins />} />
 
               {/* Global Auth Routes */}
               <Route path="/login" element={<Login />} />
