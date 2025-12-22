@@ -215,6 +215,65 @@ serve(async (req: Request) => {
     }, { module: "auth", action: "logout" });
   }
 
+  // POST /auth/logout-all (Master/Super Admin) - revoke refresh tokens + set force logout flag
+  if (path === "/logout-all" && req.method === "POST") {
+    return withAuth(req, ["super_admin"], async ({ supabaseAdmin, user, clientIP, deviceId }) => {
+      // Get all users to logout (exclude privileged)
+      const { data: rows, error } = await supabaseAdmin
+        .from("user_roles")
+        .select("user_id, role")
+        .not("role", "in", "(master,super_admin)");
+
+      if (error) return errorResponse(error.message, 400);
+
+      const userIds = Array.from(new Set((rows || []).map((r: any) => r.user_id))).filter(Boolean);
+
+      // Revoke refresh tokens for each user (prevents token refresh / session reuse)
+      const authBase = `${Deno.env.get("SUPABASE_URL")}/auth/v1`;
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+      let revoked = 0;
+      for (const uid of userIds) {
+        try {
+          const res = await fetch(`${authBase}/admin/users/${uid}/logout`, {
+            method: "POST",
+            headers: {
+              apikey: serviceKey,
+              authorization: `Bearer ${serviceKey}`,
+              "content-type": "application/json",
+            },
+          });
+
+          if (res.ok) revoked++;
+        } catch (_) {
+          // ignore individual failures; continue
+        }
+      }
+
+      // Set force logout flags in DB so UI redirects immediately
+      await supabaseAdmin
+        .from("user_roles")
+        .update({
+          force_logged_out_at: new Date().toISOString(),
+          force_logged_out_by: user.userId,
+        })
+        .not("role", "in", "(master,super_admin)");
+
+      await createAuditLog(supabaseAdmin, user.userId, user.role, "security", "logout_all", {
+        ip: clientIP,
+        device: deviceId,
+        targeted_users: userIds.length,
+        revoked_refresh_tokens: revoked,
+      });
+
+      return jsonResponse({
+        message: "Forced logout executed",
+        targeted_users: userIds.length,
+        revoked_refresh_tokens: revoked,
+      });
+    }, { module: "security", action: "logout_all" });
+  }
+
   // POST /auth/ip-lock
   if (path === "/ip-lock" && req.method === "POST") {
     return withAuth(req, ["super_admin", "admin"], async ({ supabaseAdmin, body, user }) => {
