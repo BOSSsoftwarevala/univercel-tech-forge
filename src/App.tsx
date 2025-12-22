@@ -106,6 +106,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <GlobalOfferPopup />
               <FloatingAIChatbotWrapper />
             <Routes>
               {/* Public Routes */}
