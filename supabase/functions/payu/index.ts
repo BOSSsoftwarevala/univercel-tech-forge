@@ -1,14 +1,32 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
+import { checkRateLimit, rateLimitExceededResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
 };
 
 const PAYU_MERCHANT_KEY = Deno.env.get('PAYU_MERCHANT_KEY');
 const PAYU_SALT_KEY = Deno.env.get('PAYU_SALT_KEY');
-const PAYU_BASE_URL = 'https://test.payu.in'; // Use 'https://secure.payu.in' for production
+// Use environment variable for production switching
+const PAYU_BASE_URL = Deno.env.get('PAYU_ENVIRONMENT') === 'production' 
+  ? 'https://secure.payu.in' 
+  : 'https://test.payu.in';
+
+// Get client IP
+function getClientIP(req: Request): string {
+  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+         req.headers.get('cf-connecting-ip') || 'unknown';
+}
+
+// Input validation
+function sanitizeInput(input: string): string {
+  if (typeof input !== 'string') return '';
+  return input.replace(/[<>'"&]/g, '').trim().slice(0, 500);
+}
 
 async function generateHash(data: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -98,6 +116,15 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Rate limiting
+  const clientIP = getClientIP(req);
+  const rateLimitResult = checkRateLimit(clientIP, 'payu', 'payment');
+  
+  if (!rateLimitResult.allowed) {
+    console.warn(`[PayU] Rate limit exceeded for IP: ${clientIP}`);
+    return rateLimitExceededResponse(rateLimitResult.resetIn);
+  }
+
   try {
     const body = await req.text();
     if (!body) {
@@ -108,11 +135,17 @@ serve(async (req) => {
     
     const { action, ...params } = JSON.parse(body);
     
-    console.log(`PayU action requested: ${action}`);
+    console.log(`[PayU] Action: ${action} from IP: ${clientIP}`);
 
     if (!PAYU_MERCHANT_KEY || !PAYU_SALT_KEY) {
       console.error('PayU credentials not configured');
       throw new Error('PayU credentials not configured');
+    }
+
+    // Validate action
+    const validActions = ['create-payment', 'verify-payment', 'generate-txnid'];
+    if (!validActions.includes(action)) {
+      throw new Error(`Invalid action: ${action}. Valid actions: ${validActions.join(', ')}`);
     }
 
     let result;
@@ -122,12 +155,20 @@ serve(async (req) => {
         if (!params.amount || !params.productinfo || !params.firstname || !params.email) {
           throw new Error('Missing required fields: amount, productinfo, firstname, email');
         }
+        // Validate email format
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(params.email)) {
+          throw new Error('Invalid email format');
+        }
+        // Validate amount
+        if (!/^\d+(\.\d{1,2})?$/.test(params.amount) || parseFloat(params.amount) <= 0) {
+          throw new Error('Invalid amount format');
+        }
         const txnid = params.txnid || generateTxnId();
         result = await createPaymentHash({
           txnid,
           amount: params.amount,
-          productinfo: params.productinfo,
-          firstname: params.firstname,
+          productinfo: sanitizeInput(params.productinfo),
+          firstname: sanitizeInput(params.firstname),
           email: params.email,
           udf1: params.successUrl || '',
           udf2: params.failureUrl || '',
@@ -149,19 +190,25 @@ serve(async (req) => {
         throw new Error(`Unknown action: ${action}`);
     }
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify({ success: true, data: result }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    console.error('PayU function error:', errorMessage);
+    console.error('[PayU] Error:', errorMessage);
+    
+    let statusCode = 400;
+    if (errorMessage.includes('credentials')) {
+      statusCode = 503;
+    }
+    
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ success: false, error: errorMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: statusCode,
       }
     );
   }
