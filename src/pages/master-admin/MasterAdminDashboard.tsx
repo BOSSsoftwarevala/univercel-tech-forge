@@ -176,109 +176,107 @@ const MasterAdminDashboard = () => {
   };
 
   const UserCard = ({ userRole, showActions = true }: { userRole: UserRole; showActions?: boolean }) => (
-    <Card className="bg-card/50 border-border/50">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              {userRole.role === 'master' ? (
-                <Crown className="w-5 h-5 text-yellow-500" />
-              ) : (
-                <Users className="w-5 h-5 text-primary" />
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-foreground">{userRole.user_id.slice(0, 8)}...</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge className={getRoleBadgeColor(userRole.role)}>
-                  {userRole.role.replace(/_/g, ' ')}
+    <div className="bg-[#1a1a2e] border border-gray-800/50 rounded-xl p-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center">
+            {userRole.role === 'master' ? (
+              <Crown className="w-5 h-5 text-amber-400" />
+            ) : (
+              <Users className="w-5 h-5 text-violet-400" />
+            )}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-white">{userRole.user_id.slice(0, 8)}...</p>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge className={getRoleBadgeColor(userRole.role)}>
+                {userRole.role.replace(/_/g, ' ')}
+              </Badge>
+              {userRole.force_logged_out_at && (
+                <Badge className="bg-red-500/20 text-red-400 border-0 text-xs">
+                  Force Logged Out
                 </Badge>
-                {userRole.force_logged_out_at && (
-                  <Badge variant="destructive" className="text-xs">
-                    Force Logged Out
-                  </Badge>
-                )}
-              </div>
+              )}
             </div>
           </div>
-          
-          {showActions && userRole.role !== 'master' && (
-            <div className="flex items-center gap-2">
-              {userRole.approval_status === 'pending' && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-green-500/50 text-green-400 hover:bg-green-500/10"
-                    onClick={() => handleApprove(userRole.user_id)}
-                    disabled={actionLoading === userRole.user_id}
-                  >
-                    <CheckCircle className="w-4 h-4 mr-1" />
-                    Approve
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-                    onClick={() => handleReject(userRole.user_id)}
-                    disabled={actionLoading === userRole.user_id}
-                  >
-                    <XCircle className="w-4 h-4 mr-1" />
-                    Reject
-                  </Button>
-                </>
-              )}
-              
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={actionLoading === userRole.user_id}
-                  >
-                    <Power className="w-4 h-4 mr-1" />
-                    Force Logout
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Force Logout User?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will immediately log out the user from all devices. They will need to log in again.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleForceLogout(userRole.user_id)}>
-                      Force Logout
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          )}
         </div>
-      </CardContent>
-    </Card>
+        
+        {showActions && userRole.role !== 'master' && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {userRole.approval_status === 'pending' && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-green-500/50 text-green-400 hover:bg-green-500/10 bg-transparent"
+                  onClick={() => handleApprove(userRole.user_id)}
+                  disabled={actionLoading === userRole.user_id}
+                >
+                  <CheckCircle className="w-4 h-4 mr-1" />
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-500/50 text-red-400 hover:bg-red-500/10 bg-transparent"
+                  onClick={() => handleReject(userRole.user_id)}
+                  disabled={actionLoading === userRole.user_id}
+                >
+                  <XCircle className="w-4 h-4 mr-1" />
+                  Reject
+                </Button>
+              </>
+            )}
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  className="bg-red-500 hover:bg-red-600 text-white border-0"
+                  disabled={actionLoading === userRole.user_id}
+                >
+                  <Power className="w-4 h-4 mr-1" />
+                  Force Logout
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-[#12121a] border-gray-800">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-white">Force Logout User?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-400">
+                    This will immediately log out the user from all devices. They will need to log in again.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleForceLogout(userRole.user_id)} className="bg-red-500 hover:bg-red-600">
+                    Force Logout
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
+      </div>
+    </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-yellow-500/5 p-6">
+    <div className="min-h-screen bg-[#0a0a0f] p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-lg shadow-yellow-500/20">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
               <Crown className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Master Admin Control Center</h1>
-              <p className="text-muted-foreground">Complete system oversight and user management</p>
+              <h1 className="text-2xl font-bold text-white">Master Admin Control Center</h1>
+              <p className="text-gray-400">Complete system oversight and user management</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={fetchUsers} disabled={loading}>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button variant="outline" onClick={fetchUsers} disabled={loading} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -288,131 +286,126 @@ const MasterAdminDashboard = () => {
                 <Button 
                   variant="destructive" 
                   disabled={forceLogoutAllLoading || nonMasterUsers.length === 0}
+                  className="bg-gradient-to-r from-red-500 to-rose-600 border-0"
                 >
                   <Power className="w-4 h-4 mr-2" />
                   Force Logout All ({nonMasterUsers.length})
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="bg-[#12121a] border-gray-800">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Force Logout All Users?</AlertDialogTitle>
-                  <AlertDialogDescription>
+                  <AlertDialogTitle className="text-white">Force Logout All Users?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-400">
                     This will immediately log out all {nonMasterUsers.length} non-Master users from all devices. 
                     Master Admin accounts will NOT be affected.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleForceLogoutAll}>
+                  <AlertDialogCancel className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleForceLogoutAll} className="bg-red-500 hover:bg-red-600">
                     Force Logout All
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
             
-            <Button variant="outline" onClick={() => navigate('/super-admin')}>
+            <Button variant="outline" onClick={() => navigate('/super-admin')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
               <Shield className="w-4 h-4 mr-2" />
               Super Admin Panel
             </Button>
-            <Button variant="outline" onClick={handleLogout}>
+            <Button variant="outline" onClick={handleLogout} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-card/50 border-yellow-500/30">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-yellow-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{users.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Users</p>
-                </div>
+        {/* Stats Cards - Colorful gradient style */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-amber-400 to-orange-500">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 mb-1">Total Users</p>
+                <p className="text-3xl font-bold text-white">{users.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-3 rounded-xl bg-white/20">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
           
-          <Card className="bg-card/50 border-amber-500/30">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{pendingUsers.length}</p>
-                  <p className="text-sm text-muted-foreground">Pending Approval</p>
-                </div>
+          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-violet-400 to-purple-600">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 mb-1">Pending Approval</p>
+                <p className="text-3xl font-bold text-white">{pendingUsers.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-3 rounded-xl bg-white/20">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
           
-          <Card className="bg-card/50 border-green-500/30">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{approvedUsers.length}</p>
-                  <p className="text-sm text-muted-foreground">Approved</p>
-                </div>
+          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-lime-300 to-green-500">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 mb-1">Approved</p>
+                <p className="text-3xl font-bold text-white">{approvedUsers.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-3 rounded-xl bg-white/20">
+                <CheckCircle className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
           
-          <Card className="bg-card/50 border-red-500/30">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                  <XCircle className="w-5 h-5 text-red-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{rejectedUsers.length}</p>
-                  <p className="text-sm text-muted-foreground">Rejected</p>
-                </div>
+          <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-rose-400 to-pink-600">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70 mb-1">Rejected</p>
+                <p className="text-3xl font-bold text-white">{rejectedUsers.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-3 rounded-xl bg-white/20">
+                <XCircle className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Alert for pending users */}
         {pendingUsers.length > 0 && (
-          <Card className="bg-amber-500/10 border-amber-500/30">
-            <CardContent className="p-4 flex items-center gap-3">
-              <AlertTriangle className="w-6 h-6 text-amber-500" />
-              <div>
-                <p className="font-medium text-foreground">{pendingUsers.length} user(s) awaiting approval</p>
-                <p className="text-sm text-muted-foreground">Review and approve or reject pending accounts</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-center gap-3">
+            <AlertTriangle className="w-6 h-6 text-amber-400" />
+            <div>
+              <p className="font-medium text-white">{pendingUsers.length} user(s) awaiting approval</p>
+              <p className="text-sm text-gray-400">Review and approve or reject pending accounts</p>
+            </div>
+          </div>
         )}
 
         {/* User Management Tabs */}
         <Tabs defaultValue="live-reports" className="w-full">
-          <TabsList className="bg-muted/50">
+          <TabsList className="bg-[#1a1a2e] border border-gray-800">
             <TabsTrigger value="live-reports" className="gap-2">
               <Activity className="w-4 h-4" />
               Live Reports
             </TabsTrigger>
-            <TabsTrigger value="pending" className="gap-2">
+            <TabsTrigger value="pending" className="gap-2 data-[state=active]:bg-violet-500 data-[state=active]:text-white">
               <Clock className="w-4 h-4" />
               Pending ({pendingUsers.length})
             </TabsTrigger>
-            <TabsTrigger value="approved" className="gap-2">
+            <TabsTrigger value="approved" className="gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
               <CheckCircle className="w-4 h-4" />
               Approved ({approvedUsers.length})
             </TabsTrigger>
-            <TabsTrigger value="rejected" className="gap-2">
+            <TabsTrigger value="rejected" className="gap-2 data-[state=active]:bg-red-500 data-[state=active]:text-white">
               <XCircle className="w-4 h-4" />
               Rejected ({rejectedUsers.length})
             </TabsTrigger>
-            <TabsTrigger value="all" className="gap-2">
+            <TabsTrigger value="all" className="gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
               <Users className="w-4 h-4" />
               All Users ({users.length})
             </TabsTrigger>
@@ -423,16 +416,16 @@ const MasterAdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="pending" className="mt-4">
-            <Card>
+            <Card className="bg-[#12121a] border-gray-800/50">
               <CardHeader>
-                <CardTitle>Pending Approvals</CardTitle>
-                <CardDescription>Users waiting for access approval</CardDescription>
+                <CardTitle className="text-white">Pending Approvals</CardTitle>
+                <CardDescription className="text-gray-400">Users waiting for access approval</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {loading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading...</p>
+                  <p className="text-gray-400 text-center py-8">Loading...</p>
                 ) : pendingUsers.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No pending approvals</p>
+                  <p className="text-gray-400 text-center py-8">No pending approvals</p>
                 ) : (
                   pendingUsers.map(u => <UserCard key={u.id} userRole={u} />)
                 )}
@@ -441,16 +434,16 @@ const MasterAdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="approved" className="mt-4">
-            <Card>
+            <Card className="bg-[#12121a] border-gray-800/50">
               <CardHeader>
-                <CardTitle>Approved Users</CardTitle>
-                <CardDescription>Users with dashboard access</CardDescription>
+                <CardTitle className="text-white">Approved Users</CardTitle>
+                <CardDescription className="text-gray-400">Users with dashboard access</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {loading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading...</p>
+                  <p className="text-gray-400 text-center py-8">Loading...</p>
                 ) : approvedUsers.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No approved users</p>
+                  <p className="text-gray-400 text-center py-8">No approved users</p>
                 ) : (
                   approvedUsers.map(u => <UserCard key={u.id} userRole={u} />)
                 )}
@@ -459,16 +452,16 @@ const MasterAdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="rejected" className="mt-4">
-            <Card>
+            <Card className="bg-[#12121a] border-gray-800/50">
               <CardHeader>
-                <CardTitle>Rejected Users</CardTitle>
-                <CardDescription>Users denied access</CardDescription>
+                <CardTitle className="text-white">Rejected Users</CardTitle>
+                <CardDescription className="text-gray-400">Users denied access</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {loading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading...</p>
+                  <p className="text-gray-400 text-center py-8">Loading...</p>
                 ) : rejectedUsers.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No rejected users</p>
+                  <p className="text-gray-400 text-center py-8">No rejected users</p>
                 ) : (
                   rejectedUsers.map(u => <UserCard key={u.id} userRole={u} showActions={false} />)
                 )}
@@ -477,16 +470,16 @@ const MasterAdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="all" className="mt-4">
-            <Card>
+            <Card className="bg-[#12121a] border-gray-800/50">
               <CardHeader>
-                <CardTitle>All Users</CardTitle>
-                <CardDescription>Complete user list</CardDescription>
+                <CardTitle className="text-white">All Users</CardTitle>
+                <CardDescription className="text-gray-400">Complete user list</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {loading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading...</p>
+                  <p className="text-gray-400 text-center py-8">Loading...</p>
                 ) : users.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No users found</p>
+                  <p className="text-gray-400 text-center py-8">No users found</p>
                 ) : (
                   users.map(u => <UserCard key={u.id} userRole={u} />)
                 )}
