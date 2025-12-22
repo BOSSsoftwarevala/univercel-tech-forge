@@ -9743,6 +9743,8 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           created_at: string
+          force_logged_out_at: string | null
+          force_logged_out_by: string | null
           id: string
           rejection_reason: string | null
           role: Database["public"]["Enums"]["app_role"]
@@ -9753,6 +9755,8 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string
+          force_logged_out_at?: string | null
+          force_logged_out_by?: string | null
           id?: string
           rejection_reason?: string | null
           role: Database["public"]["Enums"]["app_role"]
@@ -9763,6 +9767,8 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string
+          force_logged_out_at?: string | null
+          force_logged_out_by?: string | null
           id?: string
           rejection_reason?: string | null
           role?: Database["public"]["Enums"]["app_role"]
@@ -9967,8 +9973,14 @@ export type Database = {
         }
         Returns: Json
       }
+      check_force_logout: { Args: { check_user_id: string }; Returns: string }
+      clear_force_logout: { Args: { clear_user_id: string }; Returns: boolean }
       exceeds_workload_threshold: {
         Args: { _developer_id: string }
+        Returns: boolean
+      }
+      force_logout_user: {
+        Args: { admin_user_id: string; target_user_id: string }
         Returns: boolean
       }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
@@ -9977,6 +9989,18 @@ export type Database = {
       get_prime_user_id: { Args: { _user_id: string }; Returns: string }
       get_reseller_id: { Args: { _user_id: string }; Returns: string }
       get_risk_level: { Args: { score: number }; Returns: string }
+      get_users_for_approval: {
+        Args: { viewer_role: string }
+        Returns: {
+          approval_status: string
+          approved_at: string
+          approved_by: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }[]
+      }
       has_overlapping_promise: {
         Args: { _deadline: string; _developer_id: string }
         Returns: boolean

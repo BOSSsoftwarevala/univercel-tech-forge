@@ -3,13 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-// Privileged roles with direct access (no approval needed)
-const PRIVILEGED_ROLES = ['master', 'super_admin'];
-
 // Strict role-to-dashboard mapping
+// MASTER gets a separate dashboard, SUPER_ADMIN gets the command center
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
-  master: '/super-admin',
-  super_admin: '/super-admin',
+  master: '/master-admin',           // Master Admin has its own dashboard
+  super_admin: '/super-admin',       // Super Admin goes to command center
   admin: '/super-admin',
   developer: '/developer',
   franchise: '/franchise',
@@ -45,7 +43,7 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
  * 5. No role → Public demos page
  */
 const Dashboard = () => {
-  const { user, userRole, approvalStatus, loading, isPrivileged } = useAuth();
+  const { user, userRole, approvalStatus, loading, isPrivileged, isMaster, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const hasNavigated = useRef(false);
   const [status, setStatus] = useState<'loading' | 'checking' | 'redirecting'>('loading');
@@ -81,13 +79,21 @@ const Dashboard = () => {
       return () => clearTimeout(timeoutId);
     }
 
-    // PRIVILEGED ROLES: Direct access
-    if (isPrivileged) {
-      const targetRoute = ROLE_DASHBOARD_MAP[userRole] || '/super-admin';
-      console.log(`[Dashboard] Privileged role: ${userRole} → ${targetRoute}`);
+    // MASTER ADMIN: Goes to master admin dashboard
+    if (isMaster) {
+      console.log('[Dashboard] Master Admin → /master-admin');
       setStatus('redirecting');
       hasNavigated.current = true;
-      navigate(targetRoute, { replace: true });
+      navigate('/master-admin', { replace: true });
+      return;
+    }
+
+    // SUPER ADMIN: Goes to super admin command center
+    if (isSuperAdmin) {
+      console.log('[Dashboard] Super Admin → /super-admin');
+      setStatus('redirecting');
+      hasNavigated.current = true;
+      navigate('/super-admin', { replace: true });
       return;
     }
 

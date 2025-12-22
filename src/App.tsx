@@ -43,6 +43,9 @@ import PermissionMatrix from "./pages/super-admin/PermissionMatrix";
 import SecurityCenter from "./pages/super-admin/SecurityCenter";
 import AuthGateway from "./pages/auth/AuthGateway";
 
+// Master Admin Pages
+import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
+
 // Franchise Layout & Pages
 import FranchiseLayout from "./components/layouts/FranchiseLayout";
 import FranchiseDashboardPage from "./pages/franchise/Dashboard";
@@ -137,7 +140,11 @@ const App = () => (
               <Route path="/account-suspension" element={<AccountSuspension />} />
               <Route path="/access-denied" element={<AccessDenied />} />
 
-              {/* Super Admin & Master Routes - Direct Access */}
+              {/* Master Admin Routes - MASTER ONLY */}
+              <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
+              <Route path="/master-admin/*" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
+
+              {/* Super Admin Routes - Super Admin and Master can access */}
               <Route path="/admin" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin/dashboard" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
