@@ -192,12 +192,14 @@ const App = () => (
               <Route path="/franchise/hrm" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseHRM /></FranchiseLayout></RequireRole>} />
               <Route path="/franchise/lead-activity" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseLeadActivity /></FranchiseLayout></RequireRole>} />
               <Route path="/franchise-program" element={<FranchiseLanding />} />
+              <Route path="/franchise-landing" element={<FranchiseLanding />} />
               <Route path="/franchise-dashboard" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseDashboard /></RequireRole>} />
 
               {/* Reseller Routes */}
               <Route path="/reseller" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
               <Route path="/reseller/dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
               <Route path="/reseller-program" element={<ResellerLanding />} />
+              <Route path="/reseller-landing" element={<ResellerLanding />} />
               <Route path="/reseller-dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
 
               {/* Developer Routes */}
