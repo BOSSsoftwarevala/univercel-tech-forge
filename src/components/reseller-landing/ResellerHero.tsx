@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Play, BarChart3, Sparkles, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const FranchiseHero = () => {
+const ResellerHero = () => {
   // Network nodes for referral chain visualization
   const nodes = [
     { x: 50, y: 30, size: 20, delay: 0 },
@@ -316,4 +316,4 @@ const FranchiseHero = () => {
   );
 };
 
-export default FranchiseHero;
+export default ResellerHero;
