@@ -30,6 +30,10 @@ import PendingApproval from "./pages/auth/PendingApproval";
 
 // Public Pages
 import PublicDemos from "./pages/demos/PublicDemos";
+import SimpleDemoList from "./pages/SimpleDemoList";
+import SimpleDemoView from "./pages/SimpleDemoView";
+import SimpleCheckout from "./pages/SimpleCheckout";
+import SimpleUserDashboard from "./pages/SimpleUserDashboard";
 
 import SettingsPage from "./pages/Settings";
 
@@ -123,6 +127,11 @@ const App = () => (
             <Routes>
               {/* Public Routes - No login required */}
               <Route path="/" element={<Homepage />} />
+              <Route path="/demos" element={<SimpleDemoList />} />
+              <Route path="/demo/:demoId" element={<SimpleDemoView />} />
+              <Route path="/checkout/:demoId" element={<SimpleCheckout />} />
+              <Route path="/user-dashboard" element={<SimpleUserDashboard />} />
+              <Route path="/pricing" element={<SimpleDemoList />} />
               <Route path="/demos/public" element={<PublicDemos />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -131,7 +140,7 @@ const App = () => (
               <Route path="/change-password" element={<RequireAuth><ChangePassword /></RequireAuth>} />
               <Route path="/onboard" element={<Homepage />} />
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
-              <Route path="/apply" element={<ApplyPortal />} />
+              <Route path="/apply" element={<SimpleDemoList />} />
               <Route path="/bootstrap-admins" element={<BootstrapAdmins />} />
               <Route path="/sectors" element={<SectorsBrowse />} />
               <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
