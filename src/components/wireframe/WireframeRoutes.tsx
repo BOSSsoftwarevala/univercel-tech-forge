@@ -14,6 +14,7 @@ import { SEOManagerScreen } from './screens/SEOManagerScreen';
 import { TaskManagerScreen } from './screens/TaskManagerScreen';
 import { RnDScreen } from './screens/RnDScreen';
 import { ClientSuccessScreen } from './screens/ClientSuccessScreen';
+import { PerformanceManagerScreen } from './screens/PerformanceManagerScreen';
 
 // Placeholder for remaining screens
 function PlaceholderScreen({ title }: { title: string }) {
@@ -46,7 +47,7 @@ export function WireframeRoutes() {
         <Route path="task-manager" element={<TaskManagerScreen />} />
         <Route path="rnd" element={<RnDScreen />} />
         <Route path="client-success" element={<ClientSuccessScreen />} />
-        <Route path="performance" element={<PlaceholderScreen title="Performance Manager" />} />
+        <Route path="performance" element={<PerformanceManagerScreen />} />
         <Route path="legal" element={<PlaceholderScreen title="Legal & Compliance" />} />
         <Route path="hr" element={<PlaceholderScreen title="HR/Hiring" />} />
         <Route path="influencer" element={<PlaceholderScreen title="Influencer Dashboard" />} />
