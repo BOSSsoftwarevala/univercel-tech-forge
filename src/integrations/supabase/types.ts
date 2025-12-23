@@ -2258,6 +2258,103 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_validation_logs: {
+        Row: {
+          created_at: string | null
+          demo_id: string | null
+          demo_url: string
+          error_message: string | null
+          http_status: number | null
+          id: string
+          response_time_ms: number | null
+          status: string
+          validated_at: string | null
+          validated_by: string | null
+          validation_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          demo_id?: string | null
+          demo_url: string
+          error_message?: string | null
+          http_status?: number | null
+          id?: string
+          response_time_ms?: number | null
+          status?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_type: string
+        }
+        Update: {
+          created_at?: string | null
+          demo_id?: string | null
+          demo_url?: string
+          error_message?: string | null
+          http_status?: number | null
+          id?: string
+          response_time_ms?: number | null
+          status?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_validation_logs_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_verification_queue: {
+        Row: {
+          attempts: number | null
+          completed_at: string | null
+          created_at: string | null
+          demo_id: string | null
+          error_message: string | null
+          id: string
+          last_attempt_at: string | null
+          max_attempts: number | null
+          priority: number | null
+          status: string
+        }
+        Insert: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          demo_id?: string | null
+          error_message?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          max_attempts?: number | null
+          priority?: number | null
+          status?: string
+        }
+        Update: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          demo_id?: string | null
+          error_message?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          max_attempts?: number | null
+          priority?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_verification_queue_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demos: {
         Row: {
           activated_at: string | null
@@ -2277,16 +2374,20 @@ export type Database = {
           expiry_date: string | null
           health_check_interval: number | null
           health_score: number | null
+          http_status: number | null
           id: string
           is_bulk_created: boolean | null
           is_trending: boolean | null
           last_health_check: string | null
+          last_verified_at: string | null
           lifecycle_status: string | null
           login_url: string | null
           masked_url: string | null
           max_concurrent_logins: number | null
           multi_login_enabled: boolean | null
+          normalized_url: string | null
           renewal_date: string | null
+          response_time_ms: number | null
           status: Database["public"]["Enums"]["demo_status"]
           tech_stack: Database["public"]["Enums"]["demo_tech_stack"]
           technology_id: string | null
@@ -2295,6 +2396,7 @@ export type Database = {
           updated_at: string
           uptime_percentage: number | null
           url: string
+          verification_status: string | null
           video_fallback_url: string | null
         }
         Insert: {
@@ -2315,16 +2417,20 @@ export type Database = {
           expiry_date?: string | null
           health_check_interval?: number | null
           health_score?: number | null
+          http_status?: number | null
           id?: string
           is_bulk_created?: boolean | null
           is_trending?: boolean | null
           last_health_check?: string | null
+          last_verified_at?: string | null
           lifecycle_status?: string | null
           login_url?: string | null
           masked_url?: string | null
           max_concurrent_logins?: number | null
           multi_login_enabled?: boolean | null
+          normalized_url?: string | null
           renewal_date?: string | null
+          response_time_ms?: number | null
           status?: Database["public"]["Enums"]["demo_status"]
           tech_stack?: Database["public"]["Enums"]["demo_tech_stack"]
           technology_id?: string | null
@@ -2333,6 +2439,7 @@ export type Database = {
           updated_at?: string
           uptime_percentage?: number | null
           url: string
+          verification_status?: string | null
           video_fallback_url?: string | null
         }
         Update: {
@@ -2353,16 +2460,20 @@ export type Database = {
           expiry_date?: string | null
           health_check_interval?: number | null
           health_score?: number | null
+          http_status?: number | null
           id?: string
           is_bulk_created?: boolean | null
           is_trending?: boolean | null
           last_health_check?: string | null
+          last_verified_at?: string | null
           lifecycle_status?: string | null
           login_url?: string | null
           masked_url?: string | null
           max_concurrent_logins?: number | null
           multi_login_enabled?: boolean | null
+          normalized_url?: string | null
           renewal_date?: string | null
+          response_time_ms?: number | null
           status?: Database["public"]["Enums"]["demo_status"]
           tech_stack?: Database["public"]["Enums"]["demo_tech_stack"]
           technology_id?: string | null
@@ -2371,6 +2482,7 @@ export type Database = {
           updated_at?: string
           uptime_percentage?: number | null
           url?: string
+          verification_status?: string | null
           video_fallback_url?: string | null
         }
         Relationships: [
@@ -10387,6 +10499,7 @@ export type Database = {
         }
         Returns: string
       }
+      normalize_demo_url: { Args: { url: string }; Returns: string }
       reject_user: {
         Args: {
           _reason?: string

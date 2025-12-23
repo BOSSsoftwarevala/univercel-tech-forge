@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Link2, 
@@ -12,14 +12,19 @@ import {
   EyeOff,
   CheckCircle2,
   AlertCircle,
-  Edit3,
   X,
   Globe,
   Layers,
   User,
   Lock,
   Copy,
-  Search
+  Search,
+  AlertTriangle,
+  Zap,
+  Upload,
+  Shield,
+  FileCheck,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,24 +45,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -69,13 +59,21 @@ interface LoginRole {
   showPassword: boolean;
 }
 
-interface FetchedDemoData {
-  url: string;
-  title: string;
-  description: string;
-  source: string;
-  demoType: string;
-  category: string;
+interface ValidationResult {
+  isValid: boolean;
+  isDuplicate: boolean;
+  isReachable: boolean;
+  httpStatus?: number;
+  responseTime?: number;
+  normalizedUrl?: string;
+  duplicateId?: string;
+  duplicateTitle?: string;
+  errorMessage?: string;
+  title?: string;
+  description?: string;
+  source?: string;
+  demoType?: string;
+  category?: string;
 }
 
 interface RegisteredDemo {
@@ -86,23 +84,35 @@ interface RegisteredDemo {
   demo_type: string;
   status: string;
   lifecycle_status: string | null;
+  verification_status: string | null;
   created_at: string;
   login_count: number;
+  http_status: number | null;
+  last_verified_at: string | null;
+}
+
+interface BulkVerifyStats {
+  total: number;
+  active: number;
+  broken: number;
+  pending: number;
 }
 
 const DEMO_TYPES = ["Admin Panel", "Dashboard", "Frontend", "Backend", "Full Stack", "API", "Mobile App"];
 const CATEGORIES = [
   "Education", "Healthcare", "E-Commerce", "POS/Billing", "CRM", "HRM", 
   "Hotel/Booking", "Restaurant", "Real Estate", "ERP", "General", "Finance",
-  "Logistics", "Social Media", "Entertainment", "Travel", "Fitness", "News/Blog"
+  "Logistics", "Social Media", "Entertainment", "Travel", "Fitness", "News/Blog",
+  "Inventory", "Project Management", "Events", "Insurance", "Manufacturing",
+  "Automotive", "Beauty/Salon", "Library", "Subscription"
 ];
 const SOURCES = ["Codecanyon", "Envato", "ThemeForest", "GitHub", "Demo Site", "Preview Site", "Custom"];
 
 const DemoURLCollector = () => {
   // Form state
   const [demoUrl, setDemoUrl] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
-  const [fetchedData, setFetchedData] = useState<FetchedDemoData | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   
   // Editable fields
   const [demoName, setDemoName] = useState("");
@@ -112,25 +122,57 @@ const DemoURLCollector = () => {
   const [demoType, setDemoType] = useState("");
   const [source, setSource] = useState("");
   
-  // Login roles
+  // Login roles (4-9 per demo)
   const [loginRoles, setLoginRoles] = useState<LoginRole[]>([]);
   
   // Registered demos list
   const [registeredDemos, setRegisteredDemos] = useState<RegisteredDemo[]>([]);
   const [isLoadingDemos, setIsLoadingDemos] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Edit dialog
-  const [editingDemo, setEditingDemo] = useState<RegisteredDemo | null>(null);
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  // Bulk verification state
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyProgress, setVerifyProgress] = useState(0);
+  const [verifyStats, setVerifyStats] = useState<BulkVerifyStats | null>(null);
+  
+  // Stats
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    broken: 0,
+    pending: 0,
+    unverified: 0
+  });
 
   // Fetch registered demos on mount
   useEffect(() => {
     fetchRegisteredDemos();
+    fetchStats();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      const { count: total } = await supabase.from('demos').select('id', { count: 'exact', head: true });
+      const { count: active } = await supabase.from('demos').select('id', { count: 'exact', head: true }).eq('status', 'active');
+      const { count: broken } = await supabase.from('demos').select('id', { count: 'exact', head: true }).eq('verification_status', 'broken');
+      const { count: pending } = await supabase.from('demos').select('id', { count: 'exact', head: true }).eq('lifecycle_status', 'pending_activation');
+      const { count: unverified } = await supabase.from('demos').select('id', { count: 'exact', head: true }).eq('verification_status', 'unverified');
+      
+      setStats({
+        total: total || 0,
+        active: active || 0,
+        broken: broken || 0,
+        pending: pending || 0,
+        unverified: unverified || 0
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
 
   const fetchRegisteredDemos = async () => {
     setIsLoadingDemos(true);
@@ -145,10 +187,14 @@ const DemoURLCollector = () => {
           demo_type,
           status,
           lifecycle_status,
+          verification_status,
+          http_status,
+          last_verified_at,
           created_at,
           demo_login_credentials(id)
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
 
       if (error) throw error;
 
@@ -160,6 +206,9 @@ const DemoURLCollector = () => {
         demo_type: demo.demo_type || 'Full Stack',
         status: demo.status,
         lifecycle_status: demo.lifecycle_status,
+        verification_status: demo.verification_status,
+        http_status: demo.http_status,
+        last_verified_at: demo.last_verified_at,
         created_at: demo.created_at,
         login_count: demo.demo_login_credentials?.length || 0
       }));
@@ -177,57 +226,76 @@ const DemoURLCollector = () => {
     }
   };
 
-  const fetchDemoDetails = async () => {
+  const validateDemoUrl = async () => {
     if (!demoUrl.trim()) {
       toast({
         title: "URL Required",
-        description: "Please enter a demo URL to fetch details",
+        description: "Please enter a demo URL to validate",
         variant: "destructive"
       });
       return;
     }
 
-    setIsFetching(true);
+    setIsValidating(true);
+    setValidationResult(null);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-demo-url', {
+      const { data, error } = await supabase.functions.invoke('validate-demo-url', {
         body: { url: demoUrl }
       });
 
       if (error) throw error;
 
-      if (data.success) {
-        const fetched = data.data as FetchedDemoData;
-        setFetchedData(fetched);
-        setDemoName(fetched.title);
-        setDemoDescription(fetched.description);
-        setSector(fetched.category);
-        setDemoType(fetched.demoType);
-        setSource(fetched.source);
+      const validation = data.validation as ValidationResult;
+      setValidationResult(validation);
+
+      if (validation.isDuplicate) {
+        toast({
+          title: "Duplicate Detected",
+          description: `This URL already exists as "${validation.duplicateTitle}"`,
+          variant: "destructive"
+        });
+      } else if (!validation.isReachable) {
+        toast({
+          title: "URL Unreachable",
+          description: validation.errorMessage || "Could not connect to the URL",
+          variant: "destructive"
+        });
+      } else if (validation.isValid) {
+        // Auto-fill fields from validation
+        setDemoName(validation.title || '');
+        setDemoDescription(validation.description || '');
+        setSector(validation.category || 'General');
+        setDemoType(validation.demoType || 'Full Stack');
+        setSource(validation.source || 'Custom');
         
         toast({
-          title: "Details Fetched",
-          description: "Demo details have been auto-detected. You can edit them if needed.",
-        });
-      } else {
-        toast({
-          title: "Fetch Failed",
-          description: data.error || "Could not fetch demo details. Please fill manually.",
-          variant: "destructive"
+          title: "URL Validated",
+          description: "Demo details auto-detected. You can edit them if needed.",
         });
       }
     } catch (error) {
-      console.error('Error fetching demo details:', error);
+      console.error('Validation error:', error);
       toast({
-        title: "Connection Error",
-        description: "Failed to connect. Please fill details manually.",
+        title: "Validation Failed",
+        description: "Could not validate URL. Please check and try again.",
         variant: "destructive"
       });
     } finally {
-      setIsFetching(false);
+      setIsValidating(false);
     }
   };
 
   const addLoginRole = () => {
+    if (loginRoles.length >= 9) {
+      toast({
+        title: "Maximum Roles Reached",
+        description: "You can add up to 9 login roles per demo",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const newRole: LoginRole = {
       id: crypto.randomUUID(),
       roleName: "",
@@ -256,7 +324,7 @@ const DemoURLCollector = () => {
 
   const resetForm = () => {
     setDemoUrl("");
-    setFetchedData(null);
+    setValidationResult(null);
     setDemoName("");
     setDemoDescription("");
     setSector("");
@@ -281,7 +349,26 @@ const DemoURLCollector = () => {
       return;
     }
 
-    // Validate login roles if any
+    // Check if validation was done and passed
+    if (validationResult?.isDuplicate) {
+      toast({ 
+        title: "Cannot Register", 
+        description: "This URL is a duplicate. Please use a different URL.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    // Validate login roles if any (minimum 4 if adding roles)
+    if (loginRoles.length > 0 && loginRoles.length < 4) {
+      toast({ 
+        title: "Minimum Roles Required", 
+        description: "Please add at least 4 login roles or remove all roles", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     for (const role of loginRoles) {
       if (!role.roleName.trim() || !role.username.trim() || !role.password.trim()) {
         toast({ 
@@ -295,14 +382,13 @@ const DemoURLCollector = () => {
 
     setIsSubmitting(true);
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({ title: "Error", description: "You must be logged in", variant: "destructive" });
         return;
       }
 
-      // Insert demo in PENDING status (using 'inactive' as pending state since enum doesn't have 'pending')
+      // Insert demo in PENDING status
       const { data: newDemo, error: demoError } = await supabase
         .from('demos')
         .insert([{
@@ -313,6 +399,9 @@ const DemoURLCollector = () => {
           demo_type: demoType || 'Full Stack',
           status: 'inactive' as const,
           lifecycle_status: 'pending_activation',
+          verification_status: validationResult?.isReachable ? 'verified' : 'unverified',
+          http_status: validationResult?.httpStatus,
+          response_time_ms: validationResult?.responseTime,
           created_by: user.id,
           total_login_roles: loginRoles.length,
           tech_stack: 'php' as const
@@ -320,7 +409,18 @@ const DemoURLCollector = () => {
         .select()
         .single();
 
-      if (demoError) throw demoError;
+      if (demoError) {
+        // Check for unique constraint violation
+        if (demoError.code === '23505') {
+          toast({ 
+            title: "Duplicate URL", 
+            description: "This demo URL already exists in the system", 
+            variant: "destructive" 
+          });
+          return;
+        }
+        throw demoError;
+      }
 
       // Insert login credentials if any
       if (loginRoles.length > 0) {
@@ -338,9 +438,19 @@ const DemoURLCollector = () => {
 
         if (credError) {
           console.error('Error inserting credentials:', credError);
-          // Don't throw - demo was created successfully
         }
       }
+
+      // Log the validation
+      await supabase.from('demo_validation_logs').insert({
+        demo_id: newDemo.id,
+        demo_url: demoUrl,
+        validation_type: 'registration',
+        status: 'passed',
+        http_status: validationResult?.httpStatus,
+        response_time_ms: validationResult?.responseTime,
+        validated_by: user.id
+      });
 
       // Log the action
       await supabase.from('audit_logs').insert({
@@ -358,11 +468,12 @@ const DemoURLCollector = () => {
 
       toast({
         title: "Demo Registered",
-        description: `"${demoName}" has been registered in PENDING state. Activate it when ready.`,
+        description: `"${demoName}" has been registered in PENDING state.`,
       });
 
       resetForm();
       fetchRegisteredDemos();
+      fetchStats();
 
     } catch (error: any) {
       console.error('Error registering demo:', error);
@@ -373,6 +484,62 @@ const DemoURLCollector = () => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const bulkVerifyDemos = async () => {
+    setIsVerifying(true);
+    setVerifyProgress(0);
+    setVerifyStats(null);
+
+    try {
+      // Process in batches
+      let totalProcessed = 0;
+      let allStats: BulkVerifyStats = { total: 0, active: 0, broken: 0, pending: 0 };
+
+      for (let i = 0; i < 10; i++) { // Max 10 batches of 50 = 500 demos per run
+        setVerifyProgress((i + 1) * 10);
+        
+        const { data, error } = await supabase.functions.invoke('bulk-verify-demos', {
+          body: { batchSize: 50, skipVerified: true }
+        });
+
+        if (error) throw error;
+
+        if (data.stats.total === 0) {
+          break; // No more demos to verify
+        }
+
+        allStats.total += data.stats.total;
+        allStats.active += data.stats.active;
+        allStats.broken += data.stats.broken;
+        totalProcessed += data.stats.total;
+
+        // Small delay between batches
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      setVerifyStats(allStats);
+      setVerifyProgress(100);
+
+      toast({
+        title: "Verification Complete",
+        description: `Verified ${allStats.total} demos: ${allStats.active} active, ${allStats.broken} broken`,
+      });
+
+      fetchRegisteredDemos();
+      fetchStats();
+
+    } catch (error: any) {
+      console.error('Bulk verification error:', error);
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to verify demos",
+        variant: "destructive"
+      });
+    } finally {
+      setIsVerifying(false);
+      setTimeout(() => setVerifyProgress(0), 2000);
     }
   };
 
@@ -394,10 +561,35 @@ const DemoURLCollector = () => {
 
       toast({ title: "Success", description: "Demo activated successfully" });
       fetchRegisteredDemos();
+      fetchStats();
     } catch (error: any) {
       toast({ 
         title: "Error", 
         description: error.message || "Failed to activate demo", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const deactivateDemo = async (demoId: string) => {
+    try {
+      const { error } = await supabase
+        .from('demos')
+        .update({ 
+          status: 'inactive',
+          lifecycle_status: 'deactivated'
+        })
+        .eq('id', demoId);
+
+      if (error) throw error;
+
+      toast({ title: "Success", description: "Demo deactivated" });
+      fetchRegisteredDemos();
+      fetchStats();
+    } catch (error: any) {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to deactivate demo", 
         variant: "destructive" 
       });
     }
@@ -409,22 +601,15 @@ const DemoURLCollector = () => {
     }
 
     try {
-      // Delete credentials first
-      await supabase
-        .from('demo_login_credentials')
-        .delete()
-        .eq('demo_id', demoId);
-
-      // Delete demo
-      const { error } = await supabase
-        .from('demos')
-        .delete()
-        .eq('id', demoId);
-
+      await supabase.from('demo_login_credentials').delete().eq('demo_id', demoId);
+      await supabase.from('demo_validation_logs').delete().eq('demo_id', demoId);
+      
+      const { error } = await supabase.from('demos').delete().eq('id', demoId);
       if (error) throw error;
 
       toast({ title: "Deleted", description: "Demo has been removed" });
       fetchRegisteredDemos();
+      fetchStats();
     } catch (error: any) {
       toast({ 
         title: "Error", 
@@ -439,25 +624,30 @@ const DemoURLCollector = () => {
     toast({ title: "Copied", description: "URL copied to clipboard" });
   };
 
-  const filteredDemos = registeredDemos.filter(demo =>
-    demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    demo.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    demo.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDemos = registeredDemos.filter(demo => {
+    const matchesSearch = demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      demo.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      demo.category.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (statusFilter === 'all') return matchesSearch;
+    if (statusFilter === 'active') return matchesSearch && demo.status === 'active';
+    if (statusFilter === 'pending') return matchesSearch && demo.lifecycle_status === 'pending_activation';
+    if (statusFilter === 'broken') return matchesSearch && demo.verification_status === 'broken';
+    return matchesSearch;
+  });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-neon-green/20 text-neon-green border-neon-green/50';
-      case 'inactive': return 'bg-neon-orange/20 text-neon-orange border-neon-orange/50';
-      case 'down': return 'bg-destructive/20 text-destructive border-destructive/50';
-      case 'maintenance': return 'bg-neon-cyan/20 text-neon-cyan border-neon-cyan/50';
-      default: return 'bg-muted text-muted-foreground';
-    }
+  const getStatusColor = (demo: RegisteredDemo) => {
+    if (demo.verification_status === 'broken') return 'bg-destructive/20 text-destructive border-destructive/50';
+    if (demo.lifecycle_status === 'pending_activation') return 'bg-neon-orange/20 text-neon-orange border-neon-orange/50';
+    if (demo.status === 'active') return 'bg-neon-green/20 text-neon-green border-neon-green/50';
+    return 'bg-muted text-muted-foreground';
   };
 
-  const getStatusLabel = (status: string, lifecycle: string | null) => {
-    if (lifecycle === 'pending_activation') return 'Pending';
-    return status.charAt(0).toUpperCase() + status.slice(1);
+  const getStatusLabel = (demo: RegisteredDemo) => {
+    if (demo.verification_status === 'broken') return 'Broken';
+    if (demo.lifecycle_status === 'pending_activation') return 'Pending';
+    if (demo.status === 'active') return 'Active';
+    return 'Inactive';
   };
 
   return (
@@ -465,15 +655,112 @@ const DemoURLCollector = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-mono font-bold text-foreground">Demo URL Collection</h1>
+          <h1 className="text-2xl font-mono font-bold text-foreground">Global Demo Registry</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Paste any demo URL worldwide, auto-detect details, add login credentials, and register
+            Universal demo management system with validation and verification
           </p>
         </div>
-        <Badge className="bg-neon-teal/20 text-neon-teal border-neon-teal/50">
-          <Globe className="w-3 h-3 mr-1" />
-          Universal Intake
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={bulkVerifyDemos}
+            disabled={isVerifying}
+            className="bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50 hover:bg-neon-cyan/30"
+          >
+            {isVerifying ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Zap className="w-4 h-4 mr-2" />
+            )}
+            Bulk Verify All
+          </Button>
+          <Badge className="bg-neon-teal/20 text-neon-teal border-neon-teal/50">
+            <Globe className="w-3 h-3 mr-1" />
+            {stats.total.toLocaleString()} Demos
+          </Badge>
+        </div>
+      </div>
+
+      {/* Bulk Verify Progress */}
+      <AnimatePresence>
+        {isVerifying && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <Card className="glass-panel border-neon-cyan/30">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-4">
+                  <Activity className="w-5 h-5 animate-pulse text-neon-cyan" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Verifying all demo URLs...</p>
+                    <Progress value={verifyProgress} className="mt-2 h-2" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">{verifyProgress}%</span>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Verify Stats */}
+      {verifyStats && (
+        <Card className="glass-panel border-neon-green/30">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-6">
+              <FileCheck className="w-8 h-8 text-neon-green" />
+              <div className="flex-1 grid grid-cols-3 gap-4">
+                <div>
+                  <div className="text-2xl font-mono font-bold text-foreground">{verifyStats.total}</div>
+                  <div className="text-xs text-muted-foreground">Verified</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-mono font-bold text-neon-green">{verifyStats.active}</div>
+                  <div className="text-xs text-muted-foreground">Active</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-mono font-bold text-destructive">{verifyStats.broken}</div>
+                  <div className="text-xs text-muted-foreground">Broken</div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setVerifyStats(null)}>
+                Dismiss
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-5 gap-4">
+        {[
+          { label: "Total", value: stats.total, icon: Layers, color: "text-primary" },
+          { label: "Active", value: stats.active, icon: CheckCircle2, color: "text-neon-green" },
+          { label: "Pending", value: stats.pending, icon: AlertCircle, color: "text-neon-orange" },
+          { label: "Broken", value: stats.broken, icon: AlertTriangle, color: "text-destructive" },
+          { label: "Unverified", value: stats.unverified, icon: Shield, color: "text-muted-foreground" },
+        ].map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-panel p-4"
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={`w-5 h-5 ${stat.color}`} />
+                <div>
+                  <div className={`text-2xl font-mono font-bold ${stat.color}`}>
+                    {stat.value.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -485,38 +772,74 @@ const DemoURLCollector = () => {
               Register New Demo
             </CardTitle>
             <CardDescription>
-              Paste any demo URL and we'll auto-detect the details
+              Paste any demo URL worldwide - auto-validation enabled
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* URL Input */}
+            {/* URL Input with Validation */}
             <div className="space-y-2">
               <Label>Demo URL *</Label>
               <div className="flex gap-2">
                 <Input
                   placeholder="https://codecanyon.net/item/demo-preview..."
                   value={demoUrl}
-                  onChange={(e) => setDemoUrl(e.target.value)}
-                  className="flex-1 bg-secondary/50"
+                  onChange={(e) => {
+                    setDemoUrl(e.target.value);
+                    setValidationResult(null);
+                  }}
+                  className={`flex-1 bg-secondary/50 ${
+                    validationResult?.isDuplicate ? 'border-destructive' : 
+                    validationResult?.isValid ? 'border-neon-green' : ''
+                  }`}
                 />
                 <Button 
-                  onClick={fetchDemoDetails}
-                  disabled={isFetching || !demoUrl.trim()}
+                  onClick={validateDemoUrl}
+                  disabled={isValidating || !demoUrl.trim()}
                   className="command-button-secondary"
                 >
-                  {isFetching ? (
+                  {isValidating ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <RefreshCw className="w-4 h-4" />
+                    <Shield className="w-4 h-4" />
                   )}
-                  <span className="ml-2">Fetch</span>
+                  <span className="ml-2">Validate</span>
                 </Button>
               </div>
-              {fetchedData && (
-                <p className="text-xs text-neon-green flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  Auto-detected from {fetchedData.source}
-                </p>
+              
+              {/* Validation Status */}
+              {validationResult && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  validationResult.isDuplicate ? 'bg-destructive/20 border border-destructive/50' :
+                  !validationResult.isReachable ? 'bg-neon-orange/20 border border-neon-orange/50' :
+                  'bg-neon-green/20 border border-neon-green/50'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {validationResult.isDuplicate ? (
+                      <>
+                        <AlertTriangle className="w-4 h-4 text-destructive" />
+                        <span className="text-destructive font-medium">Duplicate URL</span>
+                      </>
+                    ) : !validationResult.isReachable ? (
+                      <>
+                        <AlertCircle className="w-4 h-4 text-neon-orange" />
+                        <span className="text-neon-orange font-medium">URL Unreachable</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 text-neon-green" />
+                        <span className="text-neon-green font-medium">Valid & Reachable</span>
+                      </>
+                    )}
+                  </div>
+                  {validationResult.errorMessage && (
+                    <p className="mt-1 text-xs opacity-80">{validationResult.errorMessage}</p>
+                  )}
+                  {validationResult.responseTime && (
+                    <p className="mt-1 text-xs opacity-80">
+                      Response: {validationResult.responseTime}ms | HTTP {validationResult.httpStatus}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 
@@ -599,19 +922,20 @@ const DemoURLCollector = () => {
 
             <Separator />
 
-            {/* Login Roles Section */}
+            {/* Login Roles Section (4-9 per demo) */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label className="text-base">Login Credentials</Label>
+                  <Label className="text-base">Login Credentials (4-9 roles)</Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Add login roles for this demo (optional)
+                    {loginRoles.length}/9 roles added {loginRoles.length > 0 && loginRoles.length < 4 && "(min 4 required)"}
                   </p>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={addLoginRole}
+                  disabled={loginRoles.length >= 9}
                   className="border-primary/50 text-primary hover:bg-primary/10"
                 >
                   <Plus className="w-4 h-4 mr-1" />
@@ -699,7 +1023,7 @@ const DemoURLCollector = () => {
                 <div className="text-center py-6 text-muted-foreground text-sm">
                   <Lock className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>No login roles added yet</p>
-                  <p className="text-xs">Click "Add Role" to add login credentials</p>
+                  <p className="text-xs">Click "Add Role" to add login credentials (4-9 roles)</p>
                 </div>
               )}
             </div>
@@ -710,7 +1034,7 @@ const DemoURLCollector = () => {
             <div className="flex gap-3">
               <Button 
                 onClick={handleSubmit}
-                disabled={isSubmitting || !demoUrl || !demoName || !sector}
+                disabled={isSubmitting || !demoUrl || !demoName || !sector || validationResult?.isDuplicate}
                 className="flex-1 command-button-primary"
               >
                 {isSubmitting ? (
@@ -731,8 +1055,8 @@ const DemoURLCollector = () => {
             </div>
 
             <p className="text-xs text-center text-muted-foreground">
-              <AlertCircle className="w-3 h-3 inline mr-1" />
-              Demo will be registered in PENDING state. Activate manually when ready.
+              <Shield className="w-3 h-3 inline mr-1" />
+              Demos are validated for uniqueness and registered in PENDING state
             </p>
           </CardContent>
         </Card>
@@ -747,7 +1071,7 @@ const DemoURLCollector = () => {
                   Registered Demos
                 </CardTitle>
                 <CardDescription>
-                  {registeredDemos.length} demos registered
+                  {filteredDemos.length} of {registeredDemos.length} demos shown
                 </CardDescription>
               </div>
               <Button 
@@ -761,15 +1085,28 @@ const DemoURLCollector = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search demos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-secondary/50"
-              />
+            {/* Filters */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search demos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-secondary/50"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-32 bg-secondary/50">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="broken">Broken</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Demo List */}
@@ -781,8 +1118,8 @@ const DemoURLCollector = () => {
               ) : filteredDemos.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Globe className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>No demos registered yet</p>
-                  <p className="text-xs mt-1">Paste a URL on the left to get started</p>
+                  <p>No demos found</p>
+                  <p className="text-xs mt-1">Register a demo on the left to get started</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -799,8 +1136,8 @@ const DemoURLCollector = () => {
                             <h4 className="font-medium text-foreground truncate">
                               {demo.title}
                             </h4>
-                            <Badge className={getStatusColor(demo.lifecycle_status === 'pending_activation' ? 'inactive' : demo.status)}>
-                              {getStatusLabel(demo.status, demo.lifecycle_status)}
+                            <Badge className={getStatusColor(demo)}>
+                              {getStatusLabel(demo)}
                             </Badge>
                           </div>
                           <p className="text-xs text-muted-foreground mt-1 truncate">
@@ -818,13 +1155,15 @@ const DemoURLCollector = () => {
                           <User className="w-3 h-3" />
                           {demo.login_count} roles
                         </span>
-                        <span>
-                          {new Date(demo.created_at).toLocaleDateString()}
-                        </span>
+                        {demo.http_status && (
+                          <span className="flex items-center gap-1">
+                            HTTP {demo.http_status}
+                          </span>
+                        )}
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        {demo.status === 'pending' && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {demo.lifecycle_status === 'pending_activation' && (
                           <Button 
                             size="sm" 
                             className="h-7 text-xs bg-neon-green/20 text-neon-green hover:bg-neon-green/30"
@@ -834,6 +1173,16 @@ const DemoURLCollector = () => {
                             Activate
                           </Button>
                         )}
+                        {demo.status === 'active' && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={() => deactivateDemo(demo.id)}
+                          >
+                            Deactivate
+                          </Button>
+                        )}
                         <Button 
                           size="sm" 
                           variant="ghost"
@@ -841,7 +1190,7 @@ const DemoURLCollector = () => {
                           onClick={() => copyToClipboard(demo.url)}
                         >
                           <Copy className="w-3 h-3 mr-1" />
-                          Copy URL
+                          Copy
                         </Button>
                         <Button 
                           size="sm" 
