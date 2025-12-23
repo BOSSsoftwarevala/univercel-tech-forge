@@ -95,9 +95,8 @@ const FuturisticHero = () => {
           transition={{ duration: 1, delay: 0.5 }}
           className="w-full"
         >
-          {/* First row - 4 buttons */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center mb-3 sm:mb-4">
-            {ctaButtons.slice(0, 4).map((btn, index) => (
+          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
+            {ctaButtons.map((btn, index) => (
               <motion.div
                 key={btn.label}
                 initial={{ opacity: 0, y: 20 }}
@@ -110,16 +109,14 @@ const FuturisticHero = () => {
                   to={btn.href}
                   className={`
                     group relative inline-flex items-center gap-2 
-                    px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-3.5
+                    px-5 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-4
                     rounded-full
                     text-sm sm:text-base font-bold uppercase tracking-wide
                     transition-all duration-300 overflow-hidden
                     backdrop-blur-md
                     ${btn.variant === 'primary' 
                       ? 'bg-gradient-to-r from-[hsl(187,100%,50%)] to-[hsl(210,100%,55%)] text-[hsl(220,30%,5%)] shadow-[0_0_30px_hsl(187_100%_50%/0.5),0_0_60px_hsl(210_100%_55%/0.3)] border-2 border-[hsl(187,100%,60%)]' 
-                      : btn.variant === 'gold'
-                      ? 'bg-[hsl(220,30%,8%)/0.8] border-2 border-[hsl(45,100%,50%)] text-[hsl(45,100%,55%)] shadow-[0_0_25px_hsl(45_100%_50%/0.4),inset_0_0_20px_hsl(45_100%_50%/0.1)]'
-                      : 'bg-[hsl(220,30%,8%)/0.8] border-2 border-[hsl(210,100%,55%)/0.6] text-[hsl(210,100%,70%)] shadow-[0_0_20px_hsl(210_100%_55%/0.2),inset_0_0_15px_hsl(210_100%_55%/0.1)]'
+                      : 'bg-[hsl(220,30%,8%)/0.8] border-2 border-[hsl(45,100%,50%)] text-[hsl(45,100%,55%)] shadow-[0_0_30px_hsl(45_100%_50%/0.5),inset_0_0_25px_hsl(45_100%_50%/0.15)]'
                     }
                   `}
                 >
@@ -138,44 +135,6 @@ const FuturisticHero = () => {
                 </Link>
               </motion.div>
             ))}
-          </div>
-
-          {/* Second row - 1 button centered */}
-          <div className="flex justify-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Link
-                to={ctaButtons[4].href}
-                className="
-                  group relative inline-flex items-center gap-2 
-                  px-6 py-3 sm:px-8 sm:py-3.5 lg:px-10 lg:py-4
-                  rounded-full
-                  text-sm sm:text-base font-bold uppercase tracking-wide
-                  transition-all duration-300 overflow-hidden
-                  backdrop-blur-md
-                  bg-[hsl(220,30%,8%)/0.8] border-2 border-[hsl(45,100%,50%)] text-[hsl(45,100%,55%)] 
-                  shadow-[0_0_30px_hsl(45_100%_50%/0.5),inset_0_0_25px_hsl(45_100%_50%/0.15)]
-                "
-              >
-                <Crown className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>{ctaButtons[4].label}</span>
-                
-                {/* Crown glow animation */}
-                <motion.div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, rgba(255,200,50,0.2), transparent)',
-                  }}
-                  animate={{ x: ['-100%', '100%'] }}
-                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-                />
-              </Link>
-            </motion.div>
           </div>
         </motion.div>
       </div>
