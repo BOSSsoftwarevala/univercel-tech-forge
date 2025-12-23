@@ -10,7 +10,7 @@ import DemoRentalAssignment from "@/components/demo-manager/DemoRentalAssignment
 import DemoNotifications from "@/components/demo-manager/DemoNotifications";
 import BulkDemoCreator from "@/components/demo-manager/BulkDemoCreator";
 import DemoLoginManager from "@/components/demo-manager/DemoLoginManager";
-import DemoURLManager from "@/components/demo-manager/DemoURLManager";
+import DemoURLCollector from "@/components/demo-manager/DemoURLCollector";
 
 type DemoView = 
   | "dashboard"
@@ -43,7 +43,7 @@ const ProductDemoManager = () => {
       case "logins":
         return <DemoLoginManager />;
       case "url-collect":
-        return <DemoURLManager />;
+        return <DemoURLCollector />;
       default:
         return <DemoDashboard />;
     }
