@@ -23,6 +23,7 @@ import HeaderAlertStack from "@/components/shared/HeaderAlertStack";
 import LiveAlertGrid from "@/components/admin/LiveAlertGrid";
 import FloatingChatButton from "@/components/admin/FloatingChatButton";
 import WelcomeBoss from "@/components/admin/WelcomeBoss";
+import ProductManager from "@/components/demo-manager/ProductManager";
 import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 type AdminView =
@@ -171,6 +172,8 @@ const SuperAdminDashboard = () => {
         return <ActivityMonitor />;
       case "metrics":
         return <GlobalMetrics />;
+      case "demo-product":
+        return <ProductManager viewOnly={true} />;
       default:
         return <GlobalLiveControlCenter />;
     }
