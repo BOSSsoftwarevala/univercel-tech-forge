@@ -35,13 +35,13 @@ interface Product {
   created_at: string;
   category?: { id: string; name: string; icon: string };
   subcategory?: { id: string; name: string };
-  demo_mappings?: { demo_id: string; demos: { id: string; title: string; demo_url: string; status: string } }[];
+  demo_mappings?: { demo_id: string; demos: { id: string; title: string; url: string; status: string } }[];
 }
 
 interface Demo {
   id: string;
   title: string;
-  demo_url: string;
+  url: string;
   status: string;
 }
 
@@ -86,7 +86,7 @@ export const ProductManager: React.FC = () => {
           *,
           category:business_categories(id, name, icon),
           subcategory:business_subcategories(id, name),
-          demo_mappings:product_demo_mappings(demo_id, demos(id, title, demo_url, status))
+          demo_mappings:product_demo_mappings(demo_id, demos(id, title, url, status))
         `)
         .order("created_at", { ascending: false });
 
@@ -107,10 +107,10 @@ export const ProductManager: React.FC = () => {
   const fetchDemos = async () => {
     const { data } = await supabase
       .from("demos")
-      .select("id, title, demo_url, status")
+      .select("id, title, url, status")
       .eq("status", "active")
       .order("title");
-    if (data) setDemos(data);
+    if (data) setDemos(data as Demo[]);
   };
 
   const fetchLogs = async () => {
