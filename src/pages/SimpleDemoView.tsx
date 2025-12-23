@@ -33,11 +33,12 @@ const SimpleDemoView = () => {
       
       setLoading(true);
       
-      // Fetch demo details
+      // Fetch demo details (only active demos)
       const { data: demoData } = await supabase
         .from('demos')
         .select('id, title, url, description, category, login_url')
         .eq('id', demoId)
+        .eq('status', 'active')
         .single();
 
       if (demoData) {
