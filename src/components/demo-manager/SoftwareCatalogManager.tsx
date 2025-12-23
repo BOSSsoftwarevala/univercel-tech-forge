@@ -74,6 +74,14 @@ const CATEGORIES = [
   "Subscription", "General"
 ];
 
+interface TypeStats {
+  saas: number;
+  desktop: number;
+  mobile: number;
+  hybrid: number;
+  offline: number;
+}
+
 const SoftwareCatalogManager = () => {
   const [catalogItems, setCatalogItems] = useState<SoftwareItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -81,6 +89,8 @@ const SoftwareCatalogManager = () => {
   const [typeFilter, setTypeFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [totalCount, setTotalCount] = useState(0);
+  const [typeStats, setTypeStats] = useState<TypeStats>({ saas: 0, desktop: 0, mobile: 0, hybrid: 0, offline: 0 });
+  const [registeredCount, setRegisteredCount] = useState(0);
   
   // Import state
   const [isImporting, setIsImporting] = useState(false);
@@ -95,7 +105,31 @@ const SoftwareCatalogManager = () => {
   useEffect(() => {
     fetchCatalog();
     fetchTotalCount();
+    fetchTypeStats();
   }, [page, typeFilter, categoryFilter]);
+
+  const fetchTypeStats = async () => {
+    try {
+      // Fetch counts for each type
+      const { count: saas } = await supabase.from('software_catalog').select('id', { count: 'exact', head: true }).eq('type', 'SaaS');
+      const { count: desktop } = await supabase.from('software_catalog').select('id', { count: 'exact', head: true }).eq('type', 'Desktop');
+      const { count: mobile } = await supabase.from('software_catalog').select('id', { count: 'exact', head: true }).eq('type', 'Mobile');
+      const { count: hybrid } = await supabase.from('software_catalog').select('id', { count: 'exact', head: true }).eq('type', 'Hybrid');
+      const { count: offline } = await supabase.from('software_catalog').select('id', { count: 'exact', head: true }).eq('type', 'Offline');
+      const { count: registered } = await supabase.from('software_catalog').select('id', { count: 'exact', head: true }).eq('is_demo_registered', true);
+      
+      setTypeStats({
+        saas: saas || 0,
+        desktop: desktop || 0,
+        mobile: mobile || 0,
+        hybrid: hybrid || 0,
+        offline: offline || 0
+      });
+      setRegisteredCount(registered || 0);
+    } catch (error) {
+      console.error('Error fetching type stats:', error);
+    }
+  };
 
   const fetchTotalCount = async () => {
     let query = supabase
@@ -204,6 +238,7 @@ const SoftwareCatalogManager = () => {
         });
         fetchCatalog();
         fetchTotalCount();
+        fetchTypeStats();
       } else {
         throw new Error(data.error);
       }
@@ -251,6 +286,82 @@ const SoftwareCatalogManager = () => {
     }
   };
 
+  const loadSampleData = async () => {
+    setIsImporting(true);
+    setImportProgress(10);
+    
+    try {
+      // Fetch the pre-uploaded CSV file
+      const response = await fetch('/data/software-list.csv');
+      if (!response.ok) throw new Error('Failed to load sample data file');
+      
+      const text = await response.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+      setImportProgress(20);
+
+      // Parse CSV
+      const csvData = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const values = line.split(',');
+        const item: Record<string, string> = {};
+        headers.forEach((header, index) => {
+          item[header] = values[index]?.trim() || '';
+        });
+
+        if (item.name) {
+          csvData.push(item);
+        }
+      }
+
+      setImportProgress(40);
+      console.log(`Parsed ${csvData.length} items from sample CSV`);
+
+      // Send to edge function
+      const { data, error } = await supabase.functions.invoke('import-software-catalog', {
+        body: { csvData }
+      });
+
+      setImportProgress(90);
+
+      if (error) throw error;
+
+      if (data.success) {
+        setImportStats({
+          total: data.total,
+          imported: data.imported,
+          failed: data.failed
+        });
+        toast({
+          title: "Import Complete",
+          description: `Successfully imported ${data.imported.toLocaleString()} software products!`,
+        });
+        fetchCatalog();
+        fetchTotalCount();
+        fetchTypeStats();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      console.error('Load sample data error:', error);
+      toast({
+        title: "Import Failed",
+        description: error.message || "Failed to load sample data",
+        variant: "destructive"
+      });
+    } finally {
+      setImportProgress(100);
+      setTimeout(() => {
+        setIsImporting(false);
+        setImportProgress(0);
+      }, 1000);
+    }
+  };
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'SaaS': return 'bg-neon-teal/20 text-neon-teal border-neon-teal/50';
@@ -284,6 +395,19 @@ const SoftwareCatalogManager = () => {
             onChange={handleFileUpload}
             className="hidden"
           />
+          <Button 
+            variant="default"
+            onClick={loadSampleData}
+            disabled={isImporting || totalCount > 0}
+            className="bg-neon-green/20 text-neon-green border border-neon-green/50 hover:bg-neon-green/30"
+          >
+            {isImporting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4 mr-2" />
+            )}
+            Load 5000+ Software
+          </Button>
           <Button 
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
@@ -364,9 +488,9 @@ const SoftwareCatalogManager = () => {
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: "Total Products", value: totalCount.toLocaleString(), icon: Package, color: "text-primary" },
-          { label: "SaaS", value: catalogItems.filter(i => i.type === 'SaaS').length.toString(), icon: Database, color: "text-neon-teal" },
-          { label: "Registered", value: catalogItems.filter(i => i.is_demo_registered).length.toString(), icon: CheckCircle2, color: "text-neon-green" },
-          { label: "Pending", value: catalogItems.filter(i => !i.is_demo_registered).length.toString(), icon: AlertCircle, color: "text-neon-orange" },
+          { label: "SaaS", value: typeStats.saas.toLocaleString(), icon: Database, color: "text-neon-teal" },
+          { label: "Registered", value: registeredCount.toLocaleString(), icon: CheckCircle2, color: "text-neon-green" },
+          { label: "Pending", value: (totalCount - registeredCount).toLocaleString(), icon: AlertCircle, color: "text-neon-orange" },
         ].map((stat, index) => {
           const Icon = stat.icon;
           return (
