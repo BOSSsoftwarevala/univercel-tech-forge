@@ -464,7 +464,9 @@ export default function DemoManagerPanel() {
                         size="sm"
                         variant="ghost"
                         className="text-red-400 hover:text-red-300"
-                        onClick={() => handleDeleteDemo(demo.id, demo.title)}
+                        onClick={() => {
+                          handleDeleteDemo(demo.id, demo.title);
+                        }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
