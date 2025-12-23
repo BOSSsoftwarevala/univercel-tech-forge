@@ -45,7 +45,11 @@ interface Demo {
   status: string;
 }
 
-export const ProductManager: React.FC = () => {
+interface ProductManagerProps {
+  viewOnly?: boolean;
+}
+
+export const ProductManager: React.FC<ProductManagerProps> = ({ viewOnly = false }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [demos, setDemos] = useState<Demo[]>([]);
@@ -349,70 +353,72 @@ export const ProductManager: React.FC = () => {
             <Button variant="outline" size="icon" onClick={fetchProducts}>
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button onClick={resetForm}><Plus className="h-4 w-4 mr-2" />Add Product</Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Add New Product</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <Input placeholder="Product Name *" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Select value={formData.product_type} onValueChange={v => setFormData({ ...formData, product_type: v })}>
-                      <SelectTrigger><SelectValue placeholder="Product Type" /></SelectTrigger>
+            {!viewOnly && (
+              <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                <DialogTrigger asChild>
+                  <Button onClick={resetForm}><Plus className="h-4 w-4 mr-2" />Add Product</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Add New Product</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <Input placeholder="Product Name *" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Select value={formData.product_type} onValueChange={v => setFormData({ ...formData, product_type: v })}>
+                        <SelectTrigger><SelectValue placeholder="Product Type" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="software">Software</SelectItem>
+                          <SelectItem value="service">Service</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={formData.category_id} onValueChange={v => setFormData({ ...formData, category_id: v, subcategory_id: "" })}>
+                        <SelectTrigger><SelectValue placeholder="Category *" /></SelectTrigger>
+                        <SelectContent>
+                          {categories.map(cat => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Select value={formData.subcategory_id} onValueChange={v => setFormData({ ...formData, subcategory_id: v })} disabled={!formData.category_id}>
+                      <SelectTrigger><SelectValue placeholder="Sub-category *" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="software">Software</SelectItem>
-                        <SelectItem value="service">Service</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={formData.category_id} onValueChange={v => setFormData({ ...formData, category_id: v, subcategory_id: "" })}>
-                      <SelectTrigger><SelectValue placeholder="Category *" /></SelectTrigger>
-                      <SelectContent>
-                        {categories.map(cat => (
-                          <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        {subcategories.map(sub => (
+                          <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <Textarea placeholder="Description" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                    <div>
+                      <p className="text-sm font-medium mb-2">Link Demos (Active only)</p>
+                      <ScrollArea className="h-32 border rounded p-2">
+                        {demos.map(demo => (
+                          <label key={demo.id} className="flex items-center gap-2 py-1 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.demo_ids.includes(demo.id)}
+                              onChange={e => {
+                                if (e.target.checked) {
+                                  setFormData({ ...formData, demo_ids: [...formData.demo_ids, demo.id] });
+                                } else {
+                                  setFormData({ ...formData, demo_ids: formData.demo_ids.filter(id => id !== demo.id) });
+                                }
+                              }}
+                            />
+                            <span className="text-sm">{demo.title}</span>
+                          </label>
+                        ))}
+                      </ScrollArea>
+                    </div>
                   </div>
-                  <Select value={formData.subcategory_id} onValueChange={v => setFormData({ ...formData, subcategory_id: v })} disabled={!formData.category_id}>
-                    <SelectTrigger><SelectValue placeholder="Sub-category *" /></SelectTrigger>
-                    <SelectContent>
-                      {subcategories.map(sub => (
-                        <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Textarea placeholder="Description" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-                  <div>
-                    <p className="text-sm font-medium mb-2">Link Demos (Active only)</p>
-                    <ScrollArea className="h-32 border rounded p-2">
-                      {demos.map(demo => (
-                        <label key={demo.id} className="flex items-center gap-2 py-1 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.demo_ids.includes(demo.id)}
-                            onChange={e => {
-                              if (e.target.checked) {
-                                setFormData({ ...formData, demo_ids: [...formData.demo_ids, demo.id] });
-                              } else {
-                                setFormData({ ...formData, demo_ids: formData.demo_ids.filter(id => id !== demo.id) });
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{demo.title}</span>
-                        </label>
-                      ))}
-                    </ScrollArea>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
-                  <Button onClick={handleCreate}>Create Product</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+                    <Button onClick={handleCreate}>Create Product</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
 
           {/* Products Table */}
@@ -462,15 +468,22 @@ export const ProductManager: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1 justify-end">
-                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
-                              <Edit className="h-4 w-4" />
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)} title="View">
+                              <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(product)}>
-                              {product.status === "active" ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDelete(product)}>
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
+                            {!viewOnly && (
+                              <>
+                                <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)} title="Edit">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(product)}>
+                                  {product.status === "active" ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleDelete(product)}>
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

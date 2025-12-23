@@ -32,6 +32,7 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: Lock, label: 'Security Center', path: '/super-admin/security-center' },
     { icon: Building2, label: 'Branch Manager', path: '/super-admin/branch-manager' },
     { icon: Package, label: 'Demo Manager', path: '/super-admin/demo-manager' },
+    { icon: Sparkles, label: 'Product Manager', path: '/super-admin/product-manager' },
     { icon: Megaphone, label: 'Lead Engine', path: '/super-admin/lead-engine' },
     { icon: ListTodo, label: 'Task Engine', path: '/super-admin/task-engine' },
     { icon: Code2, label: 'Developer Manager', path: '/super-admin/developer-manager' },

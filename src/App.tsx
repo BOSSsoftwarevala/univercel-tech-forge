@@ -41,6 +41,7 @@ import RoleManager from "./pages/super-admin/RoleManager";
 import UserManager from "./pages/super-admin/UserManager";
 import PermissionMatrix from "./pages/super-admin/PermissionMatrix";
 import SecurityCenter from "./pages/super-admin/SecurityCenter";
+import ProductManagerPage from "./pages/super-admin/ProductManagerPage";
 import AuthGateway from "./pages/auth/AuthGateway";
 
 // Master Admin Pages
@@ -162,6 +163,7 @@ const App = () => (
               <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["master", "super_admin"]}><PermissionMatrix /></RequireRole>} />
               <Route path="/super-admin/security-center" element={<RequireRole allowed={["master", "super_admin"]}><SecurityCenter /></RequireRole>} />
               <Route path="/super-admin/demo-manager" element={<RequireRole allowed={["master", "super_admin"]}><ProductDemoManager /></RequireRole>} />
+              <Route path="/super-admin/product-manager" element={<RequireRole allowed={["master", "super_admin"]}><ProductManagerPage /></RequireRole>} />
               <Route path="/super-admin/system-settings" element={<RequireRole allowed={["master", "super_admin"]}><SystemSettings /></RequireRole>} />
               <Route path="/super-admin/branch-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin/lead-engine" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
