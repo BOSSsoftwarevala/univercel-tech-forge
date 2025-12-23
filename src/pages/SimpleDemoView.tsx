@@ -1,39 +1,92 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Play, ExternalLink, Check } from 'lucide-react';
+import { ArrowLeft, Play, ExternalLink, Check, Loader2, Globe } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface DemoData {
+  id: string;
+  title: string;
+  url: string;
+  description: string | null;
+  category: string;
+  login_url: string | null;
+}
+
+interface LoginRole {
+  id: string;
+  role_name: string;
+  username: string;
+  password_encrypted: string;
+}
 
 const SimpleDemoView = () => {
   const { demoId } = useParams();
-  const [selectedRole, setSelectedRole] = useState('admin');
+  const [selectedRole, setSelectedRole] = useState('');
+  const [demo, setDemo] = useState<DemoData | null>(null);
+  const [loginRoles, setLoginRoles] = useState<LoginRole[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock demo data - would come from API
-  const demo = {
-    id: demoId,
-    name: 'Restaurant POS',
-    description: 'Complete restaurant billing, kitchen management, and inventory system.',
-    demoUrl: 'https://demo.softwarevala.com/restaurant-pos',
-    roles: [
-      { id: 'admin', label: 'Admin', description: 'Full access to all features' },
-      { id: 'cashier', label: 'Cashier', description: 'Billing and orders only' },
-      { id: 'kitchen', label: 'Kitchen', description: 'View orders and update status' },
-    ],
-    features: [
-      'Multi-table billing',
-      'Kitchen order display',
-      'Inventory management',
-      'Daily reports',
-      'Customer management',
-      'Menu customization',
-    ],
-    price: '₹15,000',
-    priceLabel: 'one-time payment',
-  };
+  useEffect(() => {
+    const fetchDemo = async () => {
+      if (!demoId) return;
+      
+      setLoading(true);
+      
+      // Fetch demo details
+      const { data: demoData } = await supabase
+        .from('demos')
+        .select('id, title, url, description, category, login_url')
+        .eq('id', demoId)
+        .single();
+
+      if (demoData) {
+        setDemo(demoData);
+      }
+
+      // Fetch login roles for this demo
+      const { data: rolesData } = await supabase
+        .from('demo_login_roles')
+        .select('id, role_name, username, password_encrypted')
+        .eq('demo_id', demoId)
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (rolesData && rolesData.length > 0) {
+        setLoginRoles(rolesData);
+        setSelectedRole(rolesData[0].id);
+      }
+
+      setLoading(false);
+    };
+
+    fetchDemo();
+  }, [demoId]);
 
   const handleOpenDemo = () => {
-    // Would open demo in new tab or iframe based on selected role
-    window.open(`${demo.demoUrl}?role=${selectedRole}`, '_blank');
+    if (!demo) return;
+    const demoUrl = demo.login_url || demo.url;
+    window.open(demoUrl, '_blank');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
+      </div>
+    );
+  }
+
+  if (!demo) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl mb-4">Demo not found</p>
+          <Link to="/demos" className="text-cyan-400 hover:underline">Back to Demos</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -59,8 +112,8 @@ const SimpleDemoView = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3">{demo.name}</h1>
-          <p className="text-slate-400 text-lg">{demo.description}</p>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">{demo.title}</h1>
+          <p className="text-slate-400 text-lg">{demo.description || demo.category}</p>
         </motion.div>
 
         {/* Demo Preview Card */}
@@ -83,12 +136,24 @@ const SimpleDemoView = () => {
           </div>
 
           <div className="p-6">
+            {/* Demo URL Display */}
+            <div className="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Globe className="w-4 h-4 text-cyan-400" />
+                <span className="text-sm font-medium text-slate-300">Demo URL</span>
+              </div>
+              <p className="text-cyan-400 text-sm break-all">{demo.url}</p>
+              {demo.login_url && demo.login_url !== demo.url && (
+                <p className="text-slate-400 text-xs mt-2">Login: {demo.login_url}</p>
+              )}
+            </div>
+
             {/* Role Selector - Only if demo has multiple roles */}
-            {demo.roles.length > 1 && (
+            {loginRoles.length > 1 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-slate-400 mb-3">Select Role to View</h3>
                 <div className="grid grid-cols-3 gap-3">
-                  {demo.roles.map((role) => (
+                  {loginRoles.map((role) => (
                     <button
                       key={role.id}
                       onClick={() => setSelectedRole(role.id)}
@@ -100,9 +165,9 @@ const SimpleDemoView = () => {
                     >
                       <div className="flex items-center gap-2 mb-1">
                         {selectedRole === role.id && <Check className="w-4 h-4 text-cyan-400" />}
-                        <span className="font-semibold">{role.label}</span>
+                        <span className="font-semibold">{role.role_name}</span>
                       </div>
-                      <p className="text-xs text-slate-400">{role.description}</p>
+                      <p className="text-xs text-slate-400">User: {role.username}</p>
                     </button>
                   ))}
                 </div>
@@ -120,41 +185,44 @@ const SimpleDemoView = () => {
           </div>
         </motion.div>
 
-        {/* Features & Pricing */}
+        {/* Category & Actions */}
         <div className="grid sm:grid-cols-2 gap-6">
-          {/* Features */}
+          {/* Demo Info */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="bg-slate-900 border border-slate-800 rounded-xl p-6"
           >
-            <h3 className="text-lg font-semibold mb-4">Features</h3>
-            <ul className="space-y-2">
-              {demo.features.map((feature, index) => (
-                <li key={index} className="flex items-center gap-2 text-slate-300">
-                  <Check className="w-4 h-4 text-cyan-400" />
-                  {feature}
-                </li>
-              ))}
+            <h3 className="text-lg font-semibold mb-4">Demo Details</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-slate-300">
+                <Check className="w-4 h-4 text-cyan-400" />
+                Category: {demo.category}
+              </li>
+              <li className="flex items-center gap-2 text-slate-300">
+                <Check className="w-4 h-4 text-cyan-400" />
+                Live demo access
+              </li>
+              <li className="flex items-center gap-2 text-slate-300">
+                <Check className="w-4 h-4 text-cyan-400" />
+                {loginRoles.length > 0 ? `${loginRoles.length} login role(s)` : 'Direct access'}
+              </li>
             </ul>
           </motion.div>
 
-          {/* Pricing */}
+          {/* Actions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="bg-slate-900 border border-slate-800 rounded-xl p-6"
           >
-            <h3 className="text-lg font-semibold mb-4">Pricing</h3>
-            <div className="text-center py-4">
-              <p className="text-4xl font-bold text-cyan-400">{demo.price}</p>
-              <p className="text-slate-400 text-sm">{demo.priceLabel}</p>
-            </div>
+            <h3 className="text-lg font-semibold mb-4">Interested?</h3>
+            <p className="text-slate-400 text-sm mb-4">Try the demo first, then purchase if you like it.</p>
             <Link
               to={`/checkout/${demo.id}`}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-400 rounded-lg font-semibold transition-colors mt-4"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-400 rounded-lg font-semibold transition-colors"
             >
               Buy Now
             </Link>

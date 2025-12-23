@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, ArrowLeft, Search, Building2, ShoppingCart, GraduationCap, Heart, Utensils, Truck, Briefcase, Home } from 'lucide-react';
+import { Play, ArrowLeft, Search, Building2, ShoppingCart, GraduationCap, Heart, Utensils, Truck, Briefcase, Home, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Demo {
+  id: string;
+  title: string;
+  url: string;
+  category: string;
+  description: string | null;
+  status: string;
+}
 
 const SimpleDemoList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  const [demos, setDemos] = useState<Demo[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = [
     { id: 'all', label: 'All', icon: Building2 },
@@ -18,25 +30,28 @@ const SimpleDemoList = () => {
     { id: 'realestate', label: 'Real Estate', icon: Home },
   ];
 
-  const demos = [
-    { id: '1', name: 'Restaurant POS', category: 'restaurant', description: 'Complete billing & kitchen management', image: '/placeholder.svg' },
-    { id: '2', name: 'Hotel Management', category: 'business', description: 'Booking, rooms & guest management', image: '/placeholder.svg' },
-    { id: '3', name: 'School ERP', category: 'education', description: 'Students, fees & attendance system', image: '/placeholder.svg' },
-    { id: '4', name: 'Hospital HMIS', category: 'healthcare', description: 'Patient records & appointments', image: '/placeholder.svg' },
-    { id: '5', name: 'Retail POS', category: 'retail', description: 'Inventory, billing & reports', image: '/placeholder.svg' },
-    { id: '6', name: 'Real Estate CRM', category: 'realestate', description: 'Properties, leads & sales', image: '/placeholder.svg' },
-    { id: '7', name: 'Logistics Manager', category: 'logistics', description: 'Fleet, deliveries & tracking', image: '/placeholder.svg' },
-    { id: '8', name: 'Gym Management', category: 'business', description: 'Members, plans & attendance', image: '/placeholder.svg' },
-    { id: '9', name: 'Salon & Spa', category: 'business', description: 'Bookings, services & billing', image: '/placeholder.svg' },
-    { id: '10', name: 'Coaching Center', category: 'education', description: 'Batches, students & tests', image: '/placeholder.svg' },
-    { id: '11', name: 'Pharmacy POS', category: 'healthcare', description: 'Medicine inventory & billing', image: '/placeholder.svg' },
-    { id: '12', name: 'Supermarket POS', category: 'retail', description: 'Multi-counter billing system', image: '/placeholder.svg' },
-  ];
+  useEffect(() => {
+    const fetchDemos = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('demos')
+        .select('id, title, url, category, description, status')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setDemos(data);
+      }
+      setLoading(false);
+    };
+
+    fetchDemos();
+  }, []);
 
   const filteredDemos = demos.filter(demo => {
-    const matchesSearch = demo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         demo.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === 'all' || demo.category === activeCategory;
+    const matchesSearch = demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         (demo.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'all' || demo.category?.toLowerCase().includes(activeCategory);
     return matchesSearch && matchesCategory;
   });
 
@@ -96,45 +111,56 @@ const SimpleDemoList = () => {
           ))}
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
+          </div>
+        )}
+
         {/* Demo Grid - Simple Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredDemos.map((demo, index) => (
-            <motion.div
-              key={demo.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all group"
-            >
-              {/* Demo Preview Image */}
-              <div className="aspect-video bg-slate-800 relative">
-                <img src={demo.image} alt={demo.name} className="w-full h-full object-cover opacity-50" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                    <Play className="w-8 h-8 text-cyan-400" />
+        {!loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredDemos.map((demo, index) => (
+              <motion.div
+                key={demo.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all group"
+              >
+                {/* Demo Preview Image */}
+                <div className="aspect-video bg-slate-800 relative">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-500/10 to-blue-600/10">
+                    <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
+                      <Play className="w-8 h-8 text-cyan-400" />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Demo Info */}
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-1">{demo.name}</h3>
-                <p className="text-sm text-slate-400 mb-4">{demo.description}</p>
-                
-                {/* Single CTA Button */}
-                <Link
-                  to={`/demo/${demo.id}`}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all"
-                >
-                  <Play className="w-4 h-4" />
-                  View Live Demo
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                {/* Demo Info */}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-1">{demo.title}</h3>
+                  <p className="text-sm text-slate-400 mb-2">{demo.description || demo.category}</p>
+                  
+                  {/* Demo URL Preview */}
+                  <p className="text-xs text-cyan-400/70 truncate mb-4">{demo.url}</p>
+                  
+                  {/* Single CTA Button */}
+                  <Link
+                    to={`/demo/${demo.id}`}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all"
+                  >
+                    <Play className="w-4 h-4" />
+                    View Live Demo
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
-        {filteredDemos.length === 0 && (
+        {!loading && filteredDemos.length === 0 && (
           <div className="text-center py-16">
             <p className="text-slate-400 text-lg">No demos found matching your search.</p>
           </div>
