@@ -11,6 +11,7 @@ import DemoNotifications from "@/components/demo-manager/DemoNotifications";
 import BulkDemoCreator from "@/components/demo-manager/BulkDemoCreator";
 import DemoLoginManager from "@/components/demo-manager/DemoLoginManager";
 import DemoURLCollector from "@/components/demo-manager/DemoURLCollector";
+import SoftwareCatalogManager from "@/components/demo-manager/SoftwareCatalogManager";
 
 type DemoView = 
   | "dashboard"
@@ -20,7 +21,8 @@ type DemoView =
   | "rentals"
   | "bulk-create"
   | "logins"
-  | "url-collect";
+  | "url-collect"
+  | "software-catalog";
 
 const ProductDemoManager = () => {
   const [activeView, setActiveView] = useState<DemoView>("dashboard");
@@ -44,6 +46,8 @@ const ProductDemoManager = () => {
         return <DemoLoginManager />;
       case "url-collect":
         return <DemoURLCollector />;
+      case "software-catalog":
+        return <SoftwareCatalogManager />;
       default:
         return <DemoDashboard />;
     }

@@ -20,6 +20,7 @@ interface DemoManagerSidebarProps {
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutGrid, badge: "LIVE" },
+  { id: "software-catalog", label: "Software Catalog", icon: Package, badge: "5K+" },
   { id: "url-collect", label: "URL Collection", icon: Link2, badge: "NEW" },
   { id: "bulk-create", label: "Bulk Create", icon: FileSpreadsheet, badge: null },
   { id: "logins", label: "Login Manager", icon: Users, badge: null },

@@ -9165,6 +9165,56 @@ export type Database = {
           },
         ]
       }
+      software_catalog: {
+        Row: {
+          base_price: number | null
+          category: string | null
+          created_at: string | null
+          demo_id: string | null
+          demo_url: string | null
+          id: string
+          is_demo_registered: boolean | null
+          name: string
+          type: string
+          updated_at: string | null
+          vendor: string | null
+        }
+        Insert: {
+          base_price?: number | null
+          category?: string | null
+          created_at?: string | null
+          demo_id?: string | null
+          demo_url?: string | null
+          id?: string
+          is_demo_registered?: boolean | null
+          name: string
+          type: string
+          updated_at?: string | null
+          vendor?: string | null
+        }
+        Update: {
+          base_price?: number | null
+          category?: string | null
+          created_at?: string | null
+          demo_id?: string | null
+          demo_url?: string | null
+          id?: string
+          is_demo_registered?: boolean | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "software_catalog_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sports_events: {
         Row: {
           created_at: string | null
