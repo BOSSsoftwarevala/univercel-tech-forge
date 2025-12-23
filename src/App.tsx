@@ -34,6 +34,8 @@ import SimpleDemoList from "./pages/SimpleDemoList";
 import SimpleDemoView from "./pages/SimpleDemoView";
 import SimpleCheckout from "./pages/SimpleCheckout";
 import SimpleUserDashboard from "./pages/SimpleUserDashboard";
+import DemoAccess from "./pages/DemoAccess";
+import DemoDirectory from "./pages/DemoDirectory";
 
 import SettingsPage from "./pages/Settings";
 
@@ -145,6 +147,10 @@ const App = () => (
               <Route path="/bootstrap-admins" element={<BootstrapAdmins />} />
               <Route path="/sectors" element={<SectorsBrowse />} />
               <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
+              
+              {/* One-Click Demo Access - No Login Required */}
+              <Route path="/demo-directory" element={<DemoDirectory />} />
+              <Route path="/demo/:role" element={<DemoAccess />} />
 
               {/* Global Auth Routes */}
               <Route path="/login" element={<Login />} />
