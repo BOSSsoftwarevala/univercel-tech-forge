@@ -93,16 +93,22 @@ export const SportsEventsManager = () => {
     }
 
     const eventData = {
-      ...editingEvent,
+      name: editingEvent.name,
+      sport_type: editingEvent.sport_type || 'other',
+      team1_name: editingEvent.team1_name || null,
+      team2_name: editingEvent.team2_name || null,
+      team1_color: editingEvent.team1_color || null,
+      team2_color: editingEvent.team2_color || null,
       start_date: new Date(editingEvent.start_date!).toISOString(),
       end_date: new Date(editingEvent.end_date!).toISOString(),
+      default_discount: editingEvent.default_discount || 0,
+      is_active: editingEvent.is_active ?? true,
     };
 
     if (isEditing && editingEvent.id) {
-      const { id, ...updateData } = eventData;
       const { error } = await supabase
         .from('sports_events')
-        .update(updateData as any)
+        .update(eventData)
         .eq('id', editingEvent.id);
 
       if (error) {
@@ -115,7 +121,6 @@ export const SportsEventsManager = () => {
     } else {
       const { error } = await supabase
         .from('sports_events')
-        // @ts-ignore - name is validated above
         .insert([eventData]);
 
       if (error) {

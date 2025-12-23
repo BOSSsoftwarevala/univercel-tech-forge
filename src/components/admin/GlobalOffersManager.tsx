@@ -97,16 +97,26 @@ export const GlobalOffersManager = () => {
     }
 
     const offerData = {
-      ...editingOffer,
+      title: editingOffer.title,
+      description: editingOffer.description || null,
+      discount_percentage: editingOffer.discount_percentage || 0,
+      event_type: editingOffer.event_type || 'custom',
+      event_name: editingOffer.event_name || null,
       start_date: new Date(editingOffer.start_date!).toISOString(),
       end_date: new Date(editingOffer.end_date!).toISOString(),
+      is_active: editingOffer.is_active ?? true,
+      is_auto_detected: editingOffer.is_auto_detected ?? false,
+      theme_primary_color: editingOffer.theme_primary_color || '#3b82f6',
+      theme_secondary_color: editingOffer.theme_secondary_color || '#1e40af',
+      theme_accent_color: editingOffer.theme_accent_color || '#60a5fa',
+      banner_text: editingOffer.banner_text || null,
+      icon: editingOffer.icon || null,
     };
 
     if (isEditing && editingOffer.id) {
-      const { id, ...updateData } = offerData;
       const { error } = await supabase
         .from('global_offers')
-        .update(updateData as any)
+        .update(offerData)
         .eq('id', editingOffer.id);
 
       if (error) {
@@ -120,7 +130,6 @@ export const GlobalOffersManager = () => {
     } else {
       const { error } = await supabase
         .from('global_offers')
-        // @ts-ignore - title is validated above
         .insert([offerData]);
 
       if (error) {
