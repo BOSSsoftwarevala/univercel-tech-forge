@@ -719,6 +719,80 @@ export type Database = {
         }
         Relationships: []
       }
+      business_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      business_subcategories: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "business_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buzzer_queue: {
         Row: {
           accepted_at: string | null
@@ -7222,6 +7296,86 @@ export type Database = {
           },
         ]
       }
+      product_action_logs: {
+        Row: {
+          action: string
+          action_details: Json | null
+          created_at: string | null
+          id: string
+          performed_by: string | null
+          performer_role: Database["public"]["Enums"]["app_role"] | null
+          product_id: string | null
+          product_name: string
+        }
+        Insert: {
+          action: string
+          action_details?: Json | null
+          created_at?: string | null
+          id?: string
+          performed_by?: string | null
+          performer_role?: Database["public"]["Enums"]["app_role"] | null
+          product_id?: string | null
+          product_name: string
+        }
+        Update: {
+          action?: string
+          action_details?: Json | null
+          created_at?: string | null
+          id?: string
+          performed_by?: string | null
+          performer_role?: Database["public"]["Enums"]["app_role"] | null
+          product_id?: string | null
+          product_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_action_logs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      product_demo_mappings: {
+        Row: {
+          demo_id: string
+          id: string
+          linked_at: string | null
+          linked_by: string | null
+          product_id: string
+        }
+        Insert: {
+          demo_id: string
+          id?: string
+          linked_at?: string | null
+          linked_by?: string | null
+          product_id: string
+        }
+        Update: {
+          demo_id?: string
+          id?: string
+          linked_at?: string | null
+          linked_by?: string | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_demo_mappings_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_demo_mappings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       product_modules: {
         Row: {
           additional_price: number | null
@@ -7284,48 +7438,81 @@ export type Database = {
       }
       products: {
         Row: {
+          business_category_id: string | null
           category: string | null
           created_at: string
+          created_by: string | null
           description: string | null
           features_json: Json | null
+          has_broken_demo: boolean | null
           is_active: boolean | null
           lifetime_price: number | null
           monthly_price: number | null
           pricing_model: string | null
           product_id: string
           product_name: string
+          product_type: string | null
+          status: string | null
+          subcategory_id: string | null
           tech_stack: string | null
           updated_at: string
         }
         Insert: {
+          business_category_id?: string | null
           category?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           features_json?: Json | null
+          has_broken_demo?: boolean | null
           is_active?: boolean | null
           lifetime_price?: number | null
           monthly_price?: number | null
           pricing_model?: string | null
           product_id?: string
           product_name: string
+          product_type?: string | null
+          status?: string | null
+          subcategory_id?: string | null
           tech_stack?: string | null
           updated_at?: string
         }
         Update: {
+          business_category_id?: string | null
           category?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           features_json?: Json | null
+          has_broken_demo?: boolean | null
           is_active?: boolean | null
           lifetime_price?: number | null
           monthly_price?: number | null
           pricing_model?: string | null
           product_id?: string
           product_name?: string
+          product_type?: string | null
+          status?: string | null
+          subcategory_id?: string | null
           tech_stack?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_business_category_id_fkey"
+            columns: ["business_category_id"]
+            isOneToOne: false
+            referencedRelation: "business_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "business_subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promise_logs: {
         Row: {
