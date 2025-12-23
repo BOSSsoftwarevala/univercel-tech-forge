@@ -378,7 +378,17 @@ body.buzzer-blocking .buzzer-alert-container {
   unicode-bidi: embed;
 }
 
-/* Responsive fixes for mobile sidebar */
+/* ========================================
+   MOBILE & TABLET RESPONSIVE FIXES
+   ======================================== */
+
+/* Touch-friendly minimum sizes */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Responsive sidebar */
 @media (max-width: 768px) {
   .sidebar-collapsed {
     width: 0 !important;
@@ -388,9 +398,88 @@ body.buzzer-blocking .buzzer-alert-container {
   
   .sidebar-open {
     position: fixed;
-    width: 256px;
+    width: min(280px, 85vw);
     z-index: 50;
   }
+  
+  /* Larger touch targets on mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+  }
+  
+  /* Better spacing on mobile */
+  .mobile-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Stack flex items on mobile */
+  .mobile-stack {
+    flex-direction: column;
+  }
+  
+  /* Full width on mobile */
+  .mobile-full {
+    width: 100%;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-padding {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .tablet-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+  .desktop-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .desktop-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Safe area for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* GPU acceleration for animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Status dot consistency */
@@ -416,4 +505,49 @@ body.buzzer-blocking .buzzer-alert-container {
   background-color: hsl(var(--neon-red));
   box-shadow: 0 0 8px hsl(var(--neon-red) / 0.6);
   animation: pulse 0.5s ease-in-out infinite;
+}
+
+/* Fast card loading skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted) / 0.5) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Bottom navigation for mobile */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: hsl(var(--card) / 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid hsl(var(--border) / 0.5);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Card hover states - faster on mobile */
+@media (hover: none) {
+  .card-hover:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+  }
+}
+
+@media (hover: hover) {
+  .card-hover:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s;
+  }
 }
