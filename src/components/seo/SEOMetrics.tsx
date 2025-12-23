@@ -1,15 +1,33 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   TrendingUp, Globe, Link2, Search, Users, Shield,
-  BarChart3, Target, Zap, ArrowUpRight, ArrowDownRight
+  BarChart3, Target, Zap, ArrowUpRight, ArrowDownRight,
+  FileText, Wand2, ExternalLink, ChevronDown
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface SEOMetricsProps {
   activeRegion: string;
 }
 
 const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
+  const [selectedCountry, setSelectedCountry] = useState("All Countries");
+
+  const countries = [
+    "All Countries",
+    "India", "UAE", "Saudi Arabia", "Kenya", "Nigeria", 
+    "South Africa", "Egypt", "Singapore", "Malaysia", "Indonesia"
+  ];
+
   const metrics = [
     { 
       label: "Global Ranking", 
@@ -44,11 +62,11 @@ const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
       color: "from-orange-500 to-amber-500"
     },
     { 
-      label: "Social × SEO", 
+      label: "Content Score", 
       value: "89%", 
       change: "+5.2%", 
       trend: "up",
-      icon: BarChart3,
+      icon: FileText,
       color: "from-blue-500 to-indigo-500"
     },
     { 
@@ -59,6 +77,14 @@ const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
       icon: Shield,
       color: "from-green-500 to-emerald-500"
     },
+  ];
+
+  const topPages = [
+    { url: "/pos-software", traffic: "12.5K", position: 3, change: "+2" },
+    { url: "/hospital-management", traffic: "8.2K", position: 5, change: "+1" },
+    { url: "/school-erp", traffic: "6.8K", position: 7, change: "-1" },
+    { url: "/real-estate-crm", traffic: "5.4K", position: 9, change: "+3" },
+    { url: "/restaurant-pos", traffic: "4.1K", position: 12, change: "+5" },
   ];
 
   const trafficData = [
@@ -76,28 +102,121 @@ const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
     { name: "Middle East", value: 25, color: "#f59e0b" },
   ];
 
-  const aiSuggestions = [
-    { text: "Add 2 blogs for Real-Estate category", priority: "high" },
-    { text: "Optimize meta tags for Hospital Software", priority: "medium" },
-    { text: "Build 5 backlinks for POS industry", priority: "medium" },
-    { text: "Update schema for School Management pages", priority: "low" },
-  ];
+  const handleAutoAction = (action: string) => {
+    toast.success(`${action} started! AI is processing...`);
+  };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with Actions */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">SEO Dashboard</h2>
+          <h2 className="text-2xl font-bold text-white">SEO Command Center</h2>
           <p className="text-slate-400">Real-time search domination metrics</p>
         </div>
+        <div className="flex items-center gap-3">
+          {/* Country Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-slate-800/50 border-slate-700 text-white hover:bg-slate-700">
+                <Globe className="w-4 h-4 mr-2" />
+                {selectedCountry}
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-slate-900 border-slate-700">
+              {countries.map((country) => (
+                <DropdownMenuItem 
+                  key={country}
+                  onClick={() => setSelectedCountry(country)}
+                  className="text-white hover:bg-slate-800 cursor-pointer"
+                >
+                  {country}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => handleAutoAction("Full SEO Optimization")}
+            className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg text-sm font-semibold flex items-center gap-2"
+          >
+            <Zap className="w-4 h-4" />
+            Run Full Optimization
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Quick Action Buttons */}
+      <div className="grid grid-cols-4 gap-4">
         <motion.button
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg text-sm font-semibold flex items-center gap-2"
+          onClick={() => handleAutoAction("Auto Keyword Research")}
+          className="p-4 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-cyan-500/30 hover:border-cyan-400/50 transition-all group"
         >
-          <Zap className="w-4 h-4" />
-          Run Full Optimization
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-cyan-500/20 rounded-lg group-hover:bg-cyan-500/30 transition-colors">
+              <Search className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-white">Auto Keyword Research</p>
+              <p className="text-xs text-slate-400">AI-powered discovery</p>
+            </div>
+          </div>
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleAutoAction("Auto SEO Page Creation")}
+          className="p-4 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-purple-500/30 hover:border-purple-400/50 transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-500/20 rounded-lg group-hover:bg-purple-500/30 transition-colors">
+              <FileText className="w-5 h-5 text-purple-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-white">Auto SEO Page</p>
+              <p className="text-xs text-slate-400">Generate optimized pages</p>
+            </div>
+          </div>
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleAutoAction("Auto Internal Linking")}
+          className="p-4 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-emerald-500/30 hover:border-emerald-400/50 transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/30 transition-colors">
+              <Link2 className="w-5 h-5 text-emerald-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-white">Auto Internal Linking</p>
+              <p className="text-xs text-slate-400">Smart link structure</p>
+            </div>
+          </div>
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleAutoAction("Auto Meta Generation")}
+          className="p-4 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-amber-500/30 hover:border-amber-400/50 transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-500/20 rounded-lg group-hover:bg-amber-500/30 transition-colors">
+              <Wand2 className="w-5 h-5 text-amber-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-white">Auto Meta Tags</p>
+              <p className="text-xs text-slate-400">Title & description</p>
+            </div>
+          </div>
         </motion.button>
       </div>
 
@@ -134,30 +253,26 @@ const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
         ))}
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-2 gap-6">
+      {/* Charts & Top Pages Row */}
+      <div className="grid grid-cols-3 gap-6">
         {/* Traffic Chart */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="p-6 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700/50"
+          className="col-span-1 p-6 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700/50"
         >
-          <h3 className="text-lg font-semibold text-white mb-4">Traffic Growth AI Prediction</h3>
-          <ResponsiveContainer width="100%" height={250}>
+          <h3 className="text-lg font-semibold text-white mb-4">Traffic Growth</h3>
+          <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={trafficData}>
               <defs>
                 <linearGradient id="colorOrganic" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
                   <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
                 </linearGradient>
-                <linearGradient id="colorPaid" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="name" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+              <YAxis stroke="#64748b" fontSize={12} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: "#1e293b", 
@@ -166,54 +281,106 @@ const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
                 }}
               />
               <Area type="monotone" dataKey="organic" stroke="#06b6d4" fillOpacity={1} fill="url(#colorOrganic)" />
-              <Area type="monotone" dataKey="paid" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorPaid)" />
             </AreaChart>
           </ResponsiveContainer>
+        </motion.div>
+
+        {/* Top Pages Performance */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="col-span-1 p-6 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700/50"
+        >
+          <h3 className="text-lg font-semibold text-white mb-4">Top Pages Performance</h3>
+          <div className="space-y-3">
+            {topPages.map((page, index) => (
+              <div key={page.url} className="flex items-center justify-between p-2 bg-slate-800/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-500 w-4">#{index + 1}</span>
+                  <div>
+                    <p className="text-sm text-white">{page.url}</p>
+                    <p className="text-xs text-slate-400">{page.traffic} visits</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-cyan-400">#{page.position}</span>
+                  <span className={`text-xs ${page.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
+                    {page.change}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
 
         {/* Region Heatmap */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="p-6 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700/50"
+          className="col-span-1 p-6 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700/50"
         >
           <h3 className="text-lg font-semibold text-white mb-4">Market Heatmap</h3>
-          <div className="flex items-center gap-6">
-            <ResponsiveContainer width="60%" height={250}>
+          <div className="flex flex-col items-center">
+            <ResponsiveContainer width="100%" height={150}>
               <PieChart>
                 <Pie
                   data={regionData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
+                  innerRadius={40}
+                  outerRadius={70}
                   dataKey="value"
                 >
                   {regionData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "#1e293b", 
-                    border: "1px solid #334155",
-                    borderRadius: "8px"
-                  }}
-                />
               </PieChart>
             </ResponsiveContainer>
-            <div className="space-y-3">
+            <div className="flex gap-4 mt-2">
               {regionData.map((region) => (
-                <div key={region.name} className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: region.color }} />
-                  <span className="text-sm text-slate-300">{region.name}</span>
-                  <span className="text-sm font-bold text-white">{region.value}%</span>
+                <div key={region.name} className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: region.color }} />
+                  <span className="text-xs text-slate-400">{region.name} {region.value}%</span>
                 </div>
               ))}
             </div>
           </div>
         </motion.div>
       </div>
+
+      {/* Backlinks Overview */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-6 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700/50"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Backlinks Overview</h3>
+          <Button variant="outline" size="sm" className="bg-slate-800/50 border-slate-700 text-white">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            View All Backlinks
+          </Button>
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          <div className="p-4 bg-slate-800/50 rounded-lg text-center">
+            <p className="text-2xl font-bold text-cyan-400">2,847</p>
+            <p className="text-sm text-slate-400">Total Backlinks</p>
+          </div>
+          <div className="p-4 bg-slate-800/50 rounded-lg text-center">
+            <p className="text-2xl font-bold text-emerald-400">156</p>
+            <p className="text-sm text-slate-400">Referring Domains</p>
+          </div>
+          <div className="p-4 bg-slate-800/50 rounded-lg text-center">
+            <p className="text-2xl font-bold text-purple-400">89</p>
+            <p className="text-sm text-slate-400">High Authority</p>
+          </div>
+          <div className="p-4 bg-slate-800/50 rounded-lg text-center">
+            <p className="text-2xl font-bold text-amber-400">+24</p>
+            <p className="text-sm text-slate-400">New This Week</p>
+          </div>
+        </div>
+      </motion.div>
 
       {/* AI Insight Box */}
       <motion.div
@@ -225,22 +392,38 @@ const SEOMetrics = ({ activeRegion }: SEOMetricsProps) => {
           <div className="p-2 bg-cyan-500/20 rounded-lg">
             <Target className="w-5 h-5 text-cyan-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white">AI Insight — Today's Suggestions</h3>
+          <h3 className="text-lg font-semibold text-white">AI Insight — Today's Priority Actions</h3>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          {aiSuggestions.map((suggestion, index) => (
+          {[
+            { text: "Add 2 blogs for Real-Estate category", priority: "high" },
+            { text: "Optimize meta tags for Hospital Software", priority: "medium" },
+            { text: "Build 5 backlinks for POS industry", priority: "medium" },
+            { text: "Update schema for School Management pages", priority: "low" },
+          ].map((suggestion, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg"
+              className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg group hover:bg-slate-800 transition-colors"
             >
-              <div className={`w-2 h-2 rounded-full ${
-                suggestion.priority === "high" ? "bg-red-400" :
-                suggestion.priority === "medium" ? "bg-yellow-400" : "bg-green-400"
-              }`} />
-              <span className="text-sm text-slate-300">{suggestion.text}</span>
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${
+                  suggestion.priority === "high" ? "bg-red-400" :
+                  suggestion.priority === "medium" ? "bg-yellow-400" : "bg-green-400"
+                }`} />
+                <span className="text-sm text-slate-300">{suggestion.text}</span>
+              </div>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-cyan-400 hover:text-cyan-300"
+                onClick={() => handleAutoAction(suggestion.text)}
+              >
+                <Zap className="w-3 h-3 mr-1" />
+                Run
+              </Button>
             </motion.div>
           ))}
         </div>
