@@ -22,6 +22,7 @@ import { MarketingManagerScreen } from './screens/MarketingManagerScreen';
 import { ProductLibraryScreen } from './screens/ProductLibraryScreen';
 import { SupportDashboardScreen } from './screens/SupportDashboardScreen';
 import { SalesDashboardScreen } from './screens/SalesDashboardScreen';
+import { AIConsoleScreen } from './screens/AIConsoleScreen';
 
 // Placeholder for remaining screens
 function PlaceholderScreen({ title }: { title: string }) {
@@ -62,7 +63,7 @@ export function WireframeRoutes() {
         <Route path="products" element={<ProductLibraryScreen />} />
         <Route path="support" element={<SupportDashboardScreen />} />
         <Route path="sales" element={<SalesDashboardScreen />} />
-        <Route path="ai-console" element={<PlaceholderScreen title="AI Console" />} />
+        <Route path="ai-console" element={<AIConsoleScreen />} />
         <Route path="settings" element={<PlaceholderScreen title="Settings" />} />
       </Route>
     </Routes>
