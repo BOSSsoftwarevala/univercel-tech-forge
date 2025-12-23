@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import type { Database } from '@/integrations/supabase/types';
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 export interface DemoReportCard {
   id: string;
@@ -106,7 +109,7 @@ export function useDemoManagerAccess(): UseDemoManagerAccessReturn {
         user_id: user.id,
         action: 'unauthorized_demo_access_attempt',
         module: 'demo_security',
-        role: userRole as any,
+        role: (userRole || 'client') as AppRole,
         meta_json: {
           action_attempted: action,
           demo_id: demoId,
@@ -168,7 +171,7 @@ export function useDemoManagerAccess(): UseDemoManagerAccessReturn {
         user_id: user.id,
         action: params.actionType,
         module: 'demo',
-        role: DEMO_ACTION_ROLE as any,
+        role: DEMO_ACTION_ROLE as AppRole,
         meta_json: {
           demo_id: params.demoId,
           demo_name: params.demoName,

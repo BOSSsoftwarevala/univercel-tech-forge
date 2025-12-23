@@ -115,9 +115,16 @@ export default function DemoManagerPanel() {
         .order('timestamp', { ascending: false })
         .limit(50);
 
+      const metaJson = (meta: unknown): { demo_id?: string } => {
+        if (meta && typeof meta === 'object' && 'demo_id' in meta) {
+          return meta as { demo_id?: string };
+        }
+        return {};
+      };
+      
       setLogs((data || []).map(d => ({
         id: d.id,
-        demo_id: (d.meta_json as any)?.demo_id || '',
+        demo_id: metaJson(d.meta_json).demo_id || '',
         action: d.action,
         details: JSON.stringify(d.meta_json),
         created_at: d.timestamp
