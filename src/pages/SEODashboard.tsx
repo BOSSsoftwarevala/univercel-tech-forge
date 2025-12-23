@@ -14,25 +14,19 @@ import SEOMetrics from "@/components/seo/SEOMetrics";
 import KeywordManager from "@/components/seo/KeywordManager";
 import MetaTagEngine from "@/components/seo/MetaTagEngine";
 import ContentGenerator from "@/components/seo/ContentGenerator";
-import BacklinkManager from "@/components/seo/BacklinkManager";
-import CompetitorIntelligence from "@/components/seo/CompetitorIntelligence";
-import SEOAlerts from "@/components/seo/SEOAlerts";
-import SEOWallet from "@/components/seo/SEOWallet";
-import PerformanceReview from "@/components/seo/PerformanceReview";
-import SpamGuard from "@/components/seo/SpamGuard";
-import RegionalModes from "@/components/seo/RegionalModes";
-import SocialSEOSync from "@/components/seo/SocialSEOSync";
+import LeadIntelligence from "@/components/seo/LeadIntelligence";
+import AdsAutomation from "@/components/seo/AdsAutomation";
+import EmailAutomation from "@/components/seo/EmailAutomation";
+import SocialCommentAutomation from "@/components/seo/SocialCommentAutomation";
+import ChatMessageReply from "@/components/seo/ChatMessageReply";
+import AutomationFlows from "@/components/seo/AutomationFlows";
+import CombinedWallet from "@/components/seo/CombinedWallet";
+import ReportsAnalytics from "@/components/seo/ReportsAnalytics";
+import SettingsIntegrations from "@/components/seo/SettingsIntegrations";
 import AIInsightPanel from "@/components/seo/AIInsightPanel";
-import TechnicalSEOPanel from "@/components/seo/TechnicalSEOPanel";
-import RankTracker from "@/components/seo/RankTracker";
-import ContentDeployment from "@/components/seo/ContentDeployment";
-import ProductSEOLibrary from "@/components/seo/ProductSEOLibrary";
-import AutomationScheduler from "@/components/seo/AutomationScheduler";
-import HeatmapBehavior from "@/components/seo/HeatmapBehavior";
-import DemoSEOIntegration from "@/components/seo/DemoSEOIntegration";
 
 const SEODashboard = () => {
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState("command");
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [activeRegion, setActiveRegion] = useState<"global" | "africa" | "asia" | "middleeast">("global");
   const navigate = useNavigate();
@@ -45,25 +39,17 @@ const SEODashboard = () => {
   };
 
   const sidebarItems = [
-    { id: "dashboard", label: "Dashboard", icon: BarChart3 },
-    { id: "keywords", label: "Keyword Manager", icon: Search },
-    { id: "meta", label: "Meta Engine", icon: FileText },
-    { id: "content", label: "Content Generator", icon: Sparkles },
-    { id: "technical", label: "Technical SEO", icon: FileCode },
-    { id: "ranks", label: "Rank Tracker", icon: TrendingUp },
-    { id: "library", label: "Product Library", icon: Database },
-    { id: "deployment", label: "Deployment", icon: Rocket },
-    { id: "backlinks", label: "Backlink Manager", icon: Link2 },
-    { id: "competitors", label: "Competitor Intel", icon: Target },
-    { id: "demo", label: "Demo SEO", icon: Eye },
-    { id: "heatmap", label: "Heatmap", icon: MousePointer },
-    { id: "scheduler", label: "Automation", icon: Calendar },
-    { id: "regional", label: "Regional Modes", icon: Map },
-    { id: "social", label: "Social × SEO", icon: Share2 },
-    { id: "alerts", label: "Live Alerts", icon: Bell },
-    { id: "spam", label: "Spam Guard", icon: Shield },
-    { id: "wallet", label: "SEO Wallet", icon: Wallet },
-    { id: "performance", label: "Performance", icon: TrendingUp },
+    { id: "command", label: "SEO Command Center", icon: Globe },
+    { id: "leads", label: "Lead Intelligence", icon: Target },
+    { id: "content", label: "Content Automation", icon: FileText },
+    { id: "ads", label: "Ads Automation", icon: Megaphone },
+    { id: "email", label: "Email Automation", icon: Mail },
+    { id: "social", label: "Social & Comment", icon: Share2 },
+    { id: "chat", label: "Chat & Message Reply", icon: MessageSquare },
+    { id: "automation", label: "Automation Flows", icon: Zap },
+    { id: "wallet", label: "Combined Wallet", icon: Wallet },
+    { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
+    { id: "settings", label: "Settings & Integrations", icon: Settings },
   ];
 
   const renderContent = () => {
