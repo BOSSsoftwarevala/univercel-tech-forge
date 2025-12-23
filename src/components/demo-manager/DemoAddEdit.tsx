@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { 
   Plus, 
   Edit, 
@@ -21,7 +21,8 @@ import {
   Users,
   Search,
   MoreVertical,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 import {
   Dialog,
@@ -36,64 +37,174 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { apiService } from "@/lib/api/apiService";
 
 interface Demo {
   id: string;
   title: string;
   category: string;
   url: string;
-  maskedUrl: string;
-  techStack: string;
+  login_url: string;
+  demo_type: string;
   status: string;
-  multiLogin: boolean;
-  maxLogins: number;
-  healthInterval: number;
-  backupUrl: string;
   description: string;
+  created_at: string;
 }
 
 const DemoAddEdit = () => {
-  const { toast } = useToast();
+  const [demos, setDemos] = useState<Demo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingDemo, setEditingDemo] = useState<Demo | null>(null);
+  const [demoToDelete, setDemoToDelete] = useState<Demo | null>(null);
   
   const [formData, setFormData] = useState({
     title: "",
     category: "",
     url: "",
-    techStack: "react",
+    login_url: "",
+    demo_type: "web",
     description: "",
-    multiLogin: false,
-    maxLogins: 1,
-    healthInterval: 5,
-    backupUrl: "",
   });
 
-  const demos: Demo[] = [
-    { id: "1", title: "CRM Enterprise", category: "Business", url: "https://demo.crm.com", maskedUrl: "demo-crm-****", techStack: "react", status: "active", multiLogin: true, maxLogins: 5, healthInterval: 5, backupUrl: "https://backup.crm.com", description: "Enterprise CRM solution" },
-    { id: "2", title: "E-Commerce Suite", category: "Retail", url: "https://demo.ecom.com", maskedUrl: "demo-ecom-****", techStack: "node", status: "active", multiLogin: true, maxLogins: 3, healthInterval: 3, backupUrl: "", description: "Full e-commerce platform" },
-    { id: "3", title: "HR Management", category: "HR", url: "https://demo.hr.com", maskedUrl: "demo-hr-****", techStack: "php", status: "maintenance", multiLogin: false, maxLogins: 1, healthInterval: 10, backupUrl: "", description: "HR management system" },
-    { id: "4", title: "Inventory System", category: "Logistics", url: "https://demo.inv.com", maskedUrl: "demo-inv-****", techStack: "java", status: "active", multiLogin: true, maxLogins: 2, healthInterval: 5, backupUrl: "https://backup.inv.com", description: "Inventory tracking solution" },
-    { id: "5", title: "Finance Portal", category: "Finance", url: "https://demo.fin.com", maskedUrl: "demo-fin-****", techStack: "python", status: "down", multiLogin: false, maxLogins: 1, healthInterval: 2, backupUrl: "https://backup.fin.com", description: "Financial management portal" },
-  ];
-
-  const techStacks = [
-    { value: "php", label: "PHP", color: "bg-indigo-500/20 text-indigo-400" },
-    { value: "node", label: "Node.js", color: "bg-green-500/20 text-green-400" },
-    { value: "java", label: "Java", color: "bg-orange-500/20 text-orange-400" },
-    { value: "python", label: "Python", color: "bg-yellow-500/20 text-yellow-400" },
-    { value: "react", label: "React", color: "bg-cyan-500/20 text-cyan-400" },
-    { value: "angular", label: "Angular", color: "bg-red-500/20 text-red-400" },
-    { value: "vue", label: "Vue.js", color: "bg-emerald-500/20 text-emerald-400" },
-    { value: "other", label: "Other", color: "bg-gray-500/20 text-gray-400" },
-  ];
-
   const categories = ["Business", "Retail", "HR", "Logistics", "Finance", "Healthcare", "Education", "Real Estate"];
+  const demoTypes = ["web", "mobile", "desktop", "api"];
 
-  const getTechBadge = (tech: string) => {
-    const found = techStacks.find(t => t.value === tech);
-    return found ? found.color : "bg-gray-500/20 text-gray-400";
+  useEffect(() => {
+    fetchDemos();
+  }, []);
+
+  const fetchDemos = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('demos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setDemos(data || []);
+    } catch (err: any) {
+      console.error('Error fetching demos:', err);
+      toast.error('Failed to load demos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.title || !formData.url || !formData.category) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      if (editingDemo) {
+        // Update existing demo
+        const result = await apiService.updateDemo(editingDemo.id, {
+          title: formData.title,
+          category: formData.category,
+          url: formData.url,
+          login_url: formData.login_url,
+          demo_type: formData.demo_type,
+          description: formData.description,
+        });
+        
+        if (result.success) {
+          toast.success(`${formData.title} has been updated`);
+        }
+      } else {
+        // Create new demo
+        const result = await apiService.createDemo({
+          title: formData.title,
+          category: formData.category,
+          url: formData.url,
+          login_url: formData.login_url,
+          demo_type: formData.demo_type,
+          description: formData.description,
+        });
+        
+        if (result.success) {
+          toast.success(`${formData.title} has been added`);
+        }
+      }
+      
+      setIsDialogOpen(false);
+      resetForm();
+      fetchDemos();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!demoToDelete) return;
+
+    setActionLoading(true);
+    try {
+      const result = await apiService.deleteDemo(demoToDelete.id);
+      if (result.success) {
+        toast.success(`${demoToDelete.title} has been removed`);
+        fetchDemos();
+      }
+    } finally {
+      setActionLoading(false);
+      setDeleteDialogOpen(false);
+      setDemoToDelete(null);
+    }
+  };
+
+  const handleEdit = (demo: Demo) => {
+    setEditingDemo(demo);
+    setFormData({
+      title: demo.title || "",
+      category: demo.category || "",
+      url: demo.url || "",
+      login_url: demo.login_url || "",
+      demo_type: demo.demo_type || "web",
+      description: demo.description || "",
+    });
+    setIsDialogOpen(true);
+  };
+
+  const confirmDelete = (demo: Demo) => {
+    setDemoToDelete(demo);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleToggleStatus = async (demo: Demo) => {
+    const isActive = demo.status === 'active';
+    const result = await apiService.toggleDemoStatus(demo.id, !isActive);
+    if (result.success) {
+      fetchDemos();
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      category: "",
+      url: "",
+      login_url: "",
+      demo_type: "web",
+      description: "",
+    });
+    setEditingDemo(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -105,66 +216,9 @@ const DemoAddEdit = () => {
     }
   };
 
-  const handleSubmit = () => {
-    if (!formData.title || !formData.url || !formData.category) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: editingDemo ? "Demo Updated Successfully" : "Demo Added Successfully",
-      description: `${formData.title} has been ${editingDemo ? "updated" : "added"} to the system.`,
-    });
-    
-    setIsDialogOpen(false);
-    resetForm();
-  };
-
-  const handleDelete = (demo: Demo) => {
-    toast({
-      title: "Demo Removed",
-      description: `${demo.title} has been removed from the system.`,
-    });
-  };
-
-  const handleEdit = (demo: Demo) => {
-    setEditingDemo(demo);
-    setFormData({
-      title: demo.title,
-      category: demo.category,
-      url: demo.url,
-      techStack: demo.techStack,
-      description: demo.description,
-      multiLogin: demo.multiLogin,
-      maxLogins: demo.maxLogins,
-      healthInterval: demo.healthInterval,
-      backupUrl: demo.backupUrl,
-    });
-    setIsDialogOpen(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      category: "",
-      url: "",
-      techStack: "react",
-      description: "",
-      multiLogin: false,
-      maxLogins: 1,
-      healthInterval: 5,
-      backupUrl: "",
-    });
-    setEditingDemo(null);
-  };
-
   const filteredDemos = demos.filter(demo =>
-    demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    demo.category.toLowerCase().includes(searchQuery.toLowerCase())
+    demo.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    demo.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -233,74 +287,27 @@ const DemoAddEdit = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="techStack">Tech Stack</Label>
-                  <Select value={formData.techStack} onValueChange={(v) => setFormData({ ...formData, techStack: v })}>
-                    <SelectTrigger className="bg-background border-border">
-                      <SelectValue placeholder="Select tech stack" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {techStacks.map(tech => (
-                        <SelectItem key={tech.value} value={tech.value}>
-                          <div className="flex items-center gap-2">
-                            <Code className="w-3 h-3" />
-                            {tech.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="healthInterval">Health Check Interval (min)</Label>
+                  <Label htmlFor="login_url">Login URL</Label>
                   <Input
-                    id="healthInterval"
-                    type="number"
-                    min={1}
-                    max={60}
-                    value={formData.healthInterval}
-                    onChange={(e) => setFormData({ ...formData, healthInterval: parseInt(e.target.value) || 5 })}
+                    id="login_url"
+                    placeholder="https://demo.example.com/login"
+                    value={formData.login_url}
+                    onChange={(e) => setFormData({ ...formData, login_url: e.target.value })}
                     className="bg-background border-border"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backupUrl">Backup URL</Label>
-                <div className="relative">
-                  <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="backupUrl"
-                    placeholder="https://backup.example.com"
-                    value={formData.backupUrl}
-                    onChange={(e) => setFormData({ ...formData, backupUrl: e.target.value })}
-                    className="bg-background border-border pl-10"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 rounded-lg bg-background/50 border border-border">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">Multi-Login Support</p>
-                    <p className="text-xs text-muted-foreground">Allow multiple concurrent sessions</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Switch
-                    checked={formData.multiLogin}
-                    onCheckedChange={(checked) => setFormData({ ...formData, multiLogin: checked })}
-                  />
-                  {formData.multiLogin && (
-                    <Input
-                      type="number"
-                      min={1}
-                      max={10}
-                      value={formData.maxLogins}
-                      onChange={(e) => setFormData({ ...formData, maxLogins: parseInt(e.target.value) || 1 })}
-                      className="w-16 bg-background border-border"
-                    />
-                  )}
+                <div className="space-y-2">
+                  <Label htmlFor="demo_type">Demo Type</Label>
+                  <Select value={formData.demo_type} onValueChange={(v) => setFormData({ ...formData, demo_type: v })}>
+                    <SelectTrigger className="bg-background border-border">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {demoTypes.map(type => (
+                        <SelectItem key={type} value={type}>{type.toUpperCase()}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -319,7 +326,8 @@ const DemoAddEdit = () => {
                 <Button variant="outline" onClick={() => { setIsDialogOpen(false); resetForm(); }}>
                   Cancel
                 </Button>
-                <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
+                <Button onClick={handleSubmit} disabled={actionLoading} className="bg-primary hover:bg-primary/90">
+                  {actionLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                   {editingDemo ? "Update Demo" : "Add Demo"}
                 </Button>
               </div>
@@ -329,89 +337,122 @@ const DemoAddEdit = () => {
       </div>
 
       {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search demos..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-background/50 border-border"
-        />
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search demos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 bg-background/50 border-border"
+          />
+        </div>
+        <Button variant="outline" onClick={fetchDemos} disabled={loading}>
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Refresh"}
+        </Button>
       </div>
 
       {/* Demo List */}
       <div className="grid gap-4">
-        {filteredDemos.map((demo, index) => (
-          <motion.div
-            key={demo.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className="glass-card border-border/50 hover:border-primary/50 transition-all">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Monitor className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-foreground">{demo.title}</h3>
-                        <Badge className={getStatusBadge(demo.status)}>{demo.status}</Badge>
-                        <Badge className={getTechBadge(demo.techStack)}>{demo.techStack.toUpperCase()}</Badge>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : filteredDemos.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No demos found. Add your first demo!
+          </div>
+        ) : (
+          filteredDemos.map((demo, index) => (
+            <motion.div
+              key={demo.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <Card className="glass-card border-border/50 hover:border-primary/50 transition-all">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Monitor className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-sm text-muted-foreground">{demo.category} • {demo.description}</p>
-                      <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Link className="w-3 h-3" />
-                          {demo.maskedUrl}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {demo.healthInterval}min interval
-                        </span>
-                        {demo.multiLogin && (
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{demo.title}</h3>
+                          <Badge className={getStatusBadge(demo.status)}>{demo.status}</Badge>
+                          <Badge variant="outline">{demo.demo_type?.toUpperCase()}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{demo.category} • {demo.description}</p>
+                        <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {demo.maxLogins} logins
+                            <Link className="w-3 h-3" />
+                            {demo.url?.slice(0, 40)}...
                           </span>
-                        )}
+                        </div>
                       </div>
                     </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-border"
+                        onClick={() => window.open(demo.url, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="border-border">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEdit(demo)}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Demo
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleToggleStatus(demo)}>
+                            <Shield className="w-4 h-4 mr-2" />
+                            {demo.status === 'active' ? 'Set Maintenance' : 'Activate'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => confirmDelete(demo)}
+                            className="text-red-400 focus:text-red-400"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Remove Demo
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="border-border">
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="border-border">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(demo)}>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit Demo
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDelete(demo)}
-                          className="text-red-400 focus:text-red-400"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Remove Demo
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))
+        )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Demo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{demoToDelete?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              {actionLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
