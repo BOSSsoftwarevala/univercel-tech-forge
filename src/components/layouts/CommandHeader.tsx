@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+/**
+ * Command Header - Performance Optimized
+ * Responsive, mobile-friendly, memoized
+ */
+
+import { useState, useEffect, memo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Volume2, VolumeX, Search, User, Settings, LogOut,
-  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare
+  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +23,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
 import { ROLE_CONFIG, AppRole } from '@/types/roles';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface Alert {
   id: string;
@@ -28,7 +35,7 @@ interface Alert {
   acknowledged: boolean;
 }
 
-const CommandHeader = () => {
+const CommandHeader = memo(() => {
   const { user, userRole, signOut } = useAuth();
   const location = useLocation();
   const [buzzerActive, setBuzzerActive] = useState(false);
@@ -230,6 +237,8 @@ const CommandHeader = () => {
       </div>
     </header>
   );
-};
+});
+
+CommandHeader.displayName = 'CommandHeader';
 
 export default CommandHeader;
