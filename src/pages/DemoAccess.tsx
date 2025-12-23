@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CheckCircle2, Shield, Users, Code, Store, Megaphone, UserCheck } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useDemoTestMode } from '@/contexts/DemoTestModeContext';
 
 // Demo credentials for each role - NO PASSWORD REQUIRED, ONE-CLICK LOGIN
 const DEMO_ACCOUNTS: Record<string, { email: string; password: string; name: string; icon: React.ElementType; color: string; dashboard: string }> = {
@@ -69,9 +68,11 @@ const DemoAccess = () => {
   const { role } = useParams<{ role: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Preparing demo access...');
+  
+  // Demo Test Mode - No toasts, no delays, instant access
+  const { isTestMode, shouldShowAnimation } = useDemoTestMode();
 
   useEffect(() => {
     const autoLogin = async () => {
@@ -134,31 +135,25 @@ const DemoAccess = () => {
         setStatus('success');
         setMessage(`Welcome! Redirecting to ${account.name} Dashboard...`);
         
-        toast({
-          title: `Demo Access Granted`,
-          description: `You are now logged in as ${account.name}`,
-        });
-
-        // Redirect to role dashboard
-        setTimeout(() => {
+        // In test mode: instant redirect, no toast, no delay
+        // In normal mode: show toast and delay
+        if (isTestMode) {
           navigate(account.dashboard, { replace: true });
-        }, 1500);
+        } else {
+          setTimeout(() => {
+            navigate(account.dashboard, { replace: true });
+          }, 1500);
+        }
 
       } catch (err: any) {
         console.error('Demo login error:', err);
         setStatus('error');
         setMessage(err.message || 'Failed to access demo. Please try again.');
-        
-        toast({
-          title: 'Demo Access Failed',
-          description: err.message,
-          variant: 'destructive',
-        });
       }
     };
 
     autoLogin();
-  }, [role, searchParams, navigate, toast]);
+  }, [role, searchParams, navigate, isTestMode]);
 
   const roleKey = role?.toLowerCase() || searchParams.get('role')?.toLowerCase() || '';
   const account = DEMO_ACCOUNTS[roleKey];
@@ -167,27 +162,22 @@ const DemoAccess = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="max-w-md w-full"
+      <div
+        className={`max-w-md w-full ${shouldShowAnimation() ? 'animate-fade-in' : ''}`}
       >
         <div className="bg-card border border-border rounded-2xl shadow-2xl p-8 text-center">
-          {/* Icon */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.2 }}
+          {/* Icon - Minimal animation in test mode */}
+          <div
             className={`w-20 h-20 mx-auto rounded-full bg-gradient-to-br ${gradientColor} flex items-center justify-center mb-6`}
           >
             {status === 'loading' ? (
-              <Loader2 className="w-10 h-10 text-white animate-spin" />
+              <Loader2 className={`w-10 h-10 text-white ${shouldShowAnimation() ? 'animate-spin' : ''}`} />
             ) : status === 'success' ? (
               <CheckCircle2 className="w-10 h-10 text-white" />
             ) : (
               <Icon className="w-10 h-10 text-white" />
             )}
-          </motion.div>
+          </div>
 
           {/* Title */}
           <h1 className="text-2xl font-bold text-foreground mb-2">
@@ -195,29 +185,20 @@ const DemoAccess = () => {
           </h1>
 
           {/* Status Message */}
-          <motion.p
-            key={message}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <p
             className={`text-sm ${status === 'error' ? 'text-destructive' : 'text-muted-foreground'}`}
           >
             {message}
-          </motion.p>
+          </p>
 
-          {/* Loading Bar */}
-          {status === 'loading' && (
-            <motion.div
-              className="mt-6 h-1 bg-muted rounded-full overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <motion.div
-                className={`h-full bg-gradient-to-r ${gradientColor}`}
-                initial={{ width: '0%' }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 2, ease: 'easeInOut' }}
+          {/* Loading Bar - Only show in non-test mode */}
+          {status === 'loading' && shouldShowAnimation() && (
+            <div className="mt-6 h-1 bg-muted rounded-full overflow-hidden">
+              <div
+                className={`h-full bg-gradient-to-r ${gradientColor} animate-pulse`}
+                style={{ width: '60%' }}
               />
-            </motion.div>
+            </div>
           )}
 
           {/* Features */}
@@ -254,7 +235,7 @@ const DemoAccess = () => {
             ))}
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

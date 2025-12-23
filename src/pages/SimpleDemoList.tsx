@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Play, ArrowLeft, Search, Building2, ShoppingCart, GraduationCap, Heart, Utensils, Truck, Briefcase, Home, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useDemoTestMode } from '@/contexts/DemoTestModeContext';
 
 interface Demo {
   id: string;
@@ -18,6 +18,9 @@ const SimpleDemoList = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [demos, setDemos] = useState<Demo[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Demo Test Mode - Check if we should skip restrictions
+  const { isTestMode, shouldShowAnimation } = useDemoTestMode();
 
   const categories = [
     { id: 'all', label: 'All', icon: Building2 },
@@ -33,11 +36,20 @@ const SimpleDemoList = () => {
   useEffect(() => {
     const fetchDemos = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // In test mode, fetch ALL demos regardless of status
+      // Otherwise only fetch active demos
+      let query = supabase
         .from('demos')
         .select('id, title, url, category, description, status')
-        .eq('status', 'active')
         .order('created_at', { ascending: false });
+      
+      // Only filter by status if NOT in test mode
+      if (!isTestMode) {
+        query = query.eq('status', 'active');
+      }
+
+      const { data, error } = await query;
 
       if (!error && data) {
         setDemos(data);
@@ -46,7 +58,7 @@ const SimpleDemoList = () => {
     };
 
     fetchDemos();
-  }, []);
+  }, [isTestMode]);
 
   const filteredDemos = demos.filter(demo => {
     const matchesSearch = demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -65,9 +77,12 @@ const SimpleDemoList = () => {
               <ArrowLeft className="w-5 h-5" />
               <span className="text-sm font-medium">Back to Home</span>
             </Link>
-            <Link to="/login" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
-              Login
-            </Link>
+            {/* Hide login button in test mode - no login required */}
+            {!isTestMode && (
+              <Link to="/login" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -118,16 +133,16 @@ const SimpleDemoList = () => {
           </div>
         )}
 
-        {/* Demo Grid - Simple Cards */}
+        {/* Demo Grid - Simple Cards, minimal animation in test mode */}
         {!loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredDemos.map((demo, index) => (
-              <motion.div
+              <div
                 key={demo.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all group"
+                className={`bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all group ${
+                  shouldShowAnimation() ? 'animate-fade-in' : ''
+                }`}
+                style={shouldShowAnimation() ? { animationDelay: `${index * 50}ms` } : undefined}
               >
                 {/* Demo Preview Image */}
                 <div className="aspect-video bg-slate-800 relative">
@@ -146,7 +161,7 @@ const SimpleDemoList = () => {
                   {/* Demo URL Preview */}
                   <p className="text-xs text-cyan-400/70 truncate mb-4">{demo.url}</p>
                   
-                  {/* Single CTA Button */}
+                  {/* Single CTA Button - Direct access, no popups */}
                   <Link
                     to={`/demo/${demo.id}`}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all"
@@ -155,7 +170,7 @@ const SimpleDemoList = () => {
                     View Live Demo
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}

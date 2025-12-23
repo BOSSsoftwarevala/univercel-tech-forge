@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { AnimationProvider } from "./contexts/AnimationContext";
+import { DemoTestModeProvider } from "./contexts/DemoTestModeContext";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
 import GlobalOfferPopup from "@/components/offers/GlobalOfferPopup";
@@ -119,15 +120,16 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <AnimationProvider>
-        <TooltipProvider>
-          <DomainProtection>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <GlobalOfferPopup />
-              <FloatingAIChatbotWrapper />
-            <Routes>
+      <DemoTestModeProvider>
+        <AnimationProvider>
+          <TooltipProvider>
+            <DomainProtection>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <GlobalOfferPopup />
+                <FloatingAIChatbotWrapper />
+              <Routes>
               {/* Public Routes - No login required */}
               <Route path="/" element={<Homepage />} />
               <Route path="/demos" element={<SimpleDemoList />} />
@@ -289,10 +291,11 @@ const App = () => (
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </DomainProtection>
-      </TooltipProvider>
-    </AnimationProvider>
+            </BrowserRouter>
+          </DomainProtection>
+        </TooltipProvider>
+      </AnimationProvider>
+    </DemoTestModeProvider>
   </AuthProvider>
 </QueryClientProvider>
 );

@@ -28,6 +28,7 @@ import { format } from "date-fns";
 import { useDemoManagerAccess } from "@/hooks/useDemoManagerAccess";
 import { DemoReportCardsList } from "@/components/demo-manager/DemoReportCard";
 import { DemoAccessGate } from "@/components/demo-manager/DemoAccessGate";
+import { isDemoTestMode } from "@/contexts/DemoTestModeContext";
 
 interface Demo {
   id: string;
@@ -133,6 +134,9 @@ export default function DemoManagerPanel() {
   }, [fetchReportCards]);
 
   useEffect(() => {
+    // Skip realtime alerts in test mode - no interruptions
+    if (isDemoTestMode()) return;
+    
     const channel = supabase
       .channel('demo-alerts')
       .on(

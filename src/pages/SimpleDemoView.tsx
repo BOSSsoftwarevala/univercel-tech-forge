@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Play, ExternalLink, Check, Loader2, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useDemoTestMode } from '@/contexts/DemoTestModeContext';
 
 interface DemoData {
   id: string;
@@ -11,6 +11,7 @@ interface DemoData {
   description: string | null;
   category: string;
   login_url: string | null;
+  status: string;
 }
 
 interface LoginRole {
@@ -26,6 +27,9 @@ const SimpleDemoView = () => {
   const [demo, setDemo] = useState<DemoData | null>(null);
   const [loginRoles, setLoginRoles] = useState<LoginRole[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Demo Test Mode - Check if we should skip restrictions
+  const { isTestMode, shouldShowAnimation } = useDemoTestMode();
 
   useEffect(() => {
     const fetchDemo = async () => {
@@ -33,13 +37,19 @@ const SimpleDemoView = () => {
       
       setLoading(true);
       
-      // Fetch demo details (only active demos)
-      const { data: demoData } = await supabase
+      // In test mode, fetch ALL demos (not just active)
+      // Otherwise only fetch active demos
+      let query = supabase
         .from('demos')
-        .select('id, title, url, description, category, login_url')
-        .eq('id', demoId)
-        .eq('status', 'active')
-        .single();
+        .select('id, title, url, description, category, login_url, status')
+        .eq('id', demoId);
+      
+      // Only filter by status if NOT in test mode
+      if (!isTestMode) {
+        query = query.eq('status', 'active');
+      }
+      
+      const { data: demoData } = await query.single();
 
       if (demoData) {
         setDemo(demoData);
@@ -62,11 +72,12 @@ const SimpleDemoView = () => {
     };
 
     fetchDemo();
-  }, [demoId]);
+  }, [demoId, isTestMode]);
 
   const handleOpenDemo = () => {
     if (!demo) return;
     const demoUrl = demo.login_url || demo.url;
+    // Open demo directly - no approval, no confirmation in test mode
     window.open(demoUrl, '_blank');
   };
 
@@ -99,30 +110,28 @@ const SimpleDemoView = () => {
               <ArrowLeft className="w-5 h-5" />
               <span className="text-sm font-medium">Back to Demos</span>
             </Link>
-            <Link to="/login" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
-              Login
-            </Link>
+            {/* Hide login button in test mode - no login required */}
+            {!isTestMode && (
+              <Link to="/login" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </header>
 
       <main className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
-        {/* Demo Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-10"
+        {/* Demo Header - Minimal animation in test mode */}
+        <div
+          className={`text-center mb-10 ${shouldShowAnimation() ? 'animate-fade-in' : ''}`}
         >
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">{demo.title}</h1>
           <p className="text-slate-400 text-lg">{demo.description || demo.category}</p>
-        </motion.div>
+        </div>
 
         {/* Demo Preview Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-8"
+        <div
+          className={`bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-8 ${shouldShowAnimation() ? 'animate-fade-in' : ''}`}
         >
           {/* Demo Preview Image */}
           <div className="aspect-video bg-slate-800 relative">
@@ -149,7 +158,7 @@ const SimpleDemoView = () => {
               )}
             </div>
 
-            {/* Role Selector - Only if demo has multiple roles */}
+            {/* Role Selector - Always available, no approval needed in test mode */}
             {loginRoles.length > 1 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-slate-400 mb-3">Select Role to View</h3>
@@ -175,7 +184,7 @@ const SimpleDemoView = () => {
               </div>
             )}
 
-            {/* Single Open Demo Button */}
+            {/* Single Open Demo Button - Direct access, no popups */}
             <button
               onClick={handleOpenDemo}
               className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-lg font-bold hover:from-cyan-400 hover:to-blue-500 transition-all shadow-[0_0_30px_rgba(6,182,212,0.3)]"
@@ -184,16 +193,13 @@ const SimpleDemoView = () => {
               Open Demo
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* Category & Actions */}
         <div className="grid sm:grid-cols-2 gap-6">
           {/* Demo Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-6"
+          <div
+            className={`bg-slate-900 border border-slate-800 rounded-xl p-6 ${shouldShowAnimation() ? 'animate-fade-in' : ''}`}
           >
             <h3 className="text-lg font-semibold mb-4">Demo Details</h3>
             <ul className="space-y-3">
@@ -210,14 +216,11 @@ const SimpleDemoView = () => {
                 {loginRoles.length > 0 ? `${loginRoles.length} login role(s)` : 'Direct access'}
               </li>
             </ul>
-          </motion.div>
+          </div>
 
-          {/* Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-6"
+          {/* Actions - Only show purchase option if not in test mode for real purchases */}
+          <div
+            className={`bg-slate-900 border border-slate-800 rounded-xl p-6 ${shouldShowAnimation() ? 'animate-fade-in' : ''}`}
           >
             <h3 className="text-lg font-semibold mb-4">Interested?</h3>
             <p className="text-slate-400 text-sm mb-4">Try the demo first, then purchase if you like it.</p>
@@ -227,7 +230,7 @@ const SimpleDemoView = () => {
             >
               Buy Now
             </Link>
-          </motion.div>
+          </div>
         </div>
       </main>
     </div>
