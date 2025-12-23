@@ -270,16 +270,27 @@ export default function DemoManagerPanel() {
   const checkDemoHealth = async (demo: Demo) => {
     toast.info(`Checking health of ${demo.title}...`);
     try {
-      await fetch(demo.url, { mode: 'no-cors' });
-      toast.success(`${demo.title} is accessible`);
-    } catch (err) {
-      toast.error(`${demo.title} may be down`);
-      await supabase.from('demo_alerts').insert({
-        demo_id: demo.id,
-        alert_type: 'health_check_failed',
-        message: `Health check failed for ${demo.title}`,
-        is_active: true
+      const { data, error } = await supabase.functions.invoke('check-demo-health', {
+        body: { 
+          demoId: demo.id, 
+          url: demo.url,
+          createAlert: true 
+        }
       });
+
+      if (error) throw error;
+
+      if (data?.reachable) {
+        toast.success(`${demo.title} is accessible (${data.responseTime}ms)`);
+      } else {
+        toast.error(`${demo.title} is down: ${data?.error || 'Unreachable'}`);
+      }
+      
+      // Refresh demo list to show updated status
+      fetchDemos();
+    } catch (err) {
+      console.error('Health check failed:', err);
+      toast.error(`Health check failed for ${demo.title}`);
     }
   };
 

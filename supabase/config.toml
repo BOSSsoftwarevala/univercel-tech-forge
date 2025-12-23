@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.api-backup]
 verify_jwt = false
+
+[functions.check-demo-health]
+verify_jwt = false
