@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, MessageSquare, Sparkles } from 'lucide-react';
+import { Play, MessageSquare, Sparkles, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AIBrainGraphic from './AIBrainGraphic';
 
@@ -155,8 +155,8 @@ const HeroSection = () => {
                 variant="outline"
                 className="border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary group px-8"
               >
-                Become Franchise
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                Upgrade to Prime
+                <Crown className="w-4 h-4 ml-2" />
               </Button>
               
               <Button

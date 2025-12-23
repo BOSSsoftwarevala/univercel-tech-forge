@@ -1,14 +1,11 @@
 import { motion } from 'framer-motion';
-import { Rocket, Users, Code, Crown } from 'lucide-react';
+import { Rocket, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroAiWoman from '@/assets/hero-ai-woman.png';
 
 const FuturisticHero = () => {
   const ctaButtons = [
     { label: 'Explore Live Demos', href: '/demos/public', icon: Rocket, variant: 'primary' },
-    { label: 'Join as Franchise', href: '/franchise-landing', icon: Users, variant: 'gold' },
-    { label: 'Become Reseller', href: '/reseller-landing', icon: Users, variant: 'secondary' },
-    { label: 'Apply Developer', href: '/auth', icon: Code, variant: 'secondary' },
     { label: 'Upgrade to Prime', href: '/auth', icon: Crown, variant: 'gold' },
   ];
 

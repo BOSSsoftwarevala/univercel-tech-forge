@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import softwareValaLogo from '@/assets/software-vala-logo.png';
 const navItems = [
   { label: 'Products', href: '#products' },
-  { label: 'Demo', href: '#demo' },
-  { label: 'Franchise', href: '#franchise' },
-  { label: 'Reseller', href: '#reseller' },
+  { label: 'Demo', href: '/demos/public' },
   { label: 'Support', href: '#support' },
 ];
 
