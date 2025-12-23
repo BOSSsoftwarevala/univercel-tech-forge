@@ -10282,6 +10282,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notifications: {
+        Row: {
+          action_label: string | null
+          action_url: string | null
+          created_at: string
+          dismissed_at: string | null
+          event_type: string | null
+          id: string
+          is_buzzer: boolean | null
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          message: string
+          read_at: string | null
+          role_target: string[] | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_url?: string | null
+          created_at?: string
+          dismissed_at?: string | null
+          event_type?: string | null
+          id?: string
+          is_buzzer?: boolean | null
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message: string
+          read_at?: string | null
+          role_target?: string[] | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_label?: string | null
+          action_url?: string | null
+          created_at?: string
+          dismissed_at?: string | null
+          event_type?: string | null
+          id?: string
+          is_buzzer?: boolean | null
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message?: string
+          read_at?: string | null
+          role_target?: string[] | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_online_status: {
         Row: {
           current_page: string | null
@@ -10338,6 +10389,9 @@ export type Database = {
           id: string
           rejection_reason: string | null
           role: Database["public"]["Enums"]["app_role"]
+          two_factor_enabled: boolean | null
+          two_factor_method: string | null
+          two_factor_verified_at: string | null
           user_id: string
         }
         Insert: {
@@ -10350,6 +10404,9 @@ export type Database = {
           id?: string
           rejection_reason?: string | null
           role: Database["public"]["Enums"]["app_role"]
+          two_factor_enabled?: boolean | null
+          two_factor_method?: string | null
+          two_factor_verified_at?: string | null
           user_id: string
         }
         Update: {
@@ -10362,6 +10419,9 @@ export type Database = {
           id?: string
           rejection_reason?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          two_factor_enabled?: boolean | null
+          two_factor_method?: string | null
+          two_factor_verified_at?: string | null
           user_id?: string
         }
         Relationships: []
