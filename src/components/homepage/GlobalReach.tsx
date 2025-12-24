@@ -3,7 +3,7 @@ import { Globe, MapPin } from 'lucide-react';
 import softwarevalaLogo from '@/assets/softwarevala-logo.jpg';
 
 const countries = [
-  { name: 'India', flag: '🇮🇳', region: 'South Asia' },
+  { name: 'India', flag: '🇮🇳', region: 'South Asia • 10+ Branches', cities: ['Ranchi', 'Siliguri', 'Guwahati', 'Jaipur', 'Patna', 'Goa', 'Baroda'] },
   { name: 'United Kingdom', flag: '🇬🇧', region: 'Europe' },
   { name: 'Kenya', flag: '🇰🇪', region: 'East Africa' },
   { name: 'Burundi', flag: '🇧🇮', region: 'East Africa' },
@@ -157,10 +157,10 @@ const GlobalReach = () => {
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6"
         >
           {[
-            { value: '11,850+', label: 'Software Products' },
-            { value: '2,850+', label: 'Active Resellers' },
-            { value: '52+', label: 'Global Franchises' },
-            { value: '7+', label: 'Countries' },
+            { value: '2,870+', label: 'Active Resellers' },
+            { value: '600+', label: 'VIP Clients' },
+            { value: '57', label: 'Franchises Worldwide' },
+            { value: '28+', label: 'Govt. Projects Ongoing' },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
