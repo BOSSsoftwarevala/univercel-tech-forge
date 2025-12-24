@@ -655,6 +655,190 @@ export type Database = {
         }
         Relationships: []
       }
+      assist_abuse_flags: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          flag_count: number | null
+          flag_type: string
+          id: string
+          is_resolved: boolean | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string | null
+          staff_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          flag_count?: number | null
+          flag_type: string
+          id?: string
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          staff_id: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          flag_count?: number | null
+          flag_type?: string
+          id?: string
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          staff_id?: string
+        }
+        Relationships: []
+      }
+      assist_eligibility_settings: {
+        Row: {
+          allowed_modes: string[] | null
+          created_at: string | null
+          id: string
+          is_assist_enabled: boolean | null
+          max_duration_minutes: number | null
+          max_sessions_per_staff: number | null
+          requires_approval: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          allowed_modes?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_assist_enabled?: boolean | null
+          max_duration_minutes?: number | null
+          max_sessions_per_staff?: number | null
+          requires_approval?: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          allowed_modes?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_assist_enabled?: boolean | null
+          max_duration_minutes?: number | null
+          max_sessions_per_staff?: number | null
+          requires_approval?: boolean | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      assist_force_end_logs: {
+        Row: {
+          created_at: string | null
+          end_type: string
+          ended_by: string
+          ended_by_role: Database["public"]["Enums"]["app_role"] | null
+          id: string
+          reason: string
+          session_duration_seconds: number | null
+          session_id: string
+          was_policy_violation: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_type: string
+          ended_by: string
+          ended_by_role?: Database["public"]["Enums"]["app_role"] | null
+          id?: string
+          reason: string
+          session_duration_seconds?: number | null
+          session_id: string
+          was_policy_violation?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          end_type?: string
+          ended_by?: string
+          ended_by_role?: Database["public"]["Enums"]["app_role"] | null
+          id?: string
+          reason?: string
+          session_duration_seconds?: number | null
+          session_id?: string
+          was_policy_violation?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assist_force_end_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "safe_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assist_request_queue: {
+        Row: {
+          created_at: string | null
+          id: string
+          rejection_reason: string | null
+          request_reason: string | null
+          requested_duration_minutes: number | null
+          requested_mode: string | null
+          requested_support_staff_id: string | null
+          requesting_user_id: string
+          requesting_user_role: Database["public"]["Enums"]["app_role"] | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          session_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rejection_reason?: string | null
+          request_reason?: string | null
+          requested_duration_minutes?: number | null
+          requested_mode?: string | null
+          requested_support_staff_id?: string | null
+          requesting_user_id: string
+          requesting_user_role?: Database["public"]["Enums"]["app_role"] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rejection_reason?: string | null
+          request_reason?: string | null
+          requested_duration_minutes?: number | null
+          requested_mode?: string | null
+          requested_support_staff_id?: string | null
+          requesting_user_id?: string
+          requesting_user_role?: Database["public"]["Enums"]["app_role"] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assist_request_queue_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "safe_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -12559,6 +12743,14 @@ export type Database = {
       exceeds_workload_threshold: {
         Args: { _developer_id: string }
         Returns: boolean
+      }
+      force_end_all_assist_sessions: {
+        Args: { p_reason: string }
+        Returns: Json
+      }
+      force_end_assist_session: {
+        Args: { p_end_type?: string; p_reason: string; p_session_id: string }
+        Returns: Json
       }
       force_logout_all_except_master: {
         Args: { admin_user_id: string }
