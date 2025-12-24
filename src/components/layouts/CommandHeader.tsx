@@ -144,8 +144,10 @@ const CommandHeader = memo(() => {
           </span>
         </motion.button>
 
-        {/* Safe Assist */}
-        <SafeAssistTrigger variant="compact" />
+        {/* Safe Assist - ONLY visible to support roles, NOT to regular users */}
+        {userRole && ['support', 'client_success', 'super_admin', 'master'].includes(userRole) && (
+          <SafeAssistTrigger variant="compact" />
+        )}
 
         {/* Buzzer Control */}
         <AnimatePresence>

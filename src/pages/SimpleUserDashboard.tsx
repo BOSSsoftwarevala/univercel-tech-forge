@@ -536,17 +536,14 @@ const SimpleUserDashboard = () => {
                 {/* Quick Actions */}
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-lg">Quick Actions</CardTitle>
+                    <CardTitle className="text-lg">Wallet Info</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start" onClick={() => toast.info('Transfer feature coming soon!')}>
-                      <ArrowRight className="w-4 h-4 mr-3" />
-                      Transfer to Bank
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start" onClick={() => toast.info('Bill payment coming soon!')}>
-                      <Zap className="w-4 h-4 mr-3" />
-                      Pay Bills
-                    </Button>
+                    <div className="p-3 rounded-lg bg-secondary/50 text-center">
+                      <Shield className="w-8 h-8 text-primary mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Your wallet is secure and view-only.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Contact support for any wallet queries.</p>
+                    </div>
                     <Button variant="outline" className="w-full justify-start" onClick={() => toast.info('Referral program coming soon!')}>
                       <Gift className="w-4 h-4 mr-3" />
                       Refer & Earn ₹500
