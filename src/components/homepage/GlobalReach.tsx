@@ -158,6 +158,7 @@ const GlobalReach = () => {
         >
           {[
             { value: '5,170+', label: 'Software Products' },
+            { value: '100+', label: 'Offline Software' },
             { value: '2,870+', label: 'Active Resellers' },
             { value: '600+', label: 'VIP Clients' },
             { value: '57', label: 'Franchises Worldwide' },
