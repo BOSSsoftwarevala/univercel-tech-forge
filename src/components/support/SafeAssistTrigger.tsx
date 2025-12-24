@@ -38,19 +38,18 @@ export function SafeAssistTrigger({ variant = 'compact', className }: SafeAssist
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(true)}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-500 hover:bg-green-500/20 transition-all text-sm font-medium ${className}`}
+                className={`flex items-center justify-center p-1.5 rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-all ${className}`}
               >
-                <img src={safeAssistIcon} alt="Safe Assist" className="w-6 h-6 rounded-full object-cover" />
-                <span className="hidden sm:inline">Safe Assist</span>
+                <img src={safeAssistIcon} alt="Safe Assist" className="w-6 h-6 rounded object-contain" />
               </motion.button>
             ) : (
               <Button 
                 variant="outline"
+                size="icon"
                 onClick={() => setIsOpen(true)}
-                className={`gap-2 border-green-500/30 text-green-500 hover:bg-green-500/10 ${className}`}
+                className={`border-green-500/30 hover:bg-green-500/10 ${className}`}
               >
-                <img src={safeAssistIcon} alt="Safe Assist" className="w-5 h-5 rounded-full object-cover" />
-                Safe Assist
+                <img src={safeAssistIcon} alt="Safe Assist" className="w-5 h-5 rounded object-contain" />
               </Button>
             )}
           </TooltipTrigger>
