@@ -130,7 +130,7 @@ const CommandHeader = memo(() => {
           whileTap={{ scale: 0.95 }}
           onClick={handlePromiseClick}
           className={cn(
-            "flex items-center gap-1.5 px-2 py-1 rounded-md font-medium text-xs transition-all",
+            "flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium text-sm transition-all",
             promiseState === 'active'
               ? 'bg-green-500/20 text-green-500 border border-green-500/50'
               : promiseState === 'pending'
@@ -138,7 +138,7 @@ const CommandHeader = memo(() => {
               : 'bg-secondary/50 text-muted-foreground border border-border/50 hover:border-primary/50'
           )}
         >
-          <img src={promiseIcon} alt="Promise" className="w-5 h-5 rounded-full object-cover" />
+          <img src={promiseIcon} alt="Promise" className="w-6 h-6 rounded-full object-cover" />
           <span className="hidden sm:inline">
             {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
           </span>
