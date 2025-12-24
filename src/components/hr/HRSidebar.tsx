@@ -2,9 +2,13 @@ import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Users, UserPlus, GraduationCap, ClipboardCheck,
   FileText, Award, Calendar, Settings, ChevronLeft, ChevronRight,
-  Briefcase, Target, TrendingUp
+  Briefcase, Target, TrendingUp, LogOut, Lock
 } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface HRSidebarProps {
   activeSection: string;
@@ -27,12 +31,22 @@ const menuItems = [
 
 const HRSidebar = ({ activeSection, setActiveSection }: HRSidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'HR Manager';
+  const maskedId = user?.id ? `HR-${user.id.substring(0, 4).toUpperCase()}` : 'HR-0000';
+  
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   return (
     <motion.aside
       initial={{ width: 280 }}
       animate={{ width: collapsed ? 80 : 280 }}
-      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-950 via-violet-950/20 to-slate-950 border-r border-violet-500/20 z-40"
+      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-950 via-violet-950/20 to-slate-950 border-r border-violet-500/20 z-40 flex flex-col"
     >
       {/* Header */}
       <div className="h-16 flex items-center px-4 border-b border-violet-500/20">
@@ -49,6 +63,21 @@ const HRSidebar = ({ activeSection, setActiveSection }: HRSidebarProps) => {
         </div>
       </div>
 
+      {/* User Info & Role Badge */}
+      {!collapsed && (
+        <div className="p-4 border-b border-violet-500/20">
+          <div className="bg-slate-800/50 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-white truncate">{userName}</span>
+              <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white text-[10px] px-2 py-0.5">
+                HR MANAGER
+              </Badge>
+            </div>
+            <span className="text-xs text-slate-500 font-mono">{maskedId}</span>
+          </div>
+        </div>
+      )}
+
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
@@ -58,7 +87,7 @@ const HRSidebar = ({ activeSection, setActiveSection }: HRSidebarProps) => {
       </button>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-1 mt-4">
+      <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = activeSection === item.id;
           return (
@@ -97,7 +126,7 @@ const HRSidebar = ({ activeSection, setActiveSection }: HRSidebarProps) => {
 
       {/* Stats Widget */}
       {!collapsed && (
-        <div className="absolute bottom-20 left-4 right-4">
+        <div className="px-4 pb-2">
           <div className="p-4 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 border border-violet-500/20">
             <div className="flex items-center gap-2 mb-3">
               <Users className="w-4 h-4 text-violet-400" />
@@ -117,12 +146,49 @@ const HRSidebar = ({ activeSection, setActiveSection }: HRSidebarProps) => {
         </div>
       )}
 
-      {/* Settings */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-violet-300 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}>
-          <Settings className="w-5 h-5" />
-          {!collapsed && <span className="font-medium text-sm">Settings</span>}
-        </button>
+      {/* Footer Actions */}
+      <div className="p-4 border-t border-violet-500/20 space-y-2">
+        {!collapsed ? (
+          <>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex-1 text-slate-400 hover:text-violet-300 hover:bg-violet-500/10"
+                onClick={() => navigate('/change-password')}
+              >
+                <Lock className="w-4 h-4 mr-1" />
+                Password
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex-1 text-slate-400 hover:text-violet-300 hover:bg-violet-500/10"
+                onClick={() => navigate('/settings')}
+              >
+                <Settings className="w-4 h-4 mr-1" />
+                Settings
+              </Button>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </>
+        ) : (
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            size="icon"
+            className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
+        )}
       </div>
     </motion.aside>
   );
