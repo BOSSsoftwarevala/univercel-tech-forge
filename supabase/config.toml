@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.ai-hr-assistant]
 verify_jwt = false
+
+[functions.ai-client-success]
+verify_jwt = false

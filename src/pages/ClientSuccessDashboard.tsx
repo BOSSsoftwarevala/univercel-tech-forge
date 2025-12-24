@@ -13,6 +13,10 @@ import { SuccessPlaybook } from "@/components/client-success/SuccessPlaybook";
 import { ChurnPrevention } from "@/components/client-success/ChurnPrevention";
 import { NPSScoreboard } from "@/components/client-success/NPSScoreboard";
 import { ClientSuccessNotifications } from "@/components/client-success/ClientSuccessNotifications";
+import { KYCManager } from "@/components/client-success/KYCManager";
+import { AutoInterview } from "@/components/client-success/AutoInterview";
+import { AIClientAssistant } from "@/components/client-success/AIClientAssistant";
+import { ClientInsights } from "@/components/client-success/ClientInsights";
 import { useAuth } from "@/hooks/useAuth";
 import { RoleBadge } from "@/components/ui/RoleBadge";
 import { ROLES } from "@/config/roles";
@@ -48,6 +52,14 @@ const ClientSuccessDashboard = () => {
         return <ChurnPrevention />;
       case "nps":
         return <NPSScoreboard />;
+      case "kyc":
+        return <KYCManager />;
+      case "interview":
+        return <AutoInterview />;
+      case "ai-assistant":
+        return <AIClientAssistant />;
+      case "insights":
+        return <ClientInsights />;
       default:
         return <ClientHealthDashboard />;
     }

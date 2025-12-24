@@ -41,14 +41,16 @@ export const ClientSuccessTopBar = ({ activeTab, onTabChange, userName = "Manage
   const [isAILoading, setIsAILoading] = useState(false);
 
   const tabs = [
-    { id: "health", label: "Client Health", icon: Heart },
+    { id: "health", label: "Health", icon: Heart },
+    { id: "kyc", label: "KYC", icon: FileText },
+    { id: "interview", label: "Auto Interview", icon: Users },
+    { id: "ai-assistant", label: "AI Assistant", icon: Sparkles },
+    { id: "insights", label: "Insights", icon: Activity },
     { id: "onboarding", label: "Onboarding", icon: Users },
     { id: "sentiment", label: "Sentiment", icon: Activity },
     { id: "escalation", label: "Escalation", icon: AlertTriangle },
-    { id: "feedback", label: "Feedback", icon: MessageSquare },
-    { id: "playbook", label: "Playbook", icon: FileText },
-    { id: "churn", label: "Churn Prevention", icon: TrendingUp },
-    { id: "nps", label: "NPS Score", icon: Sparkles },
+    { id: "churn", label: "Churn", icon: TrendingUp },
+    { id: "nps", label: "NPS", icon: Sparkles },
   ];
 
   const handleAIEmpathyEngine = async () => {
