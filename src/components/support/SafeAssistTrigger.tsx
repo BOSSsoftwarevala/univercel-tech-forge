@@ -38,9 +38,9 @@ export function SafeAssistTrigger({ variant = 'compact', className }: SafeAssist
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(true)}
-                className={`flex items-center justify-center w-10 h-10 rounded-full bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-all overflow-hidden ${className}`}
+                className={`flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-green-500/30 hover:border-green-500/50 transition-all ${className}`}
               >
-                <img src={safeAssistIcon} alt="Safe Assist" className="w-7 h-7 object-contain" />
+                <img src={safeAssistIcon} alt="Safe Assist" className="w-full h-full object-cover" />
               </motion.button>
             ) : (
               <Button 
