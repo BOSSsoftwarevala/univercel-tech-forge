@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.campaign-optimizer]
 verify_jwt = false
+
+[functions.ai-seo-automation]
+verify_jwt = false
