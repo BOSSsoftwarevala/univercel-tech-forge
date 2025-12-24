@@ -6,7 +6,7 @@ import {
   Wallet, Zap, Target, TrendingUp, Bell,
   Sparkles, Map, Share2, FileCode, Megaphone, Mail, MessageSquare,
   Database, Calendar, MousePointer, Eye, Rocket, Settings, LogOut, Lock,
-  Bot, Tag, Code2, Users, KeyRound
+  Bot, Tag, Code2, Users, KeyRound, ArrowLeft
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -186,9 +186,13 @@ const SEODashboard = () => {
               <Bot className="w-4 h-4" />
               Open AI Assistant
             </motion.button>
+            <motion.button onClick={() => navigate('/dashboard')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-xs font-medium text-cyan-300 flex items-center justify-center gap-1">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Back to Dashboard
+            </motion.button>
             <div className="flex gap-2">
-              <motion.button onClick={() => navigate('/settings')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1 py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-xs font-medium text-cyan-300 flex items-center justify-center gap-1">
-                <KeyRound className="w-3.5 h-3.5" />
+              <motion.button onClick={() => navigate('/change-password')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1 py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-xs font-medium text-cyan-300 flex items-center justify-center gap-1">
+                <Lock className="w-3.5 h-3.5" />
                 Password
               </motion.button>
               <motion.button onClick={() => navigate('/settings')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1 py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-xs font-medium text-cyan-300 flex items-center justify-center gap-1">
@@ -196,6 +200,10 @@ const SEODashboard = () => {
                 Settings
               </motion.button>
             </div>
+            <motion.button onClick={() => navigate('/forgot-password')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-2 px-3 bg-slate-800/50 border border-cyan-500/30 rounded-lg text-xs font-medium text-cyan-300 flex items-center justify-center gap-1">
+              <KeyRound className="w-3.5 h-3.5" />
+              Forgot Password
+            </motion.button>
             <motion.button onClick={handleLogout} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-2 px-4 bg-red-500/10 border border-red-500/30 rounded-lg text-sm font-medium text-red-400 flex items-center justify-center gap-2">
               <LogOut className="w-4 h-4" />
               Logout
