@@ -8,7 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Volume2, VolumeX, Search, User, Settings, LogOut,
-  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu
+  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu, Handshake
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,12 +41,23 @@ const CommandHeader = memo(() => {
   const location = useLocation();
   const [buzzerActive, setBuzzerActive] = useState(false);
   const [buzzerMuted, setBuzzerMuted] = useState(false);
+  const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
   const [alerts, setAlerts] = useState<Alert[]>([
     { id: '1', type: 'critical', title: 'Demo Down', message: 'E-commerce demo offline', timestamp: new Date(), acknowledged: false },
     { id: '2', type: 'warning', title: 'SLA Breach', message: 'Task #2847 exceeded deadline', timestamp: new Date(), acknowledged: false },
     { id: '3', type: 'info', title: 'New Lead', message: 'Hot lead from Mumbai assigned', timestamp: new Date(), acknowledged: true },
   ]);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const handlePromiseClick = () => {
+    if (promiseState === 'idle') {
+      setPromiseState('pending');
+    } else if (promiseState === 'pending') {
+      setPromiseState('active');
+    } else {
+      setPromiseState('idle');
+    }
+  };
 
   const unacknowledgedCount = alerts.filter(a => !a.acknowledged).length;
   const roleConfig = userRole ? ROLE_CONFIG[userRole as AppRole] : null;
@@ -112,6 +123,26 @@ const CommandHeader = memo(() => {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* Promise Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handlePromiseClick}
+          className={cn(
+            "flex items-center gap-1.5 px-2 py-1 rounded-md font-medium text-xs transition-all",
+            promiseState === 'active'
+              ? 'bg-green-500/20 text-green-500 border border-green-500/50'
+              : promiseState === 'pending'
+              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/50 animate-pulse'
+              : 'bg-secondary/50 text-muted-foreground border border-border/50 hover:border-primary/50'
+          )}
+        >
+          <Handshake className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">
+            {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
+          </span>
+        </motion.button>
+
         {/* Safe Assist */}
         <SafeAssistTrigger variant="compact" />
 
