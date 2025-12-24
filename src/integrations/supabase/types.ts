@@ -8402,6 +8402,190 @@ export type Database = {
         }
         Relationships: []
       }
+      remote_assist_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          recipients: string[]
+          session_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          recipients?: string[]
+          session_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          recipients?: string[]
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_assist_alerts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "remote_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      remote_assist_events: {
+        Row: {
+          actor_type: string
+          event_data: Json
+          event_type: string
+          id: string
+          session_id: string
+          timestamp: string
+        }
+        Insert: {
+          actor_type: string
+          event_data?: Json
+          event_type: string
+          id?: string
+          session_id: string
+          timestamp?: string
+        }
+        Update: {
+          actor_type?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          session_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_assist_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "remote_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      remote_assist_mask_patterns: {
+        Row: {
+          created_at: string
+          field_type: string
+          id: string
+          is_active: boolean
+          pattern_name: string
+          selector_pattern: string
+        }
+        Insert: {
+          created_at?: string
+          field_type: string
+          id?: string
+          is_active?: boolean
+          pattern_name: string
+          selector_pattern: string
+        }
+        Update: {
+          created_at?: string
+          field_type?: string
+          id?: string
+          is_active?: boolean
+          pattern_name?: string
+          selector_pattern?: string
+        }
+        Relationships: []
+      }
+      remote_assist_sessions: {
+        Row: {
+          agent_device_fingerprint: string | null
+          agent_ip_address: string | null
+          agent_masked_id: string | null
+          agent_watermark_text: string | null
+          created_at: string
+          end_reason: string | null
+          ended_at: string | null
+          ended_by: string | null
+          expires_at: string
+          id: string
+          is_recording_enabled: boolean
+          max_duration_minutes: number
+          mode: Database["public"]["Enums"]["remote_assist_mode"]
+          recording_url: string | null
+          session_code: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["remote_assist_status"]
+          support_agent_id: string | null
+          support_agent_role: Database["public"]["Enums"]["app_role"] | null
+          user_consent_at: string | null
+          user_consent_given: boolean
+          user_device_fingerprint: string | null
+          user_id: string
+          user_ip_address: string | null
+          user_role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          agent_device_fingerprint?: string | null
+          agent_ip_address?: string | null
+          agent_masked_id?: string | null
+          agent_watermark_text?: string | null
+          created_at?: string
+          end_reason?: string | null
+          ended_at?: string | null
+          ended_by?: string | null
+          expires_at?: string
+          id?: string
+          is_recording_enabled?: boolean
+          max_duration_minutes?: number
+          mode?: Database["public"]["Enums"]["remote_assist_mode"]
+          recording_url?: string | null
+          session_code: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["remote_assist_status"]
+          support_agent_id?: string | null
+          support_agent_role?: Database["public"]["Enums"]["app_role"] | null
+          user_consent_at?: string | null
+          user_consent_given?: boolean
+          user_device_fingerprint?: string | null
+          user_id: string
+          user_ip_address?: string | null
+          user_role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          agent_device_fingerprint?: string | null
+          agent_ip_address?: string | null
+          agent_masked_id?: string | null
+          agent_watermark_text?: string | null
+          created_at?: string
+          end_reason?: string | null
+          ended_at?: string | null
+          ended_by?: string | null
+          expires_at?: string
+          id?: string
+          is_recording_enabled?: boolean
+          max_duration_minutes?: number
+          mode?: Database["public"]["Enums"]["remote_assist_mode"]
+          recording_url?: string | null
+          session_code?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["remote_assist_status"]
+          support_agent_id?: string | null
+          support_agent_role?: Database["public"]["Enums"]["app_role"] | null
+          user_consent_at?: string | null
+          user_consent_given?: boolean
+          user_device_fingerprint?: string | null
+          user_id?: string
+          user_ip_address?: string | null
+          user_role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       rental_activity: {
         Row: {
           bounce: boolean | null
@@ -12167,6 +12351,11 @@ export type Database = {
         }
         Returns: string
       }
+      create_remote_assist_session: { Args: never; Returns: Json }
+      end_remote_assist_session: {
+        Args: { p_reason?: string; p_session_id: string }
+        Returns: Json
+      }
       exceeds_workload_threshold: {
         Args: { _developer_id: string }
         Returns: boolean
@@ -12189,6 +12378,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_session_code: { Args: never; Returns: string }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
       get_franchise_id: { Args: { _user_id: string }; Returns: string }
       get_influencer_id: { Args: { _user_id: string }; Returns: string }
@@ -12207,6 +12397,10 @@ export type Database = {
           role: string
           user_id: string
         }[]
+      }
+      give_remote_assist_consent: {
+        Args: { p_session_id: string }
+        Returns: Json
       }
       has_active_penalty: {
         Args: { _min_level?: number; _user_id: string }
@@ -12262,6 +12456,10 @@ export type Database = {
           _violation_type: string
         }
         Returns: string
+      }
+      join_remote_assist_session: {
+        Args: { p_session_code: string }
+        Returns: Json
       }
       log_activity: {
         Args: {
@@ -12488,6 +12686,13 @@ export type Database = {
         | "in_progress"
         | "breached"
         | "completed"
+      remote_assist_mode: "view_only" | "guided_cursor"
+      remote_assist_status:
+        | "pending"
+        | "active"
+        | "ended"
+        | "expired"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -12733,6 +12938,14 @@ export const Constants = {
         "in_progress",
         "breached",
         "completed",
+      ],
+      remote_assist_mode: ["view_only", "guided_cursor"],
+      remote_assist_status: [
+        "pending",
+        "active",
+        "ended",
+        "expired",
+        "cancelled",
       ],
     },
   },

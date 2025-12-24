@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.ai-reseller-assistant]
 verify_jwt = false
+
+[functions.remote-assist-relay]
+verify_jwt = false
