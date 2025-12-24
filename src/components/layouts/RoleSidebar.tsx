@@ -8,7 +8,7 @@ import {
   Wallet, HeadphonesIcon, Target, BarChart3, Scale, Search,
   Ban, Bell, Settings, Activity, GitBranch, Lock, Zap, Heart,
   Brain, UserPlus, MessageSquare, Star, ChevronLeft, ChevronRight,
-  Sparkles, DollarSign, FileText, TrendingUp, Lightbulb, Server, Eye
+  Sparkles, DollarSign, FileText, TrendingUp, Lightbulb
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ interface MenuItem {
   badge?: number;
 }
 
-// Role-specific menu configurations matching new 24-role hierarchy
+// Role-specific menu configurations (uses database-compatible role names)
 const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 0 – OWNERSHIP
   master: [
@@ -60,47 +60,31 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: Shield, label: 'Permissions', path: '/admin/permissions' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
   ],
-  server_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/server-manager' },
-    { icon: Server, label: 'Servers', path: '/servers/list' },
-    { icon: Activity, label: 'Monitoring', path: '/servers/monitoring' },
-    { icon: FileText, label: 'Logs', path: '/servers/logs' },
-    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
-  ],
   // GRADE 2 – BUSINESS MANAGEMENT
-  franchise_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/franchise-manager' },
-    { icon: Building2, label: 'Franchises', path: '/franchises/list' },
-    { icon: MapPin, label: 'Territories', path: '/franchises/territories' },
-    { icon: TrendingUp, label: 'Performance', path: '/franchises/performance' },
+  client_success: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/client-success' },
+    { icon: Heart, label: 'Satisfaction', path: '/clients/satisfaction' },
+    { icon: HeadphonesIcon, label: 'Support Queue', path: '/clients/support' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
-  sales_support_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/sales-support' },
-    { icon: Target, label: 'Sales Pipeline', path: '/sales/pipeline' },
-    { icon: HeadphonesIcon, label: 'Support Queue', path: '/support/queue' },
-    { icon: Heart, label: 'Satisfaction', path: '/support/satisfaction' },
+  support: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/support-dashboard' },
+    { icon: HeadphonesIcon, label: 'Tickets', path: '/support/tickets' },
+    { icon: FileText, label: 'Knowledge', path: '/support/knowledge' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
-  reseller_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/reseller-manager' },
-    { icon: Users, label: 'Resellers', path: '/resellers/list' },
-    { icon: DollarSign, label: 'Commissions', path: '/resellers/commissions' },
-    { icon: TrendingUp, label: 'Performance', path: '/resellers/performance' },
-    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
-  ],
-  api_ai_manager: [
+  ai_manager: [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/ai-console' },
     { icon: Brain, label: 'AI Console', path: '/ai/console' },
-    { icon: Lock, label: 'API Security', path: '/api/security' },
+    { icon: Zap, label: 'Cache', path: '/ai/cache' },
     { icon: TrendingUp, label: 'Optimization', path: '/ai/optimization' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
-  influencer_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/influencer-manager' },
-    { icon: Zap, label: 'Influencers', path: '/influencers/list' },
-    { icon: Megaphone, label: 'Campaigns', path: '/influencers/campaigns' },
-    { icon: BarChart3, label: 'Analytics', path: '/influencers/analytics' },
+  api_security: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/api-security' },
+    { icon: Lock, label: 'API Keys', path: '/api-security/keys' },
+    { icon: Shield, label: 'Security Logs', path: '/api-security/logs' },
+    { icon: Activity, label: 'Monitoring', path: '/api-security/monitoring' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
   seo_manager: [
@@ -124,14 +108,14 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: BarChart3, label: 'Analytics', path: '/leads/analytics' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
-  pro_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/pro-manager' },
-    { icon: Star, label: 'Prime Users', path: '/prime/users' },
-    { icon: DollarSign, label: 'Subscriptions', path: '/prime/subscriptions' },
-    { icon: HeadphonesIcon, label: 'Support', path: '/prime/support' },
+  demo_manager: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/demo-manager' },
+    { icon: Package, label: 'Catalog', path: '/demos/catalog' },
+    { icon: Activity, label: 'Health Monitor', path: '/demos/health' },
+    { icon: Sparkles, label: 'Rental Links', path: '/demos/rental' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
-  legal_manager: [
+  legal_compliance: [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/legal' },
     { icon: FileText, label: 'Documents', path: '/legal/documents' },
     { icon: Scale, label: 'Compliance', path: '/legal/compliance' },
@@ -152,11 +136,32 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: Heart, label: 'Team', path: '/hr/team' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
-  developer_manager: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/developer-manager' },
-    { icon: Code2, label: 'Developers', path: '/developers/list' },
-    { icon: GitBranch, label: 'Code Review', path: '/developers/code-review' },
-    { icon: TrendingUp, label: 'Performance', path: '/developers/performance' },
+  performance_manager: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/performance' },
+    { icon: TrendingUp, label: 'Metrics', path: '/performance/metrics' },
+    { icon: Code2, label: 'Developers', path: '/performance/developers' },
+    { icon: Ban, label: 'Escalations', path: '/performance/escalations' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  rnd_manager: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/rnd-dashboard' },
+    { icon: Lightbulb, label: 'Suggestions', path: '/rnd/suggestions' },
+    { icon: GitBranch, label: 'Roadmap', path: '/rnd/roadmap' },
+    { icon: FileText, label: 'Research', path: '/rnd/research' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  finance_manager: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/finance' },
+    { icon: Wallet, label: 'Wallets', path: '/finance/wallets' },
+    { icon: DollarSign, label: 'Payouts', path: '/finance/payouts' },
+    { icon: FileText, label: 'Reports', path: '/finance/reports' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  r_and_d: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/rnd-dashboard' },
+    { icon: Lightbulb, label: 'Research', path: '/rnd/research' },
+    { icon: GitBranch, label: 'Development', path: '/rnd/development' },
+    { icon: Activity, label: 'Testing', path: '/rnd/testing' },
     { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
   ],
   // GRADE 3 – PARTNERS
@@ -201,13 +206,10 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: ListTodo, label: 'Task Status', path: '/prime/tasks' },
     { icon: MessageSquare, label: 'Dedicated Chat', path: '/prime/chat' },
   ],
-  user: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/user/dashboard' },
-    { icon: Package, label: 'Demos', path: '/user/demos' },
-    { icon: HeadphonesIcon, label: 'Support', path: '/user/support' },
-  ],
-  frontend: [
-    { icon: Eye, label: 'Public View', path: '/public' },
+  client: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/client/dashboard' },
+    { icon: Package, label: 'Demos', path: '/client/demos' },
+    { icon: HeadphonesIcon, label: 'Support', path: '/client/support' },
   ],
 };
 
@@ -219,7 +221,7 @@ interface RoleSidebarProps {
 
 const RoleSidebar = ({ role, collapsed = false, onToggle }: RoleSidebarProps) => {
   const location = useLocation();
-  const menuItems = roleMenus[role] || roleMenus.user;
+  const menuItems = roleMenus[role] || roleMenus.client;
   const roleConfig = ROLE_CONFIG[role];
 
   return (
