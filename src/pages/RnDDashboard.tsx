@@ -9,6 +9,10 @@ import { DecisionBoard } from "@/components/rnd/DecisionBoard";
 import { RnDNotifications } from "@/components/rnd/RnDNotifications";
 import { RnDWallet } from "@/components/rnd/RnDWallet";
 import { RnDSidebar } from "@/components/rnd/RnDSidebar";
+import { AIRnDAssistant } from "@/components/rnd/AIRnDAssistant";
+import { AIIdeaScorer } from "@/components/rnd/AIIdeaScorer";
+import { TechnologyRadar } from "@/components/rnd/TechnologyRadar";
+import { InnovationPipeline } from "@/components/rnd/InnovationPipeline";
 import { motion } from "framer-motion";
 
 const RnDDashboard = () => {
@@ -29,6 +33,14 @@ const RnDDashboard = () => {
         return <FeedbackPortal />;
       case "decisions":
         return <DecisionBoard />;
+      case "ai-assistant":
+        return <AIRnDAssistant />;
+      case "idea-scorer":
+        return <AIIdeaScorer />;
+      case "tech-radar":
+        return <TechnologyRadar />;
+      case "pipeline":
+        return <InnovationPipeline />;
       default:
         return <FutureLab onSelectIdea={setSelectedIdea} />;
     }
