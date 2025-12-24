@@ -18,7 +18,9 @@ import {
   Mic,
   MicOff,
   Volume2,
-  Languages
+  Languages,
+  Handshake,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +28,45 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+// Compact Promise Button for chat header
+const PromiseButtonCompact = () => {
+  const [promiseState, setPromiseState] = useState<'none' | 'active' | 'pending'>('none');
+  
+  const handleClick = () => {
+    if (promiseState === 'none') {
+      setPromiseState('pending');
+      toast.info('Navigate to your dashboard to start a promise');
+    } else if (promiseState === 'pending') {
+      setPromiseState('active');
+      toast.success('Promise activated!');
+    } else {
+      toast.info('Promise is active - complete your task!');
+    }
+  };
+
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={handleClick}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-xs transition-all ${
+        promiseState === 'active'
+          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+          : promiseState === 'pending'
+          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50 animate-pulse'
+          : 'bg-slate-800/50 text-slate-300 border border-slate-700/50 hover:border-cyan-500/50'
+      }`}
+    >
+      <Handshake className="w-3.5 h-3.5" />
+      <span>
+        {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
+      </span>
+    </motion.button>
+  );
+};
 
 interface MaskedUser {
   maskedId: string;
@@ -432,10 +473,31 @@ const MaskedInternalChat = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4">
       <div className="max-w-4xl mx-auto">
+        {/* Top Navigation Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-3 flex items-center justify-between"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.history.back()}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+          
+          {/* Promise Button */}
+          <PromiseButtonCompact />
+        </motion.div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
           className="mb-4"
         >
           <Card className="bg-slate-900/80 border-slate-800 p-4">
