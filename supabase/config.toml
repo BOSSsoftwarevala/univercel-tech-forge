@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.ai-demo-assistant]
 verify_jwt = false
+
+[functions.campaign-optimizer]
+verify_jwt = false

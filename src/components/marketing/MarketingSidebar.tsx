@@ -10,8 +10,15 @@ import {
   Globe,
   TrendingUp,
   Sparkles,
-  Brain
+  Brain,
+  LogOut,
+  Settings,
+  Lock
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface MarketingSidebarProps {
   activeSection: string;
@@ -19,6 +26,17 @@ interface MarketingSidebarProps {
 }
 
 const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarProps) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Marketing Manager';
+  const maskedId = user?.id ? `MKT-${user.id.substring(0, 4).toUpperCase()}` : 'MKT-0000';
+  
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+  
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "campaigns", label: "Campaigns", icon: Rocket },
@@ -37,7 +55,7 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
       animate={{ x: 0, opacity: 1 }}
       className="w-72 bg-gradient-to-b from-slate-900/95 to-slate-950/95 backdrop-blur-xl border-r border-teal-500/20 flex flex-col"
     >
-      {/* Header */}
+      {/* Header with User Info */}
       <div className="p-6 border-b border-teal-500/20">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
@@ -51,9 +69,20 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
           </div>
         </div>
         
+        {/* User Info & Role Badge */}
+        <div className="mt-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-white truncate">{userName}</span>
+            <Badge className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-[10px] px-2 py-0.5">
+              MARKETING MANAGER
+            </Badge>
+          </div>
+          <span className="text-xs text-slate-500 font-mono">{maskedId}</span>
+        </div>
+        
         {/* AI Status */}
         <motion.div 
-          className="mt-4 p-3 rounded-lg bg-gradient-to-r from-teal-500/10 to-cyan-600/5 border border-teal-500/20"
+          className="mt-3 p-3 rounded-lg bg-gradient-to-r from-teal-500/10 to-cyan-600/5 border border-teal-500/20"
           animate={{ boxShadow: ["0 0 20px rgba(20,184,166,0.1)", "0 0 30px rgba(20,184,166,0.2)", "0 0 20px rgba(20,184,166,0.1)"] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
@@ -66,7 +95,7 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -114,6 +143,38 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
           </div>
           <span className="text-lg font-bold text-orange-400">12</span>
         </div>
+      </div>
+      
+      {/* Footer Actions */}
+      <div className="p-4 border-t border-teal-500/20 space-y-2">
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 text-slate-400 hover:text-teal-300 hover:bg-teal-500/10"
+            onClick={() => navigate('/change-password')}
+          >
+            <Lock className="w-4 h-4 mr-1" />
+            Password
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 text-slate-400 hover:text-teal-300 hover:bg-teal-500/10"
+            onClick={() => navigate('/settings')}
+          >
+            <Settings className="w-4 h-4 mr-1" />
+            Settings
+          </Button>
+        </div>
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Sign Out
+        </Button>
       </div>
     </motion.aside>
   );

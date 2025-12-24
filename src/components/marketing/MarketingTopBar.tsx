@@ -1,9 +1,14 @@
 import { motion } from "framer-motion";
-import { Bell, Search, RefreshCw, Calendar, Download, Filter, DollarSign, Users, MousePointer, Target } from "lucide-react";
+import { Bell, Search, RefreshCw, DollarSign, Users, MousePointer, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const MarketingTopBar = () => {
+  const { user } = useAuth();
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Marketing Manager';
+  const maskedId = user?.id ? `MKT-${user.id.substring(0, 4).toUpperCase()}` : 'MKT-0000';
+  
   const metrics = [
     { label: "Ad Spend", value: "₹4.2L", icon: DollarSign, color: "text-amber-400", bg: "bg-amber-500/10" },
     { label: "Leads", value: "1,847", icon: Users, color: "text-emerald-400", bg: "bg-emerald-500/10" },
@@ -17,11 +22,16 @@ const MarketingTopBar = () => {
       animate={{ y: 0, opacity: 1 }}
       className="h-20 bg-slate-900/80 backdrop-blur-xl border-b border-teal-500/20 px-6 flex items-center justify-between"
     >
-      {/* Title & Status */}
+      {/* Title & Welcome */}
       <div className="flex items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-teal-100">Marketing Command</h2>
-          <p className="text-sm text-slate-500">Multi-channel campaign control</p>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-semibold text-teal-100">Welcome, {userName}</h2>
+            <Badge className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-[10px] px-2 py-0.5">
+              MARKETING MANAGER
+            </Badge>
+          </div>
+          <p className="text-sm text-slate-500">ID: {maskedId} • Multi-channel campaign control</p>
         </div>
         <Badge className="bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-300 border-emerald-500/40">
           <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse" />
