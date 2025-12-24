@@ -78,6 +78,8 @@ type AdminView =
   | "promise-management"
   | "ai-management"
   | "franchise-keys"
+  | "role-rules"
+  | "invoices"
   | "settings";
 
 interface AdminSidebarFullProps {
@@ -150,6 +152,13 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
         { id: "hr", label: "HR", icon: Briefcase },
         { id: "compliance", label: "Compliance", icon: Scale },
         { id: "legal", label: "Legal", icon: FileText },
+      ]
+    },
+    {
+      title: "Documentation & Billing",
+      items: [
+        { id: "role-rules", label: "Role Rules", icon: FileText },
+        { id: "invoices", label: "Invoices", icon: DollarSign },
       ]
     },
     {
