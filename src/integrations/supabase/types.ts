@@ -8402,190 +8402,6 @@ export type Database = {
         }
         Relationships: []
       }
-      remote_assist_alerts: {
-        Row: {
-          alert_type: string
-          created_at: string
-          id: string
-          is_read: boolean
-          message: string
-          recipients: string[]
-          session_id: string
-        }
-        Insert: {
-          alert_type: string
-          created_at?: string
-          id?: string
-          is_read?: boolean
-          message: string
-          recipients?: string[]
-          session_id: string
-        }
-        Update: {
-          alert_type?: string
-          created_at?: string
-          id?: string
-          is_read?: boolean
-          message?: string
-          recipients?: string[]
-          session_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "remote_assist_alerts_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "remote_assist_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      remote_assist_events: {
-        Row: {
-          actor_type: string
-          event_data: Json
-          event_type: string
-          id: string
-          session_id: string
-          timestamp: string
-        }
-        Insert: {
-          actor_type: string
-          event_data?: Json
-          event_type: string
-          id?: string
-          session_id: string
-          timestamp?: string
-        }
-        Update: {
-          actor_type?: string
-          event_data?: Json
-          event_type?: string
-          id?: string
-          session_id?: string
-          timestamp?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "remote_assist_events_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "remote_assist_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      remote_assist_mask_patterns: {
-        Row: {
-          created_at: string
-          field_type: string
-          id: string
-          is_active: boolean
-          pattern_name: string
-          selector_pattern: string
-        }
-        Insert: {
-          created_at?: string
-          field_type: string
-          id?: string
-          is_active?: boolean
-          pattern_name: string
-          selector_pattern: string
-        }
-        Update: {
-          created_at?: string
-          field_type?: string
-          id?: string
-          is_active?: boolean
-          pattern_name?: string
-          selector_pattern?: string
-        }
-        Relationships: []
-      }
-      remote_assist_sessions: {
-        Row: {
-          agent_device_fingerprint: string | null
-          agent_ip_address: string | null
-          agent_masked_id: string | null
-          agent_watermark_text: string | null
-          created_at: string
-          end_reason: string | null
-          ended_at: string | null
-          ended_by: string | null
-          expires_at: string
-          id: string
-          is_recording_enabled: boolean
-          max_duration_minutes: number
-          mode: Database["public"]["Enums"]["remote_assist_mode"]
-          recording_url: string | null
-          session_code: string
-          started_at: string | null
-          status: Database["public"]["Enums"]["remote_assist_status"]
-          support_agent_id: string | null
-          support_agent_role: Database["public"]["Enums"]["app_role"] | null
-          user_consent_at: string | null
-          user_consent_given: boolean
-          user_device_fingerprint: string | null
-          user_id: string
-          user_ip_address: string | null
-          user_role: Database["public"]["Enums"]["app_role"]
-        }
-        Insert: {
-          agent_device_fingerprint?: string | null
-          agent_ip_address?: string | null
-          agent_masked_id?: string | null
-          agent_watermark_text?: string | null
-          created_at?: string
-          end_reason?: string | null
-          ended_at?: string | null
-          ended_by?: string | null
-          expires_at?: string
-          id?: string
-          is_recording_enabled?: boolean
-          max_duration_minutes?: number
-          mode?: Database["public"]["Enums"]["remote_assist_mode"]
-          recording_url?: string | null
-          session_code: string
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["remote_assist_status"]
-          support_agent_id?: string | null
-          support_agent_role?: Database["public"]["Enums"]["app_role"] | null
-          user_consent_at?: string | null
-          user_consent_given?: boolean
-          user_device_fingerprint?: string | null
-          user_id: string
-          user_ip_address?: string | null
-          user_role: Database["public"]["Enums"]["app_role"]
-        }
-        Update: {
-          agent_device_fingerprint?: string | null
-          agent_ip_address?: string | null
-          agent_masked_id?: string | null
-          agent_watermark_text?: string | null
-          created_at?: string
-          end_reason?: string | null
-          ended_at?: string | null
-          ended_by?: string | null
-          expires_at?: string
-          id?: string
-          is_recording_enabled?: boolean
-          max_duration_minutes?: number
-          mode?: Database["public"]["Enums"]["remote_assist_mode"]
-          recording_url?: string | null
-          session_code?: string
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["remote_assist_status"]
-          support_agent_id?: string | null
-          support_agent_role?: Database["public"]["Enums"]["app_role"] | null
-          user_consent_at?: string | null
-          user_consent_given?: boolean
-          user_device_fingerprint?: string | null
-          user_id?: string
-          user_ip_address?: string | null
-          user_role?: Database["public"]["Enums"]["app_role"]
-        }
-        Relationships: []
-      }
       rental_activity: {
         Row: {
           bounce: boolean | null
@@ -10048,6 +9864,299 @@ export type Database = {
           is_active?: boolean | null
           role_id?: string
           role_name?: string
+        }
+        Relationships: []
+      }
+      safe_assist_ai_logs: {
+        Row: {
+          action_recommended: string | null
+          action_taken: string | null
+          ai_analysis: Json | null
+          auto_handled: boolean | null
+          event_type: string
+          id: string
+          risk_level: string | null
+          session_id: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          action_recommended?: string | null
+          action_taken?: string | null
+          ai_analysis?: Json | null
+          auto_handled?: boolean | null
+          event_type: string
+          id?: string
+          risk_level?: string | null
+          session_id?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          action_recommended?: string | null
+          action_taken?: string | null
+          ai_analysis?: Json | null
+          auto_handled?: boolean | null
+          event_type?: string
+          id?: string
+          risk_level?: string | null
+          session_id?: string | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "safe_assist_ai_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "safe_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      safe_assist_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          recipients: string[]
+          session_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          recipients?: string[]
+          session_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          recipients?: string[]
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_assist_alerts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "safe_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      safe_assist_events: {
+        Row: {
+          actor_type: string
+          event_data: Json
+          event_type: string
+          id: string
+          session_id: string
+          timestamp: string
+        }
+        Insert: {
+          actor_type: string
+          event_data?: Json
+          event_type: string
+          id?: string
+          session_id: string
+          timestamp?: string
+        }
+        Update: {
+          actor_type?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          session_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_assist_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "safe_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      safe_assist_mask_patterns: {
+        Row: {
+          created_at: string
+          field_type: string
+          id: string
+          is_active: boolean
+          pattern_name: string
+          selector_pattern: string
+        }
+        Insert: {
+          created_at?: string
+          field_type: string
+          id?: string
+          is_active?: boolean
+          pattern_name: string
+          selector_pattern: string
+        }
+        Update: {
+          created_at?: string
+          field_type?: string
+          id?: string
+          is_active?: boolean
+          pattern_name?: string
+          selector_pattern?: string
+        }
+        Relationships: []
+      }
+      safe_assist_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          notification_type: string
+          read_at: string | null
+          session_id: string | null
+          severity: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          notification_type: string
+          read_at?: string | null
+          session_id?: string | null
+          severity?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          notification_type?: string
+          read_at?: string | null
+          session_id?: string | null
+          severity?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "safe_assist_notifications_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "safe_assist_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      safe_assist_sessions: {
+        Row: {
+          agent_device_fingerprint: string | null
+          agent_entered_user_code: string | null
+          agent_ip_address: string | null
+          agent_masked_id: string | null
+          agent_watermark_text: string | null
+          ai_flags: Json | null
+          ai_monitoring_enabled: boolean | null
+          ai_risk_score: number | null
+          client_notified_at: string | null
+          created_at: string
+          dual_verified: boolean | null
+          end_reason: string | null
+          ended_at: string | null
+          ended_by: string | null
+          expires_at: string
+          id: string
+          is_recording_enabled: boolean
+          max_duration_minutes: number
+          mode: Database["public"]["Enums"]["remote_assist_mode"]
+          recording_url: string | null
+          session_code: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["remote_assist_status"]
+          support_agent_id: string | null
+          support_agent_role: Database["public"]["Enums"]["app_role"] | null
+          user_consent_at: string | null
+          user_consent_given: boolean
+          user_device_fingerprint: string | null
+          user_entered_agent_code: string | null
+          user_id: string
+          user_ip_address: string | null
+          user_role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          agent_device_fingerprint?: string | null
+          agent_entered_user_code?: string | null
+          agent_ip_address?: string | null
+          agent_masked_id?: string | null
+          agent_watermark_text?: string | null
+          ai_flags?: Json | null
+          ai_monitoring_enabled?: boolean | null
+          ai_risk_score?: number | null
+          client_notified_at?: string | null
+          created_at?: string
+          dual_verified?: boolean | null
+          end_reason?: string | null
+          ended_at?: string | null
+          ended_by?: string | null
+          expires_at?: string
+          id?: string
+          is_recording_enabled?: boolean
+          max_duration_minutes?: number
+          mode?: Database["public"]["Enums"]["remote_assist_mode"]
+          recording_url?: string | null
+          session_code: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["remote_assist_status"]
+          support_agent_id?: string | null
+          support_agent_role?: Database["public"]["Enums"]["app_role"] | null
+          user_consent_at?: string | null
+          user_consent_given?: boolean
+          user_device_fingerprint?: string | null
+          user_entered_agent_code?: string | null
+          user_id: string
+          user_ip_address?: string | null
+          user_role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          agent_device_fingerprint?: string | null
+          agent_entered_user_code?: string | null
+          agent_ip_address?: string | null
+          agent_masked_id?: string | null
+          agent_watermark_text?: string | null
+          ai_flags?: Json | null
+          ai_monitoring_enabled?: boolean | null
+          ai_risk_score?: number | null
+          client_notified_at?: string | null
+          created_at?: string
+          dual_verified?: boolean | null
+          end_reason?: string | null
+          ended_at?: string | null
+          ended_by?: string | null
+          expires_at?: string
+          id?: string
+          is_recording_enabled?: boolean
+          max_duration_minutes?: number
+          mode?: Database["public"]["Enums"]["remote_assist_mode"]
+          recording_url?: string | null
+          session_code?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["remote_assist_status"]
+          support_agent_id?: string | null
+          support_agent_role?: Database["public"]["Enums"]["app_role"] | null
+          user_consent_at?: string | null
+          user_consent_given?: boolean
+          user_device_fingerprint?: string | null
+          user_entered_agent_code?: string | null
+          user_id?: string
+          user_ip_address?: string | null
+          user_role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
       }
@@ -12379,6 +12488,7 @@ export type Database = {
         Returns: string
       }
       generate_session_code: { Args: never; Returns: string }
+      generate_user_verification_code: { Args: never; Returns: string }
       get_developer_id: { Args: { _user_id: string }; Returns: string }
       get_franchise_id: { Args: { _user_id: string }; Returns: string }
       get_influencer_id: { Args: { _user_id: string }; Returns: string }
@@ -12499,6 +12609,17 @@ export type Database = {
         }
         Returns: string
       }
+      log_safe_assist_ai_event: {
+        Args: {
+          p_analysis: Json
+          p_auto_handle?: boolean
+          p_event_type: string
+          p_recommended_action: string
+          p_risk_level: string
+          p_session_id: string
+        }
+        Returns: string
+      }
       log_unauthorized_demo_attempt: {
         Args: {
           _action_attempted: string
@@ -12572,6 +12693,15 @@ export type Database = {
       }
       verify_otp: {
         Args: { p_otp_code: string; p_otp_type: string; p_user_id: string }
+        Returns: Json
+      }
+      verify_safe_assist_connection: {
+        Args: {
+          p_agent_code: string
+          p_is_agent: boolean
+          p_session_id: string
+          p_user_code: string
+        }
         Returns: Json
       }
     }
