@@ -32,7 +32,7 @@ const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
       {/* Sidebar */}
       <aside className="w-64 border-r border-border/50 bg-card/50 backdrop-blur-xl flex flex-col">
         <div className="p-4 border-b border-border/50">
-          <Link to="/super-admin/dashboard" className="flex items-center gap-2">
+          <Link to="/super-admin" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
               <Crown className="w-4 h-4 text-primary-foreground" />
             </div>
