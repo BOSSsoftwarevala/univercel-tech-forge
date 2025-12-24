@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-// Strict role-to-dashboard mapping
+// Strict role-to-dashboard mapping (28 roles)
 // MASTER gets a separate dashboard, SUPER_ADMIN gets the command center
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
   master: '/master-admin',           // Master Admin has its own dashboard
@@ -30,6 +30,11 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
   demo_manager: '/demo-manager',
   ai_manager: '/ai-console',
   api_security: '/api-integrations',
+  // New roles (25-28)
+  safe_assist: '/safe-assist',
+  assist_manager: '/assist-manager',
+  promise_tracker: '/promise-tracker',
+  promise_management: '/promise-management',
 };
 
 /**

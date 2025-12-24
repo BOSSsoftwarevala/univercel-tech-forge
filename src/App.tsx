@@ -118,6 +118,9 @@ import SectorsBrowse from "./pages/SectorsBrowse";
 import SubCategoryDemos from "./pages/SubCategoryDemos";
 import { AIBillingDashboard } from "./components/ai-billing";
 // New Role Pages (25-28)
+import SafeAssistDashboard from "./pages/safe-assist/SafeAssistDashboard";
+import AssistManagerDashboard from "./pages/assist-manager/AssistManagerDashboard";
+import PromiseTrackerDashboard from "./pages/promise-tracker/PromiseTrackerDashboard";
 import PromiseManagementDashboard from "./pages/promise-management/PromiseManagementDashboard";
 // Wireframe Routes
 import { WireframeRoutes } from "./components/wireframe/WireframeRoutes";
@@ -288,6 +291,12 @@ const App = () => (
               <Route path="/ai/*" element={<RequireRole allowed={["ai_manager", "super_admin"]}><AIOptimizationConsole /></RequireRole>} />
 
               {/* NEW ROLES (25-28) Routes */}
+              <Route path="/safe-assist" element={<RequireRole allowed={["safe_assist", "super_admin", "master"]}><SafeAssistDashboard /></RequireRole>} />
+              <Route path="/safe-assist/*" element={<RequireRole allowed={["safe_assist", "super_admin", "master"]}><SafeAssistDashboard /></RequireRole>} />
+              <Route path="/assist-manager" element={<RequireRole allowed={["assist_manager", "super_admin", "master"]}><AssistManagerDashboard /></RequireRole>} />
+              <Route path="/assist-manager/*" element={<RequireRole allowed={["assist_manager", "super_admin", "master"]}><AssistManagerDashboard /></RequireRole>} />
+              <Route path="/promise-tracker" element={<RequireRole allowed={["promise_tracker", "super_admin", "master"]}><PromiseTrackerDashboard /></RequireRole>} />
+              <Route path="/promise-tracker/*" element={<RequireRole allowed={["promise_tracker", "super_admin", "master"]}><PromiseTrackerDashboard /></RequireRole>} />
               <Route path="/promise-management" element={<RequireRole allowed={["promise_management", "super_admin", "master"]}><PromiseManagementDashboard /></RequireRole>} />
               <Route path="/promise-management/*" element={<RequireRole allowed={["promise_management", "super_admin", "master"]}><PromiseManagementDashboard /></RequireRole>} />
 
