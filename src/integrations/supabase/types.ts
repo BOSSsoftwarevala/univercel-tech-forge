@@ -9478,6 +9478,59 @@ export type Database = {
           },
         ]
       }
+      server_ai_analysis: {
+        Row: {
+          analysis_result: Json
+          analysis_type: string
+          analyzed_at: string | null
+          analyzed_by: string | null
+          created_at: string | null
+          health_score: number | null
+          id: string
+          recommendations: string[] | null
+          risk_score: number | null
+          server_id: string | null
+          suggestions: Json | null
+          threats_detected: Json | null
+        }
+        Insert: {
+          analysis_result?: Json
+          analysis_type: string
+          analyzed_at?: string | null
+          analyzed_by?: string | null
+          created_at?: string | null
+          health_score?: number | null
+          id?: string
+          recommendations?: string[] | null
+          risk_score?: number | null
+          server_id?: string | null
+          suggestions?: Json | null
+          threats_detected?: Json | null
+        }
+        Update: {
+          analysis_result?: Json
+          analysis_type?: string
+          analyzed_at?: string | null
+          analyzed_by?: string | null
+          created_at?: string | null
+          health_score?: number | null
+          id?: string
+          recommendations?: string[] | null
+          risk_score?: number | null
+          server_id?: string | null
+          suggestions?: Json | null
+          threats_detected?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "server_ai_analysis_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       server_backups: {
         Row: {
           backup_name: string
@@ -9557,8 +9610,15 @@ export type Database = {
       }
       server_instances: {
         Row: {
+          ai_health_score: number | null
+          ai_risk_score: number | null
+          ai_suggestions: Json | null
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
           auto_scaling_enabled: boolean | null
           auto_setup_completed: boolean | null
+          compliance_status: string | null
           cpu_cores: number | null
           created_at: string
           created_by: string | null
@@ -9568,25 +9628,41 @@ export type Database = {
           health_status: string | null
           id: string
           ip_address: string | null
+          is_user_submitted: boolean | null
+          last_ai_analysis: string | null
           last_health_check: string | null
           max_instances: number | null
           min_instances: number | null
           os_type: string | null
+          protection_enabled: boolean | null
+          protection_level: string | null
           ram_gb: number | null
           region: string
+          rejection_reason: string | null
           server_code: string
           server_name: string
           server_type: string
           setup_config: Json | null
           status: string | null
           storage_gb: number | null
+          submitted_by: string | null
           tags: string[] | null
+          threat_alerts: Json | null
           updated_at: string
           uptime_percentage: number | null
+          verification_token: string | null
+          verified_at: string | null
         }
         Insert: {
+          ai_health_score?: number | null
+          ai_risk_score?: number | null
+          ai_suggestions?: Json | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           auto_scaling_enabled?: boolean | null
           auto_setup_completed?: boolean | null
+          compliance_status?: string | null
           cpu_cores?: number | null
           created_at?: string
           created_by?: string | null
@@ -9596,25 +9672,41 @@ export type Database = {
           health_status?: string | null
           id?: string
           ip_address?: string | null
+          is_user_submitted?: boolean | null
+          last_ai_analysis?: string | null
           last_health_check?: string | null
           max_instances?: number | null
           min_instances?: number | null
           os_type?: string | null
+          protection_enabled?: boolean | null
+          protection_level?: string | null
           ram_gb?: number | null
           region: string
+          rejection_reason?: string | null
           server_code: string
           server_name: string
           server_type: string
           setup_config?: Json | null
           status?: string | null
           storage_gb?: number | null
+          submitted_by?: string | null
           tags?: string[] | null
+          threat_alerts?: Json | null
           updated_at?: string
           uptime_percentage?: number | null
+          verification_token?: string | null
+          verified_at?: string | null
         }
         Update: {
+          ai_health_score?: number | null
+          ai_risk_score?: number | null
+          ai_suggestions?: Json | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           auto_scaling_enabled?: boolean | null
           auto_setup_completed?: boolean | null
+          compliance_status?: string | null
           cpu_cores?: number | null
           created_at?: string
           created_by?: string | null
@@ -9624,21 +9716,30 @@ export type Database = {
           health_status?: string | null
           id?: string
           ip_address?: string | null
+          is_user_submitted?: boolean | null
+          last_ai_analysis?: string | null
           last_health_check?: string | null
           max_instances?: number | null
           min_instances?: number | null
           os_type?: string | null
+          protection_enabled?: boolean | null
+          protection_level?: string | null
           ram_gb?: number | null
           region?: string
+          rejection_reason?: string | null
           server_code?: string
           server_name?: string
           server_type?: string
           setup_config?: Json | null
           status?: string | null
           storage_gb?: number | null
+          submitted_by?: string | null
           tags?: string[] | null
+          threat_alerts?: Json | null
           updated_at?: string
           uptime_percentage?: number | null
+          verification_token?: string | null
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -9688,6 +9789,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "server_metrics_history_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      server_protection_events: {
+        Row: {
+          auto_resolved: boolean | null
+          blocked: boolean | null
+          created_at: string | null
+          description: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          server_id: string | null
+          severity: string | null
+          source_ip: string | null
+        }
+        Insert: {
+          auto_resolved?: boolean | null
+          blocked?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          server_id?: string | null
+          severity?: string | null
+          source_ip?: string | null
+        }
+        Update: {
+          auto_resolved?: boolean | null
+          blocked?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          server_id?: string | null
+          severity?: string | null
+          source_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "server_protection_events_server_id_fkey"
             columns: ["server_id"]
             isOneToOne: false
             referencedRelation: "server_instances"
@@ -9745,6 +9899,92 @@ export type Database = {
           {
             foreignKeyName: "server_setup_logs_server_id_fkey"
             columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      server_submission_requests: {
+        Row: {
+          additional_notes: string | null
+          ai_pre_check_result: Json | null
+          ai_risk_assessment: Json | null
+          compliance_requirements: string[] | null
+          created_at: string | null
+          created_server_id: string | null
+          expected_usage: string | null
+          hostname: string | null
+          id: string
+          ip_address: string | null
+          provider: string | null
+          purpose: string | null
+          region: string | null
+          rejection_reason: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          server_name: string
+          server_type: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+          user_role: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          ai_pre_check_result?: Json | null
+          ai_risk_assessment?: Json | null
+          compliance_requirements?: string[] | null
+          created_at?: string | null
+          created_server_id?: string | null
+          expected_usage?: string | null
+          hostname?: string | null
+          id?: string
+          ip_address?: string | null
+          provider?: string | null
+          purpose?: string | null
+          region?: string | null
+          rejection_reason?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          server_name: string
+          server_type: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+          user_role: string
+        }
+        Update: {
+          additional_notes?: string | null
+          ai_pre_check_result?: Json | null
+          ai_risk_assessment?: Json | null
+          compliance_requirements?: string[] | null
+          created_at?: string | null
+          created_server_id?: string | null
+          expected_usage?: string | null
+          hostname?: string | null
+          id?: string
+          ip_address?: string | null
+          provider?: string | null
+          purpose?: string | null
+          region?: string | null
+          rejection_reason?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          server_name?: string
+          server_type?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+          user_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "server_submission_requests_created_server_id_fkey"
+            columns: ["created_server_id"]
             isOneToOne: false
             referencedRelation: "server_instances"
             referencedColumns: ["id"]
