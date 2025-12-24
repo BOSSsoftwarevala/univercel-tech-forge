@@ -655,6 +655,45 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_audit_logs: {
+        Row: {
+          action: string
+          amount: number | null
+          approved_by: string | null
+          created_at: string | null
+          daily_limit_exceeded: boolean | null
+          id: string
+          monthly_limit_exceeded: boolean | null
+          payout_request_id: string | null
+          reason: string | null
+          user_flagged: boolean | null
+        }
+        Insert: {
+          action: string
+          amount?: number | null
+          approved_by?: string | null
+          created_at?: string | null
+          daily_limit_exceeded?: boolean | null
+          id?: string
+          monthly_limit_exceeded?: boolean | null
+          payout_request_id?: string | null
+          reason?: string | null
+          user_flagged?: boolean | null
+        }
+        Update: {
+          action?: string
+          amount?: number | null
+          approved_by?: string | null
+          created_at?: string | null
+          daily_limit_exceeded?: boolean | null
+          id?: string
+          monthly_limit_exceeded?: boolean | null
+          payout_request_id?: string | null
+          reason?: string | null
+          user_flagged?: boolean | null
+        }
+        Relationships: []
+      }
       assist_abuse_flags: {
         Row: {
           created_at: string | null
@@ -7183,6 +7222,42 @@ export type Database = {
           ip_address?: string | null
           user_id?: string
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      payout_limits_config: {
+        Row: {
+          auto_approve_threshold: number
+          created_at: string | null
+          daily_limit: number
+          id: string
+          is_active: boolean | null
+          monthly_limit: number
+          requires_manual_review: boolean | null
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          auto_approve_threshold?: number
+          created_at?: string | null
+          daily_limit?: number
+          id?: string
+          is_active?: boolean | null
+          monthly_limit?: number
+          requires_manual_review?: boolean | null
+          role: string
+          updated_at?: string | null
+        }
+        Update: {
+          auto_approve_threshold?: number
+          created_at?: string | null
+          daily_limit?: number
+          id?: string
+          is_active?: boolean | null
+          monthly_limit?: number
+          requires_manual_review?: boolean | null
+          role?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
