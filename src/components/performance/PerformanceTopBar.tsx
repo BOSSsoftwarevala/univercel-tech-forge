@@ -27,6 +27,7 @@ export const PerformanceTopBar = ({ activeTab, onTabChange }: PerformanceTopBarP
     { id: "risk", label: "Risk Detector", icon: TrendingUp },
     { id: "incentives", label: "Incentives", icon: Sparkles },
     { id: "compare", label: "Compare", icon: Clock },
+    { id: "ai-coach", label: "AI Coach", icon: Sparkles },
   ];
 
   const liveMetrics = [
@@ -82,10 +83,11 @@ export const PerformanceTopBar = ({ activeTab, onTabChange }: PerformanceTopBarP
           </div>
 
           <Button 
+            onClick={() => onTabChange('ai-coach')}
             className="bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white gap-2"
           >
             <Sparkles className="w-4 h-4" />
-            AI Analysis
+            AI Coach
           </Button>
 
           <motion.div

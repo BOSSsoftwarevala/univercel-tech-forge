@@ -8,6 +8,7 @@ import { RiskDetector } from "@/components/performance/RiskDetector";
 import { IncentiveEngine } from "@/components/performance/IncentiveEngine";
 import { ComparisonMatrix } from "@/components/performance/ComparisonMatrix";
 import { PerformanceNotifications } from "@/components/performance/PerformanceNotifications";
+import AIPerformanceCoach from "@/components/performance/AIPerformanceCoach";
 import { motion } from "framer-motion";
 
 const PerformanceManager = () => {
@@ -28,6 +29,8 @@ const PerformanceManager = () => {
         return <IncentiveEngine />;
       case "compare":
         return <ComparisonMatrix />;
+      case "ai-coach":
+        return <AIPerformanceCoach />;
       default:
         return <UniversalPerformanceIndex />;
     }
