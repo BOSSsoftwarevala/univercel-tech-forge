@@ -10,7 +10,11 @@ import {
   Search,
   Sparkles,
   Activity,
-  Zap
+  Zap,
+  Bot,
+  Target,
+  Radar,
+  Rocket
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,11 +30,13 @@ export const RnDTopBar = ({ activeTab, onTabChange }: RnDTopBarProps) => {
 
   const tabs = [
     { id: "future-lab", label: "Future Lab", icon: Lightbulb, count: 24 },
-    { id: "prototype", label: "Prototype Builder", icon: Blocks, count: 8 },
-    { id: "impact", label: "Impact Analyzer", icon: Activity, count: 12 },
-    { id: "trends", label: "Trend Scanner", icon: TrendingUp, count: 5 },
-    { id: "feedback", label: "Feedback Portal", icon: TestTube, count: 47 },
-    { id: "decisions", label: "Decision Board", icon: Map, count: 6 },
+    { id: "ai-assistant", label: "AI Assistant", icon: Bot, count: 0, isAI: true },
+    { id: "idea-scorer", label: "Idea Scorer", icon: Target, count: 0, isAI: true },
+    { id: "tech-radar", label: "Tech Radar", icon: Radar, count: 0, isAI: true },
+    { id: "pipeline", label: "Pipeline", icon: Rocket, count: 5 },
+    { id: "prototype", label: "Prototype", icon: Blocks, count: 8 },
+    { id: "trends", label: "Trends", icon: TrendingUp, count: 5 },
+    { id: "decisions", label: "Decisions", icon: Map, count: 6 },
   ];
 
   return (
@@ -121,13 +127,22 @@ export const RnDTopBar = ({ activeTab, onTabChange }: RnDTopBarProps) => {
               className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                 isActive 
                   ? "bg-gradient-to-r from-violet-600/30 to-cyan-600/30 text-white border border-violet-500/50" 
+                  : tab.isAI
+                  ? "text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 border border-violet-500/20"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className={`w-4 h-4 ${tab.isAI ? "text-violet-400" : ""}`} />
               <span className="text-sm font-medium">{tab.label}</span>
+              {tab.isAI && (
+                <motion.div
+                  className="w-1.5 h-1.5 rounded-full bg-violet-400"
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
               {tab.count > 0 && (
                 <Badge 
                   variant="secondary" 
