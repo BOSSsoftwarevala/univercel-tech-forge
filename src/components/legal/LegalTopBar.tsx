@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { Search, Settings, Scale, AlertTriangle, FileCheck, Clock } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, Scale, AlertTriangle, FileCheck, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
 import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LegalTopBarProps {
   notifications?: NotificationAlert[];
@@ -16,6 +16,11 @@ const LegalTopBar = ({
   onDismissNotification = () => {},
   onNotificationAction = () => {}
 }: LegalTopBarProps) => {
+  const { user } = useAuth();
+  
+  const userName = user?.email?.split('@')[0] || 'Legal Manager';
+  const maskedId = `LGL-${user?.id?.slice(0, 4).toUpperCase() || 'XXXX'}`;
+
   const metrics = [
     { label: "Active Agreements", value: "147", icon: FileCheck, color: "text-emerald-400", bg: "bg-emerald-500/10" },
     { label: "Pending Signatures", value: "23", icon: Clock, color: "text-cyan-400", bg: "bg-cyan-500/10" },
@@ -32,12 +37,15 @@ const LegalTopBar = ({
       {/* Welcome */}
       <div className="flex items-center gap-4">
         <div>
-          <p className="text-sm text-cyan-500/80">Legal & Compliance</p>
-          <h2 className="text-xl font-semibold text-white">Manager Console</h2>
+          <p className="text-sm text-cyan-500/80">Welcome back,</p>
+          <h2 className="text-xl font-semibold text-white">{userName}</h2>
         </div>
         <Badge className="bg-cyan-600/20 text-cyan-400 border-cyan-600/40">
           <Scale className="w-3 h-3 mr-1" />
-          Authorized
+          {maskedId}
+        </Badge>
+        <Badge className="bg-slate-700/50 text-slate-300 border-slate-600/40">
+          LEGAL & COMPLIANCE
         </Badge>
       </div>
 
@@ -78,30 +86,6 @@ const LegalTopBar = ({
           onDismiss={onDismissNotification}
           onAction={onNotificationAction}
         />
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-10 h-10 rounded-xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-cyan-500 transition-colors"
-        >
-          <Settings className="w-5 h-5" />
-        </motion.button>
-
-        <div className="flex items-center gap-3 pl-4 border-l border-slate-700/50">
-          <div className="text-right">
-            <p className="text-sm font-medium text-white">Legal Admin</p>
-            <p className="text-xs text-slate-500">Compliance Officer</p>
-          </div>
-          <motion.div whileHover={{ scale: 1.05 }} className="relative">
-            <Avatar className="w-11 h-11 ring-2 ring-cyan-600/50 ring-offset-2 ring-offset-slate-900">
-              <AvatarImage src="/placeholder.svg" />
-              <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-cyan-700 text-white font-bold">
-                LA
-              </AvatarFallback>
-            </Avatar>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-900" />
-          </motion.div>
-        </div>
       </div>
     </motion.header>
   );
