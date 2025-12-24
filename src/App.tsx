@@ -61,6 +61,7 @@ import ComplianceCenter from "./pages/super-admin/ComplianceCenter";
 // Master Admin Pages
 import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
+import BulkUserCreation from "./pages/admin/BulkUserCreation";
 
 // Franchise Layout & Pages
 import FranchiseLayout from "./components/layouts/FranchiseLayout";
@@ -190,6 +191,9 @@ const App = () => (
               {/* Master Admin Routes - MASTER ONLY */}
               <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
               <Route path="/master-admin/*" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
+              
+              {/* Admin Utilities - Master and Super Admin */}
+              <Route path="/admin/bulk-users" element={<RequireRole allowed={["master", "super_admin"]}><BulkUserCreation /></RequireRole>} />
 
               {/* Super Admin Routes - Super Admin and Master can access */}
               <Route path="/admin" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
