@@ -175,19 +175,29 @@ export type Database = {
           action_data: Json
           action_target: string
           action_type: string
+          ai_risk_assessment: Json | null
           approval_status: string | null
           approved_at: string | null
           approved_by: string | null
           auto_approve_eligible: boolean | null
           created_at: string | null
+          device_fingerprint: string | null
+          device_trusted: boolean | null
+          email_link_expires_at: string | null
+          email_link_sent_at: string | null
+          email_link_token: string | null
           email_verified: boolean | null
           expires_at: string | null
           id: string
+          ip_address: string | null
           otp_required: boolean | null
           otp_verification_id: string | null
           otp_verified: boolean | null
+          password_verified: boolean | null
+          password_verified_at: string | null
           priority: string | null
           rejection_reason: string | null
+          risk_score: number | null
           updated_at: string | null
           user_id: string
           user_role: string
@@ -196,19 +206,29 @@ export type Database = {
           action_data?: Json
           action_target: string
           action_type: string
+          ai_risk_assessment?: Json | null
           approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           auto_approve_eligible?: boolean | null
           created_at?: string | null
+          device_fingerprint?: string | null
+          device_trusted?: boolean | null
+          email_link_expires_at?: string | null
+          email_link_sent_at?: string | null
+          email_link_token?: string | null
           email_verified?: boolean | null
           expires_at?: string | null
           id?: string
+          ip_address?: string | null
           otp_required?: boolean | null
           otp_verification_id?: string | null
           otp_verified?: boolean | null
+          password_verified?: boolean | null
+          password_verified_at?: string | null
           priority?: string | null
           rejection_reason?: string | null
+          risk_score?: number | null
           updated_at?: string | null
           user_id: string
           user_role: string
@@ -217,19 +237,29 @@ export type Database = {
           action_data?: Json
           action_target?: string
           action_type?: string
+          ai_risk_assessment?: Json | null
           approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           auto_approve_eligible?: boolean | null
           created_at?: string | null
+          device_fingerprint?: string | null
+          device_trusted?: boolean | null
+          email_link_expires_at?: string | null
+          email_link_sent_at?: string | null
+          email_link_token?: string | null
           email_verified?: boolean | null
           expires_at?: string | null
           id?: string
+          ip_address?: string | null
           otp_required?: boolean | null
           otp_verification_id?: string | null
           otp_verified?: boolean | null
+          password_verified?: boolean | null
+          password_verified_at?: string | null
           priority?: string | null
           rejection_reason?: string | null
+          risk_score?: number | null
           updated_at?: string | null
           user_id?: string
           user_role?: string
@@ -652,6 +682,33 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"] | null
           timestamp?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      backup_codes: {
+        Row: {
+          code_hash: string
+          created_at: string | null
+          id: string
+          is_used: boolean | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string | null
+          id?: string
+          is_used?: boolean | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string | null
+          id?: string
+          is_used?: boolean | null
+          used_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -6801,6 +6858,36 @@ export type Database = {
         }
         Relationships: []
       }
+      password_verifications: {
+        Row: {
+          action_type: string
+          device_fingerprint: string | null
+          expires_at: string | null
+          id: string
+          ip_address: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          action_type: string
+          device_fingerprint?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          device_fingerprint?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       payout_records: {
         Row: {
           amount: number
@@ -10110,6 +10197,57 @@ export type Database = {
           },
         ]
       }
+      session_security: {
+        Row: {
+          allowed_ips: string[] | null
+          created_at: string | null
+          force_logout_at: string | null
+          id: string
+          ip_locked: boolean | null
+          last_activity_at: string | null
+          require_email_verify_for_critical: boolean | null
+          require_password_for_delete: boolean | null
+          require_password_for_financial: boolean | null
+          session_started_at: string | null
+          session_timeout_minutes: number | null
+          session_token_hash: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          allowed_ips?: string[] | null
+          created_at?: string | null
+          force_logout_at?: string | null
+          id?: string
+          ip_locked?: boolean | null
+          last_activity_at?: string | null
+          require_email_verify_for_critical?: boolean | null
+          require_password_for_delete?: boolean | null
+          require_password_for_financial?: boolean | null
+          session_started_at?: string | null
+          session_timeout_minutes?: number | null
+          session_token_hash?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          allowed_ips?: string[] | null
+          created_at?: string | null
+          force_logout_at?: string | null
+          id?: string
+          ip_locked?: boolean | null
+          last_activity_at?: string | null
+          require_email_verify_for_critical?: boolean | null
+          require_password_for_delete?: boolean | null
+          require_password_for_financial?: boolean | null
+          session_started_at?: string | null
+          session_timeout_minutes?: number | null
+          session_token_hash?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       sla_monitoring: {
         Row: {
           actual_hours: number | null
@@ -10760,6 +10898,60 @@ export type Database = {
           transaction_id?: string
           type?: string
           wallet_id?: string | null
+        }
+        Relationships: []
+      }
+      trusted_devices: {
+        Row: {
+          browser: string | null
+          created_at: string | null
+          device_fingerprint: string
+          device_name: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          is_trusted: boolean | null
+          last_used_at: string | null
+          location: string | null
+          os: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          trust_expires_at: string | null
+          user_id: string
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string | null
+          device_fingerprint: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_trusted?: boolean | null
+          last_used_at?: string | null
+          location?: string | null
+          os?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          trust_expires_at?: string | null
+          user_id: string
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string | null
+          device_fingerprint?: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_trusted?: boolean | null
+          last_used_at?: string | null
+          location?: string | null
+          os?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          trust_expires_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -11465,6 +11657,7 @@ export type Database = {
         Returns: Json
       }
       check_force_logout: { Args: { check_user_id: string }; Returns: string }
+      check_session_valid: { Args: { p_user_id: string }; Returns: Json }
       clear_force_logout: { Args: { clear_user_id: string }; Returns: boolean }
       create_demo_report_card: {
         Args: {
@@ -11494,6 +11687,7 @@ export type Database = {
         Args: { admin_user_id: string; target_user_id: string }
         Returns: boolean
       }
+      generate_backup_codes: { Args: { p_user_id: string }; Returns: string[] }
       generate_otp: {
         Args: {
           p_action_data?: Json
@@ -11534,8 +11728,16 @@ export type Database = {
         Returns: boolean
       }
       is_demo_manager: { Args: { _user_id?: string }; Returns: boolean }
+      is_device_trusted: {
+        Args: { p_fingerprint: string; p_user_id: string }
+        Returns: boolean
+      }
       is_franchise: { Args: { _user_id: string }; Returns: boolean }
       is_influencer: { Args: { _user_id: string }; Returns: boolean }
+      is_password_recently_verified: {
+        Args: { p_action_type: string; p_user_id: string }
+        Returns: boolean
+      }
       is_prime_user: { Args: { _user_id: string }; Returns: boolean }
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
@@ -11641,6 +11843,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      verify_backup_code: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: boolean
+      }
       verify_otp: {
         Args: { p_otp_code: string; p_otp_type: string; p_user_id: string }
         Returns: Json
@@ -11698,6 +11904,17 @@ export type Database = {
         | "api_security"
         | "r_and_d"
         | "master"
+      critical_action_type:
+        | "delete_data"
+        | "edit_financial"
+        | "add_user"
+        | "remove_user"
+        | "change_role"
+        | "server_action"
+        | "bulk_operation"
+        | "export_data"
+        | "change_settings"
+        | "ai_action"
       demo_lifecycle_status: "pending" | "active" | "disabled" | "archived"
       demo_status: "active" | "inactive" | "maintenance" | "down"
       demo_tech_stack:
@@ -11926,6 +12143,18 @@ export const Constants = {
         "api_security",
         "r_and_d",
         "master",
+      ],
+      critical_action_type: [
+        "delete_data",
+        "edit_financial",
+        "add_user",
+        "remove_user",
+        "change_role",
+        "server_action",
+        "bulk_operation",
+        "export_data",
+        "change_settings",
+        "ai_action",
       ],
       demo_lifecycle_status: ["pending", "active", "disabled", "archived"],
       demo_status: ["active", "inactive", "maintenance", "down"],
