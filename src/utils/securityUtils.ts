@@ -219,7 +219,7 @@ export function checkPasswordStrength(password: string): {
   return { score, feedback };
 }
 
-// Permission matrix
+// Permission matrix for all 24 roles
 export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
   master: {
     view_all: true,
@@ -238,6 +238,14 @@ export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
     approve_users: true,
     view_master_logs: false,
     manage_roles: true,
+  },
+  admin: {
+    view_all: true,
+    edit_all: true,
+    delete_all: false,
+    force_logout: false,
+    approve_users: false,
+    manage_roles: false,
   },
   demo_manager: {
     view_demos: true,
@@ -304,6 +312,74 @@ export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
     view_ai_usage: true,
     manage_ai_limits: true,
     view_ai_logs: true,
+    force_logout: false,
+  },
+  task_manager: {
+    view_tasks: true,
+    manage_tasks: true,
+    assign_developers: true,
+    view_performance: true,
+    force_logout: false,
+  },
+  lead_manager: {
+    view_leads: true,
+    manage_leads: true,
+    view_pipeline: true,
+    view_analytics: true,
+    force_logout: false,
+  },
+  seo_manager: {
+    view_seo: true,
+    manage_keywords: true,
+    view_analytics: true,
+    force_logout: false,
+  },
+  rnd_manager: {
+    view_suggestions: true,
+    manage_roadmap: true,
+    view_research: true,
+    force_logout: false,
+  },
+  r_and_d: {
+    view_research: true,
+    manage_development: true,
+    view_testing: true,
+    force_logout: false,
+  },
+  performance_manager: {
+    view_performance: true,
+    manage_escalations: true,
+    view_developers: true,
+    force_logout: false,
+  },
+  marketing_manager: {
+    view_campaigns: true,
+    manage_influencers: true,
+    view_analytics: true,
+    force_logout: false,
+  },
+  legal_compliance: {
+    view_documents: true,
+    manage_compliance: true,
+    view_policies: true,
+    force_logout: false,
+  },
+  hr_manager: {
+    view_hiring: true,
+    manage_onboarding: true,
+    view_team: true,
+    force_logout: false,
+  },
+  support: {
+    view_tickets: true,
+    manage_tickets: true,
+    view_knowledge: true,
+    force_logout: false,
+  },
+  api_security: {
+    view_api: true,
+    manage_security: true,
+    view_logs: true,
     force_logout: false,
   },
 };
