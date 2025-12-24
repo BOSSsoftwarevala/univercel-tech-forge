@@ -17,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { toast } from 'sonner';
 
+// Public roles that can self-register (Grade 3 Partners + Grade 4 Users)
 const publicRoles: AppRole[] = ['developer', 'franchise', 'reseller', 'influencer', 'prime', 'client'];
 
 const roleIcons: Record<string, any> = {
@@ -27,7 +28,7 @@ const roleIcons: Record<string, any> = {
   reseller: Store,
   influencer: Zap,
   prime: Star,
-  client: User,
+  user: User,
 };
 
 const AuthGateway = () => {

@@ -13,59 +13,75 @@ import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
 
-// Role status data
+// Role status data - Updated for new 24-role hierarchy
 const roleStatuses: Array<{
   role: AppRole;
   active: number;
   pending: number;
   done: number;
 }> = [
+  // GRADE 0 - OWNERSHIP
+  { role: 'master', active: 1, pending: 0, done: 5 },
+  // GRADE 1 - PLATFORM CONTROL
   { role: 'super_admin', active: 2, pending: 0, done: 15 },
   { role: 'admin', active: 5, pending: 1, done: 45 },
-  { role: 'developer', active: 47, pending: 8, done: 156 },
+  { role: 'server_manager', active: 2, pending: 0, done: 32 },
+  // GRADE 2 - BUSINESS MANAGEMENT
+  { role: 'franchise_manager', active: 3, pending: 1, done: 67 },
+  { role: 'sales_support_manager', active: 4, pending: 2, done: 156 },
+  { role: 'reseller_manager', active: 2, pending: 0, done: 89 },
+  { role: 'api_ai_manager', active: 1, pending: 0, done: 12 },
+  { role: 'influencer_manager', active: 2, pending: 1, done: 45 },
+  { role: 'seo_manager', active: 3, pending: 0, done: 45 },
+  { role: 'marketing_manager', active: 4, pending: 0, done: 56 },
+  { role: 'lead_manager', active: 4, pending: 1, done: 128 },
+  { role: 'pro_manager', active: 2, pending: 0, done: 34 },
+  { role: 'legal_manager', active: 2, pending: 0, done: 34 },
+  { role: 'task_manager', active: 3, pending: 0, done: 445 },
+  { role: 'hr_manager', active: 2, pending: 1, done: 23 },
+  { role: 'developer_manager', active: 2, pending: 0, done: 67 },
+  // GRADE 3 - PARTNERS
   { role: 'franchise', active: 23, pending: 5, done: 67 },
+  { role: 'developer', active: 47, pending: 8, done: 156 },
   { role: 'reseller', active: 156, pending: 12, done: 234 },
   { role: 'influencer', active: 89, pending: 15, done: 178 },
+  // GRADE 4 - USERS
   { role: 'prime', active: 342, pending: 28, done: 892 },
-  { role: 'seo_manager', active: 3, pending: 0, done: 45 },
-  { role: 'lead_manager', active: 4, pending: 1, done: 128 },
-  { role: 'task_manager', active: 3, pending: 0, done: 445 },
-  { role: 'demo_manager', active: 2, pending: 1, done: 67 },
-  { role: 'rnd_manager', active: 2, pending: 0, done: 21 },
-  { role: 'client_success', active: 5, pending: 2, done: 567 },
-  { role: 'performance_manager', active: 2, pending: 0, done: 21 },
-  { role: 'finance_manager', active: 3, pending: 1, done: 89 },
-  { role: 'marketing_manager', active: 4, pending: 0, done: 56 },
-  { role: 'legal_compliance', active: 2, pending: 0, done: 34 },
-  { role: 'hr_manager', active: 2, pending: 1, done: 23 },
-  { role: 'support', active: 8, pending: 2, done: 567 },
-  { role: 'ai_manager', active: 1, pending: 0, done: 12 },
-  { role: 'client', active: 1247, pending: 89, done: 3456 },
+  { role: 'user', active: 1247, pending: 89, done: 3456 },
+  { role: 'frontend', active: 0, pending: 0, done: 0 },
 ];
 
 const getIconForRole = (role: AppRole): LucideIcon => {
   const icons: Record<string, LucideIcon> = {
+    // GRADE 0
+    master: Crown,
+    // GRADE 1
     super_admin: Crown,
     admin: Shield,
-    developer: Code2,
+    server_manager: Activity,
+    // GRADE 2
+    franchise_manager: Building2,
+    sales_support_manager: HeadphonesIcon,
+    reseller_manager: Users,
+    api_ai_manager: Brain,
+    influencer_manager: Zap,
+    seo_manager: Search,
+    marketing_manager: MessageSquare,
+    lead_manager: Target,
+    pro_manager: Star,
+    legal_manager: Scale,
+    task_manager: ListTodo,
+    hr_manager: UserPlus,
+    developer_manager: Code2,
+    // GRADE 3
     franchise: Building2,
+    developer: Code2,
     reseller: Store,
     influencer: Zap,
+    // GRADE 4
     prime: Star,
-    seo_manager: Search,
-    lead_manager: Target,
-    task_manager: ListTodo,
-    demo_manager: Package,
-    rnd_manager: Brain,
-    client_success: HeadphonesIcon,
-    performance_manager: TrendingUp,
-    finance_manager: Wallet,
-    marketing_manager: MessageSquare,
-    legal_compliance: Scale,
-    hr_manager: UserPlus,
-    support: HeadphonesIcon,
-    ai_manager: Brain,
-    client: Users,
+    user: Users,
+    frontend: Globe,
   };
   return icons[role] || Users;
 };
