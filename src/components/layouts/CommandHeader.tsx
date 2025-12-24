@@ -8,7 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Volume2, VolumeX, Search, User, Settings, LogOut,
-  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu, Handshake
+  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { SafeAssistTrigger } from '@/components/support/SafeAssistTrigger';
+import promiseIcon from '@/assets/promise-icon.jpg';
 
 interface Alert {
   id: string;
@@ -137,7 +138,7 @@ const CommandHeader = memo(() => {
               : 'bg-secondary/50 text-muted-foreground border border-border/50 hover:border-primary/50'
           )}
         >
-          <Handshake className="w-3.5 h-3.5" />
+          <img src={promiseIcon} alt="Promise" className="w-5 h-5 rounded-full object-cover" />
           <span className="hidden sm:inline">
             {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
           </span>
