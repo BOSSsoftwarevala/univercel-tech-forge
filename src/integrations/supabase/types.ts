@@ -11793,6 +11793,7 @@ export type Database = {
       }
       is_franchise: { Args: { _user_id: string }; Returns: boolean }
       is_influencer: { Args: { _user_id: string }; Returns: boolean }
+      is_master: { Args: never; Returns: boolean }
       is_password_recently_verified: {
         Args: { p_action_type: string; p_user_id: string }
         Returns: boolean

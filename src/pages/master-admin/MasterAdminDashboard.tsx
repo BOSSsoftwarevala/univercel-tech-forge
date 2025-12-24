@@ -22,7 +22,9 @@ import {
   Megaphone,
   Monitor,
   UserCog,
-  Settings
+  Settings,
+  KeyRound,
+  ArrowLeft
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -355,8 +357,14 @@ const MasterAdminDashboard = () => {
               </AlertDialogContent>
             </AlertDialog>
             
+            <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate('/super-admin')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
               <Shield className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/change-password')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+              <KeyRound className="w-4 h-4" />
             </Button>
             <Button variant="outline" size="sm" onClick={handleLogout} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
               <LogOut className="w-4 h-4" />
