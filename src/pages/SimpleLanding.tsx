@@ -8,6 +8,8 @@ import {
   ChevronRight, MousePointer, Layers, Headphones, Phone,
   Mail, MessageCircle, Award, BadgeCheck, ThumbsUp, Menu, X
 } from 'lucide-react';
+import { PricingBanner } from '@/components/landing/PricingBanner';
+import { LanguageSwitcher } from '@/components/landing/LanguageSwitcher';
 
 const SimpleLanding = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -186,6 +188,7 @@ const SimpleLanding = () => {
             </nav>
 
             <div className="flex items-center gap-3">
+              <LanguageSwitcher compact />
               <Link 
                 to="/demos"
                 className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-sm font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 hover:scale-105"
@@ -354,6 +357,9 @@ const SimpleLanding = () => {
           </motion.div>
         </motion.div>
       </section>
+
+      {/* Pricing Banner - HIGHLIGHTED */}
+      <PricingBanner />
 
       {/* Stats Section */}
       <section className="relative py-16 border-y border-white/5 bg-white/[0.01]">

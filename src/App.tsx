@@ -8,6 +8,7 @@ import { AnimationProvider } from "./contexts/AnimationContext";
 import { DemoTestModeProvider } from "./contexts/DemoTestModeContext";
 import { SecurityProvider } from "./contexts/SecurityContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { TranslationProvider } from "./contexts/TranslationContext";
 import SystemNotificationsInitializer from "./components/notifications/SystemNotificationsInitializer";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
@@ -141,6 +142,7 @@ const App = () => (
               <BrowserRouter>
                 <SecurityProvider>
                   <NotificationProvider>
+                    <TranslationProvider>
                     <SystemNotificationsInitializer />
                     <GlobalOfferPopup />
                     <FloatingAIChatbotWrapper />
@@ -319,6 +321,7 @@ const App = () => (
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+                    </TranslationProvider>
                   </NotificationProvider>
                 </SecurityProvider>
             </BrowserRouter>
