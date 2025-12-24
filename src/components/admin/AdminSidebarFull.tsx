@@ -33,7 +33,10 @@ import {
   Settings,
   LogOut,
   KeyRound,
-  Server
+  Server,
+  Handshake,
+  Key,
+  UserX
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -71,6 +74,10 @@ type AdminView =
   | "server-management"
   | "approval-queue"
   | "2fa-settings"
+  | "force-logout"
+  | "promise-management"
+  | "ai-management"
+  | "franchise-keys"
   | "settings";
 
 interface AdminSidebarFullProps {
@@ -103,7 +110,9 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
       items: [
         { id: "lead-distribution", label: "Lead Manager", icon: UserPlus },
         { id: "dev-orchestration", label: "Developer Panel", icon: Code },
+        { id: "promise-management", label: "Promise Tracker", icon: Handshake },
         { id: "franchise", label: "Franchise", icon: Store },
+        { id: "franchise-keys", label: "Franchise Keys", icon: Key },
         { id: "reseller", label: "Reseller", icon: ShoppingBag },
         { id: "sales", label: "Sales", icon: TrendingUp },
         { id: "support", label: "Support", icon: HeadphonesIcon },
@@ -114,6 +123,7 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
       items: [
         { id: "wallet-finance", label: "Finance", icon: DollarSign },
         { id: "performance-ai", label: "Performance", icon: Gauge },
+        { id: "ai-management", label: "AI Management", icon: Brain },
       ]
     },
     {
@@ -145,7 +155,8 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
     {
       title: "Security & System",
       items: [
-        { id: "approval-queue", label: "Approvals", icon: Shield },
+        { id: "approval-queue", label: "Approvals Hub", icon: Shield },
+        { id: "force-logout", label: "Force Logout", icon: UserX },
         { id: "2fa-settings", label: "2FA & Security", icon: KeyRound },
         { id: "roles", label: "Role Access", icon: Shield },
         { id: "users", label: "User Mgmt", icon: Users },

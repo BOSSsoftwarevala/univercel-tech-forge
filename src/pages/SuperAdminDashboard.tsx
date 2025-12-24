@@ -32,6 +32,12 @@ import { SuperAdminApprovalQueue } from "@/components/admin/SuperAdminApprovalQu
 import { TwoFactorSettings } from "@/components/auth/TwoFactorSettings";
 import { TrustedDeviceManager } from "@/components/auth/TrustedDeviceManager";
 import { BackupCodesManager } from "@/components/auth/BackupCodesManager";
+import ForceLogoutManager from "@/components/admin/ForceLogoutManager";
+import ApprovalsHub from "@/components/admin/ApprovalsHub";
+import PromiseManagement from "@/components/admin/PromiseManagement";
+import AIManagementCenter from "@/components/admin/AIManagementCenter";
+import FranchiseKeyGenerator from "@/components/admin/FranchiseKeyGenerator";
+import ServerManagementHub from "@/components/admin/ServerManagementHub";
 import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
 type AdminView =
@@ -65,6 +71,10 @@ type AdminView =
   | "server-management"
   | "approval-queue"
   | "2fa-settings"
+  | "force-logout"
+  | "promise-management"
+  | "ai-management"
+  | "franchise-keys"
   | "settings";
 
 // Sample notifications for demo
@@ -190,9 +200,19 @@ const SuperAdminDashboard = () => {
       case "influencer":
         return <AIInfluencerManager />;
       case "server-management":
-        return <ServerManagement />;
+        return <ServerManagementHub />;
       case "approval-queue":
-        return <SuperAdminApprovalQueue />;
+        return <ApprovalsHub />;
+      case "force-logout":
+        return <ForceLogoutManager />;
+      case "promise-management":
+        return <PromiseManagement />;
+      case "ai-management":
+        return <AIManagementCenter />;
+      case "franchise-keys":
+        return <FranchiseKeyGenerator />;
+      case "franchise":
+        return <FranchiseKeyGenerator />;
       case "2fa-settings":
         return (
           <div className="space-y-6">
