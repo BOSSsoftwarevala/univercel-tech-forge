@@ -12,50 +12,62 @@ import {
   BarChart3,
   FileText,
   Shield,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-
-const stats = [
-  { label: 'Total Promises', value: '2,847', icon: FileCheck, trend: '+12%', color: 'text-primary' },
-  { label: 'Fulfilled', value: '2,156', icon: CheckCircle2, trend: '+8%', color: 'text-green-400' },
-  { label: 'Pending', value: '456', icon: Clock, trend: '-5%', color: 'text-yellow-400' },
-  { label: 'At Risk', value: '235', icon: AlertTriangle, trend: '-15%', color: 'text-red-400' },
-];
-
-const recentPromises = [
-  { id: 'PRO-001', client: 'TechCorp Ltd', promise: 'Delivery by Dec 25', status: 'on_track', progress: 85 },
-  { id: 'PRO-002', client: 'Global Inc', promise: 'Feature launch Q1', status: 'at_risk', progress: 45 },
-  { id: 'PRO-003', client: 'StartupXYZ', promise: 'Support SLA 99.9%', status: 'fulfilled', progress: 100 },
-  { id: 'PRO-004', client: 'Enterprise Co', promise: 'Integration complete', status: 'on_track', progress: 72 },
-  { id: 'PRO-005', client: 'SMB Solutions', promise: 'Training sessions', status: 'pending', progress: 30 },
-];
-
-const departments = [
-  { name: 'Sales', total: 845, fulfilled: 720, rate: 85 },
-  { name: 'Support', total: 623, fulfilled: 590, rate: 95 },
-  { name: 'Development', total: 512, fulfilled: 380, rate: 74 },
-  { name: 'Operations', total: 456, fulfilled: 420, rate: 92 },
-  { name: 'Marketing', total: 411, fulfilled: 350, rate: 85 },
-];
+import { useActivePromises, usePromiseMetrics, useTopPerformers } from '@/hooks/usePromiseData';
 
 export function PromiseManagementScreen() {
+  const { data: promises, isLoading: promisesLoading } = useActivePromises();
+  const { data: metrics, isLoading: metricsLoading } = usePromiseMetrics();
+  const { data: topPerformers, isLoading: performersLoading } = useTopPerformers();
+
+  const isLoading = promisesLoading || metricsLoading || performersLoading;
+
+  const stats = [
+    { label: 'Active Promises', value: metrics?.activePromises || 0, icon: FileCheck, trend: '+12%', color: 'text-primary' },
+    { label: 'Completed Today', value: metrics?.completedToday || 0, icon: CheckCircle2, trend: '+8%', color: 'text-green-400' },
+    { label: 'At Risk', value: metrics?.atRisk || 0, icon: Clock, trend: '-5%', color: 'text-yellow-400' },
+    { label: 'Breached Today', value: metrics?.breachedToday || 0, icon: AlertTriangle, trend: '-15%', color: 'text-red-400' },
+  ];
+
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'fulfilled':
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Fulfilled</Badge>;
-      case 'on_track':
-        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">On Track</Badge>;
-      case 'at_risk':
-        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">At Risk</Badge>;
-      case 'pending':
+      case 'completed':
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Completed</Badge>;
+      case 'in_progress':
+      case 'assigned':
+        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">In Progress</Badge>;
+      case 'breached':
+        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Breached</Badge>;
+      case 'promised':
         return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Pending</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  const getProgressFromPromise = (promise: any) => {
+    if (promise.status === 'completed') return 100;
+    if (promise.status === 'breached') return 100;
+    const now = new Date();
+    const start = new Date(promise.promise_time);
+    const end = new Date(promise.deadline);
+    const total = end.getTime() - start.getTime();
+    const elapsed = now.getTime() - start.getTime();
+    return Math.min(Math.max(Math.round((elapsed / total) * 100), 0), 100);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -127,25 +139,33 @@ export function PromiseManagementScreen() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentPromises.map((promise) => (
-                  <div 
-                    key={promise.id}
-                    className="p-3 rounded-lg bg-background/50 border border-border/30 hover:border-primary/30 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-mono text-muted-foreground">{promise.id}</span>
-                        <span className="font-medium text-sm">{promise.client}</span>
+                {(!promises || promises.length === 0) ? (
+                  <p className="text-muted-foreground text-center py-8">No active promises</p>
+                ) : (
+                  promises.map((promise) => (
+                    <div 
+                      key={promise.id}
+                      className="p-3 rounded-lg bg-background/50 border border-border/30 hover:border-primary/30 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-mono text-muted-foreground">{promise.id.slice(0, 8)}</span>
+                          <span className="font-medium text-sm">Task: {promise.task_id.slice(0, 8)}</span>
+                        </div>
+                        {getStatusBadge(promise.status)}
                       </div>
-                      {getStatusBadge(promise.status)}
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Deadline: {new Date(promise.deadline).toLocaleDateString()}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Progress value={getProgressFromPromise(promise)} className="h-1.5 flex-1" />
+                        <span className="text-xs text-muted-foreground w-10 text-right">
+                          {getProgressFromPromise(promise)}%
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{promise.promise}</p>
-                    <div className="flex items-center gap-2">
-                      <Progress value={promise.progress} className="h-1.5 flex-1" />
-                      <span className="text-xs text-muted-foreground w-10 text-right">{promise.progress}%</span>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -161,30 +181,34 @@ export function PromiseManagementScreen() {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-primary" />
-                Department Performance
+                Top Performers
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {departments.map((dept) => (
-                  <div key={dept.name} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span>{dept.name}</span>
-                      <span className="text-muted-foreground">{dept.fulfilled}/{dept.total}</span>
+                {(!topPerformers || topPerformers.length === 0) ? (
+                  <p className="text-muted-foreground text-center py-4">No performance data</p>
+                ) : (
+                  topPerformers.map((performer) => (
+                    <div key={performer.developer_id} className="space-y-1.5">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Dev {performer.developer_id.slice(0, 6)}</span>
+                        <span className="text-muted-foreground">{performer.completed}/{performer.total}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Progress 
+                          value={performer.rate} 
+                          className={`h-2 flex-1 ${
+                            performer.rate >= 90 ? '[&>div]:bg-green-500' : 
+                            performer.rate >= 75 ? '[&>div]:bg-yellow-500' : 
+                            '[&>div]:bg-red-500'
+                          }`}
+                        />
+                        <span className="text-xs font-medium w-10 text-right">{performer.rate}%</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Progress 
-                        value={dept.rate} 
-                        className={`h-2 flex-1 ${
-                          dept.rate >= 90 ? '[&>div]:bg-green-500' : 
-                          dept.rate >= 75 ? '[&>div]:bg-yellow-500' : 
-                          '[&>div]:bg-red-500'
-                        }`}
-                      />
-                      <span className="text-xs font-medium w-10 text-right">{dept.rate}%</span>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
