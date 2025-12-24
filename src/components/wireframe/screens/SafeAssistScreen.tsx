@@ -17,9 +17,11 @@ import {
   Video,
   Activity,
   Zap,
-  RefreshCw
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
 import { useSafeAssistSessions, useSafeAssistAlerts, useSafeAssistMetrics } from '@/hooks/useSafeAssistData';
+import { useEndSession, useTerminateSession } from '@/hooks/useSafeAssistActions';
 import { formatDistanceToNow } from 'date-fns';
 
 const getStatusColor = (status: string) => {
@@ -55,6 +57,9 @@ export function SafeAssistScreen() {
   const { data: sessions, isLoading: sessionsLoading, refetch: refetchSessions } = useSafeAssistSessions();
   const { data: alerts, isLoading: alertsLoading, refetch: refetchAlerts } = useSafeAssistAlerts();
   const { data: metrics, isLoading: metricsLoading, refetch: refetchMetrics } = useSafeAssistMetrics();
+  
+  const endSession = useEndSession();
+  const terminateSession = useTerminateSession();
 
   const handleRefresh = () => {
     refetchSessions();
@@ -238,9 +243,26 @@ export function SafeAssistScreen() {
                         <Button size="sm" variant="outline">
                           <Eye className="h-3 w-3 mr-1" /> Watch
                         </Button>
-                        <Button size="sm" variant="destructive">
-                          Terminate
-                        </Button>
+                        {session.status === 'active' && (
+                          <>
+                            <Button 
+                              size="sm" 
+                              variant="secondary"
+                              onClick={() => endSession.mutate(session.id)}
+                              disabled={endSession.isPending}
+                            >
+                              {endSession.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'End'}
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={() => terminateSession.mutate({ sessionId: session.id })}
+                              disabled={terminateSession.isPending}
+                            >
+                              {terminateSession.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Terminate'}
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -15,9 +15,11 @@ import {
   DollarSign,
   BarChart3,
   RefreshCw,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import { useActivePromises, usePromiseFines, usePromiseMetrics, useTopPerformers } from '@/hooks/usePromiseData';
+import { useCompletePromise, useBreachPromise } from '@/hooks/usePromiseActions';
 import { formatDistanceToNow, differenceInMinutes, isPast } from 'date-fns';
 
 const getStatusConfig = (status: string, deadline: string) => {
@@ -83,6 +85,9 @@ export function PromiseTrackerScreen() {
   const { data: fines, isLoading: finesLoading, refetch: refetchFines } = usePromiseFines();
   const { data: metrics, isLoading: metricsLoading, refetch: refetchMetrics } = usePromiseMetrics();
   const { data: topPerformers, isLoading: performersLoading } = useTopPerformers();
+
+  const completePromise = useCompletePromise();
+  const breachPromise = useBreachPromise();
 
   const handleRefresh = () => {
     refetchPromises();
@@ -260,9 +265,28 @@ export function PromiseTrackerScreen() {
                         <Button size="sm" variant="outline" className="flex-1">
                           <Eye className="h-3 w-3 mr-1" /> Details
                         </Button>
+                        <Button 
+                          size="sm" 
+                          variant="default"
+                          className="flex-1"
+                          onClick={() => completePromise.mutate(promise.id)}
+                          disabled={completePromise.isPending}
+                        >
+                          {completePromise.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : (
+                            <><CheckCircle2 className="h-3 w-3 mr-1" /> Complete</>
+                          )}
+                        </Button>
                         {isOverdue && (
-                          <Button size="sm" variant="destructive" className="flex-1">
-                            <AlertTriangle className="h-3 w-3 mr-1" /> Escalate
+                          <Button 
+                            size="sm" 
+                            variant="destructive" 
+                            className="flex-1"
+                            onClick={() => breachPromise.mutate({ promiseId: promise.id })}
+                            disabled={breachPromise.isPending}
+                          >
+                            {breachPromise.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : (
+                              <><AlertTriangle className="h-3 w-3 mr-1" /> Breach</>
+                            )}
                           </Button>
                         )}
                       </div>
