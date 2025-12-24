@@ -9,6 +9,7 @@ import { DemoTestModeProvider } from "./contexts/DemoTestModeContext";
 import { SecurityProvider } from "./contexts/SecurityContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { TranslationProvider } from "./contexts/TranslationContext";
+import { GlobalRealtimeProvider } from "./providers/GlobalRealtimeProvider";
 import SystemNotificationsInitializer from "./components/notifications/SystemNotificationsInitializer";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
@@ -144,6 +145,7 @@ const App = () => (
                 <SecurityProvider>
                   <NotificationProvider>
                     <TranslationProvider>
+                      <GlobalRealtimeProvider>
                     <SystemNotificationsInitializer />
                     <GlobalOfferPopup />
                     <FloatingAIChatbotWrapper />
