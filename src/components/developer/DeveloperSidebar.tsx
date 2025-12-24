@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, ListTodo, Timer, Code2, 
   Wallet, Settings, ChevronLeft, ChevronRight, 
-  LogOut, Lock, Briefcase, Brain, Flame, Zap
+  LogOut, Lock, Briefcase, Brain, Flame, Zap,
+  Activity, User2, Award, Compass
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -16,13 +17,15 @@ interface DeveloperSidebarProps {
 
 const menuItems = [
   { id: 'dashboard', label: 'Command Center', icon: LayoutDashboard },
-  { id: 'portfolio', label: 'AI Portfolio', icon: Briefcase, isAI: true },
-  { id: 'skills', label: 'Skill Assessment', icon: Brain, isAI: true },
-  { id: 'productivity', label: 'Productivity Coach', icon: Flame, isAI: true },
-  { id: 'tasks', label: 'Task Assignment', icon: ListTodo },
-  { id: 'timer', label: 'Timer & Progress', icon: Timer },
-  { id: 'code', label: 'Code Submission', icon: Code2 },
-  { id: 'wallet', label: 'Wallet & Payouts', icon: Wallet },
+  { id: 'monitoring', label: 'AI Monitoring', icon: Activity, isAI: true },
+  { id: 'portfolio', label: 'AI Portfolio', icon: User2, isAI: true },
+  { id: 'skills', label: 'Skill Assessment', icon: Award, isAI: true },
+  { id: 'code-intel', label: 'Code Intelligence', icon: Code2, isAI: true },
+  { id: 'career', label: 'Career Advisor', icon: Compass, isAI: true },
+  { id: 'productivity', label: 'Productivity', icon: Brain, isAI: true },
+  { id: 'tasks', label: 'Tasks', icon: ListTodo },
+  { id: 'timer', label: 'Timer', icon: Timer },
+  { id: 'wallet', label: 'Wallet', icon: Wallet },
 ];
 
 const DeveloperSidebar = ({ activeSection, onSectionChange }: DeveloperSidebarProps) => {
