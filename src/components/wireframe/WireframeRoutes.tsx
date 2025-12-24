@@ -27,6 +27,7 @@ import { AIConsoleScreen } from './screens/AIConsoleScreen';
 import { SafeAssistScreen } from './screens/SafeAssistScreen';
 import { AssistManagerScreen } from './screens/AssistManagerScreen';
 import { PromiseTrackerScreen } from './screens/PromiseTrackerScreen';
+import { PromiseManagementScreen } from './screens/PromiseManagementScreen';
 
 // Placeholder for remaining screens
 function PlaceholderScreen({ title }: { title: string }) {
@@ -74,7 +75,7 @@ export function WireframeRoutes() {
         <Route path="safe-assist" element={<SafeAssistScreen />} />
         <Route path="assist-manager" element={<AssistManagerScreen />} />
         <Route path="promise-tracker" element={<PromiseTrackerScreen />} />
-        <Route path="promise-management" element={<PlaceholderScreen title="28. Promise Management" />} />
+        <Route path="promise-management" element={<PromiseManagementScreen />} />
       </Route>
     </Routes>
   );
