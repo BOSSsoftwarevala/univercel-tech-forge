@@ -1649,6 +1649,48 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_violation_types: {
+        Row: {
+          applicable_roles: Database["public"]["Enums"]["app_role"][] | null
+          auto_trigger_enabled: boolean | null
+          category: string
+          code: string
+          created_at: string | null
+          default_penalty_level: number
+          description: string | null
+          escalation_threshold: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          applicable_roles?: Database["public"]["Enums"]["app_role"][] | null
+          auto_trigger_enabled?: boolean | null
+          category: string
+          code: string
+          created_at?: string | null
+          default_penalty_level: number
+          description?: string | null
+          escalation_threshold?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          applicable_roles?: Database["public"]["Enums"]["app_role"][] | null
+          auto_trigger_enabled?: boolean | null
+          category?: string
+          code?: string
+          created_at?: string | null
+          default_penalty_level?: number
+          description?: string | null
+          escalation_threshold?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
       cookie_consents: {
         Row: {
           analytics: boolean | null
@@ -6448,6 +6490,78 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_review_cases: {
+        Row: {
+          assigned_at: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string | null
+          decision_reason: string | null
+          documents: Json | null
+          id: string
+          internal_notes: string | null
+          priority: string
+          reference_id: string | null
+          review_type: string
+          reviewed_at: string | null
+          reviewer_notes: string | null
+          risk_factors: Json | null
+          risk_score: number | null
+          status: string
+          submitted_at: string | null
+          updated_at: string | null
+          user_email: string | null
+          user_id: string
+          user_role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          decision_reason?: string | null
+          documents?: Json | null
+          id?: string
+          internal_notes?: string | null
+          priority?: string
+          reference_id?: string | null
+          review_type: string
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_email?: string | null
+          user_id: string
+          user_role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          decision_reason?: string | null
+          documents?: Json | null
+          id?: string
+          internal_notes?: string | null
+          priority?: string
+          reference_id?: string | null
+          review_type?: string
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_email?: string | null
+          user_id?: string
+          user_role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       license_compliance: {
         Row: {
           allowed_domains: string[] | null
@@ -6981,6 +7095,102 @@ export type Database = {
           status?: string | null
           timestamp?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      penalty_records: {
+        Row: {
+          actions_taken: Json | null
+          appeal_decision_notes: string | null
+          appeal_reviewed_at: string | null
+          appeal_reviewed_by: string | null
+          appeal_status: string | null
+          appeal_submitted_at: string | null
+          appeal_text: string | null
+          audit_trail_id: string | null
+          can_appeal: boolean | null
+          created_at: string | null
+          evidence: string | null
+          evidence_urls: Json | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          is_auto_triggered: boolean | null
+          issued_at: string
+          issued_by: string | null
+          issued_by_role: Database["public"]["Enums"]["app_role"] | null
+          lift_reason: string | null
+          lifted_at: string | null
+          lifted_by: string | null
+          penalty_level: number
+          reason: string
+          trigger_rule_id: string | null
+          updated_at: string | null
+          user_id: string
+          user_role: Database["public"]["Enums"]["app_role"]
+          violation_type: string
+        }
+        Insert: {
+          actions_taken?: Json | null
+          appeal_decision_notes?: string | null
+          appeal_reviewed_at?: string | null
+          appeal_reviewed_by?: string | null
+          appeal_status?: string | null
+          appeal_submitted_at?: string | null
+          appeal_text?: string | null
+          audit_trail_id?: string | null
+          can_appeal?: boolean | null
+          created_at?: string | null
+          evidence?: string | null
+          evidence_urls?: Json | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_auto_triggered?: boolean | null
+          issued_at?: string
+          issued_by?: string | null
+          issued_by_role?: Database["public"]["Enums"]["app_role"] | null
+          lift_reason?: string | null
+          lifted_at?: string | null
+          lifted_by?: string | null
+          penalty_level: number
+          reason: string
+          trigger_rule_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          user_role: Database["public"]["Enums"]["app_role"]
+          violation_type: string
+        }
+        Update: {
+          actions_taken?: Json | null
+          appeal_decision_notes?: string | null
+          appeal_reviewed_at?: string | null
+          appeal_reviewed_by?: string | null
+          appeal_status?: string | null
+          appeal_submitted_at?: string | null
+          appeal_text?: string | null
+          audit_trail_id?: string | null
+          can_appeal?: boolean | null
+          created_at?: string | null
+          evidence?: string | null
+          evidence_urls?: Json | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_auto_triggered?: boolean | null
+          issued_at?: string
+          issued_by?: string | null
+          issued_by_role?: Database["public"]["Enums"]["app_role"] | null
+          lift_reason?: string | null
+          lifted_at?: string | null
+          lifted_by?: string | null
+          penalty_level?: number
+          reason?: string
+          trigger_rule_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          user_role?: Database["public"]["Enums"]["app_role"]
+          violation_type?: string
         }
         Relationships: []
       }
@@ -9489,6 +9699,54 @@ export type Database = {
         }
         Relationships: []
       }
+      role_clause_agreements: {
+        Row: {
+          accepted_at: string
+          clause_id: string
+          clause_version: string
+          created_at: string | null
+          device_fingerprint: string | null
+          id: string
+          invalidated_at: string | null
+          invalidated_reason: string | null
+          ip_address: string | null
+          is_valid: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          clause_id: string
+          clause_version: string
+          created_at?: string | null
+          device_fingerprint?: string | null
+          id?: string
+          invalidated_at?: string | null
+          invalidated_reason?: string | null
+          ip_address?: string | null
+          is_valid?: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          clause_id?: string
+          clause_version?: string
+          created_at?: string | null
+          device_fingerprint?: string | null
+          id?: string
+          invalidated_at?: string | null
+          invalidated_reason?: string | null
+          ip_address?: string | null
+          is_valid?: boolean | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           action: string
@@ -11482,6 +11740,129 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_records: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          agreement_accepted_at: string | null
+          agreement_ip_address: string | null
+          agreement_version: string | null
+          asn_info: Json | null
+          asn_score: number | null
+          country_code: string | null
+          country_risk_score: number | null
+          created_at: string | null
+          current_step: string
+          date_of_birth: string | null
+          device_fingerprint: string | null
+          device_score: number | null
+          full_name: string | null
+          id: string
+          id_document_back_url: string | null
+          id_document_front_url: string | null
+          identity_verified_at: string | null
+          identity_verified_by: string | null
+          ip_reputation_score: number | null
+          is_activated: boolean | null
+          legal_review_notes: string | null
+          legal_review_status: string | null
+          legal_reviewed_at: string | null
+          legal_reviewer_id: string | null
+          liveness_photo_url: string | null
+          rejection_reason: string | null
+          requires_resubmission: boolean | null
+          resubmission_count: number | null
+          risk_assessed_at: string | null
+          risk_factors: Json | null
+          risk_score: number | null
+          role: Database["public"]["Enums"]["app_role"]
+          step_statuses: Json
+          updated_at: string | null
+          user_id: string
+          violation_history_score: number | null
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          agreement_accepted_at?: string | null
+          agreement_ip_address?: string | null
+          agreement_version?: string | null
+          asn_info?: Json | null
+          asn_score?: number | null
+          country_code?: string | null
+          country_risk_score?: number | null
+          created_at?: string | null
+          current_step?: string
+          date_of_birth?: string | null
+          device_fingerprint?: string | null
+          device_score?: number | null
+          full_name?: string | null
+          id?: string
+          id_document_back_url?: string | null
+          id_document_front_url?: string | null
+          identity_verified_at?: string | null
+          identity_verified_by?: string | null
+          ip_reputation_score?: number | null
+          is_activated?: boolean | null
+          legal_review_notes?: string | null
+          legal_review_status?: string | null
+          legal_reviewed_at?: string | null
+          legal_reviewer_id?: string | null
+          liveness_photo_url?: string | null
+          rejection_reason?: string | null
+          requires_resubmission?: boolean | null
+          resubmission_count?: number | null
+          risk_assessed_at?: string | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          role: Database["public"]["Enums"]["app_role"]
+          step_statuses?: Json
+          updated_at?: string | null
+          user_id: string
+          violation_history_score?: number | null
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          agreement_accepted_at?: string | null
+          agreement_ip_address?: string | null
+          agreement_version?: string | null
+          asn_info?: Json | null
+          asn_score?: number | null
+          country_code?: string | null
+          country_risk_score?: number | null
+          created_at?: string | null
+          current_step?: string
+          date_of_birth?: string | null
+          device_fingerprint?: string | null
+          device_score?: number | null
+          full_name?: string | null
+          id?: string
+          id_document_back_url?: string | null
+          id_document_front_url?: string | null
+          identity_verified_at?: string | null
+          identity_verified_by?: string | null
+          ip_reputation_score?: number | null
+          is_activated?: boolean | null
+          legal_review_notes?: string | null
+          legal_review_status?: string | null
+          legal_reviewed_at?: string | null
+          legal_reviewer_id?: string | null
+          liveness_photo_url?: string | null
+          rejection_reason?: string | null
+          requires_resubmission?: boolean | null
+          resubmission_count?: number | null
+          risk_assessed_at?: string | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          role?: Database["public"]["Enums"]["app_role"]
+          step_statuses?: Json
+          updated_at?: string | null
+          user_id?: string
+          violation_history_score?: number | null
+        }
+        Relationships: []
+      }
       verified_action_logs: {
         Row: {
           action_data: Json | null
@@ -11672,7 +12053,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_compliance_status: {
+        Row: {
+          active_penalties: number | null
+          highest_penalty_level: number | null
+          is_verified: boolean | null
+          last_agreement_date: string | null
+          risk_score: number | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          user_id: string | null
+          verification_step: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       approve_user: {
@@ -11762,6 +12155,7 @@ export type Database = {
       get_prime_user_id: { Args: { _user_id: string }; Returns: string }
       get_reseller_id: { Args: { _user_id: string }; Returns: string }
       get_risk_level: { Args: { score: number }; Returns: string }
+      get_user_penalty_level: { Args: { _user_id: string }; Returns: number }
       get_users_for_approval: {
         Args: { viewer_role: string }
         Returns: {
@@ -11773,6 +12167,10 @@ export type Database = {
           role: string
           user_id: string
         }[]
+      }
+      has_active_penalty: {
+        Args: { _min_level?: number; _user_id: string }
+        Returns: boolean
       }
       has_overlapping_promise: {
         Args: { _deadline: string; _developer_id: string }
@@ -11802,6 +12200,25 @@ export type Database = {
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       is_user_approved: { Args: { _user_id: string }; Returns: boolean }
+      is_user_verified: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      issue_penalty: {
+        Args: {
+          _auto_triggered?: boolean
+          _evidence?: string
+          _penalty_level: number
+          _reason: string
+          _user_id: string
+          _user_role: Database["public"]["Enums"]["app_role"]
+          _violation_type: string
+        }
+        Returns: string
+      }
       log_activity: {
         Args: {
           p_action_type: Database["public"]["Enums"]["activity_action_type"]

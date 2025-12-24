@@ -12,12 +12,18 @@ import {
   User,
   CreditCard,
   Calendar,
-  Shield
+  Shield,
+  Globe,
+  Fingerprint,
+  AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useComplianceSystem } from '@/hooks/useComplianceSystem';
+import { AppRole } from '@/types/roles';
 
 interface IdentityVerificationScreenProps {
+  role?: AppRole;
   onComplete?: (data: VerificationData) => void;
   isCompleted?: boolean;
 }
@@ -31,9 +37,11 @@ interface VerificationData {
 }
 
 export const IdentityVerificationScreen = ({ 
+  role = 'client',
   onComplete,
   isCompleted = false 
 }: IdentityVerificationScreenProps) => {
+  const { submitIdentityVerification, isLoading } = useComplianceSystem();
   const [step, setStep] = useState<'id' | 'liveness' | 'details'>('id');
   const [idFront, setIdFront] = useState<File | null>(null);
   const [idBack, setIdBack] = useState<File | null>(null);
@@ -64,10 +72,17 @@ export const IdentityVerificationScreen = ({
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    if (onComplete) {
+    // Submit to database
+    const success = await submitIdentityVerification(role, {
+      fullName,
+      dateOfBirth,
+      idFrontUrl: URL.createObjectURL(idFront),
+      idBackUrl: URL.createObjectURL(idBack),
+      livenessPhotoUrl: URL.createObjectURL(livenessPhoto),
+    });
+    
+    if (success && onComplete) {
       onComplete({
         idFrontUrl: URL.createObjectURL(idFront),
         idBackUrl: URL.createObjectURL(idBack),
@@ -77,7 +92,6 @@ export const IdentityVerificationScreen = ({
       });
     }
     
-    toast.success('Identity verification submitted');
     setIsSubmitting(false);
   };
 

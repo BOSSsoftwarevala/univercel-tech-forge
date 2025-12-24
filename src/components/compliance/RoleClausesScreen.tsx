@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, CheckCircle, AlertTriangle, Lock } from 'lucide-react';
+import { FileText, CheckCircle, AlertTriangle, Lock, Shield, User } from 'lucide-react';
 import { ROLE_CLAUSES, RoleClause } from '@/types/compliance';
 import { AppRole, ROLE_CONFIG } from '@/types/roles';
 import { motion } from 'framer-motion';
+import { useComplianceSystem } from '@/hooks/useComplianceSystem';
+import { toast } from 'sonner';
 
 interface RoleClausesScreenProps {
   role: AppRole;
@@ -22,6 +24,7 @@ export const RoleClausesScreen = ({
   isReadOnly = false,
   hasAccepted = false 
 }: RoleClausesScreenProps) => {
+  const { acceptRoleClauses, isLoading: isSubmitting } = useComplianceSystem();
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -56,8 +59,11 @@ export const RoleClausesScreen = ({
     );
   }
 
-  const handleAccept = () => {
-    if (onAccept && hasScrolledToEnd && isAgreed) {
+  const handleAccept = async () => {
+    if (!hasScrolledToEnd || !isAgreed) return;
+    
+    const success = await acceptRoleClauses(role, roleClause.id, roleClause.version);
+    if (success && onAccept) {
       onAccept(roleClause.id, roleClause.version);
     }
   };
@@ -186,11 +192,17 @@ export const RoleClausesScreen = ({
               <div className="flex justify-end gap-3">
                 <Button
                   onClick={handleAccept}
-                  disabled={!hasScrolledToEnd || !isAgreed}
+                  disabled={!hasScrolledToEnd || !isAgreed || isSubmitting}
                   className="min-w-[200px]"
                 >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Accept & Continue
+                  {isSubmitting ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Accept & Continue
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
