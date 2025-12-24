@@ -65,6 +65,12 @@ export function WireframeRoutes() {
         <Route path="sales" element={<SalesDashboardScreen />} />
         <Route path="ai-console" element={<AIConsoleScreen />} />
         <Route path="settings" element={<PlaceholderScreen title="Settings" />} />
+        <Route path="user" element={<PlaceholderScreen title="User Dashboard" />} />
+        {/* Roles 25-28 */}
+        <Route path="safe-assist" element={<PlaceholderScreen title="25. Safe Assist" />} />
+        <Route path="assist-manager" element={<PlaceholderScreen title="26. Assist Manager" />} />
+        <Route path="promise-tracker" element={<PlaceholderScreen title="27. Promise Tracker" />} />
+        <Route path="promise-management" element={<PlaceholderScreen title="28. Promise Management" />} />
       </Route>
     </Routes>
   );

@@ -38,29 +38,40 @@ interface WireframeSidebarProps {
 }
 
 const sidebarItems = [
-  { icon: Crown, label: 'Super Admin', path: '/wireframe/super-admin', color: 'text-red-500' },
-  { icon: Shield, label: 'Admin', path: '/wireframe/admin', color: 'text-orange-500' },
-  { icon: Building2, label: 'Franchise', path: '/wireframe/franchise', color: 'text-blue-500' },
-  { icon: Users, label: 'Reseller', path: '/wireframe/reseller', color: 'text-cyan-500' },
-  { icon: Code2, label: 'Developer', path: '/wireframe/developer', color: 'text-purple-500' },
-  { icon: Megaphone, label: 'Sales', path: '/wireframe/sales', color: 'text-green-500' },
-  { icon: Headphones, label: 'Support', path: '/wireframe/support', color: 'text-sky-500' },
-  { icon: Star, label: 'Prime User', path: '/wireframe/prime-user', color: 'text-amber-500' },
-  { icon: Target, label: 'Lead Manager', path: '/wireframe/lead-manager', color: 'text-teal-500' },
-  { icon: ListTodo, label: 'Task Manager', path: '/wireframe/task-manager', color: 'text-indigo-500' },
-  { icon: Search, label: 'SEO Manager', path: '/wireframe/seo-manager', color: 'text-emerald-500' },
-  { icon: Lightbulb, label: 'R&D', path: '/wireframe/rnd', color: 'text-sky-400' },
-  { icon: HeartHandshake, label: 'Client Success', path: '/wireframe/client-success', color: 'text-pink-500' },
-  { icon: TrendingUp, label: 'Performance', path: '/wireframe/performance', color: 'text-rose-500' },
-  { icon: Wallet, label: 'Finance', path: '/wireframe/finance', color: 'text-lime-500' },
-  { icon: Scale, label: 'Legal', path: '/wireframe/legal', color: 'text-stone-500' },
-  { icon: UserPlus, label: 'HR/Hiring', path: '/wireframe/hr', color: 'text-orange-400' },
-  { icon: Sparkles, label: 'Influencer', path: '/wireframe/influencer', color: 'text-fuchsia-500' },
-  { icon: Play, label: 'Demo Manager', path: '/wireframe/demo-manager', color: 'text-violet-500' },
-  { icon: BarChart3, label: 'Marketing', path: '/wireframe/marketing', color: 'text-pink-400' },
-  { icon: Package, label: 'Products', path: '/wireframe/products', color: 'text-blue-400' },
-  { icon: Bot, label: 'AI Console', path: '/wireframe/ai-console', color: 'text-cyan-400' },
-  { icon: Settings, label: 'Settings', path: '/wireframe/settings', color: 'text-gray-500' },
+  // GRADE 0 - OWNERSHIP
+  { icon: Crown, label: '1. Master Admin', path: '/wireframe/super-admin', color: 'text-red-500' },
+  // GRADE 1 - PLATFORM CONTROL
+  { icon: Shield, label: '2. Super Admin', path: '/wireframe/super-admin', color: 'text-orange-500' },
+  { icon: Shield, label: '3. Admin', path: '/wireframe/admin', color: 'text-orange-400' },
+  { icon: Settings, label: '4. Server Manager', path: '/wireframe/settings', color: 'text-gray-500' },
+  // GRADE 2 - BUSINESS MANAGEMENT
+  { icon: Building2, label: '5. Franchise Manager', path: '/wireframe/franchise', color: 'text-blue-500' },
+  { icon: Headphones, label: '6. Sales & Support', path: '/wireframe/sales', color: 'text-green-500' },
+  { icon: Users, label: '7. Reseller Manager', path: '/wireframe/reseller', color: 'text-cyan-500' },
+  { icon: Bot, label: '8. API/AI Manager', path: '/wireframe/ai-console', color: 'text-cyan-400' },
+  { icon: Sparkles, label: '9. Influencer Manager', path: '/wireframe/influencer', color: 'text-fuchsia-500' },
+  { icon: Search, label: '10. SEO Manager', path: '/wireframe/seo-manager', color: 'text-emerald-500' },
+  { icon: BarChart3, label: '11. Marketing Manager', path: '/wireframe/marketing', color: 'text-pink-400' },
+  { icon: Target, label: '12. Lead Manager', path: '/wireframe/lead-manager', color: 'text-teal-500' },
+  { icon: Star, label: '13. Pro Manager', path: '/wireframe/prime-user', color: 'text-amber-500' },
+  { icon: Scale, label: '14. Legal Manager', path: '/wireframe/legal', color: 'text-stone-500' },
+  { icon: ListTodo, label: '15. Task Manager', path: '/wireframe/task-manager', color: 'text-indigo-500' },
+  { icon: UserPlus, label: '16. HR Manager', path: '/wireframe/hr', color: 'text-orange-400' },
+  { icon: Code2, label: '17. Developer Manager', path: '/wireframe/developer', color: 'text-purple-500' },
+  // GRADE 3 - PARTNERS
+  { icon: Building2, label: '18. Franchise', path: '/wireframe/franchise', color: 'text-blue-400' },
+  { icon: Code2, label: '19. Developer', path: '/wireframe/developer', color: 'text-purple-400' },
+  { icon: Users, label: '20. Reseller', path: '/wireframe/reseller', color: 'text-cyan-400' },
+  { icon: Sparkles, label: '21. Influencer', path: '/wireframe/influencer', color: 'text-fuchsia-400' },
+  // GRADE 4 - USERS
+  { icon: Star, label: '22. Prime User', path: '/wireframe/prime-user', color: 'text-amber-400' },
+  { icon: Users, label: '23. User', path: '/wireframe/user', color: 'text-slate-400' },
+  { icon: Play, label: '24. Frontend', path: '/wireframe/demo-manager', color: 'text-violet-500' },
+  // GRADE 5 - SUPPORT & PROMISE
+  { icon: HeartHandshake, label: '25. Safe Assist', path: '/wireframe/safe-assist', color: 'text-green-400' },
+  { icon: Headphones, label: '26. Assist Manager', path: '/wireframe/assist-manager', color: 'text-sky-400' },
+  { icon: TrendingUp, label: '27. Promise Tracker', path: '/wireframe/promise-tracker', color: 'text-rose-400' },
+  { icon: Package, label: '28. Promise Management', path: '/wireframe/promise-management', color: 'text-emerald-400' },
 ];
 
 export function WireframeSidebar({ collapsed, onToggle, theme }: WireframeSidebarProps) {
