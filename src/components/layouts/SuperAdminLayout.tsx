@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Users, Shield, Package, UserCheck, Crown,
-  Settings, Activity, Lock, Scale, LogOut, KeyRound, ArrowLeft, BarChart3
+  Settings, Activity, Lock, Scale, LogOut, KeyRound, ArrowLeft, BarChart3, UserPlus
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +20,7 @@ const menuItems = [
   { icon: BarChart3, label: 'Performance', path: '/super-admin/performance' },
   { icon: Users, label: 'Role Manager', path: '/super-admin/role-manager' },
   { icon: UserCheck, label: 'User Manager', path: '/super-admin/user-manager' },
+  { icon: UserPlus, label: 'Bulk User Creation', path: '/admin/bulk-users' },
   { icon: Shield, label: 'Permission Matrix', path: '/super-admin/permission-matrix' },
   { icon: Lock, label: 'Security Center', path: '/super-admin/security-center' },
   { icon: Scale, label: 'Compliance Center', path: '/super-admin/compliance-center' },
