@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.safe-assist-relay]
 verify_jwt = false
+
+[functions.safe-assist-ai]
+verify_jwt = false

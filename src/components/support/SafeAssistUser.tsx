@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, Eye, Copy, Check, X, AlertTriangle, 
-  Lock, Fingerprint, Bot, Bell, Clock, UserCheck
+  Lock, Fingerprint, Bot, Bell, Clock, UserCheck, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useSafeAssist } from '@/hooks/useSafeAssist';
+import { SafeAssistAIChat } from './SafeAssistAIChat';
 import { toast } from 'sonner';
 
 interface SafeAssistUserProps {
@@ -35,8 +36,9 @@ export function SafeAssistUser({ onClose }: SafeAssistUserProps) {
 
   const [copied, setCopied] = useState(false);
   const [enteredAgentCode, setEnteredAgentCode] = useState('');
-  const [step, setStep] = useState<'create' | 'share' | 'verify' | 'consent' | 'active'>('create');
+  const [step, setStep] = useState<'ai_chat' | 'create' | 'share' | 'verify' | 'consent' | 'active'>('ai_chat');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [aiResolved, setAiResolved] = useState(false);
 
   const unreadNotifications = notifications.filter(n => !n.read_at);
 
@@ -194,6 +196,32 @@ export function SafeAssistUser({ onClose }: SafeAssistUserProps) {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Step: AI Chat (First) */}
+          {step === 'ai_chat' && (
+            <div className="space-y-4">
+              <SafeAssistAIChat
+                sessionId={session?.id}
+                onEscalateToHuman={() => setStep('create')}
+                onResolved={() => {
+                  setAiResolved(true);
+                  toast.success('Issue resolved by AI!');
+                  onClose?.();
+                }}
+              />
+              <div className="flex items-center justify-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep('create')}
+                  className="text-xs text-muted-foreground"
+                >
+                  <UserCheck className="w-3 h-3 mr-1" />
+                  Skip to Human Agent
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Step: Create Session */}
           {step === 'create' && (
