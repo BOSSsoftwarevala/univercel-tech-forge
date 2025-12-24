@@ -12,10 +12,22 @@ import {
 import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 const footerLinks = {
-  products: ['POS System', 'School ERP', 'Hospital Management', 'Real Estate CRM', 'HRMS'],
-  company: ['About Us', 'Careers', 'Press', 'Blog', 'Contact'],
-  resources: ['Documentation', 'API Reference', 'Tutorials', 'Case Studies', 'Webinars'],
-  legal: ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR']
+  products: [
+    { label: 'POS System', href: '/demos' },
+    { label: 'School ERP', href: '/demos' },
+    { label: 'Hospital Management', href: '/demos' },
+    { label: 'Real Estate CRM', href: '/demos' },
+    { label: 'HRMS', href: '/demos' }
+  ],
+  company: [
+    { label: 'About Us', href: '/demos' },
+    { label: 'Contact', href: 'mailto:hellosoftwarevala@gmail.com' },
+    { label: 'Support', href: 'https://wa.me/918348838383' }
+  ],
+  legal: [
+    { label: 'Privacy Policy', href: '/demos' },
+    { label: 'Terms of Service', href: '/demos' }
+  ]
 };
 
 const socialLinks = [
@@ -96,12 +108,14 @@ const HomepageFooter = forwardRef<HTMLElement>((_, ref) => {
               </h4>
               <ul className="space-y-3">
                 {links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href="#"
+                      href={link.href}
+                      target={link.href.startsWith('http') || link.href.startsWith('mailto') ? '_blank' : undefined}
+                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                       className="text-muted-foreground hover:text-primary transition-colors text-sm relative group"
                     >
-                      {link}
+                      {link.label}
                       <span className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
                     </a>
                   </li>

@@ -194,7 +194,7 @@ const SimpleLanding = () => {
                 Try Free Demo
               </Link>
               <Link 
-                to="/login"
+                to="/auth"
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-medium hover:bg-white/10 transition-all"
               >
                 <LogIn className="w-4 h-4" />
@@ -680,7 +680,7 @@ const SimpleLanding = () => {
             <div className="flex items-center gap-6 text-sm text-slate-500">
               <Link to="/demos" className="hover:text-white transition-colors">Demos</Link>
               <Link to="/sectors" className="hover:text-white transition-colors">Categories</Link>
-              <Link to="/login" className="hover:text-white transition-colors">Login</Link>
+              <Link to="/auth" className="hover:text-white transition-colors">Login</Link>
             </div>
             <div className="flex items-center gap-4 text-slate-600">
               <a href="mailto:info@softwarevala.com" className="hover:text-cyan-400 transition-colors">

@@ -79,7 +79,7 @@ const SimpleDemoList = () => {
             </Link>
             {/* Hide login button in test mode - no login required */}
             {!isTestMode && (
-              <Link to="/login" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
+              <Link to="/auth" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
                 Login
               </Link>
             )}
