@@ -79,6 +79,7 @@ export function PrimeUsersList() {
     mutationFn: async (data: typeof formData) => {
       const validityDays = data.subscription_tier === 'monthly' ? 30 : data.subscription_tier === 'yearly' ? 365 : 36500;
       const { error } = await supabase.from('prime_user_profiles').insert([{
+        user_id: crypto.randomUUID(), // Generate a placeholder UUID for manual entries
         full_name: data.full_name,
         email: data.email,
         phone: data.phone,
