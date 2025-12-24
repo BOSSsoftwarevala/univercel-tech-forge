@@ -185,6 +185,27 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: Package, label: 'Demos', path: '/client/demos' },
     { icon: HeadphonesIcon, label: 'Support', path: '/client/support' },
   ],
+  api_security: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/api-security' },
+    { icon: Lock, label: 'API Keys', path: '/api-security/keys' },
+    { icon: Shield, label: 'Security Logs', path: '/api-security/logs' },
+    { icon: Activity, label: 'Monitoring', path: '/api-security/monitoring' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  r_and_d: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/rnd-dashboard' },
+    { icon: Lightbulb, label: 'Research', path: '/rnd/research' },
+    { icon: GitBranch, label: 'Development', path: '/rnd/development' },
+    { icon: Activity, label: 'Testing', path: '/rnd/testing' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  master: [
+    { icon: LayoutDashboard, label: 'Command Center', path: '/super-admin/dashboard' },
+    { icon: Activity, label: 'Live Tracking', path: '/super-admin/live-tracking' },
+    { icon: Users, label: 'All Users', path: '/super-admin/user-manager' },
+    { icon: Shield, label: 'Security', path: '/super-admin/security-center' },
+    { icon: Settings, label: 'System Settings', path: '/super-admin/system-settings' },
+  ],
 };
 
 interface RoleSidebarProps {

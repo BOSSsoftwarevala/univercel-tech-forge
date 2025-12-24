@@ -1,4 +1,4 @@
-// All 21 roles in the Software Vala system (matches database enum)
+// All 24 roles in the Software Vala system (matches database enum)
 export type AppRole = 
   | 'super_admin'
   | 'admin'
@@ -20,7 +20,10 @@ export type AppRole =
   | 'hr_manager'
   | 'support'
   | 'ai_manager'
-  | 'client';
+  | 'client'
+  | 'api_security'
+  | 'r_and_d'
+  | 'master';
 
 // Role metadata for display
 export const ROLE_CONFIG: Record<AppRole, {
@@ -176,6 +179,27 @@ export const ROLE_CONFIG: Record<AppRole, {
     icon: 'User',
     modules: ['demos', 'support'],
     tier: 'user'
+  },
+  api_security: {
+    label: 'API Security',
+    color: '#ef4444',
+    icon: 'ShieldCheck',
+    modules: ['api', 'security', 'logs', 'chat'],
+    tier: 'manager'
+  },
+  r_and_d: {
+    label: 'R&D',
+    color: '#0ea5e9',
+    icon: 'Beaker',
+    modules: ['research', 'development', 'testing', 'chat'],
+    tier: 'manager'
+  },
+  master: {
+    label: 'Master',
+    color: '#dc2626',
+    icon: 'Crown',
+    modules: ['*'],
+    tier: 'admin'
   }
 };
 

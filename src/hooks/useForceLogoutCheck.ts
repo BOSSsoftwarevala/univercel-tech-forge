@@ -58,11 +58,13 @@ export function useForceLogoutCheck() {
 
   // Subscribe to realtime force logout events
   useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
     const setupRealtimeSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const channel = supabase
+      channel = supabase
         .channel('force-logout')
         .on(
           'postgres_changes',
@@ -80,13 +82,15 @@ export function useForceLogoutCheck() {
           }
         )
         .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
     };
 
     setupRealtimeSubscription();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, [checkForceLogout]);
 
   return { checkForceLogout };
