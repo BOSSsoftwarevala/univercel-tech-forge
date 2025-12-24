@@ -10,6 +10,7 @@ export type AppRole = Database['public']['Enums']['app_role'];
 
 // Complete role hierarchy with numeric levels for comparison
 export const ROLE_HIERARCHY: Partial<Record<AppRole, number>> = {
+  master: 110, // Master admin - highest level
   super_admin: 100,
   admin: 90,
   finance_manager: 85,
@@ -51,6 +52,7 @@ export const MASKED_ID_CONFIG: Record<string, {
   icon: string;
   displayName: string;
 }> = {
+  master: { prefix: '🔱 MASTER', digits: 1, icon: 'Crown', displayName: 'Master Admin' },
   super_admin: { prefix: '👑 BOSS', digits: 2, icon: 'Crown', displayName: 'Super Admin' },
   admin: { prefix: 'MGT', digits: 2, icon: 'Shield', displayName: 'Management' },
   developer: { prefix: 'EMP', digits: 3, icon: 'Briefcase', displayName: 'Employee' },
@@ -81,6 +83,7 @@ export const MASKED_ID_CONFIG: Record<string, {
 
 // Route access mapping for all roles
 export const ROLE_ROUTES: Partial<Record<AppRole, string[]>> = {
+  master: ['*'], // Master has full access to everything
   super_admin: ['*'], // Access to everything
   admin: ['/super-admin', '/settings', '/api-integrations', '/system-settings'],
   developer: ['/developer', '/tasks', '/settings'],
@@ -109,12 +112,14 @@ export const ROLE_ROUTES: Partial<Record<AppRole, string[]>> = {
 // Check if user has required role level
 export function hasRoleLevel(userRole: AppRole | null, requiredRole: AppRole): boolean {
   if (!userRole) return false;
+  if (userRole === 'master') return true; // Master bypasses all
   return (ROLE_HIERARCHY[userRole] || 0) >= (ROLE_HIERARCHY[requiredRole] || 0);
 }
 
 // Check if user has any of the specified roles
 export function hasAnyRole(userRole: AppRole | null, allowedRoles: AppRole[]): boolean {
   if (!userRole) return false;
+  if (userRole === 'master') return true; // Master bypasses all
   if (userRole === 'super_admin') return true; // Super admin bypasses all
   return allowedRoles.includes(userRole);
 }
@@ -122,6 +127,7 @@ export function hasAnyRole(userRole: AppRole | null, allowedRoles: AppRole[]): b
 // Check if user can access a specific route
 export function canAccessRoute(userRole: AppRole | null, route: string): boolean {
   if (!userRole) return false;
+  if (userRole === 'master') return true; // Master has full access
   if (userRole === 'super_admin') return true;
   
   const allowedRoutes = ROLE_ROUTES[userRole] || [];
@@ -161,7 +167,7 @@ export function generateMaskedId(role: AppRole | string, seed: string): { masked
   return { maskedId, config };
 }
 
-// Validate role is one of the 21 known roles (19 + general + common)
+// Validate role is one of the 24 known roles
 export function isValidRole(role: string): role is AppRole {
   return Object.keys(ROLE_HIERARCHY).includes(role);
 }
@@ -169,6 +175,7 @@ export function isValidRole(role: string): role is AppRole {
 // Get dashboard route for role
 export function getDashboardRoute(role: AppRole): string {
   const routeMap: Partial<Record<AppRole, string>> = {
+    master: '/master-admin',
     super_admin: '/super-admin',
     admin: '/super-admin',
     developer: '/developer',

@@ -310,5 +310,6 @@ export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
 
 export function hasPermission(role: string | null, permission: string): boolean {
   if (!role) return false;
+  if (role === 'master') return true; // Master has all permissions
   return PERMISSION_MATRIX[role]?.[permission] ?? false;
 }
