@@ -11,8 +11,16 @@ import {
   Bell, 
   User,
   Zap,
-  DollarSign
+  DollarSign,
+  ArrowLeft,
+  LogOut,
+  Lock,
+  KeyRound
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -30,6 +38,17 @@ const menuItems = [
 export const PerformanceSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut, userRole } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      navigate('/auth');
+    } catch (error) {
+      toast.error("Failed to logout");
+    }
+  };
 
   return (
     <aside className="w-64 min-h-screen bg-slate-900/90 backdrop-blur-xl border-r border-cyan-500/20 flex flex-col">
@@ -110,17 +129,62 @@ export const PerformanceSidebar = () => {
         </div>
       </div>
 
-      {/* User Info */}
+      {/* Role Badge & User Info */}
       <div className="p-4 border-t border-cyan-500/20">
+        <Badge className="w-full justify-center mb-3 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 text-cyan-300 border-cyan-500/40 py-1.5">
+          <BarChart3 className="w-3 h-3 mr-1.5" />
+          {userRole === 'super_admin' ? 'SUPER ADMIN' : 'PERFORMANCE MANAGER'}
+        </Badge>
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/50">
           <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 flex items-center justify-center text-white text-xs font-bold">
-            PM
+            {userRole === 'super_admin' ? 'SA' : 'PM'}
           </div>
           <div className="flex-1">
-            <p className="text-sm text-white">Performance Manager</p>
-            <p className="text-xs text-slate-500">vala(pm)0001</p>
+            <p className="text-sm text-white">{userRole === 'super_admin' ? 'Super Admin' : 'Performance Manager'}</p>
+            <p className="text-xs text-slate-500">Performance Hub</p>
           </div>
         </div>
+      </div>
+
+      {/* Footer Actions */}
+      <div className="p-4 border-t border-cyan-500/20 space-y-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+          onClick={() => navigate('/dashboard')}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+            onClick={() => navigate('/change-password')}
+          >
+            <Lock className="w-4 h-4 mr-1" />
+            Password
+          </Button>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+          onClick={() => navigate('/forgot-password')}
+        >
+          <KeyRound className="w-4 h-4 mr-2" />
+          Forgot Password
+        </Button>
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
       </div>
     </aside>
   );
