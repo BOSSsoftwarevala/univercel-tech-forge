@@ -226,15 +226,9 @@ const CommandHeader = memo(() => {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2 pl-2 pr-3">
+            <Button variant="ghost" size="icon">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-neon-teal flex items-center justify-center">
                 <User className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-medium">{getMaskedIdentity()}</p>
-                {roleConfig && (
-                  <p className="text-xs text-muted-foreground">{roleConfig.label}</p>
-                )}
               </div>
             </Button>
           </DropdownMenuTrigger>
