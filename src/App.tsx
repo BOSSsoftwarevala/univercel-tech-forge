@@ -150,7 +150,8 @@ const App = () => (
               <Route path="/onboard" element={<Homepage />} />
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
               <Route path="/apply" element={<SimpleDemoList />} />
-              <Route path="/bootstrap-admins" element={<BootstrapAdmins />} />
+              {/* Bootstrap is Master-only after initial setup */}
+              <Route path="/bootstrap-admins" element={<RequireRole allowed={["master"]} masterOnly><BootstrapAdmins /></RequireRole>} />
               <Route path="/sectors" element={<SectorsBrowse />} />
               <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
               

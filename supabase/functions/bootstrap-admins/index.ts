@@ -6,25 +6,77 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// This is a one-time bootstrap function - no auth required
-// It's protected by being a one-time operation (won't recreate existing admins)
+// SECURITY: This function requires Master Admin authentication
+// Protected by JWT verification and role check
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Allow GET for easy browser trigger
-  if (req.method !== "POST" && req.method !== "GET") {
+  // SECURITY: Only allow POST requests - no browser URL triggers
+  if (req.method !== "POST") {
     return new Response(
       JSON.stringify({ error: "Method not allowed" }),
       { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const masterPassword = Deno.env.get("MASTER_ADMIN_PASSWORD");
     const superAdminPassword = Deno.env.get("SUPER_ADMIN_PASSWORD");
+
+    // SECURITY: Verify the caller is authenticated as Master
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Create client with caller's JWT to verify their role
+    const supabaseClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // SECURITY: Verify caller is Master Admin
+    const { data: roleData, error: roleError } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .single();
+
+    // Allow first-time bootstrap if no master exists yet
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    });
+
+    const { data: existingMasterCheck } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "master")
+      .maybeSingle();
+
+    // If master exists and caller is not master, deny access
+    if (existingMasterCheck && (!roleData || roleData.role !== "master")) {
+      console.log("Unauthorized bootstrap attempt by user:", user.id);
+      return new Response(
+        JSON.stringify({ error: "Only Master Admin can perform this action" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!masterPassword || !superAdminPassword) {
       return new Response(
@@ -33,11 +85,7 @@ serve(async (req: Request) => {
       );
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    });
-
-    const results: any[] = [];
+    const results: Array<{ email: string; action?: string; role?: string; error?: string }> = [];
 
     // Bootstrap Master Admin
     const masterEmail = "hellosoftwarevala@gmail.com";
@@ -48,21 +96,18 @@ serve(async (req: Request) => {
       .maybeSingle();
 
     if (!existingMaster) {
-      // Check if user exists in auth
       const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
       const existingUser = authUsers?.users?.find(u => u.email === masterEmail);
 
-      let masterUserId: string;
+      let masterUserId: string | undefined;
 
       if (existingUser) {
         masterUserId = existingUser.id;
-        // Update password
         await supabaseAdmin.auth.admin.updateUserById(masterUserId, {
           password: masterPassword
         });
         results.push({ email: masterEmail, action: "password_updated", role: "master" });
       } else {
-        // Create new user
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
           email: masterEmail,
           password: masterPassword,
@@ -72,14 +117,13 @@ serve(async (req: Request) => {
 
         if (createError) {
           results.push({ email: masterEmail, error: createError.message });
-        } else {
+        } else if (newUser?.user) {
           masterUserId = newUser.user.id;
           results.push({ email: masterEmail, action: "created", role: "master" });
         }
       }
 
-      // Ensure role entry exists
-      if (masterUserId!) {
+      if (masterUserId) {
         const { data: existingRole } = await supabaseAdmin
           .from("user_roles")
           .select("id")
@@ -118,7 +162,7 @@ serve(async (req: Request) => {
       const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
       const existingUser = authUsers?.users?.find(u => u.email === superAdminEmail);
 
-      let superAdminUserId: string;
+      let superAdminUserId: string | undefined;
 
       if (existingUser) {
         superAdminUserId = existingUser.id;
@@ -136,13 +180,13 @@ serve(async (req: Request) => {
 
         if (createError) {
           results.push({ email: superAdminEmail, error: createError.message });
-        } else {
+        } else if (newUser?.user) {
           superAdminUserId = newUser.user.id;
           results.push({ email: superAdminEmail, action: "created", role: "super_admin" });
         }
       }
 
-      if (superAdminUserId!) {
+      if (superAdminUserId) {
         const { data: existingRole } = await supabaseAdmin
           .from("user_roles")
           .select("id")
@@ -168,6 +212,15 @@ serve(async (req: Request) => {
     } else {
       results.push({ email: superAdminEmail, action: "already_exists", role: "super_admin" });
     }
+
+    // Log to audit trail
+    await supabaseAdmin.from("audit_logs").insert({
+      user_id: user.id,
+      action: "bootstrap_admins_function_executed",
+      module: "security",
+      role: "master",
+      meta_json: { results, caller_id: user.id }
+    });
 
     return new Response(
       JSON.stringify({ success: true, results }),
