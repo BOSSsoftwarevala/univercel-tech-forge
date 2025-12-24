@@ -1,11 +1,13 @@
 import { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Users, Shield, Package, UserCheck, Crown,
-  Settings, Activity, Lock
+  Settings, Activity, Lock, Scale, LogOut, KeyRound, ArrowLeft
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface SuperAdminLayoutProps {
   children: ReactNode;
@@ -19,6 +21,7 @@ const menuItems = [
   { icon: UserCheck, label: 'User Manager', path: '/super-admin/user-manager' },
   { icon: Shield, label: 'Permission Matrix', path: '/super-admin/permission-matrix' },
   { icon: Lock, label: 'Security Center', path: '/super-admin/security-center' },
+  { icon: Scale, label: 'Compliance Center', path: '/super-admin/compliance-center' },
   { icon: Crown, label: 'Prime Manager', path: '/super-admin/prime-manager' },
   { icon: Package, label: 'Product Manager', path: '/super-admin/product-manager' },
   { icon: Settings, label: 'System Audit', path: '/super-admin/system-audit' },
@@ -26,6 +29,17 @@ const menuItems = [
 
 const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success('Logged out successfully');
+      navigate('/auth');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -58,13 +72,35 @@ const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
             ))}
           </nav>
         </ScrollArea>
-        <div className="p-4 border-t border-border/50">
-          <Link 
-            to="/dashboard" 
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+
+        {/* Footer Actions */}
+        <div className="p-3 border-t border-border/50 space-y-2">
+          {/* Back to Dashboard */}
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
           >
-            ← Back to Main Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
           </Link>
+
+          {/* Change Password */}
+          <Link
+            to="/auth/change-password"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          >
+            <KeyRound className="w-4 h-4" />
+            Change Password
+          </Link>
+
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       </aside>
 

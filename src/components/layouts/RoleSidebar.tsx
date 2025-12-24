@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
@@ -8,11 +8,13 @@ import {
   Wallet, HeadphonesIcon, Target, BarChart3, Scale, Search,
   Ban, Bell, Settings, Activity, GitBranch, Lock, Zap, Heart,
   Brain, UserPlus, MessageSquare, Star, ChevronLeft, ChevronRight,
-  Sparkles, DollarSign, FileText, TrendingUp, Lightbulb
+  Sparkles, DollarSign, FileText, TrendingUp, Lightbulb, LogOut, KeyRound, ArrowLeft
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { ROLE_CONFIG, AppRole } from '@/types/roles';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface MenuItem {
   icon: any;
@@ -298,7 +300,65 @@ const RoleSidebar = ({ role, collapsed = false, onToggle }: RoleSidebarProps) =>
           })}
         </nav>
       </ScrollArea>
+
+      {/* Footer Actions */}
+      <SidebarFooter collapsed={collapsed} />
     </motion.aside>
+  );
+};
+
+// Sidebar Footer Component with Logout, Change Password, Back
+const SidebarFooter = ({ collapsed }: { collapsed: boolean }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success('Logged out successfully');
+      navigate('/auth');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
+
+  return (
+    <div className="p-3 border-t border-border/50 space-y-2">
+      {/* Back to Dashboard */}
+      <Link
+        to="/dashboard"
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors",
+          collapsed && "justify-center"
+        )}
+      >
+        <ArrowLeft className="h-4 w-4 shrink-0" />
+        {!collapsed && <span>Back to Dashboard</span>}
+      </Link>
+
+      {/* Change Password */}
+      <Link
+        to="/auth/change-password"
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors",
+          collapsed && "justify-center"
+        )}
+      >
+        <KeyRound className="h-4 w-4 shrink-0" />
+        {!collapsed && <span>Change Password</span>}
+      </Link>
+
+      {/* Logout */}
+      <button
+        onClick={handleLogout}
+        className={cn(
+          "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors",
+          collapsed && "justify-center"
+        )}
+      >
+        <LogOut className="h-4 w-4 shrink-0" />
+        {!collapsed && <span>Logout</span>}
+      </button>
+    </div>
   );
 };
 
