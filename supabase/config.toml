@@ -59,3 +59,6 @@ verify_jwt = false
 
 [functions.ai-developer-assistant]
 verify_jwt = false
+
+[functions.ai-reseller-assistant]
+verify_jwt = false

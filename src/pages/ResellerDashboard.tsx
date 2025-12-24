@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Users, Link2, Wallet, MessageSquare, 
   GraduationCap, HeadphonesIcon, Bot, BarChart3, Target,
-  Megaphone, Settings, ChevronLeft, ChevronRight, LogOut, Lock, Star
+  Megaphone, Settings, ChevronLeft, ChevronRight, LogOut, Lock, Star,
+  Radar, Brain, Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -20,19 +21,20 @@ import { MicroTrainingLessons } from '@/components/reseller/MicroTrainingLessons
 import ResellerEscalations from '@/components/reseller/ResellerEscalations';
 import ResellerTargets from '@/components/reseller/ResellerTargets';
 import ResellerDash from '@/components/reseller/ResellerDash';
+import AIMonitoringCenter from '@/components/reseller/AIMonitoringCenter';
+import AILeadScoring from '@/components/reseller/AILeadScoring';
+import AIResellerAssistant from '@/components/reseller/AIResellerAssistant';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'monitoring', label: 'AI Monitoring', icon: Radar, badge: 'AI', isAI: true },
+  { id: 'scoring', label: 'Lead Scoring', icon: Brain, badge: 'AI', isAI: true },
+  { id: 'assistant', label: 'AI Assistant', icon: Sparkles, badge: 'AI', isAI: true },
   { id: 'leads', label: 'Lead Inbox', icon: Users, badge: 12 },
   { id: 'demos', label: 'Demo Sharing', icon: Link2 },
-  { id: 'scripts', label: 'AI Sales Script', icon: Bot, badge: 'AI' },
-  { id: 'wallet', label: 'Wallet & Commission', icon: Wallet },
-  { id: 'chat', label: 'Customer Chat', icon: MessageSquare, badge: 5 },
-  { id: 'marketing', label: 'Marketing Toolkit', icon: Megaphone },
-  { id: 'targets', label: 'Targets & Goals', icon: Target },
+  { id: 'wallet', label: 'Wallet', icon: Wallet },
+  { id: 'targets', label: 'Targets', icon: Target },
   { id: 'performance', label: 'Performance', icon: BarChart3 },
-  { id: 'escalations', label: 'Escalations', icon: HeadphonesIcon },
-  { id: 'training', label: 'Micro Training', icon: GraduationCap },
 ];
 
 const ResellerDashboard = () => {
@@ -49,15 +51,13 @@ const ResellerDashboard = () => {
 
   const renderContent = () => {
     switch (activeSection) {
+      case 'monitoring': return <AIMonitoringCenter />;
+      case 'scoring': return <AILeadScoring />;
+      case 'assistant': return <AIResellerAssistant />;
       case 'leads': return <LeadInboxReseller />;
       case 'demos': return <DemoSharingHub />;
-      case 'scripts': return <SalesScriptAI />;
       case 'wallet': return <ResellerWallet />;
-      case 'chat': return <CustomerChatMasked />;
-      case 'marketing': return <MarketingToolkit />;
       case 'performance': return <ResellerPerformanceBoard />;
-      case 'training': return <MicroTrainingLessons />;
-      case 'escalations': return <ResellerEscalations />;
       case 'targets': return <ResellerTargets />;
       default: return <ResellerDash />;
     }
