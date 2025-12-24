@@ -34,12 +34,18 @@ export default function RequireRole({ allowed, children, masterOnly = false }: R
     return <Navigate to="/access-denied" replace />;
   }
 
-  // Check if user has one of the allowed roles
-  if (!allowed.includes(userRole)) return <Navigate to="/access-denied" replace />;
-
-  // Master and Super Admin get direct access
-  if (isMaster || (userRole === 'super_admin')) {
+  // Master and Super Admin get direct access (bypass role check)
+  if (isMaster) {
     return <>{children}</>;
+  }
+
+  // Check if user has one of the allowed roles
+  if (!allowed.includes(userRole)) {
+    // Super admin can access anything except master-only
+    if (userRole === 'super_admin' && !masterOnly) {
+      return <>{children}</>;
+    }
+    return <Navigate to="/access-denied" replace />;
   }
 
   // Non-privileged roles must be approved
