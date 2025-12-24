@@ -43,9 +43,10 @@ interface Reseller {
   lastActive: string;
 }
 
+// SECURITY: 'withdrawal' type REMOVED from PendingApproval - Reseller Manager cannot approve payouts (Step 9 compliance)
 interface PendingApproval {
   id: string;
-  type: 'registration' | 'withdrawal' | 'territory_change' | 'tier_upgrade' | 'ai_topup' | 'suspension_appeal';
+  type: 'registration' | 'territory_change' | 'tier_upgrade' | 'ai_topup' | 'suspension_appeal';
   title: string;
   description: string;
   reseller: string;
@@ -124,7 +125,8 @@ const AIResellerManager = () => {
     },
   ]);
 
-  // Pending Approvals
+  // SECURITY: Pending Approvals - 'withdrawal' type REMOVED per Step 9 (Commission Separation)
+  // Reseller Manager CANNOT: Edit commissions, Approve payouts, Trigger withdrawals
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([
     {
       id: 'APR001', type: 'registration', title: 'New Reseller Registration',
@@ -133,13 +135,7 @@ const AIResellerManager = () => {
       priority: 'medium', status: 'pending',
       aiRecommendation: 'Recommended - Territory has growth potential'
     },
-    {
-      id: 'APR002', type: 'withdrawal', title: 'Commission Withdrawal Request',
-      description: 'Rajesh Enterprises requests ₹50,000 withdrawal',
-      reseller: 'Rajesh Enterprises', requestedAt: new Date(Date.now() - 600000),
-      priority: 'low', status: 'pending', amount: 50000,
-      aiRecommendation: 'Approved - Sufficient balance available'
-    },
+    // SECURITY: Withdrawal approval REMOVED - handled by Finance Manager only
     {
       id: 'APR003', type: 'tier_upgrade', title: 'Tier Upgrade Request',
       description: 'Sharma Solutions requests upgrade to Platinum tier',
@@ -212,10 +208,11 @@ const AIResellerManager = () => {
     }
   };
 
+  // SECURITY: 'withdrawal' type REMOVED from approval badge types - Finance Manager only
   const getApprovalTypeBadge = (type: string) => {
     const types: Record<string, { color: string; label: string }> = {
       registration: { color: 'cyan', label: 'Registration' },
-      withdrawal: { color: 'emerald', label: 'Withdrawal' },
+      // SECURITY: 'withdrawal' REMOVED - Reseller Manager cannot approve payouts
       territory_change: { color: 'purple', label: 'Territory' },
       tier_upgrade: { color: 'amber', label: 'Tier Upgrade' },
       ai_topup: { color: 'pink', label: 'AI Credits' },
