@@ -145,7 +145,8 @@ serve(async (req: Request) => {
     }, { module: "wallet", action: "add" });
   }
 
-  // POST /wallet/withdraw
+  // POST /wallet/withdraw - Creates request only, NO wallet debit
+  // Wallet is only debited when Super Admin/Master approves
   if (path === "/withdraw" && req.method === "POST") {
     return withAuth(req, [], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["amount"]);
@@ -195,76 +196,177 @@ serve(async (req: Request) => {
         .select("amount")
         .eq("user_id", user.userId)
         .gte("timestamp", today.toISOString())
-        .in("status", ["pending", "processing", "completed"]);
+        .in("status", ["requested", "pending", "approved", "processing", "completed"]);
 
       const todayTotal = (todayWithdrawals || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
       
       if (todayTotal + amount > limits.dailyMax) {
-        return errorResponse(`Daily withdrawal limit of ₹${limits.dailyMax} exceeded. Already withdrawn: ₹${todayTotal}`);
+        return errorResponse(`Daily withdrawal limit of ₹${limits.dailyMax} exceeded. Already requested: ₹${todayTotal}`);
       }
 
-      // Check for duplicate requests (fraud detection)
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      const { data: recentRequests } = await supabaseAdmin
+      // Check for duplicate pending requests (strict fraud prevention)
+      const { data: pendingRequests } = await supabaseAdmin
         .from("payout_requests")
-        .select("id")
+        .select("payout_id, amount")
         .eq("user_id", user.userId)
-        .eq("amount", amount)
-        .eq("status", "pending")
-        .gte("timestamp", fiveMinutesAgo.toISOString());
+        .in("status", ["requested", "pending"]);
 
-      if (recentRequests && recentRequests.length > 0) {
-        return errorResponse("Duplicate withdrawal request detected. Please wait before submitting another request.", 429);
+      if (pendingRequests && pendingRequests.length > 0) {
+        // Check if same amount already pending
+        const duplicateAmount = pendingRequests.find((p: any) => Number(p.amount) === amount);
+        if (duplicateAmount) {
+          return errorResponse("Duplicate withdrawal request. You already have a pending request for the same amount.", 429);
+        }
+        
+        // Check if total pending + new request exceeds balance
+        const pendingTotal = pendingRequests.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+        if (pendingTotal + amount > currentBalance) {
+          return errorResponse(`Cannot request ₹${amount}. You have ₹${pendingTotal} in pending requests and only ₹${currentBalance} available.`, 400);
+        }
       }
 
-      // Create payout request
+      // Generate idempotency key to prevent duplicate submissions
+      const idempotencyKey = `${user.userId}-${amount}-${Date.now()}`;
+
+      // Create payout request with status 'requested' (NOT pending)
+      // Wallet is NOT debited at this stage
       const { data: payout, error } = await supabaseAdmin.from("payout_requests").insert({
         user_id: user.userId,
         amount: amount,
-        status: "pending",
+        status: "requested", // New flow: requested -> pending -> approved/rejected
         payment_method: body.payment_method || "bank_transfer",
+        user_role: user.role,
+        wallet_debited: false, // Explicitly mark as not debited
+        idempotency_key: idempotencyKey,
+        ip_address: body.ip_address || null,
+        device_fingerprint: body.device_fingerprint || null,
       }).select().single();
 
-      if (error) return errorResponse(error.message, 400);
-
-      // Deduct from wallet using optimistic locking
-      const newBalance = currentBalance - amount;
-      const { error: updateError } = await supabaseAdmin
-        .from("wallets")
-        .update({ balance: newBalance, updated_at: new Date().toISOString() })
-        .eq("wallet_id", wallet.wallet_id)
-        .eq("balance", wallet.balance); // Optimistic locking
-
-      if (updateError) {
-        // Rollback payout request if wallet update fails
-        await supabaseAdmin.from("payout_requests").delete().eq("payout_id", payout.payout_id);
-        return errorResponse("Transaction failed - please retry", 409);
+      if (error) {
+        if (error.message.includes("idempotency_key")) {
+          return errorResponse("Duplicate request detected. Please wait.", 429);
+        }
+        return errorResponse(error.message, 400);
       }
 
-      await supabaseAdmin.from("transactions").insert({
-        wallet_id: wallet.wallet_id,
-        type: "withdrawal_pending",
-        amount: -amount,
-        reference: `Payout request ${payout.payout_id}`,
-        related_user: user.userId,
-        status: "pending",
-      });
-
-      // Audit log
+      // Audit log - no wallet debit at this stage
       await createAuditLog(supabaseAdmin, user.userId, user.role, "wallet", "withdrawal_requested", {
         payout_id: payout.payout_id,
         amount,
-        new_balance: newBalance,
+        current_balance: currentBalance,
         payment_method: body.payment_method || "bank_transfer",
+        note: "Request submitted - awaiting Super Admin/Master approval",
       });
 
       return jsonResponse({
-        message: "Withdrawal request submitted",
+        message: "Withdrawal request submitted for approval",
         payout_id: payout.payout_id,
         amount: amount,
-        status: "pending",
+        status: "requested",
+        note: "Your request will be reviewed by an administrator. Funds will be released upon approval.",
       });
     }, { module: "wallet", action: "withdraw" });
+  }
+
+  // POST /wallet/payout/approve - Super Admin/Master only
+  if (path === "/payout/approve" && req.method === "POST") {
+    return withAuth(req, ["super_admin", "master"], async ({ supabaseAdmin, body, user }) => {
+      const validation = validateRequired(body, ["payout_id"]);
+      if (validation) return errorResponse(validation);
+
+      if (!isValidUUID(body.payout_id)) {
+        return errorResponse("Invalid payout ID format");
+      }
+
+      // Call the secure database function
+      const { data, error } = await supabaseAdmin.rpc("approve_payout", {
+        p_payout_id: body.payout_id,
+        p_approver_id: user.userId,
+      });
+
+      if (error) return errorResponse(error.message, 500);
+      
+      if (!data.success) {
+        return errorResponse(data.error, 400);
+      }
+
+      return jsonResponse({
+        message: "Payout approved and wallet debited",
+        payout_id: data.payout_id,
+        amount: data.amount,
+        new_balance: data.new_balance,
+      });
+    }, { module: "wallet", action: "payout_approve" });
+  }
+
+  // POST /wallet/payout/reject - Super Admin/Master only
+  if (path === "/payout/reject" && req.method === "POST") {
+    return withAuth(req, ["super_admin", "master"], async ({ supabaseAdmin, body, user }) => {
+      const validation = validateRequired(body, ["payout_id"]);
+      if (validation) return errorResponse(validation);
+
+      if (!isValidUUID(body.payout_id)) {
+        return errorResponse("Invalid payout ID format");
+      }
+
+      // Call the secure database function
+      const { data, error } = await supabaseAdmin.rpc("reject_payout", {
+        p_payout_id: body.payout_id,
+        p_rejector_id: user.userId,
+        p_reason: body.reason || "Rejected by administrator",
+      });
+
+      if (error) return errorResponse(error.message, 500);
+      
+      if (!data.success) {
+        return errorResponse(data.error, 400);
+      }
+
+      return jsonResponse({
+        message: "Payout rejected",
+        payout_id: data.payout_id,
+        amount: data.amount,
+        reason: data.reason,
+      });
+    }, { module: "wallet", action: "payout_reject" });
+  }
+
+  // GET /wallet/payouts - Get payout requests (role-filtered)
+  if (path === "/payouts" && req.method === "GET") {
+    return withAuth(req, [], async ({ supabaseAdmin, user }) => {
+      const urlParams = new URL(req.url);
+      const status = urlParams.searchParams.get("status");
+      const page = Math.max(1, parseInt(urlParams.searchParams.get("page") || "1"));
+      const limit = Math.min(100, Math.max(1, parseInt(urlParams.searchParams.get("limit") || "50")));
+
+      // Check if user is admin
+      const isAdmin = ["super_admin", "master", "finance_manager"].includes(user.role);
+
+      let query = supabaseAdmin
+        .from("payout_requests")
+        .select("*", { count: "exact" });
+
+      // Non-admins can only see their own requests
+      if (!isAdmin) {
+        query = query.eq("user_id", user.userId);
+      }
+
+      if (status) {
+        query = query.eq("status", status);
+      }
+
+      const { data: payouts, count, error } = await query
+        .order("timestamp", { ascending: false })
+        .range((page - 1) * limit, page * limit - 1);
+
+      if (error) return errorResponse(error.message, 500);
+
+      return jsonResponse({
+        payouts: payouts || [],
+        pagination: { page, limit, total: count || 0 },
+        can_approve: ["super_admin", "master"].includes(user.role),
+      });
+    }, { module: "wallet", action: "payouts_list" });
   }
 
   // POST /wallet/transfer

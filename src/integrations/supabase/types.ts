@@ -7068,33 +7068,69 @@ export type Database = {
       payout_requests: {
         Row: {
           amount: number
+          approved_at: string | null
+          approved_by: string | null
           bank_details: Json | null
+          device_fingerprint: string | null
+          idempotency_key: string | null
+          ip_address: string | null
           payment_method: string | null
           payout_id: string
           processed_by: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          requested_at: string | null
           status: string | null
           timestamp: string
           user_id: string
+          user_role: string | null
+          wallet_debited: boolean | null
+          wallet_debited_at: string | null
         }
         Insert: {
           amount: number
+          approved_at?: string | null
+          approved_by?: string | null
           bank_details?: Json | null
+          device_fingerprint?: string | null
+          idempotency_key?: string | null
+          ip_address?: string | null
           payment_method?: string | null
           payout_id?: string
           processed_by?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          requested_at?: string | null
           status?: string | null
           timestamp?: string
           user_id: string
+          user_role?: string | null
+          wallet_debited?: boolean | null
+          wallet_debited_at?: string | null
         }
         Update: {
           amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
           bank_details?: Json | null
+          device_fingerprint?: string | null
+          idempotency_key?: string | null
+          ip_address?: string | null
           payment_method?: string | null
           payout_id?: string
           processed_by?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          requested_at?: string | null
           status?: string | null
           timestamp?: string
           user_id?: string
+          user_role?: string | null
+          wallet_debited?: boolean | null
+          wallet_debited_at?: string | null
         }
         Relationships: []
       }
@@ -12068,6 +12104,10 @@ export type Database = {
       }
     }
     Functions: {
+      approve_payout: {
+        Args: { p_approver_id: string; p_payout_id: string }
+        Returns: Json
+      }
       approve_user: {
         Args: { _approver_id: string; _target_user_id: string }
         Returns: boolean
@@ -12176,6 +12216,10 @@ export type Database = {
         Args: { _deadline: string; _developer_id: string }
         Returns: boolean
       }
+      has_pending_withdrawal: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: boolean
+      }
       has_privileged_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -12267,6 +12311,10 @@ export type Database = {
         Returns: string
       }
       normalize_demo_url: { Args: { url: string }; Returns: string }
+      reject_payout: {
+        Args: { p_payout_id: string; p_reason?: string; p_rejector_id: string }
+        Returns: Json
+      }
       reject_user: {
         Args: {
           _reason?: string
