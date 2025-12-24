@@ -61,7 +61,12 @@ export type AppRole =
   | 'client'
   | 'api_security'
   | 'r_and_d'
-  | 'master';
+  | 'master'
+  // NEW ROLES (25-28)
+  | 'safe_assist'
+  | 'assist_manager'
+  | 'promise_tracker'
+  | 'promise_management';
 
 // Grade classification for display/logic
 export type RoleGrade = 0 | 1 | 2 | 3 | 4;
@@ -96,6 +101,11 @@ export const ROLE_GRADES: Record<AppRole, { grade: RoleGrade; gradeLabel: string
   prime: { grade: 4, gradeLabel: 'Users', displayName: 'Prime User' },
   client: { grade: 4, gradeLabel: 'Users', displayName: 'User' },
   r_and_d: { grade: 2, gradeLabel: 'Business Management', displayName: 'R&D' },
+  // NEW ROLES (25-28)
+  safe_assist: { grade: 2, gradeLabel: 'Business Management', displayName: 'Safe Assist' },
+  assist_manager: { grade: 2, gradeLabel: 'Business Management', displayName: 'Assist Manager' },
+  promise_tracker: { grade: 2, gradeLabel: 'Business Management', displayName: 'Promise Tracker' },
+  promise_management: { grade: 2, gradeLabel: 'Business Management', displayName: 'Promise Management' },
 };
 
 // Role metadata for display
@@ -278,6 +288,35 @@ export const ROLE_CONFIG: Record<AppRole, {
     icon: 'User',
     modules: ['demos', 'support'],
     tier: 'user'
+  },
+  // NEW ROLES (25-28)
+  safe_assist: {
+    label: 'Safe Assist',
+    color: '#10b981',
+    icon: 'HeartHandshake',
+    modules: ['safe-assist', 'support', 'chat'],
+    tier: 'management'
+  },
+  assist_manager: {
+    label: 'Assist Manager',
+    color: '#06b6d4',
+    icon: 'Headphones',
+    modules: ['assist', 'support', 'chat', 'tickets'],
+    tier: 'management'
+  },
+  promise_tracker: {
+    label: 'Promise Tracker',
+    color: '#8b5cf6',
+    icon: 'Target',
+    modules: ['promises', 'tasks', 'tracking', 'chat'],
+    tier: 'management'
+  },
+  promise_management: {
+    label: 'Promise Management',
+    color: '#f59e0b',
+    icon: 'HandshakeIcon',
+    modules: ['promises', 'tasks', 'approvals', 'analytics', 'chat'],
+    tier: 'management'
   },
 };
 

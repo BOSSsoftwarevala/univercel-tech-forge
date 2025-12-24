@@ -117,6 +117,8 @@ import DemoCredentials from "./pages/DemoCredentials";
 import SectorsBrowse from "./pages/SectorsBrowse";
 import SubCategoryDemos from "./pages/SubCategoryDemos";
 import { AIBillingDashboard } from "./components/ai-billing";
+// New Role Pages (25-28)
+import PromiseManagementDashboard from "./pages/promise-management/PromiseManagementDashboard";
 
 const queryClient = new QueryClient();
 
@@ -282,6 +284,10 @@ const App = () => (
               <Route path="/crisis/*" element={<RequireRole allowed={["incident_crisis", "super_admin"]}><IncidentCrisisDashboard /></RequireRole>} />
               <Route path="/hr-dashboard" element={<RequireRole allowed={["hr_manager", "super_admin"]}><HRDashboard /></RequireRole>} />
               <Route path="/ai/*" element={<RequireRole allowed={["ai_manager", "super_admin"]}><AIOptimizationConsole /></RequireRole>} />
+
+              {/* NEW ROLES (25-28) Routes */}
+              <Route path="/promise-management" element={<RequireRole allowed={["promise_management", "super_admin", "master"]}><PromiseManagementDashboard /></RequireRole>} />
+              <Route path="/promise-management/*" element={<RequireRole allowed={["promise_management", "super_admin", "master"]}><PromiseManagementDashboard /></RequireRole>} />
 
               {/* System Routes - SUPER ADMIN ONLY */}
               <Route path="/system-settings" element={<RequireRole allowed={["super_admin"]}><SystemSettings /></RequireRole>} />

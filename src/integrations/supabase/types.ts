@@ -12757,6 +12757,10 @@ export type Database = {
         | "api_security"
         | "r_and_d"
         | "master"
+        | "safe_assist"
+        | "assist_manager"
+        | "promise_tracker"
+        | "promise_management"
       critical_action_type:
         | "delete_data"
         | "edit_financial"
@@ -13003,6 +13007,10 @@ export const Constants = {
         "api_security",
         "r_and_d",
         "master",
+        "safe_assist",
+        "assist_manager",
+        "promise_tracker",
+        "promise_management",
       ],
       critical_action_type: [
         "delete_data",

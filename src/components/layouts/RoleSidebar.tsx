@@ -207,6 +207,36 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: Package, label: 'Demos', path: '/client/demos' },
     { icon: HeadphonesIcon, label: 'Support', path: '/client/support' },
   ],
+  // NEW ROLES (25-28)
+  safe_assist: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/safe-assist' },
+    { icon: HeadphonesIcon, label: 'Active Sessions', path: '/safe-assist/sessions' },
+    { icon: Heart, label: 'Support Queue', path: '/safe-assist/queue' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  assist_manager: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/assist-manager' },
+    { icon: Users, label: 'Agents', path: '/assist-manager/agents' },
+    { icon: HeadphonesIcon, label: 'Tickets', path: '/assist-manager/tickets' },
+    { icon: BarChart3, label: 'Analytics', path: '/assist-manager/analytics' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  promise_tracker: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/promise-tracker' },
+    { icon: Target, label: 'Active Promises', path: '/promise-tracker/active' },
+    { icon: Activity, label: 'Tracking', path: '/promise-tracker/tracking' },
+    { icon: TrendingUp, label: 'Reports', path: '/promise-tracker/reports' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
+  promise_management: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/promise-management' },
+    { icon: ListTodo, label: 'All Promises', path: '/promise-management/promises' },
+    { icon: Users, label: 'Developers', path: '/promise-management/developers' },
+    { icon: Shield, label: 'Approvals', path: '/promise-management/approvals' },
+    { icon: BarChart3, label: 'Analytics', path: '/promise-management/analytics' },
+    { icon: Settings, label: 'Settings', path: '/promise-management/settings' },
+    { icon: MessageSquare, label: 'Chat', path: '/internal-chat' },
+  ],
 };
 
 interface RoleSidebarProps {
