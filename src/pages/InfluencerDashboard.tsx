@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Link2, Megaphone, Video, Palette, 
   Users, Wallet, Bell, Sparkles, MousePointer, Shield,
   Image, Trophy, PieChart, FileText, GraduationCap, Gift,
-  HeadphonesIcon, BarChart3, Share2
+  HeadphonesIcon, BarChart3, Share2, ArrowLeft, Lock, KeyRound, LogOut
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import InfluencerTopBar from '@/components/influencer/InfluencerTopBar';
 import InfluencerMetrics from '@/components/influencer/InfluencerMetrics';
 import LinkCreator from '@/components/influencer/LinkCreator';
@@ -51,9 +53,16 @@ const menuItems = [
 ];
 
 const InfluencerDashboard = () => {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [activeSection, setActiveSection] = useState('share'); // Default to Share & Earn
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAIOptimizer, setShowAIOptimizer] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -151,7 +160,8 @@ const InfluencerDashboard = () => {
             })}
           </nav>
 
-          <div className="absolute bottom-4 left-3 right-3">
+          {/* Influence Score Card */}
+          <div className="absolute bottom-52 left-3 right-3">
             <div className="p-3 rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 border border-violet-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-violet-400" />
@@ -170,6 +180,38 @@ const InfluencerDashboard = () => {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Account Actions */}
+          <div className="absolute bottom-4 left-3 right-3 space-y-1">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-violet-400 hover:bg-slate-800/50 transition-all"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="font-medium text-sm">Back to Dashboard</span>
+            </button>
+            <button 
+              onClick={() => navigate('/change-password')}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-violet-400 hover:bg-slate-800/50 transition-all"
+            >
+              <Lock className="w-4 h-4" />
+              <span className="font-medium text-sm">Change Password</span>
+            </button>
+            <button 
+              onClick={() => navigate('/forgot-password')}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-violet-400 hover:bg-slate-800/50 transition-all"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span className="font-medium text-sm">Forgot Password</span>
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="font-medium text-sm">Logout</span>
+            </button>
           </div>
         </motion.aside>
 
