@@ -9,9 +9,16 @@ import {
   Bell, 
   BarChart3, 
   User,
-  PlayCircle
+  PlayCircle,
+  ArrowLeft,
+  LogOut,
+  Lock,
+  KeyRound
 } from "lucide-react";
 import softwareValaLogo from '@/assets/software-vala-logo.png';
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -28,6 +35,17 @@ const menuItems = [
 export const RnDSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut, userRole } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      navigate('/auth');
+    } catch (error) {
+      toast.error("Failed to logout");
+    }
+  };
 
   return (
     <aside className="w-64 min-h-screen bg-slate-900/80 backdrop-blur-xl border-r border-violet-500/20 flex flex-col">
@@ -42,6 +60,15 @@ export const RnDSidebar = () => {
           <div>
             <p className="text-xs text-violet-400">R&D Portal</p>
           </div>
+        </div>
+      </div>
+
+      {/* Role Badge */}
+      <div className="px-4 pt-4">
+        <div className="px-3 py-1.5 rounded-lg bg-violet-500/20 border border-violet-500/30 text-center">
+          <span className="text-xs font-medium text-violet-300">
+            {userRole === 'super_admin' ? 'Super Admin' : 'R&D Manager'}
+          </span>
         </div>
       </div>
 
@@ -84,15 +111,57 @@ export const RnDSidebar = () => {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-violet-500/20">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/50">
+      {/* Footer with Actions */}
+      <div className="p-4 border-t border-violet-500/20 space-y-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-400 hover:text-violet-300 hover:bg-violet-500/10"
+          onClick={() => navigate('/dashboard')}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 text-slate-400 hover:text-violet-300 hover:bg-violet-500/10"
+            onClick={() => navigate('/change-password')}
+          >
+            <Lock className="w-4 h-4 mr-2" />
+            Change Password
+          </Button>
+        </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-400 hover:text-violet-300 hover:bg-violet-500/10"
+          onClick={() => navigate('/forgot-password')}
+        >
+          <KeyRound className="w-4 h-4 mr-2" />
+          Forgot Password
+        </Button>
+
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
+
+        {/* User Info */}
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/50 mt-2">
           <div className="w-8 h-8 rounded-full bg-gradient-to-r from-violet-600 to-cyan-600 flex items-center justify-center text-white text-xs font-bold">
-            SA
+            {userRole === 'super_admin' ? 'SA' : 'RM'}
           </div>
           <div className="flex-1">
-            <p className="text-sm text-white">Super Admin</p>
-            <p className="text-xs text-slate-500">vala(admin)0001</p>
+            <p className="text-sm text-white">{userRole === 'super_admin' ? 'Super Admin' : 'R&D Manager'}</p>
+            <p className="text-xs text-slate-500">R&D Portal</p>
           </div>
         </div>
       </div>
