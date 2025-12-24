@@ -51,6 +51,7 @@ import PermissionMatrix from "./pages/super-admin/PermissionMatrix";
 import SecurityCenter from "./pages/super-admin/SecurityCenter";
 import ProductManagerPage from "./pages/super-admin/ProductManagerPage";
 import SystemAudit from "./pages/super-admin/SystemAudit";
+import PrimeManager from "./pages/super-admin/PrimeManager";
 import AuthGateway from "./pages/auth/AuthGateway";
 
 // Master Admin Pages
@@ -193,7 +194,7 @@ const App = () => (
               <Route path="/super-admin/developer-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin/franchise-manager" element={<RequireRole allowed={["super_admin"]}><FranchiseManagement /></RequireRole>} />
               <Route path="/super-admin/reseller-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/prime-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/prime-manager" element={<RequireRole allowed={["super_admin"]}><PrimeManager /></RequireRole>} />
               <Route path="/super-admin/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
               <Route path="/super-admin/finance-center" element={<RequireRole allowed={["super_admin"]}><FinanceManager /></RequireRole>} />
               <Route path="/super-admin/support-center" element={<RequireRole allowed={["super_admin"]}><SupportDashboard /></RequireRole>} />
