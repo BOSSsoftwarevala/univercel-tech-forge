@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  LayoutDashboard, ListTodo, Timer, MessageSquare, 
-  Code2, TrendingUp, Wallet, Zap, Settings,
-  ChevronLeft, ChevronRight, LogOut, Lock
+  LayoutDashboard, ListTodo, Timer, Code2, 
+  Wallet, Settings, ChevronLeft, ChevronRight, 
+  LogOut, Lock, Briefcase, Brain, Flame, Zap
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -15,12 +15,13 @@ interface DeveloperSidebarProps {
 }
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'Command Center', icon: LayoutDashboard },
+  { id: 'portfolio', label: 'AI Portfolio', icon: Briefcase, isAI: true },
+  { id: 'skills', label: 'Skill Assessment', icon: Brain, isAI: true },
+  { id: 'productivity', label: 'Productivity Coach', icon: Flame, isAI: true },
   { id: 'tasks', label: 'Task Assignment', icon: ListTodo },
   { id: 'timer', label: 'Timer & Progress', icon: Timer },
-  { id: 'chat', label: 'Internal Chat', icon: MessageSquare },
   { id: 'code', label: 'Code Submission', icon: Code2 },
-  { id: 'performance', label: 'Performance', icon: TrendingUp },
   { id: 'wallet', label: 'Wallet & Payouts', icon: Wallet },
 ];
 
@@ -60,23 +61,38 @@ const DeveloperSidebar = ({ activeSection, onSectionChange }: DeveloperSidebarPr
             onClick={() => onSectionChange(item.id)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
               activeSection === item.id
-                ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 text-cyan-400 shadow-lg shadow-cyan-500/10'
-                : 'hover:bg-slate-800/50 text-slate-400 hover:text-cyan-400'
+                ? item.isAI 
+                  ? 'bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/50 text-violet-400 shadow-lg shadow-violet-500/10'
+                  : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 text-cyan-400 shadow-lg shadow-cyan-500/10'
+                : item.isAI
+                  ? 'hover:bg-violet-500/10 text-slate-400 hover:text-violet-400 border border-transparent hover:border-violet-500/20'
+                  : 'hover:bg-slate-800/50 text-slate-400 hover:text-cyan-400'
             }`}
           >
-            <div className={`relative ${activeSection === item.id ? 'text-cyan-400' : ''}`}>
+            <div className={`relative ${
+              activeSection === item.id 
+                ? item.isAI ? 'text-violet-400' : 'text-cyan-400' 
+                : ''
+            }`}>
               <item.icon className="w-5 h-5" />
               {activeSection === item.id && (
                 <motion.div
                   layoutId="dev-sidebar-glow"
-                  className="absolute inset-0 bg-cyan-400/30 blur-md rounded-full"
+                  className={`absolute inset-0 ${item.isAI ? 'bg-violet-400/30' : 'bg-cyan-400/30'} blur-md rounded-full`}
                 />
               )}
             </div>
             {!collapsed && (
               <>
                 <span className="font-medium flex-1 text-left">{item.label}</span>
-                {activeSection === item.id && (
+                {item.isAI && (
+                  <motion.div
+                    animate={{ opacity: [1, 0.4, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="w-1.5 h-1.5 rounded-full bg-violet-400"
+                  />
+                )}
+                {activeSection === item.id && !item.isAI && (
                   <motion.div
                     layoutId="dev-active-dot"
                     className="w-2 h-2 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400/50"

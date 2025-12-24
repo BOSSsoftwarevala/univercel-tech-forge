@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.ai-rnd-assistant]
 verify_jwt = false
+
+[functions.ai-developer-assistant]
+verify_jwt = false

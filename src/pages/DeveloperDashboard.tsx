@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DeveloperTopBar from '@/components/developer/DeveloperTopBar';
 import DeveloperSidebar from '@/components/developer/DeveloperSidebar';
-import DevDashboard from '@/components/developer/DevDashboard';
+import DeveloperCommandCenter from '@/components/developer/DeveloperCommandCenter';
+import AIPortfolioBuilder from '@/components/developer/AIPortfolioBuilder';
+import AISkillAssessment from '@/components/developer/AISkillAssessment';
+import AIProductivityCoach from '@/components/developer/AIProductivityCoach';
 import DevTaskAssignment from '@/components/developer/DevTaskAssignment';
 import DevTimerProgress from '@/components/developer/DevTimerProgress';
-import DevInternalChat from '@/components/developer/DevInternalChat';
 import DevCodeSubmission from '@/components/developer/DevCodeSubmission';
-import DevPerformance from '@/components/developer/DevPerformance';
 import DevWalletPayout from '@/components/developer/DevWalletPayout';
 import DeveloperNotifications from '@/components/developer/DeveloperNotifications';
 import AIAssistantPanel from '@/components/developer/AIAssistantPanel';
@@ -20,21 +21,23 @@ const DeveloperDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
-        return <DevDashboard />;
+        return <DeveloperCommandCenter />;
+      case 'portfolio':
+        return <AIPortfolioBuilder />;
+      case 'skills':
+        return <AISkillAssessment />;
+      case 'productivity':
+        return <AIProductivityCoach />;
       case 'tasks':
         return <DevTaskAssignment />;
       case 'timer':
         return <DevTimerProgress />;
-      case 'chat':
-        return <DevInternalChat />;
       case 'code':
         return <DevCodeSubmission />;
-      case 'performance':
-        return <DevPerformance />;
       case 'wallet':
         return <DevWalletPayout />;
       default:
-        return <DevDashboard />;
+        return <DeveloperCommandCenter />;
     }
   };
 
@@ -58,7 +61,7 @@ const DeveloperDashboard = () => {
         </svg>
 
         {/* Floating Particles */}
-        {[...Array(20)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-cyan-400 rounded-full"
