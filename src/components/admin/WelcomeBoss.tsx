@@ -1,11 +1,17 @@
 import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Badge } from "@/components/ui/badge";
 
 interface WelcomeBossProps {
   disabled?: boolean;
 }
 
 const WelcomeBoss = ({ disabled = false }: WelcomeBossProps) => {
+  const { user } = useAuth();
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Boss';
+  const firstName = userName.split(' ')[0];
+
   return (
     <motion.div 
       className="text-center py-4"
@@ -67,7 +73,7 @@ const WelcomeBoss = ({ disabled = false }: WelcomeBossProps) => {
             textShadow: '0 0 30px hsl(var(--primary) / 0.3)',
           }}
         >
-          WELCOME BOSS
+          WELCOME {firstName.toUpperCase()}
         </h1>
 
         {/* Crown Badge */}
@@ -97,6 +103,18 @@ const WelcomeBoss = ({ disabled = false }: WelcomeBossProps) => {
             }}
           />
         </motion.div>
+      </motion.div>
+
+      {/* Role Badge */}
+      <motion.div
+        className="mt-3 flex justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Badge className="bg-primary/20 text-primary border border-primary/30 px-3 py-1">
+          SUPER ADMIN
+        </Badge>
       </motion.div>
 
       {/* Subtitle */}

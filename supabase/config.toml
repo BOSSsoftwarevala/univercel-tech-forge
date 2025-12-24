@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.ai-task-assistant]
 verify_jwt = false
+
+[functions.ai-performance-analyzer]
+verify_jwt = false

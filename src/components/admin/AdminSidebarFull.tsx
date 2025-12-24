@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Shield,
@@ -29,9 +30,14 @@ import {
   FileText,
   Star,
   Crown,
-  Settings
+  Settings,
+  LogOut,
+  KeyRound
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { Badge } from "@/components/ui/badge";
 
 type AdminView =
   | "overview"
@@ -69,6 +75,17 @@ interface AdminSidebarFullProps {
 }
 
 const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) => {
+  const { user, signOut, userRole } = useAuth();
+  const navigate = useNavigate();
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Super Admin';
+  const maskedId = `SA-${user?.id?.slice(0, 4).toUpperCase() || 'XXXX'}`;
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+
   const menuSections = [
     {
       title: "Control Center",
@@ -190,17 +207,58 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
         </nav>
       </ScrollArea>
 
-      {/* Footer */}
-      <div className="p-3 border-t border-white/10">
-        <div className="flex items-center gap-3 px-3 py-2">
+      {/* Footer with User Info & Actions */}
+      <div className="p-3 border-t border-white/10 space-y-3">
+        {/* User Info */}
+        <div className="flex items-center gap-3 px-3 py-2 bg-secondary/30 rounded-lg">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-neon-teal flex items-center justify-center">
-            <span className="text-xs font-bold">SA</span>
+            <span className="text-xs font-bold text-primary-foreground">
+              {userName.charAt(0).toUpperCase()}
+            </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Super Admin</p>
-            <p className="text-xs text-muted-foreground">Full Access</p>
+            <p className="text-sm font-medium truncate">{userName}</p>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/10 text-primary border-primary/30">
+                SUPER ADMIN
+              </Badge>
+              <span className="text-[9px] text-muted-foreground font-mono">{maskedId}</span>
+            </div>
           </div>
         </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs gap-1.5 h-8"
+            onClick={() => onViewChange("settings")}
+          >
+            <KeyRound className="w-3 h-3" />
+            Password
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs gap-1.5 h-8"
+            onClick={() => onViewChange("settings")}
+          >
+            <Settings className="w-3 h-3" />
+            Settings
+          </Button>
+        </div>
+
+        {/* Logout Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+          className="w-full text-xs gap-2 h-8 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+        >
+          <LogOut className="w-3 h-3" />
+          Sign Out
+        </Button>
       </div>
     </div>
   );

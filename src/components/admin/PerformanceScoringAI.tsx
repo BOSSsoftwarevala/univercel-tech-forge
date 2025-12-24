@@ -12,16 +12,22 @@ import {
   Zap,
   BarChart3,
   Lock,
-  Lightbulb
+  Lightbulb,
+  Loader2,
+  Sparkles
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const PerformanceScoringAI = () => {
   const [activeTab, setActiveTab] = useState("developers");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
 
   const developerScores = [
     { 
@@ -82,6 +88,38 @@ const PerformanceScoringAI = () => {
     { name: "Support Agent 3", score: 76, trend: "down", tickets: 98, avgTime: "3.5h", satisfaction: 4.1 },
   ];
 
+  const handleRecalculateAll = async () => {
+    setIsAnalyzing(true);
+    setAiInsight(null);
+    
+    try {
+      const performanceData = {
+        developers: developerScores,
+        resellers: resellerScores,
+        franchises: franchiseScores,
+        support: supportScores
+      };
+
+      const { data, error } = await supabase.functions.invoke('ai-performance-analyzer', {
+        body: { performanceData, type: 'recalculate' }
+      });
+
+      if (error) throw error;
+
+      setAiInsight(data.analysis);
+      toast.success("AI analysis complete", {
+        description: "Performance scores have been recalculated"
+      });
+    } catch (error: any) {
+      console.error("AI analysis error:", error);
+      toast.error("Analysis failed", {
+        description: error.message || "Could not complete AI analysis"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 90) return "text-green-400";
     if (score >= 80) return "text-yellow-400";
@@ -121,12 +159,57 @@ const PerformanceScoringAI = () => {
             <Lock className="w-4 h-4 mr-2" />
             Rating Override Lock
           </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Brain className="w-4 h-4 mr-2" />
-            Recalculate All
+          <Button 
+            className="bg-primary hover:bg-primary/90"
+            onClick={handleRecalculateAll}
+            disabled={isAnalyzing}
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Brain className="w-4 h-4 mr-2" />
+                Recalculate All
+              </>
+            )}
           </Button>
         </div>
       </div>
+
+      {/* AI Insight Panel */}
+      {aiInsight && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="glass-card border-primary/30 bg-primary/5">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-primary mb-2">AI Analysis Results</h3>
+                  <div className="text-sm text-muted-foreground whitespace-pre-wrap max-h-48 overflow-y-auto">
+                    {aiInsight}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setAiInsight(null)}
+                  className="text-muted-foreground"
+                >
+                  ×
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Overview Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
