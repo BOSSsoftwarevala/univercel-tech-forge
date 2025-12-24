@@ -52,6 +52,7 @@ import ProductManagerPage from "./pages/super-admin/ProductManagerPage";
 import SystemAudit from "./pages/super-admin/SystemAudit";
 import PrimeManager from "./pages/super-admin/PrimeManager";
 import AuthGateway from "./pages/auth/AuthGateway";
+import ComplianceCenter from "./pages/super-admin/ComplianceCenter";
 
 // Master Admin Pages
 import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
@@ -193,6 +194,7 @@ const App = () => (
               <Route path="/super-admin/support-center" element={<RequireRole allowed={["super_admin"]}><SupportDashboard /></RequireRole>} />
               <Route path="/super-admin/ai-billing" element={<RequireRole allowed={["super_admin"]}><AIBillingDashboard /></RequireRole>} />
               <Route path="/super-admin/franchise-manager" element={<RequireRole allowed={["super_admin"]}><FranchiseManagement /></RequireRole>} />
+              <Route path="/super-admin/compliance-center" element={<RequireRole allowed={["master", "super_admin"]}><ComplianceCenter /></RequireRole>} />
 
               {/* Franchise Routes */}
               <Route path="/franchise" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout></RequireRole>} />
