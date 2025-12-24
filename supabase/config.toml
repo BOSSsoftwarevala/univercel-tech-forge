@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.ai-legal-assistant]
 verify_jwt = false
+
+[functions.ai-performance-coach]
+verify_jwt = false
