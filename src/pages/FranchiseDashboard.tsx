@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Users, Monitor, Wallet, MapPin,
   GraduationCap, TrendingUp, AlertTriangle, Settings,
-  ChevronLeft, ChevronRight, Target, FileText, ShieldCheck, LogOut, Lock
+  ChevronLeft, ChevronRight, Target, FileText, ShieldCheck, LogOut, Lock,
+  Megaphone, Search, Globe
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -19,6 +20,8 @@ import FranchisePerformanceBoard from '@/components/franchise/FranchisePerforman
 import FranchiseEscalationScreen from '@/components/franchise/FranchiseEscalationScreen';
 import { FranchiseAuditLogs } from '@/components/franchise/FranchiseAuditLogs';
 import FranchiseSecurityModule from '@/components/franchise/security/FranchiseSecurityModule';
+import { LocalMarketingSuite } from '@/components/franchise/LocalMarketingSuite';
+import FranchiseSEODashboard from '@/components/franchise/FranchiseSEODashboard';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -26,6 +29,8 @@ const menuItems = [
   { id: 'demos', label: 'Demo Access', icon: Monitor },
   { id: 'wallet', label: 'Wallet & Commission', icon: Wallet },
   { id: 'territory', label: 'Territory & Contract', icon: MapPin },
+  { id: 'marketing', label: 'Local Marketing', icon: Megaphone, badge: 'AI' },
+  { id: 'seo', label: 'SEO & Promotions', icon: Globe },
   { id: 'training', label: 'AI Training', icon: GraduationCap, badge: 'AI' },
   { id: 'performance', label: 'Performance', icon: TrendingUp },
   { id: 'escalations', label: 'Escalations', icon: AlertTriangle },
@@ -51,6 +56,8 @@ const FranchiseDashboard = () => {
       case 'demos': return <FranchiseDemoPanel />;
       case 'wallet': return <FranchiseWalletCommission />;
       case 'territory': return <FranchiseContractTerritory />;
+      case 'marketing': return <LocalMarketingSuite />;
+      case 'seo': return <FranchiseSEODashboard />;
       case 'training': return <FranchiseAITraining />;
       case 'performance': return <FranchisePerformanceBoard />;
       case 'escalations': return <FranchiseEscalationScreen />;
