@@ -7,7 +7,7 @@ import {
   LayoutDashboard, User, Wallet, Users, UserPlus, Play, Library,
   TrendingUp, BarChart3, HeadphonesIcon, MessageSquare, GraduationCap,
   Shield, Bell, Settings, Store, LogOut, Search, UsersRound, 
-  ClipboardList, Activity, Building2
+  ClipboardList, Activity, Building2, KeyRound, ArrowLeft
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -128,7 +128,24 @@ const FranchiseLayout = ({ children }: FranchiseLayoutProps) => {
             to="/dashboard" 
             className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
           >
-            ← Back to Main Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            Back to Main Dashboard
+          </Link>
+
+          <Link
+            to="/change-password"
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            Change Password
+          </Link>
+
+          <Link
+            to="/forgot-password"
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+          >
+            <Search className="w-4 h-4" />
+            Forgot Password
           </Link>
 
           {/* Logout Button */}

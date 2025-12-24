@@ -337,7 +337,7 @@ const SidebarFooter = ({ collapsed }: { collapsed: boolean }) => {
 
       {/* Change Password */}
       <Link
-        to="/auth/change-password"
+        to="/change-password"
         className={cn(
           "flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors",
           collapsed && "justify-center"
@@ -345,6 +345,18 @@ const SidebarFooter = ({ collapsed }: { collapsed: boolean }) => {
       >
         <KeyRound className="h-4 w-4 shrink-0" />
         {!collapsed && <span>Change Password</span>}
+      </Link>
+
+      {/* Forgot Password */}
+      <Link
+        to="/forgot-password"
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors",
+          collapsed && "justify-center"
+        )}
+      >
+        <KeyRound className="h-4 w-4 shrink-0" />
+        {!collapsed && <span>Forgot Password</span>}
       </Link>
 
       {/* Logout */}

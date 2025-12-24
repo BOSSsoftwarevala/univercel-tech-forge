@@ -5,7 +5,7 @@ import {
   LayoutDashboard, ListTodo, Timer, Code2, 
   Wallet, Settings, ChevronLeft, ChevronRight, 
   LogOut, Lock, Briefcase, Brain, Flame, Zap,
-  Activity, User2, Award, Compass
+  Activity, User2, Award, Compass, KeyRound
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -36,7 +36,7 @@ const DeveloperSidebar = ({ activeSection, onSectionChange }: DeveloperSidebarPr
   const handleLogout = async () => {
     await signOut();
     toast.success('Logged out successfully');
-    navigate('/login');
+    navigate('/auth');
   };
 
   return (
@@ -163,14 +163,28 @@ const DeveloperSidebar = ({ activeSection, onSectionChange }: DeveloperSidebarPr
         </div>
       )}
 
-      {/* Settings & Logout */}
+      {/* Footer Actions */}
       <div className="absolute bottom-4 left-4 right-4 space-y-2">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}
+        >
+          <Briefcase className="w-5 h-5" />
+          {!collapsed && <span className="font-medium">Back to Dashboard</span>}
+        </button>
         <button 
           onClick={() => navigate('/change-password')}
           className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}
         >
           <Lock className="w-5 h-5" />
           {!collapsed && <span className="font-medium">Change Password</span>}
+        </button>
+        <button 
+          onClick={() => navigate('/forgot-password')}
+          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all ${collapsed ? 'justify-center' : ''}`}
+        >
+          <KeyRound className="w-5 h-5" />
+          {!collapsed && <span className="font-medium">Forgot Password</span>}
         </button>
         <button 
           onClick={() => navigate('/settings')}

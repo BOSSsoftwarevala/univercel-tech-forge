@@ -86,11 +86,20 @@ const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
 
           {/* Change Password */}
           <Link
-            to="/auth/change-password"
+            to="/change-password"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
           >
             <KeyRound className="w-4 h-4" />
             Change Password
+          </Link>
+
+          {/* Forgot Password */}
+          <Link
+            to="/forgot-password"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          >
+            <KeyRound className="w-4 h-4" />
+            Forgot Password
           </Link>
 
           {/* Logout */}

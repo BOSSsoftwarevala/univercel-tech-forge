@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, AlertTriangle, Activity, Bell, 
-  FileText, Shield, Users, TrendingUp, Settings, 
-  LogOut, Lock, Radio, Zap, Server, Clock
+  LayoutDashboard, AlertTriangle, Activity, Bell,
+  FileText, Shield, Users, TrendingUp, Settings,
+  LogOut, Lock, Radio, Zap, Server, Clock, ArrowLeft, KeyRound
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -35,7 +35,7 @@ const IncidentCrisisSidebar = ({ activeSection, onSectionChange }: IncidentCrisi
   const handleLogout = async () => {
     await signOut();
     toast.success('Logged out successfully');
-    navigate('/login');
+    navigate('/auth');
   };
 
   const userName = user?.email?.split('@')[0] || 'Crisis Manager';
@@ -132,20 +132,34 @@ const IncidentCrisisSidebar = ({ activeSection, onSectionChange }: IncidentCrisi
       <div className="absolute bottom-4 left-4 right-4 space-y-2">
         <div className="flex gap-2">
           <button
+            onClick={() => navigate('/dashboard')}
+            className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-slate-800/50 border border-red-500/20 text-red-300 text-xs hover:bg-slate-800 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back
+          </button>
+          <button
             onClick={() => navigate('/change-password')}
             className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-slate-800/50 border border-red-500/20 text-red-300 text-xs hover:bg-slate-800 transition-colors"
           >
             <Lock className="w-3.5 h-3.5" />
             Password
           </button>
-          <button
-            onClick={() => navigate('/settings')}
-            className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg bg-slate-800/50 border border-red-500/20 text-red-300 text-xs hover:bg-slate-800 transition-colors"
-          >
-            <Settings className="w-3.5 h-3.5" />
-            Settings
-          </button>
         </div>
+        <button
+          onClick={() => navigate('/forgot-password')}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-red-500/20 text-red-300 text-xs hover:bg-slate-800 transition-colors"
+        >
+          <KeyRound className="w-3.5 h-3.5" />
+          Forgot Password
+        </button>
+        <button
+          onClick={() => navigate('/settings')}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-red-500/20 text-red-300 text-xs hover:bg-slate-800 transition-colors"
+        >
+          <Settings className="w-3.5 h-3.5" />
+          Settings
+        </button>
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-colors"

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   Crown, LayoutDashboard, Target, MessageCircle, FileCheck, Wallet, Bug, Download,
   Phone, Shield, Ticket, Rocket, Users, Headphones, Lightbulb, Play, Activity,
-  Brain, GraduationCap, AlertOctagon, BarChart3, Bell, Store, Settings, LogOut, Lock
+  Brain, GraduationCap, AlertOctagon, BarChart3, Bell, Store, Settings, LogOut, Lock, ArrowLeft, KeyRound
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ const PrimeUserSidebar = ({ activeSection, setActiveSection }: PrimeUserSidebarP
   const handleLogout = async () => {
     await signOut();
     toast.success('Logged out successfully');
-    navigate('/login');
+    navigate('/auth');
   };
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: LayoutDashboard },
@@ -106,24 +106,46 @@ const PrimeUserSidebar = ({ activeSection, setActiveSection }: PrimeUserSidebarP
           <span>Request Direct Call</span>
         </motion.button>
         
-        <div className="flex gap-2">
+        <div className="space-y-2">
           <motion.button
-            onClick={() => navigate('/change-password')}
+            onClick={() => navigate('/dashboard')}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-800/50 border border-amber-500/20 text-amber-300 text-sm"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-800/50 border border-amber-500/20 text-amber-300 text-sm"
           >
-            <Lock className="w-4 h-4" />
-            <span>Password</span>
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
           </motion.button>
+
+          <div className="flex gap-2">
+            <motion.button
+              onClick={() => navigate('/change-password')}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-800/50 border border-amber-500/20 text-amber-300 text-sm"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Password</span>
+            </motion.button>
+            <motion.button
+              onClick={() => navigate('/settings')}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-800/50 border border-amber-500/20 text-amber-300 text-sm"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Settings</span>
+            </motion.button>
+          </div>
+
           <motion.button
-            onClick={() => navigate('/settings')}
+            onClick={() => navigate('/forgot-password')}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-800/50 border border-amber-500/20 text-amber-300 text-sm"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-800/50 border border-amber-500/20 text-amber-300 text-sm"
           >
-            <Settings className="w-4 h-4" />
-            <span>Settings</span>
+            <KeyRound className="w-4 h-4" />
+            <span>Forgot Password</span>
           </motion.button>
         </div>
         

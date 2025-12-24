@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutGrid, Activity, Link2, BarChart3, Package, PlusCircle,
   Monitor, Globe, Settings, LogOut, Lock, AlertTriangle, History,
-  FileText, Clock, Eye, Edit, Trash2, RefreshCw, CheckCircle
+  FileText, Clock, Eye, Edit, Trash2, RefreshCw, CheckCircle, ArrowLeft, KeyRound
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -42,7 +42,7 @@ const DemoManagerDashboard = () => {
   const handleLogout = async () => {
     await signOut();
     toast.success('Logged out successfully');
-    navigate('/login');
+    navigate('/auth');
   };
 
   const renderContent = () => {
@@ -194,14 +194,28 @@ const DemoManagerDashboard = () => {
             })}
           </nav>
 
-          {/* Settings & Logout */}
+          {/* Footer Actions */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-cyan-500/20 bg-slate-900/90 backdrop-blur-xl space-y-2">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm font-medium">Back to Dashboard</span>
+            </button>
             <button 
               onClick={() => navigate('/change-password')}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all"
             >
               <Lock className="w-4 h-4" />
               <span className="text-sm font-medium">Change Password</span>
+            </button>
+            <button 
+              onClick={() => navigate('/forgot-password')}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span className="text-sm font-medium">Forgot Password</span>
             </button>
             <button 
               onClick={() => navigate('/settings')}
