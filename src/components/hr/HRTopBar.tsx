@@ -12,17 +12,11 @@ const HRTopBar = () => {
 
   return (
     <header className="h-16 bg-slate-900/80 backdrop-blur-xl border-b border-violet-500/20 flex items-center justify-between px-6">
-      {/* Welcome & Role */}
+      {/* Role Badge */}
       <div className="flex items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-white">Welcome, {userName}</span>
-            <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white text-[10px] px-2 py-0.5">
-              HR MANAGER
-            </Badge>
-          </div>
-          <span className="text-xs text-slate-500">ID: {maskedId} • People Operations</span>
-        </div>
+        <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white text-[10px] px-2 py-0.5">
+          HR MANAGER
+        </Badge>
       </div>
 
       {/* Search */}

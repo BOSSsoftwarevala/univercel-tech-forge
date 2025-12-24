@@ -46,14 +46,8 @@ const DemoManagerTopBar = ({
       animate={{ y: 0, opacity: 1 }}
       className="h-16 glass-panel border-b border-border/30 px-6 flex items-center justify-between sticky top-0 z-40"
     >
-      {/* Left Section - Welcome & Search */}
+      {/* Left Section - Search */}
       <div className="flex items-center gap-4">
-        <div className="hidden lg:block">
-          <h2 className="text-sm font-semibold">
-            Welcome, <span className="text-neon-teal">{userName}</span>
-          </h2>
-          <p className="text-[10px] text-muted-foreground font-mono">{maskedId}</p>
-        </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input

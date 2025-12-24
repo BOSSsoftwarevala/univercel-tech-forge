@@ -53,17 +53,11 @@ const FinanceTopBar = ({
 
   return (
     <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between">
-      {/* Welcome & Role */}
+      {/* Role Badge */}
       <div className="flex items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-slate-900 dark:text-white">Welcome, {userName}</span>
-            <Badge className="bg-gradient-to-r from-cyan-500 to-teal-600 text-white text-[10px] px-2 py-0.5">
-              FINANCE MANAGER
-            </Badge>
-          </div>
-          <span className="text-xs text-slate-500">ID: {maskedId} • Financial Operations Control</span>
-        </div>
+        <Badge className="bg-gradient-to-r from-cyan-500 to-teal-600 text-white text-[10px] px-2 py-0.5">
+          FINANCE MANAGER
+        </Badge>
       </div>
 
       {/* Live Metrics */}

@@ -125,15 +125,10 @@ export function GlobalHeader({
         {/* Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2 text-[hsl(var(--sv-white-soft))] hover:bg-[hsl(var(--sv-navy))]">
+            <Button variant="ghost" size="icon" className="text-[hsl(var(--sv-white-soft))] hover:bg-[hsl(var(--sv-navy))]">
               <div className="w-8 h-8 rounded-full bg-[hsl(var(--sv-blue))] flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-white">{maskedUserId}</p>
-                <p className="text-xs text-[hsl(var(--sv-gray))] capitalize">{userRole.replace("_", " ")}</p>
-              </div>
-              <ChevronDown className="w-4 h-4 hidden md:block" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-[hsl(var(--sv-navy))] border-[hsl(var(--sv-navy-light))]">

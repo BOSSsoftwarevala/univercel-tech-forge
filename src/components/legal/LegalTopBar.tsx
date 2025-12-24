@@ -34,17 +34,10 @@ const LegalTopBar = ({
       animate={{ y: 0, opacity: 1 }}
       className="h-20 bg-slate-900/90 backdrop-blur-xl border-b border-cyan-900/30 px-6 flex items-center justify-between"
     >
-      {/* Welcome */}
+      {/* Role Badge */}
       <div className="flex items-center gap-4">
-        <div>
-          <p className="text-sm text-cyan-500/80">Welcome back,</p>
-          <h2 className="text-xl font-semibold text-white">{userName}</h2>
-        </div>
-        <Badge className="bg-cyan-600/20 text-cyan-400 border-cyan-600/40">
-          <Scale className="w-3 h-3 mr-1" />
-          {maskedId}
-        </Badge>
         <Badge className="bg-slate-700/50 text-slate-300 border-slate-600/40">
+          <Scale className="w-3 h-3 mr-1" />
           LEGAL & COMPLIANCE
         </Badge>
       </div>

@@ -22,17 +22,11 @@ const MarketingTopBar = () => {
       animate={{ y: 0, opacity: 1 }}
       className="h-20 bg-slate-900/80 backdrop-blur-xl border-b border-teal-500/20 px-6 flex items-center justify-between"
     >
-      {/* Title & Welcome */}
+      {/* Role Badge */}
       <div className="flex items-center gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold text-teal-100">Welcome, {userName}</h2>
-            <Badge className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-[10px] px-2 py-0.5">
-              MARKETING MANAGER
-            </Badge>
-          </div>
-          <p className="text-sm text-slate-500">ID: {maskedId} • Multi-channel campaign control</p>
-        </div>
+        <Badge className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-[10px] px-2 py-0.5">
+          MARKETING MANAGER
+        </Badge>
         <Badge className="bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-300 border-emerald-500/40">
           <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse" />
           Live Tracking
