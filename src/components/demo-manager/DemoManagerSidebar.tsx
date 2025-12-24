@@ -14,7 +14,9 @@ import {
   Link2,
   LogOut,
   KeyRound,
-  Settings
+  Settings,
+  ArrowLeft,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -149,24 +151,44 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/dashboard')}
+          className="w-full text-xs gap-1.5 h-8 border-border/50 mb-2"
+        >
+          <ArrowLeft className="w-3 h-3" />
+          Back to Dashboard
+        </Button>
+        <div className="flex gap-2 mb-2">
           <Button
             variant="outline"
             size="sm"
+            onClick={() => navigate('/change-password')}
             className="flex-1 text-xs gap-1.5 h-8 border-border/50"
           >
-            <KeyRound className="w-3 h-3" />
+            <Lock className="w-3 h-3" />
             Password
           </Button>
           <Button
             variant="outline"
             size="sm"
+            onClick={() => navigate('/settings')}
             className="flex-1 text-xs gap-1.5 h-8 border-border/50"
           >
             <Settings className="w-3 h-3" />
             Settings
           </Button>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/forgot-password')}
+          className="w-full text-xs gap-1.5 h-8 border-border/50 mb-2"
+        >
+          <KeyRound className="w-3 h-3" />
+          Forgot Password
+        </Button>
 
         {/* Logout Button */}
         <Button
