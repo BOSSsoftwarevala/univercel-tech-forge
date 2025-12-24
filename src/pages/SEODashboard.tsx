@@ -30,6 +30,7 @@ import AIInsightPanel from "@/components/seo/AIInsightPanel";
 import CompetitorIntelligence from "@/components/seo/CompetitorIntelligence";
 import TechnicalSEOPanel from "@/components/seo/TechnicalSEOPanel";
 import AutomationScheduler from "@/components/seo/AutomationScheduler";
+import AIReelsCreator from "@/components/seo/AIReelsCreator";
 
 const SEODashboard = () => {
   const [activeSection, setActiveSection] = useState("command");
@@ -51,8 +52,9 @@ const SEODashboard = () => {
   const sidebarItems = [
     { id: "command", label: "SEO Command Center", icon: Globe, category: "main" },
     { id: "ai-assistant", label: "AI SEO Assistant", icon: Sparkles, category: "ai" },
+    { id: "reels", label: "AI Reels Creator", icon: Eye, category: "ai" },
     { id: "keywords", label: "Keyword Manager", icon: Search, category: "seo" },
-    { id: "metatags", label: "Meta Tag Engine", icon: Tag, category: "seo" },
+    { id: "metatags", label: "AI Meta Tags", icon: Tag, category: "seo" },
     { id: "content", label: "AI Content Generator", icon: FileText, category: "seo" },
     { id: "technical", label: "Technical SEO", icon: Code2, category: "seo" },
     { id: "competitors", label: "Competitor Intelligence", icon: Users, category: "seo" },
@@ -74,6 +76,7 @@ const SEODashboard = () => {
       case "ai-assistant": 
         setShowAIPanel(true);
         return <SEOMetrics activeRegion={activeRegion} />;
+      case "reels": return <AIReelsCreator />;
       case "keywords": return <KeywordManager activeRegion={activeRegion} />;
       case "metatags": return <MetaTagEngine />;
       case "content": return <ContentGenerator activeRegion={activeRegion} />;
