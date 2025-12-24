@@ -25,6 +25,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { SafeAssistTrigger } from '@/components/support/SafeAssistTrigger';
 
 interface Alert {
   id: string;
@@ -111,6 +112,9 @@ const CommandHeader = memo(() => {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* Safe Assist */}
+        <SafeAssistTrigger variant="compact" />
+
         {/* Buzzer Control */}
         <AnimatePresence>
           {buzzerActive && (
