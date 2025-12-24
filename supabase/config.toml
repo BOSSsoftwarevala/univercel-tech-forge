@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.ai-seo-automation]
 verify_jwt = false
+
+[functions.ai-legal-assistant]
+verify_jwt = false
