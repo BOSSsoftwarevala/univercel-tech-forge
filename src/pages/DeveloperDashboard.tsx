@@ -6,6 +6,9 @@ import DeveloperCommandCenter from '@/components/developer/DeveloperCommandCente
 import AIPortfolioBuilder from '@/components/developer/AIPortfolioBuilder';
 import AISkillAssessment from '@/components/developer/AISkillAssessment';
 import AIProductivityCoach from '@/components/developer/AIProductivityCoach';
+import AIMonitoringCenter from '@/components/developer/AIMonitoringCenter';
+import AICodeIntelligence from '@/components/developer/AICodeIntelligence';
+import AICareerAdvisor from '@/components/developer/AICareerAdvisor';
 import DevTaskAssignment from '@/components/developer/DevTaskAssignment';
 import DevTimerProgress from '@/components/developer/DevTimerProgress';
 import DevCodeSubmission from '@/components/developer/DevCodeSubmission';
@@ -22,10 +25,16 @@ const DeveloperDashboard = () => {
     switch (activeSection) {
       case 'dashboard':
         return <DeveloperCommandCenter />;
+      case 'monitoring':
+        return <AIMonitoringCenter />;
       case 'portfolio':
         return <AIPortfolioBuilder />;
       case 'skills':
         return <AISkillAssessment />;
+      case 'code-intel':
+        return <AICodeIntelligence />;
+      case 'career':
+        return <AICareerAdvisor />;
       case 'productivity':
         return <AIProductivityCoach />;
       case 'tasks':
