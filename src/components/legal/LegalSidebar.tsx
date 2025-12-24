@@ -9,11 +9,19 @@ import {
   Search,
   MapPin,
   Lock,
-  MessageSquare,
   Database,
   AlertTriangle,
-  Sparkles
+  Sparkles,
+  LogOut,
+  Settings,
+  KeyRound
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface LegalSidebarProps {
   activeSection: string;
@@ -21,6 +29,23 @@ interface LegalSidebarProps {
 }
 
 const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const userName = user?.email?.split('@')[0] || 'Legal Manager';
+  const maskedId = `LGL-${user?.id?.slice(0, 4).toUpperCase() || 'XXXX'}`;
+  const initials = userName.slice(0, 2).toUpperCase();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      navigate("/auth");
+    } catch (error) {
+      toast.error("Failed to logout");
+    }
+  };
+
   const menuItems = [
     { id: "dashboard", label: "Dashboard Overview", icon: LayoutDashboard },
     { id: "global-compliance", label: "Global Compliance", icon: Globe },
@@ -42,21 +67,52 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
       animate={{ x: 0, opacity: 1 }}
       className="w-72 bg-gradient-to-b from-slate-900 to-slate-950 border-r border-cyan-900/30 flex flex-col"
     >
-      {/* Header */}
+      {/* User Profile Header */}
       <div className="p-6 border-b border-cyan-900/30">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-700 flex items-center justify-center shadow-lg shadow-cyan-900/50">
-            <Scale className="w-7 h-7 text-white" />
+        <div className="flex items-center gap-3 mb-3">
+          <Avatar className="w-12 h-12 ring-2 ring-cyan-500/50">
+            <AvatarImage src="/placeholder.svg" />
+            <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-cyan-700 text-white font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-sm font-semibold text-white truncate">{userName}</h2>
+            <p className="text-xs text-cyan-400/70 font-mono">{maskedId}</p>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-white">Legal & Compliance</h1>
-            <p className="text-xs text-cyan-500/70">Global SaaS Compliance</p>
-          </div>
+        </div>
+        
+        {/* Role Badge */}
+        <Badge className="w-full justify-center bg-cyan-600/20 text-cyan-400 border-cyan-500/40 py-1.5 mb-3">
+          <Scale className="w-3 h-3 mr-1.5" />
+          LEGAL & COMPLIANCE
+        </Badge>
+        
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/settings")}
+            className="flex-1 bg-slate-800/50 border-slate-700/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"
+          >
+            <KeyRound className="w-3.5 h-3.5 mr-1" />
+            Password
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/settings")}
+            className="flex-1 bg-slate-800/50 border-slate-700/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"
+          >
+            <Settings className="w-3.5 h-3.5 mr-1" />
+            Settings
+          </Button>
         </div>
         
         {/* Status Badge */}
         <motion.div 
-          className="mt-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30"
+          className="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30"
           animate={{ boxShadow: ["0 0 15px rgba(16,185,129,0.1)", "0 0 25px rgba(16,185,129,0.2)", "0 0 15px rgba(16,185,129,0.1)"] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
@@ -99,15 +155,16 @@ const LegalSidebar = ({ activeSection, setActiveSection }: LegalSidebarProps) =>
         })}
       </nav>
 
-      {/* One-Domain Enforcement */}
+      {/* Logout Button */}
       <div className="p-4 border-t border-cyan-900/30">
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Lock className="w-4 h-4 text-red-400" />
-            <span className="text-xs text-red-400 font-medium">One-Domain Activation</span>
-          </div>
-          <p className="text-xs text-slate-500">Enforced on all licenses</p>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          className="w-full bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
       </div>
     </motion.aside>
   );
