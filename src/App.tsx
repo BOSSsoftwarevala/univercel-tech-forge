@@ -42,7 +42,6 @@ import DemoDirectory from "./pages/DemoDirectory";
 import SettingsPage from "./pages/Settings";
 
 // Super Admin Pages
-import SuperAdminDashboard from "./pages/super-admin/Dashboard";
 import SuperAdminCommandCenter from "./pages/super-admin/CommandCenter";
 import LiveTracking from "./pages/super-admin/LiveTracking";
 import RoleManager from "./pages/super-admin/RoleManager";
@@ -188,17 +187,12 @@ const App = () => (
               <Route path="/super-admin/product-manager" element={<RequireRole allowed={["master", "super_admin"]}><ProductManagerPage /></RequireRole>} />
               <Route path="/super-admin/system-settings" element={<RequireRole allowed={["master", "super_admin"]}><SystemSettings /></RequireRole>} />
               <Route path="/super-admin/system-audit" element={<RequireRole allowed={["master", "super_admin"]}><SystemAudit /></RequireRole>} />
-              <Route path="/super-admin/branch-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/lead-engine" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/task-engine" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/developer-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/franchise-manager" element={<RequireRole allowed={["super_admin"]}><FranchiseManagement /></RequireRole>} />
-              <Route path="/super-admin/reseller-manager" element={<RequireRole allowed={["super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />
               <Route path="/super-admin/prime-manager" element={<RequireRole allowed={["super_admin"]}><PrimeManager /></RequireRole>} />
               <Route path="/super-admin/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
               <Route path="/super-admin/finance-center" element={<RequireRole allowed={["super_admin"]}><FinanceManager /></RequireRole>} />
               <Route path="/super-admin/support-center" element={<RequireRole allowed={["super_admin"]}><SupportDashboard /></RequireRole>} />
               <Route path="/super-admin/ai-billing" element={<RequireRole allowed={["super_admin"]}><AIBillingDashboard /></RequireRole>} />
+              <Route path="/super-admin/franchise-manager" element={<RequireRole allowed={["super_admin"]}><FranchiseManagement /></RequireRole>} />
 
               {/* Franchise Routes */}
               <Route path="/franchise" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout></RequireRole>} />

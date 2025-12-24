@@ -2,10 +2,8 @@ import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
-  LayoutDashboard, Users, Shield, Building2, MapPin, Monitor, 
-  Package, Megaphone, ListTodo, Code2, Store, UserCheck, Crown,
-  Wallet, HeadphonesIcon, Target, BarChart3, Scale, Search,
-  Ban, Bell, Settings, Activity, GitBranch, Lock, Zap
+  LayoutDashboard, Users, Shield, Package, UserCheck, Crown,
+  Settings, Activity, Lock
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -13,36 +11,17 @@ interface SuperAdminLayoutProps {
   children: ReactNode;
 }
 
+// Only include menu items that have actual pages implemented
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/super-admin/dashboard' },
+  { icon: LayoutDashboard, label: 'Command Center', path: '/super-admin' },
   { icon: Activity, label: 'Live Tracking', path: '/super-admin/live-tracking' },
   { icon: Users, label: 'Role Manager', path: '/super-admin/role-manager' },
   { icon: UserCheck, label: 'User Manager', path: '/super-admin/user-manager' },
   { icon: Shield, label: 'Permission Matrix', path: '/super-admin/permission-matrix' },
   { icon: Lock, label: 'Security Center', path: '/super-admin/security-center' },
-  { icon: Building2, label: 'Branch Manager', path: '/super-admin/branch-manager' },
-  { icon: Monitor, label: 'IP/Device Control', path: '/super-admin/ip-device-control' },
-  { icon: Package, label: 'Demo Manager', path: '/super-admin/demo-manager' },
-  { icon: GitBranch, label: 'Product Library', path: '/super-admin/product-library' },
-  { icon: Megaphone, label: 'Lead Engine', path: '/super-admin/lead-engine' },
-  { icon: ListTodo, label: 'Task Engine', path: '/super-admin/task-engine' },
-  { icon: Code2, label: 'Developer Manager', path: '/super-admin/developer-manager' },
-  { icon: Store, label: 'Franchise Manager', path: '/super-admin/franchise-manager' },
-  { icon: Users, label: 'Reseller Manager', path: '/super-admin/reseller-manager' },
   { icon: Crown, label: 'Prime Manager', path: '/super-admin/prime-manager' },
-  { icon: Zap, label: 'Influencer Manager', path: '/super-admin/influencer-manager' },
-  { icon: Wallet, label: 'Finance Center', path: '/super-admin/finance-center' },
-  { icon: Wallet, label: 'Wallet', path: '/super-admin/wallet' },
-  { icon: HeadphonesIcon, label: 'Support Center', path: '/super-admin/support-center' },
-  { icon: Target, label: 'Client Success', path: '/super-admin/client-success' },
-  { icon: Megaphone, label: 'Marketing Center', path: '/super-admin/marketing-center' },
-  { icon: GitBranch, label: 'R&D', path: '/super-admin/rnd' },
-  { icon: BarChart3, label: 'Performance Center', path: '/super-admin/performance-center' },
-  { icon: Scale, label: 'Legal & Compliance', path: '/super-admin/legal-compliance' },
-  { icon: Search, label: 'SEO Engine', path: '/super-admin/seo-engine' },
-  { icon: Ban, label: 'Suspension Queue', path: '/super-admin/suspension-queue' },
-  { icon: Bell, label: 'Alert Center', path: '/super-admin/alert-center' },
-  { icon: Settings, label: 'System Settings', path: '/super-admin/system-settings' },
+  { icon: Package, label: 'Product Manager', path: '/super-admin/product-manager' },
+  { icon: Settings, label: 'System Audit', path: '/super-admin/system-audit' },
 ];
 
 const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
