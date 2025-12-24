@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
 import { LiveReportsDashboard } from '@/components/live-reports/LiveReportsDashboard';
+import MasterWelcome from '@/components/animations/MasterWelcome';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -362,6 +363,9 @@ const MasterAdminDashboard = () => {
             </Button>
           </div>
         </div>
+
+        {/* Master Welcome Banner */}
+        <MasterWelcome />
 
         {/* User Management Tabs */}
         <Tabs defaultValue="live-reports" className="w-full">
