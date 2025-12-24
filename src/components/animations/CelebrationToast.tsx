@@ -196,6 +196,11 @@ export const roleMotivationalMessages: Record<string, string[]> = {
     "Your oversight keeps everything in perfect order!",
     "Management excellence at its finest!"
   ],
+  admin: [
+    "Welcome Admin! Operations are under control! 🛡️",
+    "Your coordination keeps the team aligned!",
+    "Administrative excellence in action!"
+  ],
   franchise: [
     "Welcome Partner! Your territory awaits! 🤝",
     "Building success together, one deal at a time!",
@@ -255,6 +260,41 @@ export const roleMotivationalMessages: Record<string, string[]> = {
     "Lead Hunter Mode ON! 🎯",
     "Every lead is a potential success story!",
     "Converting prospects into partners!"
+  ],
+  task_manager: [
+    "Task Commander Online! Workflow mastery! 📋",
+    "Every task completed is progress made!",
+    "You keep the wheels turning smoothly!"
+  ],
+  seo_manager: [
+    "SEO Wizard Active! Rankings incoming! 🔍",
+    "Your optimization drives visibility!",
+    "Search engines love what you do!"
+  ],
+  legal_compliance: [
+    "Compliance Guardian Ready! Legal shield up! ⚖️",
+    "Keeping us protected and compliant!",
+    "Your vigilance safeguards the company!"
+  ],
+  performance_manager: [
+    "Performance Analyst Online! Metrics matter! 📈",
+    "Your insights drive improvement!",
+    "Excellence is measured by you!"
+  ],
+  rnd_manager: [
+    "R&D Innovator Activated! Discovery awaits! 🔬",
+    "Your research shapes our future!",
+    "Innovation starts with you!"
+  ],
+  ai_manager: [
+    "AI Orchestrator Online! Intelligence unleashed! 🤖",
+    "Your AI management drives efficiency!",
+    "Machine learning at your command!"
+  ],
+  client_success: [
+    "Client Champion Ready! Success awaits! 🌟",
+    "Happy clients are your superpower!",
+    "Building relationships that last!"
   ],
   default: [
     "Welcome back! Great things await! ✨",
