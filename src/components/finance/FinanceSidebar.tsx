@@ -17,7 +17,9 @@ import {
   Grid3X3,
   LogOut,
   Settings,
-  Lock
+  Lock,
+  ArrowLeft,
+  KeyRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
@@ -144,6 +146,15 @@ const FinanceSidebar = ({ activeView, onViewChange }: FinanceSidebarProps) => {
 
       {/* Footer Actions */}
       <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
+          onClick={() => navigate('/dashboard')}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
         <div className="flex gap-2">
           <Button
             variant="ghost"
@@ -164,6 +175,15 @@ const FinanceSidebar = ({ activeView, onViewChange }: FinanceSidebarProps) => {
             Settings
           </Button>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
+          onClick={() => navigate('/forgot-password')}
+        >
+          <KeyRound className="w-4 h-4 mr-2" />
+          Forgot Password
+        </Button>
         <Button
           onClick={handleLogout}
           variant="ghost"
