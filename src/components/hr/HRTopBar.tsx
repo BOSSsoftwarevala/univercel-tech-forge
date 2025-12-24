@@ -1,18 +1,36 @@
 import { motion } from 'framer-motion';
-import { Bell, Search, User, Settings, Plus, Filter } from 'lucide-react';
+import { Bell, Search, Settings, Plus, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from "@/hooks/useAuth";
 
 const HRTopBar = () => {
+  const { user } = useAuth();
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'HR Manager';
+  const maskedId = user?.id ? `HR-${user.id.substring(0, 4).toUpperCase()}` : 'HR-0000';
+
   return (
     <header className="h-16 bg-slate-900/80 backdrop-blur-xl border-b border-violet-500/20 flex items-center justify-between px-6">
+      {/* Welcome & Role */}
+      <div className="flex items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-semibold text-white">Welcome, {userName}</span>
+            <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white text-[10px] px-2 py-0.5">
+              HR MANAGER
+            </Badge>
+          </div>
+          <span className="text-xs text-slate-500">ID: {maskedId} • People Operations</span>
+        </div>
+      </div>
+
       {/* Search */}
-      <div className="flex items-center gap-4 flex-1 max-w-xl">
+      <div className="flex items-center gap-4 flex-1 max-w-md mx-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
-            placeholder="Search candidates, positions, documents..."
+            placeholder="Search candidates, positions..."
             className="pl-10 bg-slate-800/50 border-violet-500/20 text-white placeholder:text-slate-500 focus:border-violet-500/50"
           />
         </div>
@@ -51,17 +69,6 @@ const HRTopBar = () => {
         >
           <Settings className="w-5 h-5" />
         </motion.button>
-
-        {/* User */}
-        <div className="flex items-center gap-3 pl-4 border-l border-violet-500/20">
-          <div className="text-right">
-            <div className="text-sm font-medium text-white">HR Manager</div>
-            <div className="text-xs text-violet-400">Admin Access</div>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <User className="w-5 h-5 text-white" />
-          </div>
-        </div>
       </div>
     </header>
   );
