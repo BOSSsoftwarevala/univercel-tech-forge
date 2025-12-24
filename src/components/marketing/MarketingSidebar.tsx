@@ -13,7 +13,9 @@ import {
   Brain,
   LogOut,
   Settings,
-  Lock
+  Lock,
+  ArrowLeft,
+  KeyRound
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -147,6 +149,15 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
       
       {/* Footer Actions */}
       <div className="p-4 border-t border-teal-500/20 space-y-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-400 hover:text-teal-300 hover:bg-teal-500/10"
+          onClick={() => navigate('/dashboard')}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
         <div className="flex gap-2">
           <Button
             variant="ghost"
@@ -167,6 +178,15 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
             Settings
           </Button>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-400 hover:text-teal-300 hover:bg-teal-500/10"
+          onClick={() => navigate('/forgot-password')}
+        >
+          <KeyRound className="w-4 h-4 mr-2" />
+          Forgot Password
+        </Button>
         <Button
           onClick={handleLogout}
           variant="ghost"
