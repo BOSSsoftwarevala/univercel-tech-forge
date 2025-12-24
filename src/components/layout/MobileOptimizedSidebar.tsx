@@ -10,7 +10,7 @@ import {
   Crown, Building2, Users, Code2, Megaphone, Star, Target,
   ListTodo, Lightbulb, HeartHandshake, TrendingUp, Wallet,
   BarChart3, Monitor, UserPlus, Scale, Shield, Bot,
-  Settings, X, Menu, Sparkles, Home
+  Settings, X, Menu, Sparkles, Home, HeadphonesIcon, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -35,6 +35,11 @@ const navItems = [
   { icon: Monitor, label: 'Demos', path: '/demos', accent: 'text-teal-400' },
   { icon: Wallet, label: 'Finance', path: '/finance', accent: 'text-lime-400' },
   { icon: Bot, label: 'AI', path: '/ai-console', accent: 'text-sky-400' },
+  // New roles (25-28)
+  { icon: HeadphonesIcon, label: 'Safe Assist', path: '/safe-assist', accent: 'text-emerald-400' },
+  { icon: Users, label: 'Assist Manager', path: '/assist-manager', accent: 'text-indigo-400' },
+  { icon: Activity, label: 'Promise Tracker', path: '/promise-tracker', accent: 'text-orange-400' },
+  { icon: Shield, label: 'Promise Mgmt', path: '/promise-management', accent: 'text-rose-400' },
   { icon: Settings, label: 'Settings', path: '/settings', accent: 'text-gray-400' },
 ];
 
