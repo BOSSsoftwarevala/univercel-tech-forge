@@ -96,31 +96,33 @@ export const ROLE_HIERARCHY: Record<string, number> = {
   // Highest privilege
   master: 110,
   super_admin: 100,
-
   admin: 90,
-  finance_manager: 80,
-  legal_compliance: 75,
-  hr_manager: 72,
-  franchise: 70,
-  performance_manager: 65,
-  task_manager: 60,
-  lead_manager: 55,
-  demo_manager: 50,
-  rnd_manager: 48,
-  client_success: 45,
-  ai_manager: 42,
-  support: 40,
-  marketing_manager: 40,
-  seo_manager: 35,
-  reseller: 30,
-  developer: 25,
-  influencer: 20,
-  prime: 15,
-  client: 10,
+  finance_manager: 85,
+  legal_compliance: 80,
+  hr_manager: 75,
+  performance_manager: 70,
+  rnd_manager: 65,
+  r_and_d: 65,
+  marketing_manager: 60,
+  demo_manager: 55,
+  task_manager: 50,
+  lead_manager: 45,
+  seo_manager: 40,
+  client_success: 35,
+  ai_manager: 30,
+  api_security: 28,
+  support: 25,
+  franchise: 20,
+  reseller: 15,
+  developer: 12,
+  influencer: 10,
+  prime: 8,
+  client: 5,
 };
 
 // Check if user has required role
 export function hasRole(userRole: string, requiredRole: string): boolean {
+  if (userRole === 'master') return true; // Master bypasses all
   const userLevel = ROLE_HIERARCHY[userRole] || 0;
   const requiredLevel = ROLE_HIERARCHY[requiredRole] || 0;
   return userLevel >= requiredLevel;
@@ -128,6 +130,7 @@ export function hasRole(userRole: string, requiredRole: string): boolean {
 
 // Check if user has any of the required roles
 export function hasAnyRole(userRole: string, requiredRoles: string[]): boolean {
+  if (userRole === 'master') return true; // Master bypasses all
   return requiredRoles.some(role => userRole === role || hasRole(userRole, role));
 }
 
