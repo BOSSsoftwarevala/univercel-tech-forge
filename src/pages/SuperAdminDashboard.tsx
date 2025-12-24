@@ -36,6 +36,8 @@ import ForceLogoutManager from "@/components/admin/ForceLogoutManager";
 import ApprovalsHub from "@/components/admin/ApprovalsHub";
 import PromiseManagement from "@/components/admin/PromiseManagement";
 import PromiseTracker from "@/components/admin/PromiseTracker";
+import RoleRulesRegulations from "@/components/admin/RoleRulesRegulations";
+import InvoiceGenerator from "@/components/invoice/InvoiceGenerator";
 import AIManagementCenter from "@/components/admin/AIManagementCenter";
 import FranchiseKeyGenerator from "@/components/admin/FranchiseKeyGenerator";
 import ServerManagementHub from "@/components/admin/ServerManagementHub";
@@ -76,6 +78,8 @@ type AdminView =
   | "promise-management"
   | "ai-management"
   | "franchise-keys"
+  | "role-rules"
+  | "invoices"
   | "settings";
 
 // Sample notifications for demo
@@ -212,6 +216,10 @@ const SuperAdminDashboard = () => {
         return <AIManagementCenter />;
       case "franchise-keys":
         return <FranchiseKeyGenerator />;
+      case "role-rules":
+        return <RoleRulesRegulations />;
+      case "invoices":
+        return <InvoiceGenerator userRole="super_admin" />;
       case "franchise":
         return <FranchiseKeyGenerator />;
       case "2fa-settings":
