@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Inbox, AlertCircle, MessageCircle, 
-  ArrowUpRight, BookOpen, BarChart3, Heart, FileText, Settings, LogOut, Lock
+  ArrowUpRight, BookOpen, BarChart3, Heart, FileText, Settings, LogOut, Lock,
+  ArrowLeft, KeyRound
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -173,7 +174,14 @@ const SupportDashboard = () => {
               </div>
             </motion.div>
             
-            {/* Settings & Logout */}
+            {/* Account Actions */}
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-teal-500/20 text-teal-300 text-sm hover:bg-slate-800 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </button>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/change-password')}
@@ -190,6 +198,13 @@ const SupportDashboard = () => {
                 Settings
               </button>
             </div>
+            <button
+              onClick={() => navigate('/forgot-password')}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-teal-500/20 text-teal-300 text-sm hover:bg-slate-800 transition-colors"
+            >
+              <KeyRound className="w-4 h-4" />
+              Forgot Password
+            </button>
             <button
               onClick={handleLogout}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-colors"
