@@ -150,7 +150,7 @@ const App = () => (
                         <GlobalOfferPopup />
                         <FloatingAIChatbotWrapper />
                         <Routes>
-              {/* Public Routes - No login required */}
+                          {/* Public Routes - No login required */}
               <Route path="/" element={<Homepage />} />
               <Route path="/demos" element={<SimpleDemoList />} />
               <Route path="/demo/:demoId" element={<SimpleDemoView />} />
@@ -322,20 +322,20 @@ const App = () => (
               {/* Wireframe Routes - Design Sandbox */}
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
 
-              {/* Catch-all */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </GlobalRealtimeProvider>
-        </TranslationProvider>
-      </NotificationProvider>
-    </SecurityProvider>
-  </BrowserRouter>
-</DomainProtection>
-        </TooltipProvider>
-      </AnimationProvider>
-    </DemoTestModeProvider>
-  </AuthProvider>
-</QueryClientProvider>
+                          {/* Catch-all */}
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </GlobalRealtimeProvider>
+                    </TranslationProvider>
+                  </NotificationProvider>
+                </SecurityProvider>
+              </BrowserRouter>
+            </DomainProtection>
+          </TooltipProvider>
+        </AnimationProvider>
+      </DemoTestModeProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 export default App;
