@@ -12,7 +12,9 @@ import {
   Lightbulb,
   LogOut,
   Settings,
-  Lock
+  Lock,
+  ArrowLeft,
+  KeyRound
 } from "lucide-react";
 import softwareValaLogo from '@/assets/software-vala-logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -44,7 +46,7 @@ export const ClientSuccessSidebar = ({ userName = "Manager" }: ClientSuccessSide
     try {
       await signOut();
       toast.success('Logged out successfully');
-      navigate('/login');
+      navigate('/auth');
     } catch (error) {
       toast.error('Failed to logout');
     }
@@ -127,6 +129,13 @@ export const ClientSuccessSidebar = ({ userName = "Manager" }: ClientSuccessSide
         </div>
 
         {/* Action Buttons */}
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 text-sm hover:bg-slate-200 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </button>
         <div className="flex gap-2">
           <button
             onClick={() => navigate('/change-password')}
@@ -143,6 +152,13 @@ export const ClientSuccessSidebar = ({ userName = "Manager" }: ClientSuccessSide
             Settings
           </button>
         </div>
+        <button
+          onClick={() => navigate('/forgot-password')}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 text-sm hover:bg-slate-200 transition-colors"
+        >
+          <KeyRound className="w-4 h-4" />
+          Forgot Password
+        </button>
 
         {/* Logout Button */}
         <button
