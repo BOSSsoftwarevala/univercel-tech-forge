@@ -55,8 +55,8 @@ export const ProductManager: React.FC<ProductManagerProps> = ({ viewOnly = false
   const [demos, setDemos] = useState<Demo[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterCategory, setFilterCategory] = useState<string>("");
-  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -94,8 +94,8 @@ export const ProductManager: React.FC<ProductManagerProps> = ({ viewOnly = false
         `)
         .order("created_at", { ascending: false });
 
-      if (filterCategory) query = query.eq("business_category_id", filterCategory);
-      if (filterStatus) query = query.eq("status", filterStatus);
+      if (filterCategory && filterCategory !== "all") query = query.eq("business_category_id", filterCategory);
+      if (filterStatus && filterStatus !== "all") query = query.eq("status", filterStatus);
       if (search) query = query.ilike("product_name", `%${search}%`);
 
       const { data: productsData, error: productsError } = await query;
@@ -360,7 +360,7 @@ export const ProductManager: React.FC<ProductManagerProps> = ({ viewOnly = false
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                 ))}
@@ -371,7 +371,7 @@ export const ProductManager: React.FC<ProductManagerProps> = ({ viewOnly = false
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>
               </SelectContent>
