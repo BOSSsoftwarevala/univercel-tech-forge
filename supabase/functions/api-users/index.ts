@@ -29,10 +29,13 @@ serve(async (req: Request) => {
 
       if (authError) return errorResponse(authError.message, 400);
 
-      // Assign role
+      // Assign role - auto-approve since created by admin
       await supabaseAdmin.from("user_roles").insert({
         user_id: authData.user.id,
         role: body.role,
+        approval_status: 'approved',
+        approved_at: new Date().toISOString(),
+        approved_by: user.userId,
       });
 
       return jsonResponse({
