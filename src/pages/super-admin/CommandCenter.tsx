@@ -13,37 +13,77 @@ import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
 
-// Role status data - Uses database-compatible role names
-const roleStatuses: Array<{
+// Role status data organized by category
+interface RoleStatus {
   role: AppRole;
   active: number;
   pending: number;
   done: number;
-}> = [
-  // GRADE 0 - OWNERSHIP
-  { role: 'master', active: 1, pending: 0, done: 5 },
-  // GRADE 1 - PLATFORM CONTROL
-  { role: 'super_admin', active: 2, pending: 0, done: 15 },
-  { role: 'admin', active: 5, pending: 1, done: 45 },
-  // GRADE 2 - BUSINESS MANAGEMENT
-  { role: 'client_success', active: 4, pending: 2, done: 156 },
-  { role: 'support', active: 8, pending: 2, done: 567 },
-  { role: 'ai_manager', active: 1, pending: 0, done: 12 },
-  { role: 'api_security', active: 2, pending: 0, done: 34 },
-  { role: 'seo_manager', active: 3, pending: 0, done: 45 },
-  { role: 'marketing_manager', active: 4, pending: 0, done: 56 },
-  { role: 'lead_manager', active: 4, pending: 1, done: 128 },
-  { role: 'demo_manager', active: 2, pending: 1, done: 67 },
-  { role: 'legal_compliance', active: 2, pending: 0, done: 34 },
-  { role: 'task_manager', active: 3, pending: 0, done: 445 },
-  { role: 'hr_manager', active: 2, pending: 1, done: 23 },
-  { role: 'performance_manager', active: 2, pending: 0, done: 21 },
-  { role: 'rnd_manager', active: 2, pending: 0, done: 21 },
-  { role: 'finance_manager', active: 3, pending: 1, done: 89 },
-  // GRADE 3 - PARTNERS
-  { role: 'franchise', active: 23, pending: 5, done: 67 },
-  { role: 'developer', active: 47, pending: 8, done: 156 },
-  // Hidden: reseller, influencer, prime, client
+}
+
+interface CategorySection {
+  title: string;
+  roles: RoleStatus[];
+}
+
+const roleCategories: CategorySection[] = [
+  {
+    title: 'Platform Control',
+    roles: [
+      { role: 'super_admin', active: 2, pending: 0, done: 15 },
+      { role: 'admin', active: 5, pending: 1, done: 45 },
+    ]
+  },
+  {
+    title: 'Server & Infrastructure',
+    roles: [
+      { role: 'api_security', active: 2, pending: 0, done: 34 }, // Server Manager
+    ]
+  },
+  {
+    title: 'Business Managers',
+    roles: [
+      { role: 'franchise', active: 23, pending: 5, done: 67 }, // Franchise Manager
+      { role: 'client_success', active: 4, pending: 2, done: 156 }, // Sales & Support Manager
+      { role: 'ai_manager', active: 1, pending: 0, done: 12 }, // API / AI Manager
+      { role: 'seo_manager', active: 3, pending: 0, done: 45 }, // SEO Manager
+      { role: 'marketing_manager', active: 4, pending: 0, done: 56 }, // Marketing Manager
+      { role: 'lead_manager', active: 4, pending: 1, done: 128 }, // Lead Manager
+      { role: 'demo_manager', active: 2, pending: 1, done: 67 }, // Pro Manager
+      { role: 'legal_compliance', active: 2, pending: 0, done: 34 }, // Legal Manager
+      { role: 'task_manager', active: 3, pending: 0, done: 445 }, // Task Manager
+      { role: 'hr_manager', active: 2, pending: 1, done: 23 }, // HR Manager
+      { role: 'performance_manager', active: 2, pending: 0, done: 21 }, // Developer Manager
+    ]
+  },
+  {
+    title: 'Partner Network',
+    roles: [
+      { role: 'developer', active: 47, pending: 8, done: 156 }, // Developer
+      { role: 'reseller', active: 12, pending: 3, done: 89 }, // Reseller
+      { role: 'influencer', active: 8, pending: 2, done: 45 }, // Influencer
+    ]
+  },
+  {
+    title: 'User Management',
+    roles: [
+      { role: 'prime', active: 34, pending: 5, done: 234 }, // Prime User
+      { role: 'client', active: 156, pending: 12, done: 1245 }, // User
+    ]
+  },
+  {
+    title: 'System & Support',
+    roles: [
+      { role: 'support', active: 8, pending: 2, done: 567 }, // Safe Assist / Assist Manager
+      { role: 'rnd_manager', active: 2, pending: 0, done: 21 }, // Frontend
+    ]
+  },
+  {
+    title: 'Operations & Tracking',
+    roles: [
+      { role: 'finance_manager', active: 3, pending: 1, done: 89 }, // Promise Tracker / Promise Management / Dashboard Management
+    ]
+  },
 ];
 
 const getIconForRole = (role: AppRole): LucideIcon => {
@@ -475,38 +515,47 @@ const SuperAdminCommandCenter = () => {
           </div>
         </motion.div>
 
-        {/* Section Header */}
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div>
-            <h2 className="text-lg font-bold text-white">21 Role Modules • Live Activity</h2>
-            <p className="text-xs text-slate-400">Real-time monitoring across all departments</p>
-          </div>
-          <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30">
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-400 mr-1.5 animate-pulse" />
-            Live Updates
-          </Badge>
-        </motion.div>
+        {/* Categorized Role Modules */}
+        {roleCategories.map((category, catIdx) => (
+          <motion.div
+            key={category.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + catIdx * 0.1 }}
+            className="space-y-4"
+          >
+            {/* Category Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
+                <div>
+                  <h2 className="text-lg font-bold text-white">{category.title}</h2>
+                  <p className="text-xs text-slate-400">{category.roles.length} modules • Real-time monitoring</p>
+                </div>
+              </div>
+              <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-teal-400 mr-1.5 animate-pulse" />
+                Live
+              </Badge>
+            </div>
 
-        {/* 2x2 Role Activity Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {roleStatuses.map((status, idx) => (
-            <RoleActivityCard
-              key={status.role}
-              role={status.role}
-              stats={{
-                active: status.active,
-                pending: status.pending,
-                done: status.done,
-              }}
-              index={idx}
-            />
-          ))}
-        </div>
+            {/* Category Role Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {category.roles.map((status, idx) => (
+                <RoleActivityCard
+                  key={status.role}
+                  role={status.role}
+                  stats={{
+                    active: status.active,
+                    pending: status.pending,
+                    done: status.done,
+                  }}
+                  index={catIdx * 10 + idx}
+                />
+              ))}
+            </div>
+          </motion.div>
+        ))}
 
         {/* AI Insights & Alerts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
