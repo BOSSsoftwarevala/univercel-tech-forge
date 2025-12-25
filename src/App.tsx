@@ -22,8 +22,7 @@ import CategoryOnboarding from "./pages/CategoryOnboarding";
 import NotFound from "./pages/NotFound";
 
 // Auth Pages
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
+import { Navigate } from "react-router-dom";
 import Logout from "./pages/auth/Logout";
 import OTPVerify from "./pages/auth/OTPVerify";
 import DeviceVerify from "./pages/auth/DeviceVerify";
@@ -56,7 +55,7 @@ import SecurityCenter from "./pages/super-admin/SecurityCenter";
 import ProductManagerPage from "./pages/super-admin/ProductManagerPage";
 import SystemAudit from "./pages/super-admin/SystemAudit";
 import PrimeManager from "./pages/super-admin/PrimeManager";
-import AuthGateway from "./pages/auth/AuthGateway";
+
 import ComplianceCenter from "./pages/super-admin/ComplianceCenter";
 
 // Master Admin Pages
@@ -182,9 +181,9 @@ const App = () => (
               <Route path="/demo-directory" element={<DemoDirectory />} />
               <Route path="/demo/:role" element={<DemoAccess />} />
 
-              {/* Global Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              {/* Global Auth Routes - Redirects to unified /auth */}
+              <Route path="/login" element={<Navigate to="/auth" replace />} />
+              <Route path="/register" element={<Navigate to="/auth" replace />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/otp-verify" element={<OTPVerify />} />
               <Route path="/device-verify" element={<DeviceVerify />} />
