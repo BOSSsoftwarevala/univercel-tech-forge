@@ -274,6 +274,53 @@ export type Database = {
           },
         ]
       }
+      admin_area_manager: {
+        Row: {
+          assigned_super_admin_id: string | null
+          country: string
+          created_at: string | null
+          current_activity: string | null
+          id: string
+          last_login_time: string | null
+          login_device: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_super_admin_id?: string | null
+          country: string
+          created_at?: string | null
+          current_activity?: string | null
+          id?: string
+          last_login_time?: string | null
+          login_device?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_super_admin_id?: string | null
+          country?: string
+          created_at?: string | null
+          current_activity?: string | null
+          id?: string
+          last_login_time?: string | null
+          login_device?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_area_manager_assigned_super_admin_id_fkey"
+            columns: ["assigned_super_admin_id"]
+            isOneToOne: false
+            referencedRelation: "super_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_billing_qr_codes: {
         Row: {
           base_cost_total: number
@@ -499,6 +546,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ai_insights: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          is_acknowledged: boolean | null
+          issue_detected: string
+          related_role: Database["public"]["Enums"]["app_role"] | null
+          scope: string | null
+          scope_value: string | null
+          suggested_action: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          is_acknowledged?: boolean | null
+          issue_detected: string
+          related_role?: Database["public"]["Enums"]["app_role"] | null
+          scope?: string | null
+          scope_value?: string | null
+          suggested_action?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          is_acknowledged?: boolean | null
+          issue_detected?: string
+          related_role?: Database["public"]["Enums"]["app_role"] | null
+          scope?: string | null
+          scope_value?: string | null
+          suggested_action?: string | null
+        }
+        Relationships: []
       }
       ai_qr_scan_logs: {
         Row: {
@@ -877,6 +966,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      audit_lock: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_locked: boolean | null
+          lock_reason: string
+          locked_by: string | null
+          record_ref_id: string
+          table_name: string
+          unlock_condition: string | null
+          unlocked_at: string | null
+          unlocked_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_locked?: boolean | null
+          lock_reason: string
+          locked_by?: string | null
+          record_ref_id: string
+          table_name: string
+          unlock_condition?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_locked?: boolean | null
+          lock_reason?: string
+          locked_by?: string | null
+          record_ref_id?: string
+          table_name?: string
+          unlock_condition?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+        }
+        Relationships: []
       }
       audit_logs: {
         Row: {
@@ -10119,6 +10247,48 @@ export type Database = {
         }
         Relationships: []
       }
+      role_activity_log: {
+        Row: {
+          action_object: string | null
+          action_type: string
+          created_at: string | null
+          device: string | null
+          geo_location: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          risk_flag: string | null
+          role_id: string
+          role_type: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          action_object?: string | null
+          action_type: string
+          created_at?: string | null
+          device?: string | null
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          risk_flag?: string | null
+          role_id: string
+          role_type: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          action_object?: string | null
+          action_type?: string
+          created_at?: string | null
+          device?: string | null
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          risk_flag?: string | null
+          role_id?: string
+          role_type?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       role_clause_agreements: {
         Row: {
           accepted_at: string
@@ -10250,6 +10420,56 @@ export type Database = {
           role_name?: string
         }
         Relationships: []
+      }
+      sa_approval_queue: {
+        Row: {
+          action_payload: Json | null
+          action_type: string
+          created_at: string | null
+          id: string
+          priority: string | null
+          requested_by_id: string
+          requested_by_role: Database["public"]["Enums"]["app_role"]
+          review_notes: string | null
+          review_time: string | null
+          reviewed_by_super_admin_id: string | null
+          status: string | null
+        }
+        Insert: {
+          action_payload?: Json | null
+          action_type: string
+          created_at?: string | null
+          id?: string
+          priority?: string | null
+          requested_by_id: string
+          requested_by_role: Database["public"]["Enums"]["app_role"]
+          review_notes?: string | null
+          review_time?: string | null
+          reviewed_by_super_admin_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          action_payload?: Json | null
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          priority?: string | null
+          requested_by_id?: string
+          requested_by_role?: Database["public"]["Enums"]["app_role"]
+          review_notes?: string | null
+          review_time?: string | null
+          reviewed_by_super_admin_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sa_approval_queue_reviewed_by_super_admin_id_fkey"
+            columns: ["reviewed_by_super_admin_id"]
+            isOneToOne: false
+            referencedRelation: "super_admin"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       safe_assist_ai_logs: {
         Row: {
@@ -11472,6 +11692,48 @@ export type Database = {
         }
         Relationships: []
       }
+      super_admin: {
+        Row: {
+          continent: string
+          countries_managed: number | null
+          created_at: string | null
+          current_device: string | null
+          id: string
+          last_login_time: string | null
+          login_status: string | null
+          name: string
+          risk_score: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          continent: string
+          countries_managed?: number | null
+          created_at?: string | null
+          current_device?: string | null
+          id?: string
+          last_login_time?: string | null
+          login_status?: string | null
+          name: string
+          risk_score?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          continent?: string
+          countries_managed?: number | null
+          created_at?: string | null
+          current_device?: string | null
+          id?: string
+          last_login_time?: string | null
+          login_status?: string | null
+          name?: string
+          risk_score?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       suspicious_activity: {
         Row: {
           details: Json | null
@@ -11553,6 +11815,51 @@ export type Database = {
         }
         Relationships: []
       }
+      system_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          auto_action_taken: string | null
+          created_at: string | null
+          id: string
+          message: string | null
+          severity: string | null
+          source_id: string | null
+          source_table: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          auto_action_taken?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          severity?: string | null
+          source_id?: string | null
+          source_table: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          auto_action_taken?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          severity?: string | null
+          source_id?: string | null
+          source_table?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       system_financial_config: {
         Row: {
           config_key: string
@@ -11630,6 +11937,44 @@ export type Database = {
           setting_value?: string | null
         }
         Relationships: []
+      }
+      task_activity: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          performed_by_id: string
+          performed_by_role: Database["public"]["Enums"]["app_role"]
+          remarks: string | null
+          task_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          performed_by_id: string
+          performed_by_role: Database["public"]["Enums"]["app_role"]
+          remarks?: string | null
+          task_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          performed_by_id?: string
+          performed_by_role?: Database["public"]["Enums"]["app_role"]
+          remarks?: string | null
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_activity_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "task_master"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       task_deliveries: {
         Row: {
@@ -11726,6 +12071,62 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_master: {
+        Row: {
+          assigned_to_id: string | null
+          assigned_to_role: Database["public"]["Enums"]["app_role"]
+          created_at: string | null
+          created_by_super_admin_id: string | null
+          deadline: string | null
+          description: string | null
+          id: string
+          priority: string | null
+          progress_percentage: number | null
+          status: string | null
+          task_type: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to_id?: string | null
+          assigned_to_role: Database["public"]["Enums"]["app_role"]
+          created_at?: string | null
+          created_by_super_admin_id?: string | null
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          priority?: string | null
+          progress_percentage?: number | null
+          status?: string | null
+          task_type: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to_id?: string | null
+          assigned_to_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string | null
+          created_by_super_admin_id?: string | null
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          priority?: string | null
+          progress_percentage?: number | null
+          status?: string | null
+          task_type?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_master_created_by_super_admin_id_fkey"
+            columns: ["created_by_super_admin_id"]
+            isOneToOne: false
+            referencedRelation: "super_admin"
             referencedColumns: ["id"]
           },
         ]
