@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Shield, Globe, LogOut, AlertCircle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SafeAssistTrigger } from '@/components/support/SafeAssistTrigger';
+import promiseIcon from '@/assets/promise-icon.jpg';
 
 interface ControlHeaderProps {
   roleTitle: string;
@@ -21,6 +24,18 @@ export const ControlHeader = ({
   onLogout,
   children
 }: ControlHeaderProps) => {
+  const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
+
+  const handlePromiseClick = () => {
+    if (promiseState === 'idle') {
+      setPromiseState('pending');
+    } else if (promiseState === 'pending') {
+      setPromiseState('active');
+    } else {
+      setPromiseState('idle');
+    }
+  };
+
   const scopeColors = {
     Global: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     Continent: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
@@ -83,6 +98,29 @@ export const ControlHeader = ({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
+          {/* Promise Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handlePromiseClick}
+            className={cn(
+              "flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium text-sm transition-all",
+              promiseState === 'active'
+                ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                : promiseState === 'pending'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50 animate-pulse'
+                : 'bg-gray-800/50 text-gray-400 border border-gray-700/50 hover:border-amber-500/50'
+            )}
+          >
+            <img src={promiseIcon} alt="Promise" className="w-6 h-6 rounded-full object-cover" />
+            <span className="hidden sm:inline">
+              {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
+            </span>
+          </motion.button>
+
+          {/* Safe Assist */}
+          <SafeAssistTrigger variant="compact" />
+          
           {children}
           
           {/* Secure Logout */}
