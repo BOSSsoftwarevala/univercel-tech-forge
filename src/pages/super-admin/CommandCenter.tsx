@@ -5,201 +5,573 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Crown, Users, Building2, Store, Code2, Zap, Star, Target,
-  ListTodo, Package, Wallet, HeadphonesIcon, TrendingUp, Brain,
-  Activity, Globe, Shield, Scale, Search, UserPlus, MessageSquare,
+  ListTodo, HeadphonesIcon, TrendingUp, Brain,
+  Activity, Globe, Shield, Scale, Search, UserPlus,
   Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight, ScanLine,
   Server, Megaphone, MonitorPlay, Handshake, LayoutDashboard, CheckCircle,
-  ClipboardList, UserCog, Settings
+  ClipboardList, UserCog, ChevronDown, Terminal, ShoppingCart, LifeBuoy,
+  FileCheck, User, Layout, Bot, Share2
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
+import { cn } from '@/lib/utils';
 
-// Custom module item for display
-interface ModuleItem {
-  id: string;
-  label: string;
+// ==========================================
+// FIGMA MASTER PROMPT — CATEGORY HIERARCHY
+// Category → Sub → Micro → Nano (4 Levels)
+// ==========================================
+
+interface NanoCategory {
+  name: string;
+}
+
+interface MicroCategory {
+  name: string;
+  nanos: NanoCategory[];
+}
+
+interface SubCategory {
+  name: string;
+  micros: MicroCategory[];
+}
+
+interface Category {
+  id: number;
+  name: string;
   icon: LucideIcon;
-  active: number;
-  pending: number;
-  done: number;
+  color: string;
+  subs: SubCategory[];
 }
 
-interface CategorySection {
-  title: string;
-  items: ModuleItem[];
-}
-
-const dashboardCategories: CategorySection[] = [
+const categories: Category[] = [
   {
-    title: 'Platform Control',
-    items: [
-      { id: 'super_admin', label: 'Super Admin', icon: Crown, active: 2, pending: 0, done: 15 },
-      { id: 'admin', label: 'Admin', icon: Shield, active: 5, pending: 1, done: 45 },
-      { id: 'server_manager', label: 'Server Manager', icon: Server, active: 3, pending: 0, done: 28 },
-    ]
+    id: 1,
+    name: "Super Admin",
+    icon: Crown,
+    color: "from-red-500 to-rose-600",
+    subs: [{
+      name: "System Control",
+      micros: [
+        { name: "Access Control", nanos: [{ name: "Freeze System" }, { name: "Emergency Lock" }] },
+        { name: "Global Settings", nanos: [{ name: "Platform Toggle" }, { name: "Maintenance Mode" }] }
+      ]
+    }]
   },
   {
-    title: 'Business Managers',
-    items: [
-      { id: 'franchise_manager', label: 'Franchise Manager', icon: Building2, active: 4, pending: 2, done: 67 },
-      { id: 'sales_support_manager', label: 'Sales & Support Manager', icon: HeadphonesIcon, active: 6, pending: 3, done: 156 },
-      { id: 'reseller_manager', label: 'Reseller Manager', icon: Store, active: 3, pending: 1, done: 45 },
-      { id: 'api_ai_manager', label: 'API / AI Manager', icon: Brain, active: 2, pending: 0, done: 34 },
-      { id: 'influencer_manager', label: 'Influencer Manager', icon: Zap, active: 2, pending: 1, done: 23 },
-      { id: 'seo_manager', label: 'SEO Manager', icon: Search, active: 3, pending: 0, done: 45 },
-      { id: 'marketing_manager', label: 'Marketing Manager', icon: Megaphone, active: 4, pending: 1, done: 56 },
-      { id: 'lead_manager', label: 'Lead Manager', icon: Target, active: 5, pending: 2, done: 128 },
-      { id: 'pro_manager', label: 'Pro Manager', icon: Star, active: 2, pending: 1, done: 67 },
-      { id: 'legal_manager', label: 'Legal Manager', icon: Scale, active: 2, pending: 0, done: 34 },
-      { id: 'task_manager', label: 'Task Manager', icon: ListTodo, active: 4, pending: 1, done: 445 },
-      { id: 'hr_manager', label: 'HR Manager', icon: UserPlus, active: 3, pending: 1, done: 23 },
-      { id: 'developer_manager', label: 'Developer Manager', icon: Code2, active: 2, pending: 0, done: 21 },
-    ]
+    id: 2,
+    name: "Admin",
+    icon: Shield,
+    color: "from-orange-500 to-amber-600",
+    subs: [{
+      name: "Operations",
+      micros: [
+        { name: "User Operations", nanos: [{ name: "Activate" }, { name: "Suspend" }] },
+        { name: "Data Operations", nanos: [{ name: "View Logs" }, { name: "Export" }] }
+      ]
+    }]
   },
   {
-    title: 'Partner Network',
-    items: [
-      { id: 'franchise', label: 'Franchise', icon: Building2, active: 23, pending: 5, done: 89 },
-      { id: 'developer', label: 'Developer', icon: Code2, active: 47, pending: 8, done: 156 },
-      { id: 'reseller', label: 'Reseller', icon: Store, active: 12, pending: 3, done: 78 },
-      { id: 'influencer', label: 'Influencer', icon: Zap, active: 8, pending: 2, done: 45 },
-    ]
+    id: 3,
+    name: "Server Manager",
+    icon: Server,
+    color: "from-emerald-500 to-green-600",
+    subs: [{
+      name: "Infrastructure",
+      micros: [
+        { name: "Server Health", nanos: [{ name: "CPU" }, { name: "Memory" }] },
+        { name: "Deployment", nanos: [{ name: "Manual Deploy" }, { name: "Rollback" }] }
+      ]
+    }]
   },
   {
-    title: 'User Management',
-    items: [
-      { id: 'prime_user', label: 'Prime User', icon: Star, active: 34, pending: 5, done: 234 },
-      { id: 'user', label: 'User', icon: Users, active: 156, pending: 12, done: 1245 },
-    ]
+    id: 4,
+    name: "Franchise Manager",
+    icon: Building2,
+    color: "from-blue-500 to-indigo-600",
+    subs: [{
+      name: "Franchise Control",
+      micros: [
+        { name: "Area Management", nanos: [{ name: "Zone Assign" }, { name: "Zone Lock" }] },
+        { name: "Performance", nanos: [{ name: "Revenue" }, { name: "Growth" }] }
+      ]
+    }]
   },
   {
-    title: 'System & Support',
-    items: [
-      { id: 'frontend', label: 'Frontend', icon: MonitorPlay, active: 3, pending: 0, done: 45 },
-      { id: 'safe_assist', label: 'Safe Assist', icon: Handshake, active: 5, pending: 2, done: 234 },
-      { id: 'assist_manager', label: 'Assist Manager', icon: HeadphonesIcon, active: 4, pending: 1, done: 167 },
-    ]
+    id: 5,
+    name: "Sales & Support Manager",
+    icon: HeadphonesIcon,
+    color: "from-violet-500 to-purple-600",
+    subs: [{
+      name: "Sales Operations",
+      micros: [
+        { name: "Lead Handling", nanos: [{ name: "Assign Lead" }, { name: "Close Lead" }] },
+        { name: "Support", nanos: [{ name: "Ticket View" }, { name: "Resolution" }] }
+      ]
+    }]
   },
   {
-    title: 'Operations & Tracking',
-    items: [
-      { id: 'promise_tracker', label: 'Promise Tracker', icon: CheckCircle, active: 6, pending: 3, done: 289 },
-      { id: 'promise_management', label: 'Promise Management', icon: ClipboardList, active: 4, pending: 2, done: 178 },
-      { id: 'dashboard_management', label: 'Dashboard Management', icon: LayoutDashboard, active: 2, pending: 0, done: 56 },
-    ]
+    id: 6,
+    name: "Reseller Manager",
+    icon: UserCog,
+    color: "from-pink-500 to-rose-600",
+    subs: [{
+      name: "Reseller Network",
+      micros: [
+        { name: "Reseller Control", nanos: [{ name: "Approve" }, { name: "Suspend" }] },
+        { name: "Commission", nanos: [{ name: "Calculate" }, { name: "Release" }] }
+      ]
+    }]
   },
+  {
+    id: 7,
+    name: "API / AI Manager",
+    icon: Bot,
+    color: "from-cyan-500 to-teal-600",
+    subs: [{
+      name: "Intelligence",
+      micros: [
+        { name: "API Control", nanos: [{ name: "Key Issue" }, { name: "Revoke" }] },
+        { name: "AI Logic", nanos: [{ name: "Training" }, { name: "Monitoring" }] }
+      ]
+    }]
+  },
+  {
+    id: 8,
+    name: "Influencer Manager",
+    icon: Share2,
+    color: "from-fuchsia-500 to-pink-600",
+    subs: [{
+      name: "Campaigns",
+      micros: [
+        { name: "Influencer Control", nanos: [{ name: "Approve" }, { name: "Block" }] },
+        { name: "Tracking", nanos: [{ name: "Clicks" }, { name: "Conversion" }] }
+      ]
+    }]
+  },
+  {
+    id: 9,
+    name: "SEO Manager",
+    icon: Search,
+    color: "from-lime-500 to-green-600",
+    subs: [{
+      name: "Optimization",
+      micros: [
+        { name: "Content SEO", nanos: [{ name: "Meta" }, { name: "Keywords" }] },
+        { name: "Analytics", nanos: [{ name: "Ranking" }, { name: "Traffic" }] }
+      ]
+    }]
+  },
+  {
+    id: 10,
+    name: "Marketing Manager",
+    icon: Megaphone,
+    color: "from-yellow-500 to-orange-600",
+    subs: [{
+      name: "Campaign Engine",
+      micros: [
+        { name: "Festival Offers", nanos: [{ name: "Create" }, { name: "Schedule" }] },
+        { name: "Promotions", nanos: [{ name: "Discounts" }, { name: "Coupons" }] }
+      ]
+    }]
+  },
+  {
+    id: 11,
+    name: "Lead Manager",
+    icon: Target,
+    color: "from-red-500 to-orange-600",
+    subs: [{
+      name: "Lead System",
+      micros: [
+        { name: "Lead Flow", nanos: [{ name: "Capture" }, { name: "Distribute" }] },
+        { name: "Quality", nanos: [{ name: "Score" }, { name: "Filter" }] }
+      ]
+    }]
+  },
+  {
+    id: 12,
+    name: "Pro Manager",
+    icon: Star,
+    color: "from-amber-500 to-yellow-600",
+    subs: [{
+      name: "Premium Control",
+      micros: [
+        { name: "Upgrade Flow", nanos: [{ name: "Request" }, { name: "Approve" }] },
+        { name: "Benefits", nanos: [{ name: "Features" }, { name: "Priority" }] }
+      ]
+    }]
+  },
+  {
+    id: 13,
+    name: "Legal Manager",
+    icon: Scale,
+    color: "from-slate-500 to-gray-600",
+    subs: [{
+      name: "Compliance",
+      micros: [
+        { name: "Policies", nanos: [{ name: "Terms" }, { name: "Privacy" }] },
+        { name: "Risk", nanos: [{ name: "Review" }, { name: "Approve" }] }
+      ]
+    }]
+  },
+  {
+    id: 14,
+    name: "Task Manager",
+    icon: ListTodo,
+    color: "from-indigo-500 to-blue-600",
+    subs: [{
+      name: "Task Engine",
+      micros: [
+        { name: "Assignment", nanos: [{ name: "Create" }, { name: "Reassign" }] },
+        { name: "Tracking", nanos: [{ name: "Status" }, { name: "Deadline" }] }
+      ]
+    }]
+  },
+  {
+    id: 15,
+    name: "HR Manager",
+    icon: UserPlus,
+    color: "from-teal-500 to-cyan-600",
+    subs: [{
+      name: "Human Resource",
+      micros: [
+        { name: "Hiring", nanos: [{ name: "Apply" }, { name: "Review" }] },
+        { name: "Records", nanos: [{ name: "Attendance" }, { name: "Performance" }] }
+      ]
+    }]
+  },
+  {
+    id: 16,
+    name: "Developer Manager",
+    icon: Code2,
+    color: "from-purple-500 to-violet-600",
+    subs: [{
+      name: "Development Control",
+      micros: [
+        { name: "Task Allocation", nanos: [{ name: "Assign" }, { name: "Review" }] },
+        { name: "Quality", nanos: [{ name: "Bug" }, { name: "Fix" }] }
+      ]
+    }]
+  },
+  {
+    id: 17,
+    name: "Franchise",
+    icon: Store,
+    color: "from-emerald-500 to-teal-600",
+    subs: [{
+      name: "Business Panel",
+      micros: [
+        { name: "Sales", nanos: [{ name: "Deals" }, { name: "Revenue" }] },
+        { name: "Area", nanos: [{ name: "Coverage" }, { name: "Expansion" }] }
+      ]
+    }]
+  },
+  {
+    id: 18,
+    name: "Developer",
+    icon: Terminal,
+    color: "from-gray-500 to-slate-600",
+    subs: [{
+      name: "Work Panel",
+      micros: [
+        { name: "Tasks", nanos: [{ name: "View" }, { name: "Submit" }] },
+        { name: "Logs", nanos: [{ name: "Time" }, { name: "Activity" }] }
+      ]
+    }]
+  },
+  {
+    id: 19,
+    name: "Reseller",
+    icon: ShoppingCart,
+    color: "from-rose-500 to-pink-600",
+    subs: [{
+      name: "Sales Panel",
+      micros: [
+        { name: "Clients", nanos: [{ name: "Add" }, { name: "Manage" }] },
+        { name: "Wallet", nanos: [{ name: "Balance" }, { name: "Request" }] }
+      ]
+    }]
+  },
+  {
+    id: 20,
+    name: "Influencer",
+    icon: Zap,
+    color: "from-fuchsia-500 to-purple-600",
+    subs: [{
+      name: "Promotion",
+      micros: [
+        { name: "Links", nanos: [{ name: "Create" }, { name: "Share" }] },
+        { name: "Earnings", nanos: [{ name: "Track" }, { name: "Withdraw" }] }
+      ]
+    }]
+  },
+  {
+    id: 21,
+    name: "Prime User",
+    icon: Crown,
+    color: "from-yellow-500 to-amber-600",
+    subs: [{
+      name: "Premium Access",
+      micros: [
+        { name: "Products", nanos: [{ name: "Full Access" }, { name: "Priority" }] },
+        { name: "Support", nanos: [{ name: "Fast Track" }, { name: "SLA" }] }
+      ]
+    }]
+  },
+  {
+    id: 22,
+    name: "User",
+    icon: User,
+    color: "from-blue-500 to-cyan-600",
+    subs: [{
+      name: "Usage",
+      micros: [
+        { name: "Demos", nanos: [{ name: "View" }, { name: "Test" }] },
+        { name: "Account", nanos: [{ name: "Profile" }, { name: "Security" }] }
+      ]
+    }]
+  },
+  {
+    id: 23,
+    name: "Frontend",
+    icon: Layout,
+    color: "from-sky-500 to-blue-600",
+    subs: [{
+      name: "UI Layer",
+      micros: [
+        { name: "Components", nanos: [{ name: "Buttons" }, { name: "Forms" }] },
+        { name: "Layout", nanos: [{ name: "Grid" }, { name: "Responsive" }] }
+      ]
+    }]
+  },
+  {
+    id: 24,
+    name: "Safe Assist",
+    icon: LifeBuoy,
+    color: "from-green-500 to-emerald-600",
+    subs: [{
+      name: "Remote Help",
+      micros: [
+        { name: "Session", nanos: [{ name: "Start" }, { name: "End" }] },
+        { name: "Logs", nanos: [{ name: "Record" }, { name: "Review" }] }
+      ]
+    }]
+  },
+  {
+    id: 25,
+    name: "Assist Manager",
+    icon: Handshake,
+    color: "from-violet-500 to-indigo-600",
+    subs: [{
+      name: "Support Control",
+      micros: [
+        { name: "Team", nanos: [{ name: "Assign" }, { name: "Monitor" }] },
+        { name: "Quality", nanos: [{ name: "SLA" }, { name: "Feedback" }] }
+      ]
+    }]
+  },
+  {
+    id: 26,
+    name: "Promise Tracker",
+    icon: Clock,
+    color: "from-orange-500 to-red-600",
+    subs: [{
+      name: "Commitment",
+      micros: [
+        { name: "Tracking", nanos: [{ name: "Timeline" }, { name: "Status" }] },
+        { name: "Alerts", nanos: [{ name: "Delay" }, { name: "Notify" }] }
+      ]
+    }]
+  },
+  {
+    id: 27,
+    name: "Promise Management",
+    icon: FileCheck,
+    color: "from-teal-500 to-green-600",
+    subs: [{
+      name: "Promise Control",
+      micros: [
+        { name: "Approval", nanos: [{ name: "Accept" }, { name: "Reject" }] },
+        { name: "Closure", nanos: [{ name: "Complete" }, { name: "Archive" }] }
+      ]
+    }]
+  },
+  {
+    id: 28,
+    name: "Dashboard Management",
+    icon: LayoutDashboard,
+    color: "from-indigo-500 to-purple-600",
+    subs: [{
+      name: "Visualization",
+      micros: [
+        { name: "Widgets", nanos: [{ name: "Add" }, { name: "Remove" }] },
+        { name: "Layout", nanos: [{ name: "Arrange" }, { name: "Lock" }] }
+      ]
+    }]
+  }
 ];
 
-// Module Activity Card Component - For custom dashboard items
-interface ModuleActivityCardProps {
-  item: ModuleItem;
-  index: number;
-}
+// ==========================================
+// CATEGORY CARD COMPONENT (Expandable 4-Level)
+// ==========================================
 
-const ModuleActivityCard = ({ item, index }: ModuleActivityCardProps) => {
-  const Icon = item.icon;
-  const total = item.active + item.pending + item.done;
+function CategoryCard({ category }: { category: Category }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
+  const [expandedMicros, setExpandedMicros] = useState<string[]>([]);
+  const Icon = category.icon;
+
+  const toggleSub = (subName: string) => {
+    setExpandedSubs(prev => 
+      prev.includes(subName) ? prev.filter(s => s !== subName) : [...prev, subName]
+    );
+  };
+
+  const toggleMicro = (microName: string) => {
+    setExpandedMicros(prev => 
+      prev.includes(microName) ? prev.filter(m => m !== microName) : [...prev, microName]
+    );
+  };
+
+  const totalMicros = category.subs.reduce((acc, s) => acc + s.micros.length, 0);
+  const totalNanos = category.subs.reduce((acc, s) => 
+    acc + s.micros.reduce((acc2, m) => acc2 + m.nanos.length, 0), 0
+  );
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.03 }}
-      whileHover={{ scale: 1.02, y: -4 }}
-      className="relative p-5 rounded-2xl bg-slate-800/80 border border-teal-500/20 backdrop-blur-xl overflow-hidden cursor-pointer group"
+      className="bg-slate-800/80 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-xl"
       style={{
         boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
       }}
     >
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      {/* Corner Glow */}
-      <div className="absolute -top-10 -right-10 w-24 h-24 bg-teal-500/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4 relative z-10">
-        <motion.div 
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg"
-          whileHover={{ rotate: 5 }}
-          style={{
-            boxShadow: '0 8px 24px rgba(20, 184, 166, 0.4)',
-          }}
-        >
-          <Icon className="h-6 w-6 text-white" />
-        </motion.div>
-        
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-white tracking-wide truncate">{item.label}</h3>
-          <p className="text-xs text-slate-400">Live Activity</p>
+      {/* Category Header (Level 1) */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={cn(
+          "w-full flex items-center gap-3 p-4 transition-all",
+          "hover:bg-slate-700/50",
+          isExpanded && "bg-slate-700/30"
+        )}
+      >
+        <div className={cn("p-2.5 rounded-xl bg-gradient-to-br shadow-lg", category.color)}>
+          <Icon className="h-5 w-5 text-white" />
         </div>
-        
-        <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30 text-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-teal-400 mr-1.5 animate-pulse" />
-          {total}
-        </Badge>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-2 relative z-10">
-        {/* Pending */}
-        <motion.div 
-          className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center"
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="w-8 h-8 mx-auto mb-1 rounded-lg bg-amber-500/20 flex items-center justify-center">
-            <span className="text-amber-400 font-bold text-sm">{item.pending}</span>
+        <div className="flex-1 text-left">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-500 font-mono">#{category.id}</span>
+            <h3 className="font-bold text-white">{category.name}</h3>
           </div>
-          <p className="text-[10px] text-amber-300/80 uppercase tracking-wider font-medium">Pending</p>
-        </motion.div>
-
-        {/* Active */}
-        <motion.div 
-          className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-center relative"
-          whileHover={{ scale: 1.05 }}
+          <p className="text-[10px] text-slate-400">
+            {category.subs.length} sub • {totalMicros} micro • {totalNanos} nano
+          </p>
+        </div>
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
         >
-          {item.active > 0 && (
-            <div className="absolute top-1.5 right-1.5">
-              <span className="flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-400"></span>
-              </span>
+          <ChevronDown className="h-5 w-5 text-slate-400" />
+        </motion.div>
+      </button>
+
+      {/* Expanded Content */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4 space-y-2">
+              {category.subs.map((sub) => (
+                <div key={sub.name} className="border-l-2 border-teal-500/30 pl-4">
+                  {/* Sub Category (Level 2) */}
+                  <button
+                    onClick={() => toggleSub(sub.name)}
+                    className="w-full flex items-center gap-2 py-2 text-left hover:text-teal-400 transition-colors group"
+                  >
+                    <motion.div
+                      animate={{ rotate: expandedSubs.includes(sub.name) ? 90 : 0 }}
+                    >
+                      <ChevronRight className="h-4 w-4 text-teal-500" />
+                    </motion.div>
+                    <span className="text-sm font-semibold text-white group-hover:text-teal-400">{sub.name}</span>
+                    <Badge className="ml-auto bg-slate-700/50 text-slate-400 border-slate-600 text-[10px]">
+                      {sub.micros.length} micro
+                    </Badge>
+                  </button>
+
+                  {/* Micro Categories (Level 3) */}
+                  <AnimatePresence>
+                    {expandedSubs.includes(sub.name) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="ml-4 space-y-1 overflow-hidden"
+                      >
+                        {sub.micros.map((micro) => (
+                          <div key={micro.name} className="border-l border-cyan-500/30 pl-3">
+                            {/* Micro Category Header */}
+                            <button
+                              onClick={() => toggleMicro(`${sub.name}-${micro.name}`)}
+                              className="w-full flex items-center gap-2 py-1.5 text-left hover:text-cyan-400 transition-colors group"
+                            >
+                              <motion.div
+                                animate={{ rotate: expandedMicros.includes(`${sub.name}-${micro.name}`) ? 90 : 0 }}
+                              >
+                                <ChevronRight className="h-3 w-3 text-cyan-500/70" />
+                              </motion.div>
+                              <span className="text-xs text-slate-300 group-hover:text-cyan-400">{micro.name}</span>
+                              <span className="text-[9px] text-slate-500 ml-auto">
+                                {micro.nanos.length} nano
+                              </span>
+                            </button>
+
+                            {/* Nano Categories (Level 4) */}
+                            <AnimatePresence>
+                              {expandedMicros.includes(`${sub.name}-${micro.name}`) && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="ml-4 py-1 space-y-1 overflow-hidden"
+                                >
+                                  {micro.nanos.map((nano) => (
+                                    <motion.div
+                                      key={nano.name}
+                                      whileHover={{ x: 4 }}
+                                      className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-slate-900/50 border border-slate-700/50 hover:border-teal-500/30 cursor-pointer transition-all group"
+                                    >
+                                      <div className="h-1.5 w-1.5 rounded-full bg-teal-500/60 group-hover:bg-teal-400" />
+                                      <span className="text-[11px] text-slate-400 group-hover:text-teal-300">{nano.name}</span>
+                                    </motion.div>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
             </div>
-          )}
-          <div className="w-8 h-8 mx-auto mb-1 rounded-lg bg-teal-500/20 flex items-center justify-center">
-            <span className="text-teal-400 font-bold text-sm">{item.active}</span>
-          </div>
-          <p className="text-[10px] text-teal-300/80 uppercase tracking-wider font-medium">Active</p>
-        </motion.div>
-
-        {/* Done */}
-        <motion.div 
-          className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center"
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="w-8 h-8 mx-auto mb-1 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-            <span className="text-emerald-400 font-bold text-sm">{item.done > 999 ? `${(item.done/1000).toFixed(1)}k` : item.done}</span>
-          </div>
-          <p className="text-[10px] text-emerald-300/80 uppercase tracking-wider font-medium">Done</p>
-        </motion.div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mt-3 relative z-10">
-        <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden">
-          <motion.div 
-            className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${(item.done / Math.max(total, 1)) * 100}%` }}
-            transition={{ duration: 1, delay: 0.3 + index * 0.03 }}
-          />
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
-};
+}
 
-// Stats Card for Command Center Header
+// ==========================================
+// HEADER STAT CARD
+// ==========================================
+
 const HeaderStatCard = ({ 
   title, 
   value, 
@@ -257,6 +629,10 @@ const HeaderStatCard = ({
   </motion.div>
 );
 
+// ==========================================
+// MAIN COMMAND CENTER COMPONENT
+// ==========================================
+
 const SuperAdminCommandCenter = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [showAudit, setShowAudit] = useState(false);
@@ -267,14 +643,11 @@ const SuperAdminCommandCenter = () => {
     totalRevenue: 12450000,
   });
 
-  // Audit popup is now manual-only (via button) - removed auto-trigger to avoid annoying users
-
   useEffect(() => {
     const timer = setTimeout(() => setShowWelcome(false), 2500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Simulate live updates
   useEffect(() => {
     const interval = setInterval(() => {
       setLiveStats(prev => ({
@@ -287,7 +660,6 @@ const SuperAdminCommandCenter = () => {
 
   return (
     <DashboardLayout roleOverride="super_admin">
-      {/* System Audit Popup */}
       <SystemAuditPopup isVisible={showAudit} onClose={() => setShowAudit(false)} />
       
       {/* Welcome Animation Overlay */}
@@ -349,7 +721,7 @@ const SuperAdminCommandCenter = () => {
           transition={{ duration: 0.5 }}
         >
           {/* Top Bar */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <motion.div 
                 className="relative"
@@ -367,11 +739,11 @@ const SuperAdminCommandCenter = () => {
               
               <div>
                 <h1 className="text-2xl font-bold text-white tracking-tight">
-                  SUPER ADMIN COMMAND CENTER
+                  DASHBOARD COMMAND CENTER
                 </h1>
                 <p className="text-sm text-slate-400 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  All Systems Operational • Live Monitoring
+                  Category Hierarchy Structure • 4-Level System
                 </p>
               </div>
             </div>
@@ -397,125 +769,59 @@ const SuperAdminCommandCenter = () => {
             </div>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <HeaderStatCard
-              title="Booking Trajectory"
-              value="1,950"
-              subValue=".00"
+              title="Total Categories"
+              value="28"
+              icon={LayoutDashboard}
+            />
+            <HeaderStatCard
+              title="Sub Categories"
+              value="28"
+              icon={ClipboardList}
+            />
+            <HeaderStatCard
+              title="Micro Categories"
+              value="56"
+              icon={CheckCircle}
+            />
+            <HeaderStatCard
+              title="Nano Categories"
+              value="112"
               icon={Target}
-              trend="15%"
-              trendUp={true}
-            />
-            <HeaderStatCard
-              title="Active Value"
-              value={`₹${(liveStats.totalRevenue / 100000).toFixed(0)}L`}
-              subValue="450K pending"
-              icon={DollarSign}
-              trend="8%"
-              trendUp={true}
-            />
-            <HeaderStatCard
-              title="Sales Funnel"
-              value="7.50%"
-              subValue="4.39% prev"
-              icon={TrendingUp}
-              trend="3.11%"
-              trendUp={true}
-            />
-            <HeaderStatCard
-              title="Growth Rate"
-              value=".65%"
-              subValue=".12% prev"
-              icon={Zap}
-              trend="0.53%"
-              trendUp={true}
             />
           </div>
         </motion.div>
 
-        {/* Developer Timer Preview */}
-        <motion.div 
-          className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/50 backdrop-blur-xl"
+        {/* Categories Grid - All 28 Categories with 4-Level Hierarchy */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-4"
         >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4 text-teal-400" />
-              Active Developer Timers
-            </h3>
-            <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30 text-xs">{liveStats.activeDevelopers} Running</Badge>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
+            <div>
+              <h2 className="text-lg font-bold text-white">All Categories</h2>
+              <p className="text-xs text-slate-400">Click to expand hierarchy: Category → Sub → Micro → Nano</p>
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {[
-              { name: 'DEV***042', task: 'API Integration', time: '02:34:12', progress: 65 },
-              { name: 'DEV***018', task: 'UI Fixes', time: '01:15:45', progress: 40 },
-              { name: 'DEV***089', task: 'Bug Fix', time: '00:45:30', progress: 80 },
-              { name: 'DEV***034', task: 'Feature Dev', time: '03:12:00', progress: 25 },
-              { name: 'DEV***056', task: 'Testing', time: '00:30:15', progress: 90 },
-              { name: 'DEV***071', task: 'Docs', time: '01:00:00', progress: 55 },
-            ].map((dev, idx) => (
-              <motion.div 
-                key={idx} 
-                className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-600/50"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + idx * 0.05 }}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {categories.map((category, idx) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + idx * 0.02 }}
               >
-                <p className="text-[10px] text-slate-400 truncate">{dev.name}</p>
-                <p className="text-xs font-mono text-teal-400">{dev.time}</p>
-                <div className="mt-1.5 h-1 rounded-full bg-slate-700 overflow-hidden">
-                  <motion.div 
-                    className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${dev.progress}%` }}
-                    transition={{ duration: 1, delay: 0.5 + idx * 0.1 }}
-                  />
-                </div>
-                <p className="text-[9px] text-slate-500 mt-1 truncate">{dev.task}</p>
+                <CategoryCard category={category} />
               </motion.div>
             ))}
           </div>
         </motion.div>
-
-        {/* Categorized Dashboard Modules - All 28 Items */}
-        {dashboardCategories.map((category, catIdx) => (
-          <motion.div
-            key={category.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + catIdx * 0.1 }}
-            className="space-y-4"
-          >
-            {/* Category Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
-                <div>
-                  <h2 className="text-lg font-bold text-white">{category.title}</h2>
-                  <p className="text-xs text-slate-400">{category.items.length} modules • Real-time monitoring</p>
-                </div>
-              </div>
-              <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30">
-                <span className="h-1.5 w-1.5 rounded-full bg-teal-400 mr-1.5 animate-pulse" />
-                Live
-              </Badge>
-            </div>
-
-            {/* Category Module Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {category.items.map((item, idx) => (
-                <ModuleActivityCard
-                  key={item.id}
-                  item={item}
-                  index={catIdx * 10 + idx}
-                />
-              ))}
-            </div>
-          </motion.div>
-        ))}
 
         {/* AI Insights & Alerts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
