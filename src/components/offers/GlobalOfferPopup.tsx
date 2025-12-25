@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gift, Sparkles, Trophy, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +33,7 @@ interface FestivalCalendar {
   icon: string | null;
 }
 
-export const GlobalOfferPopup = () => {
+const GlobalOfferPopupInner = forwardRef<HTMLDivElement>((_, ref) => {
   const [currentOffer, setCurrentOffer] = useState<GlobalOffer | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -252,6 +252,9 @@ export const GlobalOfferPopup = () => {
       )}
     </AnimatePresence>
   );
-};
+});
 
+GlobalOfferPopupInner.displayName = 'GlobalOfferPopup';
+
+export const GlobalOfferPopup = GlobalOfferPopupInner;
 export default GlobalOfferPopup;
