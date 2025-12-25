@@ -1,11 +1,42 @@
-name: Auto Deploy to VPS
+name: Manual Deploy to VPS
+
+# ================================================
+# AUTO DEPLOY COMPLETELY DISABLED
+# Deploy ONLY via manual workflow_dispatch
+# NO auto deploy on push, save, or any trigger
+# ================================================
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: 'Type "DEPLOY" to confirm manual deployment'
+        required: true
+        type: string
+      maintenance_window:
+        description: 'Confirm this is during maintenance window'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validate deployment confirmation
+      run: |
+        if [ "${{ github.event.inputs.confirm_deploy }}" != "DEPLOY" ]; then
+          echo "❌ Deployment cancelled - confirmation text must be 'DEPLOY'"
+          exit 1
+        fi
+        if [ "${{ github.event.inputs.maintenance_window }}" != "true" ]; then
+          echo "❌ Deployment cancelled - must confirm maintenance window"
+          exit 1
+        fi
+        echo "✅ Deployment confirmed by Super Admin"
+
   build:
+    needs: validate
     runs-on: ubuntu-latest
     
     steps:
@@ -44,7 +75,7 @@ jobs:
         name: dist
         path: dist/
     
-    - name: Deploy to VPS via SSH
+    - name: Deploy to VPS via SSH (Manual Only)
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.SERVER_IP }}
@@ -52,6 +83,14 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.SERVER_PORT || 22 }}
         script: |
+          # ================================================
+          # MANUAL DEPLOY ONLY - Super Admin Controlled
+          # ================================================
+          
+          echo "🚀 Starting manual deployment..."
+          echo "Deployed by: ${{ github.actor }}"
+          echo "Deploy time: $(date)"
+          
           # Navigate to project folder
           cd /var/www/PROJECT_FOLDER
           
@@ -62,17 +101,15 @@ jobs:
           # Install dependencies
           npm ci --production
           
-          # Build if not using pre-built artifacts
-          npm run build || true
+          # Build application
+          npm run build
           
           # Restart services
-          pm2 restart all || systemctl restart nginx || true
-          
-          # Clear old caches
-          rm -rf /tmp/app-cache/* || true
+          pm2 restart all
           
           # Log deployment
-          echo "Deployed at $(date)" >> /var/log/deploy.log
+          echo "✅ Manual deployment completed at $(date) by ${{ github.actor }}" >> /var/log/deploy.log
+          echo "✅ Deployment successful"
 
   security-scan:
     runs-on: ubuntu-latest
