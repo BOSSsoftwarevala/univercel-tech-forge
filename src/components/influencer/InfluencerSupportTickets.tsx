@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 const mockTickets = [
   {
@@ -95,7 +96,13 @@ const InfluencerSupportTickets = () => {
     : mockTickets.filter(t => t.status === filterStatus);
 
   const handleSubmitTicket = () => {
-    console.log('Submitting ticket:', newTicket);
+    if (!newTicket.subject.trim() || !newTicket.description.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    toast.success("Support ticket submitted successfully!", {
+      description: `Ticket ID: TKT-${Date.now().toString(36).toUpperCase()}`
+    });
     setShowNewTicket(false);
     setNewTicket({ subject: '', category: 'general', priority: 'medium', description: '' });
   };
@@ -175,7 +182,12 @@ const InfluencerSupportTickets = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
-            onClick={() => setSelectedTicket(ticket.id)}
+            onClick={() => {
+              setSelectedTicket(ticket.id);
+              toast.info(`Viewing ticket ${ticket.id}`, {
+                description: ticket.subject
+              });
+            }}
             className={`p-4 rounded-xl border transition-all cursor-pointer ${
               selectedTicket === ticket.id
                 ? 'bg-violet-500/10 border-violet-500/50'

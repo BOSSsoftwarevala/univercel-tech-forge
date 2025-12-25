@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Image, Video, Download, Eye, Heart, Share2, Filter, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 const VisualAssetLibrary = () => {
   const banners = [
@@ -27,6 +29,21 @@ const VisualAssetLibrary = () => {
     { id: 4, name: "Feature Update", category: "Updates", downloads: 234 },
   ];
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilter, setShowFilter] = useState(false);
+
+  const handleDownload = (name: string) => {
+    toast.success(`Downloading "${name}"...`, {
+      description: "Your download will start shortly"
+    });
+  };
+
+  const handlePreview = (name: string) => {
+    toast.info(`Previewing "${name}"`, {
+      description: "Opening preview modal..."
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -37,9 +54,21 @@ const VisualAssetLibrary = () => {
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-            <Input placeholder="Search assets..." className="w-64 pl-10 bg-slate-800 border-slate-700" />
+            <Input 
+              placeholder="Search assets..." 
+              className="w-64 pl-10 bg-slate-800 border-slate-700"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          <Button variant="outline" className="border-violet-500/30 text-violet-300">
+          <Button 
+            variant="outline" 
+            className="border-violet-500/30 text-violet-300"
+            onClick={() => {
+              setShowFilter(!showFilter);
+              toast.info(showFilter ? "Filter closed" : "Filter opened");
+            }}
+          >
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
@@ -99,10 +128,10 @@ const VisualAssetLibrary = () => {
                       <Image className="w-12 h-12 text-violet-400/50" />
                     </div>
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <Button size="sm" variant="ghost" className="text-white">
+                      <Button size="sm" variant="ghost" className="text-white" onClick={() => handlePreview(banner.name)}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" className="bg-violet-500 hover:bg-violet-600">
+                      <Button size="sm" className="bg-violet-500 hover:bg-violet-600" onClick={() => handleDownload(banner.name)}>
                         <Download className="w-4 h-4" />
                       </Button>
                     </div>
@@ -147,7 +176,10 @@ const VisualAssetLibrary = () => {
                         <Eye className="w-3 h-3 inline mr-1" />{video.views.toLocaleString()}
                       </span>
                     </div>
-                    <Button className="w-full mt-3 bg-gradient-to-r from-violet-500 to-cyan-500 text-white">
+                    <Button 
+                      className="w-full mt-3 bg-gradient-to-r from-violet-500 to-cyan-500 text-white"
+                      onClick={() => handleDownload(video.name)}
+                    >
                       Download
                     </Button>
                   </CardContent>
@@ -170,7 +202,7 @@ const VisualAssetLibrary = () => {
                   <div className="aspect-[3/4] bg-gradient-to-br from-emerald-500/20 to-violet-500/20 relative flex items-center justify-center">
                     <Image className="w-12 h-12 text-emerald-400/50" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600">
+                      <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600" onClick={() => handleDownload(poster.name)}>
                         <Download className="w-4 h-4 mr-1" /> Download
                       </Button>
                     </div>

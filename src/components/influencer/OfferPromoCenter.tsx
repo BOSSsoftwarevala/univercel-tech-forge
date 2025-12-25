@@ -3,7 +3,7 @@ import { Gift, Clock, Tag, Sparkles, Flame, Percent, Calendar, ChevronRight, Cop
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
+import { toast } from "sonner";
 const OfferPromoCenter = () => {
   const activeOffers = [
     { 
@@ -143,10 +143,28 @@ const OfferPromoCenter = () => {
                       <div className="font-mono text-violet-300 font-bold">{offer.code}</div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" className="text-violet-400">
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="text-violet-400"
+                        onClick={() => {
+                          navigator.clipboard.writeText(offer.code);
+                          toast.success(`Promo code "${offer.code}" copied!`);
+                        }}
+                      >
                         <Copy className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" className="bg-gradient-to-r from-violet-500 to-cyan-500 text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-violet-500 to-cyan-500 text-white"
+                        onClick={() => {
+                          const link = `https://sv.link/promo/${offer.code.toLowerCase()}`;
+                          navigator.clipboard.writeText(link);
+                          toast.success("Promo link copied to clipboard!", {
+                            description: link
+                          });
+                        }}
+                      >
                         Get Link
                       </Button>
                     </div>

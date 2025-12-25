@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 const campaigns = [
   {
@@ -297,7 +298,12 @@ const InfluencerCampaignHub = () => {
                     </span>
                   </div>
                 </div>
-                <Button className="bg-gradient-to-r from-violet-500 to-cyan-500">
+                <Button 
+                  className="bg-gradient-to-r from-violet-500 to-cyan-500"
+                  onClick={() => toast.success(`Joined "${campaign.name}" campaign!`, {
+                    description: `Estimated earnings: ${campaign.estimatedEarnings}`
+                  })}
+                >
                   Join Campaign
                 </Button>
               </div>

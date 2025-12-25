@@ -4,6 +4,7 @@ import {
   Link2, Copy, QrCode, Share2, Check, ExternalLink,
   Smartphone, Monitor, Globe, Sparkles
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const products = [
   { id: 1, name: 'POS System Pro', commission: '15%', price: '₹15,000' },
@@ -141,6 +142,10 @@ const LinkCreator = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    const shareUrl = `https://wa.me/?text=${encodeURIComponent('Check out this amazing software! ' + generatedLink)}`;
+                    window.open(shareUrl, '_blank');
+                  }}
                   className="flex items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all text-slate-300"
                 >
                   <Share2 className="w-5 h-5 text-cyan-400" />
@@ -167,6 +172,7 @@ const LinkCreator = () => {
                 <div className="flex gap-3">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
+                    onClick={() => toast.info("Desktop preview mode")}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 text-slate-300 hover:text-white transition-colors"
                   >
                     <Monitor className="w-4 h-4" />
@@ -174,6 +180,7 @@ const LinkCreator = () => {
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
+                    onClick={() => toast.info("Mobile preview mode")}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 text-slate-300 hover:text-white transition-colors"
                   >
                     <Smartphone className="w-4 h-4" />
@@ -181,6 +188,7 @@ const LinkCreator = () => {
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
+                    onClick={() => window.open(generatedLink, '_blank')}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/50 text-slate-300 hover:text-white transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />

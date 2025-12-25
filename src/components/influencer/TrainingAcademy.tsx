@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 const TrainingAcademy = () => {
   const courses = [
@@ -116,6 +117,15 @@ const TrainingAcademy = () => {
                     <Button
                       variant={course.completed ? "outline" : "default"}
                       size="sm"
+                      onClick={() => {
+                        if (course.completed) {
+                          toast.info(`Reviewing "${course.title}"...`);
+                        } else if (course.progress > 0) {
+                          toast.success(`Continuing "${course.title}"...`);
+                        } else {
+                          toast.success(`Starting "${course.title}"...`);
+                        }
+                      }}
                       className={course.completed 
                         ? "border-slate-600 text-slate-400" 
                         : "bg-gradient-to-r from-violet-500 to-cyan-500 text-white"
@@ -154,6 +164,7 @@ const TrainingAcademy = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  onClick={() => toast.info(`Opening case study: "${study.name}"`)}
                   className="p-3 bg-slate-800/50 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   <h4 className="font-medium text-violet-100 text-sm mb-1">{study.name}</h4>
