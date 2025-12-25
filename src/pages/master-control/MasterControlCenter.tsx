@@ -85,28 +85,28 @@ const MasterControlCenter = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-stone-100 flex flex-col overflow-hidden select-none">
-      {/* TOP HEADER */}
-      <header className="h-14 bg-stone-800 flex items-center justify-between px-6 flex-shrink-0">
+    <div className="h-screen w-screen bg-neutral-100 flex flex-col overflow-hidden select-none">
+      {/* TOP HEADER - Dark charcoal matching sidebar */}
+      <header className="h-14 bg-neutral-800 flex items-center justify-between px-6 flex-shrink-0 border-b border-neutral-700">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <MasterThroneIcon size="md" showTooltip />
             <div>
               <span className="font-semibold text-white">Master Admin Control Center</span>
-              <span className="text-xs text-stone-400 ml-2">Supreme Control</span>
+              <span className="text-xs text-neutral-400 ml-2">Supreme Control</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-6">
           {/* Global Status */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-700 rounded border border-stone-600">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-700 rounded border border-neutral-600">
             <Activity className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-stone-200">All Systems Normal</span>
+            <span className="text-sm text-neutral-200">All Systems Normal</span>
           </div>
 
           {/* Session Timer */}
-          <div className="flex items-center gap-2 text-stone-300">
+          <div className="flex items-center gap-2 text-neutral-300">
             <Clock className="w-4 h-4" />
             <span className="font-mono text-sm">{sessionTime}</span>
           </div>
@@ -116,7 +116,7 @@ const MasterControlCenter = () => {
             variant="outline" 
             size="sm" 
             onClick={handleLogout}
-            className="border-stone-500 text-stone-200 hover:bg-stone-700 bg-transparent"
+            className="border-neutral-500 text-neutral-200 hover:bg-neutral-700 bg-transparent"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Secure Logout
@@ -127,17 +127,17 @@ const MasterControlCenter = () => {
       {/* MAIN LAYOUT */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR - Dark charcoal */}
-        <aside className="w-56 bg-stone-800 flex-shrink-0">
+        <aside className="w-56 bg-neutral-800 flex-shrink-0 border-r border-neutral-700">
           <ScrollArea className="h-full py-4">
             <nav className="space-y-1 px-3">
               {sidebarItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveView(item.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm transition-colors ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
                     activeView === item.id
-                      ? 'bg-stone-900 text-white border-l-2 border-amber-500'
-                      : 'text-stone-300 hover:bg-stone-700 hover:text-white'
+                      ? 'bg-neutral-900 text-white'
+                      : 'text-neutral-400 hover:bg-neutral-700 hover:text-white'
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -148,13 +148,13 @@ const MasterControlCenter = () => {
           </ScrollArea>
         </aside>
 
-        {/* MAIN CONTENT - Light background */}
-        <main className="flex-1 overflow-auto bg-stone-100 p-6">
+        {/* MAIN CONTENT - Light warm gray background */}
+        <main className="flex-1 overflow-auto bg-neutral-100 p-6">
           {renderView()}
         </main>
 
-        {/* RIGHT AI PANEL - Light with subtle border */}
-        <aside className="w-72 bg-stone-50 border-l border-stone-200 flex-shrink-0">
+        {/* RIGHT AI PANEL - Light background */}
+        <aside className="w-72 bg-neutral-50 border-l border-neutral-200 flex-shrink-0">
           <AIInsightsPanel />
         </aside>
       </div>

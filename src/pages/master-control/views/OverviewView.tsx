@@ -30,54 +30,54 @@ const OverviewView = () => {
     <div className="space-y-6">
       {/* Section A: Global Summary Cards */}
       <div>
-        <h2 className="text-lg font-semibold text-stone-800 mb-4">Global Summary</h2>
+        <h2 className="text-lg font-semibold text-neutral-800 mb-4">Global Summary</h2>
         <div className="grid grid-cols-4 gap-4">
           {summaryCards.map((card) => (
-            <Card key={card.label} className="p-4 bg-white border-stone-200 shadow-sm">
+            <div key={card.label} className="p-4 bg-white border border-neutral-200 rounded-lg shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-stone-500">{card.label}</p>
-                  <p className="text-2xl font-bold text-stone-800 mt-1">{card.value}</p>
+                  <p className="text-sm text-neutral-500">{card.label}</p>
+                  <p className="text-2xl font-bold text-neutral-800 mt-1">{card.value}</p>
                 </div>
-                <div className="w-10 h-10 bg-stone-100 rounded flex items-center justify-center">
-                  <card.icon className="w-5 h-5 text-stone-600" />
+                <div className="w-10 h-10 bg-neutral-100 rounded flex items-center justify-center">
+                  <card.icon className="w-5 h-5 text-neutral-500" />
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Section B: Continent Snapshot Table */}
       <div>
-        <h2 className="text-lg font-semibold text-stone-800 mb-4">Continent Snapshot</h2>
-        <Card className="bg-white border-stone-200 shadow-sm">
+        <h2 className="text-lg font-semibold text-neutral-800 mb-4">Continent Snapshot</h2>
+        <div className="bg-white border border-neutral-200 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="border-stone-200 bg-stone-50">
-                <TableHead className="text-stone-600 font-medium">Continent Name</TableHead>
-                <TableHead className="text-stone-600 font-medium">Super Admin</TableHead>
-                <TableHead className="text-stone-600 font-medium">Active Countries</TableHead>
-                <TableHead className="text-stone-600 font-medium">Revenue Trend</TableHead>
-                <TableHead className="text-stone-600 font-medium">Open Issues</TableHead>
-                <TableHead className="text-stone-600 font-medium">Status</TableHead>
+              <TableRow className="bg-neutral-50 border-neutral-200">
+                <TableHead className="text-neutral-600 font-medium">Continent Name</TableHead>
+                <TableHead className="text-neutral-600 font-medium">Super Admin</TableHead>
+                <TableHead className="text-neutral-600 font-medium">Active Countries</TableHead>
+                <TableHead className="text-neutral-600 font-medium">Revenue Trend</TableHead>
+                <TableHead className="text-neutral-600 font-medium">Open Issues</TableHead>
+                <TableHead className="text-neutral-600 font-medium">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {continentData.map((row) => (
                 <TableRow 
                   key={row.name} 
-                  className="border-stone-100 cursor-pointer hover:bg-stone-50"
+                  className="border-neutral-100 cursor-pointer hover:bg-neutral-50"
                 >
-                  <TableCell className="font-medium text-stone-800">{row.name}</TableCell>
-                  <TableCell className="text-stone-600">{row.admin}</TableCell>
-                  <TableCell className="text-stone-600">{row.countries}</TableCell>
-                  <TableCell className="text-stone-600 text-lg">{row.trend}</TableCell>
-                  <TableCell className="text-stone-600">{row.issues}</TableCell>
+                  <TableCell className="font-medium text-neutral-800">{row.name}</TableCell>
+                  <TableCell className="text-neutral-600">{row.admin}</TableCell>
+                  <TableCell className="text-neutral-600">{row.countries}</TableCell>
+                  <TableCell className="text-neutral-600 text-lg">{row.trend}</TableCell>
+                  <TableCell className="text-neutral-600">{row.issues}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       row.status === 'Normal' 
-                        ? 'bg-stone-100 text-stone-600' 
+                        ? 'bg-neutral-100 text-neutral-600' 
                         : 'bg-amber-100 text-amber-700'
                     }`}>
                       {row.status}
@@ -87,8 +87,8 @@ const OverviewView = () => {
               ))}
             </TableBody>
           </Table>
-        </Card>
-        <p className="text-xs text-stone-500 mt-2">Click row to view continent detail (read-only)</p>
+        </div>
+        <p className="text-xs text-neutral-500 mt-2">Click row to view continent detail (read-only)</p>
       </div>
     </div>
   );
