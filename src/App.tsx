@@ -265,6 +265,8 @@ const App = () => (
               <Route path="/influencer-command-center" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerCommandCenter /></RequireRole>} />
               <Route path="/influencer-dashboard" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerDashboard /></RequireRole>} />
               <Route path="/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
+              {/* Public demo route for Influencer Command Center */}
+              <Route path="/demo/influencer-command-center" element={<InfluencerCommandCenter />} />
 
               {/* Prime User Routes */}
               <Route path="/prime" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
