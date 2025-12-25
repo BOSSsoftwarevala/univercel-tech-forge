@@ -1,3 +1,4 @@
+// Area Manager Dashboard - Region-based control panel
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
