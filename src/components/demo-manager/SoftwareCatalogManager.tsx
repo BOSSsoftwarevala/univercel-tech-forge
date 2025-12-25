@@ -398,15 +398,15 @@ const SoftwareCatalogManager = () => {
           <Button 
             variant="default"
             onClick={loadSampleData}
-            disabled={isImporting || totalCount > 0}
-            className="bg-neon-green/20 text-neon-green border border-neon-green/50 hover:bg-neon-green/30"
+            disabled={isImporting}
+            className="bg-gradient-to-r from-neon-green to-neon-teal text-black font-bold px-6 hover:opacity-90 shadow-lg shadow-neon-green/30 animate-pulse"
           >
             {isImporting ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <Download className="w-4 h-4 mr-2" />
             )}
-            Load 5000+ Software
+            {totalCount > 0 ? 'Reload 5000+ Software' : 'Load 5000+ Software'}
           </Button>
           <Button 
             variant="outline"
