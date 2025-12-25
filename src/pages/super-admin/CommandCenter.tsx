@@ -43,11 +43,7 @@ const roleStatuses: Array<{
   // GRADE 3 - PARTNERS
   { role: 'franchise', active: 23, pending: 5, done: 67 },
   { role: 'developer', active: 47, pending: 8, done: 156 },
-  { role: 'reseller', active: 156, pending: 12, done: 234 },
-  { role: 'influencer', active: 89, pending: 15, done: 178 },
-  // GRADE 4 - USERS
-  { role: 'prime', active: 342, pending: 28, done: 892 },
-  { role: 'client', active: 1247, pending: 89, done: 3456 },
+  // Hidden: reseller, influencer, prime, client
 ];
 
 const getIconForRole = (role: AppRole): LucideIcon => {
