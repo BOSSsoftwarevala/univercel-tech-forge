@@ -446,7 +446,7 @@ function CategoryCard({ category }: { category: Category }) {
         boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
       }}
     >
-      {/* Category Header (Level 1) */}
+      {/* Category Header - Clean Style: Icon + Name Only */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
@@ -458,15 +458,7 @@ function CategoryCard({ category }: { category: Category }) {
         <div className={cn("p-2.5 rounded-xl bg-gradient-to-br shadow-lg", category.color)}>
           <Icon className="h-5 w-5 text-white" />
         </div>
-        <div className="flex-1 text-left">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-500 font-mono">#{category.id}</span>
-            <h3 className="font-bold text-white">{category.name}</h3>
-          </div>
-          <p className="text-[10px] text-slate-400">
-            {category.subs.length} sub • {totalMicros} micro • {totalNanos} nano
-          </p>
-        </div>
+        <h3 className="font-semibold text-white flex-1 text-left">{category.name}</h3>
         <motion.div
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -488,7 +480,7 @@ function CategoryCard({ category }: { category: Category }) {
             <div className="px-4 pb-4 space-y-2">
               {category.subs.map((sub) => (
                 <div key={sub.name} className="border-l-2 border-teal-500/30 pl-4">
-                  {/* Sub Category (Level 2) */}
+                  {/* Sub Category (Level 2) - Clean */}
                   <button
                     onClick={() => toggleSub(sub.name)}
                     className="w-full flex items-center gap-2 py-2 text-left hover:text-teal-400 transition-colors group"
@@ -498,10 +490,7 @@ function CategoryCard({ category }: { category: Category }) {
                     >
                       <ChevronRight className="h-4 w-4 text-teal-500" />
                     </motion.div>
-                    <span className="text-sm font-semibold text-white group-hover:text-teal-400">{sub.name}</span>
-                    <Badge className="ml-auto bg-slate-700/50 text-slate-400 border-slate-600 text-[10px]">
-                      {sub.micros.length} micro
-                    </Badge>
+                    <span className="text-sm font-medium text-white group-hover:text-teal-400">{sub.name}</span>
                   </button>
 
                   {/* Micro Categories (Level 3) */}
@@ -515,7 +504,7 @@ function CategoryCard({ category }: { category: Category }) {
                       >
                         {sub.micros.map((micro) => (
                           <div key={micro.name} className="border-l border-cyan-500/30 pl-3">
-                            {/* Micro Category Header */}
+                            {/* Micro Category - Clean */}
                             <button
                               onClick={() => toggleMicro(`${sub.name}-${micro.name}`)}
                               className="w-full flex items-center gap-2 py-1.5 text-left hover:text-cyan-400 transition-colors group"
@@ -526,9 +515,6 @@ function CategoryCard({ category }: { category: Category }) {
                                 <ChevronRight className="h-3 w-3 text-cyan-500/70" />
                               </motion.div>
                               <span className="text-xs text-slate-300 group-hover:text-cyan-400">{micro.name}</span>
-                              <span className="text-[9px] text-slate-500 ml-auto">
-                                {micro.nanos.length} nano
-                              </span>
                             </button>
 
                             {/* Nano Categories (Level 4) */}
