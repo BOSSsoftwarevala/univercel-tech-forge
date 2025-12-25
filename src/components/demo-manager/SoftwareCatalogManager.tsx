@@ -288,18 +288,28 @@ const SoftwareCatalogManager = () => {
 
   const loadSampleData = async () => {
     setIsImporting(true);
-    setImportProgress(10);
+    setImportProgress(5);
     
     try {
+      toast({
+        title: "Loading CSV...",
+        description: "Fetching software catalog data...",
+      });
+
       // Fetch the pre-uploaded CSV file
       const response = await fetch('/data/software-list.csv');
-      if (!response.ok) throw new Error('Failed to load sample data file');
+      if (!response.ok) {
+        throw new Error(`Failed to load sample data file: ${response.status} ${response.statusText}`);
+      }
       
       const text = await response.text();
+      console.log('CSV file loaded, size:', text.length, 'bytes');
+      
       const lines = text.split('\n');
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      console.log('CSV headers:', headers);
 
-      setImportProgress(20);
+      setImportProgress(15);
 
       // Parse CSV
       const csvData = [];
@@ -318,39 +328,53 @@ const SoftwareCatalogManager = () => {
         }
       }
 
-      setImportProgress(40);
+      setImportProgress(30);
       console.log(`Parsed ${csvData.length} items from sample CSV`);
 
+      toast({
+        title: "Uploading to Database...",
+        description: `Importing ${csvData.length.toLocaleString()} software products...`,
+      });
+
       // Send to edge function
+      console.log('Calling import-software-catalog edge function...');
       const { data, error } = await supabase.functions.invoke('import-software-catalog', {
         body: { csvData }
       });
 
+      console.log('Edge function response:', data, error);
+
       setImportProgress(90);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Edge function failed');
+      }
 
-      if (data.success) {
+      if (data?.success) {
         setImportStats({
           total: data.total,
           imported: data.imported,
           failed: data.failed
         });
         toast({
-          title: "Import Complete",
-          description: `Successfully imported ${data.imported.toLocaleString()} software products!`,
+          title: "Import Complete!",
+          description: `Successfully imported ${data.imported.toLocaleString()} of ${data.total.toLocaleString()} software products!`,
         });
+        if (data.errors && data.errors.length > 0) {
+          console.warn('Import errors:', data.errors);
+        }
         fetchCatalog();
         fetchTotalCount();
         fetchTypeStats();
       } else {
-        throw new Error(data.error);
+        throw new Error(data?.error || 'Import returned unsuccessful');
       }
     } catch (error: any) {
       console.error('Load sample data error:', error);
       toast({
         title: "Import Failed",
-        description: error.message || "Failed to load sample data",
+        description: error.message || "Failed to load sample data. Check console for details.",
         variant: "destructive"
       });
     } finally {
@@ -358,7 +382,7 @@ const SoftwareCatalogManager = () => {
       setTimeout(() => {
         setIsImporting(false);
         setImportProgress(0);
-      }, 1000);
+      }, 1500);
     }
   };
 

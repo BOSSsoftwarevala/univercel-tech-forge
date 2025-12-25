@@ -40,7 +40,7 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Importing ${csvData.length} software entries...`);
+    console.log(`Starting import of ${csvData.length} software entries...`);
 
     // Auto-detect category from name
     const detectCategory = (name: string): string => {
@@ -71,32 +71,37 @@ serve(async (req) => {
       return 'General';
     };
 
-    // Process in batches of 100
-    const batchSize = 100;
+    // Process in larger batches of 500 for speed
+    const batchSize = 500;
     let imported = 0;
     let failed = 0;
+    const errors: string[] = [];
 
     for (let i = 0; i < csvData.length; i += batchSize) {
       const batch = csvData.slice(i, i + batchSize);
       
       const records = batch.map((item: any) => ({
-        name: item.name,
+        name: String(item.name || '').trim(),
         base_price: parseFloat(item.base_price) || 0,
-        type: item.type,
-        vendor: item.vendor || 'Software Vala',
-        category: detectCategory(item.name),
+        type: String(item.type || 'SaaS').trim(),
+        vendor: String(item.vendor || 'Software Vala').trim(),
+        category: detectCategory(String(item.name || '')),
         is_demo_registered: false
-      }));
+      })).filter(r => r.name.length > 0);
+
+      if (records.length === 0) continue;
 
       const { error } = await supabase
         .from('software_catalog')
         .insert(records);
 
       if (error) {
-        console.error(`Batch ${i / batchSize + 1} failed:`, error);
+        console.error(`Batch ${Math.floor(i / batchSize) + 1} failed:`, error.message);
+        errors.push(`Batch ${Math.floor(i / batchSize) + 1}: ${error.message}`);
         failed += batch.length;
       } else {
-        imported += batch.length;
+        imported += records.length;
+        console.log(`Batch ${Math.floor(i / batchSize) + 1} completed: ${imported} total imported`);
       }
     }
 
@@ -108,7 +113,8 @@ serve(async (req) => {
         imported, 
         failed,
         total: csvData.length,
-        message: `Imported ${imported} of ${csvData.length} software entries`
+        errors: errors.length > 0 ? errors.slice(0, 5) : undefined,
+        message: `Imported ${imported.toLocaleString()} of ${csvData.length.toLocaleString()} software entries`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
