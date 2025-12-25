@@ -39,7 +39,7 @@
 // Database-compatible AppRole type (matches Supabase enum)
 export type AppRole = 
   | 'super_admin'
-  | 'admin'
+  | 'area_manager'
   | 'developer'
   | 'franchise'
   | 'reseller'
@@ -76,7 +76,7 @@ export const ROLE_GRADES: Record<AppRole, { grade: RoleGrade; gradeLabel: string
   master: { grade: 0, gradeLabel: 'Ownership', displayName: 'Master Admin' },
   // GRADE 1 – PLATFORM CONTROL
   super_admin: { grade: 1, gradeLabel: 'Platform Control', displayName: 'Super Admin' },
-  admin: { grade: 1, gradeLabel: 'Platform Control', displayName: 'Admin' },
+  area_manager: { grade: 1, gradeLabel: 'Platform Control', displayName: 'Area Manager' },
   // GRADE 2 – BUSINESS MANAGEMENT (mapped from old roles)
   client_success: { grade: 2, gradeLabel: 'Business Management', displayName: 'Sales & Support Manager' },
   support: { grade: 2, gradeLabel: 'Business Management', displayName: 'Support Manager' },
@@ -132,11 +132,11 @@ export const ROLE_CONFIG: Record<AppRole, {
     modules: ['*'],
     tier: 'platform'
   },
-  admin: {
-    label: 'Admin',
+  area_manager: {
+    label: 'Area Manager',
     color: '#f97316',
-    icon: 'ShieldCheck',
-    modules: ['dashboard', 'users', 'settings', 'reports'],
+    icon: 'MapPin',
+    modules: ['dashboard', 'users', 'franchise', 'reseller', 'leads', 'wallet', 'reports', 'approvals', 'alerts', 'audit'],
     tier: 'platform'
   },
   // GRADE 2 – BUSINESS MANAGEMENT

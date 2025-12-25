@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 // Existing role types preserved
 export type AppRole = 
   | 'super_admin' 
-  | 'admin' 
+  | 'area_manager' 
   | 'franchise' 
   | 'reseller' 
   | 'prime' 
@@ -23,7 +23,7 @@ export type AppRole =
 // Tenant hierarchy levels
 export const TENANT_HIERARCHY: Record<AppRole, number> = {
   super_admin: 0,  // 👑 BOSS - sees all
-  admin: 1,
+  area_manager: 1, // Region-based control
   franchise: 2,
   reseller: 3,
   prime: 4,
@@ -54,12 +54,12 @@ const TENANT_PERMISSIONS: Record<AppRole, TenantPermission> = {
     canViewCrossTenantWallet: true,
     maxChildDepth: Infinity
   },
-  admin: {
+  area_manager: {
     canViewChildTenants: true,
     canManageChildTenants: true,
-    canViewParentTenant: true,
+    canViewParentTenant: false,
     canCrossTenantChat: true,
-    canViewCrossTenantWallet: true,
+    canViewCrossTenantWallet: false,  // Read-only
     maxChildDepth: Infinity
   },
   franchise: {

@@ -59,8 +59,8 @@ export const MASKED_ID_CONFIG: Record<string, {
 }> = {
   master: { prefix: '🔱 MASTER', digits: 1, icon: 'Crown', displayName: 'Master Admin' },
   super_admin: { prefix: '👑 BOSS', digits: 2, icon: 'Crown', displayName: 'Super Admin' },
-  admin: { prefix: 'MGT', digits: 2, icon: 'Shield', displayName: 'Management' },
-  developer: { prefix: 'EMP', digits: 3, icon: 'Briefcase', displayName: 'Employee' },
+  admin: { prefix: 'ARM', digits: 2, icon: 'MapPin', displayName: 'Area Manager' },
+  area_manager: { prefix: 'ARM', digits: 2, icon: 'MapPin', displayName: 'Area Manager' },
   task_manager: { prefix: 'EMP', digits: 3, icon: 'ListTodo', displayName: 'Task Manager' },
   rnd_manager: { prefix: 'EMP', digits: 3, icon: 'Lightbulb', displayName: 'R&D Manager' },
   r_and_d: { prefix: 'EMP', digits: 3, icon: 'Lightbulb', displayName: 'R&D' },
@@ -95,7 +95,7 @@ export const MASKED_ID_CONFIG: Record<string, {
 export const ROLE_ROUTES: Partial<Record<AppRole, string[]>> = {
   master: ['*'], // Master has full access to everything
   super_admin: ['*'], // Access to everything
-  admin: ['/super-admin', '/settings', '/api-integrations', '/system-settings'],
+  admin: ['/area-manager', '/area-manager/*'], // 'admin' in database maps to 'Area Manager' in UI
   developer: ['/developer', '/tasks', '/settings'],
   franchise: ['/franchise', '/leads', '/resellers', '/settings'],
   reseller: ['/reseller', '/leads', '/settings'],
