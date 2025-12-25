@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Badge } from '@/components/ui/badge';
@@ -7,15 +7,18 @@ import {
   Crown, Users, Building2, Store, Code2, Zap, Star, Target,
   ListTodo, Package, Wallet, HeadphonesIcon, TrendingUp, Brain,
   Activity, Globe, Shield, Scale, Search, UserPlus, MessageSquare,
-  Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight, ScanLine
+  Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight, ScanLine,
+  Server, Megaphone, MonitorPlay, Handshake, LayoutDashboard, CheckCircle,
+  ClipboardList, UserCog, Settings
 } from 'lucide-react';
-import { ROLE_CONFIG, AppRole } from '@/types/roles';
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
 
-// Role status data organized by category
-interface RoleStatus {
-  role: AppRole;
+// Custom module item for display
+interface ModuleItem {
+  id: string;
+  label: string;
+  icon: LucideIcon;
   active: number;
   pending: number;
   done: number;
@@ -23,122 +26,85 @@ interface RoleStatus {
 
 interface CategorySection {
   title: string;
-  roles: RoleStatus[];
+  items: ModuleItem[];
 }
 
-const roleCategories: CategorySection[] = [
+const dashboardCategories: CategorySection[] = [
   {
     title: 'Platform Control',
-    roles: [
-      { role: 'super_admin', active: 2, pending: 0, done: 15 },
-      { role: 'admin', active: 5, pending: 1, done: 45 },
-    ]
-  },
-  {
-    title: 'Server & Infrastructure',
-    roles: [
-      { role: 'api_security', active: 2, pending: 0, done: 34 }, // Server Manager
+    items: [
+      { id: 'super_admin', label: 'Super Admin', icon: Crown, active: 2, pending: 0, done: 15 },
+      { id: 'admin', label: 'Admin', icon: Shield, active: 5, pending: 1, done: 45 },
+      { id: 'server_manager', label: 'Server Manager', icon: Server, active: 3, pending: 0, done: 28 },
     ]
   },
   {
     title: 'Business Managers',
-    roles: [
-      { role: 'franchise', active: 23, pending: 5, done: 67 }, // Franchise Manager
-      { role: 'client_success', active: 4, pending: 2, done: 156 }, // Sales & Support Manager
-      { role: 'ai_manager', active: 1, pending: 0, done: 12 }, // API / AI Manager
-      { role: 'seo_manager', active: 3, pending: 0, done: 45 }, // SEO Manager
-      { role: 'marketing_manager', active: 4, pending: 0, done: 56 }, // Marketing Manager
-      { role: 'lead_manager', active: 4, pending: 1, done: 128 }, // Lead Manager
-      { role: 'demo_manager', active: 2, pending: 1, done: 67 }, // Pro Manager
-      { role: 'legal_compliance', active: 2, pending: 0, done: 34 }, // Legal Manager
-      { role: 'task_manager', active: 3, pending: 0, done: 445 }, // Task Manager
-      { role: 'hr_manager', active: 2, pending: 1, done: 23 }, // HR Manager
-      { role: 'performance_manager', active: 2, pending: 0, done: 21 }, // Developer Manager
+    items: [
+      { id: 'franchise_manager', label: 'Franchise Manager', icon: Building2, active: 4, pending: 2, done: 67 },
+      { id: 'sales_support_manager', label: 'Sales & Support Manager', icon: HeadphonesIcon, active: 6, pending: 3, done: 156 },
+      { id: 'reseller_manager', label: 'Reseller Manager', icon: Store, active: 3, pending: 1, done: 45 },
+      { id: 'api_ai_manager', label: 'API / AI Manager', icon: Brain, active: 2, pending: 0, done: 34 },
+      { id: 'influencer_manager', label: 'Influencer Manager', icon: Zap, active: 2, pending: 1, done: 23 },
+      { id: 'seo_manager', label: 'SEO Manager', icon: Search, active: 3, pending: 0, done: 45 },
+      { id: 'marketing_manager', label: 'Marketing Manager', icon: Megaphone, active: 4, pending: 1, done: 56 },
+      { id: 'lead_manager', label: 'Lead Manager', icon: Target, active: 5, pending: 2, done: 128 },
+      { id: 'pro_manager', label: 'Pro Manager', icon: Star, active: 2, pending: 1, done: 67 },
+      { id: 'legal_manager', label: 'Legal Manager', icon: Scale, active: 2, pending: 0, done: 34 },
+      { id: 'task_manager', label: 'Task Manager', icon: ListTodo, active: 4, pending: 1, done: 445 },
+      { id: 'hr_manager', label: 'HR Manager', icon: UserPlus, active: 3, pending: 1, done: 23 },
+      { id: 'developer_manager', label: 'Developer Manager', icon: Code2, active: 2, pending: 0, done: 21 },
     ]
   },
   {
     title: 'Partner Network',
-    roles: [
-      { role: 'developer', active: 47, pending: 8, done: 156 }, // Developer
-      { role: 'reseller', active: 12, pending: 3, done: 89 }, // Reseller
-      { role: 'influencer', active: 8, pending: 2, done: 45 }, // Influencer
+    items: [
+      { id: 'franchise', label: 'Franchise', icon: Building2, active: 23, pending: 5, done: 89 },
+      { id: 'developer', label: 'Developer', icon: Code2, active: 47, pending: 8, done: 156 },
+      { id: 'reseller', label: 'Reseller', icon: Store, active: 12, pending: 3, done: 78 },
+      { id: 'influencer', label: 'Influencer', icon: Zap, active: 8, pending: 2, done: 45 },
     ]
   },
   {
     title: 'User Management',
-    roles: [
-      { role: 'prime', active: 34, pending: 5, done: 234 }, // Prime User
-      { role: 'client', active: 156, pending: 12, done: 1245 }, // User
+    items: [
+      { id: 'prime_user', label: 'Prime User', icon: Star, active: 34, pending: 5, done: 234 },
+      { id: 'user', label: 'User', icon: Users, active: 156, pending: 12, done: 1245 },
     ]
   },
   {
     title: 'System & Support',
-    roles: [
-      { role: 'support', active: 8, pending: 2, done: 567 }, // Safe Assist / Assist Manager
-      { role: 'rnd_manager', active: 2, pending: 0, done: 21 }, // Frontend
+    items: [
+      { id: 'frontend', label: 'Frontend', icon: MonitorPlay, active: 3, pending: 0, done: 45 },
+      { id: 'safe_assist', label: 'Safe Assist', icon: Handshake, active: 5, pending: 2, done: 234 },
+      { id: 'assist_manager', label: 'Assist Manager', icon: HeadphonesIcon, active: 4, pending: 1, done: 167 },
     ]
   },
   {
     title: 'Operations & Tracking',
-    roles: [
-      { role: 'finance_manager', active: 3, pending: 1, done: 89 }, // Promise Tracker / Promise Management / Dashboard Management
+    items: [
+      { id: 'promise_tracker', label: 'Promise Tracker', icon: CheckCircle, active: 6, pending: 3, done: 289 },
+      { id: 'promise_management', label: 'Promise Management', icon: ClipboardList, active: 4, pending: 2, done: 178 },
+      { id: 'dashboard_management', label: 'Dashboard Management', icon: LayoutDashboard, active: 2, pending: 0, done: 56 },
     ]
   },
 ];
 
-const getIconForRole = (role: AppRole): LucideIcon => {
-  const icons: Record<string, LucideIcon> = {
-    // GRADE 0
-    master: Crown,
-    // GRADE 1
-    super_admin: Crown,
-    admin: Shield,
-    // GRADE 2
-    client_success: HeadphonesIcon,
-    support: HeadphonesIcon,
-    ai_manager: Brain,
-    api_security: Shield,
-    seo_manager: Search,
-    marketing_manager: MessageSquare,
-    lead_manager: Target,
-    demo_manager: Package,
-    legal_compliance: Scale,
-    task_manager: ListTodo,
-    hr_manager: UserPlus,
-    performance_manager: TrendingUp,
-    rnd_manager: Brain,
-    finance_manager: Wallet,
-    r_and_d: Brain,
-    // GRADE 3
-    franchise: Building2,
-    developer: Code2,
-    reseller: Store,
-    influencer: Zap,
-    // GRADE 4
-    prime: Star,
-    client: Users,
-  };
-  return icons[role] || Users;
-};
-
-// Role Activity Card Component - 2x2 style with teal theme
-interface RoleActivityCardProps {
-  role: AppRole;
-  stats: { active: number; pending: number; done: number };
+// Module Activity Card Component - For custom dashboard items
+interface ModuleActivityCardProps {
+  item: ModuleItem;
   index: number;
 }
 
-const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
-  ({ role, stats, index }, ref) => {
-  const config = ROLE_CONFIG[role];
-  const Icon = getIconForRole(role);
-  const total = stats.active + stats.pending + stats.done;
+const ModuleActivityCard = ({ item, index }: ModuleActivityCardProps) => {
+  const Icon = item.icon;
+  const total = item.active + item.pending + item.done;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+      transition={{ duration: 0.4, delay: index * 0.03 }}
       whileHover={{ scale: 1.02, y: -4 }}
       className="relative p-5 rounded-2xl bg-slate-800/80 border border-teal-500/20 backdrop-blur-xl overflow-hidden cursor-pointer group"
       style={{
@@ -164,7 +130,7 @@ const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
         </motion.div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-white tracking-wide truncate">{config.label}</h3>
+          <h3 className="text-sm font-bold text-white tracking-wide truncate">{item.label}</h3>
           <p className="text-xs text-slate-400">Live Activity</p>
         </div>
         
@@ -182,7 +148,7 @@ const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
           whileHover={{ scale: 1.05 }}
         >
           <div className="w-8 h-8 mx-auto mb-1 rounded-lg bg-amber-500/20 flex items-center justify-center">
-            <span className="text-amber-400 font-bold text-sm">{stats.pending}</span>
+            <span className="text-amber-400 font-bold text-sm">{item.pending}</span>
           </div>
           <p className="text-[10px] text-amber-300/80 uppercase tracking-wider font-medium">Pending</p>
         </motion.div>
@@ -192,7 +158,7 @@ const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
           className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-center relative"
           whileHover={{ scale: 1.05 }}
         >
-          {stats.active > 0 && (
+          {item.active > 0 && (
             <div className="absolute top-1.5 right-1.5">
               <span className="flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
@@ -201,7 +167,7 @@ const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
             </div>
           )}
           <div className="w-8 h-8 mx-auto mb-1 rounded-lg bg-teal-500/20 flex items-center justify-center">
-            <span className="text-teal-400 font-bold text-sm">{stats.active}</span>
+            <span className="text-teal-400 font-bold text-sm">{item.active}</span>
           </div>
           <p className="text-[10px] text-teal-300/80 uppercase tracking-wider font-medium">Active</p>
         </motion.div>
@@ -212,7 +178,7 @@ const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
           whileHover={{ scale: 1.05 }}
         >
           <div className="w-8 h-8 mx-auto mb-1 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-            <span className="text-emerald-400 font-bold text-sm">{stats.done > 999 ? `${(stats.done/1000).toFixed(1)}k` : stats.done}</span>
+            <span className="text-emerald-400 font-bold text-sm">{item.done > 999 ? `${(item.done/1000).toFixed(1)}k` : item.done}</span>
           </div>
           <p className="text-[10px] text-emerald-300/80 uppercase tracking-wider font-medium">Done</p>
         </motion.div>
@@ -224,15 +190,14 @@ const RoleActivityCard = forwardRef<HTMLDivElement, RoleActivityCardProps>(
           <motion.div 
             className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${(stats.done / Math.max(total, 1)) * 100}%` }}
-            transition={{ duration: 1, delay: 0.3 + index * 0.05 }}
+            animate={{ width: `${(item.done / Math.max(total, 1)) * 100}%` }}
+            transition={{ duration: 1, delay: 0.3 + index * 0.03 }}
           />
         </div>
       </div>
     </motion.div>
   );
-});
-RoleActivityCard.displayName = "RoleActivityCard";
+};
 
 // Stats Card for Command Center Header
 const HeaderStatCard = ({ 
@@ -515,8 +480,8 @@ const SuperAdminCommandCenter = () => {
           </div>
         </motion.div>
 
-        {/* Categorized Role Modules */}
-        {roleCategories.map((category, catIdx) => (
+        {/* Categorized Dashboard Modules - All 28 Items */}
+        {dashboardCategories.map((category, catIdx) => (
           <motion.div
             key={category.title}
             initial={{ opacity: 0, y: 20 }}
@@ -530,7 +495,7 @@ const SuperAdminCommandCenter = () => {
                 <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
                 <div>
                   <h2 className="text-lg font-bold text-white">{category.title}</h2>
-                  <p className="text-xs text-slate-400">{category.roles.length} modules • Real-time monitoring</p>
+                  <p className="text-xs text-slate-400">{category.items.length} modules • Real-time monitoring</p>
                 </div>
               </div>
               <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30">
@@ -539,17 +504,12 @@ const SuperAdminCommandCenter = () => {
               </Badge>
             </div>
 
-            {/* Category Role Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {category.roles.map((status, idx) => (
-                <RoleActivityCard
-                  key={status.role}
-                  role={status.role}
-                  stats={{
-                    active: status.active,
-                    pending: status.pending,
-                    done: status.done,
-                  }}
+            {/* Category Module Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {category.items.map((item, idx) => (
+                <ModuleActivityCard
+                  key={item.id}
+                  item={item}
                   index={catIdx * 10 + idx}
                 />
               ))}
