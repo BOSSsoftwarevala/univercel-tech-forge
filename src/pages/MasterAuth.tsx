@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { Mail, Lock, ArrowRight, Crown, Eye, EyeOff, Shield } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import MasterThroneIcon from '@/components/icons/MasterThroneIcon';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
@@ -119,9 +120,7 @@ const MasterAuth = () => {
             transition={{ delay: 0.2 }}
           >
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-red-600 flex items-center justify-center shadow-2xl shadow-amber-500/20">
-                <Crown className="w-8 h-8 text-white" />
-              </div>
+              <MasterThroneIcon size="xl" showTooltip />
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-black">
                 <Shield className="w-3 h-3 text-white" />
               </div>
