@@ -7,9 +7,9 @@ const ProductManagerPage = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Product Manager</h1>
-          <p className="text-muted-foreground">View all products (read-only access for Super Admin)</p>
+          <p className="text-muted-foreground">Full product management access for Super Admin</p>
         </div>
-        <ProductManager viewOnly={true} />
+        <ProductManager viewOnly={false} />
       </div>
     </DashboardLayout>
   );
