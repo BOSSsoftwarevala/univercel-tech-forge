@@ -8,7 +8,8 @@ import {
   Wallet, HeadphonesIcon, Target, BarChart3, Scale, Search,
   Ban, Bell, Settings, Activity, GitBranch, Lock, Zap, Heart,
   Brain, UserPlus, MessageSquare, Star, ChevronLeft, ChevronRight,
-  Sparkles, DollarSign, FileText, TrendingUp, Lightbulb, LogOut, KeyRound, ArrowLeft
+  Sparkles, DollarSign, FileText, TrendingUp, Lightbulb, LogOut, KeyRound, ArrowLeft,
+  Globe2
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 0 – OWNERSHIP
   master: [
     { icon: Shield, label: 'Super Admin', path: '/super-admin?cat=super-admin' },
+    { icon: Globe2, label: 'Continent Super Admin', path: '/continent-super-admin' },
     { icon: MapPin, label: 'Area Manager', path: '/super-admin?cat=area-manager' },
     { icon: Monitor, label: 'Server Manager', path: '/super-admin?cat=server-manager' },
     { icon: Store, label: 'Franchise Manager', path: '/super-admin?cat=franchise-manager' },
@@ -59,6 +61,7 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 1 – PLATFORM CONTROL
   super_admin: [
     { icon: Shield, label: 'Super Admin', path: '/super-admin?cat=super-admin' },
+    { icon: Globe2, label: 'Continent Super Admin', path: '/continent-super-admin' },
     { icon: MapPin, label: 'Area Manager', path: '/super-admin?cat=area-manager' },
     { icon: Monitor, label: 'Server Manager', path: '/super-admin?cat=server-manager' },
     { icon: Store, label: 'Franchise Manager', path: '/super-admin?cat=franchise-manager' },
