@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 interface PerformanceTopBarProps {
   activeTab: string;
@@ -110,7 +111,10 @@ export const PerformanceTopBar = ({ activeTab, onTabChange }: PerformanceTopBarP
           return (
             <motion.button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => {
+                onTabChange(tab.id);
+                toast.success(`Switched to ${tab.label}`);
+              }}
               className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                 isActive 
                   ? "bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 text-white border border-cyan-500/50" 
