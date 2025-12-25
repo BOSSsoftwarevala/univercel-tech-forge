@@ -28,12 +28,14 @@ import {
   ClipboardList,
   Rocket,
   Bug,
-  UserCheck
+  UserCheck,
+  RotateCcw
 } from 'lucide-react';
 import TestPlanScreen from './screens/TestPlanScreen';
 import DeployChecklistScreen from './screens/DeployChecklistScreen';
 import BugFixExecutionScreen from './screens/BugFixExecutionScreen';
 import RoleBugFixScreen from './screens/RoleBugFixScreen';
+import RegressionTestScreen from './screens/RegressionTestScreen';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -422,6 +424,10 @@ const MasterAdminDashboard = () => {
               <UserCheck className="w-4 h-4" />
               Role Bugs
             </TabsTrigger>
+            <TabsTrigger value="regression" className="gap-2 data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+              <RotateCcw className="w-4 h-4" />
+              Regression
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="live-reports" className="mt-4">
@@ -528,6 +534,14 @@ const MasterAdminDashboard = () => {
             <Card className="bg-[#12121a] border-gray-800/50">
               <CardContent className="p-6">
                 <RoleBugFixScreen />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="regression" className="mt-4">
+            <Card className="bg-[#12121a] border-gray-800/50">
+              <CardContent className="p-6">
+                <RegressionTestScreen />
               </CardContent>
             </Card>
           </TabsContent>
