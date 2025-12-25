@@ -27,11 +27,13 @@ import {
   ArrowLeft,
   ClipboardList,
   Rocket,
-  Bug
+  Bug,
+  UserCheck
 } from 'lucide-react';
 import TestPlanScreen from './screens/TestPlanScreen';
 import DeployChecklistScreen from './screens/DeployChecklistScreen';
 import BugFixExecutionScreen from './screens/BugFixExecutionScreen';
+import RoleBugFixScreen from './screens/RoleBugFixScreen';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -416,6 +418,10 @@ const MasterAdminDashboard = () => {
               <Bug className="w-4 h-4" />
               Bug Fix
             </TabsTrigger>
+            <TabsTrigger value="role-bugs" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
+              <UserCheck className="w-4 h-4" />
+              Role Bugs
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="live-reports" className="mt-4">
@@ -514,6 +520,14 @@ const MasterAdminDashboard = () => {
             <Card className="bg-[#12121a] border-gray-800/50">
               <CardContent className="p-6">
                 <BugFixExecutionScreen />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="role-bugs" className="mt-4">
+            <Card className="bg-[#12121a] border-gray-800/50">
+              <CardContent className="p-6">
+                <RoleBugFixScreen />
               </CardContent>
             </Card>
           </TabsContent>
