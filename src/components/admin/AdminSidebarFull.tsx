@@ -1,94 +1,113 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard,
   Shield,
   Users,
-  Activity,
-  BarChart3,
-  Lock,
-  Globe,
-  Wallet,
-  UserPlus,
-  Code,
-  Brain,
-  Scale,
-  Bell,
-  Monitor,
-  Megaphone,
-  HeadphonesIcon,
-  Gauge,
-  Zap,
+  Server,
   Store,
+  HeadphonesIcon,
   ShoppingBag,
-  DollarSign,
-  Search,
-  TrendingUp,
-  Lightbulb,
-  Heart,
-  Briefcase,
-  FileText,
+  Brain,
   Star,
+  Search,
+  Megaphone,
+  UserPlus,
   Crown,
+  Scale,
+  ListTodo,
+  Briefcase,
+  Code,
+  Building,
+  Terminal,
+  Percent,
+  Sparkles,
+  User,
+  Layout,
+  Headphones,
+  UserCheck,
+  Clock,
+  FileCheck,
+  LayoutDashboard,
   Settings,
   LogOut,
   KeyRound,
-  Server,
-  Handshake,
-  Key,
-  UserX
+  Zap
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 
-type AdminView =
-  | "overview"
-  | "roles"
-  | "users"
-  | "health"
-  | "activity"
-  | "metrics"
-  | "security"
-  | "live-control"
-  | "wallet-finance"
-  | "lead-distribution"
-  | "dev-orchestration"
-  | "performance-ai"
-  | "compliance"
-  | "emergency"
+// Flat 28 categories - NO GROUPING
+export type AdminView =
+  | "super-admin"
+  | "admin"
+  | "server-manager"
+  | "franchise-manager"
+  | "sales-support-manager"
+  | "reseller-manager"
+  | "api-ai-manager"
+  | "influencer-manager"
+  | "seo-manager"
+  | "marketing-manager"
+  | "lead-manager"
+  | "pro-manager"
+  | "legal-manager"
+  | "task-manager"
+  | "hr-manager"
+  | "developer-manager"
   | "franchise"
+  | "developer"
   | "reseller"
-  | "sales"
-  | "support"
-  | "seo"
-  | "marketing"
-  | "rnd"
-  | "client-success"
-  | "legal"
-  | "hr"
-  | "demo-product"
   | "influencer"
-  | "prime-users"
-  | "server-management"
-  | "approval-queue"
-  | "2fa-settings"
-  | "force-logout"
+  | "prime-user"
+  | "user"
+  | "frontend"
+  | "safe-assist"
+  | "assist-manager"
+  | "promise-tracker"
   | "promise-management"
-  | "ai-management"
-  | "franchise-keys"
-  | "role-rules"
-  | "invoices"
-  | "settings";
+  | "dashboard-management";
 
 interface AdminSidebarFullProps {
   activeView: AdminView;
   onViewChange: (view: AdminView) => void;
 }
 
+// Flat list of all 28 categories - EXACT ORDER as specified
+const sidebarItems = [
+  { id: "super-admin", label: "Super Admin", icon: Shield },
+  { id: "admin", label: "Admin", icon: Users },
+  { id: "server-manager", label: "Server Manager", icon: Server },
+  { id: "franchise-manager", label: "Franchise Manager", icon: Store },
+  { id: "sales-support-manager", label: "Sales & Support Manager", icon: HeadphonesIcon },
+  { id: "reseller-manager", label: "Reseller Manager", icon: ShoppingBag },
+  { id: "api-ai-manager", label: "API / AI Manager", icon: Brain },
+  { id: "influencer-manager", label: "Influencer Manager", icon: Star },
+  { id: "seo-manager", label: "SEO Manager", icon: Search },
+  { id: "marketing-manager", label: "Marketing Manager", icon: Megaphone },
+  { id: "lead-manager", label: "Lead Manager", icon: UserPlus },
+  { id: "pro-manager", label: "Pro Manager", icon: Crown },
+  { id: "legal-manager", label: "Legal Manager", icon: Scale },
+  { id: "task-manager", label: "Task Manager", icon: ListTodo },
+  { id: "hr-manager", label: "HR Manager", icon: Briefcase },
+  { id: "developer-manager", label: "Developer Manager", icon: Code },
+  { id: "franchise", label: "Franchise", icon: Building },
+  { id: "developer", label: "Developer", icon: Terminal },
+  { id: "reseller", label: "Reseller", icon: Percent },
+  { id: "influencer", label: "Influencer", icon: Sparkles },
+  { id: "prime-user", label: "Prime User", icon: Crown },
+  { id: "user", label: "User", icon: User },
+  { id: "frontend", label: "Frontend", icon: Layout },
+  { id: "safe-assist", label: "Safe Assist", icon: Headphones },
+  { id: "assist-manager", label: "Assist Manager", icon: UserCheck },
+  { id: "promise-tracker", label: "Promise Tracker", icon: Clock },
+  { id: "promise-management", label: "Promise Management", icon: FileCheck },
+  { id: "dashboard-management", label: "Dashboard Management", icon: LayoutDashboard },
+];
+
 const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) => {
-  const { user, signOut, userRole } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Super Admin';
@@ -99,86 +118,6 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
     navigate('/auth');
   };
 
-  const menuSections = [
-    {
-      title: "Control Center",
-      items: [
-        { id: "live-control", label: "Live Control", icon: Globe },
-        { id: "overview", label: "Module Overview", icon: LayoutDashboard },
-      ]
-    },
-    {
-      title: "Operations",
-      items: [
-        { id: "lead-distribution", label: "Lead Manager", icon: UserPlus },
-        { id: "dev-orchestration", label: "Developer Panel", icon: Code },
-        { id: "promise-management", label: "Promise Tracker", icon: Handshake },
-        { id: "franchise", label: "Franchise", icon: Store },
-        { id: "franchise-keys", label: "Franchise Keys", icon: Key },
-        { id: "reseller", label: "Reseller", icon: ShoppingBag },
-        { id: "sales", label: "Sales", icon: TrendingUp },
-        { id: "support", label: "Support", icon: HeadphonesIcon },
-      ]
-    },
-    {
-      title: "Finance & Performance",
-      items: [
-        { id: "wallet-finance", label: "Finance", icon: DollarSign },
-        { id: "performance-ai", label: "Performance", icon: Gauge },
-        { id: "ai-management", label: "AI Management", icon: Brain },
-      ]
-    },
-    {
-      title: "Marketing & Growth",
-      items: [
-        { id: "seo", label: "SEO", icon: Search },
-        { id: "marketing", label: "Marketing", icon: Megaphone },
-        { id: "influencer", label: "Influencer", icon: Star },
-      ]
-    },
-    {
-      title: "Product & Innovation",
-      items: [
-        { id: "demo-product", label: "Product/Demo", icon: Monitor },
-        { id: "rnd", label: "R&D", icon: Lightbulb },
-        { id: "server-management", label: "Servers", icon: Server },
-      ]
-    },
-    {
-      title: "People & Legal",
-      items: [
-        { id: "client-success", label: "Client Success", icon: Heart },
-        { id: "prime-users", label: "Prime Users", icon: Crown },
-        { id: "hr", label: "HR", icon: Briefcase },
-        { id: "compliance", label: "Compliance", icon: Scale },
-        { id: "legal", label: "Legal", icon: FileText },
-      ]
-    },
-    {
-      title: "Documentation & Billing",
-      items: [
-        { id: "role-rules", label: "Role Rules", icon: FileText },
-        { id: "invoices", label: "Invoices", icon: DollarSign },
-      ]
-    },
-    {
-      title: "Security & System",
-      items: [
-        { id: "approval-queue", label: "Approvals Hub", icon: Shield },
-        { id: "force-logout", label: "Force Logout", icon: UserX },
-        { id: "2fa-settings", label: "2FA & Security", icon: KeyRound },
-        { id: "roles", label: "Role Access", icon: Shield },
-        { id: "users", label: "User Mgmt", icon: Users },
-        { id: "security", label: "Security", icon: Lock },
-        { id: "emergency", label: "Emergency", icon: Bell },
-        { id: "health", label: "System Health", icon: Activity },
-        { id: "activity", label: "Activity Log", icon: BarChart3 },
-        { id: "metrics", label: "Global Metrics", icon: Brain },
-        { id: "settings", label: "Settings", icon: Settings },
-      ]
-    },
-  ];
-
   return (
     <div className="fixed left-0 top-0 h-screen w-64 bg-card/50 backdrop-blur-xl border-r border-white/10 flex flex-col z-40">
       {/* Logo */}
@@ -188,49 +127,43 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
             <Zap className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg">Super Admin</h1>
+            <h1 className="font-bold text-lg">Command Center</h1>
             <p className="text-xs text-muted-foreground">Master Console</p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Flat Navigation - No Groups */}
       <ScrollArea className="flex-1">
-        <nav className="p-3">
-          {menuSections.map((section, sectionIndex) => (
-            <div key={section.title} className={sectionIndex > 0 ? "mt-4" : ""}>
-              <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                {section.title}
-              </div>
-              <div className="space-y-0.5">
-                {section.items.map((item) => {
-                  const isActive = activeView === item.id;
-                  return (
-                    <motion.button
-                      key={item.id}
-                      whileHover={{ x: 4 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => onViewChange(item.id as AdminView)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-left text-sm ${
-                        isActive
-                          ? "bg-primary/20 text-primary border border-primary/30"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                      }`}
-                    >
-                      <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-primary" : ""}`} />
-                      <span className="font-medium truncate">{item.label}</span>
-                      {isActive && (
-                        <motion.div
-                          layoutId="activeIndicator"
-                          className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"
-                        />
-                      )}
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        <nav className="p-3 space-y-0.5">
+          {sidebarItems.map((item, index) => {
+            const isActive = activeView === item.id;
+            return (
+              <motion.button
+                key={item.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.02 }}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => onViewChange(item.id as AdminView)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-left text-sm ${
+                  isActive
+                    ? "bg-primary/20 text-primary border border-primary/30"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                }`}
+              >
+                <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-primary" : ""}`} />
+                <span className="font-medium truncate">{item.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebarActiveIndicator"
+                    className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"
+                  />
+                )}
+              </motion.button>
+            );
+          })}
         </nav>
       </ScrollArea>
 
@@ -260,7 +193,7 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
             variant="outline"
             size="sm"
             className="flex-1 text-xs gap-1.5 h-8"
-            onClick={() => onViewChange("settings")}
+            onClick={() => onViewChange("super-admin")}
           >
             <KeyRound className="w-3 h-3" />
             Password
@@ -269,7 +202,7 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
             variant="outline"
             size="sm"
             className="flex-1 text-xs gap-1.5 h-8"
-            onClick={() => onViewChange("settings")}
+            onClick={() => onViewChange("super-admin")}
           >
             <Settings className="w-3 h-3" />
             Settings

@@ -1,86 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AdminSidebarFull from "@/components/admin/AdminSidebarFull";
+import AdminSidebarFull, { type AdminView } from "@/components/admin/AdminSidebarFull";
 import AdminTopBar from "@/components/admin/AdminTopBar";
-import ModuleOverview from "@/components/admin/ModuleOverview";
-import RoleAccessControl from "@/components/admin/RoleAccessControl";
-import SystemHealth from "@/components/admin/SystemHealth";
-import UserManagement from "@/components/admin/UserManagement";
-import ActivityMonitor from "@/components/admin/ActivityMonitor";
-import GlobalMetrics from "@/components/admin/GlobalMetrics";
-import SecurityCenter from "@/components/admin/SecurityCenter";
 import AdminNotifications from "@/components/admin/AdminNotifications";
-import GlobalLiveControlCenter from "@/components/admin/GlobalLiveControlCenter";
-import GlobalBranchMap from "@/components/admin/GlobalBranchMap";
-import GlobalPromiseStatus from "@/components/admin/GlobalPromiseStatus";
-import WalletFinanceConsole from "@/components/admin/WalletFinanceConsole";
-import LeadDistributionHub from "@/components/admin/LeadDistributionHub";
-import DeveloperTaskOrchestration from "@/components/admin/DeveloperTaskOrchestration";
-import AIDeveloperManagement from "@/components/admin/AIDeveloperManagement";
-import AIResellerManager from "@/components/admin/AIResellerManager";
-import AIInfluencerManager from "@/components/admin/AIInfluencerManager";
-import PerformanceScoringAI from "@/components/admin/PerformanceScoringAI";
-import ComplianceLegalShield from "@/components/admin/ComplianceLegalShield";
-import EmergencyBuzzerControls from "@/components/admin/EmergencyBuzzerControls";
 import HeaderAlertStack from "@/components/shared/HeaderAlertStack";
-import LiveAlertGrid from "@/components/admin/LiveAlertGrid";
 import FloatingChatButton from "@/components/admin/FloatingChatButton";
-import WelcomeBoss from "@/components/admin/WelcomeBoss";
-import ProductManager from "@/components/demo-manager/ProductManager";
-import ServerManagement from "@/components/admin/ServerManagement";
-import { SuperAdminApprovalQueue } from "@/components/admin/SuperAdminApprovalQueue";
-import { TwoFactorSettings } from "@/components/auth/TwoFactorSettings";
-import { TrustedDeviceManager } from "@/components/auth/TrustedDeviceManager";
-import { BackupCodesManager } from "@/components/auth/BackupCodesManager";
-import ForceLogoutManager from "@/components/admin/ForceLogoutManager";
-import ApprovalsHub from "@/components/admin/ApprovalsHub";
-import PromiseManagement from "@/components/admin/PromiseManagement";
-import PromiseTracker from "@/components/admin/PromiseTracker";
-import RoleRulesRegulations from "@/components/admin/RoleRulesRegulations";
-import InvoiceGenerator from "@/components/invoice/InvoiceGenerator";
-import AIManagementCenter from "@/components/admin/AIManagementCenter";
-import FranchiseKeyGenerator from "@/components/admin/FranchiseKeyGenerator";
-import ServerManagementHub from "@/components/admin/ServerManagementHub";
 import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
-
-type AdminView =
-  | "overview"
-  | "roles"
-  | "users"
-  | "health"
-  | "activity"
-  | "metrics"
-  | "security"
-  | "live-control"
-  | "wallet-finance"
-  | "lead-distribution"
-  | "dev-orchestration"
-  | "performance-ai"
-  | "compliance"
-  | "emergency"
-  | "franchise"
-  | "reseller"
-  | "sales"
-  | "support"
-  | "seo"
-  | "marketing"
-  | "rnd"
-  | "client-success"
-  | "legal"
-  | "hr"
-  | "demo-product"
-  | "influencer"
-  | "prime-users"
-  | "server-management"
-  | "approval-queue"
-  | "2fa-settings"
-  | "force-logout"
-  | "promise-management"
-  | "ai-management"
-  | "franchise-keys"
-  | "role-rules"
-  | "invoices"
-  | "settings";
 
 // Sample notifications for demo
 const sampleNotifications: NotificationAlert[] = [
@@ -133,8 +58,19 @@ const sampleNotifications: NotificationAlert[] = [
   },
 ];
 
+// Placeholder component for categories not yet implemented
+const CategoryPlaceholder = ({ title }: { title: string }) => (
+  <div className="flex flex-col items-center justify-center min-h-[400px] bg-card/30 rounded-2xl border border-white/10">
+    <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+      <span className="text-4xl">🚧</span>
+    </div>
+    <h2 className="text-2xl font-bold mb-2">{title}</h2>
+    <p className="text-muted-foreground">This module is ready for sub/micro/nano mapping</p>
+  </div>
+);
+
 const SuperAdminDashboard = () => {
-  const [activeView, setActiveView] = useState<AdminView>("live-control");
+  const [activeView, setActiveView] = useState<AdminView>("super-admin");
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationAlert[]>(sampleNotifications);
 
@@ -143,98 +79,45 @@ const SuperAdminDashboard = () => {
   };
 
   const handleNotificationAction = (id: string) => {
-    // Handle action and remove notification
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  // Filter priority alerts for the stack
   const stackAlerts = notifications.filter(n => n.type === 'priority' || n.type === 'danger').slice(0, 3);
 
+  // Map of category titles for display
+  const categoryTitles: Record<AdminView, string> = {
+    "super-admin": "Super Admin",
+    "admin": "Admin",
+    "server-manager": "Server Manager",
+    "franchise-manager": "Franchise Manager",
+    "sales-support-manager": "Sales & Support Manager",
+    "reseller-manager": "Reseller Manager",
+    "api-ai-manager": "API / AI Manager",
+    "influencer-manager": "Influencer Manager",
+    "seo-manager": "SEO Manager",
+    "marketing-manager": "Marketing Manager",
+    "lead-manager": "Lead Manager",
+    "pro-manager": "Pro Manager",
+    "legal-manager": "Legal Manager",
+    "task-manager": "Task Manager",
+    "hr-manager": "HR Manager",
+    "developer-manager": "Developer Manager",
+    "franchise": "Franchise",
+    "developer": "Developer",
+    "reseller": "Reseller",
+    "influencer": "Influencer",
+    "prime-user": "Prime User",
+    "user": "User",
+    "frontend": "Frontend",
+    "safe-assist": "Safe Assist",
+    "assist-manager": "Assist Manager",
+    "promise-tracker": "Promise Tracker",
+    "promise-management": "Promise Management",
+    "dashboard-management": "Dashboard Management",
+  };
+
   const renderContent = () => {
-    switch (activeView) {
-      case "live-control":
-        return (
-          <div className="space-y-6">
-            {/* Welcome Boss Title */}
-            <WelcomeBoss disabled={showNotifications} />
-            
-            {/* Live Alert Grid - 2x2 */}
-            <LiveAlertGrid />
-            
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <div className="overflow-auto max-h-[600px]">
-                <GlobalLiveControlCenter />
-              </div>
-              <div className="h-[600px]">
-                <GlobalBranchMap />
-              </div>
-            </div>
-            <GlobalPromiseStatus />
-          </div>
-        );
-      case "overview":
-        return <ModuleOverview />;
-      case "lead-distribution":
-        return <LeadDistributionHub />;
-      case "dev-orchestration":
-        return <AIDeveloperManagement />;
-      case "reseller":
-        return <AIResellerManager />;
-      case "wallet-finance":
-        return <WalletFinanceConsole />;
-      case "performance-ai":
-        return <PerformanceScoringAI />;
-      case "roles":
-        return <RoleAccessControl />;
-      case "users":
-        return <UserManagement />;
-      case "compliance":
-        return <ComplianceLegalShield />;
-      case "security":
-        return <SecurityCenter />;
-      case "emergency":
-        return <EmergencyBuzzerControls />;
-      case "health":
-        return <SystemHealth />;
-      case "activity":
-        return <ActivityMonitor />;
-      case "metrics":
-        return <GlobalMetrics />;
-      case "demo-product":
-        return <ProductManager viewOnly={true} />;
-      case "influencer":
-        return <AIInfluencerManager />;
-      case "server-management":
-        return <ServerManagementHub />;
-      case "approval-queue":
-        return <ApprovalsHub />;
-      case "force-logout":
-        return <ForceLogoutManager />;
-      case "promise-management":
-        return <PromiseTracker />;
-      case "ai-management":
-        return <AIManagementCenter />;
-      case "franchise-keys":
-        return <FranchiseKeyGenerator />;
-      case "role-rules":
-        return <RoleRulesRegulations />;
-      case "invoices":
-        return <InvoiceGenerator userRole="super_admin" />;
-      case "franchise":
-        return <FranchiseKeyGenerator />;
-      case "2fa-settings":
-        return (
-          <div className="space-y-6">
-            <TwoFactorSettings />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TrustedDeviceManager />
-              <BackupCodesManager />
-            </div>
-          </div>
-        );
-      default:
-        return <GlobalLiveControlCenter />;
-    }
+    return <CategoryPlaceholder title={categoryTitles[activeView]} />;
   };
 
   return (
