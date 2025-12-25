@@ -85,28 +85,28 @@ const MasterControlCenter = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-zinc-100 flex flex-col overflow-hidden select-none">
+    <div className="h-screen w-screen bg-stone-100 flex flex-col overflow-hidden select-none">
       {/* TOP HEADER */}
-      <header className="h-14 bg-white border-b border-zinc-300 flex items-center justify-between px-6 flex-shrink-0">
+      <header className="h-14 bg-stone-800 flex items-center justify-between px-6 flex-shrink-0">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <MasterThroneIcon size="md" showTooltip />
             <div>
-              <span className="font-semibold text-zinc-800">Master Admin Control Center</span>
-              <span className="text-xs text-zinc-500 ml-2">Supreme Control</span>
+              <span className="font-semibold text-white">Master Admin Control Center</span>
+              <span className="text-xs text-stone-400 ml-2">Supreme Control</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-6">
           {/* Global Status */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 rounded border border-zinc-300">
-            <Activity className="w-4 h-4 text-zinc-600" />
-            <span className="text-sm text-zinc-700">All Systems Normal</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-700 rounded border border-stone-600">
+            <Activity className="w-4 h-4 text-emerald-400" />
+            <span className="text-sm text-stone-200">All Systems Normal</span>
           </div>
 
           {/* Session Timer */}
-          <div className="flex items-center gap-2 text-zinc-600">
+          <div className="flex items-center gap-2 text-stone-300">
             <Clock className="w-4 h-4" />
             <span className="font-mono text-sm">{sessionTime}</span>
           </div>
@@ -116,7 +116,7 @@ const MasterControlCenter = () => {
             variant="outline" 
             size="sm" 
             onClick={handleLogout}
-            className="border-zinc-400 text-zinc-700 hover:bg-zinc-200"
+            className="border-stone-500 text-stone-200 hover:bg-stone-700 bg-transparent"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Secure Logout
@@ -126,8 +126,8 @@ const MasterControlCenter = () => {
 
       {/* MAIN LAYOUT */}
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT SIDEBAR */}
-        <aside className="w-56 bg-white border-r border-zinc-300 flex-shrink-0">
+        {/* LEFT SIDEBAR - Dark charcoal */}
+        <aside className="w-56 bg-stone-800 flex-shrink-0">
           <ScrollArea className="h-full py-4">
             <nav className="space-y-1 px-3">
               {sidebarItems.map((item) => (
@@ -136,8 +136,8 @@ const MasterControlCenter = () => {
                   onClick={() => setActiveView(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm transition-colors ${
                     activeView === item.id
-                      ? 'bg-zinc-800 text-white'
-                      : 'text-zinc-700 hover:bg-zinc-100'
+                      ? 'bg-stone-900 text-white border-l-2 border-amber-500'
+                      : 'text-stone-300 hover:bg-stone-700 hover:text-white'
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -148,13 +148,13 @@ const MasterControlCenter = () => {
           </ScrollArea>
         </aside>
 
-        {/* MAIN CONTENT */}
-        <main className="flex-1 overflow-auto bg-zinc-50 p-6">
+        {/* MAIN CONTENT - Light background */}
+        <main className="flex-1 overflow-auto bg-stone-100 p-6">
           {renderView()}
         </main>
 
-        {/* RIGHT AI PANEL */}
-        <aside className="w-72 bg-white border-l border-zinc-300 flex-shrink-0">
+        {/* RIGHT AI PANEL - Light with subtle border */}
+        <aside className="w-72 bg-stone-50 border-l border-stone-200 flex-shrink-0">
           <AIInsightsPanel />
         </aside>
       </div>

@@ -30,17 +30,17 @@ const OverviewView = () => {
     <div className="space-y-6">
       {/* Section A: Global Summary Cards */}
       <div>
-        <h2 className="text-lg font-semibold text-zinc-800 mb-4">Global Summary</h2>
+        <h2 className="text-lg font-semibold text-stone-800 mb-4">Global Summary</h2>
         <div className="grid grid-cols-4 gap-4">
           {summaryCards.map((card) => (
-            <Card key={card.label} className="p-4 bg-white border-zinc-300">
+            <Card key={card.label} className="p-4 bg-white border-stone-200 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-zinc-500">{card.label}</p>
-                  <p className="text-2xl font-bold text-zinc-800 mt-1">{card.value}</p>
+                  <p className="text-sm text-stone-500">{card.label}</p>
+                  <p className="text-2xl font-bold text-stone-800 mt-1">{card.value}</p>
                 </div>
-                <div className="w-10 h-10 bg-zinc-100 rounded flex items-center justify-center">
-                  <card.icon className="w-5 h-5 text-zinc-600" />
+                <div className="w-10 h-10 bg-stone-100 rounded flex items-center justify-center">
+                  <card.icon className="w-5 h-5 text-stone-600" />
                 </div>
               </div>
             </Card>
@@ -50,35 +50,35 @@ const OverviewView = () => {
 
       {/* Section B: Continent Snapshot Table */}
       <div>
-        <h2 className="text-lg font-semibold text-zinc-800 mb-4">Continent Snapshot</h2>
-        <Card className="bg-white border-zinc-300">
+        <h2 className="text-lg font-semibold text-stone-800 mb-4">Continent Snapshot</h2>
+        <Card className="bg-white border-stone-200 shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="border-zinc-200">
-                <TableHead className="text-zinc-600">Continent Name</TableHead>
-                <TableHead className="text-zinc-600">Super Admin</TableHead>
-                <TableHead className="text-zinc-600">Active Countries</TableHead>
-                <TableHead className="text-zinc-600">Revenue Trend</TableHead>
-                <TableHead className="text-zinc-600">Open Issues</TableHead>
-                <TableHead className="text-zinc-600">Status</TableHead>
+              <TableRow className="border-stone-200 bg-stone-50">
+                <TableHead className="text-stone-600 font-medium">Continent Name</TableHead>
+                <TableHead className="text-stone-600 font-medium">Super Admin</TableHead>
+                <TableHead className="text-stone-600 font-medium">Active Countries</TableHead>
+                <TableHead className="text-stone-600 font-medium">Revenue Trend</TableHead>
+                <TableHead className="text-stone-600 font-medium">Open Issues</TableHead>
+                <TableHead className="text-stone-600 font-medium">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {continentData.map((row) => (
                 <TableRow 
                   key={row.name} 
-                  className="border-zinc-200 cursor-pointer hover:bg-zinc-50"
+                  className="border-stone-100 cursor-pointer hover:bg-stone-50"
                 >
-                  <TableCell className="font-medium text-zinc-800">{row.name}</TableCell>
-                  <TableCell className="text-zinc-700">{row.admin}</TableCell>
-                  <TableCell className="text-zinc-700">{row.countries}</TableCell>
-                  <TableCell className="text-zinc-700 text-lg">{row.trend}</TableCell>
-                  <TableCell className="text-zinc-700">{row.issues}</TableCell>
+                  <TableCell className="font-medium text-stone-800">{row.name}</TableCell>
+                  <TableCell className="text-stone-600">{row.admin}</TableCell>
+                  <TableCell className="text-stone-600">{row.countries}</TableCell>
+                  <TableCell className="text-stone-600 text-lg">{row.trend}</TableCell>
+                  <TableCell className="text-stone-600">{row.issues}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       row.status === 'Normal' 
-                        ? 'bg-zinc-200 text-zinc-700' 
-                        : 'bg-zinc-800 text-white'
+                        ? 'bg-stone-100 text-stone-600' 
+                        : 'bg-amber-100 text-amber-700'
                     }`}>
                       {row.status}
                     </span>
@@ -88,7 +88,7 @@ const OverviewView = () => {
             </TableBody>
           </Table>
         </Card>
-        <p className="text-xs text-zinc-500 mt-2">Click row to view continent detail (read-only)</p>
+        <p className="text-xs text-stone-500 mt-2">Click row to view continent detail (read-only)</p>
       </div>
     </div>
   );

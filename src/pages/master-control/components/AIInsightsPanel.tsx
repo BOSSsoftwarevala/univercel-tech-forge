@@ -31,14 +31,14 @@ const insights = [
 
 const AIInsightsPanel = () => {
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-stone-50">
       {/* Header */}
-      <div className="p-4 border-b border-zinc-300">
+      <div className="p-4 border-b border-stone-200">
         <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-zinc-600" />
-          <h3 className="font-semibold text-zinc-800">AI Strategic Insights</h3>
+          <Brain className="w-5 h-5 text-stone-600" />
+          <h3 className="font-semibold text-stone-800">AI Strategic Insights</h3>
         </div>
-        <p className="text-xs text-zinc-500 mt-1">Read-only recommendations</p>
+        <p className="text-xs text-stone-500 mt-1">Read-only recommendations</p>
       </div>
 
       {/* Insights List */}
@@ -47,18 +47,18 @@ const AIInsightsPanel = () => {
           {insights.map((insight) => (
             <div 
               key={insight.id}
-              className="p-3 bg-zinc-50 border border-zinc-200 rounded"
+              className="p-3 bg-white border border-stone-200 rounded shadow-sm"
             >
-              <p className="text-sm text-zinc-700 leading-relaxed">
+              <p className="text-sm text-stone-700 leading-relaxed">
                 {insight.message}
               </p>
-              <p className="text-xs text-zinc-500 mt-2">{insight.context}</p>
+              <p className="text-xs text-stone-500 mt-2">{insight.context}</p>
               
               <div className="flex gap-2 mt-3">
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="text-xs h-7 border-zinc-300"
+                  className="text-xs h-7 border-stone-300 bg-emerald-600 text-white hover:bg-emerald-700"
                 >
                   <ChevronRight className="w-3 h-3 mr-1" />
                   View Context
@@ -66,7 +66,7 @@ const AIInsightsPanel = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="text-xs h-7 border-zinc-300"
+                  className="text-xs h-7 border-stone-300 text-stone-600 hover:bg-stone-100"
                 >
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Acknowledge
@@ -78,8 +78,8 @@ const AIInsightsPanel = () => {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-zinc-300 bg-zinc-50">
-        <p className="text-xs text-zinc-500 text-center">
+      <div className="p-4 border-t border-stone-200 bg-white">
+        <p className="text-xs text-stone-500 text-center">
           AI never executes actions — guidance only
         </p>
       </div>
