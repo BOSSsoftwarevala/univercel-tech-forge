@@ -29,7 +29,9 @@ import {
   Rocket,
   Bug,
   UserCheck,
-  RotateCcw
+  RotateCcw,
+  Globe,
+  AlertCircle
 } from 'lucide-react';
 import TestPlanScreen from './screens/TestPlanScreen';
 import DeployChecklistScreen from './screens/DeployChecklistScreen';
@@ -202,10 +204,10 @@ const MasterAdminDashboard = () => {
   };
 
   const UserCard = ({ userRole, showActions = true }: { userRole: UserRole; showActions?: boolean }) => (
-    <div className="bg-[#1a1a2e] border border-gray-800/50 rounded-xl p-4">
+    <div className="bg-[#1a1a2e] border border-gray-800/50 rounded-lg p-4 transition-all duration-100 hover:border-gray-700/50">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-gray-800/80 flex items-center justify-center" aria-hidden="true">
             {userRole.role === 'master' ? (
               <Crown className="w-5 h-5 text-amber-400" />
             ) : (
@@ -213,14 +215,21 @@ const MasterAdminDashboard = () => {
             )}
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{userRole.user_id.slice(0, 8)}...</p>
+            {/* Masked User ID - No copy */}
+            <p 
+              className="text-sm font-mono font-medium text-white select-none" 
+              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+              onCopy={(e) => e.preventDefault()}
+            >
+              {userRole.user_id.slice(0, 6)}...{userRole.user_id.slice(-4)}
+            </p>
             <div className="flex items-center gap-2 mt-1">
               <Badge className={getRoleBadgeColor(userRole.role)}>
                 {userRole.role.replace(/_/g, ' ')}
               </Badge>
               {userRole.force_logged_out_at && (
-                <Badge className="bg-red-500/20 text-red-400 border-0 text-xs">
-                  Force Logged Out
+                <Badge className="bg-red-500/15 text-red-400 border-red-500/20 text-[10px]">
+                  Logged Out
                 </Badge>
               )}
             </div>
@@ -228,27 +237,29 @@ const MasterAdminDashboard = () => {
         </div>
         
         {showActions && userRole.role !== 'master' && (
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap" role="group" aria-label="User actions">
             {userRole.approval_status === 'pending' && (
               <>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-green-500/50 text-green-400 hover:bg-green-500/10 bg-transparent"
+                  className="h-8 border-green-500/30 text-green-400 hover:bg-green-500/10 bg-transparent text-xs font-medium"
                   onClick={() => handleApprove(userRole.user_id)}
                   disabled={actionLoading === userRole.user_id}
+                  aria-label="Approve user"
                 >
-                  <CheckCircle className="w-4 h-4 mr-1" />
+                  <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
                   Approve
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-red-500/50 text-red-400 hover:bg-red-500/10 bg-transparent"
+                  className="h-8 border-red-500/30 text-red-400 hover:bg-red-500/10 bg-transparent text-xs font-medium"
                   onClick={() => handleReject(userRole.user_id)}
                   disabled={actionLoading === userRole.user_id}
+                  aria-label="Reject user"
                 >
-                  <XCircle className="w-4 h-4 mr-1" />
+                  <XCircle className="w-3.5 h-3.5 mr-1.5" />
                   Reject
                 </Button>
               </>
@@ -258,22 +269,30 @@ const MasterAdminDashboard = () => {
               <AlertDialogTrigger asChild>
                 <Button
                   size="sm"
-                  className="bg-red-500 hover:bg-red-600 text-white border-0"
+                  className="h-8 bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 text-xs font-medium"
                   disabled={actionLoading === userRole.user_id}
+                  aria-label="Force logout user"
                 >
-                  <Power className="w-4 h-4 mr-1" />
+                  <Power className="w-3.5 h-3.5 mr-1.5" />
                   Force Logout
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#12121a] border-gray-800">
+              <AlertDialogContent className="bg-[#12121a] border-gray-800 max-w-md">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-white">Force Logout User?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-gray-400">
-                    This will immediately log out the user from all devices. They will need to log in again.
-                  </AlertDialogDescription>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                      <AlertCircle className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div>
+                      <AlertDialogTitle className="text-white text-base font-semibold">Force Logout User?</AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-400 text-sm mt-1">
+                        This will immediately terminate the user's session on all devices.
+                      </AlertDialogDescription>
+                    </div>
+                  </div>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">Cancel</AlertDialogCancel>
+                <AlertDialogFooter className="mt-4 gap-2">
+                  <AlertDialogCancel className="bg-gray-800/50 border-gray-700 text-gray-300 hover:bg-gray-700/50">Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={() => handleForceLogout(userRole.user_id)} className="bg-red-500 hover:bg-red-600">
                     Force Logout
                   </AlertDialogAction>
@@ -287,79 +306,107 @@ const MasterAdminDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4">
-      <div className="max-w-7xl mx-auto space-y-4">
-        {/* Header - Clean */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="min-h-screen bg-[#0a0a0f]" onContextMenu={(e) => e.preventDefault()}>
+      {/* Polished Header */}
+      <header className="sticky top-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-sm border-b border-gray-800/50 px-4 lg:px-6 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left: Role Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
               <Crown className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-lg font-bold text-white">Master Admin</h1>
+            <div className="flex flex-col">
+              <h1 className="text-base font-semibold text-white tracking-tight">Master Admin</h1>
+              <div className="flex items-center gap-2 mt-0.5">
+                {/* Scope Badge */}
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-medium gap-1 bg-amber-500/15 text-amber-400 border-amber-500/25">
+                  <Globe className="w-3 h-3" />
+                  Global
+                </Badge>
+                {/* Status Pill */}
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-medium gap-1 bg-green-500/10 text-green-400 border-green-500/20">
+                  <CheckCircle className="w-3 h-3" />
+                  Normal
+                </Badge>
+              </div>
+            </div>
           </div>
           
+          {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            {/* Module Switcher Dropdown */}
+            {/* Module Switcher */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800 gap-2">
-                  <LayoutDashboard className="w-4 h-4" />
-                  Switch Module
-                  <ChevronDown className="w-4 h-4" />
+                <Button variant="outline" size="sm" className="h-8 bg-gray-800/50 border-gray-700/50 text-gray-300 hover:bg-gray-700/50 gap-2 text-xs font-medium">
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Switch</span>
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#12121a] border-gray-800 w-56">
-                <DropdownMenuLabel className="text-gray-400">Admin Modules</DropdownMenuLabel>
+              <DropdownMenuContent className="bg-[#12121a] border-gray-800 w-48">
+                <DropdownMenuLabel className="text-gray-500 text-xs">Admin Modules</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-800" />
-                <DropdownMenuItem onClick={() => navigate('/super-admin')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate('/super-admin')} className="text-gray-300 hover:bg-gray-800/50 cursor-pointer text-sm">
                   <Shield className="w-4 h-4 mr-2" />
                   Super Admin
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/demo-manager')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate('/demo-manager')} className="text-gray-300 hover:bg-gray-800/50 cursor-pointer text-sm">
                   <Monitor className="w-4 h-4 mr-2" />
                   Demo Manager
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/leads')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate('/leads')} className="text-gray-300 hover:bg-gray-800/50 cursor-pointer text-sm">
                   <Megaphone className="w-4 h-4 mr-2" />
                   Leads
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/developer-dashboard')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
-                  <UserCog className="w-4 h-4 mr-2" />
-                  Developer Dashboard
-                </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-gray-800" />
-                <DropdownMenuItem onClick={() => navigate('/settings')} className="text-gray-300 hover:bg-gray-800 cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate('/settings')} className="text-gray-300 hover:bg-gray-800/50 cursor-pointer text-sm">
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button variant="outline" onClick={fetchUsers} disabled={loading} size="sm" className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={fetchUsers} 
+              disabled={loading} 
+              className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50"
+              aria-label="Refresh"
+            >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
             
+            {/* Force Logout All - Destructive */}
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button 
-                  variant="destructive" 
+                  variant="ghost"
                   size="sm"
                   disabled={forceLogoutAllLoading || nonMasterUsers.length === 0}
-                  className="bg-red-500/80 hover:bg-red-600 border-0"
+                  className="h-8 text-red-400 hover:text-red-300 hover:bg-red-500/10 gap-1.5 text-xs font-medium"
+                  aria-label="Force logout all users"
                 >
-                  <Power className="w-4 h-4 mr-1" />
-                  Logout All
+                  <Power className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Logout All</span>
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#12121a] border-gray-800">
+              <AlertDialogContent className="bg-[#12121a] border-gray-800 max-w-md">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-white">Force Logout All Users?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-gray-400">
-                    This will immediately log out all {nonMasterUsers.length} non-Master users.
-                  </AlertDialogDescription>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                      <AlertCircle className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div>
+                      <AlertDialogTitle className="text-white text-base font-semibold">Force Logout All Users?</AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-400 text-sm mt-1">
+                        This will immediately terminate {nonMasterUsers.length} active sessions.
+                      </AlertDialogDescription>
+                    </div>
+                  </div>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">Cancel</AlertDialogCancel>
+                <AlertDialogFooter className="mt-4 gap-2">
+                  <AlertDialogCancel className="bg-gray-800/50 border-gray-700 text-gray-300 hover:bg-gray-700/50">Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={handleForceLogoutAll} className="bg-red-500 hover:bg-red-600">
                     Force Logout All
                   </AlertDialogAction>
@@ -367,21 +414,35 @@ const MasterAdminDashboard = () => {
               </AlertDialogContent>
             </AlertDialog>
             
-            <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate('/super-admin')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
-              <Shield className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate('/change-password')} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+            <div className="h-4 w-px bg-gray-800 mx-1" />
+            
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/change-password')} 
+              className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50"
+              aria-label="Change password"
+            >
               <KeyRound className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm" onClick={handleLogout} className="bg-[#1a1a2e] border-gray-800 text-gray-300 hover:bg-gray-800">
+            
+            {/* Secure Logout */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleLogout} 
+              className="h-8 text-gray-400 hover:text-white hover:bg-red-500/10 gap-1.5 text-xs font-medium"
+              aria-label="Secure logout"
+            >
               <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
+      </header>
 
+      {/* Main Content */}
+      <main className="px-4 lg:px-6 py-4 max-w-7xl mx-auto space-y-4">
         {/* Master Welcome Banner */}
         <MasterWelcome />
 
@@ -546,7 +607,7 @@ const MasterAdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
 };
