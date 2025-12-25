@@ -24,8 +24,10 @@ import {
   UserCog,
   Settings,
   KeyRound,
-  ArrowLeft
+  ArrowLeft,
+  ClipboardList
 } from 'lucide-react';
+import TestPlanScreen from './screens/TestPlanScreen';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -398,6 +400,10 @@ const MasterAdminDashboard = () => {
               <Users className="w-4 h-4" />
               All Users ({users.length})
             </TabsTrigger>
+            <TabsTrigger value="test-plan" className="gap-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+              <ClipboardList className="w-4 h-4" />
+              Test Plan
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="live-reports" className="mt-4">
@@ -472,6 +478,14 @@ const MasterAdminDashboard = () => {
                 ) : (
                   users.map(u => <UserCard key={u.id} userRole={u} />)
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="test-plan" className="mt-4">
+            <Card className="bg-[#12121a] border-gray-800/50">
+              <CardContent className="p-6">
+                <TestPlanScreen />
               </CardContent>
             </Card>
           </TabsContent>
