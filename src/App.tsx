@@ -90,6 +90,7 @@ import FranchiseLanding from "./pages/FranchiseLanding";
 import FranchiseDashboard from "./pages/FranchiseDashboard";
 import ResellerLanding from "./pages/ResellerLanding";
 import ResellerDashboard from "./pages/ResellerDashboard";
+import ResellerPortal from "./pages/ResellerPortal";
 import DeveloperDashboard from "./pages/DeveloperDashboard";
 import DevCommandCenter from "./pages/DevCommandCenter";
 import InfluencerDashboard from "./pages/InfluencerDashboard";
@@ -244,6 +245,8 @@ const App = () => (
               {/* Reseller Routes */}
               <Route path="/reseller" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
               <Route path="/reseller/dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
+              <Route path="/reseller/portal" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerPortal /></RequireRole>} />
+              <Route path="/reseller-portal" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerPortal /></RequireRole>} />
               <Route path="/reseller-program" element={<ResellerLanding />} />
               <Route path="/reseller-landing" element={<ResellerLanding />} />
               <Route path="/reseller-dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
