@@ -25,9 +25,11 @@ import {
   Settings,
   KeyRound,
   ArrowLeft,
-  ClipboardList
+  ClipboardList,
+  Rocket
 } from 'lucide-react';
 import TestPlanScreen from './screens/TestPlanScreen';
+import DeployChecklistScreen from './screens/DeployChecklistScreen';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -404,6 +406,10 @@ const MasterAdminDashboard = () => {
               <ClipboardList className="w-4 h-4" />
               Test Plan
             </TabsTrigger>
+            <TabsTrigger value="deploy" className="gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
+              <Rocket className="w-4 h-4" />
+              Deploy
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="live-reports" className="mt-4">
@@ -486,6 +492,14 @@ const MasterAdminDashboard = () => {
             <Card className="bg-[#12121a] border-gray-800/50">
               <CardContent className="p-6">
                 <TestPlanScreen />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="deploy" className="mt-4">
+            <Card className="bg-[#12121a] border-gray-800/50">
+              <CardContent className="p-6">
+                <DeployChecklistScreen />
               </CardContent>
             </Card>
           </TabsContent>
