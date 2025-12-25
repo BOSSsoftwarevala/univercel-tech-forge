@@ -62,6 +62,7 @@ import ComplianceCenter from "./pages/super-admin/ComplianceCenter";
 // Master Admin Pages
 import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
 import MasterAuth from "./pages/MasterAuth";
+import MasterControlCenter from "./pages/master-control/MasterControlCenter";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 
@@ -197,8 +198,8 @@ const App = () => (
               <Route path="/sv-master-control" element={<MasterAuth />} />
 
               {/* Master Admin Routes - MASTER ONLY */}
-              <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
-              <Route path="/master-admin/*" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
+              <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterControlCenter /></RequireRole>} />
+              <Route path="/master-admin/*" element={<RequireRole allowed={["master"]} masterOnly><MasterControlCenter /></RequireRole>} />
               
               {/* Admin Utilities - Master and Super Admin */}
               <Route path="/admin/bulk-users" element={<RequireRole allowed={["master", "super_admin"]}><BulkUserCreation /></RequireRole>} />

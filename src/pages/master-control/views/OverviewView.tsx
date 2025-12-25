@@ -1,0 +1,97 @@
+import { Globe2, Users, AlertTriangle, Shield } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+const summaryCards = [
+  { label: 'Total Continents', value: '6', icon: Globe2 },
+  { label: 'Active Super Admins', value: '5', icon: Users },
+  { label: 'Pending Critical Approvals', value: '12', icon: AlertTriangle },
+  { label: 'Global Risk Level', value: 'Low', icon: Shield },
+];
+
+const continentData = [
+  { name: 'Africa', admin: 'John Doe', countries: 12, trend: '↑', issues: 3, status: 'Normal' },
+  { name: 'Asia', admin: 'Jane Smith', countries: 28, trend: '↑', issues: 8, status: 'Attention' },
+  { name: 'Europe', admin: 'Hans Mueller', countries: 22, trend: '↓', issues: 2, status: 'Normal' },
+  { name: 'North America', admin: 'Mike Johnson', countries: 8, trend: '↑', issues: 1, status: 'Normal' },
+  { name: 'South America', admin: 'Carlos Rivera', countries: 10, trend: '↓', issues: 5, status: 'Attention' },
+  { name: 'Oceania', admin: 'Sarah Williams', countries: 4, trend: '↑', issues: 0, status: 'Normal' },
+];
+
+const OverviewView = () => {
+  return (
+    <div className="space-y-6">
+      {/* Section A: Global Summary Cards */}
+      <div>
+        <h2 className="text-lg font-semibold text-zinc-800 mb-4">Global Summary</h2>
+        <div className="grid grid-cols-4 gap-4">
+          {summaryCards.map((card) => (
+            <Card key={card.label} className="p-4 bg-white border-zinc-300">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-zinc-500">{card.label}</p>
+                  <p className="text-2xl font-bold text-zinc-800 mt-1">{card.value}</p>
+                </div>
+                <div className="w-10 h-10 bg-zinc-100 rounded flex items-center justify-center">
+                  <card.icon className="w-5 h-5 text-zinc-600" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Section B: Continent Snapshot Table */}
+      <div>
+        <h2 className="text-lg font-semibold text-zinc-800 mb-4">Continent Snapshot</h2>
+        <Card className="bg-white border-zinc-300">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-zinc-200">
+                <TableHead className="text-zinc-600">Continent Name</TableHead>
+                <TableHead className="text-zinc-600">Super Admin</TableHead>
+                <TableHead className="text-zinc-600">Active Countries</TableHead>
+                <TableHead className="text-zinc-600">Revenue Trend</TableHead>
+                <TableHead className="text-zinc-600">Open Issues</TableHead>
+                <TableHead className="text-zinc-600">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {continentData.map((row) => (
+                <TableRow 
+                  key={row.name} 
+                  className="border-zinc-200 cursor-pointer hover:bg-zinc-50"
+                >
+                  <TableCell className="font-medium text-zinc-800">{row.name}</TableCell>
+                  <TableCell className="text-zinc-700">{row.admin}</TableCell>
+                  <TableCell className="text-zinc-700">{row.countries}</TableCell>
+                  <TableCell className="text-zinc-700 text-lg">{row.trend}</TableCell>
+                  <TableCell className="text-zinc-700">{row.issues}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      row.status === 'Normal' 
+                        ? 'bg-zinc-200 text-zinc-700' 
+                        : 'bg-zinc-800 text-white'
+                    }`}>
+                      {row.status}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+        <p className="text-xs text-zinc-500 mt-2">Click row to view continent detail (read-only)</p>
+      </div>
+    </div>
+  );
+};
+
+export default OverviewView;
