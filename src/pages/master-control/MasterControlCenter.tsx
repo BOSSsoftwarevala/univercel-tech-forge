@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   LayoutGrid, Globe2, Users, Shield, AlertTriangle, 
-  Eye, FileText, Lock, LogOut, Clock, Activity
+  Eye, FileText, Lock, LogOut, Clock, Activity, CheckCircle
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import MasterThroneIcon from '@/components/icons/MasterThroneIcon';
@@ -85,39 +86,46 @@ const MasterControlCenter = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-stone-100 flex flex-col overflow-hidden select-none">
-      {/* TOP HEADER - Dark charcoal matching sidebar */}
-      <header className="h-14 bg-stone-800 flex items-center justify-between px-6 flex-shrink-0 border-b border-stone-700">
+    <div className="h-screen w-screen bg-[#0a0a0f] flex flex-col overflow-hidden select-none" onContextMenu={(e) => e.preventDefault()}>
+      {/* TOP HEADER - Dark theme */}
+      <header className="h-14 bg-[#12121a] flex items-center justify-between px-6 flex-shrink-0 border-b border-gray-800/50">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <MasterThroneIcon size="md" showTooltip />
             <div>
               <span className="font-semibold text-white">Master Admin Control Center</span>
-              <span className="text-xs text-stone-400 ml-2">Supreme Control</span>
+              <span className="text-xs text-gray-500 ml-2">Supreme Control</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          {/* Scope Badge */}
+          <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-medium gap-1 bg-amber-500/15 text-amber-400 border-amber-500/25">
+            <Globe2 className="w-3 h-3" />
+            Global
+          </Badge>
+
           {/* Global Status */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-700 rounded border border-stone-600">
-            <Activity className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-stone-200">All Systems Normal</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 rounded-lg border border-green-500/20">
+            <CheckCircle className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-xs text-green-400 font-medium">All Systems Normal</span>
           </div>
 
           {/* Session Timer */}
-          <div className="flex items-center gap-2 text-stone-300">
+          <div className="flex items-center gap-2 text-gray-400">
             <Clock className="w-4 h-4" />
             <span className="font-mono text-sm">{sessionTime}</span>
           </div>
 
           {/* Secure Logout */}
           <Button 
-            variant="outline" 
+            variant="ghost" 
             size="sm" 
             onClick={handleLogout}
-            className="border-stone-500 text-stone-200 hover:bg-stone-700 bg-transparent"
+            className="text-gray-400 hover:text-white hover:bg-red-500/10 gap-1.5 text-xs font-medium"
           >
+            <LogOut className="w-4 h-4" />
             Secure Logout
           </Button>
         </div>
@@ -125,18 +133,18 @@ const MasterControlCenter = () => {
 
       {/* MAIN LAYOUT */}
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT SIDEBAR - Dark charcoal */}
-        <aside className="w-56 bg-stone-800 flex-shrink-0 border-r border-stone-700">
+        {/* LEFT SIDEBAR - Dark theme */}
+        <aside className="w-56 bg-[#12121a] flex-shrink-0 border-r border-gray-800/50">
           <ScrollArea className="h-full py-4">
             <nav className="space-y-1 px-3">
               {sidebarItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveView(item.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-100 ${
                     activeView === item.id
-                      ? 'bg-stone-900 text-white'
-                      : 'text-stone-400 hover:bg-stone-700 hover:text-white'
+                      ? 'bg-primary/10 text-primary border border-primary/20'
+                      : 'text-gray-400 hover:bg-gray-800/50 hover:text-white border border-transparent'
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -147,13 +155,13 @@ const MasterControlCenter = () => {
           </ScrollArea>
         </aside>
 
-        {/* MAIN CONTENT - Light warm gray background */}
-        <main className="flex-1 overflow-auto bg-stone-100 p-6">
+        {/* MAIN CONTENT - Dark theme */}
+        <main className="flex-1 overflow-auto bg-[#0a0a0f] p-6">
           {renderView()}
         </main>
 
-        {/* RIGHT AI PANEL - Light background */}
-        <aside className="w-72 bg-stone-50 border-l border-stone-200 flex-shrink-0">
+        {/* RIGHT AI PANEL - Dark theme */}
+        <aside className="w-72 bg-[#12121a] border-l border-gray-800/50 flex-shrink-0">
           <AIInsightsPanel />
         </aside>
       </div>

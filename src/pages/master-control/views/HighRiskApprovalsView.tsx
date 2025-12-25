@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Table,
@@ -53,71 +53,81 @@ const HighRiskApprovalsView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-zinc-800">High Risk Approvals</h2>
-        <p className="text-sm text-zinc-500">Pending critical actions requiring Master Admin approval</p>
+        <h2 className="text-lg font-semibold text-white">High Risk Approvals</h2>
+        <p className="text-sm text-gray-500">Pending critical actions requiring Master Admin approval</p>
       </div>
 
       {/* Summary */}
-      <Card className="p-4 bg-white border-zinc-300">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-zinc-500">Pending Approvals</p>
-            <p className="text-2xl font-bold text-zinc-800">{pendingApprovals.length}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Pending Approvals</p>
+              <p className="text-2xl font-bold text-white">{pendingApprovals.length}</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-zinc-500">Critical</p>
-            <p className="text-2xl font-bold text-zinc-800">
-              {pendingApprovals.filter(a => a.risk === 'Critical').length}
-            </p>
+        </Card>
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+              <XCircle className="w-5 h-5 text-red-400" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Critical</p>
+              <p className="text-2xl font-bold text-red-400">
+                {pendingApprovals.filter(a => a.risk === 'Critical').length}
+              </p>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* Approvals Table */}
-      <Card className="bg-white border-zinc-300">
+      <Card className="bg-[#1a1a2e] border-gray-800/50 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-200">
-              <TableHead className="text-zinc-600">Request ID</TableHead>
-              <TableHead className="text-zinc-600">Requested By</TableHead>
-              <TableHead className="text-zinc-600">Action Type</TableHead>
-              <TableHead className="text-zinc-600">Risk Level</TableHead>
-              <TableHead className="text-zinc-600">Requested Time</TableHead>
-              <TableHead className="text-zinc-600">Actions</TableHead>
+            <TableRow className="border-gray-800/50 hover:bg-transparent">
+              <TableHead className="text-gray-500">Request ID</TableHead>
+              <TableHead className="text-gray-500">Requested By</TableHead>
+              <TableHead className="text-gray-500">Action Type</TableHead>
+              <TableHead className="text-gray-500">Risk Level</TableHead>
+              <TableHead className="text-gray-500">Requested Time</TableHead>
+              <TableHead className="text-gray-500">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pendingApprovals.map((approval) => (
-              <TableRow key={approval.id} className="border-zinc-200">
-                <TableCell className="font-mono text-zinc-800">{approval.id}</TableCell>
-                <TableCell className="text-zinc-700">{approval.requestedBy}</TableCell>
-                <TableCell className="text-zinc-700">{approval.action}</TableCell>
+              <TableRow key={approval.id} className="border-gray-800/30 hover:bg-gray-800/30">
+                <TableCell className="font-mono text-white">{approval.id}</TableCell>
+                <TableCell className="text-gray-400">{approval.requestedBy}</TableCell>
+                <TableCell className="text-gray-400">{approval.action}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     approval.risk === 'Critical' 
-                      ? 'bg-zinc-800 text-white'
-                      : 'bg-zinc-300 text-zinc-700'
+                      ? 'bg-red-500/15 text-red-400'
+                      : 'bg-amber-500/15 text-amber-400'
                   }`}>
                     {approval.risk}
                   </span>
                 </TableCell>
-                <TableCell className="text-zinc-700">{approval.time}</TableCell>
+                <TableCell className="text-gray-400">{approval.time}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
-                      variant="outline"
                       onClick={() => handleApprove(approval.id)}
-                      className="border-zinc-300 h-8"
+                      className="h-7 bg-green-500/15 text-green-400 hover:bg-green-500/25 border border-green-500/30"
                     >
                       <CheckCircle className="w-3 h-3 mr-1" />
                       Approve
                     </Button>
                     <Button 
                       size="sm" 
-                      variant="outline"
                       onClick={() => setRejectDialog(approval.id)}
-                      className="border-zinc-300 h-8"
+                      className="h-7 bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/30"
                     >
                       <XCircle className="w-3 h-3 mr-1" />
                       Reject
@@ -132,26 +142,26 @@ const HighRiskApprovalsView = () => {
 
       {/* Reject Dialog */}
       <Dialog open={!!rejectDialog} onOpenChange={() => setRejectDialog(null)}>
-        <DialogContent className="bg-white border-zinc-300">
+        <DialogContent className="bg-[#12121a] border-gray-800">
           <DialogHeader>
-            <DialogTitle className="text-zinc-800">Reject Request</DialogTitle>
+            <DialogTitle className="text-white">Reject Request</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-zinc-600">Rejection Reason (Required)</Label>
+              <Label className="text-gray-400">Rejection Reason (Required)</Label>
               <Textarea 
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Provide a reason for rejection..."
-                className="mt-2 bg-zinc-50 border-zinc-300"
+                className="mt-2 bg-gray-800/50 border-gray-700 text-white"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectDialog(null)} className="border-zinc-300">
+            <Button variant="outline" onClick={() => setRejectDialog(null)} className="border-gray-700 text-gray-300 hover:bg-gray-800 bg-transparent">
               Cancel
             </Button>
-            <Button onClick={handleReject} className="bg-zinc-800 text-white">
+            <Button onClick={handleReject} className="bg-red-500 text-white hover:bg-red-600">
               Confirm Rejection
             </Button>
           </DialogFooter>

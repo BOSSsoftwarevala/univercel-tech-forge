@@ -64,82 +64,90 @@ const SuperAdminsView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-zinc-800">Super Admins</h2>
-        <p className="text-sm text-zinc-500">Monitor all continent-level administrators</p>
+        <h2 className="text-lg font-semibold text-white">Super Admins</h2>
+        <p className="text-sm text-gray-500">Monitor all continent-level administrators</p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card className="p-4 bg-white border-zinc-300">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
           <div className="flex items-center gap-3">
-            <User className="w-5 h-5 text-zinc-500" />
+            <div className="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center">
+              <User className="w-5 h-5 text-gray-400" />
+            </div>
             <div>
-              <p className="text-xs text-zinc-500">Total Super Admins</p>
-              <p className="text-xl font-bold text-zinc-800">6</p>
+              <p className="text-xs text-gray-500">Total Super Admins</p>
+              <p className="text-xl font-bold text-white">6</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-white border-zinc-300">
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
           <div className="flex items-center gap-3">
-            <Activity className="w-5 h-5 text-zinc-500" />
+            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-green-400" />
+            </div>
             <div>
-              <p className="text-xs text-zinc-500">Currently Active</p>
-              <p className="text-xl font-bold text-zinc-800">4</p>
+              <p className="text-xs text-gray-500">Currently Active</p>
+              <p className="text-xl font-bold text-green-400">4</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-white border-zinc-300">
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
           <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5 text-zinc-500" />
+            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-amber-400" />
+            </div>
             <div>
-              <p className="text-xs text-zinc-500">Idle</p>
-              <p className="text-xl font-bold text-zinc-800">1</p>
+              <p className="text-xs text-gray-500">Idle</p>
+              <p className="text-xl font-bold text-amber-400">1</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-white border-zinc-300">
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
           <div className="flex items-center gap-3">
-            <Globe2 className="w-5 h-5 text-zinc-500" />
+            <div className="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center">
+              <Globe2 className="w-5 h-5 text-gray-500" />
+            </div>
             <div>
-              <p className="text-xs text-zinc-500">Offline</p>
-              <p className="text-xl font-bold text-zinc-800">1</p>
+              <p className="text-xs text-gray-500">Offline</p>
+              <p className="text-xl font-bold text-gray-400">1</p>
             </div>
           </div>
         </Card>
       </div>
 
       {/* Super Admins Table */}
-      <Card className="bg-white border-zinc-300">
+      <Card className="bg-[#1a1a2e] border-gray-800/50 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-200">
-              <TableHead className="text-zinc-600">Name</TableHead>
-              <TableHead className="text-zinc-600">Continent</TableHead>
-              <TableHead className="text-zinc-600">Status</TableHead>
-              <TableHead className="text-zinc-600">Last Login</TableHead>
-              <TableHead className="text-zinc-600">Actions Today</TableHead>
-              <TableHead className="text-zinc-600">Countries</TableHead>
+            <TableRow className="border-gray-800/50 hover:bg-transparent">
+              <TableHead className="text-gray-500">Name</TableHead>
+              <TableHead className="text-gray-500">Continent</TableHead>
+              <TableHead className="text-gray-500">Status</TableHead>
+              <TableHead className="text-gray-500">Last Login</TableHead>
+              <TableHead className="text-gray-500">Actions Today</TableHead>
+              <TableHead className="text-gray-500">Countries</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {superAdmins.map((admin) => (
-              <TableRow key={admin.name} className="border-zinc-200">
-                <TableCell className="font-medium text-zinc-800">{admin.name}</TableCell>
-                <TableCell className="text-zinc-700">{admin.continent}</TableCell>
+              <TableRow key={admin.name} className="border-gray-800/30 hover:bg-gray-800/30">
+                <TableCell className="font-medium text-white">{admin.name}</TableCell>
+                <TableCell className="text-gray-400">{admin.continent}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     admin.status === 'Active' 
-                      ? 'bg-zinc-200 text-zinc-700'
+                      ? 'bg-green-500/15 text-green-400'
                       : admin.status === 'Idle'
-                      ? 'bg-zinc-300 text-zinc-600'
-                      : 'bg-zinc-800 text-white'
+                      ? 'bg-amber-500/15 text-amber-400'
+                      : 'bg-gray-500/15 text-gray-400'
                   }`}>
                     {admin.status}
                   </span>
                 </TableCell>
-                <TableCell className="text-zinc-700">{admin.lastLogin}</TableCell>
-                <TableCell className="text-zinc-700">{admin.actionsToday}</TableCell>
-                <TableCell className="text-zinc-700">{admin.countries}</TableCell>
+                <TableCell className="text-gray-400">{admin.lastLogin}</TableCell>
+                <TableCell className="text-gray-400">{admin.actionsToday}</TableCell>
+                <TableCell className="text-gray-400">{admin.countries}</TableCell>
               </TableRow>
             ))}
           </TableBody>

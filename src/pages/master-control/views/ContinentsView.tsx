@@ -42,69 +42,69 @@ const ContinentsView = () => {
             variant="outline" 
             size="sm"
             onClick={() => setSelectedContinent(null)}
-            className="border-zinc-300"
+            className="border-gray-700 bg-transparent text-gray-300 hover:bg-gray-800"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
           <div>
-            <h2 className="text-lg font-semibold text-zinc-800">{continent?.name}</h2>
-            <p className="text-sm text-zinc-500">Super Admin: {continent?.admin}</p>
+            <h2 className="text-lg font-semibold text-white">{continent?.name}</h2>
+            <p className="text-sm text-gray-500">Super Admin: {continent?.admin}</p>
           </div>
         </div>
 
         {/* Super Admin Activity */}
-        <Card className="p-4 bg-white border-zinc-300">
-          <h3 className="font-medium text-zinc-800 mb-4">Super Admin Activity</h3>
+        <Card className="p-4 bg-[#1a1a2e] border-gray-800/50">
+          <h3 className="font-medium text-white mb-4">Super Admin Activity</h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-zinc-500" />
+              <Clock className="w-5 h-5 text-gray-500" />
               <div>
-                <p className="text-xs text-zinc-500">Last Login</p>
-                <p className="text-sm font-medium text-zinc-800">2 hours ago</p>
+                <p className="text-xs text-gray-500">Last Login</p>
+                <p className="text-sm font-medium text-white">2 hours ago</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Activity className="w-5 h-5 text-zinc-500" />
+              <Activity className="w-5 h-5 text-green-400" />
               <div>
-                <p className="text-xs text-zinc-500">Current Status</p>
-                <p className="text-sm font-medium text-zinc-800">Active</p>
+                <p className="text-xs text-gray-500">Current Status</p>
+                <p className="text-sm font-medium text-green-400">Active</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <BarChart3 className="w-5 h-5 text-zinc-500" />
+              <BarChart3 className="w-5 h-5 text-gray-500" />
               <div>
-                <p className="text-xs text-zinc-500">Actions Today</p>
-                <p className="text-sm font-medium text-zinc-800">24</p>
+                <p className="text-xs text-gray-500">Actions Today</p>
+                <p className="text-sm font-medium text-white">24</p>
               </div>
             </div>
           </div>
         </Card>
 
         {/* Country Summary Table */}
-        <Card className="bg-white border-zinc-300">
-          <div className="p-4 border-b border-zinc-200">
-            <h3 className="font-medium text-zinc-800">Country Summary</h3>
-            <p className="text-xs text-zinc-500">Read-only view — no drill-down</p>
+        <Card className="bg-[#1a1a2e] border-gray-800/50">
+          <div className="p-4 border-b border-gray-800/50">
+            <h3 className="font-medium text-white">Country Summary</h3>
+            <p className="text-xs text-gray-500">Read-only view — no drill-down</p>
           </div>
           <Table>
             <TableHeader>
-              <TableRow className="border-zinc-200">
-                <TableHead className="text-zinc-600">Country</TableHead>
-                <TableHead className="text-zinc-600">Area Manager</TableHead>
-                <TableHead className="text-zinc-600">Revenue</TableHead>
-                <TableHead className="text-zinc-600">Issues</TableHead>
-                <TableHead className="text-zinc-600">Growth %</TableHead>
+              <TableRow className="border-gray-800/50 hover:bg-transparent">
+                <TableHead className="text-gray-500">Country</TableHead>
+                <TableHead className="text-gray-500">Area Manager</TableHead>
+                <TableHead className="text-gray-500">Revenue</TableHead>
+                <TableHead className="text-gray-500">Issues</TableHead>
+                <TableHead className="text-gray-500">Growth %</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {countryData.map((row) => (
-                <TableRow key={row.country} className="border-zinc-200">
-                  <TableCell className="font-medium text-zinc-800">{row.country}</TableCell>
-                  <TableCell className="text-zinc-700">{row.manager}</TableCell>
-                  <TableCell className="text-zinc-700">{row.revenue}</TableCell>
-                  <TableCell className="text-zinc-700">{row.issues}</TableCell>
-                  <TableCell className={row.growth.startsWith('+') ? 'text-zinc-800' : 'text-zinc-500'}>
+                <TableRow key={row.country} className="border-gray-800/30 hover:bg-gray-800/30">
+                  <TableCell className="font-medium text-white">{row.country}</TableCell>
+                  <TableCell className="text-gray-400">{row.manager}</TableCell>
+                  <TableCell className="text-gray-400">{row.revenue}</TableCell>
+                  <TableCell className="text-gray-400">{row.issues}</TableCell>
+                  <TableCell className={row.growth.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
                     {row.growth}
                   </TableCell>
                 </TableRow>
@@ -119,19 +119,19 @@ const ContinentsView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-zinc-800">Continents</h2>
-        <p className="text-sm text-zinc-500">Select a continent to view details</p>
+        <h2 className="text-lg font-semibold text-white">Continents</h2>
+        <p className="text-sm text-gray-500">Select a continent to view details</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {continents.map((continent) => (
           <Card 
             key={continent.id}
-            className="p-4 bg-white border-zinc-300 cursor-pointer hover:bg-zinc-50 transition-colors"
+            className="p-4 bg-[#1a1a2e] border-gray-800/50 cursor-pointer hover:bg-gray-800/50 hover:border-gray-700 transition-all duration-100"
             onClick={() => setSelectedContinent(continent.id)}
           >
-            <h3 className="font-medium text-zinc-800">{continent.name}</h3>
-            <p className="text-sm text-zinc-500 mt-1">Super Admin: {continent.admin}</p>
+            <h3 className="font-medium text-white">{continent.name}</h3>
+            <p className="text-sm text-gray-500 mt-1">Super Admin: {continent.admin}</p>
           </Card>
         ))}
       </div>
