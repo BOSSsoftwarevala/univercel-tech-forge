@@ -64,6 +64,7 @@ import MasterAuth from "./pages/MasterAuth";
 import MasterControlCenter from "./pages/master-control/MasterControlCenter";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
+import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 
 // Franchise Layout & Pages
 import FranchiseLayout from "./components/layouts/FranchiseLayout";
@@ -202,6 +203,10 @@ const App = () => (
               
               {/* Admin Utilities - Master and Super Admin */}
               <Route path="/admin/bulk-users" element={<RequireRole allowed={["master", "super_admin"]}><BulkUserCreation /></RequireRole>} />
+
+              {/* Area Manager Routes */}
+              <Route path="/area-manager" element={<RequireRole allowed={["master", "super_admin", "area_manager"]}><AreaManagerDashboard /></RequireRole>} />
+              <Route path="/area-manager/*" element={<RequireRole allowed={["master", "super_admin", "area_manager"]}><AreaManagerDashboard /></RequireRole>} />
 
               {/* Super Admin Routes - Super Admin and Master can access */}
               <Route path="/admin" element={<RequireRole allowed={["master", "super_admin"]}><SuperAdminCommandCenter /></RequireRole>} />

@@ -182,9 +182,9 @@ export const ROLE_CLAUSES: RoleClause[] = [
     ],
   },
   {
-    id: 'admin',
-    roleId: 'admin',
-    title: 'Admin / Server Manager Clauses',
+    id: 'area_manager',
+    roleId: 'area_manager' as AppRole,
+    title: 'Area Manager Clauses',
     version: '1.0.0',
     effectiveDate: '2024-01-01',
     clauses: [

@@ -71,7 +71,7 @@ export function useComplianceSystem() {
       .from('verification_records')
       .select('*')
       .eq('user_id', user.id)
-      .eq('role', role)
+      .eq('role', role as any)
       .maybeSingle();
     
     setIsLoading(false);
@@ -102,11 +102,11 @@ export function useComplianceSystem() {
       .from('role_clause_agreements')
       .upsert({
         user_id: user.id,
-        role,
+        role: role as any,
         clause_id: clauseId,
         clause_version: version,
         accepted_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,role,clause_version' });
+      } as any, { onConflict: 'user_id,role,clause_version' });
     
     if (agreementError) {
       console.error('Error accepting clauses:', agreementError);
@@ -120,7 +120,7 @@ export function useComplianceSystem() {
       .from('verification_records')
       .upsert({
         user_id: user.id,
-        role,
+        role: role as any,
         current_step: 'identity',
         step_statuses: {
           agreement: 'approved',
@@ -131,7 +131,7 @@ export function useComplianceSystem() {
         },
         agreement_accepted_at: new Date().toISOString(),
         agreement_version: version,
-      }, { onConflict: 'user_id,role' });
+      } as any, { onConflict: 'user_id,role' });
     
     setIsLoading(false);
     
@@ -178,7 +178,7 @@ export function useComplianceSystem() {
         liveness_photo_url: data.livenessPhotoUrl,
       })
       .eq('user_id', user.id)
-      .eq('role', role);
+      .eq('role', role as any);
     
     setIsLoading(false);
     
@@ -246,7 +246,7 @@ export function useComplianceSystem() {
     
     const { data, error } = await supabase.rpc('issue_penalty', {
       _user_id: targetUserId,
-      _user_role: targetRole,
+      _user_role: targetRole as any,
       _penalty_level: level,
       _reason: reason,
       _violation_type: violationType,
@@ -385,7 +385,7 @@ export function useComplianceSystem() {
       .from('verification_records')
       .select('is_activated')
       .eq('user_id', user.id)
-      .eq('role', role)
+      .eq('role', role as any)
       .maybeSingle();
     
     return data?.is_activated ?? false;

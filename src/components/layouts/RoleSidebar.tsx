@@ -28,7 +28,7 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 0 – OWNERSHIP
   master: [
     { icon: Shield, label: 'Super Admin', path: '/super-admin?cat=super-admin' },
-    { icon: Users, label: 'Admin', path: '/super-admin?cat=admin' },
+    { icon: MapPin, label: 'Area Manager', path: '/super-admin?cat=area-manager' },
     { icon: Monitor, label: 'Server Manager', path: '/super-admin?cat=server-manager' },
     { icon: Store, label: 'Franchise Manager', path: '/super-admin?cat=franchise-manager' },
     { icon: HeadphonesIcon, label: 'Sales & Support Manager', path: '/super-admin?cat=sales-support-manager' },
@@ -59,7 +59,7 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 1 – PLATFORM CONTROL
   super_admin: [
     { icon: Shield, label: 'Super Admin', path: '/super-admin?cat=super-admin' },
-    { icon: Users, label: 'Admin', path: '/super-admin?cat=admin' },
+    { icon: MapPin, label: 'Area Manager', path: '/super-admin?cat=area-manager' },
     { icon: Monitor, label: 'Server Manager', path: '/super-admin?cat=server-manager' },
     { icon: Store, label: 'Franchise Manager', path: '/super-admin?cat=franchise-manager' },
     { icon: HeadphonesIcon, label: 'Sales & Support Manager', path: '/super-admin?cat=sales-support-manager' },
@@ -87,11 +87,19 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
     { icon: Shield, label: 'Promise Management', path: '/super-admin?cat=promise-management' },
     { icon: LayoutDashboard, label: 'Dashboard Management', path: '/super-admin?cat=dashboard-management' },
   ],
-  admin: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
-    { icon: Users, label: 'User Manager', path: '/admin/users' },
-    { icon: Shield, label: 'Permissions', path: '/admin/permissions' },
-    { icon: Settings, label: 'Settings', path: '/admin/settings' },
+  area_manager: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/area-manager' },
+    { icon: Activity, label: 'Live Activity', path: '/area-manager/live' },
+    { icon: Users, label: 'User Oversight', path: '/area-manager/users' },
+    { icon: Store, label: 'Franchise Oversight', path: '/area-manager/franchise' },
+    { icon: Package, label: 'Reseller Oversight', path: '/area-manager/reseller' },
+    { icon: HeadphonesIcon, label: 'Sales & Support', path: '/area-manager/sales-support' },
+    { icon: Target, label: 'Leads Monitor', path: '/area-manager/leads' },
+    { icon: Wallet, label: 'Wallet Monitor', path: '/area-manager/wallet' },
+    { icon: BarChart3, label: 'Reports', path: '/area-manager/reports' },
+    { icon: Shield, label: 'Approvals', path: '/area-manager/approvals' },
+    { icon: Bell, label: 'Alerts', path: '/area-manager/alerts' },
+    { icon: FileText, label: 'Audit View', path: '/area-manager/audit' },
   ],
   // GRADE 2 – BUSINESS MANAGEMENT
   client_success: [
