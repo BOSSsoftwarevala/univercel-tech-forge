@@ -4,12 +4,12 @@
  * Strict data isolation - influencer can access only own data
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Share2, Megaphone, Link2, MousePointerClick, 
   Wallet, TrendingUp, Users, FolderOpen, HeadphonesIcon, Settings, 
-  LogOut, Bell, User, Shield, Clock, Activity, Eye, Heart,
+  LogOut, Bell, User, Shield, Clock, Activity, Eye,
   ExternalLink, CheckCircle, AlertCircle, Lock, ArrowUpRight,
   ArrowDownRight, Zap, Target, BarChart3, Globe
 } from 'lucide-react';
@@ -159,12 +159,12 @@ export default function InfluencerCommandCenter() {
   const [kycStatus, setKycStatus] = useState<'pending' | 'verified' | 'rejected'>('verified');
 
   // Simulate live clicks
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setLiveClicks(prev => prev + Math.floor(Math.random() * 3));
     }, 2000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const getPlatformIcon = (platform: string) => {
     const colors: Record<string, string> = {
