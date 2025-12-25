@@ -105,11 +105,11 @@ const UnifiedSecurityCenter = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-6">
+      <div className="min-h-screen bg-[#0a0a0f] text-foreground p-6">
         {/* Background Pattern */}
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.08),transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.05),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.08),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,hsl(var(--accent)/0.05),transparent_50%)]" />
         </div>
 
         <div className="relative max-w-[1600px] mx-auto space-y-6">
@@ -230,14 +230,14 @@ const UnifiedSecurityCenter = () => {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Login Protection Zone */}
-              <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-xl">
-                <CardHeader className="border-b border-slate-700/50 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Lock className="w-5 h-5 text-indigo-400" />
+              <Card className="bg-[#1a1a2e] border-gray-800/50 backdrop-blur-xl">
+                <CardHeader className="border-b border-gray-800/50 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg text-white">
+                    <Lock className="w-5 h-5 text-primary" />
                     Login Protection Zone
                     <Tooltip>
                       <TooltipTrigger>
-                        <AlertCircle className="w-4 h-4 text-slate-500 cursor-help" />
+                        <AlertCircle className="w-4 h-4 text-gray-500 cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent className="max-w-xs">
                         Industry standard — prevents account misuse and unauthorized access
@@ -247,22 +247,22 @@ const UnifiedSecurityCenter = () => {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="grid md:grid-cols-3 gap-4">
-                    {/* One Device Login */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    {/* One Device Login - Using consistent dark theme */}
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50">
                       <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                          <Smartphone className="w-5 h-5 text-indigo-400" />
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Smartphone className="w-5 h-5 text-primary" />
                         </div>
                         <Switch 
                           checked={oneDeviceLogin} 
                           onCheckedChange={setOneDeviceLogin}
-                          className="data-[state=checked]:bg-indigo-500"
+                          className="data-[state=checked]:bg-primary"
                         />
                       </div>
                       <h4 className="font-semibold text-white mb-1">One Device Login</h4>
-                      <p className="text-xs text-slate-400">Single device access only</p>
+                      <p className="text-xs text-gray-400">Single device access only</p>
                       <div className={`mt-3 text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${
-                        oneDeviceLogin ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-400'
+                        oneDeviceLogin ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-500/10 text-gray-400'
                       }`}>
                         {oneDeviceLogin ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                         {oneDeviceLogin ? 'Enforced' : 'Disabled'}
@@ -270,7 +270,7 @@ const UnifiedSecurityCenter = () => {
                     </div>
 
                     {/* One IP Allowed */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
                           <Wifi className="w-5 h-5 text-cyan-400" />
@@ -282,7 +282,7 @@ const UnifiedSecurityCenter = () => {
                         />
                       </div>
                       <h4 className="font-semibold text-white mb-1">One IP Allowed</h4>
-                      <p className="text-xs text-slate-400">IP: 103.xx.xx.45</p>
+                      <p className="text-xs text-gray-400">IP: 103.xx.xx.45</p>
                       <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
                         <DialogTrigger asChild>
                           <Button 
@@ -294,10 +294,10 @@ const UnifiedSecurityCenter = () => {
                             Request IP Change
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-slate-900 border-slate-700">
+                        <DialogContent className="bg-[#1a1a2e] border-gray-700">
                           <DialogHeader>
                             <DialogTitle className="text-white">IP Change Verification</DialogTitle>
-                            <DialogDescription className="text-slate-400">
+                            <DialogDescription className="text-gray-400">
                               Enter OTP sent to your registered number
                             </DialogDescription>
                           </DialogHeader>
@@ -306,17 +306,17 @@ const UnifiedSecurityCenter = () => {
                               placeholder="Enter 6-digit OTP" 
                               value={otp}
                               onChange={(e) => setOtp(e.target.value)}
-                              className="bg-slate-800 border-slate-700 text-center text-lg tracking-widest"
+                              className="bg-gray-800 border-gray-700 text-center text-lg tracking-widest"
                               maxLength={6}
                             />
-                            <Button className="w-full bg-cyan-500 hover:bg-cyan-600">Verify & Change IP</Button>
+                            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Verify & Change IP</Button>
                           </div>
                         </DialogContent>
                       </Dialog>
                     </div>
 
                     {/* MFA */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <Fingerprint className="w-5 h-5 text-purple-400" />
@@ -328,9 +328,9 @@ const UnifiedSecurityCenter = () => {
                         />
                       </div>
                       <h4 className="font-semibold text-white mb-1">Multi-Factor Auth</h4>
-                      <p className="text-xs text-slate-400">OTP + ID Verification</p>
+                      <p className="text-xs text-gray-400">OTP + ID Verification</p>
                       <div className={`mt-3 text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${
-                        mfaEnabled ? 'bg-purple-500/10 text-purple-400' : 'bg-slate-500/10 text-slate-400'
+                        mfaEnabled ? 'bg-purple-500/10 text-purple-400' : 'bg-gray-500/10 text-gray-400'
                       }`}>
                         {mfaEnabled ? <ShieldCheck className="w-3 h-3" /> : <X className="w-3 h-3" />}
                         {mfaEnabled ? '2FA Active' : 'Disabled'}
@@ -341,9 +341,9 @@ const UnifiedSecurityCenter = () => {
               </Card>
 
               {/* Identity Verification */}
-              <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-xl">
-                <CardHeader className="border-b border-slate-700/50 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
+              <Card className="bg-[#1a1a2e] border-gray-800/50 backdrop-blur-xl">
+                <CardHeader className="border-b border-gray-800/50 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg text-white">
                     <UserCheck className="w-5 h-5 text-emerald-400" />
                     Identity Verification
                   </CardTitle>
@@ -351,28 +351,28 @@ const UnifiedSecurityCenter = () => {
                 <CardContent className="p-6">
                   <div className="grid md:grid-cols-4 gap-4">
                     {/* ID Upload */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 border-dashed text-center">
-                      <div className="w-12 h-12 rounded-full bg-indigo-500/10 mx-auto flex items-center justify-center mb-3">
-                        <Upload className="w-5 h-5 text-indigo-400" />
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 border-dashed text-center">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-3">
+                        <Upload className="w-5 h-5 text-primary" />
                       </div>
                       <h4 className="font-medium text-white text-sm mb-1">ID Card</h4>
-                      <p className="text-xs text-slate-500 mb-3">Aadhaar/PAN/Passport</p>
+                      <p className="text-xs text-gray-500 mb-3">Aadhaar/PAN/Passport</p>
                       {isVerified ? (
                         <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
                           <Check className="w-3 h-3 mr-1" />Verified
                         </Badge>
                       ) : (
-                        <Button size="sm" variant="outline" className="text-xs border-indigo-500/30 text-indigo-400">Upload</Button>
+                        <Button size="sm" variant="outline" className="text-xs border-primary/30 text-primary">Upload</Button>
                       )}
                     </div>
 
                     {/* Face Scan */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 text-center">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-center">
                       <div className="w-12 h-12 rounded-full bg-purple-500/10 mx-auto flex items-center justify-center mb-3">
                         <Scan className="w-5 h-5 text-purple-400" />
                       </div>
                       <h4 className="font-medium text-white text-sm mb-1">Face Scan</h4>
-                      <p className="text-xs text-slate-500 mb-3">Live match</p>
+                      <p className="text-xs text-gray-500 mb-3">Live match</p>
                       {isVerified ? (
                         <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
                           <Check className="w-3 h-3 mr-1" />Matched
@@ -385,7 +385,7 @@ const UnifiedSecurityCenter = () => {
                     </div>
 
                     {/* AI Result */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 text-center">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-center">
                       <div className={`w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-3 ${
                         isVerified ? 'bg-emerald-500/10' : 'bg-amber-500/10'
                       }`}>
@@ -396,7 +396,7 @@ const UnifiedSecurityCenter = () => {
                         )}
                       </div>
                       <h4 className="font-medium text-white text-sm mb-1">AI Verification</h4>
-                      <p className="text-xs text-slate-500 mb-3">Auto check</p>
+                      <p className="text-xs text-gray-500 mb-3">Auto check</p>
                       <Badge className={isVerified ? 
                         'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 
                         'bg-amber-500/20 text-amber-400 border-amber-500/30'
@@ -406,12 +406,12 @@ const UnifiedSecurityCenter = () => {
                     </div>
 
                     {/* Master Key */}
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 text-center">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-center">
                       <div className="w-12 h-12 rounded-full bg-amber-500/10 mx-auto flex items-center justify-center mb-3">
                         <Key className="w-5 h-5 text-amber-400" />
                       </div>
                       <h4 className="font-medium text-white text-sm mb-1">Master Key</h4>
-                      <p className="text-xs text-slate-500 mb-3">First login only</p>
+                      <p className="text-xs text-gray-500 mb-3">First login only</p>
                       <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
                         <Lock className="w-3 h-3 mr-1" />Converted
                       </Badge>
@@ -421,9 +421,9 @@ const UnifiedSecurityCenter = () => {
               </Card>
 
               {/* Masking Layer */}
-              <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-xl">
-                <CardHeader className="border-b border-slate-700/50 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
+              <Card className="bg-[#1a1a2e] border-gray-800/50 backdrop-blur-xl">
+                <CardHeader className="border-b border-gray-800/50 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg text-white">
                     <EyeOff className="w-5 h-5 text-purple-400" />
                     Masking Layer
                     <Badge variant="outline" className="ml-2 text-xs border-purple-500/30 text-purple-400">All Roles</Badge>
@@ -431,7 +431,7 @@ const UnifiedSecurityCenter = () => {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="grid md:grid-cols-2 gap-4 mb-4">
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
@@ -439,13 +439,13 @@ const UnifiedSecurityCenter = () => {
                           </div>
                           <div>
                             <h4 className="font-semibold text-white">Phone Masking</h4>
-                            <p className="text-xs text-slate-400">{phoneMasking ? '+91 XXXXX XX890' : '+91 98765 43890'}</p>
+                            <p className="text-xs text-gray-400">{phoneMasking ? '+91 XXXXX XX890' : '+91 98765 43890'}</p>
                           </div>
                         </div>
                         <Switch checked={phoneMasking} onCheckedChange={setPhoneMasking} className="data-[state=checked]:bg-purple-500" />
                       </div>
                     </div>
-                    <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
@@ -453,7 +453,7 @@ const UnifiedSecurityCenter = () => {
                           </div>
                           <div>
                             <h4 className="font-semibold text-white">Email Masking</h4>
-                            <p className="text-xs text-slate-400">{emailMasking ? 'j***@email.com' : 'john@email.com'}</p>
+                            <p className="text-xs text-gray-400">{emailMasking ? 'j***@email.com' : 'john@email.com'}</p>
                           </div>
                         </div>
                         <Switch checked={emailMasking} onCheckedChange={setEmailMasking} className="data-[state=checked]:bg-cyan-500" />
@@ -462,9 +462,9 @@ const UnifiedSecurityCenter = () => {
                   </div>
                   <Tooltip>
                     <TooltipTrigger className="w-full">
-                      <div className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20">
-                        <p className="text-xs text-slate-400 flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-indigo-400" />
+                      <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                        <p className="text-xs text-gray-400 flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-primary" />
                           Avoid direct private sharing to protect business. Secure relay for all communications.
                         </p>
                       </div>
@@ -475,9 +475,9 @@ const UnifiedSecurityCenter = () => {
               </Card>
 
               {/* Geo-Restriction Map */}
-              <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-xl">
-                <CardHeader className="border-b border-slate-700/50 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
+              <Card className="bg-[#1a1a2e] border-gray-800/50 backdrop-blur-xl">
+                <CardHeader className="border-b border-gray-800/50 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg text-white">
                     <Globe className="w-5 h-5 text-cyan-400" />
                     Geo-Restriction Map Panel
                   </CardTitle>
@@ -485,7 +485,7 @@ const UnifiedSecurityCenter = () => {
                 <CardContent className="p-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-slate-300">Allowed Territories</h4>
+                      <h4 className="text-sm font-medium text-gray-300">Allowed Territories</h4>
                       <div className="space-y-2">
                         <div className={`p-3 rounded-lg border flex items-center gap-3 ${getRoleColor('franchise')}`}>
                           <Building2 className="w-4 h-4" />
