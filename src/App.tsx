@@ -119,6 +119,7 @@ import ApplyPortal from "./pages/ApplyPortal";
 import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
 import DomainProtection from "./components/security/DomainProtection";
+import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
 import DemoCredentials from "./pages/DemoCredentials";
@@ -142,17 +143,18 @@ const App = () => (
         <AnimationProvider>
           <TooltipProvider>
             <DomainProtection>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <SecurityProvider>
-                  <NotificationProvider>
-                    <TranslationProvider>
-                      <GlobalRealtimeProvider>
-                        <SystemNotificationsInitializer />
-                        <GlobalOfferPopup />
-                        <FloatingAIChatbotWrapper />
-                        <Routes>
+              <SourceCodeProtection enabled={!import.meta.env.DEV}>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <SecurityProvider>
+                    <NotificationProvider>
+                      <TranslationProvider>
+                        <GlobalRealtimeProvider>
+                          <SystemNotificationsInitializer />
+                          <GlobalOfferPopup />
+                          <FloatingAIChatbotWrapper />
+                          <Routes>
                           {/* Public Routes - No login required */}
               <Route path="/" element={<Homepage />} />
               <Route path="/demos" element={<SimpleDemoList />} />
@@ -337,11 +339,12 @@ const App = () => (
                           {/* Catch-all */}
                           <Route path="*" element={<NotFound />} />
                         </Routes>
-                      </GlobalRealtimeProvider>
-                    </TranslationProvider>
-                  </NotificationProvider>
-                </SecurityProvider>
-              </BrowserRouter>
+                        </GlobalRealtimeProvider>
+                      </TranslationProvider>
+                    </NotificationProvider>
+                  </SecurityProvider>
+                </BrowserRouter>
+              </SourceCodeProtection>
             </DomainProtection>
           </TooltipProvider>
         </AnimationProvider>
