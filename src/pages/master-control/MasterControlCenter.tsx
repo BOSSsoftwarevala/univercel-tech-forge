@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import MasterThroneIcon from '@/components/icons/MasterThroneIcon';
 
 // Views
 import OverviewView from './views/OverviewView';
@@ -88,11 +89,12 @@ const MasterControlCenter = () => {
       {/* TOP HEADER */}
       <header className="h-14 bg-white border-b border-zinc-300 flex items-center justify-between px-6 flex-shrink-0">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-zinc-800 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SV</span>
+          <div className="flex items-center gap-3">
+            <MasterThroneIcon size="md" showTooltip />
+            <div>
+              <span className="font-semibold text-zinc-800">Master Admin Control Center</span>
+              <span className="text-xs text-zinc-500 ml-2">Supreme Control</span>
             </div>
-            <span className="font-semibold text-zinc-800">Master Admin Control Center</span>
           </div>
         </div>
 
