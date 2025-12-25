@@ -61,6 +61,7 @@ import ComplianceCenter from "./pages/super-admin/ComplianceCenter";
 
 // Master Admin Pages
 import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
+import MasterAuth from "./pages/MasterAuth";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 
@@ -191,6 +192,9 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/account-suspension" element={<AccountSuspension />} />
               <Route path="/access-denied" element={<AccessDenied />} />
+
+              {/* Hidden Master Auth - Secret Route */}
+              <Route path="/sv-master-control" element={<MasterAuth />} />
 
               {/* Master Admin Routes - MASTER ONLY */}
               <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminDashboard /></RequireRole>} />
