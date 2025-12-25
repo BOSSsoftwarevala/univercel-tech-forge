@@ -395,29 +395,35 @@ const RoleSidebar = ({ role, collapsed = false, onToggle }: RoleSidebarProps) =>
                 key={index}
                 to={item.path}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                  "hover:bg-accent/50",
-                  isActive && "bg-primary/10 text-primary border-l-2 border-primary"
+                  "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group",
+                  "hover:bg-primary/10 hover:shadow-md hover:shadow-primary/10",
+                  isActive 
+                    ? "bg-gradient-to-r from-primary/20 to-primary/10 text-primary border-l-4 border-primary shadow-lg shadow-primary/20" 
+                    : "border-l-4 border-transparent"
                 )}
               >
-                <Icon className={cn(
-                  "h-5 w-5 shrink-0",
-                  isActive ? "text-primary" : "text-muted-foreground"
-                )} />
+                <div className={cn(
+                  "p-2 rounded-lg transition-all",
+                  isActive 
+                    ? "bg-primary/20 text-primary" 
+                    : "bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                )}>
+                  <Icon className="h-5 w-5" />
+                </div>
                 {!collapsed && (
                   <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className={cn(
-                      "text-sm font-medium truncate",
-                      isActive ? "text-primary" : "text-foreground"
+                      "text-sm font-semibold truncate",
+                      isActive ? "text-primary" : "text-foreground group-hover:text-primary"
                     )}
                   >
                     {item.label}
                   </motion.span>
                 )}
                 {!collapsed && item.badge && (
-                  <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                  <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                     {item.badge}
                   </span>
                 )}

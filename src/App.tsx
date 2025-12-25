@@ -143,7 +143,18 @@ import PromiseManagementDashboard from "./pages/promise-management/PromiseManage
 // Wireframe Routes
 import { WireframeRoutes } from "./components/wireframe/WireframeRoutes";
 
-const queryClient = new QueryClient();
+// Optimized QueryClient with caching for better performance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+      retry: 2,
+      refetchOnWindowFocus: false, // Reduce unnecessary refetches
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

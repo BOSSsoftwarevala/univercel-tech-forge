@@ -8,8 +8,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Volume2, VolumeX, Search, User, Settings, LogOut,
-  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu
+  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu, Download, Smartphone
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -53,12 +54,26 @@ const CommandHeader = memo(() => {
   const handlePromiseClick = () => {
     if (promiseState === 'idle') {
       setPromiseState('pending');
+      toast.success('Promise mode activated');
     } else if (promiseState === 'pending') {
       setPromiseState('active');
+      toast.success('Task is now active');
     } else {
       setPromiseState('idle');
+      toast.info('Promise mode deactivated');
     }
   };
+
+  const handleDownloadAPK = useCallback(() => {
+    toast.success('Downloading Software Vala Mobile App...', {
+      description: 'APK file will be downloaded shortly'
+    });
+    // Create a download link for the APK
+    const link = document.createElement('a');
+    link.href = '/software-vala-app.apk';
+    link.download = 'SoftwareVala-Mobile-v1.0.0.apk';
+    link.click();
+  }, []);
 
   const unacknowledgedCount = alerts.filter(a => !a.acknowledged).length;
   const roleConfig = userRole ? ROLE_CONFIG[userRole as AppRole] : null;
@@ -124,21 +139,33 @@ const CommandHeader = memo(() => {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* Download APK Button */}
+        <motion.button
+          whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(6, 182, 212, 0.4)' }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleDownloadAPK}
+          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-semibold text-sm shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition-all border border-cyan-400/30"
+        >
+          <Smartphone className="w-4 h-4" />
+          <span className="hidden md:inline">Download App</span>
+          <Download className="w-4 h-4" />
+        </motion.button>
+
         {/* Promise Button */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handlePromiseClick}
           className={cn(
-            "flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium text-sm transition-all",
+            "flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all shadow-md",
             promiseState === 'active'
-              ? 'bg-green-500/20 text-green-500 border border-green-500/50'
+              ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white border border-green-400/50 shadow-green-500/30'
               : promiseState === 'pending'
-              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/50 animate-pulse'
-              : 'bg-secondary/50 text-muted-foreground border border-border/50 hover:border-primary/50'
+              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border border-amber-400/50 animate-pulse shadow-amber-500/30'
+              : 'bg-secondary/80 text-foreground border border-border/50 hover:border-primary/50 hover:bg-secondary'
           )}
         >
-          <img src={promiseIcon} alt="Promise" className="w-6 h-6 rounded-full object-cover" />
+          <img src={promiseIcon} alt="Promise" className="w-6 h-6 rounded-full object-cover ring-2 ring-white/20" />
           <span className="hidden sm:inline">
             {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
           </span>
