@@ -2505,6 +2505,131 @@ export type Database = {
           },
         ]
       }
+      demo_daily_ids: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          daily_id: string
+          demo_id: string | null
+          generated_date: string
+          id: string
+          is_active: boolean | null
+          sequence_number: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          daily_id: string
+          demo_id?: string | null
+          generated_date?: string
+          id?: string
+          is_active?: boolean | null
+          sequence_number: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          daily_id?: string
+          demo_id?: string | null
+          generated_date?: string
+          id?: string
+          is_active?: boolean | null
+          sequence_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_daily_ids_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_deployments: {
+        Row: {
+          approved_domain: string
+          approved_ips: string[] | null
+          blocked_attempts: number | null
+          created_at: string
+          created_by: string | null
+          daily_demo_id: string
+          demo_id: string | null
+          deployment_status: string | null
+          encryption_key_ref: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          is_domain_locked: boolean | null
+          is_encrypted: boolean | null
+          is_obfuscated: boolean | null
+          last_verification_at: string | null
+          license_key: string
+          license_key_hash: string | null
+          order_id: string | null
+          verification_count: number | null
+        }
+        Insert: {
+          approved_domain: string
+          approved_ips?: string[] | null
+          blocked_attempts?: number | null
+          created_at?: string
+          created_by?: string | null
+          daily_demo_id: string
+          demo_id?: string | null
+          deployment_status?: string | null
+          encryption_key_ref?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_domain_locked?: boolean | null
+          is_encrypted?: boolean | null
+          is_obfuscated?: boolean | null
+          last_verification_at?: string | null
+          license_key: string
+          license_key_hash?: string | null
+          order_id?: string | null
+          verification_count?: number | null
+        }
+        Update: {
+          approved_domain?: string
+          approved_ips?: string[] | null
+          blocked_attempts?: number | null
+          created_at?: string
+          created_by?: string | null
+          daily_demo_id?: string
+          demo_id?: string | null
+          deployment_status?: string | null
+          encryption_key_ref?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_domain_locked?: boolean | null
+          is_encrypted?: boolean | null
+          is_obfuscated?: boolean | null
+          last_verification_at?: string | null
+          license_key?: string
+          license_key_hash?: string | null
+          order_id?: string | null
+          verification_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_deployments_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demo_deployments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "demo_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_documents: {
         Row: {
           created_at: string
@@ -2732,6 +2857,92 @@ export type Database = {
           },
         ]
       }
+      demo_orders: {
+        Row: {
+          auto_detected: boolean | null
+          client_domain: string | null
+          client_email: string | null
+          client_name: string | null
+          created_at: string
+          daily_demo_id: string
+          demo_id: string | null
+          deployed_at: string | null
+          deployed_by: string | null
+          id: string
+          is_live: boolean | null
+          is_promoted: boolean | null
+          is_verified: boolean | null
+          order_number: string
+          order_status: string | null
+          promoted_at: string | null
+          promoted_by: string | null
+          requirements: Json | null
+          software_package_id: string | null
+          status_flow: Json | null
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          auto_detected?: boolean | null
+          client_domain?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          daily_demo_id: string
+          demo_id?: string | null
+          deployed_at?: string | null
+          deployed_by?: string | null
+          id?: string
+          is_live?: boolean | null
+          is_promoted?: boolean | null
+          is_verified?: boolean | null
+          order_number: string
+          order_status?: string | null
+          promoted_at?: string | null
+          promoted_by?: string | null
+          requirements?: Json | null
+          software_package_id?: string | null
+          status_flow?: Json | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          auto_detected?: boolean | null
+          client_domain?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          daily_demo_id?: string
+          demo_id?: string | null
+          deployed_at?: string | null
+          deployed_by?: string | null
+          id?: string
+          is_live?: boolean | null
+          is_promoted?: boolean | null
+          is_verified?: boolean | null
+          order_number?: string
+          order_status?: string | null
+          promoted_at?: string | null
+          promoted_by?: string | null
+          requirements?: Json | null
+          software_package_id?: string | null
+          status_flow?: Json | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_orders_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_renewal_logs: {
         Row: {
           auto_renewed: boolean | null
@@ -2914,6 +3125,122 @@ export type Database = {
             columns: ["demo_id"]
             isOneToOne: false
             referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_security_locks: {
+        Row: {
+          block_reason: string | null
+          created_at: string
+          deployment_id: string | null
+          id: string
+          is_authorized: boolean | null
+          license_key: string | null
+          request_domain: string | null
+          request_ip: string | null
+          request_user_agent: string | null
+          was_auto_blocked: boolean | null
+        }
+        Insert: {
+          block_reason?: string | null
+          created_at?: string
+          deployment_id?: string | null
+          id?: string
+          is_authorized?: boolean | null
+          license_key?: string | null
+          request_domain?: string | null
+          request_ip?: string | null
+          request_user_agent?: string | null
+          was_auto_blocked?: boolean | null
+        }
+        Update: {
+          block_reason?: string | null
+          created_at?: string
+          deployment_id?: string | null
+          id?: string
+          is_authorized?: boolean | null
+          license_key?: string | null
+          request_domain?: string | null
+          request_ip?: string | null
+          request_user_agent?: string | null
+          was_auto_blocked?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_security_locks_deployment_id_fkey"
+            columns: ["deployment_id"]
+            isOneToOne: false
+            referencedRelation: "demo_deployments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_software_packages: {
+        Row: {
+          client_requirements: Json | null
+          created_at: string
+          demo_id: string | null
+          id: string
+          is_ready: boolean | null
+          is_tested: boolean | null
+          order_id: string | null
+          package_name: string | null
+          package_status: string | null
+          ready_at: string | null
+          source_demo_snapshot: Json | null
+          test_results: Json | null
+          tested_at: string | null
+          tested_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_requirements?: Json | null
+          created_at?: string
+          demo_id?: string | null
+          id?: string
+          is_ready?: boolean | null
+          is_tested?: boolean | null
+          order_id?: string | null
+          package_name?: string | null
+          package_status?: string | null
+          ready_at?: string | null
+          source_demo_snapshot?: Json | null
+          test_results?: Json | null
+          tested_at?: string | null
+          tested_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_requirements?: Json | null
+          created_at?: string
+          demo_id?: string | null
+          id?: string
+          is_ready?: boolean | null
+          is_tested?: boolean | null
+          order_id?: string | null
+          package_name?: string | null
+          package_status?: string | null
+          ready_at?: string | null
+          source_demo_snapshot?: Json | null
+          test_results?: Json | null
+          tested_at?: string | null
+          tested_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_software_packages_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demo_software_packages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "demo_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -13554,6 +13881,16 @@ export type Database = {
       check_force_logout: { Args: { check_user_id: string }; Returns: string }
       check_session_valid: { Args: { p_user_id: string }; Returns: Json }
       clear_force_logout: { Args: { clear_user_id: string }; Returns: boolean }
+      create_demo_order: {
+        Args: {
+          p_client_domain: string
+          p_client_email: string
+          p_client_name: string
+          p_demo_id: string
+          p_requirements?: Json
+        }
+        Returns: string
+      }
       create_demo_report_card: {
         Args: {
           _action_type: string
@@ -13597,6 +13934,8 @@ export type Database = {
         Returns: boolean
       }
       generate_backup_codes: { Args: { p_user_id: string }; Returns: string[] }
+      generate_daily_demo_id: { Args: { p_demo_id: string }; Returns: string }
+      generate_deployment_license: { Args: never; Returns: string }
       generate_otp: {
         Args: {
           p_action_data?: Json
@@ -13833,6 +14172,15 @@ export type Database = {
       verify_backup_code: {
         Args: { p_code: string; p_user_id: string }
         Returns: boolean
+      }
+      verify_deployment_request: {
+        Args: {
+          p_license_key: string
+          p_request_domain: string
+          p_request_ip: string
+          p_user_agent?: string
+        }
+        Returns: Json
       }
       verify_otp: {
         Args: { p_otp_code: string; p_otp_type: string; p_user_id: string }

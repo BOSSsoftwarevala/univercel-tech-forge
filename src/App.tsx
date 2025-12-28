@@ -132,6 +132,7 @@ import { SourceCodeProtection } from "./components/security/SourceCodeProtection
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
 import DemoCredentials from "./pages/DemoCredentials";
+import DemoOrderSystem from "./pages/demo-system/DemoOrderSystem";
 import SectorsBrowse from "./pages/SectorsBrowse";
 import SubCategoryDemos from "./pages/SubCategoryDemos";
 import { AIBillingDashboard } from "./components/ai-billing";
@@ -388,6 +389,7 @@ const App = () => (
               <Route path="/personal-chat" element={<RequireAuth><PersonalChat /></RequireAuth>} />
               <Route path="/ai-console" element={<RequireRole allowed={["ai_manager", "super_admin"]}><AIOptimizationConsole /></RequireRole>} />
               <Route path="/demo-credentials" element={<RequireRole allowed={["super_admin"]}><DemoCredentials /></RequireRole>} />
+              <Route path="/demo-order-system" element={<RequireRole allowed={["master", "super_admin", "demo_manager"]}><DemoOrderSystem /></RequireRole>} />
 
               {/* Wireframe Routes - Design Sandbox */}
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
