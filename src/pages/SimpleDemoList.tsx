@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, ArrowLeft, Search, Building2, ShoppingCart, GraduationCap, Heart, Utensils, Truck, Briefcase, Home, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Building2, ShoppingCart, GraduationCap, Heart, Utensils, Truck, Briefcase, Home, Loader2, ShoppingBag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useDemoTestMode } from '@/contexts/DemoTestModeContext';
+import EnhancedDemoCard from '@/components/demo/EnhancedDemoCard';
+import SuggestionForm from '@/components/demo/SuggestionForm';
+import { Badge } from '@/components/ui/badge';
 
 interface Demo {
   id: string;
@@ -18,6 +21,11 @@ const SimpleDemoList = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [demos, setDemos] = useState<Demo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cartCount, setCartCount] = useState(0);
+  
+  // Suggestion form state
+  const [showSuggestionForm, setShowSuggestionForm] = useState(false);
+  const [selectedDemo, setSelectedDemo] = useState<{ id: string; title: string } | null>(null);
   
   // Demo Test Mode - Check if we should skip restrictions
   const { isTestMode, shouldShowAnimation } = useDemoTestMode();
@@ -58,7 +66,29 @@ const SimpleDemoList = () => {
     };
 
     fetchDemos();
+    fetchCartCount();
   }, [isTestMode]);
+
+  const fetchCartCount = async () => {
+    const sessionId = localStorage.getItem('demo_session_id');
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let query = supabase.from('demo_cart').select('id', { count: 'exact' }).eq('is_active', true);
+    
+    if (user) {
+      query = query.eq('user_id', user.id);
+    } else if (sessionId) {
+      query = query.eq('session_id', sessionId);
+    }
+    
+    const { count } = await query;
+    setCartCount(count || 0);
+  };
+
+  const handleOpenSuggestions = (demo: { id: string; title: string }) => {
+    setSelectedDemo(demo);
+    setShowSuggestionForm(true);
+  };
 
   const filteredDemos = demos.filter(demo => {
     const matchesSearch = demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,12 +107,28 @@ const SimpleDemoList = () => {
               <ArrowLeft className="w-5 h-5" />
               <span className="text-sm font-medium">Back to Home</span>
             </Link>
-            {/* Hide login button in test mode - no login required */}
-            {!isTestMode && (
-              <Link to="/auth" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
-                Login
+            
+            <div className="flex items-center gap-4">
+              {/* Cart Button */}
+              <Link 
+                to="/user-dashboard" 
+                className="relative p-2 text-slate-400 hover:text-white transition-colors"
+              >
+                <ShoppingBag className="w-6 h-6" />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-cyan-500 text-white text-xs">
+                    {cartCount}
+                  </Badge>
+                )}
               </Link>
-            )}
+              
+              {/* Hide login button in test mode - no login required */}
+              {!isTestMode && (
+                <Link to="/auth" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
+                  Login
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -133,43 +179,23 @@ const SimpleDemoList = () => {
           </div>
         )}
 
-        {/* Demo Grid - Simple Cards, minimal animation in test mode */}
+        {/* Demo Grid - Enhanced Cards with all buttons */}
         {!loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredDemos.map((demo, index) => (
               <div
                 key={demo.id}
-                className={`bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all group ${
-                  shouldShowAnimation() ? 'animate-fade-in' : ''
-                }`}
+                className={shouldShowAnimation() ? 'animate-fade-in' : ''}
                 style={shouldShowAnimation() ? { animationDelay: `${index * 50}ms` } : undefined}
               >
-                {/* Demo Preview Image */}
-                <div className="aspect-video bg-slate-800 relative">
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-500/10 to-blue-600/10">
-                    <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                      <Play className="w-8 h-8 text-cyan-400" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Demo Info */}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-1">{demo.title}</h3>
-                  <p className="text-sm text-slate-400 mb-2">{demo.description || demo.category}</p>
-                  
-                  {/* Demo URL Preview */}
-                  <p className="text-xs text-cyan-400/70 truncate mb-4">{demo.url}</p>
-                  
-                  {/* Single CTA Button - Direct access, no popups */}
-                  <Link
-                    to={`/demo/${demo.id}`}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all"
-                  >
-                    <Play className="w-4 h-4" />
-                    View Live Demo
-                  </Link>
-                </div>
+                <EnhancedDemoCard
+                  id={demo.id}
+                  title={demo.title}
+                  description={demo.description || demo.category}
+                  category={demo.category}
+                  status={demo.status}
+                  onOpenSuggestions={handleOpenSuggestions}
+                />
               </div>
             ))}
           </div>
@@ -181,6 +207,17 @@ const SimpleDemoList = () => {
           </div>
         )}
       </main>
+
+      {/* Suggestion Form Modal */}
+      <SuggestionForm
+        isOpen={showSuggestionForm}
+        onClose={() => {
+          setShowSuggestionForm(false);
+          setSelectedDemo(null);
+          fetchCartCount(); // Refresh cart count after action
+        }}
+        demo={selectedDemo}
+      />
     </div>
   );
 };
