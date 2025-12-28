@@ -2410,6 +2410,44 @@ export type Database = {
           },
         ]
       }
+      demo_cart: {
+        Row: {
+          added_at: string
+          demo_id: string | null
+          id: string
+          is_active: boolean | null
+          quantity: number | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          added_at?: string
+          demo_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          quantity?: number | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          added_at?: string
+          demo_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          quantity?: number | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_cart_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_categories: {
         Row: {
           created_at: string
@@ -2724,6 +2762,38 @@ export type Database = {
           },
           {
             foreignKeyName: "demo_escalations_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_favorites: {
+        Row: {
+          added_at: string
+          demo_id: string | null
+          id: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          added_at?: string
+          demo_id?: string | null
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          added_at?: string
+          demo_id?: string | null
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_favorites_demo_id_fkey"
             columns: ["demo_id"]
             isOneToOne: false
             referencedRelation: "demos"
@@ -3176,6 +3246,62 @@ export type Database = {
           },
         ]
       }
+      demo_setup_tasks: {
+        Row: {
+          assigned_server: string | null
+          auto_created: boolean | null
+          completed_at: string | null
+          created_at: string
+          domain_name: string | null
+          error_message: string | null
+          id: string
+          progress_percentage: number | null
+          started_at: string | null
+          suggestion_id: string | null
+          task_description: string | null
+          task_status: string | null
+          task_type: string
+        }
+        Insert: {
+          assigned_server?: string | null
+          auto_created?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          domain_name?: string | null
+          error_message?: string | null
+          id?: string
+          progress_percentage?: number | null
+          started_at?: string | null
+          suggestion_id?: string | null
+          task_description?: string | null
+          task_status?: string | null
+          task_type: string
+        }
+        Update: {
+          assigned_server?: string | null
+          auto_created?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          domain_name?: string | null
+          error_message?: string | null
+          id?: string
+          progress_percentage?: number | null
+          started_at?: string | null
+          suggestion_id?: string | null
+          task_description?: string | null
+          task_status?: string | null
+          task_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_setup_tasks_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "demo_suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_software_packages: {
         Row: {
           client_requirements: Json | null
@@ -3241,6 +3367,111 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "demo_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_suggestions: {
+        Row: {
+          assigned_server: string | null
+          auto_processed: boolean | null
+          created_at: string
+          demo_id: string | null
+          demo_name: string | null
+          domain_connected: boolean | null
+          domain_connected_at: string | null
+          domain_name: string | null
+          estimated_completion: string | null
+          feature_requests: string | null
+          id: string
+          is_update_request: boolean | null
+          notes: string | null
+          parent_suggestion_id: string | null
+          required_modules: string[] | null
+          server_linked: boolean | null
+          server_linked_at: string | null
+          setup_completed: boolean | null
+          setup_completed_at: string | null
+          setup_started: boolean | null
+          setup_started_at: string | null
+          setup_status: string | null
+          submitted_at: string
+          task_id: string | null
+          updated_at: string
+          user_id: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          assigned_server?: string | null
+          auto_processed?: boolean | null
+          created_at?: string
+          demo_id?: string | null
+          demo_name?: string | null
+          domain_connected?: boolean | null
+          domain_connected_at?: string | null
+          domain_name?: string | null
+          estimated_completion?: string | null
+          feature_requests?: string | null
+          id?: string
+          is_update_request?: boolean | null
+          notes?: string | null
+          parent_suggestion_id?: string | null
+          required_modules?: string[] | null
+          server_linked?: boolean | null
+          server_linked_at?: string | null
+          setup_completed?: boolean | null
+          setup_completed_at?: string | null
+          setup_started?: boolean | null
+          setup_started_at?: string | null
+          setup_status?: string | null
+          submitted_at?: string
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          assigned_server?: string | null
+          auto_processed?: boolean | null
+          created_at?: string
+          demo_id?: string | null
+          demo_name?: string | null
+          domain_connected?: boolean | null
+          domain_connected_at?: string | null
+          domain_name?: string | null
+          estimated_completion?: string | null
+          feature_requests?: string | null
+          id?: string
+          is_update_request?: boolean | null
+          notes?: string | null
+          parent_suggestion_id?: string | null
+          required_modules?: string[] | null
+          server_linked?: boolean | null
+          server_linked_at?: string | null
+          setup_completed?: boolean | null
+          setup_completed_at?: string | null
+          setup_started?: boolean | null
+          setup_started_at?: string | null
+          setup_status?: string | null
+          submitted_at?: string
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          user_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_suggestions_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demo_suggestions_parent_suggestion_id_fkey"
+            columns: ["parent_suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "demo_suggestions"
             referencedColumns: ["id"]
           },
         ]
