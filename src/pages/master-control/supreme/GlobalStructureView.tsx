@@ -65,14 +65,14 @@ const GlobalStructureView = () => {
       .select('*')
       .limit(50);
 
-    const mapped = data?.map(sa => ({
+    const mapped: SuperAdmin[] = data?.map(sa => ({
       id: sa.id,
       user_id: sa.user_id,
-      name: `SA-${sa.user_id.slice(0, 6)}`,
-      continent: sa.assigned_continent || 'Global',
-      countries: sa.assigned_countries || [],
-      status: sa.status === 'active' ? 'active' as const : 'suspended' as const,
-      last_active: sa.last_active_at || new Date().toISOString()
+      name: sa.name || `SA-${sa.user_id.slice(0, 6)}`,
+      continent: sa.continent || 'Global',
+      countries: Array.from({ length: sa.countries_managed || 0 }, (_, i) => `Country ${i + 1}`),
+      status: sa.login_status === 'online' ? 'active' as const : 'suspended' as const,
+      last_active: sa.last_login_time || new Date().toISOString()
     })) || [];
 
     setSuperAdmins(mapped);
