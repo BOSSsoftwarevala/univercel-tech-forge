@@ -97,7 +97,7 @@ export function SafeAssistUser({ onClose }: SafeAssistUserProps) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm p-4 pt-24"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm p-4 pt-40"
     >
       {/* Guided Cursor Overlay */}
       <AnimatePresence>
