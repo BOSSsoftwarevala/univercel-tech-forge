@@ -4015,6 +4015,185 @@ export type Database = {
           },
         ]
       }
+      developer_past_projects: {
+        Row: {
+          created_at: string
+          demo_url: string | null
+          demo_video_url: string | null
+          duration_months: number | null
+          id: string
+          is_verified: boolean | null
+          project_description: string | null
+          project_name: string
+          project_url: string | null
+          registration_id: string
+          role_in_project: string | null
+          technologies_used: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          demo_url?: string | null
+          demo_video_url?: string | null
+          duration_months?: number | null
+          id?: string
+          is_verified?: boolean | null
+          project_description?: string | null
+          project_name: string
+          project_url?: string | null
+          registration_id: string
+          role_in_project?: string | null
+          technologies_used?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          demo_url?: string | null
+          demo_video_url?: string | null
+          duration_months?: number | null
+          id?: string
+          is_verified?: boolean | null
+          project_description?: string | null
+          project_name?: string
+          project_url?: string | null
+          registration_id?: string
+          role_in_project?: string | null
+          technologies_used?: string[] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_past_projects_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "developer_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      developer_registrations: {
+        Row: {
+          account_holder_name: string | null
+          account_number_masked: string | null
+          bank_details_verified: boolean | null
+          bank_name: string | null
+          country: string | null
+          created_at: string
+          databases: string[] | null
+          email: string
+          expertise_level: string | null
+          frameworks: string[] | null
+          full_name: string
+          id: string
+          ifsc_code: string | null
+          nda_accepted: boolean | null
+          nda_accepted_at: string | null
+          nda_document_url: string | null
+          phone: string | null
+          photo_id_uploaded_at: string | null
+          photo_id_url: string | null
+          photo_id_verified: boolean | null
+          primary_skills: string[] | null
+          programming_languages: string[] | null
+          rejection_reason: string | null
+          resume_uploaded_at: string | null
+          resume_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          rules_accepted: boolean | null
+          rules_accepted_at: string | null
+          secondary_skills: string[] | null
+          status: Database["public"]["Enums"]["developer_verification_status"]
+          submitted_at: string | null
+          timezone: string | null
+          tools: string[] | null
+          updated_at: string
+          user_id: string
+          verification_notes: string | null
+          years_of_experience: number | null
+        }
+        Insert: {
+          account_holder_name?: string | null
+          account_number_masked?: string | null
+          bank_details_verified?: boolean | null
+          bank_name?: string | null
+          country?: string | null
+          created_at?: string
+          databases?: string[] | null
+          email: string
+          expertise_level?: string | null
+          frameworks?: string[] | null
+          full_name: string
+          id?: string
+          ifsc_code?: string | null
+          nda_accepted?: boolean | null
+          nda_accepted_at?: string | null
+          nda_document_url?: string | null
+          phone?: string | null
+          photo_id_uploaded_at?: string | null
+          photo_id_url?: string | null
+          photo_id_verified?: boolean | null
+          primary_skills?: string[] | null
+          programming_languages?: string[] | null
+          rejection_reason?: string | null
+          resume_uploaded_at?: string | null
+          resume_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          rules_accepted?: boolean | null
+          rules_accepted_at?: string | null
+          secondary_skills?: string[] | null
+          status?: Database["public"]["Enums"]["developer_verification_status"]
+          submitted_at?: string | null
+          timezone?: string | null
+          tools?: string[] | null
+          updated_at?: string
+          user_id: string
+          verification_notes?: string | null
+          years_of_experience?: number | null
+        }
+        Update: {
+          account_holder_name?: string | null
+          account_number_masked?: string | null
+          bank_details_verified?: boolean | null
+          bank_name?: string | null
+          country?: string | null
+          created_at?: string
+          databases?: string[] | null
+          email?: string
+          expertise_level?: string | null
+          frameworks?: string[] | null
+          full_name?: string
+          id?: string
+          ifsc_code?: string | null
+          nda_accepted?: boolean | null
+          nda_accepted_at?: string | null
+          nda_document_url?: string | null
+          phone?: string | null
+          photo_id_uploaded_at?: string | null
+          photo_id_url?: string | null
+          photo_id_verified?: boolean | null
+          primary_skills?: string[] | null
+          programming_languages?: string[] | null
+          rejection_reason?: string | null
+          resume_uploaded_at?: string | null
+          resume_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          rules_accepted?: boolean | null
+          rules_accepted_at?: string | null
+          secondary_skills?: string[] | null
+          status?: Database["public"]["Enums"]["developer_verification_status"]
+          submitted_at?: string | null
+          timezone?: string | null
+          tools?: string[] | null
+          updated_at?: string
+          user_id?: string
+          verification_notes?: string | null
+          years_of_experience?: number | null
+        }
+        Relationships: []
+      }
       developer_skills: {
         Row: {
           created_at: string
@@ -14253,6 +14432,7 @@ export type Database = {
         Returns: boolean
       }
       is_demo_manager: { Args: { _user_id?: string }; Returns: boolean }
+      is_developer_verified: { Args: { p_user_id: string }; Returns: boolean }
       is_device_trusted: {
         Args: { p_fingerprint: string; p_user_id: string }
         Returns: boolean
@@ -14385,8 +14565,21 @@ export type Database = {
         Args: { p_action_type: string; p_user_id: string }
         Returns: boolean
       }
+      review_developer_registration: {
+        Args: {
+          p_action: string
+          p_notes?: string
+          p_registration_id: string
+          p_rejection_reason?: string
+        }
+        Returns: Json
+      }
       set_financial_mode: {
         Args: { p_admin_id: string; p_mode: string; p_reason: string }
+        Returns: Json
+      }
+      submit_developer_registration: {
+        Args: { p_registration_id: string }
         Returns: Json
       }
       update_online_status: {
@@ -14537,6 +14730,12 @@ export type Database = {
         | "angular"
         | "vue"
         | "other"
+      developer_verification_status:
+        | "submitted"
+        | "under_review"
+        | "verified"
+        | "rejected"
+        | "pending_documents"
       lead_industry:
         | "retail"
         | "healthcare"
@@ -14792,6 +14991,13 @@ export const Constants = {
         "angular",
         "vue",
         "other",
+      ],
+      developer_verification_status: [
+        "submitted",
+        "under_review",
+        "verified",
+        "rejected",
+        "pending_documents",
       ],
       lead_industry: [
         "retail",

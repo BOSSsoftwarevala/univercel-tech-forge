@@ -103,6 +103,7 @@ import ResellerDashboard from "./pages/ResellerDashboard";
 import ResellerPortal from "./pages/ResellerPortal";
 import DeveloperDashboard from "./pages/DeveloperDashboard";
 import DevCommandCenter from "./pages/DevCommandCenter";
+import DeveloperRegistration from "./pages/developer/DeveloperRegistration";
 import InfluencerDashboard from "./pages/InfluencerDashboard";
 import InfluencerManager from "./pages/InfluencerManager";
 import SupportDashboard from "./pages/SupportDashboard";
@@ -312,6 +313,8 @@ const App = () => (
               <Route path="/reseller-dashboard" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
 
               {/* Developer Routes */}
+              <Route path="/developer/register" element={<RequireAuth><DeveloperRegistration /></RequireAuth>} />
+              <Route path="/developer/registration" element={<RequireAuth><DeveloperRegistration /></RequireAuth>} />
               <Route path="/developer" element={<RequireRole allowed={["developer", "super_admin"]}><DevCommandCenter /></RequireRole>} />
               <Route path="/developer/dashboard" element={<RequireRole allowed={["developer", "super_admin"]}><DevCommandCenter /></RequireRole>} />
               <Route path="/developer-dashboard" element={<RequireRole allowed={["developer", "super_admin"]}><DevCommandCenter /></RequireRole>} />
