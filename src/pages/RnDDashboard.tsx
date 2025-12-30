@@ -96,10 +96,10 @@ const RnDDashboard = () => {
               <stop offset="100%" stopColor="#06b6d4" />
             </linearGradient>
           </defs>
-      </svg>
-    </div>
+        </svg>
+      </div>
 
-    <RnDSidebar />
+      <RnDSidebar />
     
       <main className="flex-1 flex flex-col relative z-10">
         <RnDTopBar activeTab={activeTab} onTabChange={setActiveTab} />
