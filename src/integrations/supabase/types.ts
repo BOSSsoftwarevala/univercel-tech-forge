@@ -9221,6 +9221,68 @@ export type Database = {
           },
         ]
       }
+      promise_audit_logs: {
+        Row: {
+          action_by: string
+          action_by_role: string
+          action_type: string
+          id: string
+          ip_address: string | null
+          is_system_action: boolean | null
+          new_data: Json | null
+          new_status: string | null
+          previous_data: Json | null
+          previous_status: string | null
+          promise_id: string
+          reason: string | null
+          server_timestamp: string
+          signature: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_by: string
+          action_by_role: string
+          action_type: string
+          id?: string
+          ip_address?: string | null
+          is_system_action?: boolean | null
+          new_data?: Json | null
+          new_status?: string | null
+          previous_data?: Json | null
+          previous_status?: string | null
+          promise_id: string
+          reason?: string | null
+          server_timestamp?: string
+          signature?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_by?: string
+          action_by_role?: string
+          action_type?: string
+          id?: string
+          ip_address?: string | null
+          is_system_action?: boolean | null
+          new_data?: Json | null
+          new_status?: string | null
+          previous_data?: Json | null
+          previous_status?: string | null
+          promise_id?: string
+          reason?: string | null
+          server_timestamp?: string
+          signature?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promise_audit_logs_promise_id_fkey"
+            columns: ["promise_id"]
+            isOneToOne: false
+            referencedRelation: "promise_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promise_escalation_logs: {
         Row: {
           auto_triggered: boolean | null
@@ -9330,6 +9392,8 @@ export type Database = {
           approval_required: boolean | null
           approved_at: string | null
           approved_by: string | null
+          assigned_role: string | null
+          auto_escalation_enabled: boolean | null
           breach_reason: string | null
           confirmed_at: string | null
           confirmed_by_developer: boolean | null
@@ -9342,12 +9406,17 @@ export type Database = {
           extended_by: string | null
           extended_count: number | null
           extended_deadline: string | null
+          final_audit_log_id: string | null
           fine_amount: number | null
           finished_time: string | null
+          fulfillment_verified_at: string | null
+          fulfillment_verified_by: string | null
           id: string
           is_locked: boolean | null
+          last_status_change_at: string | null
           linked_demo_id: string | null
           linked_order_id: string | null
+          linked_task_verified: boolean | null
           on_time_bonus: boolean | null
           penalty_amount: number | null
           priority: string | null
@@ -9356,9 +9425,11 @@ export type Database = {
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
+          responsible_user_id: string | null
           reward_amount: number | null
           score_effect: number | null
           status: Database["public"]["Enums"]["promise_status"]
+          status_change_count: number | null
           task_id: string
           updated_at: string
         }
@@ -9367,6 +9438,8 @@ export type Database = {
           approval_required?: boolean | null
           approved_at?: string | null
           approved_by?: string | null
+          assigned_role?: string | null
+          auto_escalation_enabled?: boolean | null
           breach_reason?: string | null
           confirmed_at?: string | null
           confirmed_by_developer?: boolean | null
@@ -9379,12 +9452,17 @@ export type Database = {
           extended_by?: string | null
           extended_count?: number | null
           extended_deadline?: string | null
+          final_audit_log_id?: string | null
           fine_amount?: number | null
           finished_time?: string | null
+          fulfillment_verified_at?: string | null
+          fulfillment_verified_by?: string | null
           id?: string
           is_locked?: boolean | null
+          last_status_change_at?: string | null
           linked_demo_id?: string | null
           linked_order_id?: string | null
+          linked_task_verified?: boolean | null
           on_time_bonus?: boolean | null
           penalty_amount?: number | null
           priority?: string | null
@@ -9393,9 +9471,11 @@ export type Database = {
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
+          responsible_user_id?: string | null
           reward_amount?: number | null
           score_effect?: number | null
           status?: Database["public"]["Enums"]["promise_status"]
+          status_change_count?: number | null
           task_id: string
           updated_at?: string
         }
@@ -9404,6 +9484,8 @@ export type Database = {
           approval_required?: boolean | null
           approved_at?: string | null
           approved_by?: string | null
+          assigned_role?: string | null
+          auto_escalation_enabled?: boolean | null
           breach_reason?: string | null
           confirmed_at?: string | null
           confirmed_by_developer?: boolean | null
@@ -9416,12 +9498,17 @@ export type Database = {
           extended_by?: string | null
           extended_count?: number | null
           extended_deadline?: string | null
+          final_audit_log_id?: string | null
           fine_amount?: number | null
           finished_time?: string | null
+          fulfillment_verified_at?: string | null
+          fulfillment_verified_by?: string | null
           id?: string
           is_locked?: boolean | null
+          last_status_change_at?: string | null
           linked_demo_id?: string | null
           linked_order_id?: string | null
+          linked_task_verified?: boolean | null
           on_time_bonus?: boolean | null
           penalty_amount?: number | null
           priority?: string | null
@@ -9430,9 +9517,11 @@ export type Database = {
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
+          responsible_user_id?: string | null
           reward_amount?: number | null
           score_effect?: number | null
           status?: Database["public"]["Enums"]["promise_status"]
+          status_change_count?: number | null
           task_id?: string
           updated_at?: string
         }
@@ -14238,6 +14327,19 @@ export type Database = {
       }
     }
     Views: {
+      promise_manager_metrics: {
+        Row: {
+          active_escalations: number | null
+          breached: number | null
+          fulfilled: number | null
+          fulfillment_rate: number | null
+          overdue: number | null
+          pending_approval: number | null
+          total_active: number | null
+          total_promises: number | null
+        }
+        Relationships: []
+      }
       user_compliance_status: {
         Row: {
           active_penalties: number | null
@@ -14258,6 +14360,10 @@ export type Database = {
         Returns: Json
       }
       approve_promise: {
+        Args: { p_approver_id: string; p_promise_id: string }
+        Returns: Json
+      }
+      approve_promise_strict: {
         Args: { p_approver_id: string; p_promise_id: string }
         Returns: Json
       }
@@ -14347,9 +14453,25 @@ export type Database = {
         }
         Returns: string
       }
+      create_promise_with_validation: {
+        Args: {
+          p_assigned_role: string
+          p_deadline: string
+          p_developer_id: string
+          p_priority: string
+          p_promise_type: string
+          p_responsible_user_id?: string
+          p_task_id: string
+        }
+        Returns: Json
+      }
       create_remote_assist_session: { Args: never; Returns: Json }
       end_remote_assist_session: {
         Args: { p_reason?: string; p_session_id: string }
+        Returns: Json
+      }
+      escalate_overdue_promise: {
+        Args: { p_promise_id: string }
         Returns: Json
       }
       escalate_overdue_promises: { Args: never; Returns: number }
@@ -14372,6 +14494,14 @@ export type Database = {
       force_logout_user: {
         Args: { admin_user_id: string; target_user_id: string }
         Returns: boolean
+      }
+      fulfill_promise_strict: {
+        Args: {
+          p_force_close?: boolean
+          p_fulfiller_id: string
+          p_promise_id: string
+        }
+        Returns: Json
       }
       generate_backup_codes: { Args: { p_user_id: string }; Returns: string[] }
       generate_daily_demo_id: { Args: { p_demo_id: string }; Returns: string }
@@ -14543,6 +14673,10 @@ export type Database = {
         Args: { p_promise_id: string; p_reason?: string; p_rejector_id: string }
         Returns: Json
       }
+      reject_promise_strict: {
+        Args: { p_promise_id: string; p_reason: string; p_rejector_id: string }
+        Returns: Json
+      }
       reject_user: {
         Args: {
           _reason?: string
@@ -14622,6 +14756,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      validate_promise_integrity: {
+        Args: { p_promise_id: string }
+        Returns: Json
       }
       verify_backup_code: {
         Args: { p_code: string; p_user_id: string }

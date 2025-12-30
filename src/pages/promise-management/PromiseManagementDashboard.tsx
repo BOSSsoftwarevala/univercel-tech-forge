@@ -1,14 +1,16 @@
 /**
  * Promise Management Dashboard
- * Role 28 - Full promise lifecycle management
+ * ZERO-LOOPHOLE Promise Control System
+ * Role: Promise Management (Control Role) - READ-ONLY Control, No Execution
  */
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, ListTodo, Users, Shield, BarChart3, Settings,
-  CheckCircle, Clock, AlertTriangle, XCircle, TrendingUp, Target,
-  Search, Filter, RefreshCw, Plus, Eye, Edit, MoreVertical
+  LayoutDashboard, ListTodo, Shield, BarChart3, AlertTriangle,
+  CheckCircle, Clock, XCircle, TrendingUp, Target, Lock,
+  Search, RefreshCw, Eye, FileText, ChevronRight,
+  ArrowUpRight, Ban, CheckCheck, History, Bell
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,81 +22,121 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { format, formatDistanceToNow } from 'date-fns';
+import {
+  usePromiseManagerMetrics,
+  usePromisesList,
+  usePendingApprovals,
+  useOverduePromises,
+  useEscalatedPromises,
+  usePromiseAuditLogs,
+  useApprovePromiseStrict,
+  useRejectPromiseStrict,
+  useFulfillPromise,
+  useEscalatePromise,
+  type PromiseWithDetails,
+} from '@/hooks/usePromiseManager';
 
-interface PromiseTask {
-  id: string;
-  title: string;
-  developer_name: string;
-  developer_id: string;
-  status: 'assigned' | 'promised' | 'in_progress' | 'completed' | 'breached';
-  deadline: string;
-  promised_at?: string;
-  created_at: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  client_name: string;
-}
-
-const mockPromises: PromiseTask[] = [
-  { id: '1', title: 'E-commerce Module Integration', developer_name: 'Dev-7X9K', developer_id: 'dev1', status: 'in_progress', deadline: '2024-12-28', promised_at: '2024-12-20', created_at: '2024-12-18', priority: 'high', client_name: 'ABC Corp' },
-  { id: '2', title: 'Payment Gateway Setup', developer_name: 'Dev-3A2B', developer_id: 'dev2', status: 'promised', deadline: '2024-12-30', promised_at: '2024-12-22', created_at: '2024-12-19', priority: 'critical', client_name: 'XYZ Ltd' },
-  { id: '3', title: 'Dashboard Analytics', developer_name: 'Dev-9C4D', developer_id: 'dev3', status: 'completed', deadline: '2024-12-25', promised_at: '2024-12-15', created_at: '2024-12-10', priority: 'medium', client_name: 'Tech Solutions' },
-  { id: '4', title: 'Mobile App API', developer_name: 'Dev-5E6F', developer_id: 'dev4', status: 'breached', deadline: '2024-12-20', promised_at: '2024-12-12', created_at: '2024-12-08', priority: 'high', client_name: 'StartUp Inc' },
-  { id: '5', title: 'User Authentication', developer_name: 'Dev-7X9K', developer_id: 'dev1', status: 'assigned', deadline: '2025-01-05', created_at: '2024-12-22', priority: 'medium', client_name: 'Global Services' },
-];
-
-const statusConfig = {
-  assigned: { label: 'Assigned', color: 'bg-slate-500', icon: Clock },
-  promised: { label: 'Promised', color: 'bg-amber-500', icon: Target },
-  in_progress: { label: 'In Progress', color: 'bg-blue-500', icon: TrendingUp },
-  completed: { label: 'Completed', color: 'bg-green-500', icon: CheckCircle },
+const statusConfig: Record<string, { label: string; color: string; icon: typeof Clock }> = {
+  pending_approval: { label: 'Pending Approval', color: 'bg-amber-500', icon: Clock },
+  assigned: { label: 'Active', color: 'bg-blue-500', icon: Target },
+  promised: { label: 'Promised', color: 'bg-cyan-500', icon: TrendingUp },
+  in_progress: { label: 'In Progress', color: 'bg-indigo-500', icon: TrendingUp },
+  completed: { label: 'Fulfilled', color: 'bg-green-500', icon: CheckCircle },
   breached: { label: 'Breached', color: 'bg-red-500', icon: XCircle },
 };
 
-const priorityConfig = {
+const priorityConfig: Record<string, { label: string; color: string }> = {
   low: { label: 'Low', color: 'bg-slate-400' },
-  medium: { label: 'Medium', color: 'bg-blue-400' },
-  high: { label: 'High', color: 'bg-orange-400' },
-  critical: { label: 'Critical', color: 'bg-red-500' },
+  normal: { label: 'Normal', color: 'bg-blue-400' },
+  high: { label: 'High', color: 'bg-orange-500' },
+  critical: { label: 'Critical', color: 'bg-red-600' },
 };
 
 export default function PromiseManagementDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [promises, setPromises] = useState<PromiseTask[]>(mockPromises);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedPromise, setSelectedPromise] = useState<PromiseWithDetails | null>(null);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
-  // Stats calculation
-  const stats = {
-    total: promises.length,
-    active: promises.filter(p => ['promised', 'in_progress'].includes(p.status)).length,
-    completed: promises.filter(p => p.status === 'completed').length,
-    breached: promises.filter(p => p.status === 'breached').length,
-    pending: promises.filter(p => p.status === 'assigned').length,
-    fulfillmentRate: Math.round((promises.filter(p => p.status === 'completed').length / Math.max(promises.filter(p => ['completed', 'breached'].includes(p.status)).length, 1)) * 100),
-  };
+  // Data hooks
+  const { data: metrics, isLoading: metricsLoading, refetch: refetchMetrics } = usePromiseManagerMetrics();
+  const { data: allPromises = [], isLoading: promisesLoading, refetch: refetchPromises } = usePromisesList({ 
+    status: filterStatus !== 'all' ? filterStatus : undefined 
+  });
+  const { data: pendingApprovals = [] } = usePendingApprovals();
+  const { data: overduePromises = [] } = useOverduePromises();
+  const { data: escalatedPromises = [] } = useEscalatedPromises();
+  const { data: auditLogs = [] } = usePromiseAuditLogs(selectedPromise?.id);
 
-  const filteredPromises = promises.filter(p => {
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.developer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.client_name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
-    return matchesSearch && matchesStatus;
+  // Mutations
+  const approvePromise = useApprovePromiseStrict();
+  const rejectPromise = useRejectPromiseStrict();
+  const fulfillPromise = useFulfillPromise();
+  const escalatePromise = useEscalatePromise();
+
+  const filteredPromises = allPromises.filter(p => {
+    if (!searchQuery) return true;
+    const search = searchQuery.toLowerCase();
+    return (
+      p.id.toLowerCase().includes(search) ||
+      p.promise_type?.toLowerCase().includes(search) ||
+      p.priority?.toLowerCase().includes(search)
+    );
   });
 
   const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success('Data refreshed');
-    }, 1000);
+    refetchMetrics();
+    refetchPromises();
+    toast.success('Data refreshed');
   };
+
+  const handleApprove = async (promise: PromiseWithDetails) => {
+    await approvePromise.mutateAsync(promise.id);
+  };
+
+  const handleReject = async () => {
+    if (!selectedPromise) return;
+    if (!rejectReason.trim()) {
+      toast.error('Rejection reason is mandatory');
+      return;
+    }
+    await rejectPromise.mutateAsync({ promiseId: selectedPromise.id, reason: rejectReason });
+    setRejectDialogOpen(false);
+    setRejectReason('');
+    setSelectedPromise(null);
+  };
+
+  const handleEscalate = async (promise: PromiseWithDetails) => {
+    await escalatePromise.mutateAsync(promise.id);
+  };
+
+  const handleFulfill = async (promise: PromiseWithDetails) => {
+    await fulfillPromise.mutateAsync({ promiseId: promise.id });
+  };
+
+  const openRejectDialog = (promise: PromiseWithDetails) => {
+    setSelectedPromise(promise);
+    setRejectDialogOpen(true);
+  };
+
+  const openDetailsDialog = (promise: PromiseWithDetails) => {
+    setSelectedPromise(promise);
+    setDetailsDialogOpen(true);
+  };
+
+  const isOverdue = (deadline: string) => new Date(deadline) < new Date();
 
   return (
     <DashboardLayout>
@@ -102,70 +144,91 @@ export default function PromiseManagementDashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Promise Management</h1>
-            <p className="text-muted-foreground">Monitor and manage all developer promises across the platform</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">Promise Management</h1>
+              <Badge variant="outline" className="gap-1 text-amber-500 border-amber-500/50">
+                <Shield className="w-3 h-3" />
+                Control Role
+              </Badge>
+            </div>
+            <p className="text-muted-foreground">Zero-loophole promise control, validation, tracking & enforcement</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            <Badge variant="secondary" className="gap-1">
+              <Lock className="w-3 h-3" />
+              Read-Only Control
+            </Badge>
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className={`w-4 h-4 mr-2 ${metricsLoading ? 'animate-spin' : ''}`} />
               Refresh
-            </Button>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              New Assignment
             </Button>
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Clickable */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+          <Card 
+            className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 cursor-pointer hover:border-primary/40 transition-colors"
+            onClick={() => { setFilterStatus('all'); setActiveTab('promises'); }}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <ListTodo className="w-8 h-8 text-primary" />
-                <span className="text-2xl font-bold">{stats.total}</span>
+                <span className="text-2xl font-bold">{metrics?.total_promises || 0}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Total Promises</p>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
+          <Card 
+            className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20 cursor-pointer hover:border-blue-500/40 transition-colors"
+            onClick={() => { setFilterStatus('assigned'); setActiveTab('promises'); }}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <TrendingUp className="w-8 h-8 text-blue-500" />
-                <span className="text-2xl font-bold">{stats.active}</span>
+                <span className="text-2xl font-bold">{metrics?.total_active || 0}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Active</p>
             </CardContent>
           </Card>
-          
-          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <CheckCircle className="w-8 h-8 text-green-500" />
-                <span className="text-2xl font-bold">{stats.completed}</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">Completed</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <XCircle className="w-8 h-8 text-red-500" />
-                <span className="text-2xl font-bold">{stats.breached}</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">Breached</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20">
+
+          <Card 
+            className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20 cursor-pointer hover:border-amber-500/40 transition-colors"
+            onClick={() => setActiveTab('approvals')}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <Clock className="w-8 h-8 text-amber-500" />
-                <span className="text-2xl font-bold">{stats.pending}</span>
+                <span className="text-2xl font-bold">{metrics?.pending_approval || 0}</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-2">Pending</p>
+              <p className="text-sm text-muted-foreground mt-2">Pending Approval</p>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20 cursor-pointer hover:border-red-500/40 transition-colors"
+            onClick={() => setActiveTab('overdue')}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+                <span className="text-2xl font-bold">{metrics?.overdue || 0}</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">Overdue</p>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20 cursor-pointer hover:border-green-500/40 transition-colors"
+            onClick={() => { setFilterStatus('completed'); setActiveTab('promises'); }}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <CheckCircle className="w-8 h-8 text-green-500" />
+                <span className="text-2xl font-bold">{metrics?.fulfilled || 0}</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">Fulfilled</p>
             </CardContent>
           </Card>
           
@@ -173,7 +236,7 @@ export default function PromiseManagementDashboard() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <Target className="w-8 h-8 text-purple-500" />
-                <span className="text-2xl font-bold">{stats.fulfillmentRate}%</span>
+                <span className="text-2xl font-bold">{metrics?.fulfillment_rate || 0}%</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Fulfillment Rate</p>
             </CardContent>
@@ -191,55 +254,87 @@ export default function PromiseManagementDashboard() {
               <ListTodo className="w-4 h-4" />
               All Promises
             </TabsTrigger>
-            <TabsTrigger value="developers" className="gap-2">
-              <Users className="w-4 h-4" />
-              Developers
-            </TabsTrigger>
             <TabsTrigger value="approvals" className="gap-2">
               <Shield className="w-4 h-4" />
               Approvals
+              {pendingApprovals.length > 0 && (
+                <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {pendingApprovals.length}
+                </Badge>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Analytics
+            <TabsTrigger value="overdue" className="gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              Overdue
+              {overduePromises.length > 0 && (
+                <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {overduePromises.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="escalations" className="gap-2">
+              <Bell className="w-4 h-4" />
+              Escalations
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="gap-2">
+              <History className="w-4 h-4" />
+              Audit Logs
             </TabsTrigger>
           </TabsList>
 
+          {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Promises */}
+              {/* Recent Activity */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Recent Promises</CardTitle>
-                  <CardDescription>Latest promise activity</CardDescription>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                    Active Promises
+                  </CardTitle>
+                  <CardDescription>Currently active promise commitments</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[300px]">
                     <div className="space-y-3">
-                      {promises.slice(0, 5).map((promise) => {
-                        const StatusIcon = statusConfig[promise.status].icon;
+                      {allPromises.filter(p => !['completed', 'breached'].includes(p.status)).slice(0, 5).map((promise) => {
+                        const status = statusConfig[promise.status] || statusConfig.assigned;
+                        const StatusIcon = status.icon;
+                        const overdue = isOverdue(promise.deadline);
                         return (
                           <motion.div
                             key={promise.id}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
+                            className={`flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer
+                              ${overdue ? 'bg-red-500/10 hover:bg-red-500/20 border border-red-500/30' : 'bg-secondary/30 hover:bg-secondary/50'}`}
+                            onClick={() => openDetailsDialog(promise)}
                           >
                             <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-full ${statusConfig[promise.status].color} flex items-center justify-center`}>
+                              <div className={`w-10 h-10 rounded-full ${status.color} flex items-center justify-center`}>
                                 <StatusIcon className="w-5 h-5 text-white" />
                               </div>
                               <div>
-                                <p className="font-medium text-sm">{promise.title}</p>
-                                <p className="text-xs text-muted-foreground">{promise.developer_name} • {promise.client_name}</p>
+                                <p className="font-medium text-sm">{promise.promise_type}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Due: {format(new Date(promise.deadline), 'MMM dd, yyyy HH:mm')}
+                                  {overdue && <span className="text-red-500 ml-2">• OVERDUE</span>}
+                                </p>
                               </div>
                             </div>
-                            <Badge variant="outline" className={priorityConfig[promise.priority].color + ' text-white border-0'}>
-                              {promise.priority}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className={`${priorityConfig[promise.priority]?.color || 'bg-slate-400'} text-white border-0`}>
+                                {promise.priority}
+                              </Badge>
+                              {promise.is_locked && <Lock className="w-4 h-4 text-muted-foreground" />}
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            </div>
                           </motion.div>
                         );
                       })}
+                      {allPromises.filter(p => !['completed', 'breached'].includes(p.status)).length === 0 && (
+                        <p className="text-muted-foreground text-center py-8">No active promises</p>
+                      )}
                     </div>
                   </ScrollArea>
                 </CardContent>
@@ -248,44 +343,53 @@ export default function PromiseManagementDashboard() {
               {/* Fulfillment Progress */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Fulfillment Progress</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-primary" />
+                    Fulfillment Progress
+                  </CardTitle>
                   <CardDescription>Promise completion metrics</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Overall Fulfillment</span>
-                      <span className="font-medium">{stats.fulfillmentRate}%</span>
+                      <span>Overall Fulfillment Rate</span>
+                      <span className="font-medium">{metrics?.fulfillment_rate || 0}%</span>
                     </div>
-                    <Progress value={stats.fulfillmentRate} className="h-3" />
+                    <Progress value={metrics?.fulfillment_rate || 0} className="h-3" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                      <p className="text-2xl font-bold text-green-500">{stats.completed}</p>
-                      <p className="text-sm text-muted-foreground">On-time Delivery</p>
+                      <p className="text-2xl font-bold text-green-500">{metrics?.fulfilled || 0}</p>
+                      <p className="text-sm text-muted-foreground">Fulfilled</p>
                     </div>
                     <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                      <p className="text-2xl font-bold text-red-500">{stats.breached}</p>
+                      <p className="text-2xl font-bold text-red-500">{metrics?.breached || 0}</p>
                       <p className="text-sm text-muted-foreground">Breached</p>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Status Distribution</p>
-                    <div className="flex gap-1 h-4 rounded-full overflow-hidden">
-                      {Object.entries(statusConfig).map(([status, config]) => {
-                        const count = promises.filter(p => p.status === status).length;
-                        const percentage = (count / promises.length) * 100;
-                        return (
-                          <div
-                            key={status}
-                            className={`${config.color} transition-all`}
-                            style={{ width: `${percentage}%` }}
-                            title={`${config.label}: ${count}`}
-                          />
-                        );
-                      })}
+                  <Separator />
+
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium">Quick Stats</p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Active Escalations</span>
+                      <Badge variant="outline" className={metrics?.active_escalations ? 'text-red-500' : ''}>
+                        {metrics?.active_escalations || 0}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Pending Approvals</span>
+                      <Badge variant="outline" className={pendingApprovals.length ? 'text-amber-500' : ''}>
+                        {pendingApprovals.length}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Overdue Promises</span>
+                      <Badge variant="outline" className={overduePromises.length ? 'text-red-500' : ''}>
+                        {overduePromises.length}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -293,133 +397,432 @@ export default function PromiseManagementDashboard() {
             </div>
           </TabsContent>
 
+          {/* All Promises Tab */}
           <TabsContent value="promises" className="space-y-4">
-            {/* Filters */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search promises, developers, clients..."
+                  placeholder="Search promises..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              <div className="flex gap-2">
-                {['all', 'assigned', 'promised', 'in_progress', 'completed', 'breached'].map((status) => (
+              <div className="flex gap-2 flex-wrap">
+                {['all', 'pending_approval', 'assigned', 'in_progress', 'completed', 'breached'].map((status) => (
                   <Button
                     key={status}
                     variant={filterStatus === status ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setFilterStatus(status)}
-                    className="capitalize"
                   >
-                    {status === 'all' ? 'All' : status.replace('_', ' ')}
+                    {status === 'all' ? 'All' : statusConfig[status]?.label || status}
                   </Button>
                 ))}
               </div>
             </div>
 
-            {/* Table */}
             <Card>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Task</TableHead>
-                      <TableHead>Developer</TableHead>
-                      <TableHead>Client</TableHead>
+                      <TableHead>Promise Type</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Priority</TableHead>
                       <TableHead>Deadline</TableHead>
+                      <TableHead>Escalation</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredPromises.map((promise) => {
-                      const StatusIcon = statusConfig[promise.status].icon;
+                      const status = statusConfig[promise.status] || statusConfig.assigned;
+                      const StatusIcon = status.icon;
+                      const overdue = isOverdue(promise.deadline) && !['completed', 'breached'].includes(promise.status);
                       return (
-                        <TableRow key={promise.id}>
-                          <TableCell className="font-medium">{promise.title}</TableCell>
-                          <TableCell>{promise.developer_name}</TableCell>
-                          <TableCell>{promise.client_name}</TableCell>
+                        <TableRow key={promise.id} className={overdue ? 'bg-red-500/5' : ''}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {promise.promise_type}
+                              {promise.is_locked && <Lock className="w-3 h-3 text-muted-foreground" />}
+                            </div>
+                          </TableCell>
                           <TableCell>
-                            <Badge className={`${statusConfig[promise.status].color} text-white border-0 gap-1`}>
+                            <Badge className={`${status.color} text-white border-0 gap-1`}>
                               <StatusIcon className="w-3 h-3" />
-                              {statusConfig[promise.status].label}
+                              {status.label}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className={`${priorityConfig[promise.priority].color} text-white border-0`}>
+                            <Badge variant="outline" className={`${priorityConfig[promise.priority]?.color || 'bg-slate-400'} text-white border-0`}>
                               {promise.priority}
                             </Badge>
                           </TableCell>
-                          <TableCell>{new Date(promise.deadline).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className={overdue ? 'text-red-500 font-medium' : ''}>
+                              {format(new Date(promise.deadline), 'MMM dd, yyyy HH:mm')}
+                              {overdue && <span className="ml-2 text-xs">OVERDUE</span>}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {promise.escalation_level > 0 ? (
+                              <Badge variant="destructive">Level {promise.escalation_level}</Badge>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
                           <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="w-4 h-4" />
+                            <div className="flex items-center justify-end gap-1">
+                              <Button variant="ghost" size="icon" onClick={() => openDetailsDialog(promise)}>
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {!promise.is_locked && overdue && (
+                                <Button variant="ghost" size="icon" onClick={() => handleEscalate(promise)}>
+                                  <ArrowUpRight className="w-4 h-4 text-amber-500" />
                                 </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                  <Eye className="w-4 h-4 mr-2" />
-                                  View Details
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <Edit className="w-4 h-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
                     })}
+                    {filteredPromises.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          No promises found
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="developers">
+          {/* Approvals Tab */}
+          <TabsContent value="approvals" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Developer Performance</CardTitle>
-                <CardDescription>Track developer promise fulfillment rates</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Pending Approvals
+                </CardTitle>
+                <CardDescription>Review and approve or reject promise requests</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Developer performance metrics and rankings will be displayed here.</p>
+                {pendingApprovals.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <CheckCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No pending approvals</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingApprovals.map((promise) => (
+                      <motion.div
+                        key={promise.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 rounded-lg border bg-secondary/20"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-amber-500 text-white">Pending</Badge>
+                              <Badge variant="outline" className={`${priorityConfig[promise.priority]?.color || 'bg-slate-400'} text-white border-0`}>
+                                {promise.priority}
+                              </Badge>
+                            </div>
+                            <h4 className="font-medium">{promise.promise_type}</h4>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <p>Deadline: {format(new Date(promise.deadline), 'MMM dd, yyyy HH:mm')}</p>
+                              <p>Created: {formatDistanceToNow(new Date(promise.created_at), { addSuffix: true })}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => openRejectDialog(promise)}
+                              disabled={rejectPromise.isPending}
+                            >
+                              <Ban className="w-4 h-4 mr-1" />
+                              Reject
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => handleApprove(promise)}
+                              disabled={approvePromise.isPending}
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Approve
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="approvals">
+          {/* Overdue Tab */}
+          <TabsContent value="overdue" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Pending Approvals</CardTitle>
-                <CardDescription>Review and approve promise extensions and modifications</CardDescription>
+                <CardTitle className="flex items-center gap-2 text-red-500">
+                  <AlertTriangle className="w-5 h-5" />
+                  Overdue Promises
+                </CardTitle>
+                <CardDescription>Promises that have exceeded their deadline</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">No pending approvals at this time.</p>
+                {overduePromises.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <CheckCircle className="w-12 h-12 mx-auto mb-4 opacity-50 text-green-500" />
+                    <p>No overdue promises</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Promise Type</TableHead>
+                        <TableHead>Deadline</TableHead>
+                        <TableHead>Time Overdue</TableHead>
+                        <TableHead>Escalation Level</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {overduePromises.map((promise) => (
+                        <TableRow key={promise.id} className="bg-red-500/5">
+                          <TableCell className="font-medium">{promise.promise_type}</TableCell>
+                          <TableCell>{format(new Date(promise.deadline), 'MMM dd, yyyy HH:mm')}</TableCell>
+                          <TableCell className="text-red-500 font-medium">
+                            {formatDistanceToNow(new Date(promise.deadline), { addSuffix: false })} overdue
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="destructive">Level {promise.escalation_level || 0}</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={() => handleEscalate(promise)}
+                              disabled={escalatePromise.isPending}
+                            >
+                              <ArrowUpRight className="w-4 h-4 mr-1" />
+                              Escalate
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="analytics">
+          {/* Escalations Tab */}
+          <TabsContent value="escalations" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Promise Analytics</CardTitle>
-                <CardDescription>Detailed analytics and reporting</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="w-5 h-5" />
+                  Active Escalations
+                </CardTitle>
+                <CardDescription>Promises that have been escalated (cannot be muted or deleted)</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Analytics dashboard with charts and insights will be displayed here.</p>
+                {escalatedPromises.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <CheckCircle className="w-12 h-12 mx-auto mb-4 opacity-50 text-green-500" />
+                    <p>No active escalations</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {escalatedPromises.map((promise) => (
+                      <div key={promise.id} className="p-4 rounded-lg border border-red-500/30 bg-red-500/5">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="destructive">Escalation Level {promise.escalation_level}</Badge>
+                              <Badge variant="outline" className={`${priorityConfig[promise.priority]?.color || 'bg-slate-400'} text-white border-0`}>
+                                {promise.priority}
+                              </Badge>
+                            </div>
+                            <h4 className="font-medium">{promise.promise_type}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Overdue since: {formatDistanceToNow(new Date(promise.deadline), { addSuffix: true })}
+                            </p>
+                          </div>
+                          <Button variant="outline" size="sm" onClick={() => openDetailsDialog(promise)}>
+                            <Eye className="w-4 h-4 mr-1" />
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Audit Logs Tab */}
+          <TabsContent value="audit" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Immutable Audit Logs
+                </CardTitle>
+                <CardDescription>Read-only, append-only audit trail (cannot be modified or deleted)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[500px]">
+                  <div className="space-y-2">
+                    {auditLogs.map((log) => (
+                      <div key={log.id} className="p-3 rounded-lg bg-secondary/30 border text-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="outline">
+                            {log.action_type.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(log.server_timestamp), 'MMM dd, yyyy HH:mm:ss')}
+                          </span>
+                        </div>
+                        <div className="text-muted-foreground space-y-1">
+                          <p>
+                            <span className="font-medium">By:</span> {log.action_by_role}
+                            {log.is_system_action && <Badge variant="secondary" className="ml-2 text-xs">SYSTEM</Badge>}
+                          </p>
+                          {log.previous_status && (
+                            <p><span className="font-medium">Status:</span> {log.previous_status} → {log.new_status}</p>
+                          )}
+                          {log.reason && <p><span className="font-medium">Reason:</span> {log.reason}</p>}
+                        </div>
+                      </div>
+                    ))}
+                    {auditLogs.length === 0 && (
+                      <p className="text-center py-8 text-muted-foreground">No audit logs available</p>
+                    )}
+                  </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Reject Dialog */}
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Promise</DialogTitle>
+            <DialogDescription>
+              Provide a mandatory reason for rejection. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Enter rejection reason (mandatory)..."
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            rows={4}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleReject} disabled={rejectPromise.isPending}>
+              Reject Promise
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details Dialog */}
+      <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Promise Details
+              {selectedPromise?.is_locked && (
+                <Badge variant="secondary" className="gap-1">
+                  <Lock className="w-3 h-3" />
+                  Locked
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPromise && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Promise Type</p>
+                  <p className="font-medium">{selectedPromise.promise_type}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <Badge className={`${statusConfig[selectedPromise.status]?.color || 'bg-slate-500'} text-white`}>
+                    {statusConfig[selectedPromise.status]?.label || selectedPromise.status}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Priority</p>
+                  <Badge className={`${priorityConfig[selectedPromise.priority]?.color || 'bg-slate-400'} text-white`}>
+                    {selectedPromise.priority}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Deadline</p>
+                  <p className="font-medium">{format(new Date(selectedPromise.deadline), 'MMM dd, yyyy HH:mm')}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Assigned Role</p>
+                  <p className="font-medium">{selectedPromise.assigned_role || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Escalation Level</p>
+                  <p className="font-medium">{selectedPromise.escalation_level || 0}</p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Approval Info</p>
+                {selectedPromise.approved_at ? (
+                  <p className="text-sm">Approved at: {format(new Date(selectedPromise.approved_at), 'MMM dd, yyyy HH:mm')}</p>
+                ) : selectedPromise.rejection_reason ? (
+                  <div className="text-sm text-red-500">
+                    <p>Rejected: {selectedPromise.rejection_reason}</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Pending approval</p>
+                )}
+              </div>
+
+              <Separator />
+
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Promise ID</p>
+                <code className="text-xs bg-secondary p-2 rounded block">{selectedPromise.id}</code>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>Close</Button>
+            {selectedPromise && !selectedPromise.is_locked && selectedPromise.status !== 'pending_approval' && (
+              <Button onClick={() => handleFulfill(selectedPromise)} disabled={fulfillPromise.isPending}>
+                <CheckCheck className="w-4 h-4 mr-1" />
+                Mark Fulfilled
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
