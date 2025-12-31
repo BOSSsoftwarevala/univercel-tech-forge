@@ -80,6 +80,9 @@ import ValaMasterWorkspace from "./pages/vala-control/ValaMasterWorkspace";
 // Dev Manager Pages
 import SecureDevManagerDashboard from "./pages/dev-manager/SecureDevManagerDashboard";
 
+// HR Manager Pages
+import SecureHRManagerDashboard from "./pages/hr-manager/SecureHRManagerDashboard";
+
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 import ContinentSuperAdminDashboard from "./pages/continent-super-admin/ContinentSuperAdminDashboard";
@@ -423,6 +426,9 @@ const App = () => (
 
               {/* Dev Manager Dashboard */}
               <Route path="/dev-manager" element={<RequireAuth><SecureDevManagerDashboard /></RequireAuth>} />
+
+              {/* HR Manager Dashboard */}
+              <Route path="/hr-manager" element={<RequireAuth><SecureHRManagerDashboard /></RequireAuth>} />
 
               {/* Wireframe Routes - Design Sandbox */}
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
