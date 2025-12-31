@@ -107,6 +107,12 @@ import SecureSEOManagerDashboard from "./pages/seo-manager/SecureSEOManagerDashb
 // API/AI Manager Pages
 import SecureAPIAIManagerDashboard from "./pages/api-ai-manager/SecureAPIAIManagerDashboard";
 
+// Reseller Manager Pages
+import SecureResellerManagerDashboard from "./pages/reseller-manager/SecureResellerManagerDashboard";
+
+// Sales & Support Manager Pages
+import SecureSalesSupportManagerDashboard from "./pages/sales-support-manager/SecureSalesSupportManagerDashboard";
+
 // Secure Control System Pages
 import SecureControlSystem from "./pages/control-system/SecureControlSystem";
 import MasterAdminControl from "./pages/control-system/MasterAdminControl";
@@ -375,9 +381,17 @@ const App = () => (
               <Route path="/influencer-dashboard" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerDashboard /></RequireRole>} />
               <Route path="/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
               <Route path="/influencer-manager-secure" element={<RequireRole allowed={["influencer_manager", "super_admin"]}><SecureInfluencerManagerDashboard /></RequireRole>} />
+              
+              {/* Reseller Manager Routes */}
+              <Route path="/reseller-manager" element={<RequireRole allowed={["reseller_manager", "super_admin"]}><SecureResellerManagerDashboard /></RequireRole>} />
+              <Route path="/reseller-manager-secure" element={<RequireRole allowed={["reseller_manager", "super_admin"]}><SecureResellerManagerDashboard /></RequireRole>} />
+              
+              {/* Sales & Support Manager Routes */}
+              <Route path="/sales-support-manager" element={<RequireRole allowed={["sales_support_manager", "super_admin"]}><SecureSalesSupportManagerDashboard /></RequireRole>} />
+              <Route path="/sales-support-manager-secure" element={<RequireRole allowed={["sales_support_manager", "super_admin"]}><SecureSalesSupportManagerDashboard /></RequireRole>} />
+              
               {/* Public demo route for Influencer Command Center */}
               <Route path="/demo/influencer-command-center" element={<InfluencerCommandCenter />} />
-
               {/* Prime User Routes */}
               <Route path="/prime" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
               <Route path="/prime/dashboard" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
