@@ -69,6 +69,7 @@ import ComplianceCenter from "./pages/super-admin/ComplianceCenter";
 import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
 import MasterAuth from "./pages/MasterAuth";
 import MasterControlCenter from "./pages/master-control/MasterControlCenter";
+import MasterAdminSupreme from "./pages/master-admin-supreme/MasterAdminSupreme";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
 
 // Vala Control System Pages
@@ -276,6 +277,7 @@ const App = () => (
               {/* Master Admin Routes - MASTER ONLY */}
               <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterControlCenter /></RequireRole>} />
               <Route path="/master-admin/*" element={<RequireRole allowed={["master"]} masterOnly><MasterControlCenter /></RequireRole>} />
+              <Route path="/master-admin-supreme" element={<RequireRole allowed={["master"]} masterOnly><MasterAdminSupreme /></RequireRole>} />
               
               {/* Admin Utilities - Master and Super Admin */}
               <Route path="/admin/bulk-users" element={<RequireRole allowed={["master", "super_admin"]}><BulkUserCreation /></RequireRole>} />
