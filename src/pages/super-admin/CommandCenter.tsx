@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Badge } from '@/components/ui/badge';
@@ -619,7 +620,58 @@ const HeaderStatCard = ({
 // MAIN COMMAND CENTER COMPONENT
 // ==========================================
 
+// Category titles for display when a specific category is selected
+const categoryTitles: Record<string, string> = {
+  "super-admin": "Super Admin",
+  "admin": "Admin",
+  "area-manager": "Area Manager",
+  "server-manager": "Server Manager",
+  "franchise-manager": "Franchise Manager",
+  "sales-support-manager": "Sales & Support Manager",
+  "reseller-manager": "Reseller Manager",
+  "api-ai-manager": "API / AI Manager",
+  "influencer-manager": "Influencer Manager",
+  "seo-manager": "SEO Manager",
+  "marketing-manager": "Marketing Manager",
+  "lead-manager": "Lead Manager",
+  "pro-manager": "Pro Manager",
+  "legal-manager": "Legal Manager",
+  "task-manager": "Task Manager",
+  "hr-manager": "HR Manager",
+  "developer-manager": "Developer Manager",
+  "franchise": "Franchise",
+  "developer": "Developer",
+  "reseller": "Reseller",
+  "influencer": "Influencer",
+  "prime-user": "Prime User",
+  "user": "User",
+  "frontend": "Frontend",
+  "safe-assist": "Safe Assist",
+  "assist-manager": "Assist Manager",
+  "promise-tracker": "Promise Tracker",
+  "promise-management": "Promise Management",
+  "dashboard-management": "Dashboard Management",
+};
+
+// Placeholder component for categories
+const CategoryPlaceholder = ({ title }: { title: string }) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="flex flex-col items-center justify-center min-h-[400px] bg-slate-800/50 rounded-2xl border border-slate-700/50"
+  >
+    <div className="w-20 h-20 rounded-2xl bg-teal-500/20 flex items-center justify-center mb-4">
+      <span className="text-4xl">🚧</span>
+    </div>
+    <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
+    <p className="text-slate-400">This module is ready for sub/micro/nano mapping</p>
+  </motion.div>
+);
+
 const SuperAdminCommandCenter = () => {
+  const [searchParams] = useSearchParams();
+  const activeCategory = searchParams.get('cat');
+  
   const [showWelcome, setShowWelcome] = useState(true);
   const [showAudit, setShowAudit] = useState(false);
   const [liveStats, setLiveStats] = useState({
@@ -629,10 +681,15 @@ const SuperAdminCommandCenter = () => {
     totalRevenue: 12450000,
   });
 
+  // Skip welcome animation if navigating to a specific category
   useEffect(() => {
-    const timer = setTimeout(() => setShowWelcome(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (activeCategory) {
+      setShowWelcome(false);
+    } else {
+      const timer = setTimeout(() => setShowWelcome(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [activeCategory]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -643,6 +700,14 @@ const SuperAdminCommandCenter = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Render category-specific content when a category is selected
+  const renderCategoryContent = () => {
+    if (!activeCategory) return null;
+    
+    const title = categoryTitles[activeCategory] || activeCategory;
+    return <CategoryPlaceholder title={title} />;
+  };
 
   return (
     <DashboardLayout roleOverride="super_admin">
@@ -725,11 +790,11 @@ const SuperAdminCommandCenter = () => {
               
               <div>
                 <h1 className="text-2xl font-bold text-white tracking-tight">
-                  DASHBOARD COMMAND CENTER
+                  {activeCategory ? categoryTitles[activeCategory] || activeCategory.toUpperCase() : 'DASHBOARD COMMAND CENTER'}
                 </h1>
                 <p className="text-sm text-slate-400 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Category Hierarchy Structure • 4-Level System
+                  {activeCategory ? `Managing ${categoryTitles[activeCategory] || activeCategory}` : 'Category Hierarchy Structure • 4-Level System'}
                 </p>
               </div>
             </div>
@@ -755,159 +820,184 @@ const SuperAdminCommandCenter = () => {
             </div>
           </div>
 
-          {/* Stats Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <HeaderStatCard
-              title="Total Categories"
-              value="28"
-              icon={LayoutDashboard}
-            />
-            <HeaderStatCard
-              title="Sub Categories"
-              value="28"
-              icon={ClipboardList}
-            />
-            <HeaderStatCard
-              title="Micro Categories"
-              value="56"
-              icon={CheckCircle}
-            />
-            <HeaderStatCard
-              title="Nano Categories"
-              value="112"
-              icon={Target}
-            />
-          </div>
+          {/* Stats Summary - Only show when no category selected */}
+          {!activeCategory && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <HeaderStatCard
+                title="Total Categories"
+                value="28"
+                icon={LayoutDashboard}
+              />
+              <HeaderStatCard
+                title="Sub Categories"
+                value="28"
+                icon={ClipboardList}
+              />
+              <HeaderStatCard
+                title="Micro Categories"
+                value="56"
+                icon={CheckCircle}
+              />
+              <HeaderStatCard
+                title="Nano Categories"
+                value="112"
+                icon={Target}
+              />
+            </div>
+          )}
         </motion.div>
 
-        {/* Categories Grid - All 28 Categories with 4-Level Hierarchy */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="space-y-4"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
-            <div>
-              <h2 className="text-lg font-bold text-white">All Categories</h2>
-              <p className="text-xs text-slate-400">Click to expand hierarchy: Category → Sub → Micro → Nano</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {categories.map((category, idx) => (
+        {/* Render category-specific content OR default overview */}
+        <AnimatePresence mode="wait">
+          {activeCategory ? (
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {renderCategoryContent()}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Categories Grid - All 28 Categories with 4-Level Hierarchy */}
               <motion.div
-                key={category.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + idx * 0.02 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-4"
               >
-                <CategoryCard category={category} />
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
+                  <div>
+                    <h2 className="text-lg font-bold text-white">All Categories</h2>
+                    <p className="text-xs text-slate-400">Click to expand hierarchy: Category → Sub → Micro → Nano</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {categories.map((category, idx) => (
+                    <motion.div
+                      key={category.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + idx * 0.02 }}
+                    >
+                      <CategoryCard category={category} />
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
-            ))}
-          </div>
-        </motion.div>
 
-        {/* AI Insights & Alerts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* AI Insights */}
-          <motion.div 
-            className="p-5 rounded-2xl bg-slate-800/60 border border-teal-500/20 backdrop-blur-xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600">
-                <Brain className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-white text-sm">AI Insights</h3>
-                <p className="text-[10px] text-slate-400">Powered by Vala Intelligence</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {[
-                { insight: 'Lead conversion rate up 15% this week', type: 'positive' },
-                { insight: '3 developers approaching SLA deadline', type: 'warning' },
-                { insight: 'Mumbai region showing highest growth', type: 'info' },
-              ].map((item, idx) => (
+              {/* AI Insights & Alerts */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                {/* AI Insights */}
                 <motion.div 
-                  key={idx} 
-                  className={`p-3 rounded-xl border ${
-                    item.type === 'positive' 
-                      ? 'bg-emerald-500/10 border-emerald-500/30' 
-                      : item.type === 'warning' 
-                      ? 'bg-amber-500/10 border-amber-500/30' 
-                      : 'bg-teal-500/10 border-teal-500/30'
-                  }`}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + idx * 0.1 }}
+                  className="p-5 rounded-2xl bg-slate-800/60 border border-teal-500/20 backdrop-blur-xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
                 >
-                  <div className="flex items-start gap-2">
-                    {item.type === 'positive' && <TrendingUp className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />}
-                    {item.type === 'warning' && <Clock className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />}
-                    {item.type === 'info' && <Globe className="h-4 w-4 text-teal-400 mt-0.5 shrink-0" />}
-                    <p className="text-xs text-slate-200">{item.insight}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Critical Alerts */}
-          <motion.div 
-            className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/50 backdrop-blur-xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-amber-500/20">
-                <AlertTriangle className="h-5 w-5 text-amber-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-white text-sm">Critical Alerts</h3>
-                <p className="text-[10px] text-slate-400">Requires immediate attention</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {[
-                { type: 'critical', title: 'Demo Offline', desc: 'E-commerce v2.1 down', time: '2m ago' },
-                { type: 'warning', title: 'SLA Breach', desc: 'Task #4521 exceeded', time: '8m ago' },
-                { type: 'info', title: 'New Franchise', desc: 'Mumbai South approved', time: '3h ago' },
-              ].map((alert, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.7 + i * 0.1 }}
-                  className={`p-3 rounded-xl border ${
-                    alert.type === 'critical' 
-                      ? 'bg-rose-500/10 border-rose-500/30' 
-                      : alert.type === 'warning'
-                      ? 'bg-amber-500/10 border-amber-500/30'
-                      : 'bg-teal-500/10 border-teal-500/30'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium text-xs text-white">{alert.title}</p>
-                      <p className="text-[10px] text-slate-400">{alert.desc}</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600">
+                      <Brain className="h-5 w-5 text-white" />
                     </div>
-                    <span className="text-[10px] text-slate-500">{alert.time}</span>
+                    <div>
+                      <h3 className="font-semibold text-white text-sm">AI Insights</h3>
+                      <p className="text-[10px] text-slate-400">Powered by Vala Intelligence</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { insight: 'Lead conversion rate up 15% this week', type: 'positive' },
+                      { insight: '3 developers approaching SLA deadline', type: 'warning' },
+                      { insight: 'Mumbai region showing highest growth', type: 'info' },
+                    ].map((item, idx) => (
+                      <motion.div 
+                        key={idx} 
+                        className={`p-3 rounded-xl border ${
+                          item.type === 'positive' 
+                            ? 'bg-emerald-500/10 border-emerald-500/30' 
+                            : item.type === 'warning' 
+                            ? 'bg-amber-500/10 border-amber-500/30' 
+                            : 'bg-teal-500/10 border-teal-500/30'
+                        }`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6 + idx * 0.1 }}
+                      >
+                        <div className="flex items-start gap-2">
+                          {item.type === 'positive' && <TrendingUp className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />}
+                          {item.type === 'warning' && <Clock className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />}
+                          {item.type === 'info' && <Globe className="h-4 w-4 text-teal-400 mt-0.5 shrink-0" />}
+                          <p className="text-xs text-slate-200">{item.insight}</p>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
                 </motion.div>
-              ))}
-            </div>
-            <Button variant="ghost" size="sm" className="w-full gap-2 mt-3 text-xs text-slate-400 hover:text-white">
-              View All Alerts
-              <ChevronRight className="w-3 h-3" />
-            </Button>
-          </motion.div>
-        </div>
+
+                {/* Critical Alerts */}
+                <motion.div 
+                  className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/50 backdrop-blur-xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-amber-500/20">
+                      <AlertTriangle className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-sm">Critical Alerts</h3>
+                      <p className="text-[10px] text-slate-400">Requires immediate attention</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { type: 'critical', title: 'Demo Offline', desc: 'E-commerce v2.1 down', time: '2m ago' },
+                      { type: 'warning', title: 'SLA Breach', desc: 'Task #4521 exceeded', time: '8m ago' },
+                      { type: 'info', title: 'New Franchise', desc: 'Mumbai South approved', time: '3h ago' },
+                    ].map((alert, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.7 + i * 0.1 }}
+                        className={`p-3 rounded-xl border ${
+                          alert.type === 'critical' 
+                            ? 'bg-rose-500/10 border-rose-500/30' 
+                            : alert.type === 'warning'
+                            ? 'bg-amber-500/10 border-amber-500/30'
+                            : 'bg-teal-500/10 border-teal-500/30'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-medium text-xs text-white">{alert.title}</p>
+                            <p className="text-[10px] text-slate-400">{alert.desc}</p>
+                          </div>
+                          <span className="text-[10px] text-slate-500">{alert.time}</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <Button variant="ghost" size="sm" className="w-full gap-2 mt-3 text-xs text-slate-400 hover:text-white">
+                    View All Alerts
+                    <ChevronRight className="w-3 h-3" />
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </DashboardLayout>
   );
