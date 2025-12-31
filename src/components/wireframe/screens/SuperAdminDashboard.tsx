@@ -9,6 +9,7 @@ import { CommandCenterHeader } from '../components/CommandCenterHeader';
 import { RoleActivityCard } from '../components/RoleActivityCard';
 import { BuzzerAlert } from '../components/BuzzerAlert';
 import { ParticleBackground } from '../components/ParticleBackground';
+import { toast } from 'sonner';
 
 interface RoleData {
   id: string;
@@ -57,6 +58,16 @@ export function SuperAdminDashboard() {
           priority="high"
           countdown={45}
           isDark={isDark}
+          onAccept={() => {
+            toast.success('Lead Accepted', {
+              description: 'Lead #L-2847 has been assigned to you.'
+            });
+          }}
+          onDismiss={() => {
+            toast.info('Lead Dismissed', {
+              description: 'Lead will be escalated to next available agent.'
+            });
+          }}
         />
 
         {/* Developer Timer Preview */}
