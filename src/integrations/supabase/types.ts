@@ -1251,6 +1251,60 @@ export type Database = {
         }
         Relationships: []
       }
+      blackbox_events: {
+        Row: {
+          created_at: string
+          device_fingerprint: string | null
+          entity_id: string | null
+          entity_type: string | null
+          event_type: string
+          geo_location: string | null
+          id: string
+          ip_address: string | null
+          is_sealed: boolean
+          metadata: Json | null
+          module_name: string
+          risk_score: number | null
+          role_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_fingerprint?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_sealed?: boolean
+          metadata?: Json | null
+          module_name: string
+          risk_score?: number | null
+          role_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_fingerprint?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_sealed?: boolean
+          metadata?: Json | null
+          module_name?: string
+          risk_score?: number | null
+          role_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       branch_map: {
         Row: {
           branch_code: string
@@ -7962,6 +8016,347 @@ export type Database = {
         }
         Relationships: []
       }
+      master_admin_activity_log: {
+        Row: {
+          action: string
+          action_category: string
+          blackbox_event_id: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          super_admin_id: string | null
+          target_entity_id: string | null
+          target_entity_type: string | null
+        }
+        Insert: {
+          action: string
+          action_category: string
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          super_admin_id?: string | null
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+        }
+        Update: {
+          action?: string
+          action_category?: string
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          super_admin_id?: string | null
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_admin_activity_log_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_admin_activity_log_super_admin_id_fkey"
+            columns: ["super_admin_id"]
+            isOneToOne: false
+            referencedRelation: "master_super_admin_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_ai_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_description: string | null
+          alert_title: string
+          alert_type: string
+          auto_action_taken: string | null
+          blackbox_event_id: string | null
+          created_at: string
+          id: string
+          is_acknowledged: boolean | null
+          is_resolved: boolean | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          source_module: string
+          target_entity_id: string | null
+          target_entity_type: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_description?: string | null
+          alert_title: string
+          alert_type: string
+          auto_action_taken?: string | null
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          source_module: string
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_description?: string | null
+          alert_title?: string
+          alert_type?: string
+          auto_action_taken?: string | null
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_module?: string
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_ai_alerts_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_ai_behavior_scores: {
+        Row: {
+          anomaly_factors: Json | null
+          anomaly_level: string
+          behavior_score: number
+          created_at: string
+          evaluated_at: string
+          flagged_reason: string | null
+          id: string
+          is_flagged: boolean | null
+          last_action_pattern: Json | null
+          last_login_pattern: Json | null
+          pattern_analysis: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anomaly_factors?: Json | null
+          anomaly_level?: string
+          behavior_score?: number
+          created_at?: string
+          evaluated_at?: string
+          flagged_reason?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          last_action_pattern?: Json | null
+          last_login_pattern?: Json | null
+          pattern_analysis?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anomaly_factors?: Json | null
+          anomaly_level?: string
+          behavior_score?: number
+          created_at?: string
+          evaluated_at?: string
+          flagged_reason?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          last_action_pattern?: Json | null
+          last_login_pattern?: Json | null
+          pattern_analysis?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      master_approval_steps: {
+        Row: {
+          approval_id: string | null
+          approver_role: string
+          approver_user_id: string | null
+          blackbox_event_id: string | null
+          created_at: string
+          decision_at: string | null
+          decision_notes: string | null
+          id: string
+          status: string
+          step_number: number
+        }
+        Insert: {
+          approval_id?: string | null
+          approver_role: string
+          approver_user_id?: string | null
+          blackbox_event_id?: string | null
+          created_at?: string
+          decision_at?: string | null
+          decision_notes?: string | null
+          id?: string
+          status?: string
+          step_number: number
+        }
+        Update: {
+          approval_id?: string | null
+          approver_role?: string
+          approver_user_id?: string | null
+          blackbox_event_id?: string | null
+          created_at?: string
+          decision_at?: string | null
+          decision_notes?: string | null
+          id?: string
+          status?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_approval_steps_approval_id_fkey"
+            columns: ["approval_id"]
+            isOneToOne: false
+            referencedRelation: "master_approvals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_approval_steps_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_approvals: {
+        Row: {
+          created_at: string
+          current_approvers: number | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          priority: string | null
+          request_description: string | null
+          request_title: string
+          request_type: string
+          requested_by: string
+          requested_by_role: string | null
+          required_approvers: number | null
+          risk_factors: Json | null
+          risk_score: number
+          status: string
+          target_entity_id: string | null
+          target_entity_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_approvers?: number | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          request_description?: string | null
+          request_title: string
+          request_type: string
+          requested_by: string
+          requested_by_role?: string | null
+          required_approvers?: number | null
+          risk_factors?: Json | null
+          risk_score?: number
+          status?: string
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_approvers?: number | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          request_description?: string | null
+          request_title?: string
+          request_type?: string
+          requested_by?: string
+          requested_by_role?: string | null
+          required_approvers?: number | null
+          risk_factors?: Json | null
+          risk_score?: number
+          status?: string
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      master_audit_exports: {
+        Row: {
+          created_at: string
+          date_range_end: string | null
+          date_range_start: string | null
+          download_count: number | null
+          expires_at: string | null
+          export_scope: Json
+          export_type: string
+          file_path: string | null
+          file_size_bytes: number | null
+          id: string
+          max_downloads: number | null
+          requested_by: string
+          status: string
+          watermark_hash: string
+        }
+        Insert: {
+          created_at?: string
+          date_range_end?: string | null
+          date_range_start?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          export_scope?: Json
+          export_type: string
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          max_downloads?: number | null
+          requested_by: string
+          status?: string
+          watermark_hash?: string
+        }
+        Update: {
+          created_at?: string
+          date_range_end?: string | null
+          date_range_start?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          export_scope?: Json
+          export_type?: string
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          max_downloads?: number | null
+          requested_by?: string
+          status?: string
+          watermark_hash?: string
+        }
+        Relationships: []
+      }
       master_audit_log: {
         Row: {
           action: string
@@ -7995,6 +8390,708 @@ export type Database = {
           table_name?: string | null
           user_id?: string | null
           user_role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Relationships: []
+      }
+      master_continents: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      master_countries: {
+        Row: {
+          continent_id: string | null
+          created_at: string
+          id: string
+          iso_code: string
+          metadata: Json | null
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          continent_id?: string | null
+          created_at?: string
+          id?: string
+          iso_code: string
+          metadata?: Json | null
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          continent_id?: string | null
+          created_at?: string
+          id?: string
+          iso_code?: string
+          metadata?: Json | null
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_countries_continent_id_fkey"
+            columns: ["continent_id"]
+            isOneToOne: false
+            referencedRelation: "master_continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_global_rules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          impact_level: string | null
+          is_locked: boolean | null
+          rule_code: string
+          rule_logic: Json
+          rule_name: string
+          rule_type: string
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          impact_level?: string | null
+          is_locked?: boolean | null
+          rule_code: string
+          rule_logic?: Json
+          rule_name: string
+          rule_type: string
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          impact_level?: string | null
+          is_locked?: boolean | null
+          rule_code?: string
+          rule_logic?: Json
+          rule_name?: string
+          rule_type?: string
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      master_ip_watchlist: {
+        Row: {
+          block_reason: string | null
+          blocked_at: string | null
+          blocked_by: string | null
+          created_at: string
+          expires_at: string | null
+          hit_count: number | null
+          id: string
+          ip_address: string
+          is_blocked: boolean
+          last_seen_at: string | null
+          metadata: Json | null
+          risk_level: string
+          updated_at: string
+        }
+        Insert: {
+          block_reason?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          hit_count?: number | null
+          id?: string
+          ip_address: string
+          is_blocked?: boolean
+          last_seen_at?: string | null
+          metadata?: Json | null
+          risk_level?: string
+          updated_at?: string
+        }
+        Update: {
+          block_reason?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          hit_count?: number | null
+          id?: string
+          ip_address?: string
+          is_blocked?: boolean
+          last_seen_at?: string | null
+          metadata?: Json | null
+          risk_level?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      master_live_activity: {
+        Row: {
+          action_description: string | null
+          action_name: string
+          blackbox_event_id: string | null
+          created_at: string
+          id: string
+          payload: Json | null
+          severity: string
+          source_module: string
+          user_id: string | null
+          user_role: string | null
+        }
+        Insert: {
+          action_description?: string | null
+          action_name: string
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          payload?: Json | null
+          severity?: string
+          source_module: string
+          user_id?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          action_description?: string | null
+          action_name?: string
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          payload?: Json | null
+          severity?: string
+          source_module?: string
+          user_id?: string | null
+          user_role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_live_activity_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_rentable_features: {
+        Row: {
+          base_price: number | null
+          created_at: string
+          description: string | null
+          feature_code: string
+          feature_name: string
+          id: string
+          is_active: boolean | null
+          is_premium: boolean | null
+          module_name: string
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number | null
+          created_at?: string
+          description?: string | null
+          feature_code: string
+          feature_name: string
+          id?: string
+          is_active?: boolean | null
+          is_premium?: boolean | null
+          module_name: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number | null
+          created_at?: string
+          description?: string | null
+          feature_code?: string
+          feature_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_premium?: boolean | null
+          module_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      master_rental_plans: {
+        Row: {
+          created_at: string
+          currency: string | null
+          duration_type: string
+          duration_value: number
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          plan_code: string
+          plan_name: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          duration_type: string
+          duration_value?: number
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          plan_code: string
+          plan_name: string
+          price?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          duration_type?: string
+          duration_value?: number
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          plan_code?: string
+          plan_name?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      master_rental_usage_logs: {
+        Row: {
+          id: string
+          ip_address: string | null
+          logged_at: string
+          rental_id: string | null
+          usage_metric: Json | null
+          usage_type: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          logged_at?: string
+          rental_id?: string | null
+          usage_metric?: Json | null
+          usage_type: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          logged_at?: string
+          rental_id?: string | null
+          usage_metric?: Json | null
+          usage_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_rental_usage_logs_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "master_rentals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_rentals: {
+        Row: {
+          auto_renew: boolean | null
+          created_at: string
+          end_time: string
+          feature_id: string | null
+          id: string
+          max_usage: number | null
+          metadata: Json | null
+          plan_id: string | null
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          start_time: string
+          status: string
+          updated_at: string
+          usage_count: number | null
+          user_id: string
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          created_at?: string
+          end_time: string
+          feature_id?: string | null
+          id?: string
+          max_usage?: number | null
+          metadata?: Json | null
+          plan_id?: string | null
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          start_time?: string
+          status?: string
+          updated_at?: string
+          usage_count?: number | null
+          user_id: string
+        }
+        Update: {
+          auto_renew?: boolean | null
+          created_at?: string
+          end_time?: string
+          feature_id?: string | null
+          id?: string
+          max_usage?: number | null
+          metadata?: Json | null
+          plan_id?: string | null
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          start_time?: string
+          status?: string
+          updated_at?: string
+          usage_count?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_rentals_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "master_rentable_features"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_rentals_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "master_rental_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_risk_entity_scores: {
+        Row: {
+          calculated_at: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          previous_value: number | null
+          risk_factors: Json | null
+          risk_level: string
+          risk_value: number
+          trend: string | null
+        }
+        Insert: {
+          calculated_at?: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          previous_value?: number | null
+          risk_factors?: Json | null
+          risk_level?: string
+          risk_value?: number
+          trend?: string | null
+        }
+        Update: {
+          calculated_at?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          previous_value?: number | null
+          risk_factors?: Json | null
+          risk_level?: string
+          risk_value?: number
+          trend?: string | null
+        }
+        Relationships: []
+      }
+      master_rule_execution_logs: {
+        Row: {
+          affected_entities: number | null
+          blackbox_event_id: string | null
+          executed_at: string
+          executed_by: string | null
+          execution_result: string
+          id: string
+          impact_summary: Json | null
+          rule_id: string | null
+        }
+        Insert: {
+          affected_entities?: number | null
+          blackbox_event_id?: string | null
+          executed_at?: string
+          executed_by?: string | null
+          execution_result: string
+          id?: string
+          impact_summary?: Json | null
+          rule_id?: string | null
+        }
+        Update: {
+          affected_entities?: number | null
+          blackbox_event_id?: string | null
+          executed_at?: string
+          executed_by?: string | null
+          execution_result?: string
+          id?: string
+          impact_summary?: Json | null
+          rule_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_rule_execution_logs_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_rule_execution_logs_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "master_global_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_security_events: {
+        Row: {
+          blackbox_event_id: string | null
+          created_at: string
+          device_fingerprint: string | null
+          event_description: string | null
+          event_type: string
+          geo_location: string | null
+          id: string
+          ip_address: string | null
+          is_resolved: boolean | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          blackbox_event_id?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          event_description?: string | null
+          event_type: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          user_id?: string | null
+        }
+        Update: {
+          blackbox_event_id?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          event_description?: string | null
+          event_type?: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_security_events_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_super_admin_profiles: {
+        Row: {
+          assigned_continent_id: string | null
+          authority_scope: Json
+          created_at: string
+          display_name: string
+          id: string
+          last_active_at: string | null
+          risk_level: string | null
+          status: string
+          total_actions: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_continent_id?: string | null
+          authority_scope?: Json
+          created_at?: string
+          display_name: string
+          id?: string
+          last_active_at?: string | null
+          risk_level?: string | null
+          status?: string
+          total_actions?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_continent_id?: string | null
+          authority_scope?: Json
+          created_at?: string
+          display_name?: string
+          id?: string
+          last_active_at?: string | null
+          risk_level?: string | null
+          status?: string
+          total_actions?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_super_admin_profiles_assigned_continent_id_fkey"
+            columns: ["assigned_continent_id"]
+            isOneToOne: false
+            referencedRelation: "master_continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_system_locks: {
+        Row: {
+          activated_at: string
+          activated_by: string
+          blackbox_event_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          lock_scope: string
+          lock_type: string
+          reason: string
+          release_notes: string | null
+          released_at: string | null
+          released_by: string | null
+          scheduled_release_at: string | null
+          severity: string
+          target_id: string | null
+          target_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string
+          activated_by: string
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          lock_scope: string
+          lock_type?: string
+          reason: string
+          release_notes?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          scheduled_release_at?: string | null
+          severity?: string
+          target_id?: string | null
+          target_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string
+          activated_by?: string
+          blackbox_event_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          lock_scope?: string
+          lock_type?: string
+          reason?: string
+          release_notes?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          scheduled_release_at?: string | null
+          severity?: string
+          target_id?: string | null
+          target_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_system_locks_blackbox_event_id_fkey"
+            columns: ["blackbox_event_id"]
+            isOneToOne: false
+            referencedRelation: "blackbox_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_system_settings: {
+        Row: {
+          created_at: string
+          id: string
+          is_encrypted: boolean | null
+          is_locked: boolean | null
+          last_modified_by: string | null
+          setting_key: string
+          setting_type: string | null
+          setting_value: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_encrypted?: boolean | null
+          is_locked?: boolean | null
+          last_modified_by?: string | null
+          setting_key: string
+          setting_type?: string | null
+          setting_value: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_encrypted?: boolean | null
+          is_locked?: boolean | null
+          last_modified_by?: string | null
+          setting_key?: string
+          setting_type?: string | null
+          setting_value?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -15108,6 +16205,22 @@ export type Database = {
           p_recommended_action: string
           p_risk_level: string
           p_session_id: string
+        }
+        Returns: string
+      }
+      log_to_blackbox: {
+        Args: {
+          p_device_fingerprint?: string
+          p_entity_id?: string
+          p_entity_type?: string
+          p_event_type: string
+          p_geo_location?: string
+          p_ip_address?: string
+          p_metadata?: Json
+          p_module_name: string
+          p_risk_score?: number
+          p_role_name?: string
+          p_user_id?: string
         }
         Returns: string
       }
