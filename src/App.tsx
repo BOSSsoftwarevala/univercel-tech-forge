@@ -76,6 +76,10 @@ import ValaOperationWorkspace from "./pages/vala-control/ValaOperationWorkspace"
 import ValaRegionalWorkspace from "./pages/vala-control/ValaRegionalWorkspace";
 import ValaAIHeadWorkspace from "./pages/vala-control/ValaAIHeadWorkspace";
 import ValaMasterWorkspace from "./pages/vala-control/ValaMasterWorkspace";
+
+// Dev Manager Pages
+import SecureDevManagerDashboard from "./pages/dev-manager/SecureDevManagerDashboard";
+
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 import ContinentSuperAdminDashboard from "./pages/continent-super-admin/ContinentSuperAdminDashboard";
@@ -416,6 +420,9 @@ const App = () => (
               <Route path="/vala/regional" element={<RequireAuth><ValaRegionalWorkspace /></RequireAuth>} />
               <Route path="/vala/ai-head" element={<RequireAuth><ValaAIHeadWorkspace /></RequireAuth>} />
               <Route path="/vala/master" element={<RequireRole allowed={["master"]} masterOnly><ValaMasterWorkspace /></RequireRole>} />
+
+              {/* Dev Manager Dashboard */}
+              <Route path="/dev-manager" element={<RequireAuth><SecureDevManagerDashboard /></RequireAuth>} />
 
               {/* Wireframe Routes - Design Sandbox */}
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
