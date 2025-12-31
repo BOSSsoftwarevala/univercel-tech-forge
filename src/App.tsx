@@ -86,6 +86,9 @@ import SecureHRManagerDashboard from "./pages/hr-manager/SecureHRManagerDashboar
 // Task Manager Pages
 import SecureTaskManagerDashboard from "./pages/task-manager/SecureTaskManagerDashboard";
 
+// Legal Manager Pages
+import SecureLegalManagerDashboard from "./pages/legal-manager/SecureLegalManagerDashboard";
+
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 import ContinentSuperAdminDashboard from "./pages/continent-super-admin/ContinentSuperAdminDashboard";
@@ -379,6 +382,9 @@ const App = () => (
               
               {/* Secure Task Manager Dashboard */}
               <Route path="/task-manager-secure" element={<RequireRole allowed={["task_manager", "super_admin"]}><SecureTaskManagerDashboard /></RequireRole>} />
+              
+              {/* Secure Legal Manager Dashboard */}
+              <Route path="/legal-manager-secure" element={<RequireRole allowed={["legal_manager", "super_admin"]}><SecureLegalManagerDashboard /></RequireRole>} />
               <Route path="/seo" element={<RequireRole allowed={["seo_manager", "super_admin"]}><SEODashboard /></RequireRole>} />
               <Route path="/seo/*" element={<RequireRole allowed={["seo_manager", "super_admin"]}><SEODashboard /></RequireRole>} />
               <Route path="/seo-dashboard" element={<RequireRole allowed={["seo_manager", "super_admin"]}><SEODashboard /></RequireRole>} />
