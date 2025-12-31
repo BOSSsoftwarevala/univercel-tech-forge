@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FileText, Lock, Search, Clock, Download, Eye,
-  Calendar, User, Shield, ChevronRight, Play, Pause
+  Calendar, User, Shield, ChevronRight, Play, Pause, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { BlackboxPanel, useBlackbox } from '../engines/BlackboxEngine';
 
 interface AuditLog {
   id: string;
@@ -33,7 +34,7 @@ export function AuditModule() {
   const [timelinePosition, setTimelinePosition] = useState([50]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
+  const { events } = useBlackbox();
   return (
     <div className="space-y-6">
       {/* Read-Only Banner */}
@@ -178,6 +179,23 @@ export function AuditModule() {
             </motion.div>
           ))}
         </Card>
+      </motion.div>
+
+      {/* Blackbox Mirror (Full View) */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <div className="relative">
+          <div className="absolute -top-2 left-4 px-3 py-1 bg-blue-500/20 rounded-full border border-blue-500/30">
+            <div className="flex items-center gap-2">
+              <Box className="w-3 h-3 text-blue-400" />
+              <span className="text-[10px] text-blue-300 uppercase tracking-wider font-bold">Blackbox Mirror - Read Only</span>
+            </div>
+          </div>
+          <BlackboxPanel maxEvents={15} />
+        </div>
       </motion.div>
 
       {/* Rental Access */}

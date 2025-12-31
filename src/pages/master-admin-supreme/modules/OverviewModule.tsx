@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, Users, DollarSign, Activity, Globe2, 
-  Shield, CheckCircle, AlertTriangle, Clock, Zap
+  Shield, CheckCircle, AlertTriangle, Clock, Zap, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { BlackboxPanel, useBlackbox } from '../engines/BlackboxEngine';
+import { AIWatcherPanel, RiskPanel, RentalPanel } from '../engines/AIWatcherEngine';
+import { LiveActivityFeed } from '../engines/LiveActivityEngine';
 
 interface KPICardProps {
   title: string;
@@ -53,13 +56,7 @@ const KPICard = ({ title, value, change, icon: Icon, trend, delay }: KPICardProp
 
 export function OverviewModule() {
   const [healthRing, setHealthRing] = useState(94);
-  const [activities, setActivities] = useState([
-    { id: 1, action: 'Super Admin SA-0012 approved withdrawal', time: '2 min ago', type: 'success' },
-    { id: 2, action: 'Security scan completed for Asia region', time: '5 min ago', type: 'info' },
-    { id: 3, action: 'High-risk approval flagged for review', time: '8 min ago', type: 'warning' },
-    { id: 4, action: 'Global rule #47 activated', time: '12 min ago', type: 'success' },
-    { id: 5, action: 'New franchise onboarded: Mumbai Branch', time: '15 min ago', type: 'info' },
-  ]);
+  const { events } = useBlackbox();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -147,7 +144,7 @@ export function OverviewModule() {
           </Card>
         </motion.div>
 
-        {/* Live Activity Ticker */}
+        {/* Live Activity Feed */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -155,39 +152,39 @@ export function OverviewModule() {
           className="lg:col-span-2"
         >
           <Card className="p-6 bg-gradient-to-br from-white/10 to-white/5 border-white/10 backdrop-blur-xl h-full">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">Live Activity</h3>
-              <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-green-500/20 border border-green-500/30">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs text-green-400">Real-time</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {activities.map((activity, index) => (
-                <motion.div
-                  key={activity.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
-                >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    activity.type === 'success' ? 'bg-green-500/20' :
-                    activity.type === 'warning' ? 'bg-amber-500/20' :
-                    'bg-blue-500/20'
-                  }`}>
-                    {activity.type === 'success' ? <CheckCircle className="w-4 h-4 text-green-400" /> :
-                     activity.type === 'warning' ? <AlertTriangle className="w-4 h-4 text-amber-400" /> :
-                     <Activity className="w-4 h-4 text-blue-400" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-white/80">{activity.action}</p>
-                  </div>
-                  <span className="text-xs text-white/40">{activity.time}</span>
-                </motion.div>
-              ))}
-            </div>
+            <LiveActivityFeed maxEvents={6} />
           </Card>
+        </motion.div>
+      </div>
+
+      {/* Blackbox & Engines Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Blackbox Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="lg:col-span-2"
+        >
+          <BlackboxPanel maxEvents={8} />
+        </motion.div>
+
+        {/* AI Watcher */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <AIWatcherPanel />
+        </motion.div>
+
+        {/* Risk Engine */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <RiskPanel />
         </motion.div>
       </div>
 
@@ -195,28 +192,9 @@ export function OverviewModule() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 0.9 }}
       >
-        <Card className="p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 backdrop-blur-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-amber-300">Rental Features Active</h4>
-                <p className="text-xs text-amber-200/60">Dashboard widgets • Time-based access • Premium modules</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-xs text-white/50">Time Remaining</p>
-                <p className="text-lg font-bold text-amber-300">23:45:12</p>
-              </div>
-              <Zap className="w-6 h-6 text-amber-400" />
-            </div>
-          </div>
-        </Card>
+        <RentalPanel />
       </motion.div>
     </div>
   );

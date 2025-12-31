@@ -2,11 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   Shield, FileText, CheckCircle, AlertTriangle, Clock,
-  Layers, ChevronRight, Eye, Zap, History
+  Layers, ChevronRight, Eye, Zap, History, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { BlackboxPanel, useBlackbox } from '../engines/BlackboxEngine';
 
 interface Rule {
   id: string;
@@ -155,6 +156,23 @@ export function GlobalRulesModule() {
             ))}
           </div>
         </Card>
+      </motion.div>
+
+      {/* Blackbox - Rule Changes Auto-Logged */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+      >
+        <div className="relative">
+          <div className="absolute -top-2 left-4 px-3 py-1 bg-cyan-500/20 rounded-full border border-cyan-500/30">
+            <div className="flex items-center gap-2">
+              <Box className="w-3 h-3 text-cyan-400" />
+              <span className="text-[10px] text-cyan-300 uppercase tracking-wider font-bold">Rule Changes Auto-Logged to Blackbox</span>
+            </div>
+          </div>
+          <BlackboxPanel maxEvents={8} module="Rules" />
+        </div>
       </motion.div>
     </div>
   );

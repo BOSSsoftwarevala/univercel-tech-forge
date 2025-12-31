@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   AlertTriangle, Shield, Clock, CheckCircle, XCircle,
-  User, DollarSign, Gauge, Zap, Eye
+  User, DollarSign, Gauge, Zap, Eye, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { BlackboxPanel, useBlackbox } from '../engines/BlackboxEngine';
+import { RiskPanel } from '../engines/AIWatcherEngine';
 
 interface Approval {
   id: string;
@@ -29,6 +31,21 @@ const pendingApprovals: Approval[] = [
 
 export function ApprovalsModule() {
   const [processing, setProcessing] = useState<string | null>(null);
+  const { logEvent } = useBlackbox();
+
+  const handleApproval = (approval: Approval, action: 'approve' | 'reject') => {
+    logEvent({
+      action: action === 'approve' ? 'HIGH-RISK APPROVAL GRANTED' : 'HIGH-RISK APPROVAL REJECTED',
+      actor: 'MA-0001',
+      actorRole: 'Master Admin',
+      target: `${approval.type} - ${approval.user}`,
+      module: 'Approvals',
+      ip: '192.168.1.xxx',
+      geo: 'Mumbai, IN',
+      device: 'Chrome/Windows',
+      riskScore: approval.riskScore,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -170,6 +187,7 @@ export function ApprovalsModule() {
                       size="sm"
                       variant="outline"
                       className="bg-red-500/20 border-red-500/30 hover:bg-red-500/30 text-red-300 gap-1"
+                      onClick={() => handleApproval(approval, 'reject')}
                     >
                       <XCircle className="w-3 h-3" />
                       Reject
@@ -177,6 +195,7 @@ export function ApprovalsModule() {
                     <Button
                       size="sm"
                       className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white gap-1"
+                      onClick={() => handleApproval(approval, 'approve')}
                     >
                       <CheckCircle className="w-3 h-3" />
                       Approve
@@ -189,11 +208,38 @@ export function ApprovalsModule() {
         ))}
       </div>
 
+      {/* Blackbox & Risk Engine Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="relative">
+            <div className="absolute -top-2 left-4 px-3 py-1 bg-red-500/30 rounded-full border border-red-500/50">
+              <div className="flex items-center gap-2">
+                <Box className="w-3 h-3 text-red-400" />
+                <span className="text-[10px] text-red-300 uppercase tracking-wider font-bold">Forced Logging - Cannot Bypass</span>
+              </div>
+            </div>
+            <BlackboxPanel maxEvents={6} module="Approvals" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.75 }}
+        >
+          <RiskPanel />
+        </motion.div>
+      </div>
+
       {/* Fast-Track Rental */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 0.9 }}
       >
         <Card className="p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 backdrop-blur-xl">
           <div className="flex items-center justify-between">

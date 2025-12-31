@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Eye, Shield, AlertTriangle, Globe2, Activity, Lock,
-  Wifi, Monitor, Clock, Zap, Terminal, MapPin
+  Wifi, Monitor, Clock, Zap, Terminal, MapPin, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { BlackboxPanel, useBlackbox } from '../engines/BlackboxEngine';
+import { AIWatcherPanel } from '../engines/AIWatcherEngine';
+import { LiveActivityFeed } from '../engines/LiveActivityEngine';
 
 interface ThreatEvent {
   id: string;
@@ -28,6 +31,7 @@ export function SecurityMonitorModule() {
   const [threats, setThreats] = useState(initialThreats);
   const [securityLevel, setSecurityLevel] = useState(87);
   const [matrixLines, setMatrixLines] = useState<string[]>([]);
+  const { logEvent } = useBlackbox();
 
   // Simulate matrix effect
   useEffect(() => {
@@ -229,6 +233,27 @@ export function SecurityMonitorModule() {
               </div>
             </div>
           </Card>
+        </motion.div>
+      </div>
+
+      {/* Blackbox & AI Watcher Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Security Blackbox */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <BlackboxPanel maxEvents={8} module="Security" />
+        </motion.div>
+
+        {/* AI Watcher */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <AIWatcherPanel />
         </motion.div>
       </div>
     </div>

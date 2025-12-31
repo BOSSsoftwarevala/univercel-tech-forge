@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Lock, AlertTriangle, Shield, Power, RefreshCw,
-  Clock, Zap, AlertOctagon, CheckCircle2, XCircle
+  Clock, Zap, AlertOctagon, CheckCircle2, XCircle, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { BlackboxPanel, useBlackbox } from '../engines/BlackboxEngine';
 
 export function SystemLockModule() {
   const [lockdownActive, setLockdownActive] = useState(false);
   const [confirmStep, setConfirmStep] = useState(0);
+  const { logEvent } = useBlackbox();
 
   const handleLockdown = () => {
     if (confirmStep < 3) {
@@ -19,11 +21,38 @@ export function SystemLockModule() {
     } else {
       setLockdownActive(true);
       setConfirmStep(0);
+      // Log to Blackbox
+      logEvent({
+        action: 'GLOBAL LOCKDOWN ACTIVATED',
+        actor: 'MA-0001',
+        actorRole: 'Master Admin',
+        target: 'All Systems',
+        module: 'System Lock',
+        ip: '192.168.1.xxx',
+        geo: 'Mumbai, IN',
+        device: 'Chrome/Windows',
+        riskScore: 100,
+      });
     }
   };
 
   const cancelLockdown = () => {
     setConfirmStep(0);
+  };
+
+  const releaseLockdown = () => {
+    setLockdownActive(false);
+    logEvent({
+      action: 'LOCKDOWN RELEASED',
+      actor: 'MA-0001',
+      actorRole: 'Master Admin',
+      target: 'All Systems',
+      module: 'System Lock',
+      ip: '192.168.1.xxx',
+      geo: 'Mumbai, IN',
+      device: 'Chrome/Windows',
+      riskScore: 50,
+    });
   };
 
   return (
@@ -165,10 +194,10 @@ export function SystemLockModule() {
                   <h4 className="text-xl font-bold text-red-300 mb-2">SYSTEM LOCKED</h4>
                   <p className="text-sm text-red-200/60">All operations suspended</p>
                 </div>
-                <Button
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white"
-                  onClick={() => setLockdownActive(false)}
-                >
+                  <Button
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white"
+                    onClick={releaseLockdown}
+                  >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Release Lockdown
                 </Button>
@@ -230,6 +259,23 @@ export function SystemLockModule() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Blackbox - Lock Events */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <div className="relative">
+          <div className="absolute -top-2 left-4 px-3 py-1 bg-red-500/30 rounded-full border border-red-500/50">
+            <div className="flex items-center gap-2">
+              <Box className="w-3 h-3 text-red-400" />
+              <span className="text-[10px] text-red-300 uppercase tracking-wider font-bold">Lock Events - Sealed in Blackbox</span>
+            </div>
+          </div>
+          <BlackboxPanel maxEvents={6} />
+        </div>
+      </motion.div>
     </div>
   );
 }

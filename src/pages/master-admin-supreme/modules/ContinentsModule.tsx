@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Globe2, Users, TrendingUp, Activity, ChevronRight, 
-  Clock, Zap, MapPin
+  Clock, Zap, MapPin, Box
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { BlackboxPanel } from '../engines/BlackboxEngine';
+import { LiveActivityFeed } from '../engines/LiveActivityEngine';
 
 interface Continent {
   id: string;
@@ -163,6 +165,35 @@ export function ContinentsModule() {
           </div>
         </Card>
       </motion.div>
+
+      {/* Regional Blackbox & Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="relative">
+            <div className="absolute -top-2 left-4 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/30">
+              <div className="flex items-center gap-2">
+                <Box className="w-3 h-3 text-emerald-400" />
+                <span className="text-[10px] text-emerald-300 uppercase tracking-wider font-bold">Region-based Blackbox Filters</span>
+              </div>
+            </div>
+            <BlackboxPanel maxEvents={6} />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <Card className="p-4 bg-gradient-to-br from-emerald-950/50 to-teal-950/50 border-emerald-500/20 backdrop-blur-xl h-full">
+            <LiveActivityFeed maxEvents={8} />
+          </Card>
+        </motion.div>
+      </div>
     </div>
   );
 }
