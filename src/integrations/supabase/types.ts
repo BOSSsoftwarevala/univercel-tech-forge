@@ -9281,6 +9281,13 @@ export type Database = {
             referencedRelation: "promise_logs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "promise_audit_logs_promise_id_fkey"
+            columns: ["promise_id"]
+            isOneToOne: false
+            referencedRelation: "promise_tracker_view"
+            referencedColumns: ["promise_id"]
+          },
         ]
       }
       promise_escalation_logs: {
@@ -9325,7 +9332,50 @@ export type Database = {
             referencedRelation: "promise_logs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "promise_escalation_logs_promise_id_fkey"
+            columns: ["promise_id"]
+            isOneToOne: false
+            referencedRelation: "promise_tracker_view"
+            referencedColumns: ["promise_id"]
+          },
         ]
+      }
+      promise_export_logs: {
+        Row: {
+          data_masked: boolean | null
+          export_format: string
+          exported_at: string | null
+          exporter_id: string
+          exporter_role: string
+          filter_criteria: Json | null
+          id: string
+          records_exported: number | null
+          server_timestamp: string | null
+        }
+        Insert: {
+          data_masked?: boolean | null
+          export_format: string
+          exported_at?: string | null
+          exporter_id: string
+          exporter_role: string
+          filter_criteria?: Json | null
+          id?: string
+          records_exported?: number | null
+          server_timestamp?: string | null
+        }
+        Update: {
+          data_masked?: boolean | null
+          export_format?: string
+          exported_at?: string | null
+          exporter_id?: string
+          exporter_role?: string
+          filter_criteria?: Json | null
+          id?: string
+          records_exported?: number | null
+          server_timestamp?: string | null
+        }
+        Relationships: []
       }
       promise_fines: {
         Row: {
@@ -9383,6 +9433,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "promise_logs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promise_fines_promise_id_fkey"
+            columns: ["promise_id"]
+            isOneToOne: false
+            referencedRelation: "promise_tracker_view"
+            referencedColumns: ["promise_id"]
           },
         ]
       }
@@ -9539,6 +9596,60 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "developer_tasks"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      promise_view_logs: {
+        Row: {
+          id: string
+          ip_address: string | null
+          promise_id: string | null
+          server_timestamp: string | null
+          session_id: string | null
+          user_agent: string | null
+          view_type: string
+          viewed_at: string | null
+          viewer_id: string
+          viewer_role: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          promise_id?: string | null
+          server_timestamp?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          view_type?: string
+          viewed_at?: string | null
+          viewer_id: string
+          viewer_role: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          promise_id?: string | null
+          server_timestamp?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          view_type?: string
+          viewed_at?: string | null
+          viewer_id?: string
+          viewer_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promise_view_logs_promise_id_fkey"
+            columns: ["promise_id"]
+            isOneToOne: false
+            referencedRelation: "promise_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promise_view_logs_promise_id_fkey"
+            columns: ["promise_id"]
+            isOneToOne: false
+            referencedRelation: "promise_tracker_view"
+            referencedColumns: ["promise_id"]
           },
         ]
       }
@@ -14340,6 +14451,98 @@ export type Database = {
         }
         Relationships: []
       }
+      promise_tracker_metrics: {
+        Row: {
+          active_promises: number | null
+          escalated_promises: number | null
+          fulfilled_promises: number | null
+          last_updated: string | null
+          overdue_promises: number | null
+          pending_approval: number | null
+          total_promises: number | null
+        }
+        Relationships: []
+      }
+      promise_tracker_view: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          assigned_role: string | null
+          assigned_user_masked: string | null
+          breach_reason: string | null
+          created_at: string | null
+          due_date: string | null
+          escalated_at: string | null
+          escalation_level: number | null
+          extended_count: number | null
+          finished_time: string | null
+          is_locked: boolean | null
+          linked_module: string | null
+          priority: string | null
+          promise_id: string | null
+          promise_type: string | null
+          remaining_minutes: number | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["promise_status"] | null
+          task_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: never
+          assigned_role?: never
+          assigned_user_masked?: never
+          breach_reason?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          escalated_at?: string | null
+          escalation_level?: number | null
+          extended_count?: number | null
+          finished_time?: string | null
+          is_locked?: boolean | null
+          linked_module?: never
+          priority?: string | null
+          promise_id?: string | null
+          promise_type?: string | null
+          remaining_minutes?: never
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["promise_status"] | null
+          task_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: never
+          assigned_role?: never
+          assigned_user_masked?: never
+          breach_reason?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          escalated_at?: string | null
+          escalation_level?: number | null
+          extended_count?: number | null
+          finished_time?: string | null
+          is_locked?: boolean | null
+          linked_module?: never
+          priority?: string | null
+          promise_id?: string | null
+          promise_type?: string | null
+          remaining_minutes?: never
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["promise_status"] | null
+          task_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promise_logs_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "developer_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_compliance_status: {
         Row: {
           active_penalties: number | null
@@ -14627,6 +14830,24 @@ export type Database = {
           p_ip_address?: string
           p_new_values?: Json
           p_old_values?: Json
+        }
+        Returns: string
+      }
+      log_promise_export: {
+        Args: {
+          p_export_format: string
+          p_filter_criteria?: Json
+          p_records_exported?: number
+        }
+        Returns: string
+      }
+      log_promise_view: {
+        Args: {
+          p_ip_address?: string
+          p_promise_id?: string
+          p_session_id?: string
+          p_user_agent?: string
+          p_view_type?: string
         }
         Returns: string
       }
