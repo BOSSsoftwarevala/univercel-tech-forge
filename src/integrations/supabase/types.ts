@@ -13879,6 +13879,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_demo_history: {
+        Row: {
+          demo_id: string | null
+          duration_seconds: number | null
+          id: string
+          interaction_count: number | null
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          demo_id?: string | null
+          duration_seconds?: number | null
+          id?: string
+          interaction_count?: number | null
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          demo_id?: string | null
+          duration_seconds?: number | null
+          id?: string
+          interaction_count?: number | null
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_demo_history_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_notifications: {
         Row: {
           action_label: string | null
@@ -13975,6 +14010,118 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          is_verified: boolean | null
+          last_active_at: string | null
+          phone: string | null
+          referral_code: string | null
+          referred_by: string | null
+          total_purchases: number | null
+          total_spent: number | null
+          updated_at: string | null
+          user_id: string
+          wallet_balance: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          last_active_at?: string | null
+          phone?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+          total_purchases?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          user_id: string
+          wallet_balance?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          last_active_at?: string | null
+          phone?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+          total_purchases?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          user_id?: string
+          wallet_balance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_purchases: {
+        Row: {
+          access_expires_at: string | null
+          access_granted_at: string | null
+          amount: number
+          created_at: string | null
+          currency: string | null
+          demo_id: string | null
+          id: string
+          payment_method: string | null
+          status: string | null
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          access_expires_at?: string | null
+          access_granted_at?: string | null
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          demo_id?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string | null
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          access_expires_at?: string | null
+          access_granted_at?: string | null
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          demo_id?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string | null
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_purchases_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           approval_status: string | null
@@ -14061,6 +14208,90 @@ export type Database = {
           location?: string | null
           login_at?: string | null
           logout_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string | null
+          created_at: string | null
+          description: string
+          id: string
+          priority: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: string | null
+          subject: string
+          ticket_number: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          priority?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          subject: string
+          ticket_number?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          priority?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          subject?: string
+          ticket_number?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
           user_id?: string
         }
         Relationships: []
@@ -14673,6 +14904,10 @@ export type Database = {
         Args: { p_reason?: string; p_session_id: string }
         Returns: Json
       }
+      end_user_safe_assist_on_logout: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       escalate_overdue_promise: {
         Args: { p_promise_id: string }
         Returns: Json
@@ -14981,6 +15216,10 @@ export type Database = {
       validate_promise_integrity: {
         Args: { p_promise_id: string }
         Returns: Json
+      }
+      validate_user_route_access: {
+        Args: { p_route: string; p_user_id: string }
+        Returns: boolean
       }
       verify_backup_code: {
         Args: { p_code: string; p_user_id: string }
