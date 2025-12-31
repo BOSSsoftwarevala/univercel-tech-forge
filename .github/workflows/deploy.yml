@@ -1,17 +1,17 @@
-name: Deploy to Vercel
+name: Auto Deploy to Vercel
 
 # ================================================
-# MANUAL DEPLOY - Super Admin Controlled
-# Auto-deploy disabled for security
+# AUTO DEPLOY ENABLED
+# Every push automatically deploys to Vercel
 # ================================================
 
 on:
+  push:
+    branches:
+      - main
+      - master
   workflow_dispatch:
     inputs:
-      confirm_deploy:
-        description: 'Type "DEPLOY" to confirm deployment'
-        required: true
-        type: string
       environment:
         description: 'Deployment environment'
         required: true
@@ -19,26 +19,14 @@ on:
         options:
           - production
           - preview
-        default: preview
+        default: production
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validate deployment confirmation
-        run: |
-          if [ "${{ github.event.inputs.confirm_deploy }}" != "DEPLOY" ]; then
-            echo "❌ Deployment cancelled - confirmation text must be 'DEPLOY'"
-            exit 1
-          fi
-          echo "✅ Deployment confirmed"
-
-  build-and-deploy:
-    needs: validate
+  deploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -51,39 +39,38 @@ jobs:
           node-version: '20'
           cache: 'npm'
       
+      - name: Install dependencies
+        run: npm ci
+      
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
       
       - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=${{ github.event.inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       
       - name: Build Project
-        run: vercel build ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
       
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel Production
         id: deploy
         run: |
-          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
-            DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          else
-            DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
-          fi
+          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "✅ Deployed to: $DEPLOY_URL"
       
-      - name: Log Deployment
+      - name: Deployment Summary
         run: |
           echo "================================================"
-          echo "✅ Vercel Deployment Complete"
-          echo "Environment: ${{ github.event.inputs.environment }}"
-          echo "Deployed by: ${{ github.actor }}"
-          echo "Deploy time: $(date)"
-          echo "URL: ${{ steps.deploy.outputs.deploy_url }}"
+          echo "✅ AUTO DEPLOYMENT COMPLETE"
+          echo "================================================"
+          echo "🌐 URL: ${{ steps.deploy.outputs.deploy_url }}"
+          echo "👤 Triggered by: ${{ github.actor }}"
+          echo "📅 Time: $(date)"
+          echo "📝 Commit: ${{ github.sha }}"
           echo "================================================"
 
   security-scan:
     runs-on: ubuntu-latest
-    needs: validate
     
     steps:
       - uses: actions/checkout@v4
@@ -97,13 +84,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Run dependency vulnerability scan
-        run: npm audit --audit-level=high || echo "⚠️ Vulnerabilities found - review required"
+      - name: Security audit
+        run: npm audit --audit-level=high || echo "⚠️ Review vulnerabilities"
       
-      - name: Check for secrets in code
+      - name: Secret scan
         run: |
-          if grep -rE "(password|api_key|secret_key).*=.*['\"][^'\"]+['\"]" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v ".env" | grep -v "example" | grep -v "placeholder"; then
-            echo "⚠️ Warning: Potential hardcoded secrets found"
+          if grep -rE "(password|api_key|secret_key).*=.*['\"][^'\"]+['\"]" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v "example" | grep -v "placeholder"; then
+            echo "⚠️ Potential secrets found"
           else
-            echo "✅ No hardcoded secrets detected"
+            echo "✅ Clean"
           fi
