@@ -98,6 +98,9 @@ import SecureLeadManagerDashboard from "./pages/lead-manager/SecureLeadManagerDa
 // Marketing Manager Pages
 import SecureMarketingManagerDashboard from "./pages/marketing-manager/SecureMarketingManagerDashboard";
 
+// Influencer Manager Pages
+import SecureInfluencerManagerDashboard from "./pages/influencer-manager/SecureInfluencerManagerDashboard";
+
 // SEO Manager Pages
 import SecureSEOManagerDashboard from "./pages/seo-manager/SecureSEOManagerDashboard";
 
