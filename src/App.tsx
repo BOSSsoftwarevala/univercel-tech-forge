@@ -69,6 +69,13 @@ import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
 import MasterAuth from "./pages/MasterAuth";
 import MasterControlCenter from "./pages/master-control/MasterControlCenter";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
+
+// Vala Control System Pages
+import ValaControlHub from "./pages/vala-control/ValaControlHub";
+import ValaOperationWorkspace from "./pages/vala-control/ValaOperationWorkspace";
+import ValaRegionalWorkspace from "./pages/vala-control/ValaRegionalWorkspace";
+import ValaAIHeadWorkspace from "./pages/vala-control/ValaAIHeadWorkspace";
+import ValaMasterWorkspace from "./pages/vala-control/ValaMasterWorkspace";
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 import ContinentSuperAdminDashboard from "./pages/continent-super-admin/ContinentSuperAdminDashboard";
