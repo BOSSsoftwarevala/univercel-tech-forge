@@ -104,6 +104,9 @@ import SecureInfluencerManagerDashboard from "./pages/influencer-manager/SecureI
 // SEO Manager Pages
 import SecureSEOManagerDashboard from "./pages/seo-manager/SecureSEOManagerDashboard";
 
+// API/AI Manager Pages
+import SecureAPIAIManagerDashboard from "./pages/api-ai-manager/SecureAPIAIManagerDashboard";
+
 // Secure Control System Pages
 import SecureControlSystem from "./pages/control-system/SecureControlSystem";
 import MasterAdminControl from "./pages/control-system/MasterAdminControl";
@@ -371,6 +374,7 @@ const App = () => (
               <Route path="/influencer-command-center" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerCommandCenter /></RequireRole>} />
               <Route path="/influencer-dashboard" element={<RequireRole allowed={["influencer", "super_admin"]}><InfluencerDashboard /></RequireRole>} />
               <Route path="/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
+              <Route path="/influencer-manager-secure" element={<RequireRole allowed={["influencer_manager", "super_admin"]}><SecureInfluencerManagerDashboard /></RequireRole>} />
               {/* Public demo route for Influencer Command Center */}
               <Route path="/demo/influencer-command-center" element={<InfluencerCommandCenter />} />
 
