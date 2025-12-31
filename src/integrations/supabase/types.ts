@@ -8607,6 +8607,87 @@ export type Database = {
           },
         ]
       }
+      master_permission_grants: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          grant_type: string
+          granted_by: string | null
+          id: string
+          permission_id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          grant_type?: string
+          granted_by?: string | null
+          id?: string
+          permission_id: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          grant_type?: string
+          granted_by?: string | null
+          id?: string
+          permission_id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_permission_grants_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "master_permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_permission_grants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "master_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_permissions: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_sensitive: boolean | null
+          module_name: string
+          permission_code: string
+          permission_name: string
+          requires_2fa: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_sensitive?: boolean | null
+          module_name: string
+          permission_code: string
+          permission_name: string
+          requires_2fa?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_sensitive?: boolean | null
+          module_name?: string
+          permission_code?: string
+          permission_name?: string
+          requires_2fa?: boolean | null
+        }
+        Relationships: []
+      }
       master_rentable_features: {
         Row: {
           base_price: number | null
@@ -8831,6 +8912,84 @@ export type Database = {
           risk_level?: string
           risk_value?: number
           trend?: string | null
+        }
+        Relationships: []
+      }
+      master_role_permissions: {
+        Row: {
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "master_permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "master_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_roles: {
+        Row: {
+          can_be_deleted: boolean | null
+          created_at: string
+          display_name: string
+          hierarchy_level: number
+          id: string
+          is_system_role: boolean | null
+          metadata: Json | null
+          name: string
+          scope_level: string
+          updated_at: string
+        }
+        Insert: {
+          can_be_deleted?: boolean | null
+          created_at?: string
+          display_name: string
+          hierarchy_level?: number
+          id?: string
+          is_system_role?: boolean | null
+          metadata?: Json | null
+          name: string
+          scope_level?: string
+          updated_at?: string
+        }
+        Update: {
+          can_be_deleted?: boolean | null
+          created_at?: string
+          display_name?: string
+          hierarchy_level?: number
+          id?: string
+          is_system_role?: boolean | null
+          metadata?: Json | null
+          name?: string
+          scope_level?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -9094,6 +9253,137 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      master_user_sessions: {
+        Row: {
+          device_fingerprint: string | null
+          expires_at: string
+          geo_location: string | null
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          last_activity_at: string | null
+          session_token_hash: string
+          started_at: string
+          terminated_at: string | null
+          terminated_reason: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          device_fingerprint?: string | null
+          expires_at: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_activity_at?: string | null
+          session_token_hash: string
+          started_at?: string
+          terminated_at?: string | null
+          terminated_reason?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          device_fingerprint?: string | null
+          expires_at?: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_activity_at?: string | null
+          session_token_hash?: string
+          started_at?: string
+          terminated_at?: string | null
+          terminated_reason?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "master_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_users: {
+        Row: {
+          assigned_continent_id: string | null
+          assigned_country_ids: string[] | null
+          auth_user_id: string | null
+          created_at: string
+          email: string
+          failed_login_count: number | null
+          id: string
+          is_2fa_enabled: boolean | null
+          last_login_at: string | null
+          last_login_ip: string | null
+          login_count: number | null
+          metadata: Json | null
+          name: string
+          role_id: string | null
+          status: string
+          status_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_continent_id?: string | null
+          assigned_country_ids?: string[] | null
+          auth_user_id?: string | null
+          created_at?: string
+          email: string
+          failed_login_count?: number | null
+          id?: string
+          is_2fa_enabled?: boolean | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          login_count?: number | null
+          metadata?: Json | null
+          name: string
+          role_id?: string | null
+          status?: string
+          status_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_continent_id?: string | null
+          assigned_country_ids?: string[] | null
+          auth_user_id?: string | null
+          created_at?: string
+          email?: string
+          failed_login_count?: number | null
+          id?: string
+          is_2fa_enabled?: boolean | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          login_count?: number | null
+          metadata?: Json | null
+          name?: string
+          role_id?: string | null
+          status?: string
+          status_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_users_assigned_continent_id_fkey"
+            columns: ["assigned_continent_id"]
+            isOneToOne: false
+            referencedRelation: "master_continents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_users_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "master_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       message_approval_queue: {
         Row: {
@@ -15903,6 +16193,7 @@ export type Database = {
         Returns: boolean
       }
       authorize_role_access: { Args: { _user_id: string }; Returns: boolean }
+      auto_expire_rentals: { Args: never; Returns: number }
       breach_promise_with_penalty: {
         Args: { p_promise_id: string; p_reason?: string }
         Returns: Json
@@ -15948,6 +16239,10 @@ export type Database = {
       }
       check_financial_mode: { Args: never; Returns: Json }
       check_force_logout: { Args: { check_user_id: string }; Returns: string }
+      check_rental_active: {
+        Args: { p_feature_code: string; p_user_id: string }
+        Returns: boolean
+      }
       check_session_valid: { Args: { p_user_id: string }; Returns: Json }
       clear_force_logout: { Args: { clear_user_id: string }; Returns: boolean }
       complete_promise_with_reward: {
@@ -16117,6 +16412,10 @@ export type Database = {
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
       is_server_manager: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      is_system_locked: {
+        Args: { p_scope?: string; p_target_id?: string }
+        Returns: boolean
+      }
       is_user_approved: { Args: { _user_id: string }; Returns: boolean }
       is_user_verified: {
         Args: {
@@ -16232,6 +16531,10 @@ export type Database = {
           _user_role: string
         }
         Returns: string
+      }
+      master_user_has_permission: {
+        Args: { p_permission_code: string; p_user_id: string }
+        Returns: boolean
       }
       normalize_demo_url: { Args: { url: string }; Returns: string }
       reject_payout: {
