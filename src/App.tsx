@@ -42,6 +42,7 @@ import SimpleCheckout from "./pages/SimpleCheckout";
 import SimpleUserDashboard from "./pages/SimpleUserDashboard";
 import DemoAccess from "./pages/DemoAccess";
 import DemoDirectory from "./pages/DemoDirectory";
+import DemoLogin from "./pages/DemoLogin";
 
 import SettingsPage from "./pages/Settings";
 
@@ -255,6 +256,7 @@ const App = () => (
               {/* One-Click Demo Access - No Login Required */}
               <Route path="/demo-directory" element={<DemoDirectory />} />
               <Route path="/demo/:role" element={<DemoAccess />} />
+              <Route path="/demo-login" element={<DemoLogin />} />
 
               {/* Global Auth Routes - Redirects to unified /auth */}
               <Route path="/login" element={<Navigate to="/auth" replace />} />
