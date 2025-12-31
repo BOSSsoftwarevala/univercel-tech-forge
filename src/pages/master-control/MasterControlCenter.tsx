@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   LayoutGrid, Globe2, Users, Shield, AlertTriangle, 
-  Eye, FileText, Lock, LogOut, Clock, Activity, CheckCircle
+  Eye, FileText, Lock, LogOut, Clock, CheckCircle
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -43,8 +43,8 @@ const MasterControlCenter = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Session timer
-  useState(() => {
+  // Session timer - properly use useEffect
+  useEffect(() => {
     const startTime = Date.now();
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -56,7 +56,7 @@ const MasterControlCenter = () => {
       );
     }, 1000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const handleLogout = async () => {
     await supabase.from('audit_logs').insert({

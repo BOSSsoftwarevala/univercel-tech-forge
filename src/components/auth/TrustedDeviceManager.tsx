@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -34,10 +34,10 @@ export function TrustedDeviceManager() {
   const queryClient = useQueryClient();
   const [currentFingerprint, setCurrentFingerprint] = useState<string>("");
 
-  // Generate current device fingerprint
-  useState(() => {
+  // Generate current device fingerprint - properly use useEffect
+  useEffect(() => {
     generateDeviceFingerprint().then(setCurrentFingerprint);
-  });
+  }, []);
 
   const { data: devices, isLoading } = useQuery({
     queryKey: ['trusted-devices'],

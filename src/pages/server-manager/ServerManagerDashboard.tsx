@@ -1,5 +1,5 @@
 // Server Manager Dashboard - Infrastructure Command Center
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Server, LayoutGrid, Activity, Clock, AlertTriangle, Database,
@@ -49,8 +49,8 @@ const ServerManagerDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Session timer
-  useState(() => {
+  // Session timer - properly use useEffect
+  useEffect(() => {
     const startTime = Date.now();
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -62,7 +62,7 @@ const ServerManagerDashboard = () => {
       );
     }, 1000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const handleLogout = async () => {
     await supabase.from('audit_logs').insert({
