@@ -144,6 +144,8 @@ import PromiseTrackerDashboard from "./pages/promise-tracker/PromiseTrackerDashb
 import PromiseManagementDashboard from "./pages/promise-management/PromiseManagementDashboard";
 // Wireframe Routes
 import { WireframeRoutes } from "./components/wireframe/WireframeRoutes";
+// Vala Control System
+import ValaControlCenter from "./pages/vala-control/ValaControlCenter";
 
 // Optimized QueryClient with caching for better performance
 const queryClient = new QueryClient({
@@ -393,6 +395,13 @@ const App = () => (
               <Route path="/ai-console" element={<RequireRole allowed={["ai_manager", "super_admin"]}><AIOptimizationConsole /></RequireRole>} />
               <Route path="/demo-credentials" element={<RequireRole allowed={["super_admin"]}><DemoCredentials /></RequireRole>} />
               <Route path="/demo-order-system" element={<RequireRole allowed={["master", "super_admin", "demo_manager"]}><DemoOrderSystem /></RequireRole>} />
+
+              {/* Vala Control Center - Secure Isolated System */}
+              <Route path="/vala-control" element={<RequireAuth><ValaControlCenter roleView="operations" /></RequireAuth>} />
+              <Route path="/vala-control/operations" element={<RequireAuth><ValaControlCenter roleView="operations" /></RequireAuth>} />
+              <Route path="/vala-control/regional" element={<RequireAuth><ValaControlCenter roleView="regional" /></RequireAuth>} />
+              <Route path="/vala-control/ai-head" element={<RequireAuth><ValaControlCenter roleView="ai_head" /></RequireAuth>} />
+              <Route path="/vala-control/master" element={<RequireRole allowed={["master"]} masterOnly><ValaControlCenter roleView="master" /></RequireRole>} />
 
               {/* Wireframe Routes - Design Sandbox */}
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
