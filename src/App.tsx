@@ -89,6 +89,16 @@ import SecureTaskManagerDashboard from "./pages/task-manager/SecureTaskManagerDa
 // Legal Manager Pages
 import SecureLegalManagerDashboard from "./pages/legal-manager/SecureLegalManagerDashboard";
 
+// Pro Manager Pages
+import SecureProManagerDashboard from "./pages/pro-manager/SecureProManagerDashboard";
+
+// Lead Manager Pages
+import SecureLeadManagerDashboard from "./pages/lead-manager/SecureLeadManagerDashboard";
+
+// Secure Control System Pages
+import SecureControlSystem from "./pages/control-system/SecureControlSystem";
+import MasterAdminControl from "./pages/control-system/MasterAdminControl";
+
 import BulkUserCreation from "./pages/admin/BulkUserCreation";
 import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 import ContinentSuperAdminDashboard from "./pages/continent-super-admin/ContinentSuperAdminDashboard";
