@@ -1,105 +1,68 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import DeveloperTopBar from '@/components/developer/DeveloperTopBar';
-import DeveloperSidebar from '@/components/developer/DeveloperSidebar';
-import DeveloperCommandCenter from '@/components/developer/DeveloperCommandCenter';
-import AIPortfolioBuilder from '@/components/developer/AIPortfolioBuilder';
-import AISkillAssessment from '@/components/developer/AISkillAssessment';
-import AIProductivityCoach from '@/components/developer/AIProductivityCoach';
-import AIMonitoringCenter from '@/components/developer/AIMonitoringCenter';
-import AICodeIntelligence from '@/components/developer/AICodeIntelligence';
-import AICareerAdvisor from '@/components/developer/AICareerAdvisor';
+import DeveloperTopBarComplete from '@/components/developer/DeveloperTopBarComplete';
+import DeveloperSidebarComplete from '@/components/developer/DeveloperSidebarComplete';
+import DeveloperCommandCenterComplete from '@/components/developer/sections/DeveloperCommandCenterComplete';
+import DeveloperBugsSection from '@/components/developer/sections/DeveloperBugsSection';
+import DeveloperPerformanceSection from '@/components/developer/sections/DeveloperPerformanceSection';
+import DeveloperSettingsSection from '@/components/developer/sections/DeveloperSettingsSection';
+import DeveloperAISection from '@/components/developer/sections/DeveloperAISection';
 import DevTaskAssignment from '@/components/developer/DevTaskAssignment';
 import DevTimerProgress from '@/components/developer/DevTimerProgress';
 import DevCodeSubmission from '@/components/developer/DevCodeSubmission';
-import DevWalletPayout from '@/components/developer/DevWalletPayout';
 import DeveloperNotifications from '@/components/developer/DeveloperNotifications';
 import AIAssistantPanel from '@/components/developer/AIAssistantPanel';
 
 const DeveloperDashboard = () => {
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [activeSection, setActiveSection] = useState('command-center');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState('00:45:30');
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'dashboard':
-        return <DeveloperCommandCenter />;
-      case 'monitoring':
-        return <AIMonitoringCenter />;
-      case 'portfolio':
-        return <AIPortfolioBuilder />;
-      case 'skills':
-        return <AISkillAssessment />;
-      case 'code-intel':
-        return <AICodeIntelligence />;
-      case 'career':
-        return <AICareerAdvisor />;
-      case 'productivity':
-        return <AIProductivityCoach />;
+      case 'command-center':
+        return <DeveloperCommandCenterComplete />;
       case 'tasks':
         return <DevTaskAssignment />;
+      case 'bugs':
+        return <DeveloperBugsSection />;
+      case 'code-submission':
+        return <DevCodeSubmission />;
       case 'timer':
         return <DevTimerProgress />;
-      case 'code':
-        return <DevCodeSubmission />;
-      case 'wallet':
-        return <DevWalletPayout />;
+      case 'ai-assistant':
+        return <DeveloperAISection />;
+      case 'performance':
+        return <DeveloperPerformanceSection />;
+      case 'settings':
+        return <DeveloperSettingsSection />;
       default:
-        return <DeveloperCommandCenter />;
+        return <DeveloperCommandCenterComplete />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white overflow-hidden">
-      {/* Animated Background */}
+      {/* Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(59,130,246,0.1),transparent_50%)]" />
-        
-        {/* Circuit Lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-10">
-          <defs>
-            <pattern id="dev-circuit" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 50 30 M 50 70 L 50 100 M 0 50 L 30 50 M 70 50 L 100 50" 
-                stroke="currentColor" strokeWidth="0.5" fill="none" className="text-cyan-500" />
-              <circle cx="50" cy="50" r="3" fill="currentColor" className="text-cyan-500" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#dev-circuit)" />
-        </svg>
-
-        {/* Floating Particles */}
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-cyan-400 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.8, 0.2],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
       </div>
 
       {/* Top Bar */}
-      <DeveloperTopBar 
+      <DeveloperTopBarComplete
+        timerRunning={timerRunning}
+        elapsedTime={elapsedTime}
+        onToggleTimer={() => setTimerRunning(!timerRunning)}
         onNotificationClick={() => setShowNotifications(true)}
         onAIClick={() => setShowAIPanel(true)}
       />
 
       <div className="flex pt-16">
         {/* Sidebar */}
-        <DeveloperSidebar 
+        <DeveloperSidebarComplete
           activeSection={activeSection}
           onSectionChange={setActiveSection}
         />
