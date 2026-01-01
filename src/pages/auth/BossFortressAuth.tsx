@@ -21,7 +21,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(8, 'Password must be at least 8 characters');
 
-type AuthStep = 'credentials' | 'device_verify' | 'otp_verify' | 'email_verify' | 'success';
+type AuthStep = 'credentials' | 'device_verify' | 'email_otp' | 'success';
 
 interface DeviceInfo {
   fingerprint: string;
@@ -67,10 +67,12 @@ const BossFortressAuth = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [step, setStep] = useState<AuthStep>('credentials');
-  const [otpCode, setOtpCode] = useState('');
-  const [emailCode, setEmailCode] = useState('');
+  const [emailOtpCode, setEmailOtpCode] = useState('');
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [countdown, setCountdown] = useState(0);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [securityChecks, setSecurityChecks] = useState({
     ssl: true,
     device: false,
@@ -94,7 +96,11 @@ const BossFortressAuth = () => {
         setTimeout(() => setSecurityChecks(prev => ({ ...prev, device: true })), 800),
         setTimeout(() => setSecurityChecks(prev => ({ ...prev, location: true })), 1600),
         setTimeout(() => setSecurityChecks(prev => ({ ...prev, session: true })), 2400),
-        setTimeout(() => setStep('otp_verify'), 3200)
+        setTimeout(() => {
+          setStep('email_otp');
+          // Auto-send OTP when entering email_otp step
+          sendEmailOTP();
+        }, 3200)
       ];
       return () => timers.forEach(clearTimeout);
     }
@@ -167,24 +173,28 @@ const BossFortressAuth = () => {
         return;
       }
 
-      // Check if master role
+      // Check if master or boss_owner role
       const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userData.user?.id)
+        .eq('user_id', userId)
         .single();
       
-      if (roleData?.role !== 'master') {
+      if (roleData?.role !== 'master' && roleData?.role !== 'boss_owner') {
         await supabase.auth.signOut();
         toast.error('Access Denied - Boss Only');
         setLoading(false);
         return;
       }
 
+      // Store user ID for OTP
+      setCurrentUserId(userId || null);
+      
       // Proceed to device verification
       setStep('device_verify');
-      setCountdown(60);
       
     } catch (err) {
       toast.error('Authentication Failed');
@@ -193,64 +203,90 @@ const BossFortressAuth = () => {
     }
   };
 
-  const handleOTPSubmit = async () => {
-    if (otpCode.length !== 6) {
-      toast.error('Please enter complete OTP');
-      return;
-    }
+  // Send Email OTP function
+  const sendEmailOTP = async () => {
+    if (!currentUserId || !email) return;
+    
+    setSendingOtp(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-otp', {
+        body: {
+          userId: currentUserId,
+          email: email,
+          otpType: 'boss_login',
+          actionDescription: 'Boss Fortress Login Verification'
+        }
+      });
 
-    setLoading(true);
-    
-    // Simulate OTP verification (in production, verify against stored OTP)
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo, accept any 6-digit code
-    if (otpCode.length === 6) {
-      setStep('email_verify');
-      setCountdown(60);
-      toast.success('OTP Verified');
-    } else {
-      toast.error('Invalid OTP');
-    }
-    
-    setLoading(false);
-  };
-
-  const handleEmailVerify = async () => {
-    if (emailCode.length !== 6) {
-      toast.error('Please enter complete email code');
-      return;
-    }
-
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo, accept any 6-digit code
-    setStep('success');
-    
-    await supabase.from('audit_logs').insert({
-      user_id: (await supabase.auth.getUser()).data.user?.id,
-      role: 'master' as any,
-      module: 'boss_fortress',
-      action: 'fortress_login_success',
-      meta_json: { 
-        device_fingerprint: deviceInfo?.fingerprint,
-        verification_method: '2fa_email_device'
+      if (error) {
+        console.error('OTP send error:', error);
+        toast.error('Failed to send OTP. Please try again.');
+      } else {
+        setOtpSent(true);
+        setCountdown(60);
+        toast.success('Verification code sent to your email');
       }
-    });
-
-    toast.success('Welcome, Boss!');
-    
-    setTimeout(() => {
-      navigate('/master-admin', { replace: true });
-    }, 1500);
-    
-    setLoading(false);
+    } catch (err) {
+      console.error('OTP error:', err);
+      toast.error('Failed to send verification code');
+    } finally {
+      setSendingOtp(false);
+    }
   };
 
-  const resendCode = () => {
-    setCountdown(60);
-    toast.success('Verification code sent');
+  // Verify Email OTP
+  const handleEmailOTPVerify = async () => {
+    if (emailOtpCode.length !== 6) {
+      toast.error('Please enter complete verification code');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      // Verify OTP via database
+      const { data: verifyResult, error: verifyError } = await supabase.rpc('verify_otp', {
+        p_user_id: currentUserId,
+        p_otp_code: emailOtpCode,
+        p_otp_type: 'boss_login'
+      });
+
+      if (verifyError || !verifyResult) {
+        toast.error('Invalid or expired verification code');
+        setLoading(false);
+        return;
+      }
+
+      // Success - all verification passed
+      setStep('success');
+      
+      await supabase.from('audit_logs').insert({
+        user_id: currentUserId,
+        role: 'master' as any,
+        module: 'boss_fortress',
+        action: 'fortress_login_success',
+        meta_json: { 
+          device_fingerprint: deviceInfo?.fingerprint,
+          verification_method: 'password_device_email_otp'
+        }
+      });
+
+      toast.success('Welcome, Boss!');
+      
+      setTimeout(() => {
+        navigate('/master-admin', { replace: true });
+      }, 1500);
+    } catch (err) {
+      console.error('OTP verify error:', err);
+      toast.error('Verification failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendEmailOTP = () => {
+    if (countdown > 0) return;
+    sendEmailOTP();
   };
 
   return (
@@ -326,7 +362,7 @@ const BossFortressAuth = () => {
               >
                 <div className="flex items-center gap-2 mb-6">
                   <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
-                    Step 1/4
+                    Step 1/3
                   </Badge>
                   <span className="text-sm text-zinc-400">Identity Verification</span>
                 </div>
@@ -411,7 +447,7 @@ const BossFortressAuth = () => {
               >
                 <div className="flex items-center gap-2 mb-6">
                   <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
-                    Step 2/4
+                    Step 2/3
                   </Badge>
                   <span className="text-sm text-zinc-400">Device Binding Check</span>
                 </div>
@@ -472,57 +508,10 @@ const BossFortressAuth = () => {
               </motion.div>
             )}
 
-            {/* Step 3: OTP Verification */}
-            {step === 'otp_verify' && (
+            {/* Step 3: Email OTP Verification */}
+            {step === 'email_otp' && (
               <motion.div
-                key="otp"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-6"
-              >
-                <div className="flex items-center gap-2 mb-6">
-                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
-                    Step 3/4
-                  </Badge>
-                  <span className="text-sm text-zinc-400">2FA Verification</span>
-                </div>
-
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center">
-                    <Smartphone className="w-8 h-8 text-cyan-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white">Enter Authenticator Code</h3>
-                  <p className="text-sm text-zinc-500">From your 2FA app (Google/Microsoft)</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={1} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={2} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={3} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={4} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={5} className="bg-zinc-950 border-zinc-700 text-white" />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-
-                <Button
-                  onClick={handleOTPSubmit}
-                  disabled={loading || otpCode.length !== 6}
-                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-5 border-0"
-                >
-                  {loading ? 'Verifying...' : 'Verify OTP'}
-                </Button>
-              </motion.div>
-            )}
-
-            {/* Step 4: Email Verification */}
-            {step === 'email_verify' && (
-              <motion.div
-                key="email"
+                key="email_otp"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
@@ -530,9 +519,9 @@ const BossFortressAuth = () => {
               >
                 <div className="flex items-center gap-2 mb-6">
                   <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-                    Step 4/4
+                    Step 3/3
                   </Badge>
-                  <span className="text-sm text-zinc-400">Email Confirmation</span>
+                  <span className="text-sm text-zinc-400">Email Verification</span>
                 </div>
 
                 <div className="text-center mb-6">
@@ -540,39 +529,53 @@ const BossFortressAuth = () => {
                     <Mail className="w-8 h-8 text-green-400" />
                   </div>
                   <h3 className="text-lg font-bold text-white">Email Verification</h3>
-                  <p className="text-sm text-zinc-500">Enter code sent to {email}</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <InputOTP maxLength={6} value={emailCode} onChange={setEmailCode}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={1} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={2} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={3} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={4} className="bg-zinc-950 border-zinc-700 text-white" />
-                      <InputOTPSlot index={5} className="bg-zinc-950 border-zinc-700 text-white" />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-
-                {countdown > 0 ? (
-                  <p className="text-center text-xs text-zinc-500">
-                    Resend code in {countdown}s
+                  <p className="text-sm text-zinc-500">
+                    {sendingOtp ? 'Sending code...' : `Enter code sent to ${email}`}
                   </p>
-                ) : (
-                  <button onClick={resendCode} className="w-full text-center text-xs text-cyan-400 hover:text-cyan-300">
-                    Resend verification code
-                  </button>
-                )}
+                </div>
 
-                <Button
-                  onClick={handleEmailVerify}
-                  disabled={loading || emailCode.length !== 6}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-5 border-0"
-                >
-                  {loading ? 'Verifying...' : 'Complete Authentication'}
-                </Button>
+                {sendingOtp ? (
+                  <div className="flex justify-center py-8">
+                    <div className="w-8 h-8 border-2 border-green-500/30 border-t-green-400 rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex justify-center">
+                      <InputOTP maxLength={6} value={emailOtpCode} onChange={setEmailOtpCode}>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} className="bg-zinc-950 border-zinc-700 text-white" />
+                          <InputOTPSlot index={1} className="bg-zinc-950 border-zinc-700 text-white" />
+                          <InputOTPSlot index={2} className="bg-zinc-950 border-zinc-700 text-white" />
+                          <InputOTPSlot index={3} className="bg-zinc-950 border-zinc-700 text-white" />
+                          <InputOTPSlot index={4} className="bg-zinc-950 border-zinc-700 text-white" />
+                          <InputOTPSlot index={5} className="bg-zinc-950 border-zinc-700 text-white" />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+
+                    {countdown > 0 ? (
+                      <p className="text-center text-xs text-zinc-500">
+                        Resend code in {countdown}s
+                      </p>
+                    ) : (
+                      <button 
+                        onClick={resendEmailOTP} 
+                        disabled={sendingOtp}
+                        className="w-full text-center text-xs text-cyan-400 hover:text-cyan-300"
+                      >
+                        Resend verification code
+                      </button>
+                    )}
+
+                    <Button
+                      onClick={handleEmailOTPVerify}
+                      disabled={loading || emailOtpCode.length !== 6}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-5 border-0"
+                    >
+                      {loading ? 'Verifying...' : 'Complete Authentication'}
+                    </Button>
+                  </>
+                )}
               </motion.div>
             )}
 
