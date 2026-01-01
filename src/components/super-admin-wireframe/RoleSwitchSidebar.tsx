@@ -5,7 +5,7 @@ import {
   Globe2, MapPin, Server, ChevronLeft, ChevronRight,
   Crown, LayoutDashboard, Users, Shield, Activity,
   Settings, LogOut, AlertCircle, Building2, Headphones, Handshake,
-  Target, Star, Scale, ListTodo
+  Target, Star, Scale, ListTodo, Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management";
+export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -135,6 +135,17 @@ const roleConfigs = {
     borderAccent: "border-blue-500/50",
     description: "Global task management",
   },
+  finance_manager: {
+    id: "finance_manager",
+    label: "Finance Manager",
+    shortLabel: "FIN",
+    icon: Wallet,
+    themeColor: "from-emerald-700 to-green-600",
+    accentColor: "text-emerald-400",
+    bgAccent: "bg-emerald-700/10",
+    borderAccent: "border-emerald-600/50",
+    description: "Financial operations & accounting",
+  },
 } as const;
 
 // Navigation items per role
@@ -197,6 +208,12 @@ const roleNavItems = {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "list", label: "All Tasks", icon: ListTodo },
     { id: "activity", label: "Task Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  finance_manager: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "list", label: "All Finance Managers", icon: Wallet },
+    { id: "activity", label: "Finance Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
 };

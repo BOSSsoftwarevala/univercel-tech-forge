@@ -9,3 +9,4 @@ export { default as LeadManagerView } from "./LeadManagerView";
 export { default as ProManagerView } from "./ProManagerView";
 export { default as LegalManagerView } from "./LegalManagerView";
 export { default as TaskManagementView } from "./TaskManagementView";
+export { default as FinanceManagerDashboard } from "./FinanceManagerDashboard";
