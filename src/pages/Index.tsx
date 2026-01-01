@@ -38,7 +38,7 @@ interface Demo {
 }
 
 const allDemos: Demo[] = [
-  // ============= 1. EDUCATION & ELEARNING (7 Sub-categories) =============
+  // ============= FEATURED ACTIVE DEMOS (First 20 with Live Routes) =============
   {
     id: "school-management",
     name: "School Management Software",
@@ -55,6 +55,104 @@ const allDemos: Demo[] = [
     price: "₹59,999",
     discountPrice: "₹35,999"
   },
+  {
+    id: "gym-fitness",
+    name: "Gym & Fitness Center Management",
+    category: "Gym Fitness",
+    masterCategory: "Healthcare & Medical Systems",
+    description: "Complete gym management with memberships, trainer scheduling, workout plans, and billing.",
+    url: "/demo/gym",
+    icon: Users,
+    status: "ACTIVE",
+    features: ["Memberships", "Trainer Schedule", "Workout Plans", "Billing"],
+    frontend: ["React", "TypeScript", "Fitness UI"],
+    backend: ["Node.js", "PostgreSQL", "Payment API"],
+    color: "from-orange-600 to-red-600",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "salon-spa",
+    name: "Salon & Spa Management",
+    category: "Salon Spa",
+    masterCategory: "Healthcare & Medical Systems",
+    description: "Salon management with appointments, services, staff scheduling, and customer loyalty.",
+    url: "/demo/salon",
+    icon: Star,
+    status: "ACTIVE",
+    features: ["Appointments", "Services", "Staff Schedule", "Loyalty"],
+    frontend: ["React", "TypeScript", "Beauty UI"],
+    backend: ["Node.js", "PostgreSQL", "Booking API"],
+    color: "from-pink-600 to-rose-600",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "childcare-daycare",
+    name: "Childcare & Daycare Management",
+    category: "Childcare",
+    masterCategory: "Education & eLearning",
+    description: "Daycare management with child profiles, attendance, activities, and parent communication.",
+    url: "/demo/childcare",
+    icon: Users,
+    status: "ACTIVE",
+    features: ["Child Profiles", "Attendance", "Activities", "Parent App"],
+    frontend: ["React", "TypeScript", "Childcare UI"],
+    backend: ["Node.js", "PostgreSQL", "Notification API"],
+    color: "from-purple-600 to-pink-600",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "petcare-veterinary",
+    name: "Pet Care & Veterinary Software",
+    category: "Pet Care",
+    masterCategory: "Healthcare & Medical Systems",
+    description: "Pet clinic management with patient records, appointments, prescriptions, and boarding.",
+    url: "/demo/petcare",
+    icon: Star,
+    status: "ACTIVE",
+    features: ["Pet Records", "Appointments", "Prescriptions", "Boarding"],
+    frontend: ["React", "TypeScript", "Vet UI"],
+    backend: ["Node.js", "PostgreSQL", "Medical API"],
+    color: "from-green-600 to-teal-600",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "event-management",
+    name: "Event Management Software",
+    category: "Event Mgmt",
+    masterCategory: "Marketing & Advertising Technology",
+    description: "Event management with planning, registrations, ticketing, and attendee management.",
+    url: "/demo/event",
+    icon: Calendar,
+    status: "ACTIVE",
+    features: ["Planning", "Registration", "Ticketing", "Attendees"],
+    frontend: ["React", "TypeScript", "Event UI"],
+    backend: ["Node.js", "PostgreSQL", "QR API"],
+    color: "from-violet-600 to-purple-600",
+    price: "₹59,999",
+    discountPrice: "₹35,999"
+  },
+  {
+    id: "automotive-dealership",
+    name: "Automotive Dealership Software",
+    category: "Automotive",
+    masterCategory: "Sales, CRM & Lead Management",
+    description: "Dealership management with inventory, sales, service, and customer CRM.",
+    url: "/demo/automotive",
+    icon: Car,
+    status: "ACTIVE",
+    features: ["Inventory", "Sales", "Service", "CRM"],
+    frontend: ["React", "TypeScript", "Auto UI"],
+    backend: ["Node.js", "PostgreSQL", "DMS API"],
+    color: "from-slate-600 to-gray-600",
+    price: "₹79,999",
+    discountPrice: "₹47,999"
+  },
+
+  // ============= 1. EDUCATION & ELEARNING (7 Sub-categories) =============
   {
     id: "college-erp",
     name: "College / University ERP",
@@ -1559,9 +1657,9 @@ const allDemos: Demo[] = [
     category: "Travel Booking",
     masterCategory: "Hospitality (Hotel, Restaurant, Travel)",
     description: "Travel booking with packages, flights, hotels, and itinerary management.",
-    url: "#",
+    url: "/demo/travel",
     icon: Plane,
-    status: "COMING_SOON",
+    status: "ACTIVE",
     features: ["Packages", "Flights", "Hotels", "Itinerary"],
     frontend: ["React", "TypeScript", "Travel UI"],
     backend: ["Node.js", "PostgreSQL", "GDS API"],
@@ -2404,7 +2502,7 @@ const Index = () => {
             transition={{ duration: 0.6 }}
           >
             <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 mb-4">
-              <Star className="h-3 w-3 mr-1" /> 20 Master Categories • 140 Software Solutions
+              <Star className="h-3 w-3 mr-1" /> 20 Master Categories • 147 Software Solutions • 20 Live Demos
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">Business Software</span> Marketplace
@@ -2521,7 +2619,7 @@ const Index = () => {
       <footer className="bg-[#0a1628] border-t border-cyan-500/20 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400">© 2024 Software Vala - The Name of Trust. All rights reserved.</p>
-          <p className="text-cyan-400 mt-2">20 Master Categories • 140 Software Solutions • Unlimited Possibilities</p>
+          <p className="text-cyan-400 mt-2">20 Master Categories • 147 Software Solutions • 20 Live Demos Ready</p>
         </div>
       </footer>
     </div>
