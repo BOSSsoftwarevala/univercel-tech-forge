@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { jsonResponse, errorResponse, validateRequired, getSupabaseAdmin, getSupabaseClient, corsHeaders } from "../_shared/utils.ts";
 
 // Allow self-assign only these roles.
-// Anything privileged must be assigned by Super Admin via admin tooling.
+// Anything privileged (boss_owner, ceo, master, super_admin, etc.) must be assigned by Super Admin via admin tooling.
 const SELF_ASSIGNABLE_ROLES = new Set([
   "developer",
   "franchise",
@@ -10,8 +10,6 @@ const SELF_ASSIGNABLE_ROLES = new Set([
   "influencer",
   "prime",
   "client",
-  "boss_owner",
-  "ceo",
 ]);
 
 serve(async (req: Request) => {
