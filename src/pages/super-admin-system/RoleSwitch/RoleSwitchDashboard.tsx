@@ -22,6 +22,7 @@ import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
+import RoleManagerDashboard from "./RoleManagerDashboard";
 
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
@@ -116,6 +117,8 @@ const RoleSwitchDashboard = () => {
         return <MarketingManagementDashboard />;
       case "customer_support_management":
         return <CustomerSupportManagementDashboard />;
+      case "role_manager":
+        return <RoleManagerDashboard />;
       default:
         return null;
     }
@@ -126,7 +129,8 @@ const RoleSwitchDashboard = () => {
       "min-h-screen flex flex-col transition-colors duration-300",
       activeRole === "server_manager" || activeRole === "developer_management" ? "bg-zinc-950" : 
       activeRole === "marketing_management" ? "bg-gradient-to-br from-pink-950/20 via-background to-rose-950/20" :
-      activeRole === "customer_support_management" ? "bg-gradient-to-br from-blue-950/20 via-background to-indigo-950/20" : "bg-background"
+      activeRole === "customer_support_management" ? "bg-gradient-to-br from-blue-950/20 via-background to-indigo-950/20" :
+      activeRole === "role_manager" ? "bg-gradient-to-br from-violet-950/20 via-background to-purple-950/20" : "bg-background"
     )}>
       {/* TOP BAR */}
       <header className={cn(

@@ -19,7 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management";
+export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -185,6 +185,17 @@ const roleConfigs = {
     borderAccent: "border-blue-500/50",
     description: "Support & helpdesk operations",
   },
+  role_manager: {
+    id: "role_manager",
+    label: "Role Manager",
+    shortLabel: "RM",
+    icon: Shield,
+    themeColor: "from-violet-500 to-purple-600",
+    accentColor: "text-violet-400",
+    bgAccent: "bg-violet-500/10",
+    borderAccent: "border-violet-500/50",
+    description: "Role & permission management",
+  },
 } as const;
 
 // Extended navigation items per role - role-specific features
@@ -330,6 +341,16 @@ const roleNavItems = {
     { id: "escalations", label: "Escalations", icon: AlertCircle },
     { id: "knowledge", label: "Knowledge Base", icon: BookOpen },
     { id: "activity", label: "Support Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  role_manager: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "roles", label: "All Roles", icon: Shield },
+    { id: "approvals", label: "Pending Approvals", icon: Clock },
+    { id: "matrix", label: "Permission Matrix", icon: Key },
+    { id: "assignments", label: "Role Assignments", icon: UserCheck },
+    { id: "versions", label: "Role Versions", icon: FileText },
+    { id: "audit", label: "Audit Log", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
 };
