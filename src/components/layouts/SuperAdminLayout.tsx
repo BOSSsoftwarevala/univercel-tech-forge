@@ -8,6 +8,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { PremiumButton } from '@/components/ui/PremiumButton';
 
 interface SuperAdminLayoutProps {
   children: ReactNode;
@@ -59,21 +60,25 @@ const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
     }
   };
 
-  const renderMenuItem = (item: { icon: any; label: string; path: string }) => (
-    <Link
-      key={item.path}
-      to={item.path}
-      className={cn(
-        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
-        location.pathname === item.path
-          ? 'bg-primary/10 text-primary font-medium border-l-2 border-primary'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-      )}
-    >
-      <item.icon className="w-4 h-4 flex-shrink-0" />
-      <span>{item.label}</span>
-    </Link>
-  );
+  const renderMenuItem = (item: { icon: any; label: string; path: string }) => {
+    const isActive = location.pathname === item.path;
+    const Icon = item.icon;
+    
+    return (
+      <Link key={item.path} to={item.path} className="block">
+        <PremiumButton
+          variant={isActive ? 'sidebar-active' : 'sidebar'}
+          size="sm"
+          className="w-full justify-start gap-3"
+          glowOnHover
+          userRole="super_admin"
+        >
+          <Icon className="w-4 h-4 flex-shrink-0" />
+          <span>{item.label}</span>
+        </PremiumButton>
+      </Link>
+    );
+  };
 
   const renderSection = (title: string, items: typeof coreControlItems) => (
     <div className="mb-6">
@@ -116,22 +121,31 @@ const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
         {/* Footer - ACCOUNT ACTIONS ONLY */}
         <div className="p-3 border-t border-border/50 space-y-1">
           {/* Change Password */}
-          <Link
-            to="/change-password"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-          >
-            <KeyRound className="w-4 h-4" />
-            <span>Change Password</span>
+          <Link to="/change-password" className="block">
+            <PremiumButton
+              variant="sidebar"
+              size="sm"
+              className="w-full justify-start gap-3"
+              glowOnHover
+              userRole="super_admin"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span>Change Password</span>
+            </PremiumButton>
           </Link>
 
           {/* Logout */}
-          <button
+          <PremiumButton
+            variant="danger"
+            size="sm"
+            className="w-full justify-start gap-3"
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            glowOnHover
+            userRole="super_admin"
           >
             <LogOut className="w-4 h-4" />
             <span>Logout</span>
-          </button>
+          </PremiumButton>
         </div>
       </aside>
 
