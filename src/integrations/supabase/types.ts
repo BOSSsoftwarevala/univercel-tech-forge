@@ -10692,6 +10692,78 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_attempts: {
+        Row: {
+          ai_followed_up: boolean | null
+          ai_followup_count: number | null
+          ai_followup_last_at: string | null
+          ai_followup_response: string | null
+          amount: number | null
+          completed_at: string | null
+          created_at: string | null
+          currency: string | null
+          email: string | null
+          failure_reason: string | null
+          id: string
+          payment_type: string | null
+          phone: string | null
+          product_id: string | null
+          product_name: string | null
+          resolved: boolean | null
+          session_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          user_issue_reported: string | null
+        }
+        Insert: {
+          ai_followed_up?: boolean | null
+          ai_followup_count?: number | null
+          ai_followup_last_at?: string | null
+          ai_followup_response?: string | null
+          amount?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          email?: string | null
+          failure_reason?: string | null
+          id?: string
+          payment_type?: string | null
+          phone?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          resolved?: boolean | null
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_issue_reported?: string | null
+        }
+        Update: {
+          ai_followed_up?: boolean | null
+          ai_followup_count?: number | null
+          ai_followup_last_at?: string | null
+          ai_followup_response?: string | null
+          amount?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          email?: string | null
+          failure_reason?: string | null
+          id?: string
+          payment_type?: string | null
+          phone?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          resolved?: boolean | null
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_issue_reported?: string | null
+        }
+        Relationships: []
+      }
       payout_limits_config: {
         Row: {
           auto_approve_threshold: number
@@ -12362,6 +12434,66 @@ export type Database = {
           file_path?: string
           id?: string
           usage_count?: number | null
+        }
+        Relationships: []
+      }
+      quick_support_requests: {
+        Row: {
+          ai_suggested_solution: string | null
+          assigned_to: string | null
+          attachments: Json | null
+          created_at: string | null
+          description: string
+          id: string
+          priority: string | null
+          request_type: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          response_time_minutes: number | null
+          status: string | null
+          subject: string
+          updated_at: string | null
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          ai_suggested_solution?: string | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          created_at?: string | null
+          description: string
+          id?: string
+          priority?: string | null
+          request_type?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          response_time_minutes?: number | null
+          status?: string | null
+          subject: string
+          updated_at?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          ai_suggested_solution?: string | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          priority?: string | null
+          request_type?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          response_time_minutes?: number | null
+          status?: string | null
+          subject?: string
+          updated_at?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }

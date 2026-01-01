@@ -36,6 +36,7 @@ import AccountSuspension from "./pages/auth/AccountSuspension";
 import AccessDenied from "./pages/auth/AccessDenied";
 import PendingApproval from "./pages/auth/PendingApproval";
 import BossFortressAuth from "./pages/auth/BossFortressAuth";
+import EasyAuth from "./pages/auth/EasyAuth";
 
 // Public Pages
 import PublicDemos from "./pages/demos/PublicDemos";
@@ -217,6 +218,7 @@ import PersonalChat from "./pages/PersonalChat";
 import DomainProtection from "./components/security/DomainProtection";
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
+import QuickSupport from "./components/support/QuickSupport";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
 import DemoCredentials from "./pages/DemoCredentials";
 import DemoOrderSystem from "./pages/demo-system/DemoOrderSystem";
@@ -348,6 +350,8 @@ const App = () => (
               {/* Global Auth Routes - Redirects to unified /auth */}
               <Route path="/login" element={<Navigate to="/auth" replace />} />
               <Route path="/register" element={<Navigate to="/auth" replace />} />
+              <Route path="/easy-login" element={<EasyAuth />} />
+              <Route path="/quick-signup" element={<EasyAuth />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/otp-verify" element={<OTPVerify />} />
               <Route path="/device-verify" element={<DeviceVerify />} />
@@ -615,6 +619,7 @@ const App = () => (
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                         <AdminQuickAccess />
+                        <QuickSupport />
                         </GlobalRealtimeProvider>
                       </TranslationProvider>
                     </NotificationProvider>
