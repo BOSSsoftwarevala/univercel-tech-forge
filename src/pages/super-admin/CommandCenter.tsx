@@ -10,7 +10,7 @@ import {
   Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight, ScanLine,
   Server, Megaphone, MonitorPlay, Handshake, LayoutDashboard, CheckCircle,
   ClipboardList, UserCog, ChevronDown, Terminal, ShoppingCart, LifeBuoy,
-  FileCheck, User, Layout, Bot, Share2
+  FileCheck, User, Layout, Bot, Share2, Code, Hammer, Trophy
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
@@ -686,6 +686,7 @@ const SuperAdminCommandCenter = () => {
     activeDevelopers: 47,
     demosOnline: 156,
     totalRevenue: 12450000,
+    tasksCompleted: 283,
   });
 
   // Skip welcome animation if navigating to a specific category
@@ -862,36 +863,210 @@ const SuperAdminCommandCenter = () => {
             </div>
           </div>
 
-          {/* Stats Summary - Only show when no category selected */}
+          {/* Live Activity Feed & Top Performers - Only show when no category selected */}
           {!activeCategory && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <HeaderStatCard
-                title="Total Categories"
-                value="28"
-                icon={LayoutDashboard}
-              />
-              <HeaderStatCard
-                title="Sub Categories"
-                value="28"
-                icon={ClipboardList}
-              />
-              <HeaderStatCard
-                title="Micro Categories"
-                value="56"
-                icon={CheckCircle}
-              />
-              <HeaderStatCard
-                title="Nano Categories"
-                value="112"
-                icon={Target}
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Live Activity Feed - Left Side (Takes 2 columns) */}
+              <motion.div 
+                className="lg:col-span-2 p-5 rounded-2xl bg-slate-800/60 border border-teal-500/20 backdrop-blur-xl"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg" style={{ boxShadow: '0 4px 20px rgba(20, 184, 166, 0.4)' }}>
+                        <Activity className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-800 animate-pulse" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white">Live Activity Stream</h3>
+                      <p className="text-xs text-slate-400">Real-time updates from all modules</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping" />
+                    STREAMING
+                  </Badge>
+                </div>
+
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {[
+                    { type: 'lead', icon: UserPlus, message: 'New lead received from Mumbai', user: 'Raj Patel', time: 'Just now', color: 'from-blue-500 to-cyan-500' },
+                    { type: 'promise', icon: CheckCircle, message: 'Promise completed - CRM Integration', user: 'Sarah Chen', time: '2s ago', color: 'from-emerald-500 to-teal-500' },
+                    { type: 'developer', icon: Code, message: 'Developer joined the platform', user: 'Alex Kumar', time: '5s ago', color: 'from-purple-500 to-pink-500' },
+                    { type: 'sale', icon: Star, message: 'Reseller closed deal - ₹2,50,000', user: 'Vikram Singh', time: '12s ago', color: 'from-amber-500 to-orange-500' },
+                    { type: 'development', icon: Hammer, message: 'Development completed - E-comm v3', user: 'Mike Johnson', time: '18s ago', color: 'from-rose-500 to-red-500' },
+                    { type: 'lead', icon: UserPlus, message: 'Lead qualified from Delhi NCR', user: 'Priya Sharma', time: '25s ago', color: 'from-blue-500 to-cyan-500' },
+                    { type: 'promise', icon: CheckCircle, message: 'Demo scheduled for tomorrow', user: 'David Lee', time: '32s ago', color: 'from-emerald-500 to-teal-500' },
+                    { type: 'sale', icon: Star, message: 'New franchise signed - Bangalore', user: 'Rohan Mehta', time: '45s ago', color: 'from-amber-500 to-orange-500' },
+                    { type: 'developer', icon: Code, message: 'Task completed - API Integration', user: 'Lisa Wang', time: '1m ago', color: 'from-purple-500 to-pink-500' },
+                    { type: 'development', icon: Hammer, message: 'Project deployed to production', user: 'Chris Brown', time: '2m ago', color: 'from-rose-500 to-red-500' },
+                  ].map((activity, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + idx * 0.05 }}
+                      className="flex items-center gap-4 p-3 rounded-xl bg-slate-700/30 border border-slate-600/30 hover:bg-slate-700/50 hover:border-teal-500/30 transition-all group cursor-pointer"
+                    >
+                      <div className={`p-2 rounded-lg bg-gradient-to-br ${activity.color} shadow-lg`}>
+                        <activity.icon className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white font-medium truncate">{activity.message}</p>
+                        <p className="text-xs text-slate-400">by {activity.user}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-xs text-slate-500">{activity.time}</span>
+                        <motion.div 
+                          className="w-2 h-2 rounded-full bg-emerald-500 mx-auto mt-1"
+                          animate={{ scale: [1, 1.5, 1] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: idx * 0.2 }}
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Top Performers - Right Side */}
+              <motion.div 
+                className="p-5 rounded-2xl bg-slate-800/60 border border-amber-500/20 backdrop-blur-xl"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg" style={{ boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4)' }}>
+                    <Trophy className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white">Top Performers</h3>
+                    <p className="text-xs text-slate-400">This week's stars 🌟</p>
+                  </div>
+                </div>
+
+                {/* Developers Section */}
+                <div className="mb-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Code className="h-4 w-4 text-purple-400" />
+                    <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Top Developers</span>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { name: 'Alex Kumar', avatar: '👨‍💻', tasks: 47, streak: '🔥 12 days', rank: 1 },
+                      { name: 'Sarah Chen', avatar: '👩‍💻', tasks: 42, streak: '⚡ 8 days', rank: 2 },
+                      { name: 'Mike Johnson', avatar: '🧑‍💻', tasks: 38, streak: '🚀 5 days', rank: 3 },
+                    ].map((dev, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4 + idx * 0.1 }}
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${
+                          idx === 0 
+                            ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/10 border-amber-500/40' 
+                            : idx === 1 
+                            ? 'bg-slate-700/40 border-slate-500/30' 
+                            : 'bg-slate-700/30 border-slate-600/20'
+                        }`}
+                      >
+                        <div className="relative">
+                          <span className="text-2xl">{dev.avatar}</span>
+                          {idx === 0 && (
+                            <span className="absolute -top-1 -right-1 text-sm">👑</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{dev.name}</p>
+                          <p className="text-xs text-slate-400">{dev.tasks} tasks • {dev.streak}</p>
+                        </div>
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                          idx === 0 ? 'bg-amber-500 text-black' : idx === 1 ? 'bg-slate-400 text-black' : 'bg-amber-700 text-white'
+                        }`}>
+                          #{dev.rank}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Resellers Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="h-4 w-4 text-teal-400" />
+                    <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Top Resellers</span>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { name: 'Vikram Singh', avatar: '🦸', sales: '₹12.5L', leads: 28, badge: '💎 Diamond' },
+                      { name: 'Rohan Mehta', avatar: '🦹', sales: '₹9.8L', leads: 22, badge: '🥇 Gold' },
+                      { name: 'Priya Sharma', avatar: '🧙', sales: '₹7.2L', leads: 18, badge: '🥈 Silver' },
+                    ].map((reseller, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.6 + idx * 0.1 }}
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${
+                          idx === 0 
+                            ? 'bg-gradient-to-r from-teal-500/20 to-cyan-500/10 border-teal-500/40' 
+                            : 'bg-slate-700/30 border-slate-600/20'
+                        }`}
+                      >
+                        <span className="text-2xl">{reseller.avatar}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-white truncate">{reseller.name}</p>
+                            <span className="text-xs">{reseller.badge}</span>
+                          </div>
+                          <p className="text-xs text-slate-400">{reseller.sales} • {reseller.leads} leads</p>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: [0, 10, -10, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: idx * 0.3 }}
+                        >
+                          <TrendingUp className="h-4 w-4 text-emerald-400" />
+                        </motion.div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Fun Stats */}
+                <motion.div 
+                  className="mt-5 p-4 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                >
+                  <p className="text-xs text-slate-400 text-center mb-2">🎉 Today's Highlights</p>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-lg font-bold text-teal-400">{liveStats.totalLeads.toLocaleString()}</p>
+                      <p className="text-[10px] text-slate-500">Leads</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-purple-400">{liveStats.activeDevelopers}</p>
+                      <p className="text-[10px] text-slate-500">Devs Online</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-amber-400">{liveStats.tasksCompleted}</p>
+                      <p className="text-[10px] text-slate-500">Tasks Done</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
             </div>
           )}
         </motion.div>
 
-        {/* Render category-specific content OR default overview */}
+        {/* Render category-specific content */}
         <AnimatePresence mode="wait">
-          {activeCategory ? (
+          {activeCategory && (
             <motion.div
               key={activeCategory}
               initial={{ opacity: 0, y: 20 }}
@@ -900,143 +1075,6 @@ const SuperAdminCommandCenter = () => {
               transition={{ duration: 0.3 }}
             >
               {renderCategoryContent()}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Categories Grid - All 28 Categories with 4-Level Hierarchy */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-1 h-6 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500" />
-                  <div>
-                    <h2 className="text-lg font-bold text-white">All Categories</h2>
-                    <p className="text-xs text-slate-400">Click to expand hierarchy: Category → Sub → Micro → Nano</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {categories.map((category, idx) => (
-                    <motion.div
-                      key={category.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + idx * 0.02 }}
-                    >
-                      <CategoryCard category={category} />
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* AI Insights & Alerts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-                {/* AI Insights */}
-                <motion.div 
-                  className="p-5 rounded-2xl bg-slate-800/60 border border-teal-500/20 backdrop-blur-xl"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600">
-                      <Brain className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white text-sm">AI Insights</h3>
-                      <p className="text-[10px] text-slate-400">Powered by Vala Intelligence</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { insight: 'Lead conversion rate up 15% this week', type: 'positive' },
-                      { insight: '3 developers approaching SLA deadline', type: 'warning' },
-                      { insight: 'Mumbai region showing highest growth', type: 'info' },
-                    ].map((item, idx) => (
-                      <motion.div 
-                        key={idx} 
-                        className={`p-3 rounded-xl border ${
-                          item.type === 'positive' 
-                            ? 'bg-emerald-500/10 border-emerald-500/30' 
-                            : item.type === 'warning' 
-                            ? 'bg-amber-500/10 border-amber-500/30' 
-                            : 'bg-teal-500/10 border-teal-500/30'
-                        }`}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.6 + idx * 0.1 }}
-                      >
-                        <div className="flex items-start gap-2">
-                          {item.type === 'positive' && <TrendingUp className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />}
-                          {item.type === 'warning' && <Clock className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />}
-                          {item.type === 'info' && <Globe className="h-4 w-4 text-teal-400 mt-0.5 shrink-0" />}
-                          <p className="text-xs text-slate-200">{item.insight}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* Critical Alerts */}
-                <motion.div 
-                  className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/50 backdrop-blur-xl"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-amber-500/20">
-                      <AlertTriangle className="h-5 w-5 text-amber-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white text-sm">Critical Alerts</h3>
-                      <p className="text-[10px] text-slate-400">Requires immediate attention</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { type: 'critical', title: 'Demo Offline', desc: 'E-commerce v2.1 down', time: '2m ago' },
-                      { type: 'warning', title: 'SLA Breach', desc: 'Task #4521 exceeded', time: '8m ago' },
-                      { type: 'info', title: 'New Franchise', desc: 'Mumbai South approved', time: '3h ago' },
-                    ].map((alert, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.7 + i * 0.1 }}
-                        className={`p-3 rounded-xl border ${
-                          alert.type === 'critical' 
-                            ? 'bg-rose-500/10 border-rose-500/30' 
-                            : alert.type === 'warning'
-                            ? 'bg-amber-500/10 border-amber-500/30'
-                            : 'bg-teal-500/10 border-teal-500/30'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-medium text-xs text-white">{alert.title}</p>
-                            <p className="text-[10px] text-slate-400">{alert.desc}</p>
-                          </div>
-                          <span className="text-[10px] text-slate-500">{alert.time}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                  <Button variant="ghost" size="sm" className="w-full gap-2 mt-3 text-xs text-slate-400 hover:text-white">
-                    View All Alerts
-                    <ChevronRight className="w-3 h-3" />
-                  </Button>
-                </motion.div>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
