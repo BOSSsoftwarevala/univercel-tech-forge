@@ -82,7 +82,9 @@ export function useSuperAdminSecurity() {
         p_device_fingerprint: fingerprint
       });
 
-      if (error || !data?.valid) {
+      const result = data as Record<string, unknown> | null;
+      
+      if (error || !result?.valid) {
         sessionStorage.removeItem('sa_session_token');
         setSecurityContext({
           isAuthenticated: true,
@@ -92,8 +94,8 @@ export function useSuperAdminSecurity() {
           scopeType: null,
           assignedScope: null,
           securityClearance: null,
-          isSystemLocked: data?.reason === 'system_locked',
-          lockReason: data?.lock_reason || null,
+          isSystemLocked: result?.reason === 'system_locked',
+          lockReason: (result?.lock_reason as string) || null,
         });
         return false;
       }
@@ -101,11 +103,11 @@ export function useSuperAdminSecurity() {
       setSecurityContext({
         isAuthenticated: true,
         isValidSession: true,
-        adminId: data.admin_id,
-        sessionId: data.session_id,
-        scopeType: data.scope_type,
-        assignedScope: data.assigned_scope,
-        securityClearance: data.security_clearance,
+        adminId: result.admin_id as string,
+        sessionId: result.session_id as string,
+        scopeType: result.scope_type as string,
+        assignedScope: result.assigned_scope as Record<string, unknown>,
+        securityClearance: result.security_clearance as string,
         isSystemLocked: false,
         lockReason: null,
       });
@@ -131,27 +133,29 @@ export function useSuperAdminSecurity() {
         p_user_agent: navigator.userAgent
       });
 
-      if (error || !data?.success) {
-        toast.error('Session creation failed: ' + (data?.reason || error?.message));
+      const result = data as Record<string, unknown> | null;
+      
+      if (error || !result?.success) {
+        toast.error('Session creation failed: ' + ((result?.reason as string) || error?.message));
         return null;
       }
 
-      sessionStorage.setItem('sa_session_token', data.session_token);
-      setSessionToken(data.session_token);
+      sessionStorage.setItem('sa_session_token', result.session_token as string);
+      setSessionToken(result.session_token as string);
       
       setSecurityContext({
         isAuthenticated: true,
         isValidSession: true,
-        adminId: data.admin_id,
-        sessionId: data.session_id,
-        scopeType: data.scope_type,
-        assignedScope: data.assigned_scope,
+        adminId: result.admin_id as string,
+        sessionId: result.session_id as string,
+        scopeType: result.scope_type as string,
+        assignedScope: result.assigned_scope as Record<string, unknown>,
         securityClearance: null,
         isSystemLocked: false,
         lockReason: null,
       });
 
-      return data;
+      return result;
     } catch (error) {
       console.error('Session creation error:', error);
       return null;
@@ -177,9 +181,10 @@ export function useSuperAdminSecurity() {
         return { authorized: false, reason: error.message };
       }
 
+      const result = data as Record<string, unknown> | null;
       return {
-        authorized: data?.authorized || false,
-        reason: data?.reason
+        authorized: (result?.authorized as boolean) || false,
+        reason: result?.reason as string | undefined
       };
     } catch (error) {
       return { authorized: false, reason: 'error' };
@@ -212,8 +217,8 @@ export function useSuperAdminSecurity() {
         p_target_id: options?.targetId || null,
         p_risk_level: options?.riskLevel || 'normal',
         p_reason: options?.reason || null,
-        p_previous_state: options?.previousState || null,
-        p_new_state: options?.newState || null,
+        p_previous_state: options?.previousState ? JSON.parse(JSON.stringify(options.previousState)) : null,
+        p_new_state: options?.newState ? JSON.parse(JSON.stringify(options.newState)) : null,
         p_ip_address: 'client',
         p_status: options?.status || 'success'
       });
