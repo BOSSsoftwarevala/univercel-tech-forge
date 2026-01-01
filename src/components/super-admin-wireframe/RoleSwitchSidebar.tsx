@@ -153,7 +153,11 @@ const RoleSwitchSidebar = ({
               <Tooltip key={role.id} delayDuration={0}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => onRoleChange(role.id as ActiveRole)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onRoleChange(role.id as ActiveRole);
+                    }}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                       isActive
@@ -227,7 +231,11 @@ const RoleSwitchSidebar = ({
               <Tooltip key={item.id} delayDuration={0}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => setActiveNav(item.id)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveNav(item.id);
+                    }}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                       isActive

@@ -29,9 +29,9 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 0 – OWNERSHIP
   master: [
     { icon: Shield, label: 'Super Admin', path: '/super-admin?cat=super-admin' },
-    { icon: Globe2, label: 'Continent Super Admin', path: '/continent-super-admin' },
-    { icon: MapPin, label: 'Area Manager', path: '/super-admin?cat=area-manager' },
-    { icon: Monitor, label: 'Server Manager', path: '/super-admin?cat=server-manager' },
+    { icon: Globe2, label: 'Continent Super Admin', path: '/super-admin-system/role-switch?role=continent_super_admin' },
+    { icon: MapPin, label: 'Area Manager', path: '/super-admin-system/role-switch?role=area_manager' },
+    { icon: Monitor, label: 'Server Manager', path: '/super-admin-system/role-switch?role=server_manager' },
     { icon: Store, label: 'Franchise Manager', path: '/super-admin?cat=franchise-manager' },
     { icon: HeadphonesIcon, label: 'Sales & Support Manager', path: '/super-admin?cat=sales-support-manager' },
     { icon: Package, label: 'Reseller Manager', path: '/super-admin?cat=reseller-manager' },
@@ -61,9 +61,9 @@ const roleMenus: Record<AppRole, MenuItem[]> = {
   // GRADE 1 – PLATFORM CONTROL
   super_admin: [
     { icon: Shield, label: 'Super Admin', path: '/super-admin?cat=super-admin' },
-    { icon: Globe2, label: 'Continent Super Admin', path: '/continent-super-admin' },
-    { icon: MapPin, label: 'Area Manager', path: '/super-admin?cat=area-manager' },
-    { icon: Monitor, label: 'Server Manager', path: '/super-admin?cat=server-manager' },
+    { icon: Globe2, label: 'Continent Super Admin', path: '/super-admin-system/role-switch?role=continent_super_admin' },
+    { icon: MapPin, label: 'Area Manager', path: '/super-admin-system/role-switch?role=area_manager' },
+    { icon: Monitor, label: 'Server Manager', path: '/super-admin-system/role-switch?role=server_manager' },
     { icon: Store, label: 'Franchise Manager', path: '/super-admin?cat=franchise-manager' },
     { icon: HeadphonesIcon, label: 'Sales & Support Manager', path: '/super-admin?cat=sales-support-manager' },
     { icon: Package, label: 'Reseller Manager', path: '/super-admin?cat=reseller-manager' },

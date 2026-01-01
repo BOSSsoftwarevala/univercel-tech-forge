@@ -1,12 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { 
-  Globe2, Bell, Timer, AlertCircle, Shield, X
-} from "lucide-react";
+import { Globe2, Bell, Timer, AlertCircle, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -17,19 +14,33 @@ import ServerManagerView from "./ServerManagerView";
 
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const requestedRole = useMemo(() => {
+    const role = new URLSearchParams(location.search).get("role") as ActiveRole | null;
+    return role && role in roleConfigs ? role : null;
+  }, [location.search]);
+
   const [activeRole, setActiveRole] = useState<ActiveRole>("continent_super_admin");
   const [collapsed, setCollapsed] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
-  const [riskLevel, setRiskLevel] = useState<"low" | "medium" | "high">("low");
-  const [liveAlerts, setLiveAlerts] = useState(3);
+  const [riskLevel] = useState<"low" | "medium" | "high">("low");
+  const [liveAlerts] = useState(3);
 
-  // Session timer
-  useState(() => {
-    const interval = setInterval(() => {
-      setSessionTime(prev => prev + 1);
+  // Apply role from URL (prevents accidental switching to legacy pages)
+  useEffect(() => {
+    if (requestedRole) setActiveRole(requestedRole);
+  }, [requestedRole]);
+
+  // Session timer (must never trigger navigation)
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setSessionTime((prev) => prev + 1);
     }, 1000);
-    return () => clearInterval(interval);
-  });
+
+    return () => window.clearInterval(interval);
+  }, []);
+
 
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
