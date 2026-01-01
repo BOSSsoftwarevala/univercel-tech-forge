@@ -8,7 +8,7 @@ import {
   FileText, Users, Zap, TrendingUp, Bell, BarChart3,
   ArrowUpRight, ArrowDownRight, Download, MoreHorizontal,
   Play, Pause, Flag, Hash, Mail, UserCheck, Building,
-  AlertCircle, Timer, Award, Target, ChevronDown, Square, Key
+  AlertCircle, Timer, Award, Target, ChevronDown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -505,7 +505,6 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
             {/* Tabs */}
             <Tabs value={detailTab} onValueChange={setDetailTab} className="flex-1 flex flex-col">
               <TabsList className="mx-4 mt-4 bg-slate-800/50">
-                <TabsTrigger value="actions">Actions</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="permissions">Permissions</TabsTrigger>
                 <TabsTrigger value="countries">Countries</TabsTrigger>
@@ -514,129 +513,6 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
 
               <ScrollArea className="flex-1">
                 <div className="p-4">
-                  {/* Quick Actions Tab */}
-                  <TabsContent value="actions" className="mt-0 space-y-3">
-                    {/* Pending Approvals */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                            <CheckCircle className="w-5 h-5 text-amber-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-white">Pending Approvals</h4>
-                            <p className="text-xs text-slate-400">{selectedCSA.pendingApprovals} awaiting</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-amber-500/20 text-amber-400">{selectedCSA.pendingApprovals}</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30">
-                          <CheckCircle className="w-3 h-3 mr-1" /> Approve All
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30">
-                          <X className="w-3 h-3 mr-1" /> Reject All
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Country Admin Control */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                            <Users className="w-5 h-5 text-blue-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-white">Country Admins</h4>
-                            <p className="text-xs text-slate-400">{selectedCSA.activeCountryAdmins} active</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-blue-500/20 text-blue-400">{selectedCSA.countriesCount}</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30">
-                          <Play className="w-3 h-3 mr-1" /> Enable
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30">
-                          <Pause className="w-3 h-3 mr-1" /> Disable
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Regional Operations */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                            <Globe2 className="w-5 h-5 text-purple-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-white">Regional Ops</h4>
-                            <p className="text-xs text-slate-400">{selectedCSA.continent} region</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-emerald-500/20 text-emerald-400">Active</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30">
-                          <Play className="w-3 h-3 mr-1" /> Start
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30">
-                          <Square className="w-3 h-3 mr-1" /> Stop
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Access Control */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                            <Shield className="w-5 h-5 text-emerald-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-white">Access Control</h4>
-                            <p className="text-xs text-slate-400">Permission management</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-emerald-500/20 text-emerald-400">Secure</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30">
-                          <Key className="w-3 h-3 mr-1" /> Allow
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30">
-                          <Lock className="w-3 h-3 mr-1" /> Block
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* System Issues */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-red-500/10 to-rose-500/10 border border-red-500/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
-                            <AlertTriangle className="w-5 h-5 text-red-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-white">System Issues</h4>
-                            <p className="text-xs text-slate-400">{selectedCSA.issuesResolved} resolved</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-emerald-500/20 text-emerald-400">Clear</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30">
-                          <CheckCircle className="w-3 h-3 mr-1" /> Resolve
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30">
-                          <Clock className="w-3 h-3 mr-1" /> Escalate
-                        </Button>
-                      </div>
-                    </div>
-                  </TabsContent>
-
                   {/* Profile Tab */}
                   <TabsContent value="profile" className="mt-0 space-y-4">
                     <Card className="bg-slate-800/50 border-slate-700/50">
