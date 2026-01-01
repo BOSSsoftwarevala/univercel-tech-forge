@@ -33,10 +33,12 @@ interface FestivalCalendar {
   icon: string | null;
 }
 
-const GlobalOfferPopupInner = forwardRef<HTMLDivElement>((_, ref) => {
+const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
   const [currentOffer, setCurrentOffer] = useState<GlobalOffer | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
+  
+  // Use the ref on the outermost container
 
   useEffect(() => {
     fetchActiveOffer();
@@ -118,6 +120,7 @@ const GlobalOfferPopupInner = forwardRef<HTMLDivElement>((_, ref) => {
     <AnimatePresence>
       {!isMinimized ? (
         <motion.div
+          ref={ref}
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
