@@ -13,6 +13,7 @@ import ClientPaymentSection from './ClientPaymentSection';
 interface ProjectData {
   id: string;
   client_name: string;
+  client_email: string;
   company_name: string;
   domain_name: string;
   status: string;
@@ -23,6 +24,7 @@ interface ProjectData {
   deposit_paid: boolean;
   balance_paid: boolean;
   assigned_ip: string | null;
+  currency: string | null;
   created_at: string;
 }
 
@@ -199,12 +201,12 @@ const ClientProjectStatus = () => {
                         <div className="grid grid-cols-3 gap-4 text-center">
                           <div className="p-3 bg-card border rounded-lg">
                             <p className="text-xs text-muted-foreground mb-1">Total Quote</p>
-                            <p className="font-bold">₹{project.quoted_amount.toLocaleString()}</p>
+                            <p className="font-bold">{project.currency === 'INR' ? '₹' : '$'}{project.quoted_amount.toLocaleString()}</p>
                           </div>
                           <div className="p-3 bg-card border rounded-lg">
                             <p className="text-xs text-muted-foreground mb-1">Deposit (50%)</p>
                             <p className="font-bold">
-                              ₹{project.deposit_amount?.toLocaleString()}
+                              {project.currency === 'INR' ? '₹' : '$'}{project.deposit_amount?.toLocaleString()}
                               {project.deposit_paid && (
                                 <CheckCircle className="w-4 h-4 text-green-500 inline ml-1" />
                               )}
@@ -213,7 +215,7 @@ const ClientProjectStatus = () => {
                           <div className="p-3 bg-card border rounded-lg">
                             <p className="text-xs text-muted-foreground mb-1">Balance (50%)</p>
                             <p className="font-bold">
-                              ₹{project.balance_amount?.toLocaleString()}
+                              {project.currency === 'INR' ? '₹' : '$'}{project.balance_amount?.toLocaleString()}
                               {project.balance_paid && (
                                 <CheckCircle className="w-4 h-4 text-green-500 inline ml-1" />
                               )}
@@ -250,6 +252,10 @@ const ClientProjectStatus = () => {
           )}
         </div>
       )}
+      {/* Branding */}
+      <p className="text-center text-xs text-muted-foreground mt-8">
+        Powered by <span className="font-medium">Software Vala</span>
+      </p>
     </div>
   );
 };
