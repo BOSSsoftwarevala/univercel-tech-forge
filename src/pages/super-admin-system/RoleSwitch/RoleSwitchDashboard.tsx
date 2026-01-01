@@ -41,6 +41,7 @@ const RoleSwitchDashboard = () => {
   }, [location.search]);
 
   const [activeRole, setActiveRole] = useState<ActiveRole>("continent_super_admin");
+  const [activeNav, setActiveNav] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [riskLevel] = useState<"low" | "medium" | "high">("low");
@@ -101,8 +102,12 @@ const RoleSwitchDashboard = () => {
   const handleRoleChange = (role: ActiveRole) => {
     // NO REDIRECT - just switch the view in place
     setActiveRole(role);
-    // Reset any role-specific state if needed
+    setActiveNav("dashboard"); // Reset nav when role changes
     toast.success(`Switched to ${roleConfigs[role].label} view`);
+  };
+
+  const handleNavChange = (navId: string) => {
+    setActiveNav(navId);
   };
 
   const currentConfig = roleConfigs[activeRole];
@@ -121,7 +126,7 @@ const RoleSwitchDashboard = () => {
       case "super_admin_hierarchy":
         return <SuperAdminHierarchyDashboard />;
       case "continent_super_admin":
-        return <ContinentSuperAdminView />;
+        return <ContinentSuperAdminView activeNav={activeNav} />;
       case "country_head":
         return <CountryHeadDashboard />;
       case "area_manager":
@@ -304,6 +309,8 @@ const RoleSwitchDashboard = () => {
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(!collapsed)}
           onLogout={handleLogout}
+          activeNav={activeNav}
+          onNavChange={handleNavChange}
         />
 
         {/* Dynamic Role View */}

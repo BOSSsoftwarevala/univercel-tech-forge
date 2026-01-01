@@ -28,6 +28,8 @@ interface RoleSwitchSidebarProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   onLogout: () => void;
+  activeNav?: string;
+  onNavChange?: (navId: string) => void;
 }
 
 // Role configurations with themes
@@ -444,16 +446,29 @@ const RoleSwitchSidebar = ({
   collapsed,
   onToggleCollapse,
   onLogout,
+  activeNav: externalActiveNav,
+  onNavChange,
 }: RoleSwitchSidebarProps) => {
   const currentConfig = roleConfigs[activeRole];
   const currentNavItems = roleNavItems[activeRole];
-  const [activeNav, setActiveNav] = useState("dashboard");
+  const [internalActiveNav, setInternalActiveNav] = useState("dashboard");
   const [isDrilledDown, setIsDrilledDown] = useState(false);
+  
+  // Use external activeNav if provided, otherwise use internal state
+  const activeNav = externalActiveNav ?? internalActiveNav;
+
+  const handleNavClick = (navId: string) => {
+    if (onNavChange) {
+      onNavChange(navId);
+    } else {
+      setInternalActiveNav(navId);
+    }
+  };
 
   const handleRoleSelect = (roleId: ActiveRole) => {
     onRoleChange(roleId);
     setIsDrilledDown(true);
-    setActiveNav("dashboard");
+    handleNavClick("dashboard");
   };
 
   const handleBackToRoles = () => {
@@ -687,7 +702,7 @@ const RoleSwitchSidebar = ({
                             type="button"
                             onClick={(e) => {
                               e.preventDefault();
-                              setActiveNav(item.id);
+                              handleNavClick(item.id);
                             }}
                             className={cn(
                               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
