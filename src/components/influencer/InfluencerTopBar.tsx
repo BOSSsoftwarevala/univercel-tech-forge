@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { Sparkles, User, Settings, TrendingUp } from 'lucide-react';
+import { Sparkles, User, Settings, TrendingUp, MessageSquare, Bell, HandHeart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import GlobalNotificationHeader from '@/components/shared/GlobalNotificationHeader';
 import type { NotificationAlert } from '@/components/shared/GlobalNotificationHeader';
 import { toast } from 'sonner';
+import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 interface InfluencerTopBarProps {
   onNotificationClick: () => void;
@@ -40,11 +41,14 @@ const InfluencerTopBar = ({
       <div className="flex items-center gap-4">
         <motion.div
           className="relative"
-          animate={{ rotateY: [0, 360] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          whileHover={{ scale: 1.05 }}
         >
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-violet-500/30">
-            SV
+          <div className="w-10 h-10 rounded-lg overflow-hidden shadow-lg shadow-violet-500/30">
+            <img 
+              src={softwareValaLogo} 
+              alt="Software Vala" 
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="absolute inset-0 bg-violet-400/20 blur-xl rounded-lg" />
         </motion.div>
@@ -81,12 +85,48 @@ const InfluencerTopBar = ({
       </div>
 
       {/* Right - Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* User ID */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50">
           <User className="w-4 h-4 text-slate-400" />
           <span className="text-sm text-slate-300">vala(influencer)***</span>
         </div>
+
+        {/* Promise Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => toast.info("Promise", { description: "Active promise tracking" })}
+          className="relative p-2.5 rounded-lg bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-500/30 hover:border-emerald-400/50 transition-all group"
+        >
+          <HandHeart className="w-5 h-5 text-emerald-400 group-hover:text-emerald-300" />
+        </motion.button>
+
+        {/* Internal Chat Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => toast.info("Internal Chat", { description: "Team communication" })}
+          className="relative p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/50 transition-all group"
+        >
+          <MessageSquare className="w-5 h-5 text-cyan-400 group-hover:text-cyan-300" />
+          <span className="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+        </motion.button>
+
+        {/* Bell/Alert Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onNotificationClick}
+          className="relative p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-amber-500/50 transition-all group"
+        >
+          <Bell className="w-5 h-5 text-amber-400 group-hover:text-amber-300" />
+          {notifications.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+              {notifications.length}
+            </span>
+          )}
+        </motion.button>
 
         {/* AI Optimizer Button */}
         <motion.button
