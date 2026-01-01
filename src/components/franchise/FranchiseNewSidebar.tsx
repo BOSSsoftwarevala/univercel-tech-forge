@@ -56,21 +56,17 @@ const FranchiseNewSidebar = ({ activeSection, onSectionChange }: FranchiseNewSid
           >
             <div className={`relative ${activeSection === item.id ? 'text-indigo-400' : ''}`}>
               <item.icon className="w-5 h-5" />
+              {/* Simplified glow - no layoutId for better performance */}
               {activeSection === item.id && (
-                <motion.div
-                  layoutId="franchise-sidebar-glow"
-                  className="absolute inset-0 bg-indigo-400/30 blur-md rounded-full"
-                />
+                <div className="absolute inset-0 bg-indigo-400/30 blur-md rounded-full" />
               )}
             </div>
             {!collapsed && (
               <>
                 <span className="font-medium flex-1 text-left">{item.label}</span>
+                {/* Simplified dot - no layoutId for better performance */}
                 {activeSection === item.id && (
-                  <motion.div
-                    layoutId="franchise-active-dot"
-                    className="w-2 h-2 bg-indigo-400 rounded-full shadow-lg shadow-indigo-400/50"
-                  />
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full shadow-lg shadow-indigo-400/50" />
                 )}
               </>
             )}

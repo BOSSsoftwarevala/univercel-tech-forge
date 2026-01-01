@@ -1,6 +1,6 @@
 /**
  * Role-Based Welcome Animation
- * Premium login success experience with role-specific visuals and sounds
+ * OPTIMIZED: Reduced animations for better performance
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,7 @@ import {
   Briefcase, Target, Scale, Heart, Wallet, Beaker
 } from 'lucide-react';
 import { useRoleSounds } from '@/hooks/useRoleSounds';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 interface RoleWelcomeAnimationProps {
   isVisible: boolean;
@@ -263,6 +264,10 @@ const RoleWelcomeAnimation = ({
 }: RoleWelcomeAnimationProps) => {
   const [stage, setStage] = useState(0);
   const { playLoginSuccess, isMuted } = useRoleSounds(userRole);
+  const { performanceMode } = useNetworkStatus();
+  
+  // Skip heavy animations in lite modes
+  const isLiteMode = performanceMode !== 'full';
   
   const config = useMemo(() => {
     const normalizedRole = userRole.toLowerCase().replace(/[^a-z_]/g, '');
@@ -271,7 +276,7 @@ const RoleWelcomeAnimation = ({
   
   const IconComponent = config.icon;
 
-  // Trigger animation stages
+  // Trigger animation stages - FASTER in lite mode
   useEffect(() => {
     if (!isVisible) {
       setStage(0);
@@ -280,30 +285,32 @@ const RoleWelcomeAnimation = ({
 
     // Play sound at start
     if (!isMuted) {
-      setTimeout(() => playLoginSuccess(), 200);
+      setTimeout(() => playLoginSuccess(), 100);
     }
 
+    // Faster animation in lite mode
+    const speed = isLiteMode ? 0.5 : 1;
     const timers = [
-      setTimeout(() => setStage(1), 100),
-      setTimeout(() => setStage(2), 600),
-      setTimeout(() => setStage(3), 1200),
-      setTimeout(() => setStage(4), 2000),
-      setTimeout(() => onComplete(), 3000),
+      setTimeout(() => setStage(1), 50 * speed),
+      setTimeout(() => setStage(2), 300 * speed),
+      setTimeout(() => setStage(3), 600 * speed),
+      setTimeout(() => setStage(4), 1000 * speed),
+      setTimeout(() => onComplete(), isLiteMode ? 1200 : 2500),
     ];
 
     return () => timers.forEach(clearTimeout);
-  }, [isVisible, onComplete, playLoginSuccess, isMuted]);
+  }, [isVisible, onComplete, playLoginSuccess, isMuted, isLiteMode]);
 
-  // Generate particles
+  // Generate particles - REDUCED count for performance
   const particles = useMemo(() => 
-    [...Array(15)].map((_, i) => ({
+    [...Array(isLiteMode ? 5 : 10)].map((_, i) => ({
       id: i,
       x: 50 + (Math.random() - 0.5) * 80,
       y: 50 + (Math.random() - 0.5) * 60,
-      delay: Math.random() * 0.5,
-      size: 4 + Math.random() * 6,
+      delay: Math.random() * 0.3,
+      size: 4 + Math.random() * 4,
     })),
-  []);
+  [isLiteMode]);
 
   return (
     <AnimatePresence>
@@ -361,7 +368,8 @@ const RoleWelcomeAnimation = ({
               transition={{ duration: 0.6, type: 'spring', damping: 12 }}
             >
               {/* Outer rings */}
-              {[...Array(3)].map((_, i) => (
+              {/* Simplified rings - only 1 in lite mode */}
+              {[...Array(isLiteMode ? 1 : 2)].map((_, i) => (
                 <motion.div
                   key={i}
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
@@ -371,13 +379,11 @@ const RoleWelcomeAnimation = ({
                     height: `${100 + i * 35}px`,
                     opacity: 0.4 - i * 0.1
                   }}
-                  animate={{ 
+                  animate={isLiteMode ? {} : { 
                     rotate: i % 2 === 0 ? 360 : -360,
-                    scale: [1, 1.05, 1],
                   }}
                   transition={{ 
-                    rotate: { duration: 15 - i * 3, repeat: Infinity, ease: 'linear' },
-                    scale: { duration: 2, repeat: Infinity, delay: i * 0.3 }
+                    rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
                   }}
                 />
               ))}
