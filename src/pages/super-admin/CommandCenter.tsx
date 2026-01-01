@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +15,11 @@ import {
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import RoleSwitchSidebar, { type ActiveRole, roleConfigs } from '@/components/super-admin-wireframe/RoleSwitchSidebar';
+import CommandHeader from '@/components/layouts/CommandHeader';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 // ==========================================
 // FIGMA MASTER PROMPT — CATEGORY HIERARCHY
@@ -670,10 +674,13 @@ const CategoryPlaceholder = ({ title }: { title: string }) => (
 
 const SuperAdminCommandCenter = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const activeCategory = searchParams.get('cat');
   
   const [showWelcome, setShowWelcome] = useState(true);
   const [showAudit, setShowAudit] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeRole, setActiveRole] = useState<ActiveRole>("continent_super_admin");
   const [liveStats, setLiveStats] = useState({
     totalLeads: 4523,
     activeDevelopers: 47,
@@ -701,6 +708,23 @@ const SuperAdminCommandCenter = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle role change - navigate to role switch dashboard
+  const handleRoleChange = (role: ActiveRole) => {
+    setActiveRole(role);
+    navigate(`/super-admin-system/role-switch?role=${role}`);
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate("/auth");
+    } catch {
+      toast.error("Logout failed");
+    }
+  };
+
   // Render category-specific content when a category is selected
   const renderCategoryContent = () => {
     if (!activeCategory) return null;
@@ -710,7 +734,25 @@ const SuperAdminCommandCenter = () => {
   };
 
   return (
-    <DashboardLayout roleOverride="super_admin">
+    <TooltipProvider>
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Global Header */}
+        <CommandHeader />
+        
+        {/* Main Content Area with Sidebar */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* New Role Switch Sidebar */}
+          <RoleSwitchSidebar
+            activeRole={activeRole}
+            onRoleChange={handleRoleChange}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onLogout={handleLogout}
+          />
+          
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto">
+            <div className="p-6">
       <SystemAuditPopup isVisible={showAudit} onClose={() => setShowAudit(false)} />
       
       {/* Welcome Animation Overlay */}
@@ -999,7 +1041,11 @@ const SuperAdminCommandCenter = () => {
           )}
         </AnimatePresence>
       </div>
-    </DashboardLayout>
+            </div>
+          </main>
+        </div>
+      </div>
+    </TooltipProvider>
   );
 };
 
