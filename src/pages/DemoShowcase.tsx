@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { 
   ExternalLink, Search, Filter, ShoppingCart, Users, Heart,
   GraduationCap, DollarSign, Building, Truck, Share2, Briefcase, Grid,
-  Star, ArrowRight, Send, CheckCircle
+  Star, ArrowRight, Send, CheckCircle, Code2, Utensils, Hotel, Package
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,10 +15,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import SupportStaffSection from '@/components/support/SupportStaffSection';
 
 const iconMap: Record<string, any> = {
   ShoppingCart, Users, Heart, GraduationCap, DollarSign,
-  Building, Truck, Share2, Briefcase, Grid
+  Building, Truck, Share2, Briefcase, Grid, Utensils, Hotel, Package
 };
 
 const requestSchema = z.object({
@@ -137,19 +138,34 @@ const DemoShowcase = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <Code2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold text-white">Software Vala</span>
+          </div>
+          <Button size="sm" variant="outline" className="border-purple-500 text-purple-400">
+            Contact Us
+          </Button>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-purple-500/5 opacity-50" />
         
-        <div className="relative max-w-7xl mx-auto px-4 py-20 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 py-16 text-center">
           <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
             20+ Live Projects
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Software <span className="text-purple-400">Vala</span> Demos
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-            Explore our collection of production-ready applications. Each demo is built with modern technologies and ready for deployment.
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+            Production-ready software solutions. All demos powered by Software Vala.
           </p>
           
           <Dialog open={isRequestOpen} onOpenChange={setIsRequestOpen}>
@@ -357,12 +373,15 @@ const DemoShowcase = () => {
         )}
       </div>
 
+      {/* Support Staff Section */}
+      <SupportStaffSection />
+
       {/* Footer CTA */}
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-2xl p-12 border border-purple-500/20">
-          <h2 className="text-3xl font-bold text-white mb-4">Need a Custom Solution?</h2>
-          <p className="text-gray-400 mb-6 max-w-xl mx-auto">
-            Our team can build custom applications tailored to your business needs. Contact us for a personalized demo.
+      <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+        <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-2xl p-10 border border-purple-500/20">
+          <h2 className="text-2xl font-bold text-white mb-3">Need a Custom Solution?</h2>
+          <p className="text-gray-400 mb-6 max-w-xl mx-auto text-sm">
+            Our team can build custom applications tailored to your business needs.
           </p>
           <Button size="lg" onClick={() => setIsRequestOpen(true)} className="bg-white text-purple-900 hover:bg-gray-100">
             Get Started
@@ -370,6 +389,13 @@ const DemoShowcase = () => {
           </Button>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800 py-6">
+        <p className="text-center text-sm text-gray-500">
+          Powered by <span className="font-medium text-purple-400">Software Vala</span>
+        </p>
+      </footer>
     </div>
   );
 };
