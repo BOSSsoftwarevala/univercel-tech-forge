@@ -10,6 +10,8 @@ const SELF_ASSIGNABLE_ROLES = new Set([
   "influencer",
   "prime",
   "client",
+  "boss_owner",
+  "ceo",
 ]);
 
 serve(async (req: Request) => {
