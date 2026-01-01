@@ -1,4 +1,5 @@
 export { default as SuperAdminLogin } from './Login';
+export { RoleSwitchDashboard } from './RoleSwitch';
 export { default as SuperAdminDashboard } from './Dashboard';
 export { default as SuperAdminUsers } from './Users';
 export { default as SuperAdminAdmins } from './Admins';
