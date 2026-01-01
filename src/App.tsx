@@ -245,6 +245,9 @@ import {
   SuperAdminAudit
 } from "./pages/super-admin-system";
 
+// Leader Security Assessment
+import LeaderSecurityAssessment from "./pages/leader-security/LeaderSecurityAssessment";
+
 // Optimized QueryClient with caching for better performance
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -583,6 +586,9 @@ const App = () => (
               <Route path="/super-admin-system/locks" element={<SuperAdminSystemLock />} />
               <Route path="/super-admin-system/activity-log" element={<SuperAdminActivityLog />} />
               <Route path="/super-admin-system/audit" element={<SuperAdminAudit />} />
+
+              {/* Leader Security Assessment */}
+              <Route path="/leader-security" element={<LeaderSecurityAssessment />} />
 
                           {/* Catch-all */}
                           <Route path="*" element={<NotFound />} />
