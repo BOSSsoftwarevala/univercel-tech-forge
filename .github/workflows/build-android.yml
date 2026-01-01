@@ -19,6 +19,9 @@ on:
 env:
   APP_NAME: "Software Vala"
   APP_ID: "com.softwarevala.app"
+  PLAY_CONSOLE_EMAIL: "hello.digitaldna@gmail.com"
+  PLAY_CONSOLE_ACCOUNT: "Digital DNA India"
+  PLAY_CONSOLE_ACCOUNT_ID: "5003822724528726207"
 
 jobs:
   build-android:
@@ -124,6 +127,11 @@ jobs:
           echo "📅 Build Date: $(date)"
           echo "📝 Commit: ${{ github.sha }}"
           echo "================================================"
+          echo ""
+          echo "🏢 PLAY CONSOLE DETAILS:"
+          echo "   Email: ${{ env.PLAY_CONSOLE_EMAIL }}"
+          echo "   Account: ${{ env.PLAY_CONSOLE_ACCOUNT }}"
+          echo "   Account ID: ${{ env.PLAY_CONSOLE_ACCOUNT_ID }}"
           echo ""
           echo "📥 Download APK from 'Artifacts' section"
           echo ""
