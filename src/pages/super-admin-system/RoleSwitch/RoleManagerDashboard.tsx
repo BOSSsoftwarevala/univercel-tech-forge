@@ -865,7 +865,147 @@ const RoleManagerDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Top Actions */}
+      {/* Live Business Tracking Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-6"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="w-5 h-5 text-amber-400" />
+          <h2 className="text-lg font-semibold text-white">Live Business Tracking</h2>
+          <Badge className="bg-amber-500/20 text-amber-400 text-xs">REAL-TIME</Badge>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { 
+              name: "Live Lead Tracker", 
+              icon: Users, 
+              value: 847, 
+              change: "+23", 
+              status: "up",
+              subText: "New leads today",
+              color: "emerald"
+            },
+            { 
+              name: "Live Sales Tracking", 
+              icon: Activity, 
+              value: "₹12.4L", 
+              change: "+₹2.1L", 
+              status: "up",
+              subText: "Revenue today",
+              color: "blue"
+            },
+            { 
+              name: "Live Promise Tracker", 
+              icon: CheckCircle, 
+              value: 156, 
+              change: "12 pending", 
+              status: "warning",
+              subText: "Active promises",
+              color: "violet"
+            },
+            { 
+              name: "Live Support Tracker", 
+              icon: UserCheck, 
+              value: 89, 
+              change: "4 critical", 
+              status: "critical",
+              subText: "Open tickets",
+              color: "orange"
+            },
+            { 
+              name: "Live Franchise Sales", 
+              icon: Building2, 
+              value: 34, 
+              change: "+8", 
+              status: "up",
+              subText: "Sales this week",
+              color: "cyan"
+            },
+            { 
+              name: "Live Demo Requests", 
+              icon: Eye, 
+              value: 67, 
+              change: "+15", 
+              status: "up",
+              subText: "Pending demos",
+              color: "pink"
+            },
+            { 
+              name: "Live Developer Tasks", 
+              icon: Layers, 
+              value: 234, 
+              change: "18 blocked", 
+              status: "warning",
+              subText: "Active tasks",
+              color: "indigo"
+            },
+            { 
+              name: "Live Payment Queue", 
+              icon: Shield, 
+              value: "₹45.2L", 
+              change: "7 pending", 
+              status: "warning",
+              subText: "Pending payouts",
+              color: "amber"
+            },
+            { 
+              name: "Live User Activity", 
+              icon: Globe2, 
+              value: 1247, 
+              change: "+156", 
+              status: "up",
+              subText: "Online users",
+              color: "teal"
+            },
+          ].map((tracker, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 + idx * 0.03 }}
+              className={cn(
+                "p-4 rounded-xl bg-slate-800/50 border backdrop-blur-sm hover:bg-slate-800/70 transition-all cursor-pointer group",
+                `border-${tracker.color}-500/30 hover:border-${tracker.color}-500/60`
+              )}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className={cn(
+                  "w-10 h-10 rounded-lg flex items-center justify-center",
+                  `bg-${tracker.color}-500/20`
+                )}>
+                  <tracker.icon className={cn("w-5 h-5", `text-${tracker.color}-400`)} />
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={cn(
+                    "w-2 h-2 rounded-full animate-pulse",
+                    tracker.status === "up" && "bg-emerald-500",
+                    tracker.status === "warning" && "bg-amber-500",
+                    tracker.status === "critical" && "bg-red-500"
+                  )} />
+                  <span className={cn(
+                    "text-xs font-medium",
+                    tracker.status === "up" && "text-emerald-400",
+                    tracker.status === "warning" && "text-amber-400",
+                    tracker.status === "critical" && "text-red-400"
+                  )}>{tracker.change}</span>
+                </div>
+              </div>
+              <h3 className="font-semibold text-white text-sm mb-1">{tracker.name}</h3>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className={cn("text-xl font-bold", `text-${tracker.color}-400`)}>{tracker.value}</span>
+                  <p className="text-xs text-slate-400">{tracker.subText}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-white transition-colors" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
