@@ -99,6 +99,7 @@ import MasterAdminDashboard from "./pages/master-admin/MasterAdminDashboard";
 import MasterAuth from "./pages/MasterAuth";
 import MasterControlCenter from "./pages/master-control/MasterControlCenter";
 import MasterAdminSupreme from "./pages/master-admin-supreme/MasterAdminSupreme";
+import SoftwareWalaOwnerDashboard from "./pages/owner/SoftwareWalaOwnerDashboard";
 import BootstrapAdmins from "./pages/admin/BootstrapAdmins";
 import RoleManagerPage from "./pages/admin/RoleManagerPage";
 
@@ -365,6 +366,11 @@ const App = () => (
 
               {/* Hidden Master Auth - Secret Route */}
               <Route path="/sv-master-control" element={<MasterAuth />} />
+
+              {/* Owner Dashboard - SoftwareWala Business Control */}
+              <Route path="/owner" element={<RequireRole allowed={["master", "super_admin"]}><SoftwareWalaOwnerDashboard /></RequireRole>} />
+              <Route path="/owner/*" element={<RequireRole allowed={["master", "super_admin"]}><SoftwareWalaOwnerDashboard /></RequireRole>} />
+              <Route path="/softwarewala" element={<RequireRole allowed={["master", "super_admin"]}><SoftwareWalaOwnerDashboard /></RequireRole>} />
 
               {/* Master Admin Routes - MASTER ONLY */}
               <Route path="/master-admin" element={<RequireRole allowed={["master"]} masterOnly><MasterControlCenter /></RequireRole>} />
