@@ -2595,6 +2595,57 @@ export type Database = {
         }
         Relationships: []
       }
+      crypto_audit_chain: {
+        Row: {
+          action_type: string
+          block_hash: string
+          block_number: number
+          data_hash: string
+          id: string
+          is_genesis: boolean | null
+          merkle_root: string | null
+          metadata: Json | null
+          module: string
+          nonce: string
+          previous_hash: string
+          signature: string | null
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          block_hash: string
+          block_number: number
+          data_hash: string
+          id?: string
+          is_genesis?: boolean | null
+          merkle_root?: string | null
+          metadata?: Json | null
+          module: string
+          nonce: string
+          previous_hash: string
+          signature?: string | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          block_hash?: string
+          block_number?: number
+          data_hash?: string
+          id?: string
+          is_genesis?: boolean | null
+          merkle_root?: string | null
+          metadata?: Json | null
+          module?: string
+          nonce?: string
+          previous_hash?: string
+          signature?: string | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       data_residency_config: {
         Row: {
           applicable_regulations: string[] | null
@@ -5333,6 +5384,60 @@ export type Database = {
           screen_resolution?: string | null
           timezone?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      encrypted_vault: {
+        Row: {
+          access_count: number | null
+          access_level: string
+          allowed_roles: string[] | null
+          auth_tag: string | null
+          created_at: string
+          data_type: string
+          encrypted_data: string
+          encryption_key_hash: string
+          expires_at: string | null
+          id: string
+          is_archived: boolean | null
+          iv: string
+          last_accessed_at: string | null
+          last_accessed_by: string | null
+          owner_id: string
+        }
+        Insert: {
+          access_count?: number | null
+          access_level: string
+          allowed_roles?: string[] | null
+          auth_tag?: string | null
+          created_at?: string
+          data_type: string
+          encrypted_data: string
+          encryption_key_hash: string
+          expires_at?: string | null
+          id?: string
+          is_archived?: boolean | null
+          iv: string
+          last_accessed_at?: string | null
+          last_accessed_by?: string | null
+          owner_id: string
+        }
+        Update: {
+          access_count?: number | null
+          access_level?: string
+          allowed_roles?: string[] | null
+          auth_tag?: string | null
+          created_at?: string
+          data_type?: string
+          encrypted_data?: string
+          encryption_key_hash?: string
+          expires_at?: string | null
+          id?: string
+          is_archived?: boolean | null
+          iv?: string
+          last_accessed_at?: string | null
+          last_accessed_by?: string | null
+          owner_id?: string
         }
         Relationships: []
       }
@@ -12704,6 +12809,78 @@ export type Database = {
         }
         Relationships: []
       }
+      realtime_threat_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          affected_module: string | null
+          affected_user_id: string | null
+          ai_confidence: number | null
+          alert_id: string
+          alert_type: string
+          auto_mitigated: boolean | null
+          created_at: string
+          description: string
+          device_fingerprint: string | null
+          id: string
+          metadata: Json | null
+          mitigation_action: string | null
+          recommended_action: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          source_ip: unknown
+          threat_level: string
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          affected_module?: string | null
+          affected_user_id?: string | null
+          ai_confidence?: number | null
+          alert_id: string
+          alert_type: string
+          auto_mitigated?: boolean | null
+          created_at?: string
+          description: string
+          device_fingerprint?: string | null
+          id?: string
+          metadata?: Json | null
+          mitigation_action?: string | null
+          recommended_action?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source_ip?: unknown
+          threat_level: string
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          affected_module?: string | null
+          affected_user_id?: string | null
+          ai_confidence?: number | null
+          alert_id?: string
+          alert_type?: string
+          auto_mitigated?: boolean | null
+          created_at?: string
+          description?: string
+          device_fingerprint?: string | null
+          id?: string
+          metadata?: Json | null
+          mitigation_action?: string | null
+          recommended_action?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source_ip?: unknown
+          threat_level?: string
+          title?: string
+        }
+        Relationships: []
+      }
       refund_requests: {
         Row: {
           ai_confidence_score: number | null
@@ -15072,6 +15249,68 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      security_tokens: {
+        Row: {
+          device_fingerprint: string
+          expires_at: string
+          id: string
+          ip_address: unknown
+          issued_at: string
+          max_usage: number | null
+          metadata: Json | null
+          parent_token_id: string | null
+          revoked_at: string | null
+          revoked_reason: string | null
+          token_hash: string
+          token_type: string
+          usage_count: number | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          device_fingerprint: string
+          expires_at: string
+          id?: string
+          ip_address?: unknown
+          issued_at?: string
+          max_usage?: number | null
+          metadata?: Json | null
+          parent_token_id?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          token_hash: string
+          token_type: string
+          usage_count?: number | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          device_fingerprint?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          issued_at?: string
+          max_usage?: number | null
+          metadata?: Json | null
+          parent_token_id?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          token_hash?: string
+          token_type?: string
+          usage_count?: number | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_tokens_parent_token_id_fkey"
+            columns: ["parent_token_id"]
+            isOneToOne: false
+            referencedRelation: "security_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seo_keywords: {
         Row: {
@@ -18426,6 +18665,63 @@ export type Database = {
         }
         Relationships: []
       }
+      threat_intelligence: {
+        Row: {
+          ai_analysis: Json | null
+          confidence_score: number
+          created_at: string
+          expires_at: string | null
+          first_seen: string
+          id: string
+          indicator_type: string
+          indicator_value: string
+          is_active: boolean | null
+          last_seen: string
+          mitigation_applied: boolean | null
+          mitigation_details: string | null
+          occurrence_count: number | null
+          source: string
+          threat_level: string
+          threat_type: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          confidence_score: number
+          created_at?: string
+          expires_at?: string | null
+          first_seen?: string
+          id?: string
+          indicator_type: string
+          indicator_value: string
+          is_active?: boolean | null
+          last_seen?: string
+          mitigation_applied?: boolean | null
+          mitigation_details?: string | null
+          occurrence_count?: number | null
+          source: string
+          threat_level: string
+          threat_type: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          confidence_score?: number
+          created_at?: string
+          expires_at?: string | null
+          first_seen?: string
+          id?: string
+          indicator_type?: string
+          indicator_value?: string
+          is_active?: boolean | null
+          last_seen?: string
+          mitigation_applied?: boolean | null
+          mitigation_details?: string | null
+          occurrence_count?: number | null
+          source?: string
+          threat_level?: string
+          threat_type?: string
+        }
+        Relationships: []
+      }
       training_logs: {
         Row: {
           certificate_url: string | null
@@ -19781,6 +20077,60 @@ export type Database = {
         }
         Relationships: []
       }
+      zero_trust_verifications: {
+        Row: {
+          action_allowed: boolean
+          anomalies_detected: Json | null
+          created_at: string
+          denial_reason: string | null
+          device_fingerprint: string
+          factors_verified: Json | null
+          geolocation: Json | null
+          id: string
+          ip_address: unknown
+          risk_score: number | null
+          session_token_hash: string | null
+          user_id: string
+          verification_duration_ms: number | null
+          verification_result: boolean
+          verification_type: string
+        }
+        Insert: {
+          action_allowed: boolean
+          anomalies_detected?: Json | null
+          created_at?: string
+          denial_reason?: string | null
+          device_fingerprint: string
+          factors_verified?: Json | null
+          geolocation?: Json | null
+          id?: string
+          ip_address?: unknown
+          risk_score?: number | null
+          session_token_hash?: string | null
+          user_id: string
+          verification_duration_ms?: number | null
+          verification_result: boolean
+          verification_type: string
+        }
+        Update: {
+          action_allowed?: boolean
+          anomalies_detected?: Json | null
+          created_at?: string
+          denial_reason?: string | null
+          device_fingerprint?: string
+          factors_verified?: Json | null
+          geolocation?: Json | null
+          id?: string
+          ip_address?: unknown
+          risk_score?: number | null
+          session_token_hash?: string | null
+          user_id?: string
+          verification_duration_ms?: number | null
+          verification_result?: boolean
+          verification_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       promise_manager_metrics: {
@@ -19903,6 +20253,15 @@ export type Database = {
       }
     }
     Functions: {
+      add_to_audit_chain: {
+        Args: {
+          p_action_type: string
+          p_data: Json
+          p_module: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       add_to_login_whitelist: {
         Args: {
           p_device_whitelist?: string[]
@@ -20073,6 +20432,22 @@ export type Database = {
         }
         Returns: Json
       }
+      create_threat_alert: {
+        Args: {
+          p_affected_module?: string
+          p_affected_user_id?: string
+          p_ai_confidence?: number
+          p_alert_type: string
+          p_auto_mitigate?: boolean
+          p_description: string
+          p_device_fingerprint?: string
+          p_recommended_action?: string
+          p_source_ip?: unknown
+          p_threat_level: string
+          p_title: string
+        }
+        Returns: string
+      }
       end_remote_assist_session: {
         Args: { p_reason?: string; p_session_id: string }
         Returns: Json
@@ -20227,6 +20602,21 @@ export type Database = {
           _violation_type: string
         }
         Returns: string
+      }
+      issue_security_token: {
+        Args: {
+          p_device_fingerprint: string
+          p_ip_address?: unknown
+          p_max_usage?: number
+          p_token_type: string
+          p_user_agent?: string
+          p_user_id: string
+          p_validity_minutes?: number
+        }
+        Returns: {
+          token_hash: string
+          token_id: string
+        }[]
       }
       join_remote_assist_session: {
         Args: { p_session_code: string }
@@ -20527,6 +20917,15 @@ export type Database = {
         Args: { p_route: string; p_user_id: string }
         Returns: boolean
       }
+      verify_audit_chain: {
+        Args: never
+        Returns: {
+          broken_at_block: number
+          error_message: string
+          is_valid: boolean
+          last_verified_block: number
+        }[]
+      }
       verify_backup_code: {
         Args: { p_code: string; p_user_id: string }
         Returns: boolean
@@ -20562,6 +20961,21 @@ export type Database = {
           p_user_code: string
         }
         Returns: Json
+      }
+      zero_trust_verify: {
+        Args: {
+          p_action: string
+          p_device_fingerprint: string
+          p_geolocation?: Json
+          p_ip_address?: unknown
+          p_user_id: string
+        }
+        Returns: {
+          allowed: boolean
+          denial_reason: string
+          required_factors: string[]
+          risk_score: number
+        }[]
       }
     }
     Enums: {
