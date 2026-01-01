@@ -30,6 +30,8 @@ import MasterAdminDashboard from "./MasterAdminDashboard";
 import SuperAdminHierarchyDashboard from "./SuperAdminHierarchyDashboard";
 import CountryHeadDashboard from "./CountryHeadDashboard";
 import ProductManagerDashboard from "./ProductManagerDashboard";
+import CEODashboard from "./CEODashboard";
+import BossOwnerDashboard from "./BossOwnerDashboard";
 
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
@@ -122,6 +124,10 @@ const RoleSwitchDashboard = () => {
   // Render the appropriate view based on active role
   const renderRoleView = () => {
     switch (activeRole) {
+      case "ceo":
+        return <CEODashboard />;
+      case "boss_owner":
+        return <BossOwnerDashboard />;
       case "master_admin":
         return <MasterAdminDashboard />;
       case "super_admin_hierarchy":
@@ -166,6 +172,8 @@ const RoleSwitchDashboard = () => {
   return (
     <div className={cn(
       "min-h-screen flex flex-col transition-colors duration-300",
+      activeRole === "ceo" ? "bg-gradient-to-br from-emerald-950/20 via-background to-teal-950/20" :
+      activeRole === "boss_owner" ? "bg-gradient-to-br from-amber-950/30 via-zinc-950 to-orange-950/20" :
       activeRole === "master_admin" ? "bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900" :
       activeRole === "super_admin_hierarchy" ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950" :
       activeRole === "country_head" ? "bg-gradient-to-br from-orange-950/20 via-background to-amber-950/20" :
