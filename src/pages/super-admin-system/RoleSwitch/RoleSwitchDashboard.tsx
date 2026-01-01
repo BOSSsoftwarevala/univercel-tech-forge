@@ -49,7 +49,9 @@ const RoleSwitchDashboard = () => {
   };
 
   const handleRoleChange = (role: ActiveRole) => {
+    // NO REDIRECT - just switch the view in place
     setActiveRole(role);
+    // Reset any role-specific state if needed
     toast.success(`Switched to ${roleConfigs[role].label} view`);
   };
 
