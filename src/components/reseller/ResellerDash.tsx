@@ -20,6 +20,10 @@ const ResellerDash = () => {
     { label: 'Wallet Balance', value: '₹45,200', change: '+₹8,500', trend: 'up', icon: Wallet, color: 'teal' },
     { label: 'Conversion Rate', value: '32%', change: '+4%', trend: 'up', icon: TrendingUp, color: 'cyan' },
     { label: 'Monthly Target', value: '72%', change: '-8%', trend: 'down', icon: Target, color: 'amber' },
+    { label: 'Total Clients', value: '28', change: '+3', trend: 'up', icon: Users, color: 'purple' },
+    { label: 'Sales This Month', value: '₹4.2L', change: '+18%', trend: 'up', icon: TrendingUp, color: 'blue' },
+    { label: 'Pending Commission', value: '₹45K', change: '+₹12K', trend: 'up', icon: Wallet, color: 'orange' },
+    { label: 'Lead Quality Avg', value: '78', change: '+5', trend: 'up', icon: Target, color: 'pink' },
   ];
 
   const recentLeads = [
