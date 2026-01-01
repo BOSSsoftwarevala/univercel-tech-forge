@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
 import { 
   Mail, Lock, ArrowRight, Eye, EyeOff, Shield, Fingerprint,
@@ -432,6 +432,15 @@ const BossFortressAuth = () => {
                       </div>
                     )}
                   </Button>
+
+                  <div className="text-center">
+                    <Link
+                      to="/forgot-password"
+                      className="text-xs text-amber-300/90 hover:text-amber-200 underline underline-offset-4"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                 </form>
               </motion.div>
             )}
