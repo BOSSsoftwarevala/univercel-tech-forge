@@ -182,7 +182,7 @@ const IntrusionBlocker: React.FC<IntrusionBlockerProps> = ({ children, onBlock }
       }
 
       // Check for missing browser features
-      if (!window.chrome && navigator.userAgent.includes('Chrome')) {
+      if (!(window as any).chrome && navigator.userAgent.includes('Chrome')) {
         anomalies.push('fake_chrome');
       }
 

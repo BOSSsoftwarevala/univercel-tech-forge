@@ -111,7 +111,7 @@ export function useFortressProtection() {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }, []);
 
-  // Check if device is approved
+  // Check if device is approved (using local storage for now)
   const checkDeviceApproval = useCallback(async (): Promise<boolean> => {
     try {
       const fingerprint = await generateSecureFingerprint();
@@ -119,15 +119,12 @@ export function useFortressProtection() {
       
       if (!user) return false;
 
-      const { data } = await supabase
-        .from('trusted_devices')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('device_fingerprint', fingerprint)
-        .eq('is_trusted', true)
-        .single();
+      // Check trusted devices from local storage
+      const trustedDevices = JSON.parse(localStorage.getItem('fortress_trusted_devices') || '[]');
+      const approved = trustedDevices.some((d: any) => 
+        d.user_id === user.id && d.fingerprint === fingerprint
+      );
 
-      const approved = !!data;
       setFortress(prev => ({ ...prev, deviceApproved: approved }));
       return approved;
     } catch {
@@ -135,7 +132,7 @@ export function useFortressProtection() {
     }
   }, [generateSecureFingerprint]);
 
-  // Check IP approval
+  // Check IP approval (using local storage for now)
   const checkIPApproval = useCallback(async (): Promise<boolean> => {
     try {
       const response = await fetch('https://ipapi.co/json/');
@@ -151,15 +148,12 @@ export function useFortressProtection() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
-      const { data } = await supabase
-        .from('approved_ips')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('ip_address', ipData.ip)
-        .eq('is_approved', true)
-        .single();
+      // Check approved IPs from local storage
+      const approvedIPs = JSON.parse(localStorage.getItem('fortress_approved_ips') || '[]');
+      const approved = approvedIPs.some((ip: any) => 
+        ip.user_id === user.id && ip.ip_address === ipData.ip
+      );
 
-      const approved = !!data;
       setFortress(prev => ({ ...prev, ipApproved: approved }));
       return approved;
     } catch {
@@ -371,14 +365,11 @@ export function useFortressProtection() {
     const ipApproved = await checkIPApproval();
     if (ipApproved) trustLevel++;
 
-    // Check MFA status
-    const { data: mfaData } = await supabase
-      .from('mfa_settings')
-      .select('is_enabled')
-      .eq('user_id', session.user.id)
-      .single();
+    // Check MFA status from user metadata or local settings
+    const mfaEnabled = localStorage.getItem(`fortress_mfa_${session.user.id}`) === 'true' ||
+                       session.user.user_metadata?.mfa_enabled === true;
 
-    if (mfaData?.is_enabled) {
+    if (mfaEnabled) {
       trustLevel++;
       setFortress(prev => ({ ...prev, mfaVerified: true }));
     }
