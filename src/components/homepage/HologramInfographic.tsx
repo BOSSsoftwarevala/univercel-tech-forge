@@ -8,12 +8,12 @@ import { motion } from 'framer-motion';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 const hexData = [
-  { label: 'Active Users', value: '50K+', color: 'from-primary to-neon-teal' },
-  { label: 'Countries', value: '7+', color: 'from-neon-green to-neon-teal' },
-  { label: 'Products', value: '11.8K+', color: 'from-neon-orange to-neon-red' },
-  { label: 'Resellers', value: '2.8K+', color: 'from-neon-purple to-primary' },
-  { label: 'Uptime', value: '99.9%', color: 'from-neon-teal to-neon-green' },
-  { label: 'Support', value: '24/7', color: 'from-primary to-neon-purple' },
+  { label: 'Software Products', value: '5170+', color: 'from-primary to-neon-teal', note: '2hr Prime Delivery' },
+  { label: 'Franchises', value: '52+', color: 'from-neon-green to-neon-teal' },
+  { label: 'Resellers', value: '2850+', color: 'from-neon-orange to-neon-red' },
+  { label: 'Premium Agencies', value: '300+', color: 'from-neon-purple to-primary' },
+  { label: 'Govt. Projects', value: '10+', color: 'from-neon-teal to-neon-green', note: '2 Mega Ongoing' },
+  { label: 'Global Support', value: '24/7', color: 'from-primary to-neon-purple' },
 ];
 
 const flowSteps = [
@@ -30,6 +30,26 @@ const HologramInfographic = memo(function HologramInfographic() {
   return (
     <section className="py-16 relative overflow-hidden">
       <div className="container mx-auto px-4">
+        {/* World's First Badge */}
+        <motion.div
+          initial={isLite ? {} : { opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary/20 via-neon-purple/20 to-neon-teal/20 border border-primary/40 backdrop-blur-sm">
+            <span className="text-2xl">🌍</span>
+            <span className="text-sm md:text-base font-bold bg-gradient-to-r from-primary via-neon-purple to-neon-teal bg-clip-text text-transparent">
+              WORLD'S FIRST COMPLETE SOFTWARE ECOSYSTEM
+            </span>
+            <span className="text-2xl">🚀</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
+            No one else offers this complete technology ecosystem — from software catalog to franchise network, 
+            reseller programs, government projects & AI-powered management.
+          </p>
+        </motion.div>
+
         {/* Stats Grid */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-center mb-8 text-foreground">
@@ -45,10 +65,15 @@ const HologramInfographic = memo(function HologramInfographic() {
                 transition={{ delay: index * 0.05 }}
                 className="relative group"
               >
-                <div className="relative p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-border/30 text-center">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-5 rounded-xl`} />
+                <div className="relative p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-border/30 text-center hover:border-primary/50 transition-all duration-300">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-5 rounded-xl group-hover:opacity-10 transition-opacity`} />
                   <p className="text-2xl font-bold text-primary mb-1">{item.value}</p>
                   <p className="text-xs text-muted-foreground">{item.label}</p>
+                  {item.note && (
+                    <p className="text-[10px] text-primary/70 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {item.note}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             ))}
