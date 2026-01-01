@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ const funMessages = [
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [message] = useState(() => funMessages[Math.floor(Math.random() * funMessages.length)]);
   const [countdown, setCountdown] = useState(15);
 
@@ -51,14 +52,14 @@ const NotFound = () => {
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
-          window.location.href = '/';
+          navigate('/', { replace: true });
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [navigate]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4 overflow-hidden">
@@ -191,11 +192,9 @@ const NotFound = () => {
               Take Me Home
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="gap-2">
-            <Link to="/" onClick={() => window.history.back()}>
-              <ArrowLeft className="w-5 h-5" />
-              Go Back
-            </Link>
+          <Button size="lg" variant="outline" className="gap-2" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-5 h-5" />
+            Go Back
           </Button>
           <Button asChild variant="ghost" size="lg" className="gap-2">
             <Link to="/demos">

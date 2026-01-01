@@ -284,6 +284,7 @@ const App = () => (
                           {/* Public Routes - No login required */}
               <Route path="/" element={<Index />} />
               <Route path="/demos" element={<Index />} />
+              <Route path="/explore" element={<Navigate to="/demos" replace />} />
               <Route path="/products" element={<Index />} />
               <Route path="/pricing" element={<SimpleDemoList />} />
               <Route path="/demos/public" element={<PublicDemos />} />

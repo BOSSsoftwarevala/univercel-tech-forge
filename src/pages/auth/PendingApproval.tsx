@@ -216,7 +216,7 @@ const PendingApproval = () => {
                 Explore Public Demos
               </Button>
 
-              <Button variant="secondary" className="w-full gap-2" onClick={() => navigate('/explore')}>
+              <Button variant="secondary" className="w-full gap-2" onClick={() => navigate('/demos')}>
                 <Sparkles className="w-4 h-4" />
                 Browse Features
               </Button>
