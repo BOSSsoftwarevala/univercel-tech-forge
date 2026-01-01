@@ -5,8 +5,10 @@ import { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
-// Only master and super_admin get direct access
+// Roles that get direct access without approval
 const PRIVILEGED_ROLES: string[] = ['master', 'super_admin'];
+// Roles that get auto-approved on signup (no waiting)
+const AUTO_APPROVED_ROLES: string[] = ['master', 'super_admin', 'prime'];
 
 interface AuthContextType {
   user: User | null;
@@ -166,7 +168,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           if (!fnErr && (fnData as any)?.data?.role) {
             setUserRole(((fnData as any).data.role) as AppRole);
-            const newApprovalStatus = PRIVILEGED_ROLES.includes((fnData as any).data.role) ? 'approved' : 'pending';
+            const newApprovalStatus = AUTO_APPROVED_ROLES.includes((fnData as any).data.role) ? 'approved' : 'pending';
             setApprovalStatus(newApprovalStatus as 'pending' | 'approved' | 'rejected');
             setRoleChecked(true);
           }
