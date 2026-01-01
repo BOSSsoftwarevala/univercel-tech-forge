@@ -35,6 +35,7 @@ import ChangePassword from "./pages/auth/ChangePassword";
 import AccountSuspension from "./pages/auth/AccountSuspension";
 import AccessDenied from "./pages/auth/AccessDenied";
 import PendingApproval from "./pages/auth/PendingApproval";
+import BossFortressAuth from "./pages/auth/BossFortressAuth";
 
 // Public Pages
 import PublicDemos from "./pages/demos/PublicDemos";
@@ -210,6 +211,7 @@ import SystemSettings from "./pages/SystemSettings";
 import NotificationBuzzerConsole from "./pages/NotificationBuzzerConsole";
 import APIIntegrationDashboard from "./pages/APIIntegrationDashboard";
 import ApplyPortal from "./pages/ApplyPortal";
+import CareerPortal from "./pages/CareerPortal";
 import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
 import DomainProtection from "./components/security/DomainProtection";
@@ -299,6 +301,10 @@ const App = () => (
               <Route path="/onboard" element={<Homepage />} />
               <Route path="/onboard/:category" element={<CategoryOnboarding />} />
               <Route path="/apply" element={<SimpleDemoList />} />
+              <Route path="/careers" element={<CareerPortal />} />
+              <Route path="/join-developer" element={<CareerPortal />} />
+              <Route path="/join-influencer" element={<CareerPortal />} />
+              <Route path="/jobs" element={<CareerPortal />} />
               {/* Bootstrap is Master-only after initial setup */}
               <Route path="/bootstrap-admins" element={<RequireRole allowed={["master"]} masterOnly><BootstrapAdmins /></RequireRole>} />
               <Route path="/sectors" element={<SectorsBrowse />} />
@@ -350,6 +356,9 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/account-suspension" element={<AccountSuspension />} />
               <Route path="/access-denied" element={<AccessDenied />} />
+
+              {/* Boss Fortress Auth - Ultra Secure */}
+              <Route path="/boss-fortress" element={<BossFortressAuth />} />
 
               {/* Hidden Master Auth - Secret Route */}
               <Route path="/sv-master-control" element={<MasterAuth />} />
