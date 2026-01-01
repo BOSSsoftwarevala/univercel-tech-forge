@@ -818,84 +818,100 @@ const RoleManagerDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { 
+              name: "Pending Role Approvals", 
+              icon: Shield, 
+              status: "pending",
+              actions: ["Approve", "Reject"],
+              count: 3,
+              description: "Role requests awaiting your approval"
+            },
+            { 
+              name: "Permission Change Requests", 
+              icon: Lock, 
+              status: "pending",
+              actions: ["Approve", "Reject"],
+              count: 5,
+              description: "Permission modifications pending review"
+            },
+            { 
+              name: "User Escalations", 
+              icon: AlertTriangle, 
+              status: "urgent",
+              actions: ["Handle", "Escalate"],
+              count: 2,
+              description: "Critical user issues requiring attention"
+            },
+            { 
               name: "Lead Assignment", 
               icon: Users, 
               status: "running",
-              action: "Stop",
-              actionType: "stop",
+              actions: ["Stop", "Pause"],
+              count: 48,
               description: "Auto-assign new leads to available agents"
             },
             { 
               name: "Sales Pipeline", 
               icon: Activity, 
               status: "running",
-              action: "Stop",
-              actionType: "stop",
+              actions: ["Stop", "Pause"],
+              count: 156,
               description: "Process sales conversions automatically"
-            },
-            { 
-              name: "Promise Tracking", 
-              icon: CheckCircle, 
-              status: "running",
-              action: "Stop",
-              actionType: "stop",
-              description: "Monitor and track all active promises"
             },
             { 
               name: "Support Queue", 
               icon: UserCheck, 
               status: "paused",
-              action: "Start",
-              actionType: "start",
+              actions: ["Start", "Reset"],
+              count: 24,
               description: "Auto-route tickets to support agents"
             },
             { 
               name: "Franchise Onboarding", 
               icon: Building2, 
               status: "running",
-              action: "Stop",
-              actionType: "stop",
+              actions: ["Stop", "Block"],
+              count: 12,
               description: "New franchise approval workflow"
-            },
-            { 
-              name: "Demo Scheduling", 
-              icon: Eye, 
-              status: "blocked",
-              action: "Allow",
-              actionType: "allow",
-              description: "Allow new demo bookings"
-            },
-            { 
-              name: "Developer Deployments", 
-              icon: Layers, 
-              status: "running",
-              action: "Stop",
-              actionType: "stop",
-              description: "Auto-deploy approved code changes"
             },
             { 
               name: "Payment Processing", 
               icon: Shield, 
               status: "paused",
-              action: "Start",
-              actionType: "start",
+              actions: ["Start", "Force"],
+              count: 89,
               description: "Process pending payout requests"
             },
             { 
               name: "New Registrations", 
               icon: Globe2, 
               status: "running",
-              action: "Block",
-              actionType: "block",
+              actions: ["Block", "Limit"],
+              count: 234,
               description: "Accept new user registrations"
             },
             { 
-              name: "Reseller Approvals", 
-              icon: Lock, 
+              name: "System Issues", 
+              icon: AlertCircle, 
+              status: "urgent",
+              actions: ["Resolve", "Ignore"],
+              count: 4,
+              description: "Critical system alerts pending action"
+            },
+            { 
+              name: "Role Assignments", 
+              icon: UserCheck, 
+              status: "pending",
+              actions: ["Approve", "Deny"],
+              count: 7,
+              description: "Staff role assignment requests"
+            },
+            { 
+              name: "Access Revocations", 
+              icon: XCircle, 
               status: "blocked",
-              action: "Allow",
-              actionType: "allow",
-              description: "Allow reseller application processing"
+              actions: ["Execute", "Cancel"],
+              count: 3,
+              description: "Pending access removal requests"
             },
           ].map((control, idx) => (
             <motion.div
@@ -903,53 +919,87 @@ const RoleManagerDashboard = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15 + idx * 0.03 }}
-              className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all"
+              className="p-5 rounded-xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1">
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                    "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
                     control.status === "running" && "bg-emerald-500/20",
                     control.status === "paused" && "bg-amber-500/20",
-                    control.status === "blocked" && "bg-red-500/20"
+                    control.status === "blocked" && "bg-red-500/20",
+                    control.status === "pending" && "bg-violet-500/20",
+                    control.status === "urgent" && "bg-orange-500/20"
                   )}>
                     <control.icon className={cn(
-                      "w-5 h-5",
+                      "w-6 h-6",
                       control.status === "running" && "text-emerald-400",
                       control.status === "paused" && "text-amber-400",
-                      control.status === "blocked" && "text-red-400"
+                      control.status === "blocked" && "text-red-400",
+                      control.status === "pending" && "text-violet-400",
+                      control.status === "urgent" && "text-orange-400"
                     )} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1.5">
                       <h3 className="font-semibold text-white text-sm">{control.name}</h3>
+                      <Badge className={cn(
+                        "text-[10px] px-1.5 py-0",
+                        control.status === "running" && "bg-emerald-500/20 text-emerald-400",
+                        control.status === "paused" && "bg-amber-500/20 text-amber-400",
+                        control.status === "blocked" && "bg-red-500/20 text-red-400",
+                        control.status === "pending" && "bg-violet-500/20 text-violet-400",
+                        control.status === "urgent" && "bg-orange-500/20 text-orange-400"
+                      )}>
+                        {control.count}
+                      </Badge>
                       <span className={cn(
-                        "w-2 h-2 rounded-full animate-pulse",
-                        control.status === "running" && "bg-emerald-500",
+                        "w-2 h-2 rounded-full",
+                        control.status === "running" && "bg-emerald-500 animate-pulse",
                         control.status === "paused" && "bg-amber-500",
-                        control.status === "blocked" && "bg-red-500"
+                        control.status === "blocked" && "bg-red-500",
+                        control.status === "pending" && "bg-violet-500 animate-pulse",
+                        control.status === "urgent" && "bg-orange-500 animate-pulse"
                       )} />
                     </div>
-                    <p className="text-xs text-slate-400 line-clamp-1">{control.description}</p>
+                    <p className="text-xs text-slate-400 mb-3">{control.description}</p>
+                    <div className="flex items-center gap-2">
+                      {control.actions.map((action, aIdx) => (
+                        <Button
+                          key={aIdx}
+                          type="button"
+                          size="sm"
+                          className={cn(
+                            "h-8 px-3 font-medium text-xs",
+                            action === "Approve" && "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30",
+                            action === "Reject" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
+                            action === "Stop" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
+                            action === "Start" && "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30",
+                            action === "Pause" && "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30",
+                            action === "Block" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
+                            action === "Allow" && "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30",
+                            action === "Handle" && "bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 border border-violet-500/30",
+                            action === "Escalate" && "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 border border-orange-500/30",
+                            action === "Reset" && "bg-slate-500/20 text-slate-400 hover:bg-slate-500/30 border border-slate-500/30",
+                            action === "Force" && "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 border border-orange-500/30",
+                            action === "Limit" && "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30",
+                            action === "Resolve" && "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30",
+                            action === "Ignore" && "bg-slate-500/20 text-slate-400 hover:bg-slate-500/30 border border-slate-500/30",
+                            action === "Deny" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
+                            action === "Execute" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
+                            action === "Cancel" && "bg-slate-500/20 text-slate-400 hover:bg-slate-500/30 border border-slate-500/30"
+                          )}
+                          onClick={() => toast({
+                            title: `${action} ${control.name}`,
+                            description: `Action "${action}" executed successfully.`
+                          })}
+                        >
+                          {action}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  className={cn(
-                    "shrink-0 ml-3 font-medium",
-                    control.actionType === "stop" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
-                    control.actionType === "start" && "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30",
-                    control.actionType === "allow" && "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30",
-                    control.actionType === "block" && "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30"
-                  )}
-                  onClick={() => toast({
-                    title: `${control.action} ${control.name}`,
-                    description: `Action "${control.action}" executed successfully.`
-                  })}
-                >
-                  {control.action}
-                </Button>
               </div>
             </motion.div>
           ))}
