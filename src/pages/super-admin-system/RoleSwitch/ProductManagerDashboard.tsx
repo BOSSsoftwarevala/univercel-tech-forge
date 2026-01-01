@@ -4,7 +4,9 @@ import {
   Box, Package, Play, Eye, Plus, Edit2, Trash2, Search, Filter,
   BarChart3, TrendingUp, ShoppingCart, Layers, CreditCard, Tag,
   CheckCircle2, XCircle, Clock, AlertCircle, Activity, Settings,
-  Image, FileText, Star, Users, Globe2, Download
+  Image, FileText, Star, Users, Globe2, Download, Upload, RefreshCw,
+  Link2, Copy, Calendar, Zap, ArrowUpRight, MoreHorizontal, Check,
+  Power, ChevronRight, Timer, Repeat, Share2, Lock, Unlock
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +16,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
 // Mock products data
@@ -23,110 +27,220 @@ const mockProducts = [
     id: "PRD-001", 
     name: "Enterprise ERP Suite", 
     category: "Software",
+    subCategory: "ERP",
     status: "active",
     demos: 45,
-    views: 12500,
+    activeUsers: 1250,
+    version: "v3.2.1",
+    lastUpdated: "2 days ago",
     price: "₹2,50,000",
     rating: 4.8,
-    image: "/placeholder.svg"
   },
   { 
     id: "PRD-002", 
     name: "CRM Professional", 
     category: "Software",
+    subCategory: "CRM",
     status: "active",
     demos: 32,
-    views: 8900,
+    activeUsers: 890,
+    version: "v2.8.0",
+    lastUpdated: "5 days ago",
     price: "₹1,50,000",
     rating: 4.6,
-    image: "/placeholder.svg"
   },
   { 
     id: "PRD-003", 
-    name: "Inventory Manager", 
+    name: "Inventory Manager Pro", 
     category: "Software",
+    subCategory: "Inventory",
     status: "draft",
     demos: 0,
-    views: 2100,
+    activeUsers: 0,
+    version: "v1.0.0",
+    lastUpdated: "1 hour ago",
     price: "₹75,000",
     rating: 0,
-    image: "/placeholder.svg"
   },
   { 
     id: "PRD-004", 
     name: "HR Management System", 
     category: "Software",
+    subCategory: "HRMS",
     status: "active",
     demos: 28,
-    views: 6700,
+    activeUsers: 670,
+    version: "v4.1.2",
+    lastUpdated: "1 week ago",
     price: "₹1,25,000",
     rating: 4.5,
-    image: "/placeholder.svg"
   },
   { 
     id: "PRD-005", 
     name: "E-Commerce Platform", 
     category: "Platform",
+    subCategory: "Marketplace",
     status: "active",
     demos: 56,
-    views: 15200,
+    activeUsers: 1520,
+    version: "v5.0.0",
+    lastUpdated: "3 days ago",
     price: "₹3,00,000",
     rating: 4.9,
-    image: "/placeholder.svg"
+  },
+  { 
+    id: "PRD-006", 
+    name: "Accounting Suite", 
+    category: "Software",
+    subCategory: "Finance",
+    status: "disabled",
+    demos: 12,
+    activeUsers: 340,
+    version: "v2.5.0",
+    lastUpdated: "2 weeks ago",
+    price: "₹95,000",
+    rating: 4.2,
   },
 ];
 
 // Mock demos data
 const mockDemos = [
-  { id: "DEM-001", product: "Enterprise ERP Suite", client: "ABC Corp", status: "scheduled", date: "2024-01-20", time: "10:00 AM" },
-  { id: "DEM-002", product: "CRM Professional", client: "XYZ Ltd", status: "completed", date: "2024-01-18", time: "02:00 PM" },
-  { id: "DEM-003", product: "E-Commerce Platform", client: "Tech Solutions", status: "pending", date: "2024-01-22", time: "11:00 AM" },
-  { id: "DEM-004", product: "HR Management System", client: "Global Inc", status: "scheduled", date: "2024-01-21", time: "03:00 PM" },
-  { id: "DEM-005", product: "Enterprise ERP Suite", client: "Prime Industries", status: "cancelled", date: "2024-01-15", time: "10:00 AM" },
-];
-
-// Mock activity log
-const activityLog = [
-  { action: "Product updated", target: "Enterprise ERP Suite", time: "5 min ago" },
-  { action: "Demo scheduled", target: "CRM Professional", time: "15 min ago" },
-  { action: "New product added", target: "Inventory Manager", time: "1 hour ago" },
-  { action: "Pricing updated", target: "E-Commerce Platform", time: "2 hours ago" },
-  { action: "Demo completed", target: "HR Management System", time: "3 hours ago" },
+  { 
+    id: "DEM-001", 
+    name: "ERP Enterprise Demo", 
+    product: "Enterprise ERP Suite",
+    productId: "PRD-001",
+    type: "time_based",
+    status: "active",
+    users: 45,
+    validity: "30 days",
+    expiresIn: "22 days",
+    lastUsed: "2 hours ago",
+    url: "demo.erp.example.com",
+    username: "demo_user",
+    password: "demo123",
+    conversionRate: 18.5
+  },
+  { 
+    id: "DEM-002", 
+    name: "CRM Quick Demo", 
+    product: "CRM Professional",
+    productId: "PRD-002",
+    type: "feature_limited",
+    status: "active",
+    users: 32,
+    validity: "15 days",
+    expiresIn: "8 days",
+    lastUsed: "30 min ago",
+    url: "demo.crm.example.com",
+    username: "demo_crm",
+    password: "crm456",
+    conversionRate: 22.3
+  },
+  { 
+    id: "DEM-003", 
+    name: "HR Demo Trial", 
+    product: "HR Management System",
+    productId: "PRD-004",
+    type: "user_limited",
+    status: "expired",
+    users: 28,
+    validity: "7 days",
+    expiresIn: "Expired",
+    lastUsed: "3 days ago",
+    url: "demo.hr.example.com",
+    username: "demo_hr",
+    password: "hr789",
+    conversionRate: 15.2
+  },
+  { 
+    id: "DEM-004", 
+    name: "E-Commerce Full Demo", 
+    product: "E-Commerce Platform",
+    productId: "PRD-005",
+    type: "time_based",
+    status: "active",
+    users: 56,
+    validity: "30 days",
+    expiresIn: "28 days",
+    lastUsed: "1 hour ago",
+    url: "demo.ecom.example.com",
+    username: "demo_ecom",
+    password: "ecom321",
+    conversionRate: 25.8
+  },
 ];
 
 const ProductManagerDashboard = () => {
+  const [activeTab, setActiveTab] = useState("products");
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedDemos, setSelectedDemos] = useState<string[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<typeof mockProducts[0] | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedDemo, setSelectedDemo] = useState<typeof mockDemos[0] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [showCreateDemo, setShowCreateDemo] = useState(false);
+  const [createDemoStep, setCreateDemoStep] = useState(1);
+  const [demoConfig, setDemoConfig] = useState({ product: "", type: "time_based", duration: "15" });
 
-  const handleAddProduct = () => {
-    toast.success("Product creation initiated");
-    setShowAddProduct(false);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active": return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+      case "draft": return "bg-amber-500/20 text-amber-400 border-amber-500/30";
+      case "disabled": return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "expired": return "bg-zinc-500/20 text-zinc-400 border-zinc-500/30";
+      default: return "bg-gray-500/20 text-gray-400";
+    }
   };
 
-  const handleScheduleDemo = () => {
-    toast.success("Demo scheduled successfully");
+  const handleSelectAll = (items: string[], setItems: (val: string[]) => void, allIds: string[]) => {
+    if (items.length === allIds.length) {
+      setItems([]);
+    } else {
+      setItems(allIds);
+    }
+  };
+
+  const handleBulkAction = (action: string, type: string) => {
+    const count = type === "product" ? selectedProducts.length : selectedDemos.length;
+    if (count === 0) {
+      toast.error(`Select ${type}s first`);
+      return;
+    }
+    toast.success(`${action} applied to ${count} ${type}(s)`);
+    type === "product" ? setSelectedProducts([]) : setSelectedDemos([]);
+  };
+
+  const handleCreateDemo = () => {
+    if (createDemoStep < 4) {
+      setCreateDemoStep(createDemoStep + 1);
+    } else {
+      toast.success("Demo created successfully!");
+      setShowCreateDemo(false);
+      setCreateDemoStep(1);
+      setDemoConfig({ product: "", type: "time_based", duration: "15" });
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
   };
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || product.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
+    return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-emerald-500/20 text-emerald-400";
-      case "draft": return "bg-amber-500/20 text-amber-400";
-      case "scheduled": return "bg-blue-500/20 text-blue-400";
-      case "completed": return "bg-emerald-500/20 text-emerald-400";
-      case "pending": return "bg-amber-500/20 text-amber-400";
-      case "cancelled": return "bg-red-500/20 text-red-400";
-      default: return "bg-gray-500/20 text-gray-400";
-    }
-  };
+  const filteredDemos = mockDemos.filter(demo => {
+    const matchesSearch = demo.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          demo.product.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || demo.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950/20 via-background to-violet-950/20 p-6">
@@ -134,309 +248,198 @@ const ProductManagerDashboard = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
-              <Box className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600 flex items-center justify-center shadow-xl">
+              <Box className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Product Manager Dashboard</h1>
-              <p className="text-indigo-400/80">Product Catalog • Demo Management • Listings</p>
+              <h1 className="text-2xl font-bold text-foreground">Product & Demo Manager</h1>
+              <p className="text-sm text-muted-foreground">Product Catalog • Demo Control • Bulk Operations</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge className="bg-indigo-500/20 text-indigo-400 border-indigo-500/50 px-4 py-2">
-              <Package className="w-4 h-4 mr-2" />
-              PRODUCT MANAGEMENT
-            </Badge>
-            <Dialog open={showAddProduct} onOpenChange={setShowAddProduct}>
-              <DialogTrigger asChild>
-                <Button className="bg-indigo-500 hover:bg-indigo-600 gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-card border-indigo-500/20">
-                <DialogHeader>
-                  <DialogTitle>Add New Product</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <Input placeholder="Product Name" className="bg-muted border-indigo-500/30" />
-                  <Input placeholder="Category" className="bg-muted border-indigo-500/30" />
-                  <Input placeholder="Price" className="bg-muted border-indigo-500/30" />
-                  <Button onClick={handleAddProduct} className="w-full bg-indigo-500 hover:bg-indigo-600">
-                    Create Product
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+          <Badge className="bg-indigo-500/20 text-indigo-400 border-indigo-500/50 px-4 py-2">
+            <Package className="w-4 h-4 mr-2" />
+            PRODUCT MANAGEMENT
+          </Badge>
         </div>
       </motion.div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Products</p>
-                <p className="text-2xl font-bold text-foreground mt-1">156</p>
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+        {[
+          { label: "Products", value: "156", icon: Box, color: "indigo" },
+          { label: "Active", value: "142", icon: CheckCircle2, color: "emerald" },
+          { label: "Total Demos", value: "324", icon: Play, color: "violet" },
+          { label: "Active Demos", value: "289", icon: Zap, color: "blue" },
+          { label: "Conversion", value: "18.5%", icon: TrendingUp, color: "emerald" },
+          { label: "Users", value: "45.2K", icon: Users, color: "amber" },
+        ].map((stat) => (
+          <Card key={stat.label} className="bg-card/50 border-indigo-500/10">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <stat.icon className={`w-4 h-4 text-${stat.color}-400`} />
+                <span className="text-lg font-bold text-foreground">{stat.value}</span>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-                <Box className="w-6 h-6 text-indigo-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Active Demos</p>
-                <p className="text-2xl font-bold text-foreground mt-1">24</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <Play className="w-6 h-6 text-emerald-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Views</p>
-                <p className="text-2xl font-bold text-foreground mt-1">45.2K</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                <Eye className="w-6 h-6 text-blue-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Conversions</p>
-                <p className="text-2xl font-bold text-emerald-400 mt-1">12.5%</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-emerald-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Revenue</p>
-                <p className="text-2xl font-bold text-foreground mt-1">₹2.8Cr</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-amber-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-muted/50 border border-indigo-500/20 p-1">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400">
-            Overview
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="bg-muted/50 border border-indigo-500/20 p-1 h-auto flex-wrap">
+          <TabsTrigger value="products" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400 gap-2">
+            <Box className="w-4 h-4" /> Products
           </TabsTrigger>
-          <TabsTrigger value="products" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400">
-            All Products
+          <TabsTrigger value="demos" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400 gap-2">
+            <Play className="w-4 h-4" /> Demo Manager
           </TabsTrigger>
-          <TabsTrigger value="demos" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400">
-            Demo Management
-          </TabsTrigger>
-          <TabsTrigger value="catalog" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400">
-            Product Catalog
-          </TabsTrigger>
-          <TabsTrigger value="pricing" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400">
-            Pricing & Plans
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400">
-            Analytics
+          <TabsTrigger value="analytics" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-400 gap-2">
+            <BarChart3 className="w-4 h-4" /> Analytics
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Top Products */}
-            <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <Star className="w-5 h-5 text-indigo-400" />
-                  Top Performing Products
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-64">
-                  <div className="space-y-3">
-                    {mockProducts.filter(p => p.status === "active").slice(0, 5).map((product, i) => (
-                      <div key={product.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-indigo-500/10">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm">
-                          {i + 1}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">{product.name}</p>
-                          <p className="text-xs text-muted-foreground">{product.views.toLocaleString()} views • {product.demos} demos</p>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                          <span className="text-sm text-foreground">{product.rating}</span>
-                        </div>
-                      </div>
-                    ))}
+        {/* ==================== PRODUCTS TAB ==================== */}
+        <TabsContent value="products" className="space-y-4">
+          {/* Actions Bar */}
+          <Card className="bg-card/50 border-indigo-500/10">
+            <CardContent className="p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button size="sm" className="bg-indigo-500 hover:bg-indigo-600 gap-1">
+                  <Plus className="w-4 h-4" /> Add Product
+                </Button>
+                <Button size="sm" variant="outline" className="border-indigo-500/30 text-indigo-400 gap-1">
+                  <Upload className="w-4 h-4" /> Bulk Upload
+                </Button>
+                <Separator orientation="vertical" className="h-6" />
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="border-emerald-500/30 text-emerald-400 gap-1"
+                  onClick={() => handleBulkAction("Enabled", "product")}
+                >
+                  <Power className="w-4 h-4" /> Enable
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="border-red-500/30 text-red-400 gap-1"
+                  onClick={() => handleBulkAction("Disabled", "product")}
+                >
+                  <XCircle className="w-4 h-4" /> Disable
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="border-amber-500/30 text-amber-400 gap-1"
+                  onClick={() => handleBulkAction("Category assigned", "product")}
+                >
+                  <Tag className="w-4 h-4" /> Assign Category
+                </Button>
+                <div className="flex-1" />
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Search products..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-8 h-8 w-48 bg-muted border-indigo-500/20"
+                    />
                   </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-indigo-400" />
-                  Recent Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-64">
-                  <div className="space-y-3">
-                    {activityLog.map((log, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-indigo-500/10">
-                        <Clock className="w-4 h-4 text-indigo-400" />
-                        <div className="flex-1">
-                          <p className="text-sm text-foreground">{log.action}</p>
-                          <p className="text-xs text-muted-foreground">{log.target}</p>
-                        </div>
-                        <span className="text-xs text-muted-foreground">{log.time}</span>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Powers Section */}
-          <Card className="bg-card/50 border-indigo-500/20 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center gap-2">
-                <Package className="w-5 h-5 text-indigo-400" />
-                Product Manager Powers
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { icon: Box, label: "Manage All Products", desc: "CRUD operations" },
-                  { icon: Play, label: "Demo Management", desc: "Schedule & track demos" },
-                  { icon: Layers, label: "Product Catalog", desc: "Categories & listings" },
-                  { icon: CreditCard, label: "Pricing Control", desc: "Plans & pricing" },
-                  { icon: Tag, label: "Tags & Metadata", desc: "SEO & visibility" },
-                  { icon: Image, label: "Media Library", desc: "Product assets" },
-                  { icon: BarChart3, label: "Product Analytics", desc: "Performance metrics" },
-                  { icon: Globe2, label: "Regional Availability", desc: "Market control" },
-                ].map((power, i) => (
-                  <div key={i} className="p-4 rounded-lg bg-muted/50 border border-indigo-500/20">
-                    <power.icon className="w-6 h-6 text-indigo-400 mb-2" />
-                    <p className="text-sm font-medium text-foreground">{power.label}</p>
-                    <p className="text-xs text-muted-foreground">{power.desc}</p>
-                  </div>
-                ))}
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-32 h-8 bg-muted border-indigo-500/20">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="Software">Software</SelectItem>
+                      <SelectItem value="Platform">Platform</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-28 h-8 bg-muted border-indigo-500/20">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="disabled">Disabled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        {/* All Products Tab */}
-        <TabsContent value="products" className="space-y-6">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search products..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-muted border-indigo-500/30"
-                />
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40 bg-muted border-indigo-500/30">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button className="bg-indigo-500 hover:bg-indigo-600 gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Product List */}
             <div className="lg:col-span-2">
-              <Card className="bg-card/50 border-indigo-500/20">
+              <Card className="bg-card/50 border-indigo-500/10">
                 <CardContent className="p-0">
-                  <ScrollArea className="h-[500px]">
+                  {/* Header Row */}
+                  <div className="flex items-center gap-3 px-4 py-2 border-b border-indigo-500/10 bg-muted/30">
+                    <Checkbox 
+                      checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                      onCheckedChange={() => handleSelectAll(selectedProducts, setSelectedProducts, filteredProducts.map(p => p.id))}
+                    />
+                    <span className="text-xs text-muted-foreground flex-1">
+                      {selectedProducts.length > 0 ? `${selectedProducts.length} selected` : "Select all"}
+                    </span>
+                  </div>
+                  <ScrollArea className="h-[480px]">
                     <div className="divide-y divide-indigo-500/10">
                       {filteredProducts.map((product) => (
                         <div 
                           key={product.id}
-                          onClick={() => setSelectedProduct(product)}
-                          className={`p-4 cursor-pointer transition-colors ${
+                          className={`flex items-center gap-3 p-3 cursor-pointer transition-all ${
                             selectedProduct?.id === product.id 
                               ? "bg-indigo-500/10 border-l-2 border-indigo-500" 
                               : "hover:bg-muted/50"
                           }`}
+                          onClick={() => setSelectedProduct(product)}
                         >
-                          <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
-                              <Box className="w-8 h-8 text-indigo-400" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-medium text-foreground">{product.name}</h3>
-                                <Badge className={getStatusColor(product.status)}>
-                                  {product.status}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">{product.category} • {product.price}</p>
-                              <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Eye className="w-3 h-3" /> {product.views.toLocaleString()}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Play className="w-3 h-3" /> {product.demos} demos
-                                </span>
-                                {product.rating > 0 && (
-                                  <span className="flex items-center gap-1">
-                                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {product.rating}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
+                          <Checkbox 
+                            checked={selectedProducts.includes(product.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedProducts([...selectedProducts, product.id]);
+                              } else {
+                                setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center flex-shrink-0">
+                            <Box className="w-5 h-5 text-indigo-400" />
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-foreground text-sm truncate">{product.name}</h3>
+                              <Badge className={`${getStatusColor(product.status)} text-xs`}>
+                                {product.status}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {product.category} → {product.subCategory} • {product.version}
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Play className="w-3 h-3" /> {product.demos}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3 h-3" /> {product.activeUsers}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">{product.lastUpdated}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         </div>
                       ))}
                     </div>
@@ -445,66 +448,92 @@ const ProductManagerDashboard = () => {
               </Card>
             </div>
 
-            {/* Product Detail */}
-            <Card className="bg-card/50 border-indigo-500/20">
-              <CardHeader>
-                <CardTitle className="text-foreground text-lg">Product Details</CardTitle>
-              </CardHeader>
-              <CardContent>
+            {/* Product Detail Panel */}
+            <Card className="bg-card/50 border-indigo-500/10">
+              <CardContent className="p-4">
                 {selectedProduct ? (
                   <div className="space-y-4">
-                    <div className="text-center pb-4 border-b border-indigo-500/20">
-                      <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center mx-auto mb-3">
-                        <Box className="w-12 h-12 text-indigo-400" />
+                    <div className="text-center pb-4 border-b border-indigo-500/10">
+                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center mx-auto mb-2">
+                        <Box className="w-8 h-8 text-indigo-400" />
                       </div>
-                      <h3 className="text-lg font-bold text-foreground">{selectedProduct.name}</h3>
-                      <Badge className={getStatusColor(selectedProduct.status)}>
+                      <h3 className="font-bold text-foreground">{selectedProduct.name}</h3>
+                      <Badge className={`${getStatusColor(selectedProduct.status)} mt-1`}>
                         {selectedProduct.status}
                       </Badge>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">ID</span>
-                        <span className="text-sm font-mono text-foreground">{selectedProduct.id}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Category</span>
-                        <span className="text-sm text-foreground">{selectedProduct.category}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Price</span>
-                        <span className="text-sm font-bold text-foreground">{selectedProduct.price}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Views</span>
-                        <span className="text-sm text-foreground">{selectedProduct.views.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Demos</span>
-                        <span className="text-sm text-foreground">{selectedProduct.demos}</span>
+
+                    {/* Basic Info */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase">Basic Info</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="p-2 rounded bg-muted/50">
+                          <p className="text-xs text-muted-foreground">Category</p>
+                          <p className="font-medium text-foreground">{selectedProduct.category}</p>
+                        </div>
+                        <div className="p-2 rounded bg-muted/50">
+                          <p className="text-xs text-muted-foreground">Sub Category</p>
+                          <p className="font-medium text-foreground">{selectedProduct.subCategory}</p>
+                        </div>
+                        <div className="p-2 rounded bg-muted/50">
+                          <p className="text-xs text-muted-foreground">Version</p>
+                          <p className="font-medium text-foreground">{selectedProduct.version}</p>
+                        </div>
+                        <div className="p-2 rounded bg-muted/50">
+                          <p className="text-xs text-muted-foreground">Price</p>
+                          <p className="font-medium text-foreground">{selectedProduct.price}</p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-4">
-                      <Button size="sm" variant="outline" className="border-indigo-500/50 text-indigo-400">
-                        <Eye className="w-3 h-3 mr-1" /> View
+                    {/* Stats */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase">Performance</h4>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="p-2 rounded bg-indigo-500/10">
+                          <p className="text-lg font-bold text-indigo-400">{selectedProduct.demos}</p>
+                          <p className="text-xs text-muted-foreground">Demos</p>
+                        </div>
+                        <div className="p-2 rounded bg-emerald-500/10">
+                          <p className="text-lg font-bold text-emerald-400">{selectedProduct.activeUsers}</p>
+                          <p className="text-xs text-muted-foreground">Users</p>
+                        </div>
+                        <div className="p-2 rounded bg-amber-500/10">
+                          <p className="text-lg font-bold text-amber-400">{selectedProduct.rating || "N/A"}</p>
+                          <p className="text-xs text-muted-foreground">Rating</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Demo Settings */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase">Demo Settings</h4>
+                      <div className="flex items-center justify-between p-2 rounded bg-muted/50">
+                        <span className="text-sm text-foreground">Demo Enabled</span>
+                        <Switch defaultChecked={selectedProduct.demos > 0} />
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="grid grid-cols-2 gap-2 pt-2">
+                      <Button size="sm" variant="outline" className="border-indigo-500/30 text-indigo-400 gap-1">
+                        <Edit2 className="w-3 h-3" /> Edit
                       </Button>
-                      <Button size="sm" variant="outline" className="border-indigo-500/50 text-indigo-400">
-                        <Edit2 className="w-3 h-3 mr-1" /> Edit
+                      <Button size="sm" variant="outline" className="border-emerald-500/30 text-emerald-400 gap-1">
+                        <Play className="w-3 h-3" /> Add Demo
                       </Button>
-                      <Button size="sm" variant="outline" className="border-emerald-500/50 text-emerald-400">
-                        <Play className="w-3 h-3 mr-1" /> Demo
+                      <Button size="sm" variant="outline" className="border-amber-500/30 text-amber-400 gap-1">
+                        <ArrowUpRight className="w-3 h-3" /> Upgrade
                       </Button>
-                      <Button size="sm" variant="outline" className="border-red-500/50 text-red-400">
-                        <Trash2 className="w-3 h-3 mr-1" /> Delete
+                      <Button size="sm" variant="outline" className="border-red-500/30 text-red-400 gap-1">
+                        <Trash2 className="w-3 h-3" /> Delete
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <Box className="w-12 h-12 text-indigo-400/50 mx-auto mb-3" />
-                    <p className="text-muted-foreground">Select a product to view details</p>
+                  <div className="text-center py-16">
+                    <Box className="w-12 h-12 text-indigo-400/30 mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">Select a product to view details</p>
                   </div>
                 )}
               </CardContent>
@@ -512,164 +541,496 @@ const ProductManagerDashboard = () => {
           </div>
         </TabsContent>
 
-        {/* Demo Management Tab */}
-        <TabsContent value="demos" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <Input 
-              placeholder="Search demos..." 
-              className="max-w-sm bg-muted border-indigo-500/30"
-            />
-            <Button className="bg-emerald-500 hover:bg-emerald-600 gap-2" onClick={handleScheduleDemo}>
-              <Plus className="w-4 h-4" />
-              Schedule Demo
-            </Button>
-          </div>
-
-          <Card className="bg-card/50 border-indigo-500/20">
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center gap-2">
-                <Play className="w-5 h-5 text-emerald-400" />
-                Demo Schedule
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[400px]">
-                <div className="space-y-3">
-                  {mockDemos.map((demo) => (
-                    <div key={demo.id} className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 border border-indigo-500/10">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
-                        <Play className="w-6 h-6 text-emerald-400" />
+        {/* ==================== DEMO MANAGER TAB ==================== */}
+        <TabsContent value="demos" className="space-y-4">
+          {/* Create Demo Flow */}
+          {showCreateDemo ? (
+            <Card className="bg-card/50 border-indigo-500/20">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-foreground">Create New Demo</h3>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4].map((step) => (
+                      <div 
+                        key={step}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                          step === createDemoStep 
+                            ? "bg-indigo-500 text-white" 
+                            : step < createDemoStep 
+                            ? "bg-emerald-500 text-white" 
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {step < createDemoStep ? <Check className="w-4 h-4" /> : step}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-foreground">{demo.product}</h3>
-                          <Badge className={getStatusColor(demo.status)}>
-                            {demo.status}
+                    ))}
+                  </div>
+                </div>
+
+                {createDemoStep === 1 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-foreground">Step 1: Select Product</h4>
+                    <Select value={demoConfig.product} onValueChange={(val) => setDemoConfig({...demoConfig, product: val})}>
+                      <SelectTrigger className="bg-muted border-indigo-500/20">
+                        <SelectValue placeholder="Select a product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mockProducts.filter(p => p.status === "active").map((p) => (
+                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {createDemoStep === 2 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-foreground">Step 2: Demo Type</h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { id: "time_based", label: "Time Based", desc: "7/15/30 days" },
+                        { id: "feature_limited", label: "Feature Limited", desc: "Restricted features" },
+                        { id: "user_limited", label: "User Limited", desc: "Limited users" },
+                      ].map((type) => (
+                        <div 
+                          key={type.id}
+                          onClick={() => setDemoConfig({...demoConfig, type: type.id})}
+                          className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                            demoConfig.type === type.id 
+                              ? "border-indigo-500 bg-indigo-500/10" 
+                              : "border-muted hover:border-indigo-500/50"
+                          }`}
+                        >
+                          <p className="font-medium text-foreground text-sm">{type.label}</p>
+                          <p className="text-xs text-muted-foreground">{type.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {demoConfig.type === "time_based" && (
+                      <div className="flex gap-2 mt-3">
+                        {["7", "15", "30"].map((days) => (
+                          <Button 
+                            key={days}
+                            size="sm"
+                            variant={demoConfig.duration === days ? "default" : "outline"}
+                            onClick={() => setDemoConfig({...demoConfig, duration: days})}
+                            className={demoConfig.duration === days ? "bg-indigo-500" : ""}
+                          >
+                            {days} Days
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {createDemoStep === 3 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-foreground">Step 3: Demo Access</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <p className="text-xs text-muted-foreground mb-1">Demo URL</p>
+                        <p className="text-sm font-mono text-foreground">demo.product.example.com</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <p className="text-xs text-muted-foreground mb-1">Auto Login</p>
+                        <Switch defaultChecked />
+                      </div>
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <p className="text-xs text-muted-foreground mb-1">Username</p>
+                        <p className="text-sm font-mono text-foreground">demo_user_new</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <p className="text-xs text-muted-foreground mb-1">Password</p>
+                        <p className="text-sm font-mono text-foreground">auto_generated</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {createDemoStep === 4 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-foreground">Step 4: Confirm</h4>
+                    <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                      <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                      <p className="text-center text-foreground">Ready to create demo</p>
+                      <p className="text-center text-sm text-muted-foreground">
+                        {demoConfig.type} • {demoConfig.duration} days
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-between mt-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      if (createDemoStep > 1) setCreateDemoStep(createDemoStep - 1);
+                      else setShowCreateDemo(false);
+                    }}
+                  >
+                    {createDemoStep === 1 ? "Cancel" : "Back"}
+                  </Button>
+                  <Button 
+                    className="bg-indigo-500 hover:bg-indigo-600"
+                    onClick={handleCreateDemo}
+                  >
+                    {createDemoStep === 4 ? "Create Demo" : "Next"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Demo Actions Bar */}
+              <Card className="bg-card/50 border-indigo-500/10">
+                <CardContent className="p-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button size="sm" className="bg-indigo-500 hover:bg-indigo-600 gap-1" onClick={() => setShowCreateDemo(true)}>
+                      <Plus className="w-4 h-4" /> Create Demo
+                    </Button>
+                    <Button size="sm" variant="outline" className="border-indigo-500/30 text-indigo-400 gap-1">
+                      <Upload className="w-4 h-4" /> Bulk Create
+                    </Button>
+                    <Separator orientation="vertical" className="h-6" />
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-emerald-500/30 text-emerald-400 gap-1"
+                      onClick={() => handleBulkAction("Extended", "demo")}
+                    >
+                      <Timer className="w-4 h-4" /> Extend
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-blue-500/30 text-blue-400 gap-1"
+                      onClick={() => handleBulkAction("Limit increased", "demo")}
+                    >
+                      <ArrowUpRight className="w-4 h-4" /> Increase Limit
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-amber-500/30 text-amber-400 gap-1"
+                      onClick={() => handleBulkAction("Reset", "demo")}
+                    >
+                      <RefreshCw className="w-4 h-4" /> Reset
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-red-500/30 text-red-400 gap-1"
+                      onClick={() => handleBulkAction("Disabled", "demo")}
+                    >
+                      <XCircle className="w-4 h-4" /> Disable
+                    </Button>
+                    <div className="flex-1" />
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input 
+                          placeholder="Search demos..." 
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-8 h-8 w-48 bg-muted border-indigo-500/20"
+                        />
+                      </div>
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-28 h-8 bg-muted border-indigo-500/20">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Status</SelectItem>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="expired">Expired</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="outline" className="h-8 gap-1">
+                        <Download className="w-4 h-4" /> Export
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Demo List */}
+                <div className="lg:col-span-2">
+                  <Card className="bg-card/50 border-indigo-500/10">
+                    <CardContent className="p-0">
+                      <div className="flex items-center gap-3 px-4 py-2 border-b border-indigo-500/10 bg-muted/30">
+                        <Checkbox 
+                          checked={selectedDemos.length === filteredDemos.length && filteredDemos.length > 0}
+                          onCheckedChange={() => handleSelectAll(selectedDemos, setSelectedDemos, filteredDemos.map(d => d.id))}
+                        />
+                        <span className="text-xs text-muted-foreground flex-1">
+                          {selectedDemos.length > 0 ? `${selectedDemos.length} selected` : "Select all"}
+                        </span>
+                      </div>
+                      <ScrollArea className="h-[440px]">
+                        <div className="divide-y divide-indigo-500/10">
+                          {filteredDemos.map((demo) => (
+                            <div 
+                              key={demo.id}
+                              className={`flex items-center gap-3 p-3 cursor-pointer transition-all ${
+                                selectedDemo?.id === demo.id 
+                                  ? "bg-indigo-500/10 border-l-2 border-indigo-500" 
+                                  : "hover:bg-muted/50"
+                              }`}
+                              onClick={() => setSelectedDemo(demo)}
+                            >
+                              <Checkbox 
+                                checked={selectedDemos.includes(demo.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedDemos([...selectedDemos, demo.id]);
+                                  } else {
+                                    setSelectedDemos(selectedDemos.filter(id => id !== demo.id));
+                                  }
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center flex-shrink-0">
+                                <Play className="w-5 h-5 text-emerald-400" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium text-foreground text-sm truncate">{demo.name}</h3>
+                                  <Badge className={`${getStatusColor(demo.status)} text-xs`}>
+                                    {demo.status}
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs border-indigo-500/30 text-indigo-400">
+                                    {demo.type.replace("_", " ")}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {demo.product} • {demo.validity}
+                                </p>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                  <span className="flex items-center gap-1">
+                                    <Users className="w-3 h-3" /> {demo.users}
+                                  </span>
+                                  <span className={demo.status === "expired" ? "text-red-400" : "text-emerald-400"}>
+                                    {demo.expiresIn}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5">{demo.lastUsed}</p>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Demo Detail Panel */}
+                <Card className="bg-card/50 border-indigo-500/10">
+                  <CardContent className="p-4">
+                    {selectedDemo ? (
+                      <div className="space-y-4">
+                        <div className="text-center pb-3 border-b border-indigo-500/10">
+                          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mx-auto mb-2">
+                            <Play className="w-7 h-7 text-emerald-400" />
+                          </div>
+                          <h3 className="font-bold text-foreground">{selectedDemo.name}</h3>
+                          <Badge className={`${getStatusColor(selectedDemo.status)} mt-1`}>
+                            {selectedDemo.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">Client: {demo.client}</p>
-                        <p className="text-xs text-muted-foreground">{demo.date} at {demo.time}</p>
+
+                        {/* Demo Access */}
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase">Access Details</h4>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between p-2 rounded bg-muted/50">
+                              <div>
+                                <p className="text-xs text-muted-foreground">Demo URL</p>
+                                <p className="text-sm font-mono text-foreground">{selectedDemo.url}</p>
+                              </div>
+                              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => copyToClipboard(selectedDemo.url)}>
+                                <Copy className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="p-2 rounded bg-muted/50">
+                                <p className="text-xs text-muted-foreground">Username</p>
+                                <p className="text-sm font-mono text-foreground">{selectedDemo.username}</p>
+                              </div>
+                              <div className="p-2 rounded bg-muted/50">
+                                <p className="text-xs text-muted-foreground">Password</p>
+                                <p className="text-sm font-mono text-foreground">{selectedDemo.password}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase">Usage Stats</h4>
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div className="p-2 rounded bg-blue-500/10">
+                              <p className="text-lg font-bold text-blue-400">{selectedDemo.users}</p>
+                              <p className="text-xs text-muted-foreground">Users</p>
+                            </div>
+                            <div className="p-2 rounded bg-amber-500/10">
+                              <p className="text-lg font-bold text-amber-400">{selectedDemo.validity}</p>
+                              <p className="text-xs text-muted-foreground">Validity</p>
+                            </div>
+                            <div className="p-2 rounded bg-emerald-500/10">
+                              <p className="text-lg font-bold text-emerald-400">{selectedDemo.conversionRate}%</p>
+                              <p className="text-xs text-muted-foreground">Convert</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          <Button size="sm" variant="outline" className="border-emerald-500/30 text-emerald-400 gap-1">
+                            <Timer className="w-3 h-3" /> Extend
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-blue-500/30 text-blue-400 gap-1">
+                            <ArrowUpRight className="w-3 h-3" /> Increase
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-amber-500/30 text-amber-400 gap-1">
+                            <RefreshCw className="w-3 h-3" /> Reset
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-indigo-500/30 text-indigo-400 gap-1">
+                            <Share2 className="w-3 h-3" /> Share
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-violet-500/30 text-violet-400 gap-1">
+                            <CreditCard className="w-3 h-3" /> Convert
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-red-500/30 text-red-400 gap-1">
+                            <XCircle className="w-3 h-3" /> Disable
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="border-indigo-500/50 text-indigo-400">
-                          <Eye className="w-3 h-3" />
-                        </Button>
-                        <Button size="sm" variant="outline" className="border-amber-500/50 text-amber-400">
-                          <Edit2 className="w-3 h-3" />
-                        </Button>
+                    ) : (
+                      <div className="text-center py-16">
+                        <Play className="w-12 h-12 text-emerald-400/30 mx-auto mb-3" />
+                        <p className="text-muted-foreground text-sm">Select a demo to view details</p>
                       </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* ==================== ANALYTICS TAB ==================== */}
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Product Analytics */}
+            <Card className="bg-card/50 border-indigo-500/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-foreground flex items-center gap-2 text-base">
+                  <Box className="w-5 h-5 text-indigo-400" />
+                  Product Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="p-3 rounded-lg bg-indigo-500/10 text-center">
+                    <p className="text-2xl font-bold text-indigo-400">156</p>
+                    <p className="text-xs text-muted-foreground">Total Products</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-emerald-500/10 text-center">
+                    <p className="text-2xl font-bold text-emerald-400">142</p>
+                    <p className="text-xs text-muted-foreground">Active Products</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase">Top Products by Demos</h4>
+                  {mockProducts.filter(p => p.status === "active").slice(0, 4).map((product) => (
+                    <div key={product.id} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm text-foreground">{product.name}</p>
+                        <Progress value={(product.demos / 60) * 100} className="h-1.5 mt-1" />
+                      </div>
+                      <span className="text-sm font-mono text-muted-foreground">{product.demos}</span>
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Product Catalog Tab */}
-        <TabsContent value="catalog" className="space-y-6">
-          <Card className="bg-card/50 border-indigo-500/20">
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center gap-2">
-                <Layers className="w-5 h-5 text-indigo-400" />
-                Product Catalog Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {["Software", "Platform", "Services", "Hardware", "Bundles", "Add-ons"].map((category) => (
-                  <div key={category} className="p-4 rounded-lg bg-muted/50 border border-indigo-500/20">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-medium text-foreground">{category}</span>
-                      <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">
-                        {Math.floor(Math.random() * 30 + 5)} items
-                      </Badge>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="flex-1 border-muted-foreground text-muted-foreground">
-                        View
-                      </Button>
-                      <Button size="sm" variant="outline" className="border-indigo-500/50 text-indigo-400">
-                        <Settings className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Pricing Tab */}
-        <TabsContent value="pricing" className="space-y-6">
-          <Card className="bg-card/50 border-indigo-500/20">
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-indigo-400" />
-                Pricing & Plans
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { name: "Starter", price: "₹25,000/mo", features: 5, users: 125 },
-                  { name: "Professional", price: "₹75,000/mo", features: 12, users: 340 },
-                  { name: "Enterprise", price: "₹2,00,000/mo", features: 25, users: 85 },
-                ].map((plan) => (
-                  <div key={plan.name} className="p-6 rounded-xl bg-muted/50 border border-indigo-500/20 text-center">
-                    <h3 className="text-lg font-bold text-foreground mb-2">{plan.name}</h3>
-                    <p className="text-2xl font-bold text-indigo-400 mb-4">{plan.price}</p>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>{plan.features} features</p>
-                      <p>{plan.users} active users</p>
-                    </div>
-                    <Button className="w-full mt-4 bg-indigo-500 hover:bg-indigo-600">
-                      Edit Plan
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-card/50 border-indigo-500/20">
-              <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-indigo-400" />
-                  Product Performance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center rounded-lg bg-muted/50 border border-indigo-500/20">
-                  <div className="text-center">
-                    <BarChart3 className="w-12 h-12 text-indigo-400/50 mx-auto mb-2" />
-                    <p className="text-muted-foreground">Performance Chart</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-indigo-500/20">
-              <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-emerald-400" />
-                  Conversion Trends
+            {/* Demo Analytics */}
+            <Card className="bg-card/50 border-indigo-500/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-foreground flex items-center gap-2 text-base">
+                  <Play className="w-5 h-5 text-emerald-400" />
+                  Demo Analytics
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center rounded-lg bg-muted/50 border border-indigo-500/20">
-                  <div className="text-center">
-                    <TrendingUp className="w-12 h-12 text-emerald-400/50 mx-auto mb-2" />
-                    <p className="text-muted-foreground">Conversion Chart</p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="p-3 rounded-lg bg-violet-500/10 text-center">
+                    <p className="text-2xl font-bold text-violet-400">324</p>
+                    <p className="text-xs text-muted-foreground">Total Demos</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-emerald-500/10 text-center">
+                    <p className="text-2xl font-bold text-emerald-400">289</p>
+                    <p className="text-xs text-muted-foreground">Active Demos</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-lg bg-amber-500/10 text-center">
+                    <p className="text-2xl font-bold text-amber-400">35</p>
+                    <p className="text-xs text-muted-foreground">Expired</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-blue-500/10 text-center">
+                    <p className="text-2xl font-bold text-blue-400">18.5%</p>
+                    <p className="text-xs text-muted-foreground">Conversion Rate</p>
+                  </div>
+                </div>
+                <div className="mt-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-emerald-400" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Demo → Paid Conversion</p>
+                      <p className="text-xs text-muted-foreground">58 conversions this month (+12%)</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Demo Growth Features */}
+          <Card className="bg-card/50 border-indigo-500/10">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-foreground flex items-center gap-2 text-base">
+                <Zap className="w-5 h-5 text-amber-400" />
+                Demo Growth Features
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+                {[
+                  { icon: Link2, label: "Auto URL Generator", enabled: true },
+                  { icon: Share2, label: "One-Click Share", enabled: true },
+                  { icon: BarChart3, label: "Usage Tracking", enabled: true },
+                  { icon: Clock, label: "Expiry Reminder", enabled: true },
+                  { icon: Repeat, label: "Auto Extend", enabled: false },
+                  { icon: TrendingUp, label: "Conversion Analytics", enabled: true },
+                ].map((feature, i) => (
+                  <div key={i} className="p-3 rounded-lg bg-muted/50 border border-indigo-500/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <feature.icon className="w-5 h-5 text-indigo-400" />
+                      <Switch defaultChecked={feature.enabled} />
+                    </div>
+                    <p className="text-xs font-medium text-foreground">{feature.label}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
