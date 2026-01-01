@@ -149,12 +149,8 @@ const FloatingAIChatbot = ({
           <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500/50 
                           shadow-[0_0_30px_hsl(145_80%_40%/0.4)]
                           group-hover:border-emerald-400 group-hover:shadow-[0_0_50px_hsl(145_80%_40%/0.6)]
-                          transition-all duration-300">
-            <img 
-              src={softwareValaLogo} 
-              alt="AI Assistant" 
-              className="w-full h-full object-cover"
-            />
+                          transition-all duration-300 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <span className="text-white font-bold text-lg">SV</span>
           </div>
           
           {/* Notification badge for super admin */}

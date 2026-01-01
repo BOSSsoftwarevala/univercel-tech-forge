@@ -389,21 +389,7 @@ const HomePage2035 = () => {
         </div>
       </section>
 
-      {/* Floating Chatbot Widget */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1 }}
-        className="fixed bottom-6 right-6 z-50"
-      >
-        <Button
-          size="lg"
-          className="h-14 w-14 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/25"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-pulse" />
-      </motion.div>
+      {/* Floating Chatbot Widget - Removed from homepage */}
     </div>
   );
 };

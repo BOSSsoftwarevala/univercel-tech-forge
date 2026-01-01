@@ -55,9 +55,9 @@ export function AIChatbot() {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-[hsl(var(--sv-blue))] to-[hsl(var(--sv-blue-bright))] text-white shadow-lg hover:shadow-xl transition-all z-50 p-0 overflow-hidden"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg hover:shadow-xl transition-all z-50 flex items-center justify-center"
       >
-        <img src={softwareValaLogo} alt="AI Assistant" className="w-full h-full object-cover" />
+        <span className="text-white font-bold text-lg">SV</span>
       </Button>
     );
   }

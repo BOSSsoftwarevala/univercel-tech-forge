@@ -43,20 +43,12 @@ const AIBrainWidget = forwardRef<HTMLDivElement, AIBrainWidgetProps>(({ onSearch
           <div className="absolute -inset-2 rounded-full bg-[hsl(210,100%,55%)] opacity-10 animate-pulse" />
           
           {/* Main button */}
-          <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]
-                          border-2 border-[hsl(210,100%,55%)/0.5] flex items-center justify-center
-                          shadow-[0_0_30px_hsl(210_100%_55%/0.4),inset_0_0_20px_hsl(210_100%_55%/0.1)]
-                          group-hover:border-[hsl(210,100%,55%)] group-hover:shadow-[0_0_50px_hsl(210_100%_55%/0.6)]
+          <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600
+                          border-2 border-emerald-400/50 flex items-center justify-center
+                          shadow-[0_0_30px_hsl(145_80%_40%/0.4)]
+                          group-hover:border-emerald-400 group-hover:shadow-[0_0_50px_hsl(145_80%_40%/0.6)]
                           transition-all duration-300">
-            {/* Rotating inner ring */}
-            <div className="absolute inset-2 rounded-full border border-[hsl(210,100%,55%)/0.3] animate-rotate-slow" />
-            
-            {/* Brain icon with pulse */}
-            <Brain className="w-7 h-7 text-[hsl(210,100%,55%)]" 
-                   style={{ filter: 'drop-shadow(0 0 10px hsl(210 100% 55% / 0.8))' }} />
-            
-            {/* Electric sparks */}
-            <div className="absolute top-1 right-1 w-2 h-2 bg-[hsl(210,100%,70%)] rounded-full animate-pulse" />
+            <span className="text-white font-bold text-xl">SV</span>
           </div>
         </div>
         
