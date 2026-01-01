@@ -1,12 +1,12 @@
 /**
  * Dashboard Layout - Performance Optimized
  * Mobile-first, fast loading, responsive
+ * Note: Legacy RoleSidebar removed - use /super-admin-system/role-switch for admin navigation
  */
 
 import { ReactNode, useState, memo, useCallback } from 'react';
 import { Loader2 } from 'lucide-react';
 import CommandHeader from './CommandHeader';
-import RoleSidebar from './RoleSidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { AppRole } from '@/types/roles';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -28,7 +28,6 @@ const DashboardLayout = memo(({
 }: DashboardLayoutProps) => {
   const { userRole, loading } = useAuth();
   const isMobile = useIsMobile();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   const activeRole = roleOverride || (userRole as AppRole) || 'client';
@@ -52,15 +51,6 @@ const DashboardLayout = memo(({
       
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar */}
-        {!isMobile && (
-          <RoleSidebar
-            role={activeRole}
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-        )}
-        
         {/* Mobile Sidebar */}
         {isMobile && (
           <MobileOptimizedSidebar

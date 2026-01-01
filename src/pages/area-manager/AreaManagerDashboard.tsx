@@ -1,17 +1,15 @@
 // Area Manager Dashboard - Region-based control panel
+// Note: This dashboard now redirects to /super-admin-system/role-switch?role=area_manager for full functionality
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LayoutDashboard, Activity, Users, Store, Package, HeadphonesIcon,
-  Target, Wallet, BarChart3, Shield, Bell, FileText, MapPin, Lock, Eye
+  Activity, Users, Shield, Bell, MapPin, Lock, Eye
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import RoleSidebar from '@/components/layouts/RoleSidebar';
 
 // Read-only sections that Area Manager cannot modify
 const READ_ONLY_SECTIONS = ['wallet', 'audit'];
@@ -193,9 +191,7 @@ const AreaManagerDashboard = () => {
   }, [user?.id]);
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Role-based Sidebar */}
-      <RoleSidebar role="area_manager" />
+    <div className="min-h-screen bg-background">
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
