@@ -5402,6 +5402,42 @@ export type Database = {
           },
         ]
       }
+      failed_login_attempts: {
+        Row: {
+          attempt_count: number | null
+          created_at: string | null
+          device_fingerprint: string | null
+          email: string | null
+          id: string
+          ip_address: string | null
+          is_locked: boolean | null
+          last_attempt_at: string | null
+          locked_until: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          created_at?: string | null
+          device_fingerprint?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          is_locked?: boolean | null
+          last_attempt_at?: string | null
+          locked_until?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          created_at?: string | null
+          device_fingerprint?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          is_locked?: boolean | null
+          last_attempt_at?: string | null
+          locked_until?: string | null
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           created_at: string | null
@@ -12494,6 +12530,42 @@ export type Database = {
           user_email?: string | null
           user_id?: string | null
           user_name?: string | null
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          action_count: number | null
+          action_type: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          is_blocked: boolean | null
+          user_id: string | null
+          window_end: string | null
+          window_start: string | null
+        }
+        Insert: {
+          action_count?: number | null
+          action_type: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_blocked?: boolean | null
+          user_id?: string | null
+          window_end?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          action_count?: number | null
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_blocked?: boolean | null
+          user_id?: string | null
+          window_end?: string | null
+          window_start?: string | null
         }
         Relationships: []
       }
@@ -19784,6 +19856,15 @@ export type Database = {
         Args: { p_email: string; p_ip_address: string }
         Returns: Json
       }
+      check_rate_limit: {
+        Args: {
+          p_action_type: string
+          p_max_requests?: number
+          p_user_id: string
+          p_window_minutes?: number
+        }
+        Returns: Json
+      }
       check_rental_active: {
         Args: { p_feature_code: string; p_user_id: string }
         Returns: boolean
@@ -19793,6 +19874,7 @@ export type Database = {
         Args: { p_action: string; p_target_scope?: Json; p_user_id: string }
         Returns: Json
       }
+      clear_failed_logins: { Args: { p_email: string }; Returns: undefined }
       clear_force_logout: { Args: { clear_user_id: string }; Returns: boolean }
       complete_promise_with_reward: {
         Args: { p_promise_id: string }
@@ -20222,6 +20304,14 @@ export type Database = {
       }
       submit_developer_registration: {
         Args: { p_registration_id: string }
+        Returns: Json
+      }
+      track_failed_login: {
+        Args: {
+          p_device_fingerprint?: string
+          p_email: string
+          p_ip_address: string
+        }
         Returns: Json
       }
       update_online_status: {
