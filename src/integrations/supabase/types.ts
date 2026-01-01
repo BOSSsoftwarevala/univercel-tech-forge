@@ -1180,6 +1180,142 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_healing_config: {
+        Row: {
+          auto_shutdown_on_failure: boolean | null
+          created_at: string | null
+          heartbeat_timeout_seconds: number | null
+          id: string
+          is_enabled: boolean | null
+          last_restart_at: string | null
+          max_restart_attempts: number | null
+          restart_count: number | null
+          server_id: string | null
+        }
+        Insert: {
+          auto_shutdown_on_failure?: boolean | null
+          created_at?: string | null
+          heartbeat_timeout_seconds?: number | null
+          id?: string
+          is_enabled?: boolean | null
+          last_restart_at?: string | null
+          max_restart_attempts?: number | null
+          restart_count?: number | null
+          server_id?: string | null
+        }
+        Update: {
+          auto_shutdown_on_failure?: boolean | null
+          created_at?: string | null
+          heartbeat_timeout_seconds?: number | null
+          id?: string
+          is_enabled?: boolean | null
+          last_restart_at?: string | null
+          max_restart_attempts?: number | null
+          restart_count?: number | null
+          server_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_healing_config_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auto_scaling_policies: {
+        Row: {
+          consecutive_checks_required: number | null
+          cooldown_minutes: number | null
+          cpu_threshold_percent: number | null
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          last_scale_at: string | null
+          max_cpu: number | null
+          max_ram: number | null
+          ram_threshold_percent: number | null
+          scale_up_cpu: number | null
+          scale_up_ram: number | null
+          server_id: string | null
+        }
+        Insert: {
+          consecutive_checks_required?: number | null
+          cooldown_minutes?: number | null
+          cpu_threshold_percent?: number | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_scale_at?: string | null
+          max_cpu?: number | null
+          max_ram?: number | null
+          ram_threshold_percent?: number | null
+          scale_up_cpu?: number | null
+          scale_up_ram?: number | null
+          server_id?: string | null
+        }
+        Update: {
+          consecutive_checks_required?: number | null
+          cooldown_minutes?: number | null
+          cpu_threshold_percent?: number | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_scale_at?: string | null
+          max_cpu?: number | null
+          max_ram?: number | null
+          ram_threshold_percent?: number | null
+          scale_up_cpu?: number | null
+          scale_up_ram?: number | null
+          server_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_scaling_policies_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      background_jobs: {
+        Row: {
+          created_at: string | null
+          id: string
+          interval_seconds: number
+          is_active: boolean | null
+          job_type: string
+          last_error: string | null
+          last_run_at: string | null
+          next_run_at: string | null
+          run_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interval_seconds: number
+          is_active?: boolean | null
+          job_type: string
+          last_error?: string | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          run_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interval_seconds?: number
+          is_active?: boolean | null
+          job_type?: string
+          last_error?: string | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          run_count?: number | null
+        }
+        Relationships: []
+      }
       backup_codes: {
         Row: {
           code_hash: string
@@ -7151,6 +7287,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      job_execution_logs: {
+        Row: {
+          completed_at: string | null
+          error: string | null
+          id: string
+          job_id: string | null
+          job_type: string
+          result: Json | null
+          servers_processed: number | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error?: string | null
+          id?: string
+          job_id?: string | null
+          job_type: string
+          result?: Json | null
+          servers_processed?: number | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error?: string | null
+          id?: string
+          job_id?: string | null
+          job_type?: string
+          result?: Json | null
+          servers_processed?: number | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_execution_logs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "background_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kyc_documents: {
         Row: {
@@ -14642,6 +14822,50 @@ export type Database = {
           },
         ]
       }
+      server_health: {
+        Row: {
+          consecutive_failures: number | null
+          created_at: string | null
+          health_score: number | null
+          id: string
+          is_healthy: boolean | null
+          last_check_at: string | null
+          server_id: string | null
+          sla_uptime: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          consecutive_failures?: number | null
+          created_at?: string | null
+          health_score?: number | null
+          id?: string
+          is_healthy?: boolean | null
+          last_check_at?: string | null
+          server_id?: string | null
+          sla_uptime?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          consecutive_failures?: number | null
+          created_at?: string | null
+          health_score?: number | null
+          id?: string
+          is_healthy?: boolean | null
+          last_check_at?: string | null
+          server_id?: string | null
+          sla_uptime?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "server_health_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: true
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       server_incidents: {
         Row: {
           alert_id: string | null
@@ -14890,6 +15114,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      server_metrics_cache: {
+        Row: {
+          cpu_percent: number | null
+          disk_percent: number | null
+          health_score: number | null
+          last_updated: string | null
+          network_in: number | null
+          network_out: number | null
+          ram_percent: number | null
+          server_id: string
+          status: string | null
+        }
+        Insert: {
+          cpu_percent?: number | null
+          disk_percent?: number | null
+          health_score?: number | null
+          last_updated?: string | null
+          network_in?: number | null
+          network_out?: number | null
+          ram_percent?: number | null
+          server_id: string
+          status?: string | null
+        }
+        Update: {
+          cpu_percent?: number | null
+          disk_percent?: number | null
+          health_score?: number | null
+          last_updated?: string | null
+          network_in?: number | null
+          network_out?: number | null
+          ram_percent?: number | null
+          server_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "server_metrics_cache_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: true
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       server_metrics_history: {
         Row: {
@@ -18767,6 +19035,22 @@ export type Database = {
         }
         Returns: Json
       }
+      check_auto_healing: {
+        Args: never
+        Returns: {
+          heal_reason: string
+          needs_healing: boolean
+          server_id: string
+        }[]
+      }
+      check_auto_scaling: {
+        Args: never
+        Returns: {
+          needs_scaling: boolean
+          scale_reason: string
+          server_id: string
+        }[]
+      }
       check_financial_mode: { Args: never; Returns: Json }
       check_force_logout: { Args: { check_user_id: string }; Returns: string }
       check_rental_active: {
@@ -18875,6 +19159,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_server_metrics: { Args: never; Returns: undefined }
       generate_session_code: { Args: never; Returns: string }
       generate_user_verification_code: { Args: never; Returns: string }
       get_area_manager_region: { Args: { _user_id: string }; Returns: string }
