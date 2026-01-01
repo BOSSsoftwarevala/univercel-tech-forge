@@ -122,33 +122,100 @@ const permissionTypes = [
   { key: 'configure', label: 'Configure', icon: Settings, description: 'Can change settings' },
 ] as const;
 
-// ============ MODULES ============
+// ============ MODULES (MASTER CSV) ============
 const modules = [
+  // Core
   { name: 'Dashboard', icon: Monitor, category: 'Core', isSensitive: false },
-  { name: 'Users', icon: Users, category: 'Core', isSensitive: true },
-  { name: 'Roles', icon: UserCog, category: 'System', isSensitive: true },
+  { name: 'LiveActivity', icon: Zap, category: 'Core', isSensitive: false },
+  { name: 'Notifications', icon: Settings, category: 'Core', isSensitive: false },
+  // Users & Admins
+  { name: 'Users', icon: Users, category: 'User Management', isSensitive: true },
+  { name: 'Admins', icon: UserCog, category: 'User Management', isSensitive: true },
+  // Roles & Permissions
+  { name: 'Roles', icon: Shield, category: 'System', isSensitive: true },
+  { name: 'Permissions', icon: Lock, category: 'System', isSensitive: true },
+  { name: 'PermissionMatrix', icon: Settings, category: 'System', isSensitive: true },
+  // Geography
+  { name: 'Continents', icon: Globe, category: 'Geography', isSensitive: false },
+  { name: 'Countries', icon: MapPin, category: 'Geography', isSensitive: false },
+  { name: 'Areas', icon: MapPin, category: 'Geography', isSensitive: false },
+  // Business
   { name: 'Franchise', icon: Building2, category: 'Business', isSensitive: false },
   { name: 'Reseller', icon: Users, category: 'Business', isSensitive: false },
-  { name: 'Influencer', icon: Megaphone, category: 'Marketing', isSensitive: false },
-  { name: 'Developer', icon: Code2, category: 'Operations', isSensitive: false },
+  { name: 'Sales', icon: TrendingUp, category: 'Business', isSensitive: false },
+  { name: 'Leads', icon: Users, category: 'Business', isSensitive: false },
+  { name: 'ProUsers', icon: Zap, category: 'Business', isSensitive: true },
+  // Operations
   { name: 'Tasks', icon: FileText, category: 'Operations', isSensitive: false },
-  { name: 'Finance', icon: Wallet, category: 'Finance', isSensitive: true },
+  { name: 'Approvals', icon: CheckCircle2, category: 'Operations', isSensitive: true },
+  { name: 'Rentals', icon: Building2, category: 'Operations', isSensitive: false },
+  { name: 'Rules', icon: Scale, category: 'Operations', isSensitive: true },
+  // Development
+  { name: 'DeveloperPanel', icon: Code2, category: 'Development', isSensitive: true },
+  { name: 'BugsIssues', icon: AlertTriangle, category: 'Development', isSensitive: false },
+  { name: 'QAPanel', icon: CheckCircle2, category: 'Development', isSensitive: false },
+  { name: 'Releases', icon: Zap, category: 'Development', isSensitive: true },
+  { name: 'APIs', icon: Database, category: 'Development', isSensitive: true },
+  // Support
+  { name: 'Tickets', icon: HeadphonesIcon, category: 'Support', isSensitive: false },
+  { name: 'SLA', icon: Clock, category: 'Support', isSensitive: true },
+  { name: 'KnowledgeBase', icon: FileText, category: 'Support', isSensitive: false },
+  // Finance
+  { name: 'Transactions', icon: Wallet, category: 'Finance', isSensitive: true },
+  { name: 'Commissions', icon: Wallet, category: 'Finance', isSensitive: true },
   { name: 'Payouts', icon: Wallet, category: 'Finance', isSensitive: true },
-  { name: 'Reports', icon: TrendingUp, category: 'Analytics', isSensitive: false },
-  { name: 'Analytics', icon: TrendingUp, category: 'Analytics', isSensitive: false },
-  { name: 'Support', icon: HeadphonesIcon, category: 'Support', isSensitive: false },
-  { name: 'Tickets', icon: FileText, category: 'Support', isSensitive: false },
-  { name: 'Marketing', icon: Megaphone, category: 'Marketing', isSensitive: false },
-  { name: 'SEO', icon: Search, category: 'Marketing', isSensitive: false },
-  { name: 'HR', icon: Briefcase, category: 'HR', isSensitive: true },
-  { name: 'Legal', icon: Scale, category: 'Legal', isSensitive: true },
-  { name: 'Compliance', icon: Shield, category: 'Legal', isSensitive: true },
-  { name: 'Server', icon: Server, category: 'Infrastructure', isSensitive: true },
-  { name: 'Database', icon: Database, category: 'Infrastructure', isSensitive: true },
-  { name: 'Audit', icon: FileText, category: 'Security', isSensitive: true },
-  { name: 'Security', icon: Shield, category: 'Security', isSensitive: true },
-  { name: 'Settings', icon: Settings, category: 'System', isSensitive: true },
+  { name: 'Invoices', icon: FileText, category: 'Finance', isSensitive: true },
+  { name: 'TaxCompliance', icon: Scale, category: 'Finance', isSensitive: true },
+  // Legal & Security
+  { name: 'LegalCases', icon: Scale, category: 'Legal', isSensitive: true },
+  { name: 'TrademarkIP', icon: Shield, category: 'Legal', isSensitive: true },
+  { name: 'SecurityEvents', icon: ShieldAlert, category: 'Security', isSensitive: true },
+  { name: 'SystemLock', icon: Lock, category: 'Security', isSensitive: true },
+  { name: 'AuditLogs', icon: FileText, category: 'Security', isSensitive: true },
 ];
+
+// ============ MASTER CSV PERMISSION MATRIX (Super Admin) ============
+// 1 = Allowed, 0 = Denied | Editable ONLY by Super Admin | Use for DB seed/migration
+const SUPER_ADMIN_CSV_MATRIX: Record<string, Record<string, number>> = {
+  'Dashboard':       { view: 1, create: 0, edit: 0, delete: 0, approve: 0, assign: 0, export: 0, lock: 0, configure: 0 },
+  'LiveActivity':    { view: 1, create: 0, edit: 0, delete: 0, approve: 0, assign: 0, export: 1, lock: 0, configure: 0 },
+  'Notifications':   { view: 1, create: 0, edit: 0, delete: 0, approve: 0, assign: 0, export: 0, lock: 0, configure: 1 },
+  'Users':           { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Admins':          { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Roles':           { view: 1, create: 1, edit: 1, delete: 1, approve: 1, assign: 1, export: 1, lock: 1, configure: 1 },
+  'Permissions':     { view: 1, create: 1, edit: 1, delete: 1, approve: 1, assign: 1, export: 1, lock: 1, configure: 1 },
+  'PermissionMatrix':{ view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 1 },
+  'Continents':      { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Countries':       { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Areas':           { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Franchise':       { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Reseller':        { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Sales':           { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'Leads':           { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'ProUsers':        { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 1 },
+  'Tasks':           { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'Approvals':       { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 0, configure: 0 },
+  'Rentals':         { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 0 },
+  'Rules':           { view: 1, create: 1, edit: 1, delete: 1, approve: 1, assign: 0, export: 1, lock: 1, configure: 1 },
+  'DeveloperPanel':  { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 1 },
+  'BugsIssues':      { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'QAPanel':         { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'Releases':        { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 1 },
+  'APIs':            { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 1, configure: 1 },
+  'Tickets':         { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'SLA':             { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 0, configure: 1 },
+  'KnowledgeBase':   { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 0, configure: 1 },
+  'Transactions':    { view: 1, create: 0, edit: 0, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 0 },
+  'Commissions':     { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 1, export: 1, lock: 0, configure: 0 },
+  'Payouts':         { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 0 },
+  'Invoices':        { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 0, configure: 0 },
+  'TaxCompliance':   { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 0, configure: 1 },
+  'LegalCases':      { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 0 },
+  'TrademarkIP':     { view: 1, create: 1, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 0 },
+  'SecurityEvents':  { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 1 },
+  'SystemLock':      { view: 1, create: 0, edit: 1, delete: 0, approve: 1, assign: 0, export: 1, lock: 1, configure: 1 },
+  'AuditLogs':       { view: 1, create: 0, edit: 0, delete: 0, approve: 0, assign: 0, export: 1, lock: 0, configure: 0 },
+};
 
 // ============ SYSTEM ROLES - DEFAULT LOCKED ============
 const systemRoles: Role[] = [
@@ -191,23 +258,23 @@ const systemRoles: Role[] = [
 ];
 
 // ============ GENERATE DEFAULT-LOCK PERMISSION MATRIX ============
-// ONLY Super Admin has all permissions by default
-// All other roles start with ZERO permissions
+// ONLY Super Admin uses CSV matrix, ALL other roles start with ZERO
 const generateDefaultLockMatrix = () => {
   const matrix: Record<string, Record<string, Record<string, boolean>>> = {};
   
   systemRoles.forEach(role => {
     matrix[role.id] = {};
     modules.forEach(module => {
+      matrix[role.id][module.name] = {};
+      
       if (role.isSuperAdmin) {
-        // Super Admin gets ALL permissions
-        matrix[role.id][module.name] = {};
+        // Super Admin uses MASTER CSV MATRIX
+        const csvPerms = SUPER_ADMIN_CSV_MATRIX[module.name];
         permissionTypes.forEach(perm => {
-          matrix[role.id][module.name][perm.key] = true;
+          matrix[role.id][module.name][perm.key] = csvPerms ? csvPerms[perm.key] === 1 : false;
         });
       } else {
         // ALL other roles get ZERO permissions
-        matrix[role.id][module.name] = {};
         permissionTypes.forEach(perm => {
           matrix[role.id][module.name][perm.key] = false;
         });
