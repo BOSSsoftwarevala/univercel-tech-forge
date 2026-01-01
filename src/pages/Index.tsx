@@ -1,230 +1,629 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import TopControlBar from '@/components/layout/TopControlBar';
-import Sidebar from '@/components/layout/Sidebar';
-import MetricCard from '@/components/dashboard/MetricCard';
-import StatusPanel from '@/components/dashboard/StatusPanel';
-import ActivityFeed from '@/components/dashboard/ActivityFeed';
-import QuickActions from '@/components/dashboard/QuickActions';
-import WalletOverview from '@/components/dashboard/WalletOverview';
-import DemoStatus from '@/components/dashboard/DemoStatus';
-import AIEnginePanel from '@/components/dashboard/AIEnginePanel';
-import TeamPerformance from '@/components/dashboard/TeamPerformance';
-import SecurityCompliance from '@/components/dashboard/SecurityCompliance';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { 
-  Building2, 
-  Users, 
-  Code2, 
-  DollarSign,
-  HeadphonesIcon,
-  PlayCircle,
-  Bot,
-  TrendingUp,
-  Menu,
-  X
-} from 'lucide-react';
+  Play, Heart, ShoppingCart, Lightbulb, Filter, Search,
+  Monitor, Server, Database, Code, Shield, Smartphone,
+  GraduationCap, Heart as HealthIcon, Utensils, Hotel, Home, Car, Plane,
+  CreditCard, Factory, Dumbbell, Scissors, Scale, Users, Truck,
+  Baby, Dog, PartyPopper, Briefcase, Phone, Mail, MapPin, Star, Award, CheckCircle
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import softwareValaLogo from "@/assets/software-vala-logo.jpg";
+
+interface Demo {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  url: string;
+  icon: any;
+  status: "ACTIVE" | "COMING_SOON";
+  features: string[];
+  frontend: string[];
+  backend: string[];
+  color: string;
+  price: string;
+  discountPrice: string;
+}
+
+const allDemos: Demo[] = [
+  {
+    id: "restaurant-pos",
+    name: "Restaurant POS System",
+    category: "Restaurant",
+    description: "Complete restaurant management with table booking, kitchen display, billing, and order tracking.",
+    url: "/demo/restaurant-pos",
+    icon: Utensils,
+    status: "ACTIVE",
+    features: ["Table Management", "Kitchen Display", "Billing & Invoicing", "Order Tracking"],
+    frontend: ["React", "TypeScript", "Tailwind CSS"],
+    backend: ["Node.js", "PostgreSQL", "Real-time Sync"],
+    color: "from-orange-600 to-red-600",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "school-erp",
+    name: "School ERP System",
+    category: "Education",
+    description: "Complete school management with student records, attendance, fees, and exam management.",
+    url: "/demo/school-erp",
+    icon: GraduationCap,
+    status: "ACTIVE",
+    features: ["Student Management", "Attendance System", "Fee Collection", "Exam Portal"],
+    frontend: ["React", "TypeScript", "Charts"],
+    backend: ["Node.js", "PostgreSQL", "SMS Integration"],
+    color: "from-blue-600 to-indigo-600",
+    price: "₹59,999",
+    discountPrice: "₹35,999"
+  },
+  {
+    id: "hospital-hms",
+    name: "Hospital Management System",
+    category: "Healthcare",
+    description: "Complete HMS with patient records, appointments, pharmacy, billing, and lab management.",
+    url: "/demo/hospital-hms",
+    icon: HealthIcon,
+    status: "ACTIVE",
+    features: ["Patient Records", "Appointments", "Pharmacy", "Lab Reports"],
+    frontend: ["React", "TypeScript", "Medical UI"],
+    backend: ["Node.js", "PostgreSQL", "HL7 FHIR"],
+    color: "from-emerald-600 to-teal-600",
+    price: "₹79,999",
+    discountPrice: "₹47,999"
+  },
+  {
+    id: "ecommerce-store",
+    name: "E-Commerce Platform",
+    category: "Retail & POS",
+    description: "Full-featured online store with cart, payments, inventory, and admin dashboard.",
+    url: "/demo/ecommerce-store",
+    icon: ShoppingCart,
+    status: "ACTIVE",
+    features: ["Product Catalog", "Shopping Cart", "Payment Gateway", "Order Management"],
+    frontend: ["React", "TypeScript", "Responsive"],
+    backend: ["Node.js", "PostgreSQL", "Stripe/Razorpay"],
+    color: "from-purple-600 to-pink-600",
+    price: "₹69,999",
+    discountPrice: "₹41,999"
+  },
+  {
+    id: "hotel-booking",
+    name: "Hotel Booking System",
+    category: "Hospitality",
+    description: "Hotel management with room booking, guest management, billing, and housekeeping.",
+    url: "/demo/hotel-booking",
+    icon: Hotel,
+    status: "ACTIVE",
+    features: ["Room Booking", "Guest Management", "Billing", "Housekeeping"],
+    frontend: ["React", "TypeScript", "Calendar"],
+    backend: ["Node.js", "PostgreSQL", "Channel Manager"],
+    color: "from-amber-600 to-orange-600",
+    price: "₹54,999",
+    discountPrice: "₹32,999"
+  },
+  {
+    id: "real-estate",
+    name: "Real Estate Portal",
+    category: "Real Estate",
+    description: "Property listing platform with search, filters, agent management, and lead tracking.",
+    url: "/demo/real-estate",
+    icon: Home,
+    status: "ACTIVE",
+    features: ["Property Listings", "Search & Filters", "Agent Portal", "Lead Management"],
+    frontend: ["React", "TypeScript", "Maps API"],
+    backend: ["Node.js", "PostgreSQL", "Geo-location"],
+    color: "from-emerald-600 to-green-600",
+    price: "₹64,999",
+    discountPrice: "₹38,999"
+  },
+  {
+    id: "automotive",
+    name: "Auto Dealer System",
+    category: "Automotive",
+    description: "Vehicle dealership management with inventory, sales, service booking, and CRM.",
+    url: "/demo/automotive",
+    icon: Car,
+    status: "ACTIVE",
+    features: ["Vehicle Inventory", "Sales Management", "Service Booking", "Customer CRM"],
+    frontend: ["React", "TypeScript", "Gallery"],
+    backend: ["Node.js", "PostgreSQL", "RTO Integration"],
+    color: "from-slate-600 to-zinc-600",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "travel",
+    name: "Travel Booking Platform",
+    category: "Travel & Tourism",
+    description: "Travel agency platform with tour packages, flight booking, and hotel reservations.",
+    url: "/demo/travel",
+    icon: Plane,
+    status: "ACTIVE",
+    features: ["Tour Packages", "Flight Booking", "Hotel Reservation", "Itinerary"],
+    frontend: ["React", "TypeScript", "Booking UI"],
+    backend: ["Node.js", "PostgreSQL", "GDS API"],
+    color: "from-sky-600 to-blue-600",
+    price: "₹74,999",
+    discountPrice: "₹44,999"
+  },
+  {
+    id: "finance",
+    name: "Finance & Loan Manager",
+    category: "Finance & Banking",
+    description: "Lending platform with loan management, EMI calculator, collections, and reporting.",
+    url: "/demo/finance",
+    icon: CreditCard,
+    status: "ACTIVE",
+    features: ["Loan Management", "EMI Calculator", "Collections", "Reports"],
+    frontend: ["React", "TypeScript", "Charts"],
+    backend: ["Node.js", "PostgreSQL", "Banking API"],
+    color: "from-violet-600 to-purple-600",
+    price: "₹89,999",
+    discountPrice: "₹53,999"
+  },
+  {
+    id: "manufacturing",
+    name: "Factory ERP System",
+    category: "Manufacturing",
+    description: "Manufacturing ERP with production planning, inventory, quality control, and machine monitoring.",
+    url: "/demo/manufacturing",
+    icon: Factory,
+    status: "ACTIVE",
+    features: ["Production Planning", "Inventory", "Quality Control", "Machine Monitor"],
+    frontend: ["React", "TypeScript", "Dashboard"],
+    backend: ["Node.js", "PostgreSQL", "IoT Ready"],
+    color: "from-zinc-600 to-stone-600",
+    price: "₹99,999",
+    discountPrice: "₹59,999"
+  },
+  {
+    id: "gym",
+    name: "Gym Management System",
+    category: "Fitness & Gym",
+    description: "Fitness center management with member management, class scheduling, and billing.",
+    url: "/demo/gym",
+    icon: Dumbbell,
+    status: "ACTIVE",
+    features: ["Member Management", "Class Schedule", "Billing", "Trainer Assign"],
+    frontend: ["React", "TypeScript", "Calendar"],
+    backend: ["Node.js", "PostgreSQL", "Biometric"],
+    color: "from-red-600 to-rose-600",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "salon",
+    name: "Salon & Spa Booking",
+    category: "Salon & Spa",
+    description: "Beauty salon management with appointment booking, staff scheduling, and billing.",
+    url: "/demo/salon",
+    icon: Scissors,
+    status: "ACTIVE",
+    features: ["Appointment Booking", "Staff Schedule", "Services Menu", "Billing"],
+    frontend: ["React", "TypeScript", "Booking UI"],
+    backend: ["Node.js", "PostgreSQL", "SMS Reminder"],
+    color: "from-pink-600 to-fuchsia-600",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "legal",
+    name: "Legal Practice Manager",
+    category: "Legal Services",
+    description: "Law firm management with case tracking, client management, billing, and document handling.",
+    url: "/demo/legal",
+    icon: Scale,
+    status: "ACTIVE",
+    features: ["Case Management", "Client Portal", "Billing", "Documents"],
+    frontend: ["React", "TypeScript", "Document UI"],
+    backend: ["Node.js", "PostgreSQL", "E-Sign"],
+    color: "from-slate-600 to-gray-600",
+    price: "₹59,999",
+    discountPrice: "₹35,999"
+  },
+  {
+    id: "security",
+    name: "Security Guard System",
+    category: "Security",
+    description: "Security agency management with guard tracking, patrol monitoring, and incident reporting.",
+    url: "/demo/security",
+    icon: Shield,
+    status: "ACTIVE",
+    features: ["Guard Tracking", "Patrol Monitor", "Incident Report", "Camera Feed"],
+    frontend: ["React", "TypeScript", "Maps"],
+    backend: ["Node.js", "PostgreSQL", "GPS Tracking"],
+    color: "from-gray-600 to-slate-600",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "telecom",
+    name: "Mobile Store & Recharge",
+    category: "Telecom",
+    description: "Mobile shop management with inventory, recharge portal, and service center.",
+    url: "/demo/telecom",
+    icon: Smartphone,
+    status: "ACTIVE",
+    features: ["Phone Inventory", "Recharge Portal", "Service Center", "Customer DB"],
+    frontend: ["React", "TypeScript", "E-commerce"],
+    backend: ["Node.js", "PostgreSQL", "Recharge API"],
+    color: "from-blue-600 to-indigo-600",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "childcare",
+    name: "Childcare Center System",
+    category: "Childcare",
+    description: "Daycare management with child attendance, parent communication, and activity tracking.",
+    url: "/demo/childcare",
+    icon: Baby,
+    status: "ACTIVE",
+    features: ["Child Attendance", "Parent Portal", "Activity Log", "Photo Sharing"],
+    frontend: ["React", "TypeScript", "Parent App"],
+    backend: ["Node.js", "PostgreSQL", "Push Notify"],
+    color: "from-pink-400 to-purple-400",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "petcare",
+    name: "Pet Care & Vet Clinic",
+    category: "Pet Care",
+    description: "Veterinary clinic and pet shop management with appointments, records, and grooming.",
+    url: "/demo/petcare",
+    icon: Dog,
+    status: "ACTIVE",
+    features: ["Pet Records", "Appointments", "Grooming", "Pet Shop"],
+    frontend: ["React", "TypeScript", "Pet UI"],
+    backend: ["Node.js", "PostgreSQL", "Reminder"],
+    color: "from-amber-400 to-orange-400",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "event",
+    name: "Event & Wedding Planner",
+    category: "Events & Wedding",
+    description: "Event management with vendor booking, venue management, and budget tracking.",
+    url: "/demo/event",
+    icon: PartyPopper,
+    status: "ACTIVE",
+    features: ["Event Planning", "Vendor Booking", "Venue Manage", "Budget Track"],
+    frontend: ["React", "TypeScript", "Planner UI"],
+    backend: ["Node.js", "PostgreSQL", "Vendor API"],
+    color: "from-rose-600 to-pink-600",
+    price: "₹54,999",
+    discountPrice: "₹32,999"
+  },
+  {
+    id: "crm",
+    name: "Sales CRM System",
+    category: "Business",
+    description: "Customer relationship management with lead tracking, deals pipeline, and reporting.",
+    url: "/demo/crm",
+    icon: Users,
+    status: "ACTIVE",
+    features: ["Lead Management", "Deal Pipeline", "Activity Track", "Reports"],
+    frontend: ["React", "TypeScript", "Dashboard"],
+    backend: ["Node.js", "PostgreSQL", "Email API"],
+    color: "from-blue-600 to-violet-600",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "logistics",
+    name: "Logistics & Fleet Manager",
+    category: "Logistics",
+    description: "Fleet and logistics management with shipment tracking, driver management, and route optimization.",
+    url: "/demo/logistics",
+    icon: Truck,
+    status: "ACTIVE",
+    features: ["Fleet Tracking", "Shipment Status", "Driver Manage", "Route Optimize"],
+    frontend: ["React", "TypeScript", "Maps"],
+    backend: ["Node.js", "PostgreSQL", "GPS API"],
+    color: "from-emerald-600 to-teal-600",
+    price: "₹64,999",
+    discountPrice: "₹38,999"
+  }
+];
+
+const categories = [
+  "All", "Retail & POS", "Education", "Healthcare", "Restaurant", 
+  "Logistics", "Business", "Real Estate", "Hospitality", "Finance & Banking",
+  "Manufacturing", "Fitness & Gym", "Salon & Spa", "Automotive", "Travel & Tourism",
+  "Legal Services", "Security", "Telecom", "Childcare", "Pet Care", "Events & Wedding"
+];
 
 const Index = () => {
-  const [activeItem, setActiveItem] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<string[]>([]);
 
-  const franchiseStats = [
-    { label: 'Active Franchises', value: 42, max: 50, color: 'bg-gradient-to-r from-neon-cyan to-neon-teal' },
-    { label: 'Pending Approvals', value: 7, max: 10, color: 'bg-gradient-to-r from-neon-orange to-neon-red' },
-    { label: 'Territory Coverage', value: 28, max: 35, color: 'bg-gradient-to-r from-neon-green to-neon-teal' },
-  ];
+  const filteredDemos = allDemos.filter(demo => {
+    const matchesCategory = activeCategory === "All" || demo.category === activeCategory;
+    const matchesSearch = demo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          demo.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  const developerStats = [
-    { label: 'Active Tasks', value: 127, max: 150, color: 'bg-gradient-to-r from-neon-purple to-neon-blue' },
-    { label: 'Code Reviews', value: 34, max: 40, color: 'bg-gradient-to-r from-neon-cyan to-primary' },
-    { label: 'Deployments', value: 12, max: 15, color: 'bg-gradient-to-r from-neon-green to-neon-teal' },
-  ];
+  const toggleFavorite = (id: string) => {
+    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  };
 
   return (
-    <div className="min-h-screen bg-background grid-lines">
-      {/* Background Gradient Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-neon-teal/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-neon-purple/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
-      </div>
-
-      {/* Top Control Bar */}
-      <TopControlBar />
-
-      {/* Sidebar Toggle for Mobile */}
-      <button
-        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        className="fixed top-16 left-4 z-50 p-2 glass-panel rounded-lg lg:hidden"
-      >
-        {sidebarCollapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
-      </button>
-
-      {/* Sidebar */}
-      <div className={`hidden lg:block`}>
-        <Sidebar
-          activeItem={activeItem}
-          onItemClick={setActiveItem}
-          collapsed={sidebarCollapsed}
-        />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {!sidebarCollapsed && (
-          <motion.div
-            initial={{ x: -300 }}
-            animate={{ x: 0 }}
-            exit={{ x: -300 }}
-            className="lg:hidden fixed inset-0 z-40"
-          >
-            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setSidebarCollapsed(true)} />
-            <Sidebar
-              activeItem={activeItem}
-              onItemClick={(id) => {
-                setActiveItem(id);
-                setSidebarCollapsed(true);
-              }}
-              collapsed={false}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Main Content */}
-      <main className={`transition-all duration-300 pt-14 ${sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
-        <div className="p-4 lg:p-6 space-y-6">
-          {/* Welcome Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
-          >
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold font-mono text-foreground">
-                Command <span className="neon-text">Center</span>
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Software Vala Super Admin • Full System Control
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0d1e36] to-[#0a1628]">
+      {/* Premium Header */}
+      <header className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 py-4 px-4 shadow-2xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-4">
+              <img src={softwareValaLogo} alt="Software Vala" className="h-14 w-14 rounded-full object-cover border-2 border-white shadow-lg" />
+              <div>
+                <h1 className="text-white font-bold text-2xl">Software Vala</h1>
+                <p className="text-white/90 text-sm">- The Name of Trust</p>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="command-button">
-                Export Report
-              </button>
-              <button className="command-button-primary">
-                System Settings
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Top Metrics Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard
-              title="Active Franchises"
-              value="42"
-              change={8.2}
-              changeLabel="vs last month"
-              icon={<Building2 className="w-5 h-5" />}
-              trend="up"
-              delay={0.1}
-            />
-            <MetricCard
-              title="Total Resellers"
-              value="156"
-              change={12.4}
-              changeLabel="vs last month"
-              icon={<Users className="w-5 h-5" />}
-              trend="up"
-              delay={0.15}
-            />
-            <MetricCard
-              title="Developer Tasks"
-              value="127"
-              change={-3.2}
-              changeLabel="pending"
-              icon={<Code2 className="w-5 h-5" />}
-              trend="down"
-              delay={0.2}
-            />
-            <MetricCard
-              title="Revenue Today"
-              value="$84.7K"
-              change={15.8}
-              changeLabel="+$11.2K vs yesterday"
-              icon={<DollarSign className="w-5 h-5" />}
-              trend="up"
-              delay={0.25}
-            />
-          </div>
-
-          {/* Second Metrics Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard
-              title="Support Tickets"
-              value="23"
-              change={-45}
-              changeLabel="open tickets"
-              icon={<HeadphonesIcon className="w-5 h-5" />}
-              trend="down"
-              delay={0.3}
-            />
-            <MetricCard
-              title="Demo Sessions"
-              value="89"
-              change={22.1}
-              changeLabel="this week"
-              icon={<PlayCircle className="w-5 h-5" />}
-              trend="up"
-              delay={0.35}
-            />
-            <MetricCard
-              title="AI Resolutions"
-              value="847"
-              change={34.5}
-              changeLabel="auto-handled"
-              icon={<Bot className="w-5 h-5" />}
-              trend="up"
-              delay={0.4}
-            />
-            <MetricCard
-              title="Conversion Rate"
-              value="24.8%"
-              change={4.2}
-              changeLabel="from demos"
-              icon={<TrendingUp className="w-5 h-5" />}
-              trend="up"
-              delay={0.45}
-            />
-          </div>
-
-          {/* Quick Actions */}
-          <QuickActions delay={0.5} />
-
-          {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column */}
-            <div className="space-y-6">
-              <StatusPanel title="Franchise Overview" items={franchiseStats} delay={0.55} />
-              <StatusPanel title="Developer Metrics" items={developerStats} delay={0.6} />
-              <SecurityCompliance delay={0.65} />
-            </div>
-
-            {/* Center Column */}
-            <div className="space-y-6">
-              <AIEnginePanel delay={0.7} />
-              <DemoStatus delay={0.75} />
-              <TeamPerformance delay={0.8} />
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-              <WalletOverview delay={0.85} />
-              <ActivityFeed delay={0.9} />
+            <div className="flex items-center gap-4 flex-wrap justify-center">
+              <Badge className="bg-white/20 text-white border-0 animate-pulse text-sm px-4 py-2">
+                🎉 New Year Sale - 40% OFF! 🎉
+              </Badge>
+              <Badge className="bg-white text-orange-600 font-bold text-lg px-4 py-2">40% OFF</Badge>
+              <Link to="/admin">
+                <Button variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20">
+                  Admin Login
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="py-12 px-4 bg-gradient-to-b from-[#0d1e36] to-transparent">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 mb-4">
+              <Star className="h-3 w-3 mr-1" /> Premium Software Solutions
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              20+ Ready-to-Deploy <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">Software Solutions</span>
+            </h2>
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-8">
+              Complete business software with modern design, powerful features, and full source code. 
+              Start your business today with our premium solutions!
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <CheckCircle className="h-5 w-5" /> Full Source Code
+              </div>
+              <div className="flex items-center gap-2 text-cyan-400">
+                <CheckCircle className="h-5 w-5" /> 1 Year Free Support
+              </div>
+              <div className="flex items-center gap-2 text-orange-400">
+                <CheckCircle className="h-5 w-5" /> Free Installation
+              </div>
+              <div className="flex items-center gap-2 text-purple-400">
+                <CheckCircle className="h-5 w-5" /> Lifetime Updates
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Category Filter */}
+      <div className="bg-[#0d1e36]/80 backdrop-blur-sm border-b border-cyan-500/20 py-4 px-4 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Input 
+                placeholder="Search demos..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-[#1a2d4a] border-cyan-500/30 text-white placeholder:text-gray-400"
+              />
+            </div>
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+              {filteredDemos.length} Products
+            </Badge>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {categories.slice(0, 10).map(cat => (
+              <Button
+                key={cat}
+                variant={activeCategory === cat ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveCategory(cat)}
+                className={activeCategory === cat 
+                  ? "bg-cyan-500 text-white hover:bg-cyan-600" 
+                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200"
+                }
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Demo Grid */}
+      <main className="max-w-7xl mx-auto p-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredDemos.map((demo, index) => {
+            const Icon = demo.icon;
+            return (
+              <motion.div
+                key={demo.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+              >
+                <Card className="bg-[#1a2d4a]/80 border-cyan-500/20 overflow-hidden hover:border-cyan-400/50 transition-all group hover:shadow-xl hover:shadow-cyan-500/10">
+                  {/* Card Header with Status & Favorite */}
+                  <div className={`h-40 bg-gradient-to-br ${demo.color} relative flex items-center justify-center`}>
+                    <Badge className="absolute top-3 left-3 bg-emerald-500 text-white text-xs">
+                      {demo.status === "ACTIVE" ? "ACTIVE" : "COMING SOON"}
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => toggleFavorite(demo.id)}
+                      className="absolute top-3 right-3 text-white hover:bg-white/20"
+                    >
+                      <Heart className={`h-5 w-5 ${favorites.includes(demo.id) ? "fill-red-500 text-red-500" : ""}`} />
+                    </Button>
+                    <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Icon className="h-10 w-10 text-white" />
+                    </div>
+                    {/* Price Badge */}
+                    <div className="absolute bottom-3 right-3">
+                      <Badge className="bg-white text-gray-800 font-bold text-xs line-through opacity-70 mr-1">
+                        {demo.price}
+                      </Badge>
+                      <Badge className="bg-emerald-500 text-white font-bold">
+                        {demo.discountPrice}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <CardContent className="p-4">
+                    {/* Category */}
+                    <p className="text-cyan-400 text-xs font-medium uppercase tracking-wide mb-2">
+                      {demo.category}
+                    </p>
+                    
+                    {/* Title & Description */}
+                    <h3 className="text-white font-semibold text-lg mb-2 line-clamp-1">{demo.name}</h3>
+                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">{demo.description}</p>
+
+                    {/* Features */}
+                    <div className="mb-3">
+                      <p className="text-cyan-400 text-xs font-medium mb-1">Features:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {demo.features.slice(0, 3).map((f, i) => (
+                          <Badge key={i} variant="outline" className="text-xs border-cyan-500/30 text-cyan-300">
+                            {f}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tech Stack */}
+                    <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+                      <div>
+                        <p className="text-emerald-400 font-medium flex items-center gap-1">
+                          <Monitor className="h-3 w-3" /> Frontend
+                        </p>
+                        <p className="text-gray-400">{demo.frontend.slice(0, 2).join(", ")}</p>
+                      </div>
+                      <div>
+                        <p className="text-orange-400 font-medium flex items-center gap-1">
+                          <Server className="h-3 w-3" /> Backend
+                        </p>
+                        <p className="text-gray-400">{demo.backend.slice(0, 2).join(", ")}</p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 mb-3">
+                      <Button className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs hover:from-orange-600 hover:to-red-600">
+                        Buy Now
+                      </Button>
+                      <Link to={demo.url} className="flex-1">
+                        <Button variant="outline" className="w-full border-cyan-500/50 text-cyan-400 text-xs hover:bg-cyan-500/10">
+                          <Play className="h-3 w-3 mr-1" /> Demo
+                        </Button>
+                      </Link>
+                    </div>
+
+                    {/* Secondary Links */}
+                    <div className="flex justify-between text-xs">
+                      <button className="text-gray-400 hover:text-cyan-400 flex items-center gap-1">
+                        <ShoppingCart className="h-3 w-3" /> Add to Cart
+                      </button>
+                      <button className="text-gray-400 hover:text-orange-400 flex items-center gap-1">
+                        <Lightbulb className="h-3 w-3" /> Suggestions
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
       </main>
+
+      {/* Contact Section */}
+      <section className="py-12 px-4 bg-gradient-to-t from-[#0a1628] to-transparent">
+        <div className="max-w-4xl mx-auto text-center">
+          <h3 className="text-2xl font-bold text-white mb-6">Contact Us</h3>
+          <div className="flex flex-wrap justify-center gap-6">
+            <a href="tel:+919876543210" className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300">
+              <Phone className="h-5 w-5" /> +91 98765 43210
+            </a>
+            <a href="mailto:info@softwarevala.com" className="flex items-center gap-2 text-orange-400 hover:text-orange-300">
+              <Mail className="h-5 w-5" /> info@softwarevala.com
+            </a>
+            <span className="flex items-center gap-2 text-gray-400">
+              <MapPin className="h-5 w-5" /> Ahmedabad, Gujarat, India
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Premium Footer */}
+      <footer className="bg-[#0a1628] border-t border-cyan-500/10 py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center gap-6">
+            {/* Logo and Brand */}
+            <div className="flex items-center gap-3">
+              <img src={softwareValaLogo} alt="Software Vala" className="h-12 w-12 rounded-full object-cover" />
+              <div>
+                <span className="text-white font-bold text-xl">Software Vala</span>
+                <span className="text-cyan-400 text-sm ml-2">™</span>
+              </div>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                <Award className="h-3 w-3 mr-1" /> Trusted by 500+ Clients
+              </Badge>
+              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                <Shield className="h-3 w-3 mr-1" /> 100% Secure
+              </Badge>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                <Star className="h-3 w-3 mr-1" /> 5 Star Rating
+              </Badge>
+            </div>
+
+            {/* Copyright */}
+            <div className="border-t border-cyan-500/10 pt-6 w-full text-center space-y-3">
+              <p className="text-white font-medium">
+                © 2026 Software Vala™. All Rights Reserved.
+              </p>
+              <p className="text-red-400 font-semibold text-sm">
+                ⚠️ STRICTLY PROHIBITED: Unauthorized reproduction, distribution, or modification of any content, demos, or software is a violation of Software Vala's intellectual property rights.
+              </p>
+              <div className="text-gray-500 text-xs space-y-1">
+                <p>📜 Software Vala™ is a registered trademark. All product names, logos, and brands are property of their respective owners.</p>
+                <p>⚖️ Legal action will be taken against copyright infringement under the IT Act, 2000 and Copyright Act, 1957.</p>
+                <p className="text-cyan-400">🔒 Protected by Indian Intellectual Property Laws</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
