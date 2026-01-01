@@ -15,6 +15,7 @@ import SystemNotificationsInitializer from "./components/notifications/SystemNot
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
 import GlobalOfferPopup from "@/components/offers/GlobalOfferPopup";
+import AdminQuickAccess from "@/components/admin/AdminQuickAccess";
 import Homepage from "./pages/Homepage";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -598,6 +599,7 @@ const App = () => (
                           {/* Catch-all */}
                           <Route path="*" element={<NotFound />} />
                         </Routes>
+                        <AdminQuickAccess />
                         </GlobalRealtimeProvider>
                       </TranslationProvider>
                     </NotificationProvider>
