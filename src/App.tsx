@@ -44,6 +44,7 @@ import DemoAccess from "./pages/DemoAccess";
 import DemoDirectory from "./pages/DemoDirectory";
 import DemoLogin from "./pages/DemoLogin";
 import DemoShowcase from "./pages/DemoShowcase";
+import ClientPortal from "./pages/ClientPortal";
 
 import SettingsPage from "./pages/Settings";
 
@@ -279,6 +280,10 @@ const App = () => (
               <Route path="/demo/:role" element={<DemoAccess />} />
               <Route path="/demo-login" element={<DemoLogin />} />
               <Route path="/showcase" element={<DemoShowcase />} />
+              
+              {/* Client Portal - Public Route */}
+              <Route path="/client-portal" element={<ClientPortal />} />
+              <Route path="/get-started" element={<ClientPortal />} />
 
               {/* Global Auth Routes - Redirects to unified /auth */}
               <Route path="/login" element={<Navigate to="/auth" replace />} />

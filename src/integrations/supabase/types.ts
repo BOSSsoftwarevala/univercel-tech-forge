@@ -2115,6 +2115,111 @@ export type Database = {
         }
         Relationships: []
       }
+      client_projects: {
+        Row: {
+          admin_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
+          assigned_ip: string | null
+          assigned_to: string | null
+          balance_amount: number | null
+          balance_paid: boolean | null
+          balance_paid_at: string | null
+          balance_payment_method: string | null
+          balance_transaction_id: string | null
+          client_email: string
+          client_name: string
+          client_phone: string | null
+          company_name: string | null
+          created_at: string
+          currency: string | null
+          demo_id: string | null
+          deposit_amount: number | null
+          deposit_paid: boolean | null
+          deposit_paid_at: string | null
+          deposit_payment_method: string | null
+          deposit_transaction_id: string | null
+          dns_configured: boolean | null
+          domain_name: string
+          id: string
+          logo_url: string | null
+          project_type: string
+          quoted_amount: number | null
+          requirements: string | null
+          status: string | null
+          status_message: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          assigned_ip?: string | null
+          assigned_to?: string | null
+          balance_amount?: number | null
+          balance_paid?: boolean | null
+          balance_paid_at?: string | null
+          balance_payment_method?: string | null
+          balance_transaction_id?: string | null
+          client_email: string
+          client_name: string
+          client_phone?: string | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string | null
+          demo_id?: string | null
+          deposit_amount?: number | null
+          deposit_paid?: boolean | null
+          deposit_paid_at?: string | null
+          deposit_payment_method?: string | null
+          deposit_transaction_id?: string | null
+          dns_configured?: boolean | null
+          domain_name: string
+          id?: string
+          logo_url?: string | null
+          project_type?: string
+          quoted_amount?: number | null
+          requirements?: string | null
+          status?: string | null
+          status_message?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          assigned_ip?: string | null
+          assigned_to?: string | null
+          balance_amount?: number | null
+          balance_paid?: boolean | null
+          balance_paid_at?: string | null
+          balance_payment_method?: string | null
+          balance_transaction_id?: string | null
+          client_email?: string
+          client_name?: string
+          client_phone?: string | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string | null
+          demo_id?: string | null
+          deposit_amount?: number | null
+          deposit_paid?: boolean | null
+          deposit_paid_at?: string | null
+          deposit_payment_method?: string | null
+          deposit_transaction_id?: string | null
+          dns_configured?: boolean | null
+          domain_name?: string
+          id?: string
+          logo_url?: string | null
+          project_type?: string
+          quoted_amount?: number | null
+          requirements?: string | null
+          status?: string | null
+          status_message?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       client_success_cases: {
         Row: {
           assigned_to: string | null
@@ -11753,6 +11858,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      project_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          id: string
+          new_status: string
+          notes: string | null
+          old_status: string | null
+          project_id: string
+          status_message: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_status: string
+          notes?: string | null
+          old_status?: string | null
+          project_id: string
+          status_message?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_status?: string
+          notes?: string | null
+          old_status?: string | null
+          project_id?: string
+          status_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_status_history_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "client_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promise_audit_logs: {
         Row: {
