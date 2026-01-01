@@ -274,6 +274,72 @@ export type Database = {
           },
         ]
       }
+      admin_scope_history: {
+        Row: {
+          admin_id: string
+          change_reason: string | null
+          changed_at: string | null
+          changed_by_super_admin_id: string | null
+          id: string
+          new_scope: Json
+          old_scope: Json | null
+        }
+        Insert: {
+          admin_id: string
+          change_reason?: string | null
+          changed_at?: string | null
+          changed_by_super_admin_id?: string | null
+          id?: string
+          new_scope: Json
+          old_scope?: Json | null
+        }
+        Update: {
+          admin_id?: string
+          change_reason?: string | null
+          changed_at?: string | null
+          changed_by_super_admin_id?: string | null
+          id?: string
+          new_scope?: Json
+          old_scope?: Json | null
+        }
+        Relationships: []
+      }
+      admins: {
+        Row: {
+          assigned_scope: Json | null
+          created_at: string | null
+          created_by_super_admin_id: string | null
+          id: string
+          permissions_list: Json | null
+          scope_type: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_scope?: Json | null
+          created_at?: string | null
+          created_by_super_admin_id?: string | null
+          id?: string
+          permissions_list?: Json | null
+          scope_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_scope?: Json | null
+          created_at?: string | null
+          created_by_super_admin_id?: string | null
+          id?: string
+          permissions_list?: Json | null
+          scope_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_billing_qr_codes: {
         Row: {
           base_cost_total: number
@@ -733,6 +799,66 @@ export type Database = {
           payout_request_id?: string | null
           reason?: string | null
           user_flagged?: boolean | null
+        }
+        Relationships: []
+      }
+      approval_decisions: {
+        Row: {
+          approval_id: string
+          decision: string
+          decision_reason: string | null
+          decision_time: string | null
+          id: string
+          super_admin_id: string
+        }
+        Insert: {
+          approval_id: string
+          decision: string
+          decision_reason?: string | null
+          decision_time?: string | null
+          id?: string
+          super_admin_id: string
+        }
+        Update: {
+          approval_id?: string
+          decision?: string
+          decision_reason?: string | null
+          decision_time?: string | null
+          id?: string
+          super_admin_id?: string
+        }
+        Relationships: []
+      }
+      approvals: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          request_data: Json | null
+          request_type: string
+          requested_by_user_id: string
+          risk_score: number | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          request_data?: Json | null
+          request_type: string
+          requested_by_user_id: string
+          risk_score?: number | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          request_data?: Json | null
+          request_type?: string
+          requested_by_user_id?: string
+          risk_score?: number | null
+          status?: string | null
         }
         Relationships: []
       }
@@ -2114,6 +2240,30 @@ export type Database = {
         }
         Relationships: []
       }
+      continents: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          name: string
+          status: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          name: string
+          status?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       cookie_consents: {
         Row: {
           analytics: boolean | null
@@ -2156,6 +2306,33 @@ export type Database = {
           session_id?: string
           third_party?: boolean | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      countries: {
+        Row: {
+          code: string
+          continent_id: string
+          created_at: string | null
+          id: string
+          name: string
+          status: string | null
+        }
+        Insert: {
+          code: string
+          continent_id: string
+          created_at?: string | null
+          id?: string
+          name: string
+          status?: string | null
+        }
+        Update: {
+          code?: string
+          continent_id?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          status?: string | null
         }
         Relationships: []
       }
@@ -11785,6 +11962,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rentable_features: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          feature_code: string
+          feature_name: string
+          id: string
+          is_active: boolean | null
+          module_code: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          feature_code: string
+          feature_name: string
+          id?: string
+          is_active?: boolean | null
+          module_code: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          feature_code?: string
+          feature_name?: string
+          id?: string
+          is_active?: boolean | null
+          module_code?: string
+        }
+        Relationships: []
+      }
       rental_activity: {
         Row: {
           bounce: boolean | null
@@ -11903,6 +12110,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rental_plans: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          duration_type: string
+          duration_value: number | null
+          id: string
+          is_active: boolean | null
+          plan_name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          duration_type: string
+          duration_value?: number | null
+          id?: string
+          is_active?: boolean | null
+          plan_name: string
+          price: number
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          duration_type?: string
+          duration_value?: number | null
+          id?: string
+          is_active?: boolean | null
+          plan_name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      rentals: {
+        Row: {
+          assigned_by_super_admin_id: string | null
+          assigned_to_user_id: string
+          auto_renew: boolean | null
+          created_at: string | null
+          end_time: string
+          feature_id: string
+          id: string
+          plan_id: string
+          start_time: string
+          status: string | null
+        }
+        Insert: {
+          assigned_by_super_admin_id?: string | null
+          assigned_to_user_id: string
+          auto_renew?: boolean | null
+          created_at?: string | null
+          end_time: string
+          feature_id: string
+          id?: string
+          plan_id: string
+          start_time?: string
+          status?: string | null
+        }
+        Update: {
+          assigned_by_super_admin_id?: string | null
+          assigned_to_user_id?: string
+          auto_renew?: boolean | null
+          created_at?: string | null
+          end_time?: string
+          feature_id?: string
+          id?: string
+          plan_id?: string
+          start_time?: string
+          status?: string | null
+        }
+        Relationships: []
       }
       reputation_scores: {
         Row: {
@@ -13292,6 +13571,78 @@ export type Database = {
         }
         Relationships: []
       }
+      rule_execution_logs: {
+        Row: {
+          affected_entities: Json | null
+          executed_at: string | null
+          executed_by_super_admin_id: string | null
+          execution_duration_ms: number | null
+          execution_result: string
+          id: string
+          rule_id: string
+          trigger_type: string
+        }
+        Insert: {
+          affected_entities?: Json | null
+          executed_at?: string | null
+          executed_by_super_admin_id?: string | null
+          execution_duration_ms?: number | null
+          execution_result: string
+          id?: string
+          rule_id: string
+          trigger_type: string
+        }
+        Update: {
+          affected_entities?: Json | null
+          executed_at?: string | null
+          executed_by_super_admin_id?: string | null
+          execution_duration_ms?: number | null
+          execution_result?: string
+          id?: string
+          rule_id?: string
+          trigger_type?: string
+        }
+        Relationships: []
+      }
+      rules: {
+        Row: {
+          created_at: string | null
+          created_by_super_admin_id: string | null
+          id: string
+          priority: number | null
+          rule_logic: Json
+          rule_name: string
+          rule_type: string
+          scope_definition: Json | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by_super_admin_id?: string | null
+          id?: string
+          priority?: number | null
+          rule_logic?: Json
+          rule_name: string
+          rule_type: string
+          scope_definition?: Json | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by_super_admin_id?: string | null
+          id?: string
+          priority?: number | null
+          rule_logic?: Json
+          rule_name?: string
+          rule_type?: string
+          scope_definition?: Json | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sa_approval_queue: {
         Row: {
           action_payload: Json | null
@@ -13632,6 +13983,45 @@ export type Database = {
           user_id?: string
           user_ip_address?: string | null
           user_role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      security_events: {
+        Row: {
+          affected_user_id: string | null
+          detected_at: string | null
+          device_fingerprint: string | null
+          event_type: string
+          geo_location: string | null
+          id: string
+          ip_address: string | null
+          is_resolved: boolean | null
+          severity: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          affected_user_id?: string | null
+          detected_at?: string | null
+          device_fingerprint?: string | null
+          event_type: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_resolved?: boolean | null
+          severity?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          affected_user_id?: string | null
+          detected_at?: string | null
+          device_fingerprint?: string | null
+          event_type?: string
+          geo_location?: string | null
+          id?: string
+          ip_address?: string | null
+          is_resolved?: boolean | null
+          severity?: string | null
+          user_agent?: string | null
         }
         Relationships: []
       }
@@ -14884,6 +15274,54 @@ export type Database = {
           },
         ]
       }
+      super_admin_activity_log: {
+        Row: {
+          action: string
+          action_data: Json | null
+          created_at: string | null
+          device_fingerprint: string | null
+          id: string
+          ip_address: string | null
+          module: string
+          risk_score: number | null
+          session_id: string | null
+          super_admin_id: string
+          target_entity: string | null
+          target_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          action_data?: Json | null
+          created_at?: string | null
+          device_fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          module: string
+          risk_score?: number | null
+          session_id?: string | null
+          super_admin_id: string
+          target_entity?: string | null
+          target_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          action_data?: Json | null
+          created_at?: string | null
+          device_fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          module?: string
+          risk_score?: number | null
+          session_id?: string | null
+          super_admin_id?: string
+          target_entity?: string | null
+          target_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       super_admin_admin_management: {
         Row: {
           action_type: string
@@ -15039,6 +15477,60 @@ export type Database = {
           },
         ]
       }
+      super_admin_dashboard_views: {
+        Row: {
+          id: string
+          super_admin_id: string
+          view_duration_seconds: number | null
+          viewed_at: string | null
+          widget_code: string
+        }
+        Insert: {
+          id?: string
+          super_admin_id: string
+          view_duration_seconds?: number | null
+          viewed_at?: string | null
+          widget_code: string
+        }
+        Update: {
+          id?: string
+          super_admin_id?: string
+          view_duration_seconds?: number | null
+          viewed_at?: string | null
+          widget_code?: string
+        }
+        Relationships: []
+      }
+      super_admin_dashboard_widgets: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          position_index: number | null
+          super_admin_id: string
+          widget_code: string
+          widget_config: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          position_index?: number | null
+          super_admin_id: string
+          widget_code: string
+          widget_config?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          position_index?: number | null
+          super_admin_id?: string
+          widget_code?: string
+          widget_config?: Json | null
+        }
+        Relationships: []
+      }
       super_admin_live_activity_views: {
         Row: {
           alerts_acknowledged: number | null
@@ -15143,6 +15635,33 @@ export type Database = {
         }
         Relationships: []
       }
+      super_admin_module_actions: {
+        Row: {
+          action: string
+          action_data: Json | null
+          action_time: string | null
+          id: string
+          module_id: string
+          super_admin_id: string
+        }
+        Insert: {
+          action: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          module_id: string
+          super_admin_id: string
+        }
+        Update: {
+          action?: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          module_id?: string
+          super_admin_id?: string
+        }
+        Relationships: []
+      }
       super_admin_module_controls: {
         Row: {
           access_level: string | null
@@ -15194,6 +15713,135 @@ export type Database = {
           scope_value?: string
           updated_at?: string | null
           usage_count?: number | null
+        }
+        Relationships: []
+      }
+      super_admin_permission_views: {
+        Row: {
+          id: string
+          permission_id: string
+          super_admin_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          permission_id: string
+          super_admin_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          permission_id?: string
+          super_admin_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: []
+      }
+      super_admin_profiles: {
+        Row: {
+          assigned_continent_id: string | null
+          assigned_country_id: string | null
+          authority_scope: string | null
+          can_lock_scope: boolean | null
+          can_manage_admins: boolean | null
+          can_manage_rentals: boolean | null
+          can_manage_rules: boolean | null
+          can_manage_security: boolean | null
+          can_manage_users: boolean | null
+          created_at: string | null
+          id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_continent_id?: string | null
+          assigned_country_id?: string | null
+          authority_scope?: string | null
+          can_lock_scope?: boolean | null
+          can_manage_admins?: boolean | null
+          can_manage_rentals?: boolean | null
+          can_manage_rules?: boolean | null
+          can_manage_security?: boolean | null
+          can_manage_users?: boolean | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_continent_id?: string | null
+          assigned_country_id?: string | null
+          authority_scope?: string | null
+          can_lock_scope?: boolean | null
+          can_manage_admins?: boolean | null
+          can_manage_rentals?: boolean | null
+          can_manage_rules?: boolean | null
+          can_manage_security?: boolean | null
+          can_manage_users?: boolean | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      super_admin_region_actions: {
+        Row: {
+          action: string
+          action_data: Json | null
+          action_time: string | null
+          id: string
+          region_id: string
+          region_type: string
+          super_admin_id: string
+        }
+        Insert: {
+          action: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          region_id: string
+          region_type: string
+          super_admin_id: string
+        }
+        Update: {
+          action?: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          region_id?: string
+          region_type?: string
+          super_admin_id?: string
+        }
+        Relationships: []
+      }
+      super_admin_rental_actions: {
+        Row: {
+          action: string
+          action_data: Json | null
+          action_time: string | null
+          id: string
+          rental_id: string
+          super_admin_id: string
+        }
+        Insert: {
+          action: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          rental_id: string
+          super_admin_id: string
+        }
+        Update: {
+          action?: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          rental_id?: string
+          super_admin_id?: string
         }
         Relationships: []
       }
@@ -15290,6 +15938,27 @@ export type Database = {
           target_entity_id?: string | null
           view_type?: string
           viewer_id?: string
+        }
+        Relationships: []
+      }
+      super_admin_role_views: {
+        Row: {
+          id: string
+          role_id: string
+          super_admin_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          role_id: string
+          super_admin_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          role_id?: string
+          super_admin_id?: string
+          viewed_at?: string | null
         }
         Relationships: []
       }
@@ -15450,6 +16119,33 @@ export type Database = {
           },
         ]
       }
+      super_admin_security_actions: {
+        Row: {
+          action: string
+          action_data: Json | null
+          action_time: string | null
+          id: string
+          security_event_id: string
+          super_admin_id: string
+        }
+        Insert: {
+          action: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          security_event_id: string
+          super_admin_id: string
+        }
+        Update: {
+          action?: string
+          action_data?: Json | null
+          action_time?: string | null
+          id?: string
+          security_event_id?: string
+          super_admin_id?: string
+        }
+        Relationships: []
+      }
       super_admin_security_events: {
         Row: {
           action_taken: string | null
@@ -15588,6 +16284,30 @@ export type Database = {
           result_status?: string | null
           scope_validated?: boolean | null
           target_user_id?: string
+        }
+        Relationships: []
+      }
+      super_admin_user_views: {
+        Row: {
+          id: string
+          super_admin_id: string
+          user_id: string
+          view_context: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          super_admin_id: string
+          user_id: string
+          view_context?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          super_admin_id?: string
+          user_id?: string
+          view_context?: string | null
+          viewed_at?: string | null
         }
         Relationships: []
       }
@@ -15768,6 +16488,78 @@ export type Database = {
           timestamp?: string
           unit?: string | null
           value?: number | null
+        }
+        Relationships: []
+      }
+      system_locks: {
+        Row: {
+          force_logout_triggered: boolean | null
+          id: string
+          is_active: boolean | null
+          lock_scope: string
+          locked_at: string | null
+          locked_by_super_admin_id: string | null
+          reason: string
+          target_id: string | null
+          target_name: string | null
+          unlocked_at: string | null
+          unlocked_by: string | null
+        }
+        Insert: {
+          force_logout_triggered?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          lock_scope: string
+          locked_at?: string | null
+          locked_by_super_admin_id?: string | null
+          reason: string
+          target_id?: string | null
+          target_name?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+        }
+        Update: {
+          force_logout_triggered?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          lock_scope?: string
+          locked_at?: string | null
+          locked_by_super_admin_id?: string | null
+          reason?: string
+          target_id?: string | null
+          target_name?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+        }
+        Relationships: []
+      }
+      system_modules: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_critical: boolean | null
+          module_code: string
+          module_name: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_critical?: boolean | null
+          module_code: string
+          module_name: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_critical?: boolean | null
+          module_code?: string
+          module_name?: string
+          status?: string | null
         }
         Relationships: []
       }
@@ -16881,6 +17673,36 @@ export type Database = {
           location?: string | null
           login_at?: string | null
           logout_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_status_history: {
+        Row: {
+          changed_at: string | null
+          changed_by_super_admin_id: string | null
+          id: string
+          new_status: string
+          old_status: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by_super_admin_id?: string | null
+          id?: string
+          new_status: string
+          old_status?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by_super_admin_id?: string | null
+          id?: string
+          new_status?: string
+          old_status?: string | null
+          reason?: string | null
           user_id?: string
         }
         Relationships: []

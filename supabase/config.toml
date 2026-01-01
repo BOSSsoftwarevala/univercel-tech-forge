@@ -77,3 +77,24 @@ verify_jwt = false
 
 [functions.safe-assist-ai]
 verify_jwt = false
+
+[functions.super-admin-auth]
+verify_jwt = false
+
+[functions.super-admin-actions]
+verify_jwt = false
+
+[functions.super-admin-users]
+verify_jwt = false
+
+[functions.super-admin-security]
+verify_jwt = false
+
+[functions.super-admin-locks]
+verify_jwt = false
+
+[functions.super-admin-operations]
+verify_jwt = false
+
+[functions.super-admin-live]
+verify_jwt = false
