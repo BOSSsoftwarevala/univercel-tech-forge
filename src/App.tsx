@@ -155,6 +155,8 @@ import BulkActionsReference from "./pages/admin/BulkActionsReference";
 import AreaManagerDashboard from "./pages/area-manager/AreaManagerDashboard";
 import ContinentSuperAdminDashboard from "./pages/continent-super-admin/ContinentSuperAdminDashboard";
 
+// Product Demo Manager
+import ProductDemoManagerPage from "./pages/product-demo-manager";
 // Franchise Layout & Pages
 import FranchiseLayout from "./components/layouts/FranchiseLayout";
 import FranchiseDashboardPage from "./pages/franchise/Dashboard";
@@ -467,6 +469,10 @@ const App = () => (
               <Route path="/influencer-manager" element={<RequireRole allowed={["super_admin"]}><InfluencerManager /></RequireRole>} />
               <Route path="/influencer-manager-secure" element={<RequireRole allowed={["influencer_manager", "super_admin"]}><SecureInfluencerManagerDashboard /></RequireRole>} />
               
+              {/* Product Demo Manager Routes */}
+              <Route path="/product-demo-manager" element={<RequireRole allowed={["product_demo_manager", "demo_manager", "super_admin"]}><ProductDemoManagerPage /></RequireRole>} />
+              <Route path="/product-demo-manager/*" element={<RequireRole allowed={["product_demo_manager", "demo_manager", "super_admin"]}><ProductDemoManagerPage /></RequireRole>} />
+
               {/* Reseller Manager Routes */}
               <Route path="/reseller-manager" element={<RequireRole allowed={["reseller_manager", "super_admin"]}><SecureResellerManagerDashboard /></RequireRole>} />
               <Route path="/reseller-manager-secure" element={<RequireRole allowed={["reseller_manager", "super_admin"]}><SecureResellerManagerDashboard /></RequireRole>} />
