@@ -474,7 +474,7 @@ const RoleSwitchSidebar = ({
           : "bg-sidebar border-sidebar-border"
       )}
     >
-      {/* Header with Current Role */}
+      {/* Header - Generic Control Panel (no role name to avoid duplication) */}
       <div className="p-4 border-b border-sidebar-border/50">
         <div className="flex items-center gap-3">
           <div
@@ -493,8 +493,8 @@ const RoleSwitchSidebar = ({
                 exit={{ opacity: 0 }}
                 className="flex-1"
               >
-                <h2 className="text-sm font-bold text-foreground">{currentConfig.label}</h2>
-                <p className="text-xs text-muted-foreground">Control Panel</p>
+                <h2 className="text-sm font-bold text-foreground">Control Panel</h2>
+                <p className="text-xs text-muted-foreground">Navigation Menu</p>
               </motion.div>
             )}
           </AnimatePresence>
