@@ -451,9 +451,9 @@ serve(async (req: Request) => {
     }, { module: "wallet", action: "withdraw" });
   }
 
-  // POST /wallet/payout/approve - Super Admin/Master only
+  // POST /wallet/payout/approve - Boss Owner only
   if (path === "/payout/approve" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "master"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["payout_id"]);
       if (validation) return errorResponse(validation);
 
@@ -482,9 +482,9 @@ serve(async (req: Request) => {
     }, { module: "wallet", action: "payout_approve" });
   }
 
-  // POST /wallet/payout/reject - Super Admin/Master only
+  // POST /wallet/payout/reject - Boss Owner only
   if (path === "/payout/reject" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "master"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["payout_id"]);
       if (validation) return errorResponse(validation);
 
@@ -523,7 +523,7 @@ serve(async (req: Request) => {
       const limit = Math.min(100, Math.max(1, parseInt(urlParams.searchParams.get("limit") || "50")));
 
       // Check if user is admin
-      const isAdmin = ["super_admin", "master", "finance_manager"].includes(user.role);
+      const isAdmin = ["boss_owner", "finance_manager"].includes(user.role);
 
       let query = supabaseAdmin
         .from("payout_requests")
@@ -547,14 +547,14 @@ serve(async (req: Request) => {
       return jsonResponse({
         payouts: payouts || [],
         pagination: { page, limit, total: count || 0 },
-        can_approve: ["super_admin", "master"].includes(user.role),
+        can_approve: user.role === "boss_owner",
       });
     }, { module: "wallet", action: "payouts_list" });
   }
 
   // POST /wallet/transfer
   if (path === "/transfer" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "admin", "finance_manager"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner", "admin", "finance_manager"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["from_user_id", "to_user_id", "amount", "reference"]);
       if (validation) return errorResponse(validation);
 

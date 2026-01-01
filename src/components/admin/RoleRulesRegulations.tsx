@@ -37,37 +37,18 @@ interface RoleDefinition {
 
 const roleDefinitions: RoleDefinition[] = [
   {
-    role: 'master',
-    label: 'Master Admin',
+    role: 'boss_owner',
+    label: 'Boss Owner',
     icon: Crown,
-    color: 'text-red-500 bg-red-500/20',
+    color: 'text-amber-500 bg-amber-500/20',
     tier: 'admin',
     hierarchyLevel: 110,
     description: 'Supreme system authority with unrestricted access to all modules and functions.',
-    permissions: ['Full system access', 'Create/delete any role', 'Override all restrictions', 'Access master logs', 'Force logout any user', 'Manage super admins'],
+    permissions: ['Full system access', 'Create/delete any role', 'Override all restrictions', 'Access all logs', 'Force logout any user', 'Manage all admins'],
     restrictions: ['None - full bypass authority'],
     rules: [
-      { category: 'Authority', rules: ['Can assign/revoke any role including super_admin', 'Bypass all security checks', 'Access encrypted audit logs'] },
+      { category: 'Authority', rules: ['Can assign/revoke any role', 'Bypass all security checks', 'Access encrypted audit logs'] },
       { category: 'Responsibility', rules: ['Must maintain audit trail', 'Cannot be force logged out', 'Actions are permanently logged'] }
-    ],
-    kycRequired: false,
-    ipLockRequired: false,
-    subscriptionRequired: false
-  },
-  {
-    role: 'super_admin',
-    label: 'Super Admin',
-    icon: Crown,
-    color: 'text-yellow-500 bg-yellow-500/20',
-    tier: 'admin',
-    hierarchyLevel: 100,
-    description: 'Top-level administrator with access to all system modules except master-only functions.',
-    permissions: ['Access all modules', 'Manage all users', 'View all financials', 'Approve/reject users', 'Force logout users', 'Configure system settings'],
-    restrictions: ['Cannot access master logs', 'Cannot modify master role', 'Cannot delete master actions'],
-    rules: [
-      { category: 'User Management', rules: ['Approve new user registrations', 'Assign roles up to admin level', 'Force logout any non-master user'] },
-      { category: 'Financial', rules: ['View all wallet transactions', 'Approve large payouts', 'Configure commission structures'] },
-      { category: 'Security', rules: ['Monitor security alerts', 'Review suspicious activities', 'Manage IP locks'] }
     ],
     kycRequired: false,
     ipLockRequired: false,

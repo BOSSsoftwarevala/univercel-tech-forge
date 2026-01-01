@@ -16,7 +16,7 @@ serve(async (req: Request) => {
 
   // POST /tasks/create
   if (path === "/create" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "admin", "task_manager", "lead_manager"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner", "admin", "task_manager", "lead_manager"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["title", "category"]);
       if (validation) return errorResponse(validation);
 
@@ -78,7 +78,7 @@ serve(async (req: Request) => {
 
   // PUT /tasks/assign
   if (path === "/assign" && req.method === "PUT") {
-    return withAuth(req, ["super_admin", "admin", "task_manager"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner", "admin", "task_manager"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["task_id", "developer_id"]);
       if (validation) return errorResponse(validation);
 

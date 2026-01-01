@@ -97,7 +97,7 @@ const GlobalNotificationHeader = ({
   // Filter notifications based on role
   const filteredNotifications = notifications.filter(n => {
     if (!n.roleTarget || n.roleTarget.length === 0) return true;
-    return n.roleTarget.includes(userRole) || userRole === 'super_admin';
+    return n.roleTarget.includes(userRole) || userRole === 'boss_owner';
   });
 
   const buzzerNotifications = filteredNotifications.filter(n => n.isBuzzer && n.type === 'priority');

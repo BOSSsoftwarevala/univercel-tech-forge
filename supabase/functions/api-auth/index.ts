@@ -215,14 +215,14 @@ serve(async (req: Request) => {
     }, { module: "auth", action: "logout" });
   }
 
-  // POST /auth/logout-all (Master/Super Admin) - revoke refresh tokens + set force logout flag
+  // POST /auth/logout-all (Boss Owner) - revoke refresh tokens + set force logout flag
   if (path === "/logout-all" && req.method === "POST") {
-    return withAuth(req, ["super_admin"], async ({ supabaseAdmin, user, clientIP, deviceId }) => {
+    return withAuth(req, ["boss_owner"], async ({ supabaseAdmin, user, clientIP, deviceId }) => {
       // Get all users to logout (exclude privileged)
       const { data: rows, error } = await supabaseAdmin
         .from("user_roles")
         .select("user_id, role")
-        .not("role", "in", "(master,super_admin)");
+        .not("role", "in", "(boss_owner)");
 
       if (error) return errorResponse(error.message, 400);
 

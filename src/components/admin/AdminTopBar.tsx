@@ -130,7 +130,7 @@ const AdminTopBar = ({
 
         {/* Global Notification Header */}
         <GlobalNotificationHeader
-          userRole="super_admin"
+          userRole="boss_owner"
           notifications={notifications}
           onDismiss={onDismissNotification}
           onAction={onNotificationAction}

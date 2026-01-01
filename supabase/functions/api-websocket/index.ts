@@ -95,7 +95,7 @@ function broadcastEvent(event: WebSocketEvent) {
         shouldSend = true;
       }
       // Broadcast to admins for all events
-      else if (client.role === "super_admin" || client.role === "admin") {
+      else if (client.role === "boss_owner" || client.role === "admin") {
         shouldSend = true;
       }
       // Role-specific broadcasts

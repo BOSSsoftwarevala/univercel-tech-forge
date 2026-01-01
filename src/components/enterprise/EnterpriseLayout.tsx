@@ -9,7 +9,7 @@ interface EnterpriseLayoutProps {
   userRole?: string;
 }
 
-export function EnterpriseLayout({ userRole = "super_admin" }: EnterpriseLayoutProps) {
+export function EnterpriseLayout({ userRole = "boss_owner" }: EnterpriseLayoutProps) {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-[hsl(var(--sv-navy-deep))]">

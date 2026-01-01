@@ -8,7 +8,7 @@ const FloatingAIChatbotWrapper = () => {
   const getUserRoleFromRoute = (): string => {
     const path = location.pathname;
     
-    if (path.includes('super-admin') || path.includes('admin')) return 'super_admin';
+    if (path.includes('super-admin') || path.includes('admin') || path.includes('master')) return 'boss_owner';
     if (path.includes('franchise')) return 'franchise';
     if (path.includes('reseller')) return 'reseller';
     if (path.includes('developer')) return 'developer';
