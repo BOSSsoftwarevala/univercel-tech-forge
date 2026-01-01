@@ -36,6 +36,7 @@ import AccountSuspension from "./pages/auth/AccountSuspension";
 import AccessDenied from "./pages/auth/AccessDenied";
 import PendingApproval from "./pages/auth/PendingApproval";
 import BossFortressAuth from "./pages/auth/BossFortressAuth";
+import BossRegister from "./pages/auth/BossRegister";
 import EasyAuth from "./pages/auth/EasyAuth";
 
 // Public Pages
@@ -367,6 +368,7 @@ const App = () => (
 
               {/* Boss Fortress Auth - Ultra Secure */}
               <Route path="/boss-fortress" element={<BossFortressAuth />} />
+              <Route path="/boss-register" element={<BossRegister />} />
 
               {/* Hidden Master Auth - Secret Route */}
               <Route path="/sv-master-control" element={<MasterAuth />} />
