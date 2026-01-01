@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutGrid, Globe2, Users, Shield, AlertTriangle, 
   Eye, FileText, Lock, Activity, Zap, TrendingUp,
-  Clock, Bell, Box, Brain, Radio
+  Clock, Bell, Box, Brain, Radio, Lightbulb, HeartHandshake, Radar
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +22,11 @@ import { ApprovalsModule } from './modules/ApprovalsModule';
 import { SecurityMonitorModule } from './modules/SecurityMonitorModule';
 import { AuditModule } from './modules/AuditModule';
 import { SystemLockModule } from './modules/SystemLockModule';
+import { RnDControlModule } from './modules/RnDControlModule';
+import { ClientSuccessControlModule } from './modules/ClientSuccessControlModule';
+import { AISurveillanceModule } from './modules/AISurveillanceModule';
 
-type ModuleId = 'overview' | 'continents' | 'super-admins' | 'global-rules' | 'approvals' | 'security' | 'audit' | 'system-lock';
+type ModuleId = 'overview' | 'continents' | 'super-admins' | 'global-rules' | 'approvals' | 'security' | 'audit' | 'system-lock' | 'rnd' | 'client-success' | 'ai-surveillance';
 
 interface SidebarModule {
   id: ModuleId;
@@ -32,15 +35,19 @@ interface SidebarModule {
   theme: string;
   glow: string;
   accentColor: string;
+  isAIOperated?: boolean;
 }
 
 const modules: SidebarModule[] = [
   { id: 'overview', label: 'Overview', icon: LayoutGrid, theme: 'from-black via-slate-950 to-blue-950', glow: 'shadow-blue-500/20', accentColor: 'blue' },
+  { id: 'ai-surveillance', label: 'AI Surveillance', icon: Radar, theme: 'from-black via-cyan-950 to-blue-950', glow: 'shadow-cyan-500/20', accentColor: 'cyan', isAIOperated: true },
   { id: 'continents', label: 'Continents', icon: Globe2, theme: 'from-black via-emerald-950 to-teal-950', glow: 'shadow-emerald-500/20', accentColor: 'emerald' },
   { id: 'super-admins', label: 'Super Admins', icon: Users, theme: 'from-black via-indigo-950 to-blue-950', glow: 'shadow-amber-500/20', accentColor: 'amber' },
   { id: 'global-rules', label: 'Global Rules', icon: Shield, theme: 'from-black via-slate-950 to-cyan-950', glow: 'shadow-cyan-500/20', accentColor: 'cyan' },
   { id: 'approvals', label: 'Approvals', icon: AlertTriangle, theme: 'from-black via-red-950 to-orange-950', glow: 'shadow-red-500/20', accentColor: 'red' },
   { id: 'security', label: 'Security Monitor', icon: Eye, theme: 'from-black via-green-950 to-emerald-950', glow: 'shadow-green-500/20', accentColor: 'green' },
+  { id: 'rnd', label: 'R&D Control', icon: Lightbulb, theme: 'from-black via-violet-950 to-purple-950', glow: 'shadow-violet-500/20', accentColor: 'violet', isAIOperated: true },
+  { id: 'client-success', label: 'Client Success', icon: HeartHandshake, theme: 'from-black via-rose-950 to-pink-950', glow: 'shadow-rose-500/20', accentColor: 'rose', isAIOperated: true },
   { id: 'audit', label: 'Audit', icon: FileText, theme: 'from-black via-slate-950 to-blue-950', glow: 'shadow-blue-400/20', accentColor: 'blue' },
   { id: 'system-lock', label: 'System Lock', icon: Lock, theme: 'from-black to-red-950', glow: 'shadow-red-600/30', accentColor: 'red' },
 ];
@@ -65,11 +72,14 @@ function MasterAdminContent() {
   const renderModule = () => {
     switch (activeModule) {
       case 'overview': return <OverviewModule />;
+      case 'ai-surveillance': return <AISurveillanceModule />;
       case 'continents': return <ContinentsModule />;
       case 'super-admins': return <SuperAdminsModule />;
       case 'global-rules': return <GlobalRulesModule />;
       case 'approvals': return <ApprovalsModule />;
       case 'security': return <SecurityMonitorModule />;
+      case 'rnd': return <RnDControlModule />;
+      case 'client-success': return <ClientSuccessControlModule />;
       case 'audit': return <AuditModule />;
       case 'system-lock': return <SystemLockModule />;
       default: return <OverviewModule />;
