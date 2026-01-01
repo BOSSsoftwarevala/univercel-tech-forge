@@ -26,6 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import CountryAdminDashboard from "./CountryAdminDashboard";
 
 export interface CountryData {
   id: string;
@@ -207,6 +208,7 @@ interface ContinentDashboardProps {
 const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
   const config = continentConfigs[continent];
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
+  const [viewingCountryAdmin, setViewingCountryAdmin] = useState<CountryData | null>(null);
   const [mapView, setMapView] = useState<"franchise" | "reseller" | "leads">("franchise");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -215,6 +217,17 @@ const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
       <div className="h-full flex items-center justify-center">
         <p className="text-slate-400">Configuration not found for {continent}</p>
       </div>
+    );
+  }
+
+  // If viewing a country admin dashboard, render it
+  if (viewingCountryAdmin) {
+    return (
+      <CountryAdminDashboard 
+        country={viewingCountryAdmin} 
+        continent={continent} 
+        onBack={() => setViewingCountryAdmin(null)} 
+      />
     );
   }
 
@@ -555,8 +568,16 @@ const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button className="flex-1" size="sm">View Details</Button>
-                          <Button variant="outline" size="sm">View Admin</Button>
+                          <Button 
+                            className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700" 
+                            size="sm"
+                            onClick={() => setViewingCountryAdmin(selectedCountry)}
+                          >
+                            Enter Country Dashboard
+                          </Button>
+                          <Button variant="outline" size="sm" className="border-cyan-500/50 text-cyan-400">
+                            <Eye className="w-4 h-4" />
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
