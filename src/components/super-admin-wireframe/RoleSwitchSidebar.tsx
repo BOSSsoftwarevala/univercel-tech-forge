@@ -2,10 +2,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
-  Globe2, MapPin, Server, ChevronLeft, ChevronRight,
+  Globe2, MapPin, Server, ChevronLeft, ChevronRight, ArrowLeft,
   Crown, LayoutDashboard, Users, Shield, Activity,
   Settings, LogOut, AlertCircle, Building2, Headphones, Handshake,
-  Target, Star, Scale, ListTodo, Wallet
+  Target, Star, Scale, ListTodo, Wallet, FileText, Receipt, 
+  TrendingUp, CreditCard, PieChart, BarChart3, Clock, Code2,
+  UserCheck, Briefcase, Award, MessageSquare, Phone, Mail,
+  Package, Truck, Store, Map, Database, HardDrive, Cpu,
+  Monitor, Zap, Lock, Key, Gavel, FileCheck, BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -148,71 +152,111 @@ const roleConfigs = {
   },
 } as const;
 
-// Navigation items per role
+// Extended navigation items per role - role-specific features
 const roleNavItems = {
   continent_super_admin: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Continent Admins", icon: Users },
+    { id: "continents", label: "All Continents", icon: Globe2 },
+    { id: "admins", label: "Continent Admins", icon: Users },
+    { id: "countries", label: "Country Overview", icon: Map },
     { id: "activity", label: "Live Activity", icon: Activity },
+    { id: "reports", label: "Global Reports", icon: BarChart3 },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   area_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Area Managers", icon: Users },
+    { id: "managers", label: "All Area Managers", icon: Users },
+    { id: "regions", label: "Regions & Zones", icon: Map },
+    { id: "performance", label: "Performance", icon: TrendingUp },
     { id: "activity", label: "Area Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   server_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Server Managers", icon: Users },
+    { id: "servers", label: "All Servers", icon: Server },
+    { id: "databases", label: "Databases", icon: Database },
+    { id: "storage", label: "Storage", icon: HardDrive },
+    { id: "monitoring", label: "Monitoring", icon: Monitor },
+    { id: "performance", label: "Performance", icon: Cpu },
+    { id: "security", label: "Security", icon: Shield },
     { id: "activity", label: "Tech Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   franchise_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Franchises", icon: Building2 },
+    { id: "franchises", label: "All Franchises", icon: Building2 },
+    { id: "branches", label: "Branch Network", icon: Store },
+    { id: "operations", label: "Operations", icon: Briefcase },
+    { id: "performance", label: "Performance", icon: TrendingUp },
     { id: "activity", label: "Franchise Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   sales_support_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Managers", icon: Users },
+    { id: "team", label: "Support Team", icon: Users },
+    { id: "tickets", label: "Support Tickets", icon: MessageSquare },
+    { id: "calls", label: "Call Center", icon: Phone },
+    { id: "emails", label: "Email Queue", icon: Mail },
+    { id: "performance", label: "Performance", icon: TrendingUp },
     { id: "activity", label: "Support Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   reseller_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Resellers", icon: Handshake },
+    { id: "resellers", label: "All Resellers", icon: Handshake },
+    { id: "tiers", label: "Reseller Tiers", icon: Award },
+    { id: "commissions", label: "Commissions", icon: CreditCard },
+    { id: "performance", label: "Performance", icon: TrendingUp },
+    { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "activity", label: "Partner Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   lead_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Lead Managers", icon: Target },
+    { id: "leads", label: "All Leads", icon: Target },
+    { id: "pipeline", label: "Sales Pipeline", icon: TrendingUp },
+    { id: "sources", label: "Lead Sources", icon: Zap },
+    { id: "assignments", label: "Assignments", icon: UserCheck },
     { id: "activity", label: "Lead Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   pro_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Pro Managers", icon: Crown },
+    { id: "pros", label: "All Pro Users", icon: Crown },
+    { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
+    { id: "benefits", label: "Pro Benefits", icon: Award },
+    { id: "upgrades", label: "Upgrades", icon: TrendingUp },
     { id: "activity", label: "Pro Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   legal_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Legal Managers", icon: Scale },
+    { id: "cases", label: "Legal Cases", icon: Gavel },
+    { id: "contracts", label: "Contracts", icon: FileCheck },
+    { id: "compliance", label: "Compliance", icon: Shield },
+    { id: "documents", label: "Documents", icon: BookOpen },
     { id: "activity", label: "Legal Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   task_management: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Tasks", icon: ListTodo },
+    { id: "tasks", label: "All Tasks", icon: ListTodo },
+    { id: "developers", label: "Developers", icon: Code2 },
+    { id: "projects", label: "Projects", icon: Package },
+    { id: "sprints", label: "Sprints", icon: Zap },
     { id: "activity", label: "Task Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   finance_manager: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "list", label: "All Finance Managers", icon: Wallet },
+    { id: "managers", label: "All Finance Managers", icon: Users },
+    { id: "transactions", label: "Transactions", icon: Receipt },
+    { id: "revenue", label: "Revenue", icon: TrendingUp },
+    { id: "expenses", label: "Expenses", icon: CreditCard },
+    { id: "commissions", label: "Commissions", icon: PieChart },
+    { id: "payouts", label: "Payouts", icon: Wallet },
+    { id: "invoices", label: "Invoices", icon: FileText },
+    { id: "tax", label: "Tax & Compliance", icon: Scale },
     { id: "activity", label: "Finance Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
@@ -228,6 +272,17 @@ const RoleSwitchSidebar = ({
   const currentConfig = roleConfigs[activeRole];
   const currentNavItems = roleNavItems[activeRole];
   const [activeNav, setActiveNav] = useState("dashboard");
+  const [isDrilledDown, setIsDrilledDown] = useState(false);
+
+  const handleRoleSelect = (roleId: ActiveRole) => {
+    onRoleChange(roleId);
+    setIsDrilledDown(true);
+    setActiveNav("dashboard");
+  };
+
+  const handleBackToRoles = () => {
+    setIsDrilledDown(false);
+  };
 
   return (
     <motion.aside
@@ -238,6 +293,8 @@ const RoleSwitchSidebar = ({
         "flex flex-col border-r transition-colors duration-300",
         activeRole === "server_manager" 
           ? "bg-zinc-900 border-zinc-700" 
+          : activeRole === "finance_manager"
+          ? "bg-emerald-950 border-emerald-800"
           : "bg-sidebar border-sidebar-border"
       )}
     >
@@ -266,145 +323,230 @@ const RoleSwitchSidebar = ({
         </div>
       </div>
 
-      {/* Role Switch Section */}
-      <div className="p-3 border-b border-sidebar-border/50">
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2"
-            >
-              Switch Role View
-            </motion.p>
-          )}
-        </AnimatePresence>
-        
-        <div className="space-y-1">
-          {Object.values(roleConfigs).map((role) => {
-            const Icon = role.icon;
-            const isActive = activeRole === role.id;
+      <AnimatePresence mode="wait">
+        {!isDrilledDown ? (
+          /* Role Switch Section - Show all roles */
+          <motion.div
+            key="role-list"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="flex-1 overflow-hidden"
+          >
+            <ScrollArea className="h-full">
+              <div className="p-3">
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2"
+                    >
+                      Switch Role View
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+                
+                <div className="space-y-1">
+                  {Object.values(roleConfigs).map((role) => {
+                    const Icon = role.icon;
+                    const isActive = activeRole === role.id;
 
-            return (
-              <Tooltip key={role.id} delayDuration={0}>
+                    return (
+                      <Tooltip key={role.id} delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleRoleSelect(role.id as ActiveRole);
+                            }}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                              isActive
+                                ? cn("border-l-4", role.bgAccent, role.borderAccent, role.accentColor)
+                                : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground border-l-4 border-transparent"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                              isActive 
+                                ? cn("bg-gradient-to-br", role.themeColor)
+                                : "bg-sidebar-accent"
+                            )}>
+                              <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-muted-foreground")} />
+                            </div>
+                            <AnimatePresence>
+                              {!collapsed && (
+                                <motion.div
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  className="flex-1 text-left"
+                                >
+                                  <span className="text-sm font-medium block">{role.label}</span>
+                                  <span className="text-xs text-muted-foreground">{role.description}</span>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                            {!collapsed && (
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </button>
+                        </TooltipTrigger>
+                        {collapsed && (
+                          <TooltipContent side="right" sideOffset={10}>
+                            <div>
+                              <p className="font-medium">{role.label}</p>
+                              <p className="text-xs text-muted-foreground">{role.description}</p>
+                            </div>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              </div>
+            </ScrollArea>
+          </motion.div>
+        ) : (
+          /* Drilled-down view - Show only active role's features */
+          <motion.div
+            key="role-detail"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="flex-1 overflow-hidden flex flex-col"
+          >
+            {/* Back button and active role header */}
+            <div className="p-3 border-b border-sidebar-border/50">
+              <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onRoleChange(role.id as ActiveRole);
-                    }}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBackToRoles}
                     className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                      isActive
-                        ? cn("border-l-4", role.bgAccent, role.borderAccent, role.accentColor)
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground border-l-4 border-transparent"
+                      "w-full gap-2 mb-3",
+                      collapsed ? "justify-center px-0" : "justify-start"
                     )}
                   >
-                    <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                      isActive 
-                        ? cn("bg-gradient-to-br", role.themeColor)
-                        : "bg-sidebar-accent"
-                    )}>
-                      <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-muted-foreground")} />
-                    </div>
-                    <AnimatePresence>
-                      {!collapsed && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex-1 text-left"
-                        >
-                          <span className="text-sm font-medium block">{role.label}</span>
-                          <span className="text-xs text-muted-foreground">{role.description}</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    {isActive && !collapsed && (
-                      <Badge variant="outline" className={cn("text-xs", role.accentColor, role.borderAccent)}>
+                    <ArrowLeft className="w-4 h-4" />
+                    {!collapsed && <span>Back to Roles</span>}
+                  </Button>
+                </TooltipTrigger>
+                {collapsed && (
+                  <TooltipContent side="right" sideOffset={10}>
+                    Back to Roles
+                  </TooltipContent>
+                )}
+              </Tooltip>
+
+              {/* Current Role Badge */}
+              <div className={cn(
+                "flex items-center gap-3 p-3 rounded-xl",
+                currentConfig.bgAccent,
+                "border",
+                currentConfig.borderAccent
+              )}>
+                <div className={cn(
+                  "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br",
+                  currentConfig.themeColor
+                )}>
+                  <currentConfig.icon className="w-5 h-5 text-white" />
+                </div>
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex-1"
+                    >
+                      <span className={cn("text-sm font-bold block", currentConfig.accentColor)}>
+                        {currentConfig.label}
+                      </span>
+                      <Badge variant="outline" className={cn("text-xs mt-1", currentConfig.accentColor, currentConfig.borderAccent)}>
                         Active
                       </Badge>
-                    )}
-                  </button>
-                </TooltipTrigger>
-                {collapsed && (
-                  <TooltipContent side="right" sideOffset={10}>
-                    <div>
-                      <p className="font-medium">{role.label}</p>
-                      <p className="text-xs text-muted-foreground">{role.description}</p>
-                    </div>
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            );
-          })}
-        </div>
-      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
 
-      {/* Navigation for active role */}
-      <ScrollArea className="flex-1 py-4">
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-5"
-            >
-              {currentConfig.shortLabel} Navigation
-            </motion.p>
-          )}
-        </AnimatePresence>
-        
-        <nav className="space-y-1 px-3">
-          {currentNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeNav === item.id;
-
-            return (
-              <Tooltip key={item.id} delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setActiveNav(item.id);
-                    }}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                      isActive
-                        ? cn(currentConfig.bgAccent, currentConfig.accentColor, "border-l-2", currentConfig.borderAccent)
-                        : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/50"
-                    )}
+            {/* Role-specific Navigation */}
+            <ScrollArea className="flex-1 py-4">
+              <AnimatePresence>
+                {!collapsed && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-5"
                   >
-                    <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && currentConfig.accentColor)} />
-                    <AnimatePresence>
-                      {!collapsed && (
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="text-sm font-medium truncate"
-                        >
-                          {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </button>
-                </TooltipTrigger>
-                {collapsed && (
-                  <TooltipContent side="right" sideOffset={10}>
-                    {item.label}
-                  </TooltipContent>
+                    {currentConfig.shortLabel} Features
+                  </motion.p>
                 )}
-              </Tooltip>
-            );
-          })}
-        </nav>
-      </ScrollArea>
+              </AnimatePresence>
+              
+              <nav className="space-y-1 px-3">
+                {currentNavItems.map((item, idx) => {
+                  const Icon = item.icon;
+                  const isActive = activeNav === item.id;
+
+                  return (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.03 }}
+                    >
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setActiveNav(item.id);
+                            }}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                              isActive
+                                ? cn(currentConfig.bgAccent, currentConfig.accentColor, "border-l-2", currentConfig.borderAccent)
+                                : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/50"
+                            )}
+                          >
+                            <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && currentConfig.accentColor)} />
+                            <AnimatePresence>
+                              {!collapsed && (
+                                <motion.span
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  className="text-sm font-medium truncate"
+                                >
+                                  {item.label}
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
+                          </button>
+                        </TooltipTrigger>
+                        {collapsed && (
+                          <TooltipContent side="right" sideOffset={10}>
+                            {item.label}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </motion.div>
+                  );
+                })}
+              </nav>
+            </ScrollArea>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border/50 space-y-2">
