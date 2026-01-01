@@ -1,11 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Globe2, Bell, Timer, AlertCircle, Shield } from "lucide-react";
+import { Globe2, Bell, Timer, AlertCircle, Shield, Bot, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { SafeAssistTrigger } from "@/components/support/SafeAssistTrigger";
+import promiseIcon from "@/assets/promise-icon.jpg";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
@@ -42,6 +45,26 @@ const RoleSwitchDashboard = () => {
   const [sessionTime, setSessionTime] = useState(0);
   const [riskLevel] = useState<"low" | "medium" | "high">("low");
   const [liveAlerts] = useState(3);
+  const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
+
+  const handlePromiseClick = useCallback(() => {
+    if (promiseState === 'idle') {
+      setPromiseState('pending');
+      toast.success('Promise mode activated');
+    } else if (promiseState === 'pending') {
+      setPromiseState('active');
+      toast.success('Task is now active');
+    } else {
+      setPromiseState('idle');
+      toast.info('Promise mode deactivated');
+    }
+  }, [promiseState]);
+
+  const handleChatbotClick = useCallback(() => {
+    toast.success('AI Assistant Ready', {
+      description: 'How can I help you today?'
+    });
+  }, []);
 
   // Apply role from URL (prevents accidental switching to legacy pages)
   useEffect(() => {
@@ -197,9 +220,69 @@ const RoleSwitchDashboard = () => {
           </div>
         </div>
 
-        {/* Right - Profile */}
+        {/* Right - Action Buttons & Profile */}
         <div className="flex items-center gap-3">
-          <div className="text-right">
+          {/* Promise Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handlePromiseClick}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all shadow-md",
+              promiseState === 'active'
+                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white border border-green-400/50'
+                : promiseState === 'pending'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border border-amber-400/50 animate-pulse'
+                : 'bg-secondary/80 text-foreground border border-border/50 hover:border-primary/50'
+            )}
+          >
+            <img src={promiseIcon} alt="Promise" className="w-5 h-5 rounded-full object-cover" />
+            <span className="hidden lg:inline">
+              {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
+            </span>
+          </motion.button>
+
+          {/* Safe Assist Button */}
+          <SafeAssistTrigger variant="compact" />
+
+          {/* AI Chatbot Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleChatbotClick}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white font-medium text-sm shadow-lg border border-purple-400/30"
+          >
+            <Bot className="w-4 h-4" />
+            <span className="hidden lg:inline">AI Chat</span>
+          </motion.button>
+
+          {/* Alerts Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={cn(
+              "relative flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all shadow-md",
+              liveAlerts > 0
+                ? "bg-gradient-to-r from-red-600 to-rose-600 text-white border border-red-400/50"
+                : "bg-secondary/80 text-foreground border border-border/50"
+            )}
+          >
+            <Bell className="w-4 h-4" />
+            <span className="hidden lg:inline">Alerts</span>
+            {liveAlerts > 0 && (
+              <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-red-600 text-xs rounded-full flex items-center justify-center font-bold shadow-md">
+                {liveAlerts}
+              </span>
+            )}
+          </motion.button>
+
+          {/* Internal Chat */}
+          <Button variant="ghost" size="icon" onClick={() => navigate('/internal-chat')}>
+            <MessageSquare className="w-5 h-5" />
+          </Button>
+
+          {/* Profile */}
+          <div className="text-right hidden md:block">
             <p className="text-sm font-medium">Super Admin</p>
             <p className="text-xs text-muted-foreground font-mono">SA-XXXX-001</p>
           </div>
