@@ -16,6 +16,7 @@ import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
 import GlobalOfferPopup from "@/components/offers/GlobalOfferPopup";
 import Homepage from "./pages/Homepage";
+import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CategoryOnboarding from "./pages/CategoryOnboarding";
@@ -277,8 +278,9 @@ const App = () => (
                           <FloatingAIChatbotWrapper />
                           <Routes>
                           {/* Public Routes - No login required */}
-              <Route path="/" element={<Homepage />} />
-              <Route path="/demos" element={<SimpleDemoList />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/demos" element={<Index />} />
+              <Route path="/products" element={<Index />} />
               <Route path="/products" element={<SimpleDemoList />} />
               <Route path="/demo/:demoId" element={<SimpleDemoView />} />
               <Route path="/checkout/:demoId" element={<SimpleCheckout />} />
@@ -302,8 +304,8 @@ const App = () => (
               <Route path="/demo-directory" element={<DemoDirectory />} />
               <Route path="/demo/:role" element={<DemoAccess />} />
               <Route path="/demo-login" element={<DemoLogin />} />
-              <Route path="/showcase" element={<DemoShowcase />} />
-              <Route path="/demos" element={<PremiumDemoShowcase />} />
+              <Route path="/showcase" element={<Index />} />
+              <Route path="/premium-demos" element={<PremiumDemoShowcase />} />
               
               {/* Product Demo Pages - Direct Access, Software Vala Branded */}
               <Route path="/demo/restaurant-pos" element={<RestaurantPOSDemo />} />
