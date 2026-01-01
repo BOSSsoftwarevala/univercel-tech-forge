@@ -7,8 +7,8 @@ import { toast } from "sonner";
 import { Loader2, Shield, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 
 const PERMANENT_USERS = [
-  { email: "manojcopy264@gmail.com", role: "master", grade: "GRADE 0 — OWNERSHIP" },
-  { email: "superadmin@gmail.com", role: "super_admin", grade: "GRADE 1 — PLATFORM CONTROL" },
+  { email: "manojcopy264@gmail.com", role: "boss_owner", grade: "GRADE 0 — OWNERSHIP" },
+  { email: "ceo@gmail.com", role: "ceo", grade: "GRADE 0 — EXECUTIVE" },
   { email: "admin@gmail.com", role: "admin", grade: "GRADE 1" },
   { email: "servermanager@gmail.com", role: "server_manager", grade: "GRADE 1" },
   { email: "franchisemanager@gmail.com", role: "franchise_manager", grade: "GRADE 2 — BUSINESS" },

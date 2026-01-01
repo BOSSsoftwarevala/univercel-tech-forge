@@ -62,7 +62,7 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
  * 5. No role → Public demos page
  */
 const Dashboard = () => {
-  const { user, userRole, approvalStatus, loading, isPrivileged, isMaster, isSuperAdmin } = useAuth();
+  const { user, userRole, approvalStatus, loading, isPrivileged, isBossOwner, isCEO } = useAuth();
   const navigate = useNavigate();
   const hasNavigated = useRef(false);
   const [status, setStatus] = useState<'loading' | 'checking' | 'redirecting'>('loading');
@@ -98,18 +98,18 @@ const Dashboard = () => {
       return () => clearTimeout(timeoutId);
     }
 
-    // MASTER ADMIN: Goes to master admin dashboard
-    if (isMaster) {
-      console.log('[Dashboard] Master Admin → /master-admin');
+    // BOSS OWNER: Goes to super admin dashboard (merged master + super_admin)
+    if (isBossOwner) {
+      console.log('[Dashboard] Boss Owner → /super-admin');
       setStatus('redirecting');
       hasNavigated.current = true;
-      navigate('/master-admin', { replace: true });
+      navigate('/super-admin', { replace: true });
       return;
     }
 
-    // SUPER ADMIN: Goes to super admin command center
-    if (isSuperAdmin) {
-      console.log('[Dashboard] Super Admin → /super-admin');
+    // CEO: Goes to super admin command center
+    if (isCEO) {
+      console.log('[Dashboard] CEO → /super-admin');
       setStatus('redirecting');
       hasNavigated.current = true;
       navigate('/super-admin', { replace: true });

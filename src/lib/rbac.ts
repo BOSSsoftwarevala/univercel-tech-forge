@@ -8,11 +8,12 @@ import { Database } from '@/integrations/supabase/types';
 
 export type AppRole = Database['public']['Enums']['app_role'];
 
-// Complete role hierarchy with numeric levels for comparison (29 roles)
+// Complete role hierarchy with numeric levels for comparison
+// NOTE: master and super_admin merged into boss_owner
 export const ROLE_HIERARCHY: Partial<Record<AppRole, number>> = {
-  master: 110, // Master admin - highest level
-  super_admin: 100,
-  server_manager: 95, // Infrastructure control - below Super Admin, above Area Manager
+  boss_owner: 110, // Boss Owner - highest level (merged master + super_admin)
+  ceo: 105, // CEO - below Boss Owner
+  server_manager: 95, // Infrastructure control - below CEO, above Area Manager
   area_manager: 90, // Now redirects to Country Head dashboard
   finance_manager: 85,
   legal_compliance: 80,
@@ -51,15 +52,16 @@ export const KYC_REQUIRED_ROLES: AppRole[] = ['franchise', 'reseller', 'develope
 // Roles requiring active subscription
 export const SUBSCRIPTION_REQUIRED_ROLES: AppRole[] = ['franchise', 'reseller', 'prime'];
 
-// Masked ID configuration by role (digit counts) - 28 roles
+// Masked ID configuration by role (digit counts)
+// NOTE: master and super_admin merged into boss_owner
 export const MASKED_ID_CONFIG: Record<string, { 
   prefix: string; 
   digits: number; 
   icon: string;
   displayName: string;
 }> = {
-  master: { prefix: '🔱 MASTER', digits: 1, icon: 'Crown', displayName: 'Master Admin' },
-  super_admin: { prefix: '👑 BOSS', digits: 2, icon: 'Crown', displayName: 'Super Admin' },
+  boss_owner: { prefix: '👑 BOSS', digits: 1, icon: 'Crown', displayName: 'Boss Owner' },
+  ceo: { prefix: '🔱 CEO', digits: 2, icon: 'Crown', displayName: 'CEO' },
   server_manager: { prefix: 'SRV', digits: 2, icon: 'Server', displayName: 'Server Manager' },
   area_manager: { prefix: 'CTH', digits: 2, icon: 'MapPin', displayName: 'Country Head' }, // Merged
   task_manager: { prefix: 'EMP', digits: 3, icon: 'ListTodo', displayName: 'Task Manager' },
@@ -92,10 +94,11 @@ export const MASKED_ID_CONFIG: Record<string, {
   common: { prefix: 'USR', digits: 8, icon: 'User', displayName: 'User' },
 };
 
-// Route access mapping for all 29 roles
+// Route access mapping for all roles
+// NOTE: master and super_admin merged into boss_owner
 export const ROLE_ROUTES: Partial<Record<AppRole, string[]>> = {
-  master: ['*'], // Master has full access to everything
-  super_admin: ['*'], // Access to everything
+  boss_owner: ['*'], // Boss Owner has full access to everything
+  ceo: ['*'], // CEO has full access
   server_manager: ['/server-manager', '/server-manager/*'], // Infrastructure only - no business data
   area_manager: ['/super-admin-system/role-switch', '/country-head/*'], // Redirects to Country Head
   developer: ['/developer', '/tasks', '/settings'],
@@ -129,23 +132,22 @@ export const ROLE_ROUTES: Partial<Record<AppRole, string[]>> = {
 // Check if user has required role level
 export function hasRoleLevel(userRole: AppRole | null, requiredRole: AppRole): boolean {
   if (!userRole) return false;
-  if (userRole === 'master') return true; // Master bypasses all
+  if (userRole === 'boss_owner') return true; // Boss Owner bypasses all
   return (ROLE_HIERARCHY[userRole] || 0) >= (ROLE_HIERARCHY[requiredRole] || 0);
 }
 
 // Check if user has any of the specified roles
 export function hasAnyRole(userRole: AppRole | null, allowedRoles: AppRole[]): boolean {
   if (!userRole) return false;
-  if (userRole === 'master') return true; // Master bypasses all
-  if (userRole === 'super_admin') return true; // Super admin bypasses all
+  if (userRole === 'boss_owner') return true; // Boss Owner bypasses all
   return allowedRoles.includes(userRole);
 }
 
 // Check if user can access a specific route
 export function canAccessRoute(userRole: AppRole | null, route: string): boolean {
   if (!userRole) return false;
-  if (userRole === 'master') return true; // Master has full access
-  if (userRole === 'super_admin') return true;
+  if (userRole === 'boss_owner') return true; // Boss Owner has full access
+  if (userRole === 'ceo') return true; // CEO has full access
   
   const allowedRoutes = ROLE_ROUTES[userRole] || [];
   if (allowedRoutes.includes('*')) return true;
@@ -189,11 +191,12 @@ export function isValidRole(role: string): role is AppRole {
   return Object.keys(ROLE_HIERARCHY).includes(role);
 }
 
-// Get dashboard route for role (28 roles)
+// Get dashboard route for role
+// NOTE: master and super_admin merged into boss_owner
 export function getDashboardRoute(role: AppRole): string {
   const routeMap: Partial<Record<AppRole, string>> = {
-    master: '/master-admin',
-    super_admin: '/super-admin',
+    boss_owner: '/super-admin', // Boss Owner uses super-admin dashboard
+    ceo: '/super-admin', // CEO uses super-admin dashboard
     area_manager: '/super-admin-system/role-switch?role=country_head', // Redirects to Country Head
     developer: '/developer',
     franchise: '/franchise',

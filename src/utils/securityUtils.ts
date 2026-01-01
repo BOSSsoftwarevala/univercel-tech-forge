@@ -165,14 +165,11 @@ export function canAccessRoute(
   // No role = no access to protected routes
   if (!userRole) return false;
   
-  // Master has full access
-  if (userRole === 'master') return true;
+  // Boss Owner has full access (merged master + super_admin)
+  if (userRole === 'boss_owner' && isApproved) return true;
   
-  // Super admin has most access
-  if (userRole === 'super_admin' && isApproved) {
-    // Cannot access master-only routes
-    return !pathname.startsWith('/master-admin');
-  }
+  // CEO has full access
+  if (userRole === 'ceo' && isApproved) return true;
   
   // Other roles need approval
   if (!isApproved) return false;
@@ -219,9 +216,10 @@ export function checkPasswordStrength(password: string): {
   return { score, feedback };
 }
 
-// Permission matrix for all 24 roles
+// Permission matrix for all roles
+// NOTE: master and super_admin merged into boss_owner
 export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
-  master: {
+  boss_owner: {
     view_all: true,
     edit_all: true,
     delete_all: true,
@@ -230,7 +228,7 @@ export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
     view_master_logs: true,
     manage_roles: true,
   },
-  super_admin: {
+  ceo: {
     view_all: true,
     edit_all: true,
     delete_all: true,
@@ -386,6 +384,6 @@ export const PERMISSION_MATRIX: Record<string, Record<string, boolean>> = {
 
 export function hasPermission(role: string | null, permission: string): boolean {
   if (!role) return false;
-  if (role === 'master') return true; // Master has all permissions
+  if (role === 'boss_owner') return true; // Boss Owner has all permissions
   return PERMISSION_MATRIX[role]?.[permission] ?? false;
 }

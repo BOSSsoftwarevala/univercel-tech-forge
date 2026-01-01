@@ -33,7 +33,7 @@ const TopControlBar = () => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
   const { formatTime, formatDate, getLocale } = useRegionDetection();
-  const isSuperAdmin = userRole === 'super_admin';
+  const isBossOwner = userRole === 'boss_owner' || userRole === 'ceo';
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFrozen, setIsFrozen] = useState(false);
@@ -53,7 +53,7 @@ const TopControlBar = () => {
   }, []);
 
   const statusItems: StatusItem[] = [
-    ...(isSuperAdmin
+    ...(isBossOwner
       ? ([
           {
             label: 'System',
@@ -75,7 +75,7 @@ const TopControlBar = () => {
       icon: <Radio className="w-3.5 h-3.5" />,
       path: '/api-integrations',
     },
-    ...(isSuperAdmin
+    ...(isBossOwner
       ? ([
           {
             label: 'AI',
@@ -226,11 +226,11 @@ const TopControlBar = () => {
           <span className="hidden lg:inline">BROADCAST</span>
         </motion.button>
 
-        {/* Super Admin Badge */}
-        {isSuperAdmin && (
+        {/* Boss Owner Badge */}
+        {isBossOwner && (
           <div className="flex items-center gap-2 px-3 py-1.5 glass-panel-glow rounded-lg">
             <Shield className="w-4 h-4 text-primary" />
-            <span className="text-xs font-semibold text-primary">SUPER ADMIN</span>
+            <span className="text-xs font-semibold text-primary">BOSS OWNER</span>
           </div>
         )}
       </div>

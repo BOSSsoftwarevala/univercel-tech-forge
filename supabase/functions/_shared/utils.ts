@@ -207,10 +207,11 @@ export function rateLimitResponse(resetIn: number) {
 }
 
 // Role hierarchy for access control (matches AppRole enum in types/roles.ts)
+// NOTE: master and super_admin merged into boss_owner
 export const ROLE_HIERARCHY: Record<string, number> = {
   // Highest privilege
-  master: 110,
-  super_admin: 100,
+  boss_owner: 110, // Merged master + super_admin
+  ceo: 105,
   admin: 90,
   finance_manager: 85,
   legal_compliance: 80,
@@ -235,8 +236,8 @@ export const ROLE_HIERARCHY: Record<string, number> = {
   client: 5,
 };
 
-// Admin-only roles
-export const ADMIN_ROLES = ['master', 'super_admin', 'admin'];
+// Admin-only roles (merged master + super_admin into boss_owner)
+export const ADMIN_ROLES = ['boss_owner', 'ceo', 'admin'];
 
 // Sensitive endpoints that require extra protection
 export const SENSITIVE_ENDPOINTS = [
@@ -251,7 +252,7 @@ export const SENSITIVE_ENDPOINTS = [
 
 // Check if user has required role
 export function hasRole(userRole: string, requiredRole: string): boolean {
-  if (userRole === 'master') return true; // Master bypasses all
+  if (userRole === 'boss_owner') return true; // Boss Owner bypasses all
   const userLevel = ROLE_HIERARCHY[userRole] || 0;
   const requiredLevel = ROLE_HIERARCHY[requiredRole] || 0;
   return userLevel >= requiredLevel;
@@ -259,7 +260,7 @@ export function hasRole(userRole: string, requiredRole: string): boolean {
 
 // Check if user has any of the required roles
 export function hasAnyRole(userRole: string, requiredRoles: string[]): boolean {
-  if (userRole === 'master') return true; // Master bypasses all
+  if (userRole === 'boss_owner') return true; // Boss Owner bypasses all
   return requiredRoles.some(role => userRole === role || hasRole(userRole, role));
 }
 
