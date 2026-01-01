@@ -106,8 +106,8 @@ export async function rolePermissionMiddleware(
 export function applyMasking(data: any, role: string): any {
   if (!data) return data;
   
-  // Super admin and admin see full data
-  if (role === "super_admin" || role === "admin") {
+  // Boss owner and admin see full data
+  if (role === "boss_owner" || role === "admin") {
     return data;
   }
 
@@ -128,7 +128,7 @@ export function applyMasking(data: any, role: string): any {
     if (masked.contact_email) masked.masked_contact_email = maskEmail(masked.contact_email);
     
     // Remove original sensitive fields for non-admin roles
-    if (role !== "super_admin" && role !== "admin" && role !== "finance_manager") {
+    if (role !== "boss_owner" && role !== "admin" && role !== "finance_manager") {
       delete masked.email;
       delete masked.phone;
       delete masked.full_name;

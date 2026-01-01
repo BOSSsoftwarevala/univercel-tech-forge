@@ -65,14 +65,14 @@ const MasterControlCenter = () => {
   const handleLogout = async () => {
     await supabase.from('audit_logs').insert({
       user_id: user?.id,
-      role: 'master',
+      role: 'boss_owner' as any,
       module: 'master-control',
       action: 'secure_logout',
       meta_json: { session_duration: sessionTime }
     });
     await supabase.auth.signOut();
     toast.success('Secure logout complete');
-    navigate('/sv-master-control');
+    navigate('/boss-fortress');
   };
 
   const renderView = () => {

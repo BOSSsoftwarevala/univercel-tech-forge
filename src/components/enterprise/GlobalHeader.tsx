@@ -24,7 +24,7 @@ interface GlobalHeaderProps {
 }
 
 export function GlobalHeader({
-  userRole = "super_admin",
+  userRole = "boss_owner",
   walletBalance = 125000,
   notificationCount = 5,
   buzzerActive = true,

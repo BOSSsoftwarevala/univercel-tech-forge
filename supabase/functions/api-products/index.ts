@@ -12,7 +12,7 @@ serve(async (req: Request) => {
 
   // POST /products/create
   if (path === "/create" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "admin", "product_manager"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner", "admin", "product_manager"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["product_name", "category"]);
       if (validation) return errorResponse(validation);
 
@@ -38,7 +38,7 @@ serve(async (req: Request) => {
 
   // POST /products/version
   if (path === "/version" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "admin", "product_manager", "rd_department"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner", "admin", "product_manager", "rd_department"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["product_id", "version_number"]);
       if (validation) return errorResponse(validation);
 

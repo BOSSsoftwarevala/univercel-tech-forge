@@ -6,13 +6,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// All 28 permanent user credentials
+// All permanent user credentials
 const PERMANENT_USERS = [
-  // GRADE 0 — OWNERSHIP
-  { email: "manojcopy264@gmail.com", password: "X9@Q!7K#A2W$R6M^ZpF8x5LHN", role: "master" },
+  // GRADE 0 — OWNERSHIP (Boss Owner - merged master/super_admin)
+  { email: "manojcopy264@gmail.com", password: "X9@Q!7K#A2W$R6M^ZpF8x5LHN", role: "boss_owner" },
   
   // GRADE 1 — PLATFORM CONTROL
-  { email: "superadmin@gmail.com", password: "F3@Q!8Zp#V6M2W$L9xA7R^K", role: "super_admin" },
   { email: "admin@gmail.com", password: "N8$W@A6QZ!x5F9#R2K^M7p", role: "admin" },
   { email: "servermanager@gmail.com", password: "@6KZ2M9#A!p7W$QxR8^F5", role: "server_manager" },
   

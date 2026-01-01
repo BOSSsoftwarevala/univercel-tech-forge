@@ -73,7 +73,7 @@ serve(async (req: Request) => {
       if (!thread) return errorResponse("Thread not found", 404);
 
       // Check access (creator or admin)
-      if (thread.created_by !== user.userId && !["super_admin", "admin"].includes(user.role)) {
+      if (thread.created_by !== user.userId && !["boss_owner", "admin"].includes(user.role)) {
         // Check if user is part of related role
         if (thread.related_role && thread.related_role !== user.role) {
           return errorResponse("Access denied to this thread", 403);

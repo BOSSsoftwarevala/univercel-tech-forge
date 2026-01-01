@@ -62,7 +62,7 @@ serve(async (req: Request) => {
 
   // POST /kyc/verify (Admin only)
   if (path === "/verify" && req.method === "POST") {
-    return withAuth(req, ["super_admin", "admin", "legal_compliance"], async ({ supabaseAdmin, body, user }) => {
+    return withAuth(req, ["boss_owner", "admin", "legal_compliance"], async ({ supabaseAdmin, body, user }) => {
       const validation = validateRequired(body, ["kyc_id", "status"]);
       if (validation) return errorResponse(validation);
 

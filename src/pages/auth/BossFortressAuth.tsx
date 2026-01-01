@@ -262,7 +262,7 @@ const BossFortressAuth = () => {
       
       await supabase.from('audit_logs').insert({
         user_id: currentUserId,
-        role: 'master' as any,
+        role: 'boss_owner' as any,
         module: 'boss_fortress',
         action: 'fortress_login_success',
         meta_json: { 
@@ -274,7 +274,7 @@ const BossFortressAuth = () => {
       toast.success('Welcome, Boss!');
       
       setTimeout(() => {
-        navigate('/master-admin', { replace: true });
+        navigate('/super-admin', { replace: true });
       }, 1500);
     } catch (err) {
       console.error('OTP verify error:', err);
