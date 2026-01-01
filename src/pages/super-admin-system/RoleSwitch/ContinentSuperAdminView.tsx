@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -41,6 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AsiaSuperAdminDashboard from "@/components/super-admin-wireframe/AsiaSuperAdminDashboard";
 
 // Country data for each continent
 const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
@@ -331,14 +332,36 @@ const continentSuperAdmins = [
 
 interface ContinentSuperAdminViewProps {
   activeNav?: string;
+  selectedSubItem?: string;
 }
 
-const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdminViewProps) => {
+const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: ContinentSuperAdminViewProps) => {
   const [selectedCSA, setSelectedCSA] = useState<typeof continentSuperAdmins[0] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [continentFilter, setContinentFilter] = useState("all");
   const [detailTab, setDetailTab] = useState("profile");
+  const [showContinentDashboard, setShowContinentDashboard] = useState<string | null>(null);
+
+  // Handle sub-item selection from sidebar
+  useEffect(() => {
+    if (selectedSubItem) {
+      // Map sub-item id to continent
+      const continentMap: Record<string, string> = {
+        "csa-asia": "Asia",
+        "csa-africa": "Africa",
+        "csa-europe": "Europe",
+        "csa-north-america": "North America",
+        "csa-south-america": "South America",
+        "csa-australia": "Australia/Oceania",
+        "csa-antarctica": "Antarctica"
+      };
+      const continent = continentMap[selectedSubItem];
+      if (continent) {
+        setShowContinentDashboard(continent);
+      }
+    }
+  }, [selectedSubItem]);
 
   // Stats calculations
   const totalCSAs = continentSuperAdmins.length;
@@ -746,6 +769,11 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
       </AnimatePresence>
     </div>
   );
+
+  // If a continent dashboard is selected (e.g., Asia from sidebar)
+  if (showContinentDashboard === "Asia") {
+    return <AsiaSuperAdminDashboard onBack={() => setShowContinentDashboard(null)} />;
+  }
 
   // If activeNav is "admins", show the registry view with the list
   if (activeNav === "admins") {

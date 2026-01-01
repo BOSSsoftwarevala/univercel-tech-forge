@@ -42,6 +42,7 @@ const RoleSwitchDashboard = () => {
 
   const [activeRole, setActiveRole] = useState<ActiveRole>("continent_super_admin");
   const [activeNav, setActiveNav] = useState("dashboard");
+  const [selectedSubItem, setSelectedSubItem] = useState<string | undefined>(undefined);
   const [collapsed, setCollapsed] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [riskLevel] = useState<"low" | "medium" | "high">("low");
@@ -126,7 +127,7 @@ const RoleSwitchDashboard = () => {
       case "super_admin_hierarchy":
         return <SuperAdminHierarchyDashboard />;
       case "continent_super_admin":
-        return <ContinentSuperAdminView activeNav={activeNav} />;
+        return <ContinentSuperAdminView activeNav={activeNav} selectedSubItem={selectedSubItem} />;
       case "country_head":
         return <CountryHeadDashboard />;
       case "area_manager":
@@ -311,6 +312,7 @@ const RoleSwitchDashboard = () => {
           onLogout={handleLogout}
           activeNav={activeNav}
           onNavChange={handleNavChange}
+          onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
         />
 
         {/* Dynamic Role View */}
