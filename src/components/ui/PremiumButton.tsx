@@ -22,8 +22,8 @@ const variantStyles = {
   secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
   danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
   ghost: 'bg-transparent hover:bg-secondary/50',
-  sidebar: 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-transparent',
-  'sidebar-active': 'bg-primary/15 text-primary border border-primary/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]',
+  sidebar: 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white border border-transparent hover:border-primary/20 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)]',
+  'sidebar-active': 'bg-primary/15 text-primary border border-primary/40 shadow-[0_0_20px_rgba(59,130,246,0.4)]',
 };
 
 const sizeStyles = {
@@ -53,22 +53,27 @@ export const PremiumButton = ({
   return (
     <motion.button
       className={cn(
-        'relative rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring',
+        'relative flex items-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring',
         variantStyles[variant],
         sizeStyles[size],
         className
       )}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
       onClick={handleClick}
       {...props}
     >
-      {glowOnHover && (variant === 'primary' || variant === 'sidebar-active') && (
+      {glowOnHover && (variant === 'primary' || variant === 'sidebar-active' || variant === 'sidebar') && (
         <motion.span
-          className="absolute inset-0 rounded-lg opacity-0 pointer-events-none"
-          style={{ boxShadow: '0 0 25px hsl(var(--primary) / 0.5)' }}
+          className="absolute inset-0 rounded-lg pointer-events-none"
+          initial={{ opacity: 0 }}
           whileHover={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          style={{ 
+            boxShadow: variant === 'sidebar-active' 
+              ? '0 0 25px hsl(var(--primary) / 0.5)' 
+              : '0 0 15px hsl(var(--primary) / 0.3)' 
+          }}
+          transition={{ duration: 0.25 }}
         />
       )}
       {children}
