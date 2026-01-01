@@ -44,6 +44,7 @@ import DemoAccess from "./pages/DemoAccess";
 import DemoDirectory from "./pages/DemoDirectory";
 import DemoLogin from "./pages/DemoLogin";
 import DemoShowcase from "./pages/DemoShowcase";
+import PremiumDemoShowcase from "./pages/PremiumDemoShowcase";
 import ClientPortal from "./pages/ClientPortal";
 
 // Demo Product Pages - One-click access, no login
@@ -52,6 +53,21 @@ import SchoolERPDemo from "./pages/demos/SchoolERPDemo";
 import HospitalHMSDemo from "./pages/demos/HospitalHMSDemo";
 import EcommerceStoreDemo from "./pages/demos/EcommerceStoreDemo";
 import HotelBookingDemo from "./pages/demos/HotelBookingDemo";
+import RealEstateDemo from "./pages/demos/RealEstateDemo";
+import AutomotiveDemo from "./pages/demos/AutomotiveDemo";
+import TravelDemo from "./pages/demos/TravelDemo";
+import FinanceDemo from "./pages/demos/FinanceDemo";
+import ManufacturingDemo from "./pages/demos/ManufacturingDemo";
+import GymDemo from "./pages/demos/GymDemo";
+import SalonDemo from "./pages/demos/SalonDemo";
+import LegalDemo from "./pages/demos/LegalDemo";
+import SecurityDemo from "./pages/demos/SecurityDemo";
+import TelecomDemo from "./pages/demos/TelecomDemo";
+import ChildcareDemo from "./pages/demos/ChildcareDemo";
+import PetCareDemo from "./pages/demos/PetCareDemo";
+import EventDemo from "./pages/demos/EventDemo";
+import CRMDemo from "./pages/demos/CRMDemo";
+import LogisticsDemo from "./pages/demos/LogisticsDemo";
 
 import SettingsPage from "./pages/Settings";
 
@@ -287,13 +303,29 @@ const App = () => (
               <Route path="/demo/:role" element={<DemoAccess />} />
               <Route path="/demo-login" element={<DemoLogin />} />
               <Route path="/showcase" element={<DemoShowcase />} />
+              <Route path="/demos" element={<PremiumDemoShowcase />} />
               
               {/* Product Demo Pages - Direct Access, Software Vala Branded */}
               <Route path="/demo/restaurant-pos" element={<RestaurantPOSDemo />} />
               <Route path="/demo/school-erp" element={<SchoolERPDemo />} />
               <Route path="/demo/hospital-hms" element={<HospitalHMSDemo />} />
-              <Route path="/demo/ecommerce-marketplace" element={<EcommerceStoreDemo />} />
+              <Route path="/demo/ecommerce-store" element={<EcommerceStoreDemo />} />
               <Route path="/demo/hotel-booking" element={<HotelBookingDemo />} />
+              <Route path="/demo/real-estate" element={<RealEstateDemo />} />
+              <Route path="/demo/automotive" element={<AutomotiveDemo />} />
+              <Route path="/demo/travel" element={<TravelDemo />} />
+              <Route path="/demo/finance" element={<FinanceDemo />} />
+              <Route path="/demo/manufacturing" element={<ManufacturingDemo />} />
+              <Route path="/demo/gym" element={<GymDemo />} />
+              <Route path="/demo/salon" element={<SalonDemo />} />
+              <Route path="/demo/legal" element={<LegalDemo />} />
+              <Route path="/demo/security" element={<SecurityDemo />} />
+              <Route path="/demo/telecom" element={<TelecomDemo />} />
+              <Route path="/demo/childcare" element={<ChildcareDemo />} />
+              <Route path="/demo/petcare" element={<PetCareDemo />} />
+              <Route path="/demo/event" element={<EventDemo />} />
+              <Route path="/demo/crm" element={<CRMDemo />} />
+              <Route path="/demo/logistics" element={<LogisticsDemo />} />
               
               {/* Client Portal - Public Route */}
               <Route path="/client-portal" element={<ClientPortal />} />
