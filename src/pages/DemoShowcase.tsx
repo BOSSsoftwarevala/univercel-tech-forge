@@ -8,6 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import softwareValaLogo from '@/assets/software-vala-logo.jpg';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -142,9 +143,7 @@ const DemoShowcase = () => {
       <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <Code2 className="w-5 h-5 text-white" />
-            </div>
+            <img src={softwareValaLogo} alt="Software Vala" className="w-10 h-10 rounded-full object-cover" />
             <span className="font-bold text-white">Software Vala</span>
           </div>
           <Button size="sm" variant="outline" className="border-purple-500 text-purple-400">

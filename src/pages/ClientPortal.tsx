@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Upload, FileText, Send, CheckCircle, Code2 } from 'lucide-react';
+import { Globe, Upload, FileText, Send, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ClientProjectStatus from '@/components/client-portal/ClientProjectStatus';
+import softwareValaLogo from '@/assets/software-vala-logo.jpg';
 
 const ClientPortal = () => {
   const [activeTab, setActiveTab] = useState('new-project');
@@ -131,9 +132,7 @@ const ClientPortal = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Code2 className="w-6 h-6 text-primary-foreground" />
-              </div>
+              <img src={softwareValaLogo} alt="Software Vala" className="w-10 h-10 rounded-full object-cover" />
               <div>
                 <h1 className="text-lg font-bold">Software Vala</h1>
                 <p className="text-xs text-muted-foreground">Custom Software Development</p>
