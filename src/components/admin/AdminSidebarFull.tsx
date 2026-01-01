@@ -37,7 +37,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
-import LiveTeamPanel from "@/components/super-admin-wireframe/LiveTeamPanel";
+
 
 // Flat 28 categories - NO GROUPING
 export type AdminView =
@@ -175,8 +175,6 @@ const AdminSidebarFull = ({ activeView, onViewChange }: AdminSidebarFullProps) =
         </nav>
       </ScrollArea>
 
-      {/* Live Team Panel */}
-      <LiveTeamPanel collapsed={false} />
 
       {/* Footer with User Info & Actions */}
       <div className="p-3 border-t border-white/10 space-y-3">
