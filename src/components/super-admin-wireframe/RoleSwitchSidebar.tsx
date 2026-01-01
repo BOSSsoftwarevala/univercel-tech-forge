@@ -11,7 +11,7 @@ import {
   Package, Truck, Store, Map, Database, HardDrive, Cpu,
   Monitor, Zap, Lock, Key, Gavel, FileCheck, BookOpen,
   Bug, GitBranch, Rocket, Terminal, AlertTriangle, Radio,
-  Megaphone, Image, Share2, BarChart, LineChart, Palette
+  Megaphone, Image, Share2, BarChart, LineChart, Palette, Ticket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,7 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management";
+export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -174,6 +174,17 @@ const roleConfigs = {
     borderAccent: "border-pink-500/50",
     description: "Marketing & growth operations",
   },
+  customer_support_management: {
+    id: "customer_support_management",
+    label: "Customer Support Management",
+    shortLabel: "CSM",
+    icon: Headphones,
+    themeColor: "from-blue-500 to-cyan-600",
+    accentColor: "text-blue-400",
+    bgAccent: "bg-blue-500/10",
+    borderAccent: "border-blue-500/50",
+    description: "Support & helpdesk operations",
+  },
 } as const;
 
 // Extended navigation items per role - role-specific features
@@ -307,6 +318,18 @@ const roleNavItems = {
     { id: "analytics", label: "Analytics & Insights", icon: LineChart },
     { id: "brand", label: "Brand & Compliance", icon: Palette },
     { id: "activity", label: "Marketing Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  customer_support_management: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "managers", label: "All Support Managers", icon: Users },
+    { id: "tickets", label: "Tickets", icon: MessageSquare },
+    { id: "users", label: "Users & Partners", icon: UserCheck },
+    { id: "sla", label: "SLA Management", icon: Clock },
+    { id: "communication", label: "Communication", icon: Mail },
+    { id: "escalations", label: "Escalations", icon: AlertCircle },
+    { id: "knowledge", label: "Knowledge Base", icon: BookOpen },
+    { id: "activity", label: "Support Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
 };
