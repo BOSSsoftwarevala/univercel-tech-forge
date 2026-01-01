@@ -19,16 +19,55 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  // Check if we have a valid session from the reset link
+  // Ensure the recovery session from the reset link is established
   useEffect(() => {
-    const checkSession = async () => {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get('code');
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const access_token = hashParams.get('access_token');
+    const refresh_token = hashParams.get('refresh_token');
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only sync state changes here; do not call other Supabase APIs in this callback.
+      if (!session) return;
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Session is now available for updateUser()
+      }
+    });
+
+    const ensureSession = async () => {
+      // 1) Exchange PKCE code if present
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          toast.error('Invalid or expired reset link');
+          navigate('/forgot-password');
+          return;
+        }
+      }
+
+      // 2) Set session from implicit flow tokens if present
+      if (access_token && refresh_token) {
+        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+        if (error) {
+          toast.error('Invalid or expired reset link');
+          navigate('/forgot-password');
+          return;
+        }
+      }
+
+      // 3) Validate we have a session
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Invalid or expired reset link');
         navigate('/forgot-password');
       }
     };
-    checkSession();
+
+    // Defer so the client can process URL auth params before we validate.
+    setTimeout(() => { void ensureSession(); }, 0);
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
