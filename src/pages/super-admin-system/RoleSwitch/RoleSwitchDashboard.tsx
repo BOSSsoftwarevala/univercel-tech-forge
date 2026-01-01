@@ -26,12 +26,11 @@ import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
 import RoleManagerDashboard from "./RoleManagerDashboard";
-import MasterAdminDashboard from "./MasterAdminDashboard";
-import SuperAdminHierarchyDashboard from "./SuperAdminHierarchyDashboard";
 import CountryHeadDashboard from "./CountryHeadDashboard";
 import ProductManagerDashboard from "./ProductManagerDashboard";
 import CEODashboard from "./CEODashboard";
 import BossOwnerDashboard from "./BossOwnerDashboard";
+import AdminDashboard from "./AdminDashboard";
 
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
@@ -124,14 +123,12 @@ const RoleSwitchDashboard = () => {
   // Render the appropriate view based on active role
   const renderRoleView = () => {
     switch (activeRole) {
-      case "ceo":
-        return <CEODashboard />;
       case "boss_owner":
         return <BossOwnerDashboard />;
-      case "master_admin":
-        return <BossOwnerDashboard />; // Redirect legacy master_admin to BossOwner
-      case "super_admin_hierarchy":
-        return <SuperAdminHierarchyDashboard />;
+      case "ceo":
+        return <CEODashboard />;
+      case "admin":
+        return <AdminDashboard />;
       case "continent_super_admin":
         return <ContinentSuperAdminView activeNav={activeNav} selectedSubItem={selectedSubItem} />;
       case "country_head":
@@ -172,10 +169,9 @@ const RoleSwitchDashboard = () => {
   return (
     <div className={cn(
       "min-h-screen flex flex-col transition-colors duration-300",
-      activeRole === "ceo" ? "bg-gradient-to-br from-emerald-950/20 via-background to-teal-950/20" :
       activeRole === "boss_owner" ? "bg-gradient-to-br from-amber-950/30 via-zinc-950 to-orange-950/20" :
-      activeRole === "master_admin" ? "bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900" :
-      activeRole === "super_admin_hierarchy" ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950" :
+      activeRole === "ceo" ? "bg-gradient-to-br from-emerald-950/20 via-background to-teal-950/20" :
+      activeRole === "admin" ? "bg-gradient-to-br from-purple-950/20 via-background to-violet-950/20" :
       activeRole === "country_head" ? "bg-gradient-to-br from-orange-950/20 via-background to-amber-950/20" :
       activeRole === "server_manager" || activeRole === "developer_management" ? "bg-zinc-950" : 
       activeRole === "marketing_management" ? "bg-gradient-to-br from-pink-950/20 via-background to-rose-950/20" :

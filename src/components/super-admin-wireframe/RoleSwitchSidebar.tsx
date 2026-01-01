@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 
-export type ActiveRole = "ceo" | "boss_owner" | "master_admin" | "super_admin_hierarchy" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
+export type ActiveRole = "boss_owner" | "ceo" | "admin" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -36,6 +36,17 @@ interface RoleSwitchSidebarProps {
 
 // Role configurations with themes
 export const roleConfigs = {
+  boss_owner: {
+    id: "boss_owner",
+    label: "Boss / Owner",
+    shortLabel: "BOSS",
+    icon: Crown,
+    themeColor: "from-amber-500 via-yellow-500 to-orange-600",
+    accentColor: "text-amber-400",
+    bgAccent: "bg-amber-500/10",
+    borderAccent: "border-amber-500/50",
+    description: "Final Authority • System Owner",
+  },
   ceo: {
     id: "ceo",
     label: "CEO",
@@ -47,43 +58,21 @@ export const roleConfigs = {
     borderAccent: "border-emerald-500/50",
     description: "Vision & Oversight • Read-only",
   },
-  boss_owner: {
-    id: "boss_owner",
-    label: "Boss / Owner",
-    shortLabel: "BOSS",
-    icon: Crown,
-    themeColor: "from-amber-500 via-yellow-500 to-orange-600",
-    accentColor: "text-amber-400",
-    bgAccent: "bg-amber-500/10",
-    borderAccent: "border-amber-500/50",
-    description: "Final Authority • Approve/Lock/Archive",
-  },
-  master_admin: {
-    id: "master_admin",
-    label: "Master Admin",
-    shortLabel: "MA",
+  admin: {
+    id: "admin",
+    label: "Admin",
+    shortLabel: "ADM",
     icon: Shield,
     themeColor: "from-purple-500 via-violet-500 to-indigo-600",
     accentColor: "text-purple-400",
     bgAccent: "bg-purple-500/10",
     borderAccent: "border-purple-500/50",
-    description: "Top-level authority • System Owner",
-  },
-  super_admin_hierarchy: {
-    id: "super_admin_hierarchy",
-    label: "Super Admin",
-    shortLabel: "SA",
-    icon: Globe2,
-    themeColor: "from-blue-500 via-indigo-500 to-purple-600",
-    accentColor: "text-blue-400",
-    bgAccent: "bg-blue-500/10",
-    borderAccent: "border-blue-500/50",
-    description: "Global Operations Head",
+    description: "Administrative Operations",
   },
   continent_super_admin: {
     id: "continent_super_admin",
-    label: "Continent Super Admin",
-    shortLabel: "CSA",
+    label: "Continent Admin",
+    shortLabel: "CA",
     icon: Globe2,
     themeColor: "from-blue-500 to-emerald-500",
     accentColor: "text-blue-400",
