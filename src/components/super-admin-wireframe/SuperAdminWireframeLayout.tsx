@@ -17,6 +17,8 @@ import { toast } from "sonner";
 
 interface SuperAdminWireframeLayoutProps {
   children: React.ReactNode;
+  title?: string;
+  subtitle?: string;
   activeSection?: string;
   rightPanelContent?: React.ReactNode;
   rightPanelOpen?: boolean;
@@ -41,6 +43,8 @@ const sidebarItems = [
 
 const SuperAdminWireframeLayout = ({
   children,
+  title,
+  subtitle,
   activeSection,
   rightPanelContent,
   rightPanelOpen = false,
@@ -230,6 +234,12 @@ const SuperAdminWireframeLayout = ({
         {/* MAIN CONTENT */}
         <main className="flex-1 overflow-auto">
           <div className="p-6">
+            {(title || subtitle) && (
+              <div className="mb-6">
+                {title && <h1 className="text-2xl font-bold">{title}</h1>}
+                {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
+              </div>
+            )}
             {children}
           </div>
         </main>
