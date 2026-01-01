@@ -3,21 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-// Strict role-to-dashboard mapping (28 roles)
+// Strict role-to-dashboard mapping (31 roles - ALL ROLES COVERED)
 // MASTER gets a separate dashboard, SUPER_ADMIN gets the command center
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
-  master: '/master-admin',           // Master Admin has its own dashboard
-  super_admin: '/super-admin',       // Super Admin goes to command center
+  // Tier 1: Admin Roles
+  master: '/master-admin',
+  super_admin: '/super-admin',
   admin: '/super-admin',
-  developer: '/developer',
+  
+  // Tier 2: Partner Roles
   franchise: '/franchise',
   reseller: '/reseller',
   influencer: '/influencer',
+  
+  // Tier 3: User Roles
+  developer: '/developer',
   prime: '/prime',
   client: '/demos/public',
+  support: '/support',
+  
+  // Tier 4: Manager Roles
   lead_manager: '/lead-manager',
   task_manager: '/task-manager',
-  support: '/support',
   seo_manager: '/seo',
   finance_manager: '/finance',
   hr_manager: '/hr',
@@ -30,7 +37,13 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
   demo_manager: '/demo-manager',
   ai_manager: '/ai-console',
   api_security: '/api-integrations',
-  // New roles (25-28)
+  
+  // Tier 5: Specialized Roles
+  area_manager: '/area-manager',
+  server_manager: '/server-manager',
+  product_demo_manager: '/product-demo-manager',
+  
+  // Tier 6: Support System Roles
   safe_assist: '/safe-assist',
   assist_manager: '/assist-manager',
   promise_tracker: '/promise-tracker',
