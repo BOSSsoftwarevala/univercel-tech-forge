@@ -27,6 +27,17 @@ import {
 // World map topology
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
+// Country data for each continent
+const continentCountries: Record<string, string[]> = {
+  "Africa": ["Nigeria", "Egypt", "South Africa", "Kenya", "Ghana", "Morocco", "Ethiopia", "Tanzania", "Uganda", "Algeria", "Sudan", "Tunisia", "Cameroon", "Ivory Coast", "Senegal"],
+  "Asia": ["China", "India", "Japan", "South Korea", "Indonesia", "Thailand", "Vietnam", "Philippines", "Malaysia", "Singapore", "Pakistan", "Bangladesh", "Taiwan", "Hong Kong", "UAE"],
+  "Europe": ["Germany", "France", "UK", "Italy", "Spain", "Netherlands", "Belgium", "Switzerland", "Poland", "Sweden", "Norway", "Denmark", "Austria", "Portugal", "Ireland"],
+  "North America": ["USA", "Canada", "Mexico", "Cuba", "Jamaica", "Dominican Republic", "Costa Rica", "Panama", "Guatemala", "Honduras"],
+  "South America": ["Brazil", "Argentina", "Colombia", "Chile", "Peru", "Venezuela", "Ecuador", "Bolivia", "Paraguay", "Uruguay"],
+  "Australia/Oceania": ["Australia", "New Zealand", "Fiji", "Papua New Guinea", "Samoa", "Tonga", "Vanuatu", "Solomon Islands"],
+  "Antarctica": []
+};
+
 // All 7 Continent Admins with enhanced data
 const continentAdmins = [
   {
@@ -45,6 +56,7 @@ const continentAdmins = [
     color: "#f59e0b",
     lastActive: "2 min ago",
     uptime: 99.8,
+    icon: "🌍",
   },
   {
     id: "csa-002",
@@ -62,6 +74,7 @@ const continentAdmins = [
     color: "#ef4444",
     lastActive: "5 min ago",
     uptime: 99.9,
+    icon: "🌏",
   },
   {
     id: "csa-003",
@@ -79,6 +92,7 @@ const continentAdmins = [
     color: "#3b82f6",
     lastActive: "15 min ago",
     uptime: 99.7,
+    icon: "🌍",
   },
   {
     id: "csa-004",
@@ -96,6 +110,7 @@ const continentAdmins = [
     color: "#10b981",
     lastActive: "30 min ago",
     uptime: 99.5,
+    icon: "🌎",
   },
   {
     id: "csa-005",
@@ -113,6 +128,7 @@ const continentAdmins = [
     color: "#84cc16",
     lastActive: "3 days ago",
     uptime: 0,
+    icon: "🌎",
   },
   {
     id: "csa-006",
@@ -130,6 +146,7 @@ const continentAdmins = [
     color: "#8b5cf6",
     lastActive: "1 hour ago",
     uptime: 99.6,
+    icon: "🌏",
   },
   {
     id: "csa-007",
@@ -147,6 +164,7 @@ const continentAdmins = [
     color: "#06b6d4",
     lastActive: "Offline",
     uptime: 0,
+    icon: "🧊",
   },
 ];
 
@@ -210,282 +228,257 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
     }
   };
 
-  // Render Continent Admins focused view
+  // Get countries for selected admin
+  const getCountriesForContinent = (continent: string) => {
+    return continentCountries[continent] || [];
+  };
+
+  // Render Continent Admins focused view - Clean list style
   const renderAdminsView = () => (
     <div className="h-full flex overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Left Side - List of all 7 continent admins */}
+      <div className="w-[400px] border-r border-slate-700/50 flex flex-col bg-slate-900/50">
         {/* Header */}
-        <div className="p-6 border-b border-border/30 bg-gradient-to-r from-purple-500/5 via-indigo-500/5 to-blue-500/5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 via-indigo-500 to-blue-600 flex items-center justify-center shadow-2xl shadow-purple-500/20">
-                <Users className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">Continent Admins</h1>
-                <p className="text-purple-400/80 text-sm">All 7 Continent Administrators</p>
-              </div>
+        <div className="p-5 border-b border-slate-700/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <Globe2 className="w-6 h-6 text-white" />
             </div>
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                {activeAdmins} Active
-              </Badge>
-              <Badge variant="outline" className="text-yellow-400 border-yellow-500/50 gap-2">
-                <span className="w-2 h-2 rounded-full bg-yellow-500" />
-                {continentAdmins.filter(a => a.status === "suspended").length} Suspended
-              </Badge>
-              <Badge variant="outline" className="text-red-400 border-red-500/50 gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500" />
-                {continentAdmins.filter(a => a.status === "inactive").length} Inactive
-              </Badge>
+            <div>
+              <h2 className="text-xl font-bold text-white">Continent Admins</h2>
+              <p className="text-sm text-slate-400">7 Global Administrators</p>
             </div>
+          </div>
+          <div className="flex gap-2 text-xs">
+            <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              {activeAdmins} Active
+            </Badge>
+            <Badge variant="outline" className="text-yellow-400 border-yellow-500/50 gap-1">
+              <span className="w-2 h-2 rounded-full bg-yellow-500" />
+              {continentAdmins.filter(a => a.status === "suspended").length} Suspended
+            </Badge>
+            <Badge variant="outline" className="text-red-400 border-red-500/50 gap-1">
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              {continentAdmins.filter(a => a.status === "inactive").length} Inactive
+            </Badge>
           </div>
         </div>
 
+        {/* Admin List */}
         <ScrollArea className="flex-1">
-          <div className="p-6">
-            {/* World Map with Admin Markers */}
-            <Card className="bg-slate-900/80 border-slate-700/50 backdrop-blur mb-6 overflow-hidden">
-              <CardHeader className="pb-2 border-b border-slate-700/50">
-                <CardTitle className="text-lg flex items-center gap-2 text-white">
-                  <Satellite className="w-5 h-5 text-blue-400" />
-                  World Map - Admin Locations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 relative">
-                <div className="relative h-[300px] bg-gradient-to-b from-slate-900 to-slate-950">
-                  <div className="absolute inset-0 opacity-10" style={{
-                    backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-                                     linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)`,
-                    backgroundSize: '50px 50px'
-                  }} />
-                  
-                  <ComposableMap
-                    projection="geoMercator"
-                    projectionConfig={{ scale: 140, center: [0, 20] }}
-                    className="w-full h-full"
-                  >
-                    <Geographies geography={geoUrl}>
-                      {({ geographies }) =>
-                        geographies.map((geo) => (
-                          <Geography
-                            key={geo.rsmKey}
-                            geography={geo}
-                            fill="#1e293b"
-                            stroke="#334155"
-                            strokeWidth={0.5}
-                            style={{
-                              default: { outline: 'none' },
-                              hover: { fill: '#334155', outline: 'none' },
-                              pressed: { outline: 'none' }
-                            }}
-                          />
-                        ))
-                      }
-                    </Geographies>
+          <div className="p-3 space-y-2">
+            {continentAdmins.map((admin) => (
+              <motion.div
+                key={admin.id}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedAdmin(admin)}
+                className={cn(
+                  "p-4 rounded-xl border cursor-pointer transition-all duration-200",
+                  selectedAdmin?.id === admin.id
+                    ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/50"
+                    : "bg-slate-800/50 border-slate-700/50 hover:border-slate-600"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* Continent Icon/Emoji */}
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                      style={{ backgroundColor: `${admin.color}20` }}
+                    >
+                      {admin.icon}
+                    </div>
                     
-                    {continentAdmins.map((admin) => (
-                      <Marker
-                        key={admin.id}
-                        coordinates={admin.coordinates}
-                        onClick={() => setSelectedAdmin(admin)}
-                      >
-                        <g className="cursor-pointer">
-                          <circle
-                            r={12}
-                            fill={admin.status === "active" ? "#22c55e" : admin.status === "suspended" ? "#eab308" : "#ef4444"}
-                            stroke="#0f172a"
-                            strokeWidth={3}
-                            className="drop-shadow-lg"
-                          />
-                          <text
-                            textAnchor="middle"
-                            y={28}
-                            className="fill-slate-300 text-[10px] font-medium"
-                          >
-                            {admin.code}
-                          </text>
-                        </g>
-                      </Marker>
-                    ))}
-                  </ComposableMap>
-                </div>
-              </CardContent>
-            </Card>
+                    {/* Name & Details */}
+                    <div>
+                      <h3 className="text-white font-semibold text-base">
+                        {admin.continent} <span className="text-slate-400 font-normal">Boss</span>
+                      </h3>
+                      <p className="text-sm text-slate-500">{admin.adminName}</p>
+                    </div>
+                  </div>
 
-            {/* 7 Continent Admins Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {continentAdmins.map((admin) => (
-                <motion.div
-                  key={admin.id}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedAdmin(admin)}
-                  className={cn(
-                    "relative p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 backdrop-blur",
-                    selectedAdmin?.id === admin.id
-                      ? "bg-blue-500/20 border-blue-500"
-                      : "bg-slate-800/50 border-slate-700/50 hover:border-slate-600"
-                  )}
-                >
-                  {/* Status Indicator - Top Right */}
-                  <div className="absolute top-4 right-4 flex items-center gap-2">
+                  {/* Status Dot */}
+                  <div className="flex items-center gap-2">
                     <div className="relative">
                       <div className={cn(
                         "w-4 h-4 rounded-full shadow-lg",
-                        getStatusDot(admin.status)
+                        admin.status === "active" && "bg-emerald-500 shadow-emerald-500/50",
+                        admin.status === "suspended" && "bg-yellow-500 shadow-yellow-500/50",
+                        admin.status === "inactive" && "bg-red-500 shadow-red-500/50"
                       )} />
                       {admin.status === "active" && (
-                        <div className="absolute inset-0 w-4 h-4 rounded-full bg-emerald-500 animate-ping opacity-50" />
+                        <div className="absolute inset-0 w-4 h-4 rounded-full bg-emerald-500 animate-ping opacity-40" />
                       )}
                     </div>
+                    <ChevronRight className={cn(
+                      "w-5 h-5 transition-colors",
+                      selectedAdmin?.id === admin.id ? "text-blue-400" : "text-slate-600"
+                    )} />
                   </div>
-
-                  {/* Continent Icon */}
-                  <div 
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                    style={{ backgroundColor: `${admin.color}20` }}
-                  >
-                    <Globe2 className="w-8 h-8" style={{ color: admin.color }} />
-                  </div>
-
-                  {/* Continent Name */}
-                  <h3 className="text-lg font-bold text-white mb-1">{admin.continent}</h3>
-                  
-                  {/* Admin Name */}
-                  <p className="text-sm text-slate-400 mb-3">{admin.adminName}</p>
-
-                  {/* Status Badge */}
-                  <Badge 
-                    variant="outline" 
-                    className={cn(
-                      "mb-4 capitalize",
-                      admin.status === "active" && "text-emerald-400 border-emerald-500/50 bg-emerald-500/10",
-                      admin.status === "suspended" && "text-yellow-400 border-yellow-500/50 bg-yellow-500/10",
-                      admin.status === "inactive" && "text-red-400 border-red-500/50 bg-red-500/10"
-                    )}
-                  >
-                    {admin.status}
-                  </Badge>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-slate-500 text-xs">Countries</p>
-                      <p className="text-white font-semibold">{admin.countries}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Managers</p>
-                      <p className="text-white font-semibold">{admin.managers}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Traffic</p>
-                      <p className="text-white font-semibold">{(admin.traffic / 1000).toFixed(1)}K</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Last Active</p>
-                      <p className="text-white font-semibold text-xs">{admin.lastActive}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </ScrollArea>
       </div>
 
-      {/* Detail Panel */}
-      <AnimatePresence>
-        {selectedAdmin && (
-          <motion.div
-            initial={{ x: 400, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 400, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="w-[380px] bg-slate-900 border-l border-slate-700/50 flex flex-col shadow-2xl"
-          >
-            <div 
-              className="p-5 border-b border-slate-700/50"
-              style={{ background: `linear-gradient(135deg, ${selectedAdmin.color}20, transparent)` }}
+      {/* Right Side - Selected Continent Details with Countries */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <AnimatePresence mode="wait">
+          {selectedAdmin ? (
+            <motion.div
+              key={selectedAdmin.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="h-full flex flex-col"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: `${selectedAdmin.color}30` }}
-                  >
-                    <Globe2 className="w-6 h-6" style={{ color: selectedAdmin.color }} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">{selectedAdmin.continent}</h3>
-                    <p className="text-sm text-slate-400">{selectedAdmin.adminName}</p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setSelectedAdmin(null)}>
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="p-5 space-y-6">
-                <Card className="bg-slate-800/50 border-slate-700/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-slate-400">Status</span>
-                      <div className="flex items-center gap-2">
-                        <span className={cn("w-3 h-3 rounded-full", getStatusDot(selectedAdmin.status))} />
-                        <span className={cn(
-                          "text-sm font-medium capitalize",
-                          selectedAdmin.status === "active" && "text-emerald-400",
-                          selectedAdmin.status === "suspended" && "text-yellow-400",
-                          selectedAdmin.status === "inactive" && "text-red-400"
-                        )}>
+              {/* Continent Header */}
+              <div 
+                className="p-6 border-b border-slate-700/50"
+                style={{ background: `linear-gradient(135deg, ${selectedAdmin.color}15, transparent)` }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {/* Large Continent Icon */}
+                    <div 
+                      className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl"
+                      style={{ backgroundColor: `${selectedAdmin.color}25`, boxShadow: `0 0 40px ${selectedAdmin.color}30` }}
+                    >
+                      {selectedAdmin.icon}
+                    </div>
+                    <div>
+                      <h1 className="text-3xl font-bold text-white">{selectedAdmin.continent}</h1>
+                      <p className="text-lg text-slate-400 mt-1">Boss: {selectedAdmin.adminName}</p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <Badge 
+                          className={cn(
+                            "capitalize text-sm px-3 py-1",
+                            selectedAdmin.status === "active" && "bg-emerald-500/20 text-emerald-400 border-emerald-500/50",
+                            selectedAdmin.status === "suspended" && "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
+                            selectedAdmin.status === "inactive" && "bg-red-500/20 text-red-400 border-red-500/50"
+                          )}
+                        >
+                          <span className={cn(
+                            "w-2 h-2 rounded-full mr-2",
+                            selectedAdmin.status === "active" && "bg-emerald-500",
+                            selectedAdmin.status === "suspended" && "bg-yellow-500",
+                            selectedAdmin.status === "inactive" && "bg-red-500"
+                          )} />
                           {selectedAdmin.status}
-                        </span>
+                        </Badge>
+                        <span className="text-slate-500 text-sm">{selectedAdmin.email}</span>
                       </div>
                     </div>
-                    <Separator className="bg-slate-700/50 mb-4" />
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-slate-500">Countries</p>
-                        <p className="text-xl font-bold text-white">{selectedAdmin.countries}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">Managers</p>
-                        <p className="text-xl font-bold text-white">{selectedAdmin.managers}</p>
-                      </div>
+                  </div>
+                  
+                  {/* Quick Stats */}
+                  <div className="flex gap-4">
+                    <div className="text-center px-4 py-2 bg-slate-800/50 rounded-xl">
+                      <p className="text-2xl font-bold" style={{ color: selectedAdmin.color }}>{selectedAdmin.countries}</p>
+                      <p className="text-xs text-slate-500">Countries</p>
                     </div>
-                  </CardContent>
-                </Card>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Actions</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-700 bg-slate-800/50">
-                      <Eye className="w-4 h-4" />
-                      View Details
-                    </Button>
-                    <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-700 bg-slate-800/50">
-                      <Activity className="w-4 h-4" />
-                      Activity Log
-                    </Button>
-                    <Button variant="outline" size="sm" className="justify-start gap-2 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10">
-                      <AlertTriangle className="w-4 h-4" />
-                      Suspend
-                    </Button>
-                    <Button variant="outline" size="sm" className="justify-start gap-2 border-red-500/50 text-red-400 hover:bg-red-500/10">
-                      <Lock className="w-4 h-4" />
-                      Lock Access
-                    </Button>
+                    <div className="text-center px-4 py-2 bg-slate-800/50 rounded-xl">
+                      <p className="text-2xl font-bold text-blue-400">{selectedAdmin.managers}</p>
+                      <p className="text-xs text-slate-500">Managers</p>
+                    </div>
+                    <div className="text-center px-4 py-2 bg-slate-800/50 rounded-xl">
+                      <p className="text-2xl font-bold text-purple-400">{(selectedAdmin.traffic / 1000).toFixed(1)}K</p>
+                      <p className="text-xs text-slate-500">Traffic</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </ScrollArea>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+              {/* Countries Grid */}
+              <ScrollArea className="flex-1">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                      <MapPin className="w-5 h-5" style={{ color: selectedAdmin.color }} />
+                      Countries in {selectedAdmin.continent}
+                    </h3>
+                    <span className="text-sm text-slate-500">
+                      {getCountriesForContinent(selectedAdmin.continent).length} countries shown
+                    </span>
+                  </div>
+                  
+                  {getCountriesForContinent(selectedAdmin.continent).length > 0 ? (
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                      {getCountriesForContinent(selectedAdmin.continent).map((country, index) => (
+                        <motion.div
+                          key={country}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.03 }}
+                          className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:border-slate-600 transition-all cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: selectedAdmin.color }}
+                            />
+                            <span className="text-white text-sm font-medium group-hover:text-blue-400 transition-colors">
+                              {country}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 bg-slate-800/30 rounded-xl border border-slate-700/30">
+                      <Globe2 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                      <p className="text-slate-500">No countries in this region</p>
+                    </div>
+                  )}
+
+                  {/* Admin Actions */}
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-yellow-400" />
+                      Quick Actions
+                    </h3>
+                    <div className="grid grid-cols-4 gap-3">
+                      <Button variant="outline" className="justify-start gap-2 border-slate-700 bg-slate-800/50 hover:bg-slate-700/50">
+                        <Eye className="w-4 h-4" />
+                        View Profile
+                      </Button>
+                      <Button variant="outline" className="justify-start gap-2 border-slate-700 bg-slate-800/50 hover:bg-slate-700/50">
+                        <Activity className="w-4 h-4" />
+                        Activity Log
+                      </Button>
+                      <Button variant="outline" className="justify-start gap-2 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10">
+                        <AlertTriangle className="w-4 h-4" />
+                        Suspend
+                      </Button>
+                      <Button variant="outline" className="justify-start gap-2 border-red-500/50 text-red-400 hover:bg-red-500/10">
+                        <Lock className="w-4 h-4" />
+                        Lock Access
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="h-full flex items-center justify-center"
+            >
+              <div className="text-center">
+                <Globe2 className="w-20 h-20 text-slate-700 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-500">Select a Continent Admin</h3>
+                <p className="text-slate-600 mt-2">Click on any continent admin from the list to view details</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 
