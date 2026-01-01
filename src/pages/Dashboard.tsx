@@ -39,7 +39,8 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
   api_security: '/api-integrations',
   
   // Tier 5: Specialized Roles
-  area_manager: '/area-manager',
+  area_manager: '/super-admin-system/role-switch?role=country_head', // Merged into Country Head
+  country_head: '/super-admin-system/role-switch?role=country_head',
   server_manager: '/server-manager',
   product_demo_manager: '/product-demo-manager',
   

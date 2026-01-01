@@ -79,7 +79,7 @@ const CountryHeadDashboard = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground">Country Head Dashboard</h1>
-              <p className="text-orange-400/80">{countryStats.name} • {countryStats.continent}</p>
+              <p className="text-orange-400/80">{countryStats.name} • {countryStats.continent} • Country & Regional Operations</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -159,7 +159,7 @@ const CountryHeadDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-muted/50 border border-orange-500/20 p-1">
+        <TabsList className="bg-muted/50 border border-orange-500/20 p-1 flex-wrap">
           <TabsTrigger value="overview" className="data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-400">
             Country Overview
           </TabsTrigger>
@@ -168,6 +168,10 @@ const CountryHeadDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="managers" className="data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-400">
             Area Managers
+          </TabsTrigger>
+          <TabsTrigger value="region-ops" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
+            <MapPin className="w-3 h-3 mr-1" />
+            Region Operations
           </TabsTrigger>
           <TabsTrigger value="users" className="data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-400">
             Country Users
@@ -503,6 +507,140 @@ const CountryHeadDashboard = () => {
                     </div>
                     <Badge className="bg-emerald-500/20 text-emerald-400">Resolved</Badge>
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Region Operations Tab - Merged from Area Manager */}
+        <TabsContent value="region-ops" className="space-y-6">
+          <Card className="bg-card/50 border-cyan-500/20 backdrop-blur-xl">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-cyan-400" />
+                  Region Operations Control
+                </CardTitle>
+                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/50">
+                  Live Operations
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Region Filter Panel */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-cyan-400" />
+                    Filter by Region
+                  </h3>
+                  <div className="space-y-2">
+                    {countryAreas.map((area) => (
+                      <div 
+                        key={area.id}
+                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                          selectedArea?.id === area.id 
+                            ? 'bg-cyan-500/20 border-cyan-500/50' 
+                            : 'bg-muted/30 border-border hover:border-cyan-500/30'
+                        }`}
+                        onClick={() => setSelectedArea(area)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-foreground">{area.name}</span>
+                          <Badge variant={area.status === 'active' ? 'default' : 'secondary'} className="text-xs">
+                            {area.status}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                          <span>{area.cities} cities</span>
+                          <span>{area.managers} managers</span>
+                          <span className="text-cyan-400">{area.performance}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* User Actions Panel */}
+                <div className="lg:col-span-2 space-y-4">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Users className="w-4 h-4 text-cyan-400" />
+                    {selectedArea ? `${selectedArea.name} Users` : 'Select a Region'}
+                  </h3>
+                  
+                  {selectedArea ? (
+                    <div className="space-y-3">
+                      {/* Quick Actions */}
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" className="border-cyan-500/50 text-cyan-400">
+                          <Eye className="w-3 h-3 mr-1" /> View All Users
+                        </Button>
+                        <Button size="sm" variant="outline" className="border-emerald-500/50 text-emerald-400">
+                          <Plus className="w-3 h-3 mr-1" /> Add User
+                        </Button>
+                        <Button size="sm" variant="outline" className="border-amber-500/50 text-amber-400">
+                          <Lock className="w-3 h-3 mr-1" /> Suspend User
+                        </Button>
+                        <Button size="sm" variant="outline" className="border-red-500/50 text-red-400">
+                          <AlertTriangle className="w-3 h-3 mr-1" /> Ban User
+                        </Button>
+                      </div>
+
+                      {/* Region Stats */}
+                      <div className="grid grid-cols-3 gap-3 mt-4">
+                        <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                          <p className="text-xs text-muted-foreground">Active Users</p>
+                          <p className="text-xl font-bold text-cyan-400">
+                            {Math.round(countryStats.totalUsers / 5 * (selectedArea.performance / 100))}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                          <p className="text-xs text-muted-foreground">Conversions</p>
+                          <p className="text-xl font-bold text-emerald-400">
+                            {Math.round(selectedArea.performance * 1.5)}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                          <p className="text-xs text-muted-foreground">Pending</p>
+                          <p className="text-xl font-bold text-amber-400">
+                            {Math.round((100 - selectedArea.performance) / 5)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Sample Users */}
+                      <ScrollArea className="h-48">
+                        <div className="space-y-2">
+                          {areaManagers.filter(m => m.area === selectedArea.name || true).slice(0, 4).map((user) => (
+                            <div key={user.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-xs font-medium text-cyan-400">
+                                  {user.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-foreground">{user.name}</p>
+                                  <p className="text-xs text-muted-foreground">{user.users} managed users</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={user.status === 'active' ? 'default' : 'secondary'} className="text-xs">
+                                  {user.status}
+                                </Badge>
+                                <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                                  <Eye className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  ) : (
+                    <div className="h-48 flex items-center justify-center text-muted-foreground">
+                      <p>Select a region to view operations</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

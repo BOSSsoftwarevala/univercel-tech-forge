@@ -12,7 +12,7 @@ import promiseIcon from "@/assets/promise-icon.jpg";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
-import AreaManagerView from "./AreaManagerView";
+// AreaManagerView removed - merged into CountryHeadDashboard
 import ServerManagerView from "./ServerManagerView";
 import FranchiseManagerView from "./FranchiseManagerView";
 import SalesSupportManagerView from "./SalesSupportManagerView";
@@ -129,9 +129,8 @@ const RoleSwitchDashboard = () => {
       case "continent_super_admin":
         return <ContinentSuperAdminView activeNav={activeNav} selectedSubItem={selectedSubItem} />;
       case "country_head":
+      case "area_manager": // Merged into Country Head
         return <CountryHeadDashboard />;
-      case "area_manager":
-        return <AreaManagerView />;
       case "server_manager":
         return <ServerManagerView />;
       case "franchise_manager":
