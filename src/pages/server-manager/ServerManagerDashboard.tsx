@@ -6,7 +6,7 @@ import {
   Server, LayoutGrid, Activity, AlertTriangle, Database, Shield, 
   FileText, BarChart3, LogOut, Lock, Clock, Cpu, Network, 
   Rocket, Layers, ShoppingCart, Receipt, FileSearch, Settings,
-  List, Gauge, ArrowLeft
+  List, Gauge, ArrowLeft, Plus, Brain, Terminal, HardDrive
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -36,20 +36,29 @@ import SMExplorePlans from './screens/SMExplorePlans';
 import SMBuyServer from './screens/SMBuyServer';
 import SMBilling from './screens/SMBilling';
 import SMSettings from './screens/SMSettings';
+import SMAddServer from './screens/SMAddServer';
+import SMAIHealthSuggestions from './screens/SMAIHealthSuggestions';
+import SMServerLogin from './screens/SMServerLogin';
+import SMBackupManager from './screens/SMBackupManager';
 
 type ViewType = 'dashboard' | 'registry' | 'monitoring' | 'performance' | 'alerts' | 
                 'resources' | 'network' | 'storage' | 'security' | 'deployments' |
-                'plans' | 'buy' | 'billing' | 'logs' | 'settings';
+                'plans' | 'buy' | 'billing' | 'logs' | 'settings' | 'addserver' | 
+                'aihealth' | 'serverlogin' | 'backups';
 
 const sidebarItems: { id: ViewType; label: string; icon: any; badge?: string }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
+  { id: 'addserver', label: 'Add Server', icon: Plus },
   { id: 'registry', label: 'Server Registry', icon: List },
+  { id: 'serverlogin', label: 'Server Login', icon: Terminal },
   { id: 'monitoring', label: 'Live Monitoring', icon: Activity },
+  { id: 'aihealth', label: 'AI Health Suggestions', icon: Brain },
   { id: 'performance', label: 'Performance', icon: Gauge },
   { id: 'alerts', label: 'Alerts & Incidents', icon: AlertTriangle, badge: '3' },
   { id: 'resources', label: 'Resource Usage', icon: Cpu },
   { id: 'network', label: 'Network & Traffic', icon: Network },
-  { id: 'storage', label: 'Storage & Backup', icon: Database },
+  { id: 'backups', label: 'Backup Manager', icon: HardDrive },
+  { id: 'storage', label: 'Storage', icon: Database },
   { id: 'security', label: 'Security & Firewall', icon: Shield },
   { id: 'deployments', label: 'Deployments', icon: Rocket },
   { id: 'plans', label: 'Explore Plans', icon: Layers },
@@ -97,12 +106,16 @@ const ServerManagerDashboard = () => {
   const renderView = () => {
     switch (activeView) {
       case 'dashboard': return <SMOverview />;
+      case 'addserver': return <SMAddServer />;
       case 'registry': return <SMRegistry />;
+      case 'serverlogin': return <SMServerLogin />;
       case 'monitoring': return <SMMonitoring />;
+      case 'aihealth': return <SMAIHealthSuggestions />;
       case 'performance': return <SMPerformance />;
       case 'alerts': return <SMIncidents />;
       case 'resources': return <SMResources />;
       case 'network': return <SMNetwork />;
+      case 'backups': return <SMBackupManager />;
       case 'storage': return <SMBackups />;
       case 'security': return <SMSecurity />;
       case 'deployments': return <SMDeployments />;
