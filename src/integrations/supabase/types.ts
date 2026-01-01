@@ -1227,47 +1227,65 @@ export type Database = {
       auto_scaling_policies: {
         Row: {
           consecutive_checks_required: number | null
+          consecutive_triggers: number | null
           cooldown_minutes: number | null
+          cooldown_seconds: number | null
           cpu_threshold_percent: number | null
           created_at: string | null
+          disk_threshold_percent: number | null
           id: string
           is_enabled: boolean | null
           last_scale_at: string | null
+          last_triggered_at: string | null
           max_cpu: number | null
           max_ram: number | null
+          max_storage: number | null
           ram_threshold_percent: number | null
           scale_up_cpu: number | null
           scale_up_ram: number | null
+          scale_up_storage: number | null
           server_id: string | null
         }
         Insert: {
           consecutive_checks_required?: number | null
+          consecutive_triggers?: number | null
           cooldown_minutes?: number | null
+          cooldown_seconds?: number | null
           cpu_threshold_percent?: number | null
           created_at?: string | null
+          disk_threshold_percent?: number | null
           id?: string
           is_enabled?: boolean | null
           last_scale_at?: string | null
+          last_triggered_at?: string | null
           max_cpu?: number | null
           max_ram?: number | null
+          max_storage?: number | null
           ram_threshold_percent?: number | null
           scale_up_cpu?: number | null
           scale_up_ram?: number | null
+          scale_up_storage?: number | null
           server_id?: string | null
         }
         Update: {
           consecutive_checks_required?: number | null
+          consecutive_triggers?: number | null
           cooldown_minutes?: number | null
+          cooldown_seconds?: number | null
           cpu_threshold_percent?: number | null
           created_at?: string | null
+          disk_threshold_percent?: number | null
           id?: string
           is_enabled?: boolean | null
           last_scale_at?: string | null
+          last_triggered_at?: string | null
           max_cpu?: number | null
           max_ram?: number | null
+          max_storage?: number | null
           ram_threshold_percent?: number | null
           scale_up_cpu?: number | null
           scale_up_ram?: number | null
+          scale_up_storage?: number | null
           server_id?: string | null
         }
         Relationships: [
@@ -14267,6 +14285,84 @@ export type Database = {
         }
         Relationships: []
       }
+      scaling_events: {
+        Row: {
+          completed_at: string | null
+          cooldown_until: string | null
+          cpu_after: number | null
+          cpu_before: number | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          policy_id: string | null
+          ram_after: number | null
+          ram_before: number | null
+          scale_direction: string | null
+          server_id: string | null
+          status: string | null
+          storage_after: number | null
+          storage_before: number | null
+          threshold_value: number | null
+          trigger_reason: string
+          trigger_value: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          cooldown_until?: string | null
+          cpu_after?: number | null
+          cpu_before?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          policy_id?: string | null
+          ram_after?: number | null
+          ram_before?: number | null
+          scale_direction?: string | null
+          server_id?: string | null
+          status?: string | null
+          storage_after?: number | null
+          storage_before?: number | null
+          threshold_value?: number | null
+          trigger_reason: string
+          trigger_value?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          cooldown_until?: string | null
+          cpu_after?: number | null
+          cpu_before?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          policy_id?: string | null
+          ram_after?: number | null
+          ram_before?: number | null
+          scale_direction?: string | null
+          server_id?: string | null
+          status?: string | null
+          storage_after?: number | null
+          storage_before?: number | null
+          threshold_value?: number | null
+          trigger_reason?: string
+          trigger_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scaling_events_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "auto_scaling_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scaling_events_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "server_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_events: {
         Row: {
           affected_user_id: string | null
@@ -18852,6 +18948,66 @@ export type Database = {
         }
         Relationships: []
       }
+      websocket_connections: {
+        Row: {
+          channel: string
+          connected_at: string | null
+          id: string
+          is_active: boolean | null
+          last_ping_at: string | null
+          metadata: Json | null
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          connected_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_ping_at?: string | null
+          metadata?: Json | null
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          connected_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_ping_at?: string | null
+          metadata?: Json | null
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      websocket_events: {
+        Row: {
+          channel: string
+          created_at: string | null
+          event_type: string
+          id: string
+          payload: Json
+          server_id: string | null
+        }
+        Insert: {
+          channel: string
+          created_at?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          server_id?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          server_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       promise_manager_metrics: {
@@ -19043,14 +19199,16 @@ export type Database = {
           server_id: string
         }[]
       }
-      check_auto_scaling: {
-        Args: never
-        Returns: {
-          needs_scaling: boolean
-          scale_reason: string
-          server_id: string
-        }[]
-      }
+      check_auto_scaling:
+        | {
+            Args: never
+            Returns: {
+              needs_scaling: boolean
+              scale_reason: string
+              server_id: string
+            }[]
+          }
+        | { Args: { p_server_id: string }; Returns: Json }
       check_financial_mode: { Args: never; Returns: Json }
       check_force_logout: { Args: { check_user_id: string }; Returns: string }
       check_rental_active: {
@@ -19122,6 +19280,16 @@ export type Database = {
       exceeds_workload_threshold: {
         Args: { _developer_id: string }
         Returns: boolean
+      }
+      execute_auto_scale: {
+        Args: {
+          p_new_cpu: number
+          p_new_ram: number
+          p_reason: string
+          p_server_id: string
+          p_trigger_value: number
+        }
+        Returns: Json
       }
       force_end_all_assist_sessions: {
         Args: { p_reason: string }
