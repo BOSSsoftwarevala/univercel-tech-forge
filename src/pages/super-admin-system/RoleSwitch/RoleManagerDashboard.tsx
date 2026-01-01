@@ -803,7 +803,7 @@ const RoleManagerDashboard = () => {
         ))}
       </motion.div>
 
-      {/* Live Role Tracking Grid - 15 Boxes (3 per row) */}
+      {/* Quick Action Controls - 2 Columns */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -811,200 +811,151 @@ const RoleManagerDashboard = () => {
         className="mb-6"
       >
         <div className="flex items-center gap-2 mb-4">
-          <Activity className="w-5 h-5 text-violet-400" />
-          <h2 className="text-lg font-semibold text-white">Live Role Tracking</h2>
+          <Zap className="w-5 h-5 text-amber-400" />
+          <h2 className="text-lg font-semibold text-white">Quick Action Controls</h2>
           <Badge className="bg-emerald-500/20 text-emerald-400 text-xs">LIVE</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { name: "Super Admin", icon: Shield, users: 3, status: "active", color: "violet" },
-            { name: "Admin", icon: UserCheck, users: 8, status: "active", color: "blue" },
-            { name: "Master Admin", icon: Lock, users: 2, status: "active", color: "purple" },
-            { name: "Continent Manager", icon: Globe2, users: 12, status: "active", color: "cyan" },
-            { name: "Country Admin", icon: MapPin, users: 45, status: "active", color: "emerald" },
-            { name: "Franchise Manager", icon: Building2, users: 28, status: "active", color: "amber" },
-            { name: "Lead Manager", icon: Users, users: 34, status: "active", color: "orange" },
-            { name: "Sales Manager", icon: Activity, users: 22, status: "active", color: "pink" },
-            { name: "Support Manager", icon: UserCheck, users: 18, status: "active", color: "teal" },
-            { name: "Developer", icon: Layers, users: 56, status: "active", color: "indigo" },
-            { name: "Finance Manager", icon: Shield, users: 6, status: "active", color: "lime" },
-            { name: "HR Manager", icon: Users, users: 4, status: "active", color: "rose" },
-            { name: "Marketing Manager", icon: Activity, users: 9, status: "active", color: "sky" },
-            { name: "Legal Manager", icon: FileText, users: 3, status: "active", color: "slate" },
-            { name: "Reseller", icon: Building2, users: 120, status: "active", color: "fuchsia" },
-          ].map((role, idx) => (
+            { 
+              name: "Lead Assignment", 
+              icon: Users, 
+              status: "running",
+              action: "Stop",
+              actionType: "stop",
+              description: "Auto-assign new leads to available agents"
+            },
+            { 
+              name: "Sales Pipeline", 
+              icon: Activity, 
+              status: "running",
+              action: "Stop",
+              actionType: "stop",
+              description: "Process sales conversions automatically"
+            },
+            { 
+              name: "Promise Tracking", 
+              icon: CheckCircle, 
+              status: "running",
+              action: "Stop",
+              actionType: "stop",
+              description: "Monitor and track all active promises"
+            },
+            { 
+              name: "Support Queue", 
+              icon: UserCheck, 
+              status: "paused",
+              action: "Start",
+              actionType: "start",
+              description: "Auto-route tickets to support agents"
+            },
+            { 
+              name: "Franchise Onboarding", 
+              icon: Building2, 
+              status: "running",
+              action: "Stop",
+              actionType: "stop",
+              description: "New franchise approval workflow"
+            },
+            { 
+              name: "Demo Scheduling", 
+              icon: Eye, 
+              status: "blocked",
+              action: "Allow",
+              actionType: "allow",
+              description: "Allow new demo bookings"
+            },
+            { 
+              name: "Developer Deployments", 
+              icon: Layers, 
+              status: "running",
+              action: "Stop",
+              actionType: "stop",
+              description: "Auto-deploy approved code changes"
+            },
+            { 
+              name: "Payment Processing", 
+              icon: Shield, 
+              status: "paused",
+              action: "Start",
+              actionType: "start",
+              description: "Process pending payout requests"
+            },
+            { 
+              name: "New Registrations", 
+              icon: Globe2, 
+              status: "running",
+              action: "Block",
+              actionType: "block",
+              description: "Accept new user registrations"
+            },
+            { 
+              name: "Reseller Approvals", 
+              icon: Lock, 
+              status: "blocked",
+              action: "Allow",
+              actionType: "allow",
+              description: "Allow reseller application processing"
+            },
+          ].map((control, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.15 + idx * 0.02 }}
-              className={cn(
-                "p-4 rounded-xl bg-slate-800/50 border backdrop-blur-sm hover:bg-slate-800/70 transition-all cursor-pointer group",
-                `border-${role.color}-500/30 hover:border-${role.color}-500/60`
-              )}
+              transition={{ delay: 0.15 + idx * 0.03 }}
+              className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center",
-                  `bg-${role.color}-500/20`
-                )}>
-                  <role.icon className={cn("w-5 h-5", `text-${role.color}-400`)} />
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3 flex-1">
+                  <div className={cn(
+                    "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                    control.status === "running" && "bg-emerald-500/20",
+                    control.status === "paused" && "bg-amber-500/20",
+                    control.status === "blocked" && "bg-red-500/20"
+                  )}>
+                    <control.icon className={cn(
+                      "w-5 h-5",
+                      control.status === "running" && "text-emerald-400",
+                      control.status === "paused" && "text-amber-400",
+                      control.status === "blocked" && "text-red-400"
+                    )} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-white text-sm">{control.name}</h3>
+                      <span className={cn(
+                        "w-2 h-2 rounded-full animate-pulse",
+                        control.status === "running" && "bg-emerald-500",
+                        control.status === "paused" && "bg-amber-500",
+                        control.status === "blocked" && "bg-red-500"
+                      )} />
+                    </div>
+                    <p className="text-xs text-slate-400 line-clamp-1">{control.description}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs text-emerald-400">Online</span>
-                </div>
-              </div>
-              <h3 className="font-semibold text-white text-sm mb-1">{role.name}</h3>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">{role.users} active users</span>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-white transition-colors" />
+                <Button
+                  type="button"
+                  size="sm"
+                  className={cn(
+                    "shrink-0 ml-3 font-medium",
+                    control.actionType === "stop" && "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30",
+                    control.actionType === "start" && "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30",
+                    control.actionType === "allow" && "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30",
+                    control.actionType === "block" && "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30"
+                  )}
+                  onClick={() => toast({
+                    title: `${control.action} ${control.name}`,
+                    description: `Action "${control.action}" executed successfully.`
+                  })}
+                >
+                  {control.action}
+                </Button>
               </div>
             </motion.div>
           ))}
         </div>
       </motion.div>
 
-      {/* Live Business Tracking Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mb-6"
-      >
-        <div className="flex items-center gap-2 mb-4">
-          <Zap className="w-5 h-5 text-amber-400" />
-          <h2 className="text-lg font-semibold text-white">Live Business Tracking</h2>
-          <Badge className="bg-amber-500/20 text-amber-400 text-xs">REAL-TIME</Badge>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { 
-              name: "Live Lead Tracker", 
-              icon: Users, 
-              value: 847, 
-              change: "+23", 
-              status: "up",
-              subText: "New leads today",
-              color: "emerald"
-            },
-            { 
-              name: "Live Sales Tracking", 
-              icon: Activity, 
-              value: "₹12.4L", 
-              change: "+₹2.1L", 
-              status: "up",
-              subText: "Revenue today",
-              color: "blue"
-            },
-            { 
-              name: "Live Promise Tracker", 
-              icon: CheckCircle, 
-              value: 156, 
-              change: "12 pending", 
-              status: "warning",
-              subText: "Active promises",
-              color: "violet"
-            },
-            { 
-              name: "Live Support Tracker", 
-              icon: UserCheck, 
-              value: 89, 
-              change: "4 critical", 
-              status: "critical",
-              subText: "Open tickets",
-              color: "orange"
-            },
-            { 
-              name: "Live Franchise Sales", 
-              icon: Building2, 
-              value: 34, 
-              change: "+8", 
-              status: "up",
-              subText: "Sales this week",
-              color: "cyan"
-            },
-            { 
-              name: "Live Demo Requests", 
-              icon: Eye, 
-              value: 67, 
-              change: "+15", 
-              status: "up",
-              subText: "Pending demos",
-              color: "pink"
-            },
-            { 
-              name: "Live Developer Tasks", 
-              icon: Layers, 
-              value: 234, 
-              change: "18 blocked", 
-              status: "warning",
-              subText: "Active tasks",
-              color: "indigo"
-            },
-            { 
-              name: "Live Payment Queue", 
-              icon: Shield, 
-              value: "₹45.2L", 
-              change: "7 pending", 
-              status: "warning",
-              subText: "Pending payouts",
-              color: "amber"
-            },
-            { 
-              name: "Live User Activity", 
-              icon: Globe2, 
-              value: 1247, 
-              change: "+156", 
-              status: "up",
-              subText: "Online users",
-              color: "teal"
-            },
-          ].map((tracker, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + idx * 0.03 }}
-              className={cn(
-                "p-4 rounded-xl bg-slate-800/50 border backdrop-blur-sm hover:bg-slate-800/70 transition-all cursor-pointer group",
-                `border-${tracker.color}-500/30 hover:border-${tracker.color}-500/60`
-              )}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center",
-                  `bg-${tracker.color}-500/20`
-                )}>
-                  <tracker.icon className={cn("w-5 h-5", `text-${tracker.color}-400`)} />
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={cn(
-                    "w-2 h-2 rounded-full animate-pulse",
-                    tracker.status === "up" && "bg-emerald-500",
-                    tracker.status === "warning" && "bg-amber-500",
-                    tracker.status === "critical" && "bg-red-500"
-                  )} />
-                  <span className={cn(
-                    "text-xs font-medium",
-                    tracker.status === "up" && "text-emerald-400",
-                    tracker.status === "warning" && "text-amber-400",
-                    tracker.status === "critical" && "text-red-400"
-                  )}>{tracker.change}</span>
-                </div>
-              </div>
-              <h3 className="font-semibold text-white text-sm mb-1">{tracker.name}</h3>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className={cn("text-xl font-bold", `text-${tracker.color}-400`)}>{tracker.value}</span>
-                  <p className="text-xs text-slate-400">{tracker.subText}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-white transition-colors" />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}
