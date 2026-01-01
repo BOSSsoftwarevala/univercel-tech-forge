@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,13 +9,53 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Settings, Users, Shield, Key, LayoutDashboard } from 'lucide-react';
 
+// Public routes where the button should NEVER appear
+const PUBLIC_ROUTES = [
+  '/',
+  '/auth',
+  '/demos',
+  '/demo-showcase',
+  '/demo-directory',
+  '/demo-login',
+  '/demo-access',
+  '/simple-demo',
+  '/checkout',
+  '/franchise-landing',
+  '/franchise-program',
+  '/reseller-landing',
+  '/influencer-landing',
+  '/client-portal',
+  '/premium-demo',
+];
+
 const AdminQuickAccess = () => {
-  const { userRole } = useAuth();
+  const { userRole, user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
-  // Only show for admin roles
-  const adminRoles = ['super_admin', 'admin', 'master'];
+  // STRICT: Only show for specific admin roles when fully authenticated
+  const adminRoles = ['super_admin', 'master'];
+  
+  // Hide completely while loading
+  if (loading) {
+    return null;
+  }
+  
+  // Hide if not authenticated
+  if (!user) {
+    return null;
+  }
+  
+  // Hide if no role or role is not admin
   if (!userRole || !adminRoles.includes(userRole)) {
+    return null;
+  }
+  
+  // Hide on public routes
+  const isPublicRoute = PUBLIC_ROUTES.some(route => 
+    location.pathname === route || location.pathname.startsWith('/demo/')
+  );
+  if (isPublicRoute) {
     return null;
   }
 
