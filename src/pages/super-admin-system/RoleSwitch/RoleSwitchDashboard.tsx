@@ -16,6 +16,8 @@ import SalesSupportManagerView from "./SalesSupportManagerView";
 import ResellerManagerView from "./ResellerManagerView";
 import LeadManagerView from "./LeadManagerView";
 import ProManagerView from "./ProManagerView";
+import LegalManagerView from "./LegalManagerView";
+import TaskManagementView from "./TaskManagementView";
 
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
@@ -98,6 +100,10 @@ const RoleSwitchDashboard = () => {
         return <LeadManagerView />;
       case "pro_manager":
         return <ProManagerView />;
+      case "legal_manager":
+        return <LegalManagerView />;
+      case "task_management":
+        return <TaskManagementView />;
       default:
         return null;
     }

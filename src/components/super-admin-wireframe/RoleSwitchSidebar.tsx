@@ -5,7 +5,7 @@ import {
   Globe2, MapPin, Server, ChevronLeft, ChevronRight,
   Crown, LayoutDashboard, Users, Shield, Activity,
   Settings, LogOut, AlertCircle, Building2, Headphones, Handshake,
-  Target, Star
+  Target, Star, Scale, ListTodo
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager";
+export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -113,6 +113,28 @@ const roleConfigs = {
     borderAccent: "border-yellow-500/50",
     description: "Prime user management",
   },
+  legal_manager: {
+    id: "legal_manager",
+    label: "Legal Manager",
+    shortLabel: "LG",
+    icon: Scale,
+    themeColor: "from-rose-900 to-slate-800",
+    accentColor: "text-rose-400",
+    bgAccent: "bg-rose-900/10",
+    borderAccent: "border-rose-900/50",
+    description: "Legal & compliance view",
+  },
+  task_management: {
+    id: "task_management",
+    label: "Task Management",
+    shortLabel: "TM",
+    icon: ListTodo,
+    themeColor: "from-blue-500 to-cyan-600",
+    accentColor: "text-blue-400",
+    bgAccent: "bg-blue-500/10",
+    borderAccent: "border-blue-500/50",
+    description: "Global task management",
+  },
 } as const;
 
 // Navigation items per role
@@ -163,6 +185,18 @@ const roleNavItems = {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "list", label: "All Pro Managers", icon: Crown },
     { id: "activity", label: "Pro Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  legal_manager: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "list", label: "All Legal Managers", icon: Scale },
+    { id: "activity", label: "Legal Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  task_management: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "list", label: "All Tasks", icon: ListTodo },
+    { id: "activity", label: "Task Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
 };
