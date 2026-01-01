@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { 
   Globe2, MapPin, Server, ChevronLeft, ChevronRight,
   Crown, LayoutDashboard, Users, Shield, Activity,
-  Settings, LogOut, AlertCircle
+  Settings, LogOut, AlertCircle, Building2, Headphones, Handshake
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager";
+export type ActiveRole = "continent_super_admin" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -57,6 +57,39 @@ const roleConfigs = {
     borderAccent: "border-emerald-500/50",
     description: "Infrastructure & technical ops",
   },
+  franchise_manager: {
+    id: "franchise_manager",
+    label: "Franchise Manager",
+    shortLabel: "FM",
+    icon: Building2,
+    themeColor: "from-indigo-500 to-purple-600",
+    accentColor: "text-indigo-400",
+    bgAccent: "bg-indigo-500/10",
+    borderAccent: "border-indigo-500/50",
+    description: "Business & operations view",
+  },
+  sales_support_manager: {
+    id: "sales_support_manager",
+    label: "Sales & Support Manager",
+    shortLabel: "SSM",
+    icon: Headphones,
+    themeColor: "from-teal-500 to-emerald-600",
+    accentColor: "text-teal-400",
+    bgAccent: "bg-teal-500/10",
+    borderAccent: "border-teal-500/50",
+    description: "CRM & ticketing view",
+  },
+  reseller_manager: {
+    id: "reseller_manager",
+    label: "Reseller Manager",
+    shortLabel: "RM",
+    icon: Handshake,
+    themeColor: "from-amber-500 to-orange-600",
+    accentColor: "text-amber-400",
+    bgAccent: "bg-amber-500/10",
+    borderAccent: "border-amber-500/50",
+    description: "Partner & channel view",
+  },
 } as const;
 
 // Navigation items per role
@@ -77,6 +110,24 @@ const roleNavItems = {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "list", label: "All Server Managers", icon: Users },
     { id: "activity", label: "Tech Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  franchise_manager: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "list", label: "All Franchises", icon: Building2 },
+    { id: "activity", label: "Franchise Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  sales_support_manager: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "list", label: "All Managers", icon: Users },
+    { id: "activity", label: "Support Activity", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  reseller_manager: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "list", label: "All Resellers", icon: Handshake },
+    { id: "activity", label: "Partner Activity", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
 };

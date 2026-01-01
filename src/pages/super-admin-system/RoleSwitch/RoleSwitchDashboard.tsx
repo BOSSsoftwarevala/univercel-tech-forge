@@ -11,6 +11,9 @@ import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-a
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
 import AreaManagerView from "./AreaManagerView";
 import ServerManagerView from "./ServerManagerView";
+import FranchiseManagerView from "./FranchiseManagerView";
+import SalesSupportManagerView from "./SalesSupportManagerView";
+import ResellerManagerView from "./ResellerManagerView";
 
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
@@ -83,6 +86,12 @@ const RoleSwitchDashboard = () => {
         return <AreaManagerView />;
       case "server_manager":
         return <ServerManagerView />;
+      case "franchise_manager":
+        return <FranchiseManagerView />;
+      case "sales_support_manager":
+        return <SalesSupportManagerView />;
+      case "reseller_manager":
+        return <ResellerManagerView />;
       default:
         return null;
     }
