@@ -875,94 +875,139 @@ const RoleManagerComplete = () => {
             </Card>
           )}
 
-          <Card className="bg-slate-800/50 border-slate-700/50 overflow-hidden">
-            <ScrollArea className="h-[500px]">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-slate-700">
-                    <TableHead className="text-slate-400 sticky left-0 bg-slate-800/90 z-10">Module</TableHead>
-                    {permissionTypes.map(perm => (
-                      <TableHead key={perm.key} className="text-slate-400 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          <perm.icon className="w-4 h-4" />
-                          <span className="text-xs capitalize">{perm.label}</span>
-                        </div>
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {modules.map((module) => {
-                    const perms = currentPermissions[module.name] || {};
-                    const ModuleIcon = module.icon;
-                    
-                    return (
-                      <TableRow key={module.name} className="border-slate-700/50 hover:bg-slate-700/20">
-                        <TableCell className="sticky left-0 bg-slate-800/90 z-10">
-                          <div className="flex items-center gap-2">
-                            <ModuleIcon className="w-4 h-4 text-slate-400" />
-                            <span className="text-white">{module.name}</span>
-                            {module.isSensitive && (
-                              <Badge variant="outline" className="text-xs bg-red-500/10 border-red-500/30 text-red-400">
-                                Sensitive
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        {permissionTypes.map(perm => {
-                          const isGranted = perms[perm.key];
-                          const canEdit = isEditMode && !isSuperAdminSelected;
-                          
-                          return (
-                            <TableCell key={perm.key} className="text-center">
-                              <button
-                                onClick={() => initiatePermissionToggle(selectedRole, module.name, perm.key)}
-                                disabled={!canEdit}
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                                  canEdit ? 'cursor-pointer hover:scale-110' : 'cursor-default'
-                                } ${
-                                  isGranted
-                                    ? isSuperAdminSelected
-                                      ? 'bg-red-500/30 text-red-400'
-                                      : 'bg-emerald-500/30 text-emerald-400'
-                                    : 'bg-slate-700/30 text-slate-600'
-                                }`}
-                                title={isGranted ? 'Permission Granted' : 'No Permission'}
-                              >
-                                {isGranted ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                              </button>
-                            </TableCell>
-                          );
-                        })}
+          {/* Section grouped modules */}
+          {(() => {
+            const groupedModules = [
+              { section: 'CORE', modules: ['Dashboard', 'LiveActivity', 'Notifications'] },
+              { section: 'USER MANAGEMENT', modules: ['Users', 'Admins'] },
+              { section: 'ROLE & PERMISSION SYSTEM (SUPER ADMIN ONLY)', modules: ['Roles', 'Permissions', 'PermissionMatrix'] },
+              { section: 'GEOGRAPHY', modules: ['Continents', 'Countries', 'Areas'] },
+              { section: 'BUSINESS & PARTNERS', modules: ['Franchise', 'Reseller', 'Sales', 'Leads', 'ProUsers'] },
+              { section: 'OPERATIONS', modules: ['Tasks', 'Approvals', 'Rentals', 'Rules'] },
+              { section: 'TECH & PRODUCT', modules: ['DeveloperPanel', 'BugsIssues', 'QAPanel', 'Releases', 'APIs'] },
+              { section: 'SUPPORT', modules: ['Tickets', 'SLA', 'KnowledgeBase'] },
+              { section: 'FINANCE', modules: ['Transactions', 'Commissions', 'Payouts', 'Invoices', 'TaxCompliance'] },
+              { section: 'LEGAL & SECURITY', modules: ['LegalCases', 'TrademarkIP', 'SecurityEvents', 'SystemLock', 'AuditLogs'] },
+            ];
+
+            return (
+              <Card className="bg-slate-800/50 border-slate-700/50 overflow-hidden">
+                <ScrollArea className="h-[600px]">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-slate-800 z-20">
+                      <TableRow className="border-slate-700">
+                        <TableHead className="text-slate-400 sticky left-0 bg-slate-800 z-30 min-w-[200px]">
+                          MODULE / FEATURE
+                        </TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">V</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">C</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">E</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">D</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">A</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">S</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">X</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">L</TableHead>
+                        <TableHead className="text-slate-400 text-center w-12">CFG</TableHead>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-          </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedModules.map((group) => (
+                        <>
+                          {/* Section Header */}
+                          <TableRow key={group.section} className="bg-slate-700/30 border-slate-600">
+                            <TableCell colSpan={10} className="py-2">
+                              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                                {group.section}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                          {/* Section Modules */}
+                          {group.modules.map((moduleName) => {
+                            const module = modules.find(m => m.name === moduleName);
+                            if (!module) return null;
+                            const perms = currentPermissions[module.name] || {};
+                            const ModuleIcon = module.icon;
+                            
+                            return (
+                              <TableRow key={module.name} className="border-slate-700/50 hover:bg-slate-700/20">
+                                <TableCell className="sticky left-0 bg-slate-800/90 z-10">
+                                  <div className="flex items-center gap-2">
+                                    <ModuleIcon className="w-4 h-4 text-slate-400" />
+                                    <span className="text-white text-sm">{module.name}</span>
+                                    {module.isSensitive && (
+                                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-500/10 border-red-500/30 text-red-400">
+                                        Sensitive
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                {permissionTypes.map(perm => {
+                                  const isGranted = perms[perm.key];
+                                  const canEdit = isEditMode && !isSuperAdminSelected;
+                                  
+                                  return (
+                                    <TableCell key={perm.key} className="text-center p-1">
+                                      <button
+                                        onClick={() => initiatePermissionToggle(selectedRole, module.name, perm.key)}
+                                        disabled={!canEdit}
+                                        className={`w-8 h-8 rounded flex items-center justify-center transition-all text-lg font-bold ${
+                                          canEdit ? 'cursor-pointer hover:scale-110' : 'cursor-default'
+                                        } ${
+                                          isGranted
+                                            ? isSuperAdminSelected
+                                              ? 'text-emerald-400'
+                                              : 'text-emerald-400'
+                                            : 'text-red-500/60'
+                                        }`}
+                                        title={isGranted ? 'Permission Granted' : 'No Permission'}
+                                      >
+                                        {isGranted ? '✔' : '✖'}
+                                      </button>
+                                    </TableCell>
+                                  );
+                                })}
+                              </TableRow>
+                            );
+                          })}
+                        </>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </Card>
+            );
+          })()}
 
           {/* Legend */}
-          <div className="flex items-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-emerald-500/30 flex items-center justify-center">
-                <Check className="w-3 h-3 text-emerald-400" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-400 font-bold">✔</span>
+                <span className="text-slate-400">Allowed</span>
               </div>
-              <span className="text-slate-400">Granted by Super Admin</span>
+              <div className="flex items-center gap-2">
+                <span className="text-red-500/60 font-bold">✖</span>
+                <span className="text-slate-400">Denied</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-red-500/30 flex items-center justify-center">
-                <Check className="w-3 h-3 text-red-400" />
-              </div>
-              <span className="text-slate-400">Super Admin (Default)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-slate-700/30 flex items-center justify-center">
-                <X className="w-3 h-3 text-slate-600" />
-              </div>
-              <span className="text-slate-400">No Permission (Locked)</span>
+            <div className="text-xs text-slate-500 flex items-center gap-2">
+              <Lock className="w-3 h-3" />
+              <span>V=View, C=Create, E=Edit, D=Delete, A=Approve, S=Assign, X=Export, L=Lock, CFG=Configure</span>
             </div>
           </div>
+
+          {/* Strict Rule Warning */}
+          <Card className="bg-amber-500/5 border-amber-500/30">
+            <CardContent className="py-3">
+              <div className="flex items-center gap-3">
+                <ShieldAlert className="w-5 h-5 text-amber-400" />
+                <span className="text-sm text-slate-300">
+                  <strong className="text-amber-400">STRICT RULE:</strong> This entire table is editable ONLY by Super Admin. 
+                  Other roles see READ-ONLY or NOTHING. Any deviation = security violation.
+                </span>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Approvals Tab */}
