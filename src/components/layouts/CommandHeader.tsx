@@ -8,7 +8,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Volume2, VolumeX, Search, User, Settings, LogOut,
-  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu, Download, Smartphone
+  AlertTriangle, CheckCircle, Clock, Zap, MessageSquare, Menu, Download, Smartphone,
+  Bot, Headphones, HandHeart
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -44,12 +45,20 @@ const CommandHeader = memo(() => {
   const [buzzerActive, setBuzzerActive] = useState(false);
   const [buzzerMuted, setBuzzerMuted] = useState(false);
   const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
+  const [chatbotOpen, setChatbotOpen] = useState(false);
   const [alerts, setAlerts] = useState<Alert[]>([
     { id: '1', type: 'critical', title: 'Demo Down', message: 'E-commerce demo offline', timestamp: new Date(), acknowledged: false },
     { id: '2', type: 'warning', title: 'SLA Breach', message: 'Task #2847 exceeded deadline', timestamp: new Date(), acknowledged: false },
     { id: '3', type: 'info', title: 'New Lead', message: 'Hot lead from Mumbai assigned', timestamp: new Date(), acknowledged: true },
   ]);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const handleChatbotClick = useCallback(() => {
+    setChatbotOpen(true);
+    toast.success('AI Assistant Ready', {
+      description: 'How can I help you today?'
+    });
+  }, []);
 
   const handlePromiseClick = () => {
     if (promiseState === 'idle') {
@@ -171,8 +180,72 @@ const CommandHeader = memo(() => {
           </span>
         </motion.button>
 
-        {/* Safe Assist - Visible on all roles */}
+        {/* Safe Assist Button */}
         <SafeAssistTrigger variant="compact" />
+
+        {/* AI Chatbot Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleChatbotClick}
+          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white font-medium text-sm shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all border border-purple-400/30"
+        >
+          <Bot className="w-4 h-4" />
+          <span className="hidden md:inline">AI Chat</span>
+        </motion.button>
+
+        {/* Alert Button */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={cn(
+                "relative flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all shadow-md",
+                unacknowledgedCount > 0
+                  ? "bg-gradient-to-r from-red-600 to-rose-600 text-white border border-red-400/50 shadow-red-500/30"
+                  : "bg-secondary/80 text-foreground border border-border/50 hover:border-primary/50"
+              )}
+            >
+              <Bell className="w-4 h-4" />
+              <span className="hidden md:inline">Alerts</span>
+              {unacknowledgedCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-2 -right-2 w-5 h-5 bg-white text-red-600 text-xs rounded-full flex items-center justify-center font-bold shadow-md"
+                >
+                  {unacknowledgedCount}
+                </motion.span>
+              )}
+            </motion.button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 bg-card/95 backdrop-blur-xl border-border/50">
+            <DropdownMenuLabel className="flex items-center justify-between">
+              <span>Notifications</span>
+              <Badge variant="secondary" className="text-xs">{alerts.length}</Badge>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <div className="max-h-80 overflow-y-auto">
+              {alerts.map((alert) => (
+                <DropdownMenuItem
+                  key={alert.id}
+                  className={`flex items-start gap-3 p-3 cursor-pointer ${!alert.acknowledged ? 'bg-primary/5' : ''}`}
+                  onClick={() => acknowledgeAlert(alert.id)}
+                >
+                  {getAlertIcon(alert.type)}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{alert.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">{alert.message}</p>
+                  </div>
+                  {!alert.acknowledged && (
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Buzzer Control */}
         <AnimatePresence>
@@ -202,50 +275,7 @@ const CommandHeader = memo(() => {
           )}
         </AnimatePresence>
 
-        {/* Notifications */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
-              {unacknowledgedCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-bold"
-                >
-                  {unacknowledgedCount}
-                </motion.span>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 bg-card/95 backdrop-blur-xl border-border/50">
-            <DropdownMenuLabel className="flex items-center justify-between">
-              <span>Notifications</span>
-              <Badge variant="secondary" className="text-xs">{alerts.length}</Badge>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-80 overflow-y-auto">
-              {alerts.map((alert) => (
-                <DropdownMenuItem
-                  key={alert.id}
-                  className={`flex items-start gap-3 p-3 cursor-pointer ${!alert.acknowledged ? 'bg-primary/5' : ''}`}
-                  onClick={() => acknowledgeAlert(alert.id)}
-                >
-                  {getAlertIcon(alert.type)}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{alert.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{alert.message}</p>
-                  </div>
-                  {!alert.acknowledged && (
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Chat */}
+        {/* Internal Chat Link */}
         <Button variant="ghost" size="icon" asChild>
           <Link to="/internal-chat">
             <MessageSquare className="w-5 h-5" />
