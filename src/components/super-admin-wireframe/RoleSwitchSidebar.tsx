@@ -249,7 +249,20 @@ const roleConfigs = {
 // Extended navigation items per role - role-specific features
 const roleNavItems = {
   continent_super_admin: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { 
+      id: "dashboard", 
+      label: "Dashboard", 
+      icon: LayoutDashboard,
+      subItems: [
+        { id: "csa-asia", label: "Asia Super Admin", status: "active" },
+        { id: "csa-africa", label: "Africa Super Admin", status: "active" },
+        { id: "csa-europe", label: "Europe Super Admin", status: "active" },
+        { id: "csa-north-america", label: "North America Super Admin", status: "active" },
+        { id: "csa-south-america", label: "South America Super Admin", status: "active" },
+        { id: "csa-australia", label: "Australia Super Admin", status: "active" },
+        { id: "csa-antarctica", label: "Antarctica Super Admin", status: "locked" },
+      ]
+    },
     { id: "continents", label: "All Continents", icon: Globe2 },
     { id: "admins", label: "Continent Admins", icon: Users },
     { id: "countries", label: "Country Overview", icon: Map },
@@ -689,6 +702,7 @@ const RoleSwitchSidebar = ({
                 {currentNavItems.map((item, idx) => {
                   const Icon = item.icon;
                   const isActive = activeNav === item.id;
+                  const hasSubItems = 'subItems' in item && Array.isArray(item.subItems);
 
                   return (
                     <motion.div
@@ -733,6 +747,34 @@ const RoleSwitchSidebar = ({
                           </TooltipContent>
                         )}
                       </Tooltip>
+                      
+                      {/* Sub-items for Dashboard */}
+                      {hasSubItems && isActive && !collapsed && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="ml-6 mt-1 space-y-1 border-l border-slate-700/50 pl-3"
+                        >
+                          {(item as any).subItems.map((subItem: { id: string; label: string; status: string }, subIdx: number) => (
+                            <motion.button
+                              key={subItem.id}
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: subIdx * 0.02 }}
+                              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-slate-800/50 transition-colors group"
+                            >
+                              <div className={cn(
+                                "w-2 h-2 rounded-full flex-shrink-0",
+                                subItem.status === "active" ? "bg-emerald-500" : "bg-slate-500"
+                              )} />
+                              <span className="text-slate-400 group-hover:text-white truncate">
+                                {subItem.label}
+                              </span>
+                            </motion.button>
+                          ))}
+                        </motion.div>
+                      )}
                     </motion.div>
                   );
                 })}
