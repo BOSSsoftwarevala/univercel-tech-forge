@@ -199,6 +199,23 @@ import PromiseManagementDashboard from "./pages/promise-management/PromiseManage
 import { WireframeRoutes } from "./components/wireframe/WireframeRoutes";
 // Vala Control System
 import ValaControlCenter from "./pages/vala-control/ValaControlCenter";
+// Super Admin System
+import {
+  Login as SuperAdminSystemLogin,
+  Dashboard as SuperAdminSystemDashboard,
+  Users as SuperAdminSystemUsers,
+  Admins as SuperAdminSystemAdmins,
+  Roles as SuperAdminSystemRoles,
+  Geography as SuperAdminSystemGeography,
+  Modules as SuperAdminSystemModules,
+  Rentals as SuperAdminSystemRentals,
+  Rules as SuperAdminSystemRules,
+  Approvals as SuperAdminSystemApprovals,
+  Security as SuperAdminSystemSecurity,
+  SystemLock as SuperAdminSystemSystemLock,
+  ActivityLog as SuperAdminSystemActivityLog,
+  Audit as SuperAdminSystemAudit
+} from "./pages/super-admin-system";
 
 // Optimized QueryClient with caching for better performance
 const queryClient = new QueryClient({
@@ -491,6 +508,22 @@ const App = () => (
 
               {/* Wireframe Routes - Design Sandbox */}
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
+
+              {/* Super Admin System Routes */}
+              <Route path="/super-admin-system/login" element={<SuperAdminSystemLogin />} />
+              <Route path="/super-admin-system/dashboard" element={<SuperAdminSystemDashboard />} />
+              <Route path="/super-admin-system/users" element={<SuperAdminSystemUsers />} />
+              <Route path="/super-admin-system/admins" element={<SuperAdminSystemAdmins />} />
+              <Route path="/super-admin-system/roles" element={<SuperAdminSystemRoles />} />
+              <Route path="/super-admin-system/geography" element={<SuperAdminSystemGeography />} />
+              <Route path="/super-admin-system/modules" element={<SuperAdminSystemModules />} />
+              <Route path="/super-admin-system/rentals" element={<SuperAdminSystemRentals />} />
+              <Route path="/super-admin-system/rules" element={<SuperAdminSystemRules />} />
+              <Route path="/super-admin-system/approvals" element={<SuperAdminSystemApprovals />} />
+              <Route path="/super-admin-system/security" element={<SuperAdminSystemSecurity />} />
+              <Route path="/super-admin-system/locks" element={<SuperAdminSystemSystemLock />} />
+              <Route path="/super-admin-system/activity-log" element={<SuperAdminSystemActivityLog />} />
+              <Route path="/super-admin-system/audit" element={<SuperAdminSystemAudit />} />
 
                           {/* Catch-all */}
                           <Route path="*" element={<NotFound />} />
