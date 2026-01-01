@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   Globe2, User, Shield, Calendar, Clock, Activity,
-  Eye, MapPin, Ban, Lock, Key, ChevronRight, X,
+  Eye, MapPin, Ban, Lock, ChevronRight, X,
   CheckCircle, AlertTriangle, Search, Filter, RefreshCw,
-  ThumbsUp, ThumbsDown, FileText, Users, Zap, 
-  TrendingUp, Bell, CircleDot, Wifi, Server, BarChart3,
-  ArrowUpRight, ArrowDownRight, Radio, Satellite, Signal
+  FileText, Users, Zap, TrendingUp, Bell, BarChart3,
+  ArrowUpRight, ArrowDownRight, Download, MoreHorizontal,
+  Play, Pause, Flag, Hash, Mail, UserCheck, Building,
+  AlertCircle, Timer, Award, Target, ChevronDown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,179 +17,302 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  Line
-} from "react-simple-maps";
-
-// World map topology
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Country data for each continent
-const continentCountries: Record<string, string[]> = {
-  "Africa": ["Nigeria", "Egypt", "South Africa", "Kenya", "Ghana", "Morocco", "Ethiopia", "Tanzania", "Uganda", "Algeria", "Sudan", "Tunisia", "Cameroon", "Ivory Coast", "Senegal"],
-  "Asia": ["China", "India", "Japan", "South Korea", "Indonesia", "Thailand", "Vietnam", "Philippines", "Malaysia", "Singapore", "Pakistan", "Bangladesh", "Taiwan", "Hong Kong", "UAE"],
-  "Europe": ["Germany", "France", "UK", "Italy", "Spain", "Netherlands", "Belgium", "Switzerland", "Poland", "Sweden", "Norway", "Denmark", "Austria", "Portugal", "Ireland"],
-  "North America": ["USA", "Canada", "Mexico", "Cuba", "Jamaica", "Dominican Republic", "Costa Rica", "Panama", "Guatemala", "Honduras"],
-  "South America": ["Brazil", "Argentina", "Colombia", "Chile", "Peru", "Venezuela", "Ecuador", "Bolivia", "Paraguay", "Uruguay"],
-  "Australia/Oceania": ["Australia", "New Zealand", "Fiji", "Papua New Guinea", "Samoa", "Tonga", "Vanuatu", "Solomon Islands"],
+const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
+  "Asia": [
+    { name: "China", admin: "Li Wei", status: "active" },
+    { name: "India", admin: "Raj Patel", status: "active" },
+    { name: "Japan", admin: "Yuki Tanaka", status: "active" },
+    { name: "South Korea", admin: "Kim Min-jun", status: "active" },
+    { name: "Indonesia", admin: "Budi Santoso", status: "suspended" },
+    { name: "Thailand", admin: "Somchai Prasert", status: "active" },
+    { name: "Vietnam", admin: "Nguyen Van", status: "active" },
+    { name: "Philippines", admin: "Jose Santos", status: "active" },
+    { name: "Malaysia", admin: "Ahmad Hassan", status: "active" },
+    { name: "Singapore", admin: "David Tan", status: "active" },
+  ],
+  "Africa": [
+    { name: "Nigeria", admin: "Chukwu Emeka", status: "active" },
+    { name: "Egypt", admin: "Ahmed Hassan", status: "active" },
+    { name: "South Africa", admin: "Johan Van Der Berg", status: "active" },
+    { name: "Kenya", admin: "James Ochieng", status: "suspended" },
+    { name: "Ghana", admin: "Kwame Asante", status: "active" },
+    { name: "Morocco", admin: "Youssef Benali", status: "active" },
+  ],
+  "Europe": [
+    { name: "Germany", admin: "Klaus Schmidt", status: "active" },
+    { name: "France", admin: "Pierre Dubois", status: "active" },
+    { name: "United Kingdom", admin: "James Wilson", status: "active" },
+    { name: "Italy", admin: "Marco Rossi", status: "active" },
+    { name: "Spain", admin: "Carlos Garcia", status: "suspended" },
+    { name: "Netherlands", admin: "Jan De Vries", status: "active" },
+  ],
+  "North America": [
+    { name: "United States", admin: "John Smith", status: "active" },
+    { name: "Canada", admin: "Michael Brown", status: "active" },
+    { name: "Mexico", admin: "Roberto Martinez", status: "active" },
+    { name: "Cuba", admin: "Luis Hernandez", status: "suspended" },
+  ],
+  "South America": [
+    { name: "Brazil", admin: "João Silva", status: "active" },
+    { name: "Argentina", admin: "Diego Fernandez", status: "suspended" },
+    { name: "Colombia", admin: "Carlos Mendez", status: "active" },
+    { name: "Chile", admin: "Pablo Gonzalez", status: "active" },
+  ],
+  "Australia/Oceania": [
+    { name: "Australia", admin: "Jack Thompson", status: "active" },
+    { name: "New Zealand", admin: "William Clarke", status: "active" },
+    { name: "Fiji", admin: "Ratu Meli", status: "active" },
+  ],
   "Antarctica": []
 };
 
-// All 7 Continent Admins with enhanced data
-const continentAdmins = [
+// All 7 Continent Super Admins data
+const continentSuperAdmins = [
   {
-    id: "csa-001",
-    continent: "Africa",
-    code: "AF",
-    adminName: "Victoria Mensah",
-    email: "v.mensah@system.com",
-    status: "active" as const,
-    statusColor: "bg-emerald-500",
-    countries: 54,
-    managers: 12,
-    traffic: 24500,
-    trafficChange: 12.5,
-    coordinates: [20, 0] as [number, number],
-    color: "#f59e0b",
-    lastActive: "2 min ago",
-    uptime: 99.8,
-    icon: "🌍",
-  },
-  {
-    id: "csa-002",
+    id: "CSA-ASIA-001",
     continent: "Asia",
-    code: "AS",
-    adminName: "Chen Wei",
-    email: "c.wei@system.com",
+    continentCode: "AS",
+    name: "Chen Wei",
+    email: "chen.wei@system.com",
+    username: "chenwei_csa",
     status: "active" as const,
-    statusColor: "bg-emerald-500",
-    countries: 48,
-    managers: 18,
-    traffic: 89200,
-    trafficChange: 8.2,
-    coordinates: [100, 35] as [number, number],
+    countriesCount: 48,
+    activeCountryAdmins: 45,
+    createdDate: "2023-01-15",
+    lastActivity: "2 min ago",
+    lastLogin: "Today, 09:32 AM",
+    actionsToday: 24,
+    healthScore: 94,
+    complianceScore: 98,
+    pendingApprovals: 3,
+    issuesResolved: 156,
+    icon: "🌏",
     color: "#ef4444",
-    lastActive: "5 min ago",
-    uptime: 99.9,
-    icon: "🌏",
+    permissions: {
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
+      regionalReports: true,
+      liveMonitoring: true,
+    },
+    recentActions: [
+      { action: "Approved Country Admin for Vietnam", time: "2 min ago", type: "approval" },
+      { action: "Updated regional compliance settings", time: "15 min ago", type: "config" },
+      { action: "Reviewed Thailand performance report", time: "1 hour ago", type: "review" },
+    ]
   },
   {
-    id: "csa-003",
-    continent: "Europe",
-    code: "EU",
-    adminName: "Hans Mueller",
-    email: "h.mueller@system.com",
+    id: "CSA-AFRICA-001",
+    continent: "Africa",
+    continentCode: "AF",
+    name: "Victoria Mensah",
+    email: "v.mensah@system.com",
+    username: "vmensah_csa",
     status: "active" as const,
-    statusColor: "bg-emerald-500",
-    countries: 44,
-    managers: 22,
-    traffic: 67800,
-    trafficChange: -2.1,
-    coordinates: [15, 50] as [number, number],
-    color: "#3b82f6",
-    lastActive: "15 min ago",
-    uptime: 99.7,
+    countriesCount: 54,
+    activeCountryAdmins: 48,
+    createdDate: "2023-02-20",
+    lastActivity: "5 min ago",
+    lastLogin: "Today, 08:45 AM",
+    actionsToday: 18,
+    healthScore: 89,
+    complianceScore: 95,
+    pendingApprovals: 7,
+    issuesResolved: 203,
     icon: "🌍",
+    color: "#f59e0b",
+    permissions: {
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
+      regionalReports: true,
+      liveMonitoring: true,
+    },
+    recentActions: [
+      { action: "Created new country entry: Senegal", time: "5 min ago", type: "create" },
+      { action: "Suspended Country Admin for Kenya", time: "2 hours ago", type: "suspension" },
+    ]
   },
   {
-    id: "csa-004",
+    id: "CSA-EUROPE-001",
+    continent: "Europe",
+    continentCode: "EU",
+    name: "Hans Mueller",
+    email: "h.mueller@system.com",
+    username: "hmueller_csa",
+    status: "active" as const,
+    countriesCount: 44,
+    activeCountryAdmins: 42,
+    createdDate: "2023-01-10",
+    lastActivity: "15 min ago",
+    lastLogin: "Today, 10:15 AM",
+    actionsToday: 12,
+    healthScore: 96,
+    complianceScore: 99,
+    pendingApprovals: 2,
+    issuesResolved: 89,
+    icon: "🌍",
+    color: "#3b82f6",
+    permissions: {
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
+      regionalReports: true,
+      liveMonitoring: true,
+    },
+    recentActions: [
+      { action: "Approved withdrawal for Germany", time: "15 min ago", type: "approval" },
+      { action: "Updated UK compliance settings", time: "1 hour ago", type: "config" },
+    ]
+  },
+  {
+    id: "CSA-NA-001",
     continent: "North America",
-    code: "NA",
-    adminName: "James Wilson",
+    continentCode: "NA",
+    name: "James Wilson",
     email: "j.wilson@system.com",
+    username: "jwilson_csa",
     status: "active" as const,
-    statusColor: "bg-emerald-500",
-    countries: 23,
-    managers: 8,
-    traffic: 45300,
-    trafficChange: 5.8,
-    coordinates: [-100, 40] as [number, number],
+    countriesCount: 23,
+    activeCountryAdmins: 21,
+    createdDate: "2023-03-01",
+    lastActivity: "30 min ago",
+    lastLogin: "Today, 07:00 AM",
+    actionsToday: 8,
+    healthScore: 91,
+    complianceScore: 97,
+    pendingApprovals: 4,
+    issuesResolved: 67,
+    icon: "🌎",
     color: "#10b981",
-    lastActive: "30 min ago",
-    uptime: 99.5,
-    icon: "🌎",
+    permissions: {
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
+      regionalReports: true,
+      liveMonitoring: true,
+    },
+    recentActions: [
+      { action: "Resolved escalation from Mexico", time: "30 min ago", type: "resolution" },
+    ]
   },
   {
-    id: "csa-005",
+    id: "CSA-SA-001",
     continent: "South America",
-    code: "SA",
-    adminName: "Carlos Rodriguez",
+    continentCode: "SA",
+    name: "Carlos Rodriguez",
     email: "c.rodriguez@system.com",
+    username: "crodriguez_csa",
     status: "suspended" as const,
-    statusColor: "bg-yellow-500",
-    countries: 12,
-    managers: 6,
-    traffic: 18900,
-    trafficChange: -5.2,
-    coordinates: [-60, -15] as [number, number],
-    color: "#84cc16",
-    lastActive: "3 days ago",
-    uptime: 0,
+    countriesCount: 12,
+    activeCountryAdmins: 8,
+    createdDate: "2023-04-15",
+    lastActivity: "3 days ago",
+    lastLogin: "Dec 28, 2025",
+    actionsToday: 0,
+    healthScore: 45,
+    complianceScore: 72,
+    pendingApprovals: 15,
+    issuesResolved: 34,
     icon: "🌎",
+    color: "#84cc16",
+    permissions: {
+      countriesCreate: false,
+      countriesEdit: false,
+      countryAdminAssign: false,
+      regionalReports: true,
+      liveMonitoring: false,
+    },
+    recentActions: [
+      { action: "Account suspended by Super Admin", time: "3 days ago", type: "suspension" },
+    ]
   },
   {
-    id: "csa-006",
+    id: "CSA-OC-001",
     continent: "Australia/Oceania",
-    code: "OC",
-    adminName: "Sarah Mitchell",
+    continentCode: "OC",
+    name: "Sarah Mitchell",
     email: "s.mitchell@system.com",
+    username: "smitchell_csa",
     status: "active" as const,
-    statusColor: "bg-emerald-500",
-    countries: 14,
-    managers: 4,
-    traffic: 12400,
-    trafficChange: 3.4,
-    coordinates: [135, -25] as [number, number],
-    color: "#8b5cf6",
-    lastActive: "1 hour ago",
-    uptime: 99.6,
+    countriesCount: 14,
+    activeCountryAdmins: 12,
+    createdDate: "2023-05-01",
+    lastActivity: "1 hour ago",
+    lastLogin: "Today, 06:30 AM",
+    actionsToday: 6,
+    healthScore: 88,
+    complianceScore: 94,
+    pendingApprovals: 1,
+    issuesResolved: 45,
     icon: "🌏",
+    color: "#8b5cf6",
+    permissions: {
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
+      regionalReports: true,
+      liveMonitoring: true,
+    },
+    recentActions: [
+      { action: "Updated New Zealand settings", time: "1 hour ago", type: "config" },
+    ]
   },
   {
-    id: "csa-007",
+    id: "CSA-AN-001",
     continent: "Antarctica",
-    code: "AN",
-    adminName: "Dr. Erik Larsen",
+    continentCode: "AN",
+    name: "Dr. Erik Larsen",
     email: "e.larsen@system.com",
+    username: "elarsen_csa",
     status: "inactive" as const,
-    statusColor: "bg-red-500",
-    countries: 0,
-    managers: 1,
-    traffic: 450,
-    trafficChange: 0,
-    coordinates: [0, -80] as [number, number],
-    color: "#06b6d4",
-    lastActive: "Offline",
-    uptime: 0,
+    countriesCount: 0,
+    activeCountryAdmins: 0,
+    createdDate: "2023-06-01",
+    lastActivity: "Offline",
+    lastLogin: "Dec 1, 2025",
+    actionsToday: 0,
+    healthScore: 0,
+    complianceScore: 0,
+    pendingApprovals: 0,
+    issuesResolved: 0,
     icon: "🧊",
+    color: "#06b6d4",
+    permissions: {
+      countriesCreate: false,
+      countriesEdit: false,
+      countryAdminAssign: false,
+      regionalReports: false,
+      liveMonitoring: false,
+    },
+    recentActions: []
   },
-];
-
-// Live activity data
-const liveActivities = [
-  { id: 1, continent: "Asia", action: "New franchise approved", time: "Just now", type: "success" },
-  { id: 2, continent: "Europe", action: "Withdrawal processed", time: "2 min ago", type: "info" },
-  { id: 3, continent: "Africa", action: "User suspended", time: "5 min ago", type: "warning" },
-  { id: 4, continent: "North America", action: "Server scaling triggered", time: "8 min ago", type: "info" },
-  { id: 5, continent: "Asia", action: "KYC verification completed", time: "12 min ago", type: "success" },
-  { id: 6, continent: "Europe", action: "High traffic alert", time: "15 min ago", type: "warning" },
-  { id: 7, continent: "Australia/Oceania", action: "New country added", time: "20 min ago", type: "success" },
-  { id: 8, continent: "South America", action: "Admin suspended", time: "3 days ago", type: "error" },
-];
-
-// Traffic data points for visualization
-const trafficData = [
-  { time: "00:00", value: 45000 },
-  { time: "04:00", value: 32000 },
-  { time: "08:00", value: 78000 },
-  { time: "12:00", value: 125000 },
-  { time: "16:00", value: 98000 },
-  { time: "20:00", value: 156000 },
-  { time: "Now", value: 189000 },
 ];
 
 interface ContinentSuperAdminViewProps {
@@ -196,844 +320,563 @@ interface ContinentSuperAdminViewProps {
 }
 
 const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdminViewProps) => {
-  const [selectedAdmin, setSelectedAdmin] = useState<typeof continentAdmins[0] | null>(null);
-  const [isLiveMode, setIsLiveMode] = useState(true);
-  const [pulseIndex, setPulseIndex] = useState(0);
+  const [selectedCSA, setSelectedCSA] = useState<typeof continentSuperAdmins[0] | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [continentFilter, setContinentFilter] = useState("all");
+  const [detailTab, setDetailTab] = useState("profile");
 
-  // Animate pulse effect on markers
-  useEffect(() => {
-    if (isLiveMode) {
-      const interval = setInterval(() => {
-        setPulseIndex((prev) => (prev + 1) % continentAdmins.length);
-      }, 2000);
-      return () => clearInterval(interval);
-    }
-  }, [isLiveMode]);
+  // Stats calculations
+  const totalCSAs = continentSuperAdmins.length;
+  const activeCSAs = continentSuperAdmins.filter(c => c.status === "active").length;
+  const inactiveCSAs = continentSuperAdmins.filter(c => c.status === "inactive").length;
+  const suspendedCSAs = continentSuperAdmins.filter(c => c.status === "suspended").length;
+  const liveActionsToday = continentSuperAdmins.reduce((sum, c) => sum + c.actionsToday, 0);
 
-  const totalTraffic = continentAdmins.reduce((sum, a) => sum + a.traffic, 0);
-  const activeAdmins = continentAdmins.filter(a => a.status === "active").length;
-  const totalCountries = continentAdmins.reduce((sum, a) => sum + a.countries, 0);
-  const totalManagers = continentAdmins.reduce((sum, a) => sum + a.managers, 0);
+  // Filtered CSAs
+  const filteredCSAs = continentSuperAdmins.filter(csa => {
+    const matchesSearch = csa.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          csa.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          csa.continent.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || csa.status === statusFilter;
+    const matchesContinent = continentFilter === "all" || csa.continent === continentFilter;
+    return matchesSearch && matchesStatus && matchesContinent;
+  });
 
-  const getStatusDot = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-emerald-500 shadow-emerald-500/50";
+        return <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">Active</Badge>;
       case "suspended":
-        return "bg-yellow-500 shadow-yellow-500/50";
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">Suspended</Badge>;
       case "inactive":
-        return "bg-red-500 shadow-red-500/50";
+        return <Badge className="bg-red-500/20 text-red-400 border-red-500/50">Inactive</Badge>;
       default:
-        return "bg-gray-500";
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
-  // Get countries for selected admin
-  const getCountriesForContinent = (continent: string) => {
-    return continentCountries[continent] || [];
+  const getHealthScoreColor = (score: number) => {
+    if (score >= 80) return "text-emerald-400";
+    if (score >= 60) return "text-yellow-400";
+    return "text-red-400";
   };
 
-  // Render Continent Admins focused view - Clean list style
-  const renderAdminsView = () => (
+  // Main Registry View
+  const renderRegistryView = () => (
     <div className="h-full flex overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Left Side - List of all 7 continent admins */}
-      <div className="w-[400px] border-r border-slate-700/50 flex flex-col bg-slate-900/50">
-        {/* Header */}
-        <div className="p-5 border-b border-slate-700/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <Globe2 className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">Continent Admins</h2>
-              <p className="text-sm text-slate-400">7 Global Administrators</p>
-            </div>
-          </div>
-          <div className="flex gap-2 text-xs">
-            <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              {activeAdmins} Active
-            </Badge>
-            <Badge variant="outline" className="text-yellow-400 border-yellow-500/50 gap-1">
-              <span className="w-2 h-2 rounded-full bg-yellow-500" />
-              {continentAdmins.filter(a => a.status === "suspended").length} Suspended
-            </Badge>
-            <Badge variant="outline" className="text-red-400 border-red-500/50 gap-1">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
-              {continentAdmins.filter(a => a.status === "inactive").length} Inactive
-            </Badge>
-          </div>
-        </div>
-
-        {/* Admin List */}
-        <ScrollArea className="flex-1">
-          <div className="p-3 space-y-2">
-            {continentAdmins.map((admin) => (
-              <motion.div
-                key={admin.id}
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedAdmin(admin)}
-                className={cn(
-                  "p-4 rounded-xl border cursor-pointer transition-all duration-200",
-                  selectedAdmin?.id === admin.id
-                    ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/50"
-                    : "bg-slate-800/50 border-slate-700/50 hover:border-slate-600"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {/* Continent Icon/Emoji */}
-                    <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                      style={{ backgroundColor: `${admin.color}20` }}
-                    >
-                      {admin.icon}
-                    </div>
-                    
-                    {/* Name & Details */}
-                    <div>
-                      <h3 className="text-white font-semibold text-base">
-                        {admin.continent} <span className="text-slate-400 font-normal">Boss</span>
-                      </h3>
-                      <p className="text-sm text-slate-500">{admin.adminName}</p>
-                    </div>
-                  </div>
-
-                  {/* Status Dot */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <div className={cn(
-                        "w-4 h-4 rounded-full shadow-lg",
-                        admin.status === "active" && "bg-emerald-500 shadow-emerald-500/50",
-                        admin.status === "suspended" && "bg-yellow-500 shadow-yellow-500/50",
-                        admin.status === "inactive" && "bg-red-500 shadow-red-500/50"
-                      )} />
-                      {admin.status === "active" && (
-                        <div className="absolute inset-0 w-4 h-4 rounded-full bg-emerald-500 animate-ping opacity-40" />
-                      )}
-                    </div>
-                    <ChevronRight className={cn(
-                      "w-5 h-5 transition-colors",
-                      selectedAdmin?.id === admin.id ? "text-blue-400" : "text-slate-600"
-                    )} />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* Right Side - Selected Continent Details with Countries */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <AnimatePresence mode="wait">
-          {selectedAdmin ? (
-            <motion.div
-              key={selectedAdmin.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="h-full flex flex-col"
-            >
-              {/* Continent Header */}
-              <div 
-                className="p-6 border-b border-slate-700/50"
-                style={{ background: `linear-gradient(135deg, ${selectedAdmin.color}15, transparent)` }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    {/* Large Continent Icon */}
-                    <div 
-                      className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl"
-                      style={{ backgroundColor: `${selectedAdmin.color}25`, boxShadow: `0 0 40px ${selectedAdmin.color}30` }}
-                    >
-                      {selectedAdmin.icon}
-                    </div>
-                    <div>
-                      <h1 className="text-3xl font-bold text-white">{selectedAdmin.continent}</h1>
-                      <p className="text-lg text-slate-400 mt-1">Boss: {selectedAdmin.adminName}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <Badge 
-                          className={cn(
-                            "capitalize text-sm px-3 py-1",
-                            selectedAdmin.status === "active" && "bg-emerald-500/20 text-emerald-400 border-emerald-500/50",
-                            selectedAdmin.status === "suspended" && "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
-                            selectedAdmin.status === "inactive" && "bg-red-500/20 text-red-400 border-red-500/50"
-                          )}
-                        >
-                          <span className={cn(
-                            "w-2 h-2 rounded-full mr-2",
-                            selectedAdmin.status === "active" && "bg-emerald-500",
-                            selectedAdmin.status === "suspended" && "bg-yellow-500",
-                            selectedAdmin.status === "inactive" && "bg-red-500"
-                          )} />
-                          {selectedAdmin.status}
-                        </Badge>
-                        <span className="text-slate-500 text-sm">{selectedAdmin.email}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Quick Stats */}
-                  <div className="flex gap-4">
-                    <div className="text-center px-4 py-2 bg-slate-800/50 rounded-xl">
-                      <p className="text-2xl font-bold" style={{ color: selectedAdmin.color }}>{selectedAdmin.countries}</p>
-                      <p className="text-xs text-slate-500">Countries</p>
-                    </div>
-                    <div className="text-center px-4 py-2 bg-slate-800/50 rounded-xl">
-                      <p className="text-2xl font-bold text-blue-400">{selectedAdmin.managers}</p>
-                      <p className="text-xs text-slate-500">Managers</p>
-                    </div>
-                    <div className="text-center px-4 py-2 bg-slate-800/50 rounded-xl">
-                      <p className="text-2xl font-bold text-purple-400">{(selectedAdmin.traffic / 1000).toFixed(1)}K</p>
-                      <p className="text-xs text-slate-500">Traffic</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Countries Grid */}
-              <ScrollArea className="flex-1">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                      <MapPin className="w-5 h-5" style={{ color: selectedAdmin.color }} />
-                      Countries in {selectedAdmin.continent}
-                    </h3>
-                    <span className="text-sm text-slate-500">
-                      {getCountriesForContinent(selectedAdmin.continent).length} countries shown
-                    </span>
-                  </div>
-                  
-                  {getCountriesForContinent(selectedAdmin.continent).length > 0 ? (
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                      {getCountriesForContinent(selectedAdmin.continent).map((country, index) => (
-                        <motion.div
-                          key={country}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.03 }}
-                          className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:border-slate-600 transition-all cursor-pointer group"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="w-3 h-3 rounded-full"
-                              style={{ backgroundColor: selectedAdmin.color }}
-                            />
-                            <span className="text-white text-sm font-medium group-hover:text-blue-400 transition-colors">
-                              {country}
-                            </span>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 bg-slate-800/30 rounded-xl border border-slate-700/30">
-                      <Globe2 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                      <p className="text-slate-500">No countries in this region</p>
-                    </div>
-                  )}
-
-                  {/* Admin Actions */}
-                  <div className="mt-8">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-yellow-400" />
-                      Quick Actions
-                    </h3>
-                    <div className="grid grid-cols-4 gap-3">
-                      <Button variant="outline" className="justify-start gap-2 border-slate-700 bg-slate-800/50 hover:bg-slate-700/50">
-                        <Eye className="w-4 h-4" />
-                        View Profile
-                      </Button>
-                      <Button variant="outline" className="justify-start gap-2 border-slate-700 bg-slate-800/50 hover:bg-slate-700/50">
-                        <Activity className="w-4 h-4" />
-                        Activity Log
-                      </Button>
-                      <Button variant="outline" className="justify-start gap-2 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10">
-                        <AlertTriangle className="w-4 h-4" />
-                        Suspend
-                      </Button>
-                      <Button variant="outline" className="justify-start gap-2 border-red-500/50 text-red-400 hover:bg-red-500/10">
-                        <Lock className="w-4 h-4" />
-                        Lock Access
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </ScrollArea>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="h-full flex items-center justify-center"
-            >
-              <div className="text-center">
-                <Globe2 className="w-20 h-20 text-slate-700 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-slate-500">Select a Continent Admin</h3>
-                <p className="text-slate-600 mt-2">Click on any continent admin from the list to view details</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-
-  // If activeNav is "admins", show the focused admins view
-  if (activeNav === "admins") {
-    return renderAdminsView();
-  }
-
-  // Default dashboard view
-  return (
-    <div className="h-full flex overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Main Dashboard */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-border/30 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5">
-          <div className="flex items-center justify-between">
+        <div className="p-6 border-b border-slate-700/50 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-indigo-500/5">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-blue-500/20">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl">
                 <Globe2 className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Continent Boss Dashboard</h1>
-                <p className="text-blue-400/80 text-sm">Global Operations • 7 Continents</p>
+                <h1 className="text-2xl font-bold text-white">Continent Super Admin Registry</h1>
+                <p className="text-slate-400 text-sm">Manage all 7 Continent Super Administrators</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                variant={isLiveMode ? "default" : "outline"}
-                size="sm"
-                onClick={() => setIsLiveMode(!isLiveMode)}
-                className={cn(
-                  "gap-2",
-                  isLiveMode && "bg-emerald-500 hover:bg-emerald-600"
-                )}
-              >
-                <Radio className={cn("w-4 h-4", isLiveMode && "animate-pulse")} />
-                Live Mode
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="gap-2 border-slate-700">
+                <Download className="w-4 h-4" />
+                Export
               </Button>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 border-slate-700">
                 <RefreshCw className="w-4 h-4" />
-                Sync All
+                Sync
               </Button>
             </div>
           </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-5 gap-4">
+            <Card className="bg-slate-800/50 border-slate-700/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Total Continents</p>
+                    <p className="text-3xl font-bold text-white mt-1">7</p>
+                  </div>
+                  <Globe2 className="w-10 h-10 text-blue-400/30" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-slate-800/50 border-slate-700/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Total CSAs</p>
+                    <p className="text-3xl font-bold text-white mt-1">{totalCSAs}</p>
+                  </div>
+                  <Users className="w-10 h-10 text-purple-400/30" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-emerald-500/10 border-emerald-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-emerald-400/80 uppercase tracking-wider">Active CSAs</p>
+                    <p className="text-3xl font-bold text-emerald-400 mt-1">{activeCSAs}</p>
+                  </div>
+                  <CheckCircle className="w-10 h-10 text-emerald-400/30" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-red-500/10 border-red-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-red-400/80 uppercase tracking-wider">Inactive/Suspended</p>
+                    <p className="text-3xl font-bold text-red-400 mt-1">{inactiveCSAs + suspendedCSAs}</p>
+                  </div>
+                  <AlertCircle className="w-10 h-10 text-red-400/30" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-amber-500/10 border-amber-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-amber-400/80 uppercase tracking-wider">Live Actions Today</p>
+                    <p className="text-3xl font-bold text-amber-400 mt-1">{liveActionsToday}</p>
+                  </div>
+                  <Zap className="w-10 h-10 text-amber-400/30" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
+        {/* Filters */}
+        <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-900/50">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Input
+                placeholder="Search by Name / ID / Continent..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-slate-800/50 border-slate-700 text-white"
+              />
+            </div>
+            <Select value={continentFilter} onValueChange={setContinentFilter}>
+              <SelectTrigger className="w-48 bg-slate-800/50 border-slate-700 text-white">
+                <SelectValue placeholder="By Continent" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Continents</SelectItem>
+                {continentSuperAdmins.map(c => (
+                  <SelectItem key={c.continent} value={c.continent}>{c.continent}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40 bg-slate-800/50 border-slate-700 text-white">
+                <SelectValue placeholder="By Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" className="gap-2 border-slate-700">
+              <Filter className="w-4 h-4" />
+              More Filters
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Table */}
         <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-5 gap-4">
-              <Card className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30 backdrop-blur">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-blue-400/80 uppercase tracking-wider">Total Continents</p>
-                      <p className="text-3xl font-bold text-blue-400 mt-1">7</p>
-                    </div>
-                    <Globe2 className="w-10 h-10 text-blue-400/20" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/30 backdrop-blur">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-emerald-400/80 uppercase tracking-wider">Active Admins</p>
-                      <p className="text-3xl font-bold text-emerald-400 mt-1">{activeAdmins}</p>
-                    </div>
-                    <CheckCircle className="w-10 h-10 text-emerald-400/20" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border-purple-500/30 backdrop-blur">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-purple-400/80 uppercase tracking-wider">Countries</p>
-                      <p className="text-3xl font-bold text-purple-400 mt-1">{totalCountries}</p>
-                    </div>
-                    <MapPin className="w-10 h-10 text-purple-400/20" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-br from-cyan-500/10 to-sky-500/10 border-cyan-500/30 backdrop-blur">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-cyan-400/80 uppercase tracking-wider">Total Managers</p>
-                      <p className="text-3xl font-bold text-cyan-400 mt-1">{totalManagers}</p>
-                    </div>
-                    <Users className="w-10 h-10 text-cyan-400/20" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/30 backdrop-blur">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-amber-400/80 uppercase tracking-wider">Global Traffic</p>
-                      <p className="text-3xl font-bold text-amber-400 mt-1">{(totalTraffic / 1000).toFixed(1)}K</p>
-                    </div>
-                    <Activity className="w-10 h-10 text-amber-400/20" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* World Map & Admin Grid */}
-            <div className="grid grid-cols-3 gap-6">
-              {/* World Map */}
-              <Card className="col-span-2 bg-slate-900/80 border-slate-700/50 backdrop-blur overflow-hidden">
-                <CardHeader className="pb-2 border-b border-slate-700/50">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg flex items-center gap-2 text-white">
-                      <Satellite className="w-5 h-5 text-blue-400" />
-                      Global Network Map
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        Active
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-                        Suspended
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                        Inactive
-                      </span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0 relative">
-                  <div className="relative h-[400px] bg-gradient-to-b from-slate-900 to-slate-950">
-                    {/* Grid overlay effect */}
-                    <div className="absolute inset-0 opacity-10" style={{
-                      backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-                                       linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)`,
-                      backgroundSize: '50px 50px'
-                    }} />
-                    
-                    <ComposableMap
-                      projection="geoMercator"
-                      projectionConfig={{
-                        scale: 140,
-                        center: [0, 20]
-                      }}
-                      className="w-full h-full"
+          <div className="p-6">
+            <Card className="bg-slate-900/50 border-slate-700/50">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-700/50 hover:bg-transparent">
+                    <TableHead className="text-slate-400 font-semibold">Continent</TableHead>
+                    <TableHead className="text-slate-400 font-semibold">CSA Name</TableHead>
+                    <TableHead className="text-slate-400 font-semibold">CSA ID</TableHead>
+                    <TableHead className="text-slate-400 font-semibold">Email</TableHead>
+                    <TableHead className="text-slate-400 font-semibold">Status</TableHead>
+                    <TableHead className="text-slate-400 font-semibold text-center">Countries</TableHead>
+                    <TableHead className="text-slate-400 font-semibold">Created</TableHead>
+                    <TableHead className="text-slate-400 font-semibold">Last Activity</TableHead>
+                    <TableHead className="text-slate-400 font-semibold text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredCSAs.map((csa) => (
+                    <TableRow 
+                      key={csa.id} 
+                      className="border-slate-700/30 hover:bg-slate-800/50 cursor-pointer transition-colors"
+                      onClick={() => setSelectedCSA(csa)}
                     >
-                      <Geographies geography={geoUrl}>
-                        {({ geographies }) =>
-                          geographies.map((geo) => (
-                            <Geography
-                              key={geo.rsmKey}
-                              geography={geo}
-                              fill="#1e293b"
-                              stroke="#334155"
-                              strokeWidth={0.5}
-                              style={{
-                                default: { outline: 'none' },
-                                hover: { fill: '#334155', outline: 'none' },
-                                pressed: { outline: 'none' }
-                              }}
-                            />
-                          ))
-                        }
-                      </Geographies>
-                      
-                      {/* Connection lines between continents */}
-                      {continentAdmins.slice(0, -1).map((admin, i) => {
-                        const next = continentAdmins[(i + 1) % (continentAdmins.length - 1)];
-                        return (
-                          <Line
-                            key={`line-${i}`}
-                            from={admin.coordinates}
-                            to={next.coordinates}
-                            stroke="rgba(59, 130, 246, 0.2)"
-                            strokeWidth={1}
-                            strokeLinecap="round"
-                          />
-                        );
-                      })}
-                      
-                      {/* Continent markers */}
-                      {continentAdmins.map((admin, index) => (
-                        <Marker
-                          key={admin.id}
-                          coordinates={admin.coordinates}
-                          onClick={() => setSelectedAdmin(admin)}
-                        >
-                          <g className="cursor-pointer">
-                            {/* Pulse ring for active */}
-                            {admin.status === "active" && isLiveMode && (
-                              <circle
-                                r={pulseIndex === index ? 20 : 15}
-                                fill="none"
-                                stroke={admin.color}
-                                strokeWidth={1}
-                                opacity={pulseIndex === index ? 0.8 : 0.3}
-                                className="transition-all duration-1000"
-                              />
-                            )}
-                            {/* Main circle */}
-                            <circle
-                              r={12}
-                              fill={admin.status === "active" ? admin.color : admin.status === "suspended" ? "#eab308" : "#ef4444"}
-                              stroke="#0f172a"
-                              strokeWidth={3}
-                              className="drop-shadow-lg"
-                            />
-                            {/* Status indicator */}
-                            <circle
-                              r={4}
-                              cy={-8}
-                              cx={8}
-                              fill={admin.status === "active" ? "#22c55e" : admin.status === "suspended" ? "#eab308" : "#ef4444"}
-                              stroke="#0f172a"
-                              strokeWidth={2}
-                            />
-                            {/* Label */}
-                            <text
-                              textAnchor="middle"
-                              y={30}
-                              className="fill-slate-300 text-[10px] font-medium"
-                            >
-                              {admin.code}
-                            </text>
-                          </g>
-                        </Marker>
-                      ))}
-                    </ComposableMap>
-
-                    {/* Traffic indicators */}
-                    <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                      {trafficData.map((data, i) => (
-                        <div key={i} className="flex flex-col items-center">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
                           <div 
-                            className="w-8 bg-gradient-to-t from-blue-500 to-cyan-400 rounded-t opacity-60"
-                            style={{ height: `${(data.value / 200000) * 60}px` }}
-                          />
-                          <span className="text-[9px] text-slate-500 mt-1">{data.time}</span>
+                            className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                            style={{ backgroundColor: `${csa.color}20` }}
+                          >
+                            {csa.icon}
+                          </div>
+                          <span className="text-white font-medium">{csa.continent}</span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* 7 Continent Admins List */}
-              <Card className="bg-slate-900/80 border-slate-700/50 backdrop-blur">
-                <CardHeader className="pb-3 border-b border-slate-700/50">
-                  <CardTitle className="text-lg flex items-center gap-2 text-white">
-                    <Users className="w-5 h-5 text-purple-400" />
-                    Continent Admins
-                    <Badge variant="outline" className="ml-auto text-xs">
-                      7 Total
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <ScrollArea className="h-[370px]">
-                    <div className="p-3 space-y-2">
-                      {continentAdmins.map((admin) => (
-                        <motion.div
-                          key={admin.id}
-                          whileHover={{ scale: 1.02, x: 4 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => setSelectedAdmin(admin)}
-                          className={cn(
-                            "p-3 rounded-xl border cursor-pointer transition-all duration-200",
-                            selectedAdmin?.id === admin.id
-                              ? "bg-blue-500/20 border-blue-500/50"
-                              : "bg-slate-800/50 border-slate-700/50 hover:border-slate-600"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            {/* Status Dot */}
-                            <div className="relative">
-                              <div 
-                                className={cn(
-                                  "w-3 h-3 rounded-full shadow-lg",
-                                  getStatusDot(admin.status)
-                                )}
-                              />
-                              {admin.status === "active" && isLiveMode && (
-                                <div className={cn(
-                                  "absolute inset-0 w-3 h-3 rounded-full animate-ping",
-                                  admin.statusColor
-                                )} />
-                              )}
-                            </div>
-                            
-                            {/* Admin Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <h4 className="text-sm font-semibold text-white truncate">
-                                  {admin.continent}
-                                </h4>
-                                <Badge 
-                                  variant="outline" 
-                                  className={cn(
-                                    "text-[10px] capitalize",
-                                    admin.status === "active" && "text-emerald-400 border-emerald-500/50",
-                                    admin.status === "suspended" && "text-yellow-400 border-yellow-500/50",
-                                    admin.status === "inactive" && "text-red-400 border-red-500/50"
-                                  )}
-                                >
-                                  {admin.status}
-                                </Badge>
-                              </div>
-                              <p className="text-xs text-slate-400 truncate">{admin.adminName}</p>
-                              <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-500">
-                                <span>{admin.countries} countries</span>
-                                <span>{admin.managers} managers</span>
-                              </div>
-                            </div>
-                            
-                            <ChevronRight className="w-4 h-4 text-slate-500" />
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Live Activity & Traffic */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Live Activity Feed */}
-              <Card className="bg-slate-900/80 border-slate-700/50 backdrop-blur">
-                <CardHeader className="pb-3 border-b border-slate-700/50">
-                  <CardTitle className="text-lg flex items-center gap-2 text-white">
-                    <Activity className="w-5 h-5 text-emerald-400 animate-pulse" />
-                    Live Activity
-                    {isLiveMode && (
-                      <span className="ml-2 flex items-center gap-1 text-xs text-emerald-400">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        Live
-                      </span>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <ScrollArea className="h-[220px]">
-                    <div className="p-4 space-y-3">
-                      {liveActivities.map((activity) => (
-                        <motion.div
-                          key={activity.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="flex items-start gap-3 p-2 rounded-lg bg-slate-800/30"
-                        >
-                          <div className={cn(
-                            "w-2 h-2 rounded-full mt-2",
-                            activity.type === "success" && "bg-emerald-500",
-                            activity.type === "info" && "bg-blue-500",
-                            activity.type === "warning" && "bg-yellow-500",
-                            activity.type === "error" && "bg-red-500"
-                          )} />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-white">{activity.action}</span>
-                              <span className="text-[10px] text-slate-500">{activity.time}</span>
-                            </div>
-                            <span className="text-xs text-slate-400">{activity.continent}</span>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-
-              {/* Global Traffic Stats */}
-              <Card className="bg-slate-900/80 border-slate-700/50 backdrop-blur">
-                <CardHeader className="pb-3 border-b border-slate-700/50">
-                  <CardTitle className="text-lg flex items-center gap-2 text-white">
-                    <BarChart3 className="w-5 h-5 text-cyan-400" />
-                    Traffic by Continent
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    {continentAdmins.slice(0, 6).map((admin) => (
-                      <div key={admin.id} className="space-y-1">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-300">{admin.continent}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-slate-400">{(admin.traffic / 1000).toFixed(1)}K</span>
-                            <span className={cn(
-                              "text-xs flex items-center",
-                              admin.trafficChange >= 0 ? "text-emerald-400" : "text-red-400"
-                            )}>
-                              {admin.trafficChange >= 0 ? (
-                                <ArrowUpRight className="w-3 h-3" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="bg-slate-700 text-white text-xs">
+                              {csa.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-white">{csa.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <code className="text-xs text-blue-400 bg-blue-500/10 px-2 py-1 rounded">
+                          {csa.id}
+                        </code>
+                      </TableCell>
+                      <TableCell className="text-slate-400 text-sm">{csa.email}</TableCell>
+                      <TableCell>{getStatusBadge(csa.status)}</TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-white font-medium">{csa.countriesCount}</span>
+                      </TableCell>
+                      <TableCell className="text-slate-400 text-sm">{csa.createdDate}</TableCell>
+                      <TableCell className="text-slate-400 text-sm">{csa.lastActivity}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedCSA(csa); setDetailTab("profile"); }}>
+                              <Eye className="w-4 h-4 mr-2" /> View Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedCSA(csa); setDetailTab("activity"); }}>
+                              <Activity className="w-4 h-4 mr-2" /> View Activity
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedCSA(csa); setDetailTab("countries"); }}>
+                              <MapPin className="w-4 h-4 mr-2" /> View Countries
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={(e) => e.stopPropagation()} className="text-yellow-400">
+                              {csa.status === "active" ? (
+                                <><Pause className="w-4 h-4 mr-2" /> Suspend</>
                               ) : (
-                                <ArrowDownRight className="w-3 h-3" />
+                                <><Play className="w-4 h-4 mr-2" /> Activate</>
                               )}
-                              {Math.abs(admin.trafficChange)}%
-                            </span>
-                          </div>
-                        </div>
-                        <Progress 
-                          value={(admin.traffic / 100000) * 100} 
-                          className="h-2 bg-slate-800"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                              <FileText className="w-4 h-4 mr-2" /> Audit Logs
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
           </div>
         </ScrollArea>
       </div>
 
-      {/* Detail Panel */}
+      {/* Detail Panel - Slide Out */}
       <AnimatePresence>
-        {selectedAdmin && (
+        {selectedCSA && (
           <motion.div
-            initial={{ x: 400, opacity: 0 }}
+            initial={{ x: 500, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 400, opacity: 0 }}
+            exit={{ x: 500, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="w-[380px] bg-slate-900 border-l border-slate-700/50 flex flex-col shadow-2xl"
+            className="w-[500px] bg-slate-900 border-l border-slate-700/50 flex flex-col shadow-2xl"
           >
             {/* Panel Header */}
             <div 
               className="p-5 border-b border-slate-700/50"
-              style={{ background: `linear-gradient(135deg, ${selectedAdmin.color}20, transparent)` }}
+              style={{ background: `linear-gradient(135deg, ${selectedCSA.color}15, transparent)` }}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: `${selectedAdmin.color}30` }}
+                    className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl"
+                    style={{ backgroundColor: `${selectedCSA.color}25` }}
                   >
-                    <Globe2 className="w-6 h-6" style={{ color: selectedAdmin.color }} />
+                    {selectedCSA.icon}
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">{selectedAdmin.continent}</h3>
-                    <p className="text-sm text-slate-400">{selectedAdmin.adminName}</p>
+                    <h3 className="text-xl font-bold text-white">{selectedCSA.name}</h3>
+                    <p className="text-sm text-slate-400">{selectedCSA.continent} Super Admin</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setSelectedAdmin(null)}>
+                <Button variant="ghost" size="icon" onClick={() => setSelectedCSA(null)}>
                   <X className="w-5 h-5" />
                 </Button>
               </div>
+              {getStatusBadge(selectedCSA.status)}
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="p-5 space-y-6">
-                {/* Status Card */}
-                <Card className="bg-slate-800/50 border-slate-700/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-slate-400">Status</span>
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "w-3 h-3 rounded-full",
-                          getStatusDot(selectedAdmin.status)
-                        )} />
-                        <span className={cn(
-                          "text-sm font-medium capitalize",
-                          selectedAdmin.status === "active" && "text-emerald-400",
-                          selectedAdmin.status === "suspended" && "text-yellow-400",
-                          selectedAdmin.status === "inactive" && "text-red-400"
-                        )}>
-                          {selectedAdmin.status}
-                        </span>
-                      </div>
-                    </div>
-                    <Separator className="bg-slate-700/50 mb-4" />
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-slate-500">Countries</p>
-                        <p className="text-xl font-bold text-white">{selectedAdmin.countries}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">Managers</p>
-                        <p className="text-xl font-bold text-white">{selectedAdmin.managers}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">Traffic</p>
-                        <p className="text-xl font-bold text-white">{(selectedAdmin.traffic / 1000).toFixed(1)}K</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">Uptime</p>
-                        <p className="text-xl font-bold text-white">{selectedAdmin.uptime}%</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Tabs */}
+            <Tabs value={detailTab} onValueChange={setDetailTab} className="flex-1 flex flex-col">
+              <TabsList className="mx-4 mt-4 bg-slate-800/50">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="permissions">Permissions</TabsTrigger>
+                <TabsTrigger value="countries">Countries</TabsTrigger>
+                <TabsTrigger value="activity">Activity</TabsTrigger>
+              </TabsList>
 
-                {/* Contact Info */}
-                <div>
-                  <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                    Contact
-                  </h4>
-                  <Card className="bg-slate-800/50 border-slate-700/50">
-                    <CardContent className="p-4 space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-500">Email</span>
-                        <span className="text-slate-300">{selectedAdmin.email}</span>
-                      </div>
-                      <Separator className="bg-slate-700/50" />
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-500">Last Active</span>
-                        <span className="text-slate-300">{selectedAdmin.lastActive}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+              <ScrollArea className="flex-1">
+                <div className="p-4">
+                  {/* Profile Tab */}
+                  <TabsContent value="profile" className="mt-0 space-y-4">
+                    <Card className="bg-slate-800/50 border-slate-700/50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-slate-400">Basic Information</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">CSA ID</span>
+                          <code className="text-blue-400 text-sm">{selectedCSA.id}</code>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Email</span>
+                          <span className="text-white">{selectedCSA.email}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Username</span>
+                          <span className="text-white">{selectedCSA.username}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Continent</span>
+                          <span className="text-white">{selectedCSA.continent}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Created</span>
+                          <span className="text-white">{selectedCSA.createdDate}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Last Login</span>
+                          <span className="text-white">{selectedCSA.lastLogin}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                {/* Quick Actions */}
-                <div>
-                  <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                    Actions
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-700 bg-slate-800/50">
-                      <Eye className="w-4 h-4" />
-                      View Details
-                    </Button>
-                    <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-700 bg-slate-800/50">
-                      <Activity className="w-4 h-4" />
-                      Activity Log
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="justify-start gap-2 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
-                    >
-                      <AlertTriangle className="w-4 h-4" />
-                      Suspend
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="justify-start gap-2 border-red-500/50 text-red-400 hover:bg-red-500/10"
-                    >
-                      <Lock className="w-4 h-4" />
-                      Lock Access
-                    </Button>
-                  </div>
+                    <Card className="bg-slate-800/50 border-slate-700/50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-slate-400">Performance Metrics</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-slate-500 text-sm">Health Score</span>
+                            <span className={cn("font-bold", getHealthScoreColor(selectedCSA.healthScore))}>
+                              {selectedCSA.healthScore}%
+                            </span>
+                          </div>
+                          <Progress value={selectedCSA.healthScore} className="h-2" />
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-slate-500 text-sm">Compliance Score</span>
+                            <span className={cn("font-bold", getHealthScoreColor(selectedCSA.complianceScore))}>
+                              {selectedCSA.complianceScore}%
+                            </span>
+                          </div>
+                          <Progress value={selectedCSA.complianceScore} className="h-2" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 pt-2">
+                          <div className="text-center p-3 bg-slate-700/30 rounded-lg">
+                            <p className="text-2xl font-bold text-white">{selectedCSA.activeCountryAdmins}</p>
+                            <p className="text-xs text-slate-500">Active Country Admins</p>
+                          </div>
+                          <div className="text-center p-3 bg-slate-700/30 rounded-lg">
+                            <p className="text-2xl font-bold text-white">{selectedCSA.issuesResolved}</p>
+                            <p className="text-xs text-slate-500">Issues Resolved</p>
+                          </div>
+                          <div className="text-center p-3 bg-slate-700/30 rounded-lg">
+                            <p className="text-2xl font-bold text-amber-400">{selectedCSA.pendingApprovals}</p>
+                            <p className="text-xs text-slate-500">Pending Approvals</p>
+                          </div>
+                          <div className="text-center p-3 bg-slate-700/30 rounded-lg">
+                            <p className="text-2xl font-bold text-blue-400">{selectedCSA.actionsToday}</p>
+                            <p className="text-xs text-slate-500">Actions Today</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  {/* Permissions Tab */}
+                  <TabsContent value="permissions" className="mt-0">
+                    <Card className="bg-slate-800/50 border-slate-700/50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-slate-400">Power & Permissions</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {Object.entries(selectedCSA.permissions).map(([key, value]) => (
+                          <div key={key} className="flex items-center justify-between p-2 bg-slate-700/30 rounded-lg">
+                            <span className="text-white text-sm capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </span>
+                            {value ? (
+                              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
+                                <CheckCircle className="w-3 h-3 mr-1" /> Enabled
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-red-500/20 text-red-400 border-red-500/50">
+                                <X className="w-3 h-3 mr-1" /> Disabled
+                              </Badge>
+                            )}
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  {/* Countries Tab */}
+                  <TabsContent value="countries" className="mt-0">
+                    <Card className="bg-slate-800/50 border-slate-700/50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-slate-400 flex items-center justify-between">
+                          <span>Assigned Countries</span>
+                          <Badge variant="outline" className="text-blue-400 border-blue-500/50">
+                            {selectedCSA.countriesCount} Total
+                          </Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {(continentCountries[selectedCSA.continent] || []).map((country, idx) => (
+                            <div 
+                              key={idx}
+                              className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div 
+                                  className="w-3 h-3 rounded-full"
+                                  style={{ backgroundColor: selectedCSA.color }}
+                                />
+                                <div>
+                                  <p className="text-white font-medium">{country.name}</p>
+                                  <p className="text-xs text-slate-500">Admin: {country.admin}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {getStatusBadge(country.status)}
+                                <Button variant="ghost" size="icon" className="h-7 w-7">
+                                  <Eye className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          {(continentCountries[selectedCSA.continent] || []).length === 0 && (
+                            <div className="text-center py-8 text-slate-500">
+                              No countries assigned
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  {/* Activity Tab */}
+                  <TabsContent value="activity" className="mt-0">
+                    <Card className="bg-slate-800/50 border-slate-700/50">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-sm text-slate-400">Recent Activity</CardTitle>
+                          <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                            <Download className="w-3 h-3" /> Export
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {selectedCSA.recentActions.map((action, idx) => (
+                            <div 
+                              key={idx}
+                              className="flex items-start gap-3 p-3 bg-slate-700/30 rounded-lg"
+                            >
+                              <div className={cn(
+                                "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+                                action.type === "approval" && "bg-emerald-500/20",
+                                action.type === "config" && "bg-blue-500/20",
+                                action.type === "review" && "bg-purple-500/20",
+                                action.type === "create" && "bg-green-500/20",
+                                action.type === "suspension" && "bg-red-500/20",
+                                action.type === "resolution" && "bg-cyan-500/20"
+                              )}>
+                                <Activity className={cn(
+                                  "w-4 h-4",
+                                  action.type === "approval" && "text-emerald-400",
+                                  action.type === "config" && "text-blue-400",
+                                  action.type === "review" && "text-purple-400",
+                                  action.type === "create" && "text-green-400",
+                                  action.type === "suspension" && "text-red-400",
+                                  action.type === "resolution" && "text-cyan-400"
+                                )} />
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-white text-sm">{action.action}</p>
+                                <p className="text-xs text-slate-500 mt-1">{action.time}</p>
+                              </div>
+                            </div>
+                          ))}
+                          {selectedCSA.recentActions.length === 0 && (
+                            <div className="text-center py-8 text-slate-500">
+                              No recent activity
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
                 </div>
+              </ScrollArea>
+
+              {/* Panel Actions */}
+              <div className="p-4 border-t border-slate-700/50 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" className="gap-2 border-slate-700">
+                    <FileText className="w-4 h-4" /> Audit Logs
+                  </Button>
+                  <Button variant="outline" className="gap-2 border-slate-700">
+                    <BarChart3 className="w-4 h-4" /> Full Report
+                  </Button>
+                </div>
+                {selectedCSA.status === "active" ? (
+                  <Button variant="outline" className="w-full gap-2 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10">
+                    <Pause className="w-4 h-4" /> Suspend CSA
+                  </Button>
+                ) : (
+                  <Button variant="outline" className="w-full gap-2 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
+                    <Play className="w-4 h-4" /> Activate CSA
+                  </Button>
+                )}
               </div>
-            </ScrollArea>
+            </Tabs>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
+
+  // If activeNav is "admins", show the registry view
+  if (activeNav === "admins") {
+    return renderRegistryView();
+  }
+
+  // Default dashboard view - show the same registry for now
+  return renderRegistryView();
 };
 
 export default ContinentSuperAdminView;
