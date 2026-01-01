@@ -60,12 +60,41 @@ const sampleNotifications: NotificationAlert[] = [
 
 // Placeholder component for categories not yet implemented
 const CategoryPlaceholder = ({ title }: { title: string }) => (
-  <div className="flex flex-col items-center justify-center min-h-[400px] bg-card/30 rounded-2xl border border-white/10">
-    <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-      <span className="text-4xl">🚧</span>
+  <div className="space-y-6">
+    <div className="flex flex-col items-center justify-center py-6 bg-card/30 rounded-2xl border border-white/10">
+      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
+        <span className="text-3xl">🚧</span>
+      </div>
+      <h2 className="text-2xl font-bold mb-1">{title}</h2>
+      <p className="text-muted-foreground text-sm">This module is ready for sub/micro/nano mapping</p>
     </div>
-    <h2 className="text-2xl font-bold mb-2">{title}</h2>
-    <p className="text-muted-foreground">This module is ready for sub/micro/nano mapping</p>
+    
+    {/* 3 Equal Sized Boxes */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-white/10 p-6 min-h-[200px] flex flex-col items-center justify-center hover:border-primary/30 transition-colors">
+        <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-3">
+          <span className="text-xl">📊</span>
+        </div>
+        <h3 className="font-semibold text-lg mb-1">Quick Stats</h3>
+        <p className="text-muted-foreground text-sm text-center">Overview metrics and KPIs</p>
+      </div>
+      
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-white/10 p-6 min-h-[200px] flex flex-col items-center justify-center hover:border-primary/30 transition-colors">
+        <div className="w-12 h-12 rounded-xl bg-neon-purple/20 flex items-center justify-center mb-3">
+          <span className="text-xl">⚡</span>
+        </div>
+        <h3 className="font-semibold text-lg mb-1">Recent Activity</h3>
+        <p className="text-muted-foreground text-sm text-center">Latest actions and updates</p>
+      </div>
+      
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-white/10 p-6 min-h-[200px] flex flex-col items-center justify-center hover:border-primary/30 transition-colors">
+        <div className="w-12 h-12 rounded-xl bg-neon-teal/20 flex items-center justify-center mb-3">
+          <span className="text-xl">🔧</span>
+        </div>
+        <h3 className="font-semibold text-lg mb-1">Quick Actions</h3>
+        <p className="text-muted-foreground text-sm text-center">Common tasks and shortcuts</p>
+      </div>
+    </div>
   </div>
 );
 
