@@ -37,7 +37,7 @@ const logUnauthorizedAccess = async (
 };
 
 export default function RequireRole({ allowed, children, masterOnly = false }: RequireRoleProps) {
-  const { user, userRole, loading, approvalStatus, isPrivileged, isMaster, wasForceLoggedOut } = useAuth();
+  const { user, userRole, loading, approvalStatus, isPrivileged, isBossOwner, wasForceLoggedOut } = useAuth();
   const location = useLocation();
   const hasLoggedRef = useRef(false);
 
@@ -52,18 +52,18 @@ export default function RequireRole({ allowed, children, masterOnly = false }: R
       // No role assigned
       if (!userRole) return { log: false, reason: '' };
       
-      // Master-only check
-      if (masterOnly && !isMaster) {
-        return { log: true, reason: 'master_only_route' };
+      // Master-only check (now boss_owner)
+      if (masterOnly && !isBossOwner) {
+        return { log: true, reason: 'boss_owner_only_route' };
       }
       
-      // Master bypasses all
-      if (isMaster) return { log: false, reason: '' };
+      // Boss Owner bypasses all
+      if (isBossOwner) return { log: false, reason: '' };
       
       // Check allowed roles
       if (!allowed.includes(userRole)) {
-        // Super admin can access non-master routes
-        if (userRole === 'super_admin' && !masterOnly) {
+        // CEO can access non-boss_owner routes
+        if (userRole === 'ceo' && !masterOnly) {
           return { log: false, reason: '' };
         }
         return { log: true, reason: 'role_not_allowed' };
@@ -82,7 +82,7 @@ export default function RequireRole({ allowed, children, masterOnly = false }: R
       hasLoggedRef.current = true;
       logUnauthorizedAccess(user.id, userRole, location.pathname, reason);
     }
-  }, [user, userRole, loading, approvalStatus, isMaster, masterOnly, allowed, location.pathname]);
+  }, [user, userRole, loading, approvalStatus, isBossOwner, masterOnly, allowed, location.pathname]);
 
   if (loading) {
     return (
@@ -101,20 +101,20 @@ export default function RequireRole({ allowed, children, masterOnly = false }: R
 
   if (!userRole) return <Navigate to="/pending-approval" replace />;
 
-  // Master-only routes
-  if (masterOnly && !isMaster) {
+  // Boss Owner-only routes
+  if (masterOnly && !isBossOwner) {
     return <Navigate to="/access-denied" replace />;
   }
 
-  // Master and Super Admin get direct access (bypass role check)
-  if (isMaster) {
+  // Boss Owner and CEO get direct access (bypass role check)
+  if (isBossOwner) {
     return <>{children}</>;
   }
 
   // Check if user has one of the allowed roles
   if (!allowed.includes(userRole)) {
-    // Super admin can access anything except master-only
-    if (userRole === 'super_admin' && !masterOnly) {
+    // CEO can access anything except boss_owner-only
+    if (userRole === 'ceo' && !masterOnly) {
       return <>{children}</>;
     }
     return <Navigate to="/access-denied" replace />;

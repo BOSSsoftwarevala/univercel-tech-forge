@@ -71,8 +71,8 @@ const PayoutManager = () => {
     rejected: { value: 0, count: 0 },
   });
 
-  // Check if user can approve/reject payouts (Super Admin or Master only)
-  const canApprove = userRole === "super_admin" || userRole === "master";
+  // Check if user can approve/reject payouts (Boss Owner or CEO only)
+  const canApprove = userRole === "boss_owner" || userRole === "ceo";
 
   const fetchPayouts = async () => {
     setIsLoading(true);

@@ -220,7 +220,7 @@ const SecureChatHub = () => {
     isTaskActive: false,
   };
 
-  const isSuperAdmin = currentUser.role === "super_admin";
+  const isBossOwner = currentUser.role === "boss_owner" || currentUser.role === "ceo";
   const watermark = generateWatermark(currentUser.id);
 
   // Scroll to bottom
@@ -408,7 +408,7 @@ const SecureChatHub = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {isSuperAdmin && (
+          {isBossOwner && (
             <Button
               variant="ghost"
               size="sm"
@@ -420,7 +420,7 @@ const SecureChatHub = () => {
             </Button>
           )}
           
-          {isSuperAdmin && (
+          {isBossOwner && (
             <Button
               variant="ghost"
               size="sm"
@@ -681,9 +681,9 @@ const SecureChatHub = () => {
         </div>
       </div>
 
-      {/* Super Admin Panel */}
+      {/* Boss Owner Panel */}
       <AnimatePresence>
-        {showSuperAdminPanel && isSuperAdmin && (
+        {showSuperAdminPanel && isBossOwner && (
           <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}

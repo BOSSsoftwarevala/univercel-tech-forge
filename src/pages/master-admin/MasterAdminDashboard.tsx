@@ -75,19 +75,19 @@ interface UserRole {
 
 const MasterAdminDashboard = () => {
   const navigate = useNavigate();
-  const { user, signOut, isMaster, forceLogoutUser } = useAuth();
+  const { user, signOut, isBossOwner, forceLogoutUser } = useAuth();
   const [users, setUsers] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [forceLogoutAllLoading, setForceLogoutAllLoading] = useState(false);
 
   useEffect(() => {
-    if (!isMaster) {
+    if (!isBossOwner) {
       navigate('/access-denied', { replace: true });
       return;
     }
     fetchUsers();
-  }, [isMaster, navigate]);
+  }, [isBossOwner, navigate]);
 
   const fetchUsers = async () => {
     setLoading(true);

@@ -67,8 +67,8 @@ const FloatingAIChatbot = ({
     }
   ]);
 
-  const isSuperAdmin = userRole === 'super_admin';
-  const canChatDirectly = isSuperAdmin || requestStatus === 'approved';
+  const isBossOwner = userRole === 'boss_owner' || userRole === 'ceo';
+  const canChatDirectly = isBossOwner || requestStatus === 'approved';
 
   const handleSend = () => {
     if (!message.trim()) return;
@@ -157,8 +157,8 @@ const FloatingAIChatbot = ({
             />
           </div>
           
-          {/* Notification badge for super admin */}
-          {isSuperAdmin && pendingCount > 0 && (
+          {/* Notification badge for boss owner */}
+          {isBossOwner && pendingCount > 0 && (
             <motion.div 
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
@@ -169,7 +169,7 @@ const FloatingAIChatbot = ({
           )}
           
           {/* Status indicator for non-admin */}
-          {!isSuperAdmin && (
+          {!isBossOwner && (
             <motion.div 
               className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${
                 requestStatus === 'approved' ? 'bg-emerald-500' :
@@ -189,7 +189,7 @@ const FloatingAIChatbot = ({
                        border border-emerald-500/30 text-sm text-emerald-400
                        opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap
                        shadow-[0_0_20px_hsl(145_80%_40%/0.2)]">
-          {isSuperAdmin ? `AI Chat (${pendingCount} pending)` : 
+          {isBossOwner ? `AI Chat (${pendingCount} pending)` : 
            requestStatus === 'approved' ? 'AI Chat (Approved)' :
            requestStatus === 'pending' ? 'AI Chat (Pending Approval)' :
            'Request AI Chat'}
@@ -217,7 +217,7 @@ const FloatingAIChatbot = ({
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-xs text-emerald-400">
-                      {isSuperAdmin ? 'Admin Mode' : canChatDirectly ? 'Approved' : 'Request Access'}
+                      {isBossOwner ? 'Admin Mode' : canChatDirectly ? 'Approved' : 'Request Access'}
                     </span>
                   </div>
                 </div>
@@ -232,8 +232,8 @@ const FloatingAIChatbot = ({
               </Button>
             </div>
 
-            {/* Super Admin: Pending Requests View */}
-            {isSuperAdmin && pendingCount > 0 && (
+            {/* Boss Owner: Pending Requests View */}
+            {isBossOwner && pendingCount > 0 && (
               <div className="p-3 border-b border-slate-700/50 bg-amber-500/10">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertCircle className="w-4 h-4 text-amber-400" />

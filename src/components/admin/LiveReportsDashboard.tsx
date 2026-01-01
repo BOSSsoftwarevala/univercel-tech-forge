@@ -40,7 +40,7 @@ interface ActivityLog {
 }
 
 export default function LiveReportsDashboard() {
-  const { isMaster, isSuperAdmin } = useAuth();
+  const { isBossOwner, isCEO } = useAuth();
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [stats, setStats] = useState<ReportStats>({
     totalUsers: 0,
@@ -110,9 +110,9 @@ export default function LiveReportsDashboard() {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      // Super admin cannot see master logs
-      if (isSuperAdmin && !isMaster) {
-        logsQuery = logsQuery.neq('user_role', 'master');
+      // CEO cannot see boss_owner logs
+      if (isCEO && !isBossOwner) {
+        logsQuery = logsQuery.neq('user_role', 'boss_owner');
       }
 
       const { data: logs } = await logsQuery;

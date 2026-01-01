@@ -6,9 +6,10 @@ import { Database } from '@/integrations/supabase/types';
 type AppRole = Database['public']['Enums']['app_role'];
 
 // Roles that get direct access without approval
-const PRIVILEGED_ROLES: string[] = ['master', 'super_admin'];
+// NOTE: master and super_admin merged into boss_owner
+const PRIVILEGED_ROLES: string[] = ['boss_owner', 'ceo'];
 // Roles that get auto-approved on signup (no waiting)
-const AUTO_APPROVED_ROLES: string[] = ['master', 'super_admin', 'prime'];
+const AUTO_APPROVED_ROLES: string[] = ['boss_owner', 'ceo', 'prime'];
 
 interface AuthContextType {
   user: User | null;
@@ -17,8 +18,8 @@ interface AuthContextType {
   userRole: AppRole | null;
   approvalStatus: 'pending' | 'approved' | 'rejected' | null;
   isPrivileged: boolean;
-  isMaster: boolean;
-  isSuperAdmin: boolean;
+  isBossOwner: boolean; // Merged master + super_admin
+  isCEO: boolean;
   wasForceLoggedOut: boolean;
   signUp: (email: string, password: string, role: AppRole, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string, deviceFingerprint?: string) => Promise<{ error: Error | null }>;
@@ -42,11 +43,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Prevent race condition: SIGNED_IN event role fetch can run before we clear force-logout flag.
   const pendingSignInRef = useRef(false);
 
-
-  // Computed properties
+  // Computed properties (merged master + super_admin into boss_owner)
   const isPrivileged = userRole ? PRIVILEGED_ROLES.includes(userRole) : false;
-  const isMaster = userRole === 'master';
-  const isSuperAdmin = userRole === 'super_admin';
+  const isBossOwner = userRole === 'boss_owner';
+  const isCEO = userRole === 'ceo';
 
   // Check if user was force logged out
   const checkForceLogout = useCallback(async (userId: string) => {
@@ -115,16 +115,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, [roleChecked]);
 
-  // Periodic force logout check for non-master users
+  // Periodic force logout check for non-boss_owner users
   useEffect(() => {
-    if (!user || isMaster) return;
+    if (!user || isBossOwner) return;
 
     const checkInterval = setInterval(() => {
       checkForceLogout(user.id);
     }, 30000); // Check every 30 seconds
 
     return () => clearInterval(checkInterval);
-  }, [user, isMaster, checkForceLogout]);
+  }, [user, isBossOwner, checkForceLogout]);
 
   const fetchUserRoleAndStatus = async (userId: string) => {
     // Skip if already checked and approved
@@ -365,11 +365,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setWasForceLoggedOut(false);
   };
 
-  // Master Admin only: Force logout a user
+  // Boss Owner only: Force logout a user
   const forceLogoutUser = async (targetUserId: string): Promise<{ error: Error | null }> => {
     try {
-      if (!isMaster || !user) {
-        throw new Error('Only Master Admin can force logout users');
+      if (!isBossOwner || !user) {
+        throw new Error('Only Boss Owner can force logout users');
       }
 
       const { error } = await supabase.rpc('force_logout_user', {
@@ -392,11 +392,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       userRole, 
       approvalStatus,
       isPrivileged,
-      isMaster,
-      isSuperAdmin,
+      isBossOwner,
+      isCEO,
       wasForceLoggedOut,
       signUp, 
-      signIn, 
+      signIn,
       signOut,
       refreshApprovalStatus,
       forceLogoutUser,
