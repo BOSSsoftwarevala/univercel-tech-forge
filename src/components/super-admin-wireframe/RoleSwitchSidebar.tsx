@@ -19,6 +19,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import LiveTeamPanel from "./LiveTeamPanel";
 
 export type ActiveRole = "master_admin" | "super_admin_hierarchy" | "continent_super_admin" | "country_head" | "area_manager" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
 
@@ -740,6 +741,9 @@ const RoleSwitchSidebar = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Live Team Panel */}
+      <LiveTeamPanel collapsed={collapsed} />
 
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border/50 space-y-2">
