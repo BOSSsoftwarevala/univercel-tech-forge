@@ -474,14 +474,16 @@ const RoleSwitchSidebar = ({
           : "bg-sidebar border-sidebar-border"
       )}
     >
-      {/* Header with Super Admin badge */}
+      {/* Header with Current Role */}
       <div className="p-4 border-b border-sidebar-border/50">
         <div className="flex items-center gap-3">
-          <div className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br",
-            currentConfig.themeColor
-          )}>
-            <Crown className="w-5 h-5 text-white" />
+          <div
+            className={cn(
+              "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br",
+              currentConfig.themeColor
+            )}
+          >
+            <currentConfig.icon className="w-5 h-5 text-white" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -491,7 +493,7 @@ const RoleSwitchSidebar = ({
                 exit={{ opacity: 0 }}
                 className="flex-1"
               >
-                <h2 className="text-sm font-bold text-foreground">Super Admin</h2>
+                <h2 className="text-sm font-bold text-foreground">{currentConfig.label}</h2>
                 <p className="text-xs text-muted-foreground">Control Panel</p>
               </motion.div>
             )}
