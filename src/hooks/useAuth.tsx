@@ -286,30 +286,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       if (data.user) {
+        // Boss Owner should never be blocked by allowlist rules (break-glass access)
+        let isBossOwner = false;
+        try {
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', data.user.id);
+
+          isBossOwner = (roles || []).some((r) => r.role === 'boss_owner' || r.role === 'master');
+        } catch {
+          // If role lookup fails, we fall back to normal login verification.
+        }
+
         // Generate device fingerprint if not provided
         const fingerprint = deviceFingerprint || generateDeviceFingerprint();
-        
-        // Get IP address (will be captured server-side, pass placeholder)
-        const ipAddress = 'client-side';
-        
-        // Verify login is allowed via whitelist check
-        const { data: verifyResult, error: verifyError } = await supabase.rpc('verify_login_allowed', {
-          p_user_id: data.user.id,
-          p_email: email,
-          p_ip_address: ipAddress,
-          p_device_fingerprint: fingerprint,
-          p_user_agent: navigator.userAgent
-        });
 
-        if (verifyError) {
-          console.error('Login verification error:', verifyError);
-          // Continue with login for master/super_admin even if verification fails
-        } else if (verifyResult && typeof verifyResult === 'object') {
-          const result = verifyResult as { allowed: boolean; reason?: string; message?: string };
-          if (!result.allowed) {
-            // Sign out and throw error
-            await supabase.auth.signOut();
-            throw new Error(result.message || 'Login not authorized');
+        if (!isBossOwner) {
+          // Get IP address (will be captured server-side, pass placeholder)
+          const ipAddress = 'client-side';
+
+          // Verify login is allowed via whitelist check
+          const { data: verifyResult, error: verifyError } = await supabase.rpc('verify_login_allowed', {
+            p_user_id: data.user.id,
+            p_email: email,
+            p_ip_address: ipAddress,
+            p_device_fingerprint: fingerprint,
+            p_user_agent: navigator.userAgent,
+          });
+
+          if (verifyError) {
+            console.error('Login verification error:', verifyError);
+            // Continue with login for boss/master even if verification fails
+          } else if (verifyResult && typeof verifyResult === 'object') {
+            const result = verifyResult as { allowed: boolean; reason?: string; message?: string };
+            if (!result.allowed) {
+              // Sign out and throw error
+              await supabase.auth.signOut();
+              throw new Error(result.message || 'Login not authorized');
+            }
           }
         }
 
