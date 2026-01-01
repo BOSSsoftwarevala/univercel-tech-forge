@@ -35,30 +35,53 @@ interface FestivalCalendar {
 }
 
 const ADMIN_ROLES = ['super_admin', 'master_admin'];
-const STORAGE_KEY = 'offer_banner_dismissed';
+const STORAGE_KEY = 'offer_banner_admin_daily';
+const MAX_SHOWS_PER_DAY = 2;
+
+// Helper to get today's date key
+const getTodayKey = () => new Date().toISOString().split('T')[0];
+
+// Helper to check/update daily show count for admins
+const getAdminShowCount = (): number => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return 0;
+    const parsed = JSON.parse(data);
+    if (parsed.date !== getTodayKey()) return 0;
+    return parsed.count || 0;
+  } catch {
+    return 0;
+  }
+};
+
+const incrementAdminShowCount = () => {
+  const todayKey = getTodayKey();
+  const currentCount = getAdminShowCount();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: todayKey, count: currentCount + 1 }));
+};
 
 const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
   const { userRole } = useAuth();
   const [currentOffer, setCurrentOffer] = useState<GlobalOffer | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [hasDismissed, setHasDismissed] = useState(false);
+  const [hasReachedLimit, setHasReachedLimit] = useState(false);
 
-  // Check if admin has already dismissed this offer
+  // Check if admin has reached daily limit
   useEffect(() => {
     if (ADMIN_ROLES.includes(userRole || '')) {
-      const dismissedOffers = localStorage.getItem(STORAGE_KEY);
-      if (dismissedOffers) {
-        setHasDismissed(true);
+      const showCount = getAdminShowCount();
+      if (showCount >= MAX_SHOWS_PER_DAY) {
+        setHasReachedLimit(true);
       }
     }
   }, [userRole]);
 
   useEffect(() => {
-    if (!hasDismissed) {
+    if (!hasReachedLimit) {
       fetchActiveOffer();
     }
-  }, [hasDismissed]);
+  }, [hasReachedLimit]);
 
   const fetchActiveOffer = async () => {
     // First check for active manual offers
@@ -116,28 +139,26 @@ const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
     }
   };
 
-  // Don't show for admin roles if already dismissed once
-  if (!currentOffer || !isVisible || hasDismissed) return null;
+  // Don't show for admin roles if daily limit reached
+  if (!currentOffer || !isVisible || hasReachedLimit) return null;
 
   const handleDismiss = () => {
     if (ADMIN_ROLES.includes(userRole || '')) {
-      // For admin roles, store dismissal in localStorage so it only shows once
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
-        offerId: currentOffer.id, 
-        dismissedAt: new Date().toISOString() 
-      }));
-      setHasDismissed(true);
+      incrementAdminShowCount();
+      const newCount = getAdminShowCount();
+      if (newCount >= MAX_SHOWS_PER_DAY) {
+        setHasReachedLimit(true);
+      }
     }
     setIsMinimized(true);
   };
-
   const handleClose = () => {
     if (ADMIN_ROLES.includes(userRole || '')) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
-        offerId: currentOffer.id, 
-        dismissedAt: new Date().toISOString() 
-      }));
-      setHasDismissed(true);
+      incrementAdminShowCount();
+      const newCount = getAdminShowCount();
+      if (newCount >= MAX_SHOWS_PER_DAY) {
+        setHasReachedLimit(true);
+      }
       setIsVisible(false);
     } else {
       setIsMinimized(true);
