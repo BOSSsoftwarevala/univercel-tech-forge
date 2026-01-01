@@ -41,7 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AsiaSuperAdminDashboard from "@/components/super-admin-wireframe/AsiaSuperAdminDashboard";
+import ContinentDashboard from "@/components/super-admin-wireframe/ContinentDashboard";
 
 // Country data for each continent
 const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
@@ -770,9 +770,9 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     </div>
   );
 
-  // If a continent dashboard is selected (e.g., Asia from sidebar)
-  if (showContinentDashboard === "Asia") {
-    return <AsiaSuperAdminDashboard onBack={() => setShowContinentDashboard(null)} />;
+  // If a continent dashboard is selected from sidebar
+  if (showContinentDashboard) {
+    return <ContinentDashboard continent={showContinentDashboard} onBack={() => setShowContinentDashboard(null)} />;
   }
 
   // If activeNav is "admins", show the registry view with the list
