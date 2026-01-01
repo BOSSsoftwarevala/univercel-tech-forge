@@ -98,10 +98,12 @@ const continentSuperAdmins = [
     id: "CSA-ASIA-001",
     continent: "Asia",
     continentCode: "AS",
-    name: "Chen Wei",
-    email: "chen.wei@system.com",
-    username: "chenwei_csa",
+    name: "Asia Super Admin",
+    email: "asia.csa@system.com",
+    username: "asia_superadmin",
     status: "active" as const,
+    countriesAssigned: "All Asian Countries",
+    roleLevel: "Continent Super Admin",
     countriesCount: 48,
     activeCountryAdmins: 45,
     createdDate: "2023-01-15",
@@ -131,10 +133,12 @@ const continentSuperAdmins = [
     id: "CSA-AFRICA-001",
     continent: "Africa",
     continentCode: "AF",
-    name: "Victoria Mensah",
-    email: "v.mensah@system.com",
-    username: "vmensah_csa",
+    name: "Africa Super Admin",
+    email: "africa.csa@system.com",
+    username: "africa_superadmin",
     status: "active" as const,
+    countriesAssigned: "All African Countries",
+    roleLevel: "Continent Super Admin",
     countriesCount: 54,
     activeCountryAdmins: 48,
     createdDate: "2023-02-20",
@@ -163,10 +167,12 @@ const continentSuperAdmins = [
     id: "CSA-EUROPE-001",
     continent: "Europe",
     continentCode: "EU",
-    name: "Hans Mueller",
-    email: "h.mueller@system.com",
-    username: "hmueller_csa",
+    name: "Europe Super Admin",
+    email: "europe.csa@system.com",
+    username: "europe_superadmin",
     status: "active" as const,
+    countriesAssigned: "All European Countries",
+    roleLevel: "Continent Super Admin",
     countriesCount: 44,
     activeCountryAdmins: 42,
     createdDate: "2023-01-10",
@@ -195,10 +201,12 @@ const continentSuperAdmins = [
     id: "CSA-NA-001",
     continent: "North America",
     continentCode: "NA",
-    name: "James Wilson",
-    email: "j.wilson@system.com",
-    username: "jwilson_csa",
+    name: "North America Super Admin",
+    email: "northamerica.csa@system.com",
+    username: "na_superadmin",
     status: "active" as const,
+    countriesAssigned: "USA, Canada, Mexico, Caribbean",
+    roleLevel: "Continent Super Admin",
     countriesCount: 23,
     activeCountryAdmins: 21,
     createdDate: "2023-03-01",
@@ -226,51 +234,55 @@ const continentSuperAdmins = [
     id: "CSA-SA-001",
     continent: "South America",
     continentCode: "SA",
-    name: "Carlos Rodriguez",
-    email: "c.rodriguez@system.com",
-    username: "crodriguez_csa",
-    status: "suspended" as const,
+    name: "South America Super Admin",
+    email: "southamerica.csa@system.com",
+    username: "sa_superadmin",
+    status: "active" as const,
+    countriesAssigned: "All South American Countries",
+    roleLevel: "Continent Super Admin",
     countriesCount: 12,
-    activeCountryAdmins: 8,
+    activeCountryAdmins: 10,
     createdDate: "2023-04-15",
-    lastActivity: "3 days ago",
-    lastLogin: "Dec 28, 2025",
-    actionsToday: 0,
-    healthScore: 45,
-    complianceScore: 72,
-    pendingApprovals: 15,
-    issuesResolved: 34,
+    lastActivity: "1 hour ago",
+    lastLogin: "Today, 06:30 AM",
+    actionsToday: 5,
+    healthScore: 87,
+    complianceScore: 92,
+    pendingApprovals: 3,
+    issuesResolved: 45,
     icon: "🌎",
     color: "#84cc16",
     permissions: {
-      countriesCreate: false,
-      countriesEdit: false,
-      countryAdminAssign: false,
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
       regionalReports: true,
-      liveMonitoring: false,
+      liveMonitoring: true,
     },
     recentActions: [
-      { action: "Account suspended by Super Admin", time: "3 days ago", type: "suspension" },
+      { action: "Updated Brazil compliance settings", time: "1 hour ago", type: "config" },
     ]
   },
   {
-    id: "CSA-OC-001",
+    id: "CSA-OCEANIA-001",
     continent: "Australia/Oceania",
     continentCode: "OC",
-    name: "Sarah Mitchell",
-    email: "s.mitchell@system.com",
-    username: "smitchell_csa",
+    name: "Oceania Super Admin",
+    email: "oceania.csa@system.com",
+    username: "oceania_superadmin",
     status: "active" as const,
+    countriesAssigned: "Australia, New Zealand, Pacific Islands",
+    roleLevel: "Continent Super Admin",
     countriesCount: 14,
     activeCountryAdmins: 12,
     createdDate: "2023-05-01",
-    lastActivity: "1 hour ago",
-    lastLogin: "Today, 06:30 AM",
+    lastActivity: "45 min ago",
+    lastLogin: "Today, 06:00 AM",
     actionsToday: 6,
     healthScore: 88,
     complianceScore: 94,
     pendingApprovals: 1,
-    issuesResolved: 45,
+    issuesResolved: 38,
     icon: "🌏",
     color: "#8b5cf6",
     permissions: {
@@ -281,22 +293,24 @@ const continentSuperAdmins = [
       liveMonitoring: true,
     },
     recentActions: [
-      { action: "Updated New Zealand settings", time: "1 hour ago", type: "config" },
+      { action: "Updated New Zealand settings", time: "45 min ago", type: "config" },
     ]
   },
   {
-    id: "CSA-AN-001",
+    id: "CSA-ANT-000",
     continent: "Antarctica",
     continentCode: "AN",
-    name: "Dr. Erik Larsen",
-    email: "e.larsen@system.com",
-    username: "elarsen_csa",
-    status: "inactive" as const,
+    name: "System Reserved",
+    email: "system@reserved.com",
+    username: "system_reserved",
+    status: "locked" as const,
+    countriesAssigned: "None",
+    roleLevel: "Read-only / Monitoring",
     countriesCount: 0,
     activeCountryAdmins: 0,
-    createdDate: "2023-06-01",
-    lastActivity: "Offline",
-    lastLogin: "Dec 1, 2025",
+    createdDate: "2023-01-01",
+    lastActivity: "System Locked",
+    lastLogin: "N/A",
     actionsToday: 0,
     healthScore: 0,
     complianceScore: 0,
@@ -308,8 +322,8 @@ const continentSuperAdmins = [
       countriesCreate: false,
       countriesEdit: false,
       countryAdminAssign: false,
-      regionalReports: false,
-      liveMonitoring: false,
+      regionalReports: true,
+      liveMonitoring: true,
     },
     recentActions: []
   },
@@ -329,8 +343,7 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
   // Stats calculations
   const totalCSAs = continentSuperAdmins.length;
   const activeCSAs = continentSuperAdmins.filter(c => c.status === "active").length;
-  const inactiveCSAs = continentSuperAdmins.filter(c => c.status === "inactive").length;
-  const suspendedCSAs = continentSuperAdmins.filter(c => c.status === "suspended").length;
+  const lockedCSAs = continentSuperAdmins.filter(c => c.status === "locked").length;
   const liveActionsToday = continentSuperAdmins.reduce((sum, c) => sum + c.actionsToday, 0);
 
   // Filtered CSAs
@@ -347,10 +360,8 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
     switch (status) {
       case "active":
         return <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">Active</Badge>;
-      case "suspended":
-        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">Suspended</Badge>;
-      case "inactive":
-        return <Badge className="bg-red-500/20 text-red-400 border-red-500/50">Inactive</Badge>;
+      case "locked":
+        return <Badge className="bg-slate-500/20 text-slate-400 border-slate-500/50">System Locked</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -426,14 +437,14 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard" }: ContinentSuperAdmi
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-red-500/10 border-red-500/30">
+            <Card className="bg-slate-500/10 border-slate-500/30">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-red-400/80 uppercase tracking-wider">Inactive/Suspended</p>
-                    <p className="text-3xl font-bold text-red-400 mt-1">{inactiveCSAs + suspendedCSAs}</p>
+                    <p className="text-xs text-slate-400/80 uppercase tracking-wider">System Locked</p>
+                    <p className="text-3xl font-bold text-slate-400 mt-1">{lockedCSAs}</p>
                   </div>
-                  <AlertCircle className="w-10 h-10 text-red-400/30" />
+                  <Lock className="w-10 h-10 text-slate-400/30" />
                 </div>
               </CardContent>
             </Card>
