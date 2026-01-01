@@ -2,6 +2,7 @@ import { useState, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gift, Sparkles, Trophy, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface GlobalOffer {
   id: string;
@@ -33,16 +34,31 @@ interface FestivalCalendar {
   icon: string | null;
 }
 
+const ADMIN_ROLES = ['super_admin', 'master_admin'];
+const STORAGE_KEY = 'offer_banner_dismissed';
+
 const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
+  const { userRole } = useAuth();
   const [currentOffer, setCurrentOffer] = useState<GlobalOffer | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
-  
-  // Use the ref on the outermost container
+  const [hasDismissed, setHasDismissed] = useState(false);
+
+  // Check if admin has already dismissed this offer
+  useEffect(() => {
+    if (ADMIN_ROLES.includes(userRole || '')) {
+      const dismissedOffers = localStorage.getItem(STORAGE_KEY);
+      if (dismissedOffers) {
+        setHasDismissed(true);
+      }
+    }
+  }, [userRole]);
 
   useEffect(() => {
-    fetchActiveOffer();
-  }, []);
+    if (!hasDismissed) {
+      fetchActiveOffer();
+    }
+  }, [hasDismissed]);
 
   const fetchActiveOffer = async () => {
     // First check for active manual offers
@@ -100,7 +116,33 @@ const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
     }
   };
 
-  if (!currentOffer || !isVisible) return null;
+  // Don't show for admin roles if already dismissed once
+  if (!currentOffer || !isVisible || hasDismissed) return null;
+
+  const handleDismiss = () => {
+    if (ADMIN_ROLES.includes(userRole || '')) {
+      // For admin roles, store dismissal in localStorage so it only shows once
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
+        offerId: currentOffer.id, 
+        dismissedAt: new Date().toISOString() 
+      }));
+      setHasDismissed(true);
+    }
+    setIsMinimized(true);
+  };
+
+  const handleClose = () => {
+    if (ADMIN_ROLES.includes(userRole || '')) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
+        offerId: currentOffer.id, 
+        dismissedAt: new Date().toISOString() 
+      }));
+      setHasDismissed(true);
+      setIsVisible(false);
+    } else {
+      setIsMinimized(true);
+    }
+  };
 
   const getIcon = () => {
     if (currentOffer.icon) {
@@ -209,7 +251,7 @@ const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
                 </motion.div>
 
                 <button
-                  onClick={() => setIsMinimized(true)}
+                  onClick={handleClose}
                   className="p-1.5 rounded-full hover:bg-white/20 transition-colors"
                 >
                   <X className="w-4 h-4 text-white" />
