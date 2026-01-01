@@ -6,7 +6,7 @@ import {
   ChevronRight, AlertCircle, CheckCircle, Clock, Eye,
   Target, DollarSign, UserCheck, Store, Filter, Download,
   BarChart3, PieChart, Zap, Bell, Shield, X, ArrowUpRight,
-  ArrowDownRight, RefreshCw
+  ArrowDownRight, RefreshCw, UserPlus, Check
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import CountryAdminDashboard from "./CountryAdminDashboard";
 
 export interface CountryData {
@@ -211,6 +221,29 @@ const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
   const [viewingCountryAdmin, setViewingCountryAdmin] = useState<CountryData | null>(null);
   const [mapView, setMapView] = useState<"franchise" | "reseller" | "leads">("franchise");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
+  const [newAdminName, setNewAdminName] = useState("");
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+
+  const handleCreateAdmin = () => {
+    if (!newAdminName.trim() || !selectedCountry) return;
+    
+    setCreatingAdmin(true);
+    // Simulate API call
+    setTimeout(() => {
+      toast.success(`Country Admin "${newAdminName}" created for ${selectedCountry.name}`, {
+        description: "Login credentials sent via email"
+      });
+      setShowCreateAdmin(false);
+      setNewAdminName("");
+      setCreatingAdmin(false);
+      // Navigate to country dashboard
+      setViewingCountryAdmin({
+        ...selectedCountry,
+        admin: newAdminName
+      });
+    }, 1000);
+  };
 
   if (!config) {
     return (
@@ -547,7 +580,11 @@ const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-slate-400">Country Admin</span>
-                          <span className="text-sm font-medium text-white">{selectedCountry.admin}</span>
+                          {selectedCountry.admin ? (
+                            <span className="text-sm font-medium text-white">{selectedCountry.admin}</span>
+                          ) : (
+                            <Badge variant="outline" className="text-amber-400 border-amber-500/50">Not Assigned</Badge>
+                          )}
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-slate-800/50 rounded-lg p-3 text-center">
@@ -567,6 +604,19 @@ const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
                             <p className="text-xs text-slate-400">Revenue</p>
                           </div>
                         </div>
+                        
+                        {/* Quick Create Country Admin */}
+                        <div className="border-t border-slate-700/50 pt-4 space-y-3">
+                          <Button 
+                            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                            size="sm"
+                            onClick={() => setShowCreateAdmin(true)}
+                          >
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Create Country Admin
+                          </Button>
+                        </div>
+
                         <div className="flex gap-2">
                           <Button 
                             className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700" 
@@ -700,6 +750,72 @@ const ContinentDashboard = ({ continent, onBack }: ContinentDashboardProps) => {
           )}
         </div>
       </ScrollArea>
+
+      {/* Create Country Admin Dialog */}
+      <Dialog open={showCreateAdmin} onOpenChange={setShowCreateAdmin}>
+        <DialogContent className="bg-slate-900 border-slate-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-emerald-400" />
+              Create Country Admin
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+              <Globe2 className="w-8 h-8 text-cyan-400" />
+              <div>
+                <p className="text-white font-medium">{selectedCountry?.name}</p>
+                <p className="text-xs text-slate-400">{continent} Region</p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="adminName" className="text-slate-300">Admin Name</Label>
+              <Input
+                id="adminName"
+                placeholder="Enter admin name..."
+                value={newAdminName}
+                onChange={(e) => setNewAdminName(e.target.value)}
+                className="bg-slate-800 border-slate-600 text-white"
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateAdmin()}
+              />
+            </div>
+
+            <div className="p-3 bg-emerald-900/20 border border-emerald-500/30 rounded-lg">
+              <p className="text-xs text-emerald-400 flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                Auto-generated: Email, Password, 2FA, Permissions
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCreateAdmin(false)}
+              className="border-slate-600 text-slate-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateAdmin}
+              disabled={!newAdminName.trim() || creatingAdmin}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+            >
+              {creatingAdmin ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Create Admin
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
