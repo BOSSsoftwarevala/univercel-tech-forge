@@ -45,8 +45,8 @@ const roleConfigs = {
   },
   super_admin_hierarchy: {
     id: "super_admin_hierarchy",
-    label: "Super Admin",
-    shortLabel: "SA",
+    label: "Boss",
+    shortLabel: "BO",
     icon: Globe2,
     themeColor: "from-blue-500 via-indigo-500 to-purple-600",
     accentColor: "text-blue-400",

@@ -151,7 +151,7 @@ const SuperAdminHierarchyDashboard = () => {
               <Globe2 className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Super Admin Dashboard</h1>
+              <h1 className="text-3xl font-bold text-white">Boss Dashboard</h1>
               <p className="text-blue-400/80">Global Operations Head • All Continents</p>
             </div>
           </div>
