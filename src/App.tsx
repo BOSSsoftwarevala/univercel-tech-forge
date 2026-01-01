@@ -201,6 +201,7 @@ import { WireframeRoutes } from "./components/wireframe/WireframeRoutes";
 import ValaControlCenter from "./pages/vala-control/ValaControlCenter";
 // Super Admin System
 import {
+  RoleSwitchDashboard,
   SuperAdminLogin,
   SuperAdminDashboard as SuperAdminSystemDashboard,
   SuperAdminUsers,
@@ -511,6 +512,7 @@ const App = () => (
 
               {/* Super Admin System Routes */}
               <Route path="/super-admin-system/login" element={<SuperAdminLogin />} />
+              <Route path="/super-admin-system/role-switch" element={<RoleSwitchDashboard />} />
               <Route path="/super-admin-system/dashboard" element={<SuperAdminSystemDashboard />} />
               <Route path="/super-admin-system/users" element={<SuperAdminUsers />} />
               <Route path="/super-admin-system/admins" element={<SuperAdminAdmins />} />

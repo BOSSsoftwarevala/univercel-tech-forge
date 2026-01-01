@@ -484,9 +484,11 @@ const ContinentSuperAdminView = () => {
                         >
                           <div className="flex items-center gap-4">
                             {/* Avatar with gradient */}
-                            <Avatar className="w-14 h-14 ring-2 ring-offset-2 ring-offset-background" style={{
-                              ["--tw-ring-color" as string]: continent.textColor.replace("text-", "rgb(var(--")
-                            }}>
+                            <Avatar className={cn(
+                              "w-14 h-14 ring-2 ring-offset-2 ring-offset-background",
+                              // Keep ring styling safe and theme-driven (no dynamic CSS var hacks)
+                              "ring-border"
+                            )}>
                               <AvatarImage src={continent.superAdmin.avatar} />
                               <AvatarFallback className={cn("text-white bg-gradient-to-br", continent.color)}>
                                 {continent.superAdmin.name.split(" ").map(n => n[0]).join("")}
@@ -704,8 +706,8 @@ const ContinentSuperAdminView = () => {
           >
             {/* Panel Header */}
             <div className={cn(
-              "p-5 border-b border-border flex items-center justify-between bg-gradient-to-r",
-              selectedContinent.color.replace("from-", "from-").replace("to-", "to-") + "/10"
+              "p-5 border-b border-border flex items-center justify-between",
+              selectedContinent.bgColor
             )}>
               <div className="flex items-center gap-4">
                 <span className="text-5xl">{selectedContinent.flag}</span>
