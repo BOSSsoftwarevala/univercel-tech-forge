@@ -10,7 +10,7 @@ import { useRoleSounds } from '@/hooks/useRoleSounds';
 
 interface PremiumButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'sidebar' | 'sidebar-active';
   size?: 'sm' | 'md' | 'lg';
   userRole?: string;
   enableSound?: boolean;
@@ -22,6 +22,8 @@ const variantStyles = {
   secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
   danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
   ghost: 'bg-transparent hover:bg-secondary/50',
+  sidebar: 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-transparent',
+  'sidebar-active': 'bg-primary/15 text-primary border border-primary/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]',
 };
 
 const sizeStyles = {
@@ -61,10 +63,10 @@ export const PremiumButton = ({
       onClick={handleClick}
       {...props}
     >
-      {glowOnHover && variant === 'primary' && (
+      {glowOnHover && (variant === 'primary' || variant === 'sidebar-active') && (
         <motion.span
           className="absolute inset-0 rounded-lg opacity-0 pointer-events-none"
-          style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' }}
+          style={{ boxShadow: '0 0 25px hsl(var(--primary) / 0.5)' }}
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
         />

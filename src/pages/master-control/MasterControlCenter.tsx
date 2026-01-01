@@ -142,15 +142,11 @@ const MasterControlCenter = () => {
                 <PremiumButton
                   key={item.id}
                   onClick={() => setActiveView(item.id)}
-                  variant={activeView === item.id ? 'primary' : 'ghost'}
+                  variant={activeView === item.id ? 'sidebar-active' : 'sidebar'}
                   size="sm"
                   userRole="master"
-                  glowOnHover={activeView === item.id}
-                  className={`w-full justify-start gap-3 ${
-                    activeView === item.id
-                      ? 'bg-primary/10 text-primary border border-primary/20'
-                      : 'text-gray-400 hover:bg-gray-800/50 hover:text-white border border-transparent'
-                  }`}
+                  glowOnHover={true}
+                  className="w-full justify-start gap-3"
                 >
                   <item.icon className="w-4 h-4" />
                   <span>{item.label}</span>
