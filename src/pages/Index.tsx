@@ -2483,11 +2483,6 @@ const Index = () => {
                 🎉 New Year Sale - 40% OFF! 🎉
               </Badge>
               <Badge className="bg-white text-orange-600 font-bold text-lg px-4 py-2">40% OFF</Badge>
-              <Link to="/admin">
-                <Button variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20">
-                  Admin Login
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
