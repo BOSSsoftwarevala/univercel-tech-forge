@@ -1,12 +1,13 @@
 /**
  * Role-Based Payment Success Animation
- * Celebratory animations with confetti, checkmarks, and role-based variations
+ * OPTIMIZED: Reduced confetti and animations for better performance
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useMemo } from 'react';
-import { Check, Sparkles, Zap, Star, Crown, Award, PartyPopper } from 'lucide-react';
+import { Check, Sparkles, Zap, Star, Crown, Award } from 'lucide-react';
 import { useRoleSounds } from '@/hooks/useRoleSounds';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 interface RolePaymentSuccessAnimationProps {
   isVisible: boolean;
@@ -25,8 +26,12 @@ const RolePaymentSuccessAnimation = ({
 }: RolePaymentSuccessAnimationProps) => {
   const [stage, setStage] = useState(0);
   const { playPaymentSuccess, isMuted } = useRoleSounds(userRole);
+  const { performanceMode } = useNetworkStatus();
+  
+  // Skip heavy animations in lite modes
+  const isLiteMode = performanceMode !== 'full';
 
-  // Role-based animation style
+  // Role-based animation style - REDUCED in lite mode
   const animationStyle = useMemo(() => {
     const role = userRole.toLowerCase();
     
@@ -35,44 +40,41 @@ const RolePaymentSuccessAnimation = ({
       return {
         showConfetti: false,
         showBadge: false,
-        showStars: true,
+        showStars: !isLiteMode,
         primaryColor: 'hsl(45, 100%, 50%)',
         secondaryColor: 'hsl(30, 100%, 50%)',
         style: 'minimal',
       };
     }
     
-    // Partner (franchise/reseller): badge + confetti
+    // Partner (franchise/reseller): badge + reduced confetti
     if (role.includes('franchise') || role.includes('reseller') || role.includes('partner')) {
       return {
-        showConfetti: true,
+        showConfetti: !isLiteMode,
         showBadge: true,
-        showStars: true,
+        showStars: !isLiteMode,
         primaryColor: 'hsl(45, 100%, 50%)',
         secondaryColor: 'hsl(210, 100%, 55%)',
         style: 'premium',
       };
     }
     
-    // Regular users: simple confetti
+    // Regular users: reduced confetti
     return {
-      showConfetti: true,
+      showConfetti: !isLiteMode,
       showBadge: false,
-      showStars: true,
+      showStars: !isLiteMode,
       primaryColor: 'hsl(120, 100%, 45%)',
       secondaryColor: 'hsl(142, 76%, 50%)',
       style: 'standard',
     };
-  }, [userRole]);
+  }, [userRole, isLiteMode]);
 
-  // Confetti colors
+  // Confetti colors - reduced
   const confettiColors = useMemo(() => [
     'hsl(45, 100%, 50%)',
     'hsl(210, 100%, 55%)',
-    'hsl(280, 100%, 60%)',
     'hsl(120, 100%, 45%)',
-    'hsl(330, 100%, 60%)',
-    'hsl(187, 100%, 50%)',
   ], []);
 
   useEffect(() => {
@@ -83,19 +85,21 @@ const RolePaymentSuccessAnimation = ({
 
     // Play sound
     if (!isMuted) {
-      setTimeout(() => playPaymentSuccess(), 300);
+      setTimeout(() => playPaymentSuccess(), 150);
     }
 
+    // FASTER animation timings
+    const speed = isLiteMode ? 0.5 : 1;
     const timers = [
-      setTimeout(() => setStage(1), 100),
-      setTimeout(() => setStage(2), 600),
-      setTimeout(() => setStage(3), 1200),
-      setTimeout(() => setStage(4), 2000),
-      setTimeout(() => onComplete(), 3500),
+      setTimeout(() => setStage(1), 50 * speed),
+      setTimeout(() => setStage(2), 300 * speed),
+      setTimeout(() => setStage(3), 600 * speed),
+      setTimeout(() => setStage(4), 1000 * speed),
+      setTimeout(() => onComplete(), isLiteMode ? 1200 : 2500),
     ];
 
     return () => timers.forEach(clearTimeout);
-  }, [isVisible, onComplete, playPaymentSuccess, isMuted]);
+  }, [isVisible, onComplete, playPaymentSuccess, isMuted, isLiteMode]);
 
   return (
     <AnimatePresence>
@@ -110,7 +114,8 @@ const RolePaymentSuccessAnimation = ({
           {/* Confetti (for users and partners) */}
           {animationStyle.showConfetti && stage >= 3 && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[...Array(50)].map((_, i) => {
+              {/* REDUCED confetti count from 50 to 15 */}
+              {[...Array(15)].map((_, i) => {
                 const color = confettiColors[i % confettiColors.length];
                 const isSquare = i % 3 === 0;
                 const startX = 50 + (Math.random() - 0.5) * 30;
@@ -118,26 +123,25 @@ const RolePaymentSuccessAnimation = ({
                 return (
                   <motion.div
                     key={i}
-                    className={`absolute ${isSquare ? 'w-3 h-3' : 'w-2 h-4'}`}
+                    className={`absolute ${isSquare ? 'w-2 h-2' : 'w-1.5 h-3'}`}
                     style={{
                       background: color,
                       left: `${startX}%`,
                       top: '50%',
                       borderRadius: isSquare ? '2px' : '1px',
-                      boxShadow: `0 0 8px ${color}`,
                     }}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{
-                      opacity: [0, 1, 1, 0],
-                      scale: [0, 1, 1, 0.5],
-                      x: (Math.random() - 0.5) * 500,
-                      y: [0, -180 - Math.random() * 200, 350 + Math.random() * 150],
-                      rotate: Math.random() * 720 - 360,
+                      opacity: [0, 1, 0],
+                      scale: [0, 1, 0.5],
+                      x: (Math.random() - 0.5) * 300,
+                      y: [0, -100 - Math.random() * 100, 200],
+                      rotate: Math.random() * 360,
                     }}
                     transition={{
-                      duration: 2.2 + Math.random() * 0.5,
-                      delay: Math.random() * 0.4,
-                      ease: [0.25, 0.46, 0.45, 0.94],
+                      duration: 1.5,
+                      delay: Math.random() * 0.2,
+                      ease: 'easeOut',
                     }}
                   />
                 );
@@ -148,20 +152,21 @@ const RolePaymentSuccessAnimation = ({
           {/* Stars burst (for all roles) */}
           {animationStyle.showStars && stage >= 3 && (
             <div className="absolute inset-0 pointer-events-none">
-              {[...Array(10)].map((_, i) => (
+              {/* REDUCED stars from 10 to 6 */}
+              {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={`star-${i}`}
                   className="absolute left-1/2 top-1/2"
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{
                     opacity: [0, 1, 0],
-                    scale: [0, 1.2, 0],
-                    x: Math.cos((i / 10) * Math.PI * 2) * 130,
-                    y: Math.sin((i / 10) * Math.PI * 2) * 130,
+                    scale: [0, 1, 0],
+                    x: Math.cos((i / 6) * Math.PI * 2) * 100,
+                    y: Math.sin((i / 6) * Math.PI * 2) * 100,
                   }}
-                  transition={{ duration: 0.9, delay: 0.1 + i * 0.05 }}
+                  transition={{ duration: 0.6, delay: i * 0.05 }}
                 >
-                  <Star className="w-5 h-5 text-[hsl(45,100%,50%)] fill-[hsl(45,100%,50%)]" />
+                  <Star className="w-4 h-4 text-[hsl(45,100%,50%)] fill-[hsl(45,100%,50%)]" />
                 </motion.div>
               ))}
             </div>
@@ -177,23 +182,20 @@ const RolePaymentSuccessAnimation = ({
               animate={{ scale: stage >= 1 ? 1 : 0 }}
               transition={{ type: 'spring', damping: 12, stiffness: 100 }}
             >
-              {/* Outer rings */}
-              {[...Array(3)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute inset-0 rounded-full border-2"
-                  style={{ 
-                    borderColor: animationStyle.primaryColor,
-                    transform: `scale(${1 + i * 0.25})`,
-                    opacity: 0.4 - i * 0.1
-                  }}
-                  animate={{
-                    scale: [1 + i * 0.25, 1.15 + i * 0.25, 1 + i * 0.25],
-                    opacity: [0.4 - i * 0.1, 0.6 - i * 0.1, 0.4 - i * 0.1],
-                  }}
-                  transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.2 }}
-                />
-              ))}
+              {/* Outer rings - REDUCED from 3 to 1 */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-2"
+                style={{ 
+                  borderColor: animationStyle.primaryColor,
+                  transform: 'scale(1.25)',
+                  opacity: 0.3
+                }}
+                animate={isLiteMode ? {} : {
+                  scale: [1.25, 1.35, 1.25],
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
 
               {/* Main circle */}
               <motion.div
@@ -228,8 +230,8 @@ const RolePaymentSuccessAnimation = ({
                 </motion.div>
               </motion.div>
 
-              {/* Sparkle effects */}
-              {stage >= 2 && [...Array(8)].map((_, i) => (
+              {/* Sparkle effects - REDUCED from 8 to 4 */}
+              {stage >= 2 && !isLiteMode && [...Array(4)].map((_, i) => (
                 <motion.div
                   key={`spark-${i}`}
                   className="absolute left-1/2 top-1/2"
@@ -237,12 +239,12 @@ const RolePaymentSuccessAnimation = ({
                   animate={{
                     opacity: [0, 1, 0],
                     scale: [0, 1, 0],
-                    x: Math.cos((i / 8) * Math.PI * 2) * 85 - 10,
-                    y: Math.sin((i / 8) * Math.PI * 2) * 85 - 10,
+                    x: Math.cos((i / 4) * Math.PI * 2) * 80,
+                    y: Math.sin((i / 4) * Math.PI * 2) * 80,
                   }}
-                  transition={{ duration: 0.7, delay: i * 0.07 }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
-                  <Sparkles className="w-5 h-5 text-[hsl(45,100%,50%)]" />
+                  <Sparkles className="w-4 h-4 text-[hsl(45,100%,50%)]" />
                 </motion.div>
               ))}
             </motion.div>
