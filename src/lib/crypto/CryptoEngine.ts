@@ -95,10 +95,13 @@ class CryptoEngine {
       ['deriveKey']
     );
 
+    // Convert Uint8Array to ArrayBuffer for PBKDF2
+    const saltBuffer = salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer;
+
     return crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt,
+        salt: saltBuffer,
         iterations: ITERATIONS,
         hash: HASH_ALGORITHM
       },
