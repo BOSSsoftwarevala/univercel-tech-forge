@@ -13,9 +13,6 @@ import {
   Eye,
   Edit,
   Lock,
-  Unlock,
-  Check,
-  X,
   Crown,
   UserCog
 } from "lucide-react";
@@ -30,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
 
 interface Role {
   id: string;
@@ -116,8 +114,23 @@ const permissionMatrix: Record<string, Record<string, { view: boolean; edit: boo
 
 const RoleAccessControl = () => {
   const [selectedRole, setSelectedRole] = useState<string>("super_admin");
+  const [permissions, setPermissions] = useState(permissionMatrix);
 
-  const currentPermissions = permissionMatrix[selectedRole] || {};
+  const currentPermissions = permissions[selectedRole] || {};
+
+  const handleToggle = (module: string, type: 'view' | 'edit' | 'admin') => {
+    setPermissions(prev => ({
+      ...prev,
+      [selectedRole]: {
+        ...prev[selectedRole],
+        [module]: {
+          ...prev[selectedRole]?.[module],
+          [type]: !prev[selectedRole]?.[module]?.[type]
+        }
+      }
+    }));
+    toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} permission updated for ${module}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -217,25 +230,25 @@ const RoleAccessControl = () => {
                 <TableRow key={module} className="border-border/30">
                   <TableCell className="font-medium">{module}</TableCell>
                   <TableCell className="text-center">
-                    {perms.view ? (
-                      <Check className="w-5 h-5 text-neon-green mx-auto" />
-                    ) : (
-                      <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
-                    )}
+                    <Switch
+                      checked={perms.view}
+                      onCheckedChange={() => handleToggle(module, 'view')}
+                      className="data-[state=checked]:bg-neon-green"
+                    />
                   </TableCell>
                   <TableCell className="text-center">
-                    {perms.edit ? (
-                      <Check className="w-5 h-5 text-neon-cyan mx-auto" />
-                    ) : (
-                      <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
-                    )}
+                    <Switch
+                      checked={perms.edit}
+                      onCheckedChange={() => handleToggle(module, 'edit')}
+                      className="data-[state=checked]:bg-neon-cyan"
+                    />
                   </TableCell>
                   <TableCell className="text-center">
-                    {perms.admin ? (
-                      <Check className="w-5 h-5 text-neon-purple mx-auto" />
-                    ) : (
-                      <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
-                    )}
+                    <Switch
+                      checked={perms.admin}
+                      onCheckedChange={() => handleToggle(module, 'admin')}
+                      className="data-[state=checked]:bg-neon-purple"
+                    />
                   </TableCell>
                 </TableRow>
               );
@@ -247,15 +260,15 @@ const RoleAccessControl = () => {
       {/* Legend */}
       <div className="flex items-center gap-6 text-sm">
         <div className="flex items-center gap-2">
-          <Check className="w-4 h-4 text-neon-green" />
+          <Eye className="w-4 h-4 text-neon-green" />
           <span className="text-muted-foreground">View - Can access and view data</span>
         </div>
         <div className="flex items-center gap-2">
-          <Check className="w-4 h-4 text-neon-cyan" />
+          <Edit className="w-4 h-4 text-neon-cyan" />
           <span className="text-muted-foreground">Edit - Can modify data</span>
         </div>
         <div className="flex items-center gap-2">
-          <Check className="w-4 h-4 text-neon-purple" />
+          <Lock className="w-4 h-4 text-neon-purple" />
           <span className="text-muted-foreground">Admin - Full module control</span>
         </div>
       </div>

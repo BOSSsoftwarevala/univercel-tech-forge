@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 // Mock Finance Manager Data
 const financeManagers = [
@@ -143,6 +144,10 @@ interface FinanceManagerDetailProps {
 const FinanceManagerDetail = ({ manager, onClose }: FinanceManagerDetailProps) => {
   const [activeTab, setActiveTab] = useState("transactions");
 
+  const handleAction = (actionName: string) => {
+    toast.success(`${actionName} initiated for ${manager.name}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 300 }}
@@ -227,6 +232,7 @@ const FinanceManagerDetail = ({ manager, onClose }: FinanceManagerDetailProps) =
                 <Button
                   key={idx}
                   variant="ghost"
+                  onClick={() => handleAction(item.action)}
                   className={cn(
                     "justify-start gap-2 h-10 bg-emerald-800/30 hover:bg-emerald-700/40 border border-emerald-700/30",
                     item.color

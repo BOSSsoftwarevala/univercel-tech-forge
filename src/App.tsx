@@ -409,6 +409,7 @@ const App = () => (
               <Route path="/super-admin/ai-billing" element={<RequireRole allowed={["super_admin"]}><AIBillingDashboard /></RequireRole>} />
               <Route path="/super-admin/franchise-manager" element={<RequireRole allowed={["super_admin"]}><FranchiseManagement /></RequireRole>} />
               <Route path="/super-admin/compliance-center" element={<RequireRole allowed={["master", "super_admin"]}><ComplianceCenter /></RequireRole>} />
+              <Route path="/super-admin/performance" element={<RequireRole allowed={["master", "super_admin"]}><PerformanceManager /></RequireRole>} />
 
               {/* Franchise Routes */}
               <Route path="/franchise" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseLayout><FranchiseDashboardPage /></FranchiseLayout></RequireRole>} />
