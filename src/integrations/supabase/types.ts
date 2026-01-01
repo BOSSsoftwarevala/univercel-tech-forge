@@ -3398,6 +3398,51 @@ export type Database = {
           },
         ]
       }
+      demo_projects: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          project_name: string
+          project_url: string
+          tech_stack: string[] | null
+          thumbnail_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          project_name: string
+          project_url: string
+          tech_stack?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          project_name?: string
+          project_url?: string
+          tech_stack?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       demo_renewal_logs: {
         Row: {
           auto_renewed: boolean | null
@@ -3583,6 +3628,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      demo_requests: {
+        Row: {
+          client_email: string
+          client_name: string
+          company_name: string | null
+          created_at: string | null
+          id: string
+          interested_category: string | null
+          message: string | null
+          notes: string | null
+          phone: string | null
+          responded_at: string | null
+          responded_by: string | null
+          status: string | null
+        }
+        Insert: {
+          client_email: string
+          client_name: string
+          company_name?: string | null
+          created_at?: string | null
+          id?: string
+          interested_category?: string | null
+          message?: string | null
+          notes?: string | null
+          phone?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          client_email?: string
+          client_name?: string
+          company_name?: string | null
+          created_at?: string | null
+          id?: string
+          interested_category?: string | null
+          message?: string | null
+          notes?: string | null
+          phone?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string | null
+        }
+        Relationships: []
       }
       demo_security_locks: {
         Row: {

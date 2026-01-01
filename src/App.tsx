@@ -43,6 +43,7 @@ import SimpleUserDashboard from "./pages/SimpleUserDashboard";
 import DemoAccess from "./pages/DemoAccess";
 import DemoDirectory from "./pages/DemoDirectory";
 import DemoLogin from "./pages/DemoLogin";
+import DemoShowcase from "./pages/DemoShowcase";
 
 import SettingsPage from "./pages/Settings";
 
@@ -277,6 +278,7 @@ const App = () => (
               <Route path="/demo-directory" element={<DemoDirectory />} />
               <Route path="/demo/:role" element={<DemoAccess />} />
               <Route path="/demo-login" element={<DemoLogin />} />
+              <Route path="/showcase" element={<DemoShowcase />} />
 
               {/* Global Auth Routes - Redirects to unified /auth */}
               <Route path="/login" element={<Navigate to="/auth" replace />} />
