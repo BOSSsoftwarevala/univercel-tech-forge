@@ -2479,10 +2479,21 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-4 flex-wrap justify-center">
-              <Badge className="bg-white/20 text-white border-0 animate-pulse text-sm px-4 py-2">
+              {/* $249 Lifetime Pricing Badge */}
+              <Badge className="bg-white text-green-600 font-bold text-lg px-4 py-2 animate-pulse">
+                💰 $249 Lifetime - No Hidden Charges!
+              </Badge>
+              <Badge className="bg-white/20 text-white border-0 text-sm px-4 py-2">
                 🎉 New Year Sale - 40% OFF! 🎉
               </Badge>
               <Badge className="bg-white text-orange-600 font-bold text-lg px-4 py-2">40% OFF</Badge>
+              {/* Login Button */}
+              <Link to="/auth">
+                <Button className="bg-white text-orange-600 hover:bg-white/90 font-bold gap-2">
+                  <Lock className="h-4 w-4" />
+                  Login / Sign Up
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
