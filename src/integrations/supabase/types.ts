@@ -21037,6 +21037,8 @@ export type Database = {
         | "area_manager"
         | "server_manager"
         | "product_demo_manager"
+        | "boss_owner"
+        | "ceo"
       critical_action_type:
         | "delete_data"
         | "edit_financial"
@@ -21297,6 +21299,8 @@ export const Constants = {
         "area_manager",
         "server_manager",
         "product_demo_manager",
+        "boss_owner",
+        "ceo",
       ],
       critical_action_type: [
         "delete_data",
