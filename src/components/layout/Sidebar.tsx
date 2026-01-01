@@ -55,7 +55,7 @@ const menuItems: MenuItem[] = [
     icon: <Building2 className="w-4 h-4" />,
     badge: 42,
     badgeColor: 'bg-neon-cyan/20 text-neon-cyan',
-    path: '/super-admin/franchise-manager'
+    path: '/super-admin-system/role-switch?role=franchise_manager'
   },
   { 
     id: 'reseller', 
@@ -63,7 +63,7 @@ const menuItems: MenuItem[] = [
     icon: <Users className="w-4 h-4" />,
     badge: 156,
     badgeColor: 'bg-neon-teal/20 text-neon-teal',
-    path: '/super-admin/reseller-manager'
+    path: '/super-admin-system/role-switch?role=reseller_manager'
   },
   { 
     id: 'developer', 
