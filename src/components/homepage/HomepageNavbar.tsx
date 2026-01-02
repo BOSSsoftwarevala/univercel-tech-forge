@@ -98,6 +98,14 @@ const HomepageNavbar = () => {
             >
               Login
             </Button>
+
+            {/* Boss Portal Button */}
+            <Button
+              onClick={() => navigate('/boss/login')}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold shadow-lg shadow-purple-500/30"
+            >
+              Boss Portal
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -130,13 +138,19 @@ const HomepageNavbar = () => {
                   {item.label}
                 </a>
               ))}
-              <div className="pt-4 border-t border-border/30">
+              <div className="pt-4 border-t border-border/30 space-y-2">
                 <Button
                   variant="outline"
                   className="w-full border-primary/50 text-primary"
                   onClick={() => navigate('/auth')}
                 >
                   Login
+                </Button>
+                <Button
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold"
+                  onClick={() => navigate('/boss/login')}
+                >
+                  Boss Portal
                 </Button>
               </div>
             </div>

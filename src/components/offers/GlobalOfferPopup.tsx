@@ -1,8 +1,10 @@
 import { useState, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Gift, Sparkles, Trophy, Calendar } from 'lucide-react';
+import { X, Gift, Sparkles, Trophy, Calendar, LogIn, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 interface GlobalOffer {
   id: string;
@@ -61,7 +63,8 @@ const incrementAdminShowCount = () => {
 };
 
 const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
-  const { userRole } = useAuth();
+  const { userRole, user } = useAuth();
+  const navigate = useNavigate();
   const [currentOffer, setCurrentOffer] = useState<GlobalOffer | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -253,8 +256,31 @@ const GlobalOfferPopupInner = forwardRef<HTMLDivElement, object>((_, ref) => {
                 </div>
               </motion.div>
 
-              {/* Right: Discount Badge and Close */}
-              <div className="flex items-center gap-3">
+              {/* Right: Login Buttons + Discount Badge and Close */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Login Buttons - Only show when not logged in */}
+                {!user && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => navigate('/auth')}
+                      className="text-white hover:bg-white/20 text-xs sm:text-sm gap-1"
+                    >
+                      <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Login</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => navigate('/boss/login')}
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm gap-1 shadow-lg"
+                    >
+                      <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Boss</span>
+                    </Button>
+                  </>
+                )}
+                
                 <motion.div
                   className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-lg"
                   style={{ backgroundColor: currentOffer.theme_accent_color }}
