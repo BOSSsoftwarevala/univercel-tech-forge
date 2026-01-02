@@ -56,6 +56,7 @@ import ClientPortal from "./pages/ClientPortal";
 
 // Demo Product Pages - One-click access, no login
 import RestaurantPOSDemo from "./pages/demos/RestaurantPOSDemo";
+import SaaSPOSDemo from "./pages/saas-pos/SaaSPOSDemo";
 import RestaurantSmallDemo from "./pages/demos/restaurant/RestaurantSmallDemo";
 import RestaurantMediumDemo from "./pages/demos/restaurant/RestaurantMediumDemo";
 import RestaurantLargeDemo from "./pages/demos/restaurant/RestaurantLargeDemo";
