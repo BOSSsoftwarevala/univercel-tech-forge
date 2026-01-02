@@ -12,7 +12,8 @@ import {
   Bell,
   ChevronDown,
   Menu,
-  X
+  X,
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,22 +40,25 @@ const SalesCRMLayout = ({ children, activeSection, onSectionChange }: SalesCRMLa
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-[hsl(225,30%,96%)]">
+      {/* Sidebar with Blue Gradient */}
       <motion.aside
         initial={{ x: -280 }}
         animate={{ x: sidebarOpen ? 0 : -280 }}
-        className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 flex flex-col z-50 shadow-sm"
+        className="fixed left-0 top-0 h-screen w-64 flex flex-col z-50"
+        style={{
+          background: 'linear-gradient(180deg, hsl(225, 70%, 50%) 0%, hsl(235, 75%, 55%) 50%, hsl(250, 80%, 58%) 100%)'
+        }}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-slate-100">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
               <Handshake className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-800">Sales CRM</h1>
-              <p className="text-xs text-slate-500">by Software Vala</p>
+              <h1 className="text-lg font-bold text-white">Sales CRM</h1>
+              <p className="text-xs text-white/70">by Software Vala</p>
             </div>
           </div>
         </div>
@@ -71,17 +75,17 @@ const SalesCRMLayout = ({ children, activeSection, onSectionChange }: SalesCRMLa
                 whileTap={{ scale: 0.98 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   isActive
-                    ? "bg-blue-50 text-blue-600 shadow-sm"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"
+                    ? "bg-white text-[hsl(225,85%,50%)] shadow-lg"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? "text-blue-600" : ""}`} />
+                <item.icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
                 {item.badge && (
                   <Badge className={`ml-auto ${
                     isActive 
-                      ? "bg-blue-500 text-white" 
-                      : "bg-slate-200 text-slate-600"
+                      ? "bg-[hsl(225,85%,55%)] text-white" 
+                      : "bg-white/20 text-white"
                   }`}>
                     {item.badge}
                   </Badge>
@@ -92,13 +96,15 @@ const SalesCRMLayout = ({ children, activeSection, onSectionChange }: SalesCRMLa
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100">
-          <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
-            <p className="text-sm font-medium text-slate-700">Need Help?</p>
-            <p className="text-xs text-slate-500 mt-1">Contact support for assistance</p>
-            <Button size="sm" className="w-full mt-3 bg-blue-500 hover:bg-blue-600">
-              Get Support
-            </Button>
+        <div className="p-4 border-t border-white/10">
+          <div className="p-4 rounded-xl bg-white/10 backdrop-blur">
+            <div className="flex items-center gap-3">
+              <Zap className="w-5 h-5 text-yellow-300" />
+              <div>
+                <p className="text-sm font-medium text-white">Need Help?</p>
+                <p className="text-xs text-white/70">Contact support</p>
+              </div>
+            </div>
           </div>
         </div>
       </motion.aside>
@@ -106,44 +112,44 @@ const SalesCRMLayout = ({ children, activeSection, onSectionChange }: SalesCRMLa
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
         {/* Top Bar */}
-        <header className="sticky top-0 z-40 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm">
+        <header className="sticky top-0 z-40 h-16 bg-white border-b border-[hsl(225,20%,90%)] flex items-center justify-between px-6 shadow-sm">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-slate-600"
+              className="text-[hsl(225,30%,40%)]"
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
             
             <div className="relative w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(225,15%,50%)]" />
               <Input 
                 placeholder="Search leads, customers, deals..." 
-                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
+                className="pl-10 bg-[hsl(225,30%,97%)] border-[hsl(225,20%,90%)] focus:bg-white focus:border-[hsl(225,85%,55%)]"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="relative text-slate-600">
+            <Button variant="ghost" size="icon" className="relative text-[hsl(225,30%,40%)]">
               <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[hsl(0,80%,55%)] text-white text-xs rounded-full flex items-center justify-center">
                 3
               </span>
             </Button>
 
-            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+            <div className="flex items-center gap-3 pl-4 border-l border-[hsl(225,20%,90%)]">
               <Avatar className="w-9 h-9">
                 <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback className="bg-blue-100 text-blue-600">JD</AvatarFallback>
+                <AvatarFallback className="bg-[hsl(225,85%,55%)] text-white">JD</AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <p className="text-sm font-medium text-slate-700">John Doe</p>
-                <p className="text-xs text-slate-500">Sales Manager</p>
+                <p className="text-sm font-medium text-[hsl(225,30%,20%)]">John Doe</p>
+                <p className="text-xs text-[hsl(225,15%,50%)]">Sales Manager</p>
               </div>
-              <ChevronDown className="w-4 h-4 text-slate-400" />
+              <ChevronDown className="w-4 h-4 text-[hsl(225,15%,50%)]" />
             </div>
           </div>
         </header>
