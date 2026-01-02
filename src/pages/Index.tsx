@@ -2512,6 +2512,13 @@ const Index = () => {
                   Login
                 </Button>
               </Link>
+              {/* Temporary Boss Portal Access - Remove after 2-3 days */}
+              <Link to="/boss/login">
+                <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold gap-2 shadow-lg shadow-purple-500/30">
+                  <Shield className="h-4 w-4" />
+                  Boss Portal
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
