@@ -240,9 +240,7 @@ const RoleSwitchDashboard = () => {
       {/* TOP BAR */}
       <header className={cn(
         "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
-        activeRole === "server_manager" 
-          ? "bg-zinc-900/80 border-zinc-700" 
-          : "bg-card/80 border-border/50"
+        "bg-gradient-to-r from-[#0d0d14] via-[#12121a] to-[#0d0d14] border-amber-500/20"
       )}>
         {/* Left - Current Role Badge */}
         <div className="flex items-center gap-4">
@@ -277,10 +275,7 @@ const RoleSwitchDashboard = () => {
           </Badge>
 
           {/* Session Timer */}
-          <div className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg",
-            activeRole === "server_manager" ? "bg-zinc-800" : "bg-secondary/50"
-          )}>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <Timer className={cn("w-4 h-4", currentConfig.accentColor)} />
             <span className="text-sm font-mono text-foreground">{formatTime(sessionTime)}</span>
           </div>
