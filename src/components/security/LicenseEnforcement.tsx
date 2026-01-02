@@ -3,7 +3,7 @@
  * ==============================
  * Displays license information and enforces legal compliance.
  * 
- * © 2024 Software Vala. All Rights Reserved.
+ * © 2024 Software Wala. All Rights Reserved.
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,7 @@ interface LicenseInfo {
 
 const LICENSE_INFO: LicenseInfo = {
   type: "Proprietary Commercial License",
-  holder: "Software Vala Pvt. Ltd.",
+  holder: "Software Wala Pvt. Ltd.",
   validUntil: "Perpetual",
   restrictions: [
     "No redistribution without written consent",
@@ -114,7 +114,7 @@ const LicenseEnforcement = () => {
             {/* Legal Notice */}
             <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
               <p className="text-xs text-muted-foreground">
-                © 2024 Software Vala Pvt. Ltd. All rights reserved. This software is protected by
+                © 2024 Software Wala Pvt. Ltd. All rights reserved. This software is protected by
                 copyright law and international treaties. Unauthorized reproduction or distribution
                 may result in severe civil and criminal penalties.
               </p>
