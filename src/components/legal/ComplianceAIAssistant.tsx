@@ -147,7 +147,7 @@ const ComplianceAIAssistant = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white">AI Legal & Compliance Assistant</h2>
-          <p className="text-stone-500">Powered by Lovable AI - Real-time legal guidance</p>
+          <p className="text-stone-500">Real-time legal guidance</p>
         </div>
         <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/40">
           <Sparkles className="w-3 h-3 mr-1" />

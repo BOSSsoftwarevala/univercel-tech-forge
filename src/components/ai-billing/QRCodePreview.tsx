@@ -31,7 +31,7 @@ export const QRCodePreview = ({ selectedQR, onQRSelect }: QRCodePreviewProps) =>
     managementFee: 3.00,
     finalCost: 13.00,
     module: "SEO",
-    provider: "Lovable AI",
+    provider: "Software Vala AI",
     date: new Date().toISOString(),
     walletRef: "TXN-2024122100001",
     triggeredBy: "admin",

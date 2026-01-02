@@ -215,7 +215,7 @@ const DemoManager = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Demo Manager</h1>
-          <p className="text-gray-400">Manage your Lovable project demos</p>
+          <p className="text-gray-400">Manage your project demos</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={fetchData} className="border-gray-700">
@@ -361,7 +361,7 @@ const DemoManager = () => {
               <Input
                 value={formData.project_url}
                 onChange={(e) => setFormData({ ...formData, project_url: e.target.value })}
-                placeholder="https://your-app.lovable.app"
+                placeholder="https://your-app.example.com"
                 className="bg-gray-800 border-gray-700"
               />
             </div>

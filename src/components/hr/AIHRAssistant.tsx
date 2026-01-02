@@ -223,7 +223,7 @@ const AIHRAssistant = () => {
           <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
             AI HR Assistant
           </h2>
-          <p className="text-slate-400 text-sm mt-1">Powered by Lovable AI — Recruitment, training, and HR automation</p>
+          <p className="text-slate-400 text-sm mt-1">Recruitment, training, and HR automation</p>
         </div>
         <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/40">
           <Sparkles className="w-3 h-3 mr-1" />

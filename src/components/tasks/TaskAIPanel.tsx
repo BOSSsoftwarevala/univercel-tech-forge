@@ -167,7 +167,7 @@ const TaskAIPanel = ({ isOpen, onClose, task }: TaskAIPanelProps) => {
                     AI Task Assistant
                     <Badge className="bg-violet-500/20 text-violet-400 border-violet-500/30">
                       <Sparkles className="w-3 h-3 mr-1" />
-                      Lovable AI
+                      AI Powered
                     </Badge>
                   </h3>
                   <p className="text-xs text-violet-400">Intelligent task automation</p>

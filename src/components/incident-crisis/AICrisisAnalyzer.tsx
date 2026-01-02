@@ -157,7 +157,7 @@ const AICrisisAnalyzer = ({ isOpen, onClose }: AICrisisAnalyzerProps) => {
                       AI Crisis Analyzer
                       <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
                         <Sparkles className="w-3 h-3 mr-1" />
-                        Powered by Lovable AI
+                        AI Powered
                       </Badge>
                     </h2>
                     <p className="text-xs text-slate-400">

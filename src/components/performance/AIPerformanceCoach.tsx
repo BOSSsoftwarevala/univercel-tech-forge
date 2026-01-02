@@ -240,7 +240,7 @@ export const AIPerformanceCoach = () => {
           <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
             AI Performance Coach
           </h2>
-          <p className="text-slate-400 text-sm mt-1">Powered by Lovable AI — Real-time performance insights & coaching</p>
+          <p className="text-slate-400 text-sm mt-1">Real-time performance insights & coaching</p>
         </div>
         <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/40">
           <Sparkles className="w-3 h-3 mr-1" />
