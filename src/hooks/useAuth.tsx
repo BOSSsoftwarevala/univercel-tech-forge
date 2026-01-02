@@ -289,12 +289,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Boss Owner should never be blocked by allowlist rules (break-glass access)
         let isBossOwner = false;
         try {
-          const { data: roles } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', data.user.id);
+          // Use SECURITY DEFINER function - reliable even if RLS blocks direct table reads
+          const [bossResult, masterResult, ceoResult] = await Promise.all([
+            supabase.rpc('has_role', { _user_id: data.user.id, _role: 'boss_owner' }),
+            supabase.rpc('has_role', { _user_id: data.user.id, _role: 'master' }),
+            supabase.rpc('has_role', { _user_id: data.user.id, _role: 'ceo' }),
+          ]);
 
-          isBossOwner = (roles || []).some((r) => r.role === 'boss_owner' || r.role === 'master');
+          isBossOwner =
+            bossResult.data === true || masterResult.data === true || ceoResult.data === true;
         } catch {
           // If role lookup fails, we fall back to normal login verification.
         }
