@@ -368,6 +368,7 @@ const App = () => (
               {/* Boss Fortress Auth - Ultra Secure */}
               <Route path="/boss-fortress" element={<BossFortressAuth />} />
               <Route path="/boss-register" element={<BossRegister />} />
+              <Route path="/boss/login" element={<SuperAdminLogin />} />
 
               {/* Owner Dashboard - SoftwareWala Business Control */}
               <Route path="/owner" element={<RequireRole allowed={["boss_owner"]}><SoftwareWalaOwnerDashboard /></RequireRole>} />
