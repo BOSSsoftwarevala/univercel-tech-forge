@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   Target, User, Shield, Calendar, Clock, Activity,
-  Eye, MapPin, Ban, Lock, ChevronRight, X,
+  Eye, MapPin, Ban, Lock, ChevronRight, X, ChevronDown,
   CheckCircle, AlertTriangle, Search, RefreshCw,
-  Users, TrendingUp, Phone, Mail, Flag,
+  Users, TrendingUp, Phone, Mail, Flag, Layers,
   ArrowUpRight, ArrowDownRight, Flame, Snowflake,
-  UserPlus, GitMerge, BarChart3, Zap
+  UserPlus, GitMerge, BarChart3, Zap, Inbox, Filter, Share2
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -17,6 +17,46 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Category Hierarchy for Lead Manager
+interface NanoCategory {
+  name: string;
+  count?: number;
+}
+
+interface MicroCategory {
+  name: string;
+  nanos: NanoCategory[];
+}
+
+interface SubCategory {
+  name: string;
+  micros: MicroCategory[];
+}
+
+const leadManagerCategories: SubCategory[] = [
+  {
+    name: "Lead Flow",
+    micros: [
+      { name: "Capture", nanos: [{ name: "Web Form", count: 45 }, { name: "API Import", count: 23 }, { name: "Manual Entry", count: 12 }] },
+      { name: "Distribute", nanos: [{ name: "Auto-Assign", count: 34 }, { name: "Round Robin", count: 18 }, { name: "Territory", count: 27 }] },
+    ]
+  },
+  {
+    name: "Quality Control",
+    micros: [
+      { name: "Scoring", nanos: [{ name: "AI Score", count: 156 }, { name: "Manual Score", count: 42 }] },
+      { name: "Filtering", nanos: [{ name: "Spam Filter", count: 89 }, { name: "Duplicate Check", count: 34 }, { name: "Validation", count: 67 }] },
+    ]
+  },
+  {
+    name: "Pipeline",
+    micros: [
+      { name: "Stages", nanos: [{ name: "New", count: 24 }, { name: "Contacted", count: 18 }, { name: "Demo", count: 12 }, { name: "Negotiation", count: 8 }] },
+      { name: "Actions", nanos: [{ name: "Follow-up", count: 45 }, { name: "Escalate", count: 7 }, { name: "Close", count: 89 }] },
+    ]
+  },
+];
 
 // Mock data for lead managers
 const leadManagersData = [
@@ -128,6 +168,26 @@ const LeadManagerView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCountry, setFilterCountry] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  
+  // Category hierarchy state
+  const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
+  const [expandedMicros, setExpandedMicros] = useState<string[]>([]);
+
+  const toggleSub = (subName: string) => {
+    setExpandedSubs(prev => 
+      prev.includes(subName) 
+        ? prev.filter(s => s !== subName) 
+        : [...prev, subName]
+    );
+  };
+
+  const toggleMicro = (microKey: string) => {
+    setExpandedMicros(prev => 
+      prev.includes(microKey) 
+        ? prev.filter(m => m !== microKey) 
+        : [...prev, microKey]
+    );
+  };
 
   const handleSelectManager = (manager: typeof leadManagersData[0]) => {
     setSelectedManager(manager);
@@ -245,6 +305,111 @@ const LeadManagerView = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* SubCategory & Nano Category Hierarchy */}
+            <Card className="bg-card/50 backdrop-blur border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Layers className="w-5 h-5 text-violet-400" />
+                  Lead Categories Hierarchy
+                  <Badge variant="outline" className="ml-2 text-xs">Sub → Micro → Nano</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {leadManagerCategories.map((sub) => (
+                  <div key={sub.name} className="border border-border/50 rounded-lg overflow-hidden">
+                    {/* SubCategory Level */}
+                    <motion.button
+                      onClick={() => toggleSub(sub.name)}
+                      className="w-full flex items-center justify-between p-3 bg-violet-500/10 hover:bg-violet-500/15 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                          <Layers className="w-4 h-4 text-violet-400" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-foreground">{sub.name}</p>
+                          <p className="text-xs text-muted-foreground">{sub.micros.length} micro categories</p>
+                        </div>
+                      </div>
+                      <ChevronDown className={cn(
+                        "w-5 h-5 text-muted-foreground transition-transform",
+                        expandedSubs.includes(sub.name) && "rotate-180"
+                      )} />
+                    </motion.button>
+
+                    {/* MicroCategory Level */}
+                    <AnimatePresence>
+                      {expandedSubs.includes(sub.name) && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="p-2 space-y-2 bg-background/30">
+                            {sub.micros.map((micro) => (
+                              <div key={micro.name} className="border border-border/30 rounded-lg overflow-hidden">
+                                <motion.button
+                                  onClick={() => toggleMicro(`${sub.name}-${micro.name}`)}
+                                  className="w-full flex items-center justify-between p-2 bg-purple-500/5 hover:bg-purple-500/10 transition-colors"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center">
+                                      <Filter className="w-3 h-3 text-purple-400" />
+                                    </div>
+                                    <span className="text-sm font-medium">{micro.name}</span>
+                                    <Badge variant="outline" className="text-xs">{micro.nanos.length} nanos</Badge>
+                                  </div>
+                                  <ChevronDown className={cn(
+                                    "w-4 h-4 text-muted-foreground transition-transform",
+                                    expandedMicros.includes(`${sub.name}-${micro.name}`) && "rotate-180"
+                                  )} />
+                                </motion.button>
+
+                                {/* NanoCategory Level */}
+                                <AnimatePresence>
+                                  {expandedMicros.includes(`${sub.name}-${micro.name}`) && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="p-2 space-y-1 bg-background/50">
+                                        {micro.nanos.map((nano) => (
+                                          <motion.div
+                                            key={nano.name}
+                                            whileHover={{ x: 4 }}
+                                            className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group"
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-1.5 h-1.5 rounded-full bg-teal-400 group-hover:bg-teal-300" />
+                                              <span className="text-xs text-muted-foreground group-hover:text-teal-400 transition-colors">
+                                                {nano.name}
+                                              </span>
+                                            </div>
+                                            {nano.count && (
+                                              <Badge variant="secondary" className="text-xs h-5">
+                                                {nano.count}
+                                              </Badge>
+                                            )}
+                                          </motion.div>
+                                        ))}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
 
             {/* Filters */}
             <Card className="bg-card/50 backdrop-blur border-border/50">
