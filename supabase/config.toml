@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.super-admin-live]
 verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false
