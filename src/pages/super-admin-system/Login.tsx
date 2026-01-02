@@ -31,12 +31,24 @@ const SuperAdminLogin = () => {
 
       if (authError) throw authError;
 
-      // Log login action
-      await supabase.from("super_admin_sessions").insert({
-        user_id: data.user?.id || "",
-        session_token: data.session?.access_token || "",
+      const userId = data.user?.id;
+      const accessToken = data.session?.access_token;
+
+      if (!userId || !accessToken) {
+        throw new Error("Login incomplete. Please retry.");
+      }
+
+      // Log login action (do not block login if logging fails)
+      const { error: logError } = await supabase.from("super_admin_sessions").insert({
+        user_id: userId,
+        session_token: accessToken,
         ip_address: "detected",
       });
+
+      if (logError) {
+        // Avoid blocking access due to analytics/logging insert failures
+        // (RLS/type constraints/etc.)
+      }
 
       toast.success("Login successful");
       navigate("/super-admin-system");
