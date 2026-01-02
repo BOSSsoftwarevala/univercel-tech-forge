@@ -56,6 +56,9 @@ import ClientPortal from "./pages/ClientPortal";
 
 // Demo Product Pages - One-click access, no login
 import RestaurantPOSDemo from "./pages/demos/RestaurantPOSDemo";
+import RestaurantSmallDemo from "./pages/demos/restaurant/RestaurantSmallDemo";
+import RestaurantMediumDemo from "./pages/demos/restaurant/RestaurantMediumDemo";
+import RestaurantLargeDemo from "./pages/demos/restaurant/RestaurantLargeDemo";
 import SchoolERPDemo from "./pages/demos/SchoolERPDemo";
 import HospitalHMSDemo from "./pages/demos/HospitalHMSDemo";
 import EcommerceStoreDemo from "./pages/demos/EcommerceStoreDemo";
@@ -317,7 +320,10 @@ const App = () => (
               <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
               
               {/* Product Demo Pages - MUST come BEFORE dynamic routes */}
-              <Route path="/demo/restaurant-pos" element={<RestaurantPOSDemo />} />
+<Route path="/demo/restaurant-pos" element={<RestaurantPOSDemo />} />
+              <Route path="/demo/restaurant-small" element={<RestaurantSmallDemo />} />
+              <Route path="/demo/restaurant-medium" element={<RestaurantMediumDemo />} />
+              <Route path="/demo/restaurant-large" element={<RestaurantLargeDemo />} />
               <Route path="/demo/school-erp" element={<SchoolERPDemo />} />
               <Route path="/demo/hospital-hms" element={<HospitalHMSDemo />} />
               <Route path="/demo/ecommerce-store" element={<EcommerceStoreDemo />} />
