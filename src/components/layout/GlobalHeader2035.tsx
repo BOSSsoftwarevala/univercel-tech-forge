@@ -58,9 +58,7 @@ const GlobalHeader2035 = ({ roleName, maskedId, lowDataMode, onChatToggle }: Hea
   return (
     <header className={cn(
       "h-16 flex items-center justify-between px-6 border-b sticky top-0 z-40",
-      lowDataMode 
-        ? "bg-background border-border" 
-        : "bg-[#0d1025]/80 backdrop-blur-xl border-white/5"
+      "bg-[#1a1f3c] border-[#2a3f6f]"
     )}>
       {/* Left Section - Search & Role */}
       <div className="flex items-center gap-4">
