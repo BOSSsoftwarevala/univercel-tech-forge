@@ -169,9 +169,13 @@ const LeadManagerView = () => {
   const [filterCountry, setFilterCountry] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   
-  // Category hierarchy state
-  const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
-  const [expandedMicros, setExpandedMicros] = useState<string[]>([]);
+  // Category hierarchy state (default open so sub/micro/nano are visible immediately)
+  const [expandedSubs, setExpandedSubs] = useState<string[]>(() => [leadManagerCategories[0]?.name].filter(Boolean) as string[]);
+  const [expandedMicros, setExpandedMicros] = useState<string[]>(() => {
+    const sub = leadManagerCategories[0];
+    const micro = sub?.micros?.[0];
+    return sub && micro ? [`${sub.name}-${micro.name}`] : [];
+  });
 
   const toggleSub = (subName: string) => {
     setExpandedSubs(prev => 

@@ -114,29 +114,49 @@ const statusColors = {
   suspended: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
-function TreeNode({ node, level = 0 }: { node: HierarchyNode; level?: number }) {
+function TreeNode({
+  node,
+  level = 0,
+  selectedId,
+  onSelect,
+}: {
+  node: HierarchyNode;
+  level?: number;
+  selectedId: string | null;
+  onSelect: (node: HierarchyNode) => void;
+}) {
   const [expanded, setExpanded] = useState(level < 2);
-  const [selected, setSelected] = useState(false);
   const Icon = node.icon;
   const hasChildren = node.children && node.children.length > 0;
+  const isSelected = selectedId === node.id;
 
   return (
     <div className="select-none">
       <motion.div
         className={cn(
           "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors",
-          selected ? "bg-amber-500/20 border border-amber-500/30" : "hover:bg-white/5"
+          isSelected ? "bg-amber-500/20 border border-amber-500/30" : "hover:bg-white/5"
         )}
         style={{ paddingLeft: `${level * 24 + 8}px` }}
-        onClick={() => setSelected(!selected)}
+        onClick={() => onSelect(node)}
+        role="button"
+        aria-pressed={isSelected}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelect(node);
+          }
+        }}
       >
         {hasChildren && (
-          <button 
+          <button
             onClick={(e) => {
               e.stopPropagation();
               setExpanded(!expanded);
             }}
             className="p-1 hover:bg-white/10 rounded"
+            aria-label={expanded ? "Collapse" : "Expand"}
           >
             {expanded ? (
               <ChevronDown className="w-4 h-4 text-white/50" />
@@ -146,32 +166,44 @@ function TreeNode({ node, level = 0 }: { node: HierarchyNode; level?: number }) 
           </button>
         )}
         {!hasChildren && <div className="w-6" />}
-        
-        <div className={cn(
-          "w-8 h-8 rounded-lg flex items-center justify-center",
-          level === 0 ? "bg-amber-500/20 text-amber-400" : "bg-white/10 text-white/60"
-        )}>
+
+        <div
+          className={cn(
+            "w-8 h-8 rounded-lg flex items-center justify-center",
+            level === 0
+              ? "bg-amber-500/20 text-amber-400"
+              : isSelected
+                ? "bg-amber-500/15 text-amber-300"
+                : "bg-white/10 text-white/60"
+          )}
+        >
           <Icon className="w-4 h-4" />
         </div>
-        
+
         <div className="flex-1">
           <div className="text-sm font-medium text-white">{node.name}</div>
           <div className="text-[10px] text-white/50">{node.role}</div>
         </div>
-        
+
         <Badge className={`${statusColors[node.status]} border text-[10px]`}>
           {node.assignedCount}
         </Badge>
       </motion.div>
-      
+
       {hasChildren && expanded && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
         >
           {node.children!.map((child) => (
-            <TreeNode key={child.id} node={child} level={level + 1} />
+            <TreeNode
+              key={child.id}
+              node={child}
+              level={level + 1}
+              selectedId={selectedId}
+              onSelect={onSelect}
+            />
           ))}
         </motion.div>
       )}
@@ -200,7 +232,11 @@ export function HierarchyControl() {
           </CardHeader>
           <CardContent>
             <div className="space-y-1 max-h-[600px] overflow-y-auto">
-              <TreeNode node={hierarchyData} />
+              <TreeNode
+                node={hierarchyData}
+                selectedId={selectedNode?.id ?? null}
+                onSelect={setSelectedNode}
+              />
             </div>
           </CardContent>
         </Card>
