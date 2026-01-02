@@ -248,7 +248,32 @@ export const roleConfigs = {
 } as const;
 
 // Extended navigation items per role - role-specific features
-const roleNavItems = {
+const roleNavItems: Record<ActiveRole, Array<{ id: string; label: string; icon: any; subItems?: Array<{ id: string; label: string; status: string }> }>> = {
+  boss_owner: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "super-admins", label: "Super Admins", icon: Users },
+    { id: "roles", label: "Roles & Permissions", icon: Key },
+    { id: "modules", label: "System Modules", icon: Cpu },
+    { id: "audit", label: "Audit & Blackbox", icon: Database },
+    { id: "security", label: "Security & Legal", icon: Shield },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  ceo: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "overview", label: "Business Overview", icon: Eye },
+    { id: "revenue", label: "Revenue Insights", icon: TrendingUp },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "reports", label: "Reports", icon: FileText },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
+  admin: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "users", label: "User Management", icon: Users },
+    { id: "roles", label: "Roles & Access", icon: Shield },
+    { id: "modules", label: "Modules", icon: Cpu },
+    { id: "activity", label: "Activity Log", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
+  ],
   continent_super_admin: [
     {
       id: "dashboard",
@@ -405,23 +430,6 @@ const roleNavItems = {
     { id: "assignments", label: "Role Assignments", icon: UserCheck },
     { id: "versions", label: "Role Versions", icon: FileText },
     { id: "audit", label: "Audit Log", icon: Activity },
-    { id: "settings", label: "Settings", icon: Settings },
-  ],
-  master_admin: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "super-admins", label: "Super Admins", icon: Users },
-    { id: "roles", label: "Roles & Permissions", icon: Key },
-    { id: "modules", label: "System Modules", icon: Cpu },
-    { id: "audit", label: "Audit & Blackbox", icon: Database },
-    { id: "security", label: "Security & Legal", icon: Shield },
-    { id: "settings", label: "Settings", icon: Settings },
-  ],
-  super_admin_hierarchy: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "continents", label: "Continents", icon: Globe2 },
-    { id: "admins", label: "Continent Admins", icon: Users },
-    { id: "modules", label: "Global Modules", icon: Cpu },
-    { id: "activity", label: "Activity Log", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   country_head: [
