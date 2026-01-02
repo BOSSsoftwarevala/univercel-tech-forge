@@ -83,6 +83,7 @@ import CRMDemo from "./pages/demos/CRMDemo";
 import LogisticsDemo from "./pages/demos/LogisticsDemo";
 import SalesCRMDemo from "./pages/sales-crm/SalesCRMDemo";
 import SalesCRMAuthPage from "./pages/sales-crm/SalesCRMAuthPage";
+import SimpleHRMDemo from "./pages/simple-hrm/SimpleHRMDemo";
 
 import SettingsPage from "./pages/Settings";
 
