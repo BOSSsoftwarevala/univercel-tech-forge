@@ -757,33 +757,38 @@ const RoleSwitchSidebar = ({
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: subIdx * 0.02 }}
                               onClick={() => onSubItemClick?.(subItem.id)}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:bg-slate-700/50 hover:border-slate-600 transition-all group"
+                              className={cn(
+                                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all group",
+                                "bg-sidebar-accent/35 border-sidebar-border/40 hover:bg-sidebar-accent/55 hover:border-sidebar-border/60"
+                              )}
                             >
                               {/* Globe Icon */}
-                              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-lg flex-shrink-0">
+                              <div className="w-8 h-8 rounded-lg bg-aurora-gold/15 flex items-center justify-center text-lg flex-shrink-0">
                                 🌍
                               </div>
-                              
+
                               {/* Name */}
                               <div className="flex-1 text-left min-w-0">
-                                <span className="text-sm text-white font-medium truncate block">
+                                <span className="text-sm text-sidebar-foreground font-medium truncate block">
                                   {subItem.label.replace(" Super Admin", "")}
                                 </span>
-                                <span className="text-xs text-slate-500">Super Admin</span>
+                                <span className="text-xs text-muted-foreground">Super Admin</span>
                               </div>
-                              
+
                               {/* Status & Arrow */}
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <div className="relative">
-                                  <div className={cn(
-                                    "w-3 h-3 rounded-full",
-                                    subItem.status === "active" ? "bg-emerald-500" : "bg-slate-500"
-                                  )} />
+                                  <div
+                                    className={cn(
+                                      "w-3 h-3 rounded-full",
+                                      subItem.status === "active" ? "bg-status-success" : "bg-muted-foreground/40"
+                                    )}
+                                  />
                                   {subItem.status === "active" && (
-                                    <div className="absolute inset-0 w-3 h-3 rounded-full bg-emerald-500 animate-ping opacity-40" />
+                                    <div className="absolute inset-0 w-3 h-3 rounded-full bg-status-success animate-ping opacity-40" />
                                   )}
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition-colors" />
+                                <ChevronRight className="w-4 h-4 text-muted-foreground/70 group-hover:text-aurora-gold transition-colors" />
                               </div>
                             </motion.button>
                           ))}
