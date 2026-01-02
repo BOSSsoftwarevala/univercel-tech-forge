@@ -26,7 +26,7 @@ interface SuperAdminWireframeLayoutProps {
 }
 
 const sidebarItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/super-admin-system" },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/super-admin-system/dashboard" },
   { id: "users", label: "Users", icon: Users, path: "/super-admin-system/users" },
   { id: "admins", label: "Admins", icon: UserCog, path: "/super-admin-system/admins" },
   { id: "roles", label: "Roles & Permissions", icon: Shield, path: "/super-admin-system/roles" },
@@ -36,8 +36,8 @@ const sidebarItems = [
   { id: "rules", label: "Rules", icon: FileText, path: "/super-admin-system/rules" },
   { id: "approvals", label: "Approvals", icon: CheckCircle, path: "/super-admin-system/approvals" },
   { id: "security", label: "Security", icon: AlertTriangle, path: "/super-admin-system/security" },
-  { id: "system-lock", label: "System Lock", icon: Lock, path: "/super-admin-system/lock" },
-  { id: "activity-log", label: "Activity Log", icon: Activity, path: "/super-admin-system/activity" },
+  { id: "system-lock", label: "System Lock", icon: Lock, path: "/super-admin-system/locks" },
+  { id: "activity-log", label: "Activity Log", icon: Activity, path: "/super-admin-system/activity-log" },
   { id: "audit", label: "Audit (Read Only)", icon: Eye, path: "/super-admin-system/audit" },
 ];
 

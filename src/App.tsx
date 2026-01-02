@@ -602,6 +602,7 @@ const App = () => (
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
 
               {/* Super Admin System Routes */}
+              <Route path="/super-admin-system" element={<Navigate to="/super-admin-system/dashboard" replace />} />
               <Route path="/super-admin-system/login" element={<SuperAdminLogin />} />
               <Route path="/super-admin-system/role-switch" element={<RoleSwitchDashboard />} />
               <Route path="/super-admin-system/dashboard" element={<SuperAdminSystemDashboard />} />
