@@ -7,58 +7,73 @@
 @layer base {
   :root {
     /* ========================================
-       PREMIUM DYNAMIC THEME - AURORA EDITION
-       Modern, Dynamic, Professional
+       SOFTWARE VALA - MODERN SAAS THEME
+       Blue/Purple Professional Design
        ======================================== */
     
-    /* Core Colors - Deep Space with Aurora Glow */
-    --background: 230 25% 5%;
-    --foreground: 220 20% 95%;
+    /* Core Colors - Clean Light Theme */
+    --background: 225 30% 96%;
+    --foreground: 225 30% 15%;
 
-    --card: 230 25% 8%;
-    --card-foreground: 220 20% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 225 30% 15%;
 
-    --popover: 230 25% 10%;
-    --popover-foreground: 220 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 225 30% 15%;
 
-    /* Primary - Electric Violet */
-    --primary: 265 85% 60%;
+    /* Primary - Royal Blue */
+    --primary: 225 85% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Deep Indigo */
-    --secondary: 240 30% 15%;
-    --secondary-foreground: 220 20% 90%;
+    /* Secondary - Light Blue Gray */
+    --secondary: 225 25% 92%;
+    --secondary-foreground: 225 30% 25%;
 
-    /* Muted - Soft Slate */
-    --muted: 230 20% 18%;
-    --muted-foreground: 220 15% 55%;
+    /* Muted - Soft Gray */
+    --muted: 225 20% 94%;
+    --muted-foreground: 225 15% 50%;
 
-    /* Accent - Vivid Cyan */
-    --accent: 185 100% 50%;
-    --accent-foreground: 230 25% 5%;
+    /* Accent - Purple Blue */
+    --accent: 250 85% 60%;
+    --accent-foreground: 0 0% 100%;
 
     /* Destructive - Vibrant Red */
-    --destructive: 0 85% 55%;
+    --destructive: 0 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 230 20% 20%;
-    --input: 230 20% 15%;
-    --ring: 265 85% 60%;
+    --border: 225 20% 88%;
+    --input: 225 20% 92%;
+    --ring: 225 85% 55%;
 
     --radius: 0.75rem;
 
     /* ========================================
-       PREMIUM COLOR PALETTE
+       SOFTWARE VALA COLOR PALETTE
        ======================================== */
     
+    /* Primary Palette */
+    --sv-primary: 225 85% 55%;
+    --sv-primary-light: 225 85% 65%;
+    --sv-primary-dark: 225 85% 45%;
+    
+    /* Accent Palette */
+    --sv-accent: 250 85% 60%;
+    --sv-accent-light: 250 85% 70%;
+    --sv-accent-dark: 250 85% 50%;
+    
+    /* Sidebar Gradient Colors */
+    --sv-sidebar-start: 225 70% 50%;
+    --sv-sidebar-mid: 235 75% 55%;
+    --sv-sidebar-end: 250 80% 58%;
+
     /* Aurora Colors - Dynamic Gradient Palette */
-    --aurora-violet: 265 85% 60%;
-    --aurora-purple: 280 75% 55%;
-    --aurora-blue: 220 90% 55%;
-    --aurora-cyan: 185 100% 50%;
-    --aurora-teal: 170 80% 45%;
-    --aurora-green: 150 75% 50%;
+    --aurora-violet: 250 85% 60%;
+    --aurora-purple: 265 75% 55%;
+    --aurora-blue: 225 85% 55%;
+    --aurora-cyan: 195 90% 50%;
+    --aurora-teal: 175 80% 45%;
+    --aurora-green: 145 75% 45%;
     --aurora-lime: 80 85% 55%;
     --aurora-gold: 45 100% 55%;
     --aurora-orange: 25 95% 55%;
@@ -67,133 +82,134 @@
     --aurora-magenta: 300 85% 55%;
 
     /* Status Colors */
-    --status-success: 150 80% 45%;
+    --status-success: 145 75% 45%;
     --status-warning: 40 95% 50%;
-    --status-error: 0 85% 55%;
-    --status-info: 200 95% 50%;
+    --status-error: 0 80% 55%;
+    --status-info: 200 90% 50%;
     --status-pending: 45 100% 55%;
 
     /* Neon Glow Colors */
-    --neon-violet: 265 100% 70%;
-    --neon-cyan: 185 100% 60%;
-    --neon-green: 150 100% 55%;
+    --neon-violet: 250 100% 70%;
+    --neon-cyan: 195 100% 60%;
+    --neon-green: 145 100% 50%;
     --neon-orange: 25 100% 60%;
     --neon-red: 0 100% 60%;
-    --neon-purple: 280 100% 65%;
-    --neon-blue: 220 100% 65%;
-    --neon-teal: 170 100% 55%;
+    --neon-purple: 265 100% 65%;
+    --neon-blue: 225 100% 65%;
+    --neon-teal: 175 100% 55%;
     --neon-pink: 320 100% 65%;
     --neon-gold: 45 100% 60%;
 
-    /* Surface Colors - Glass & Depth */
-    --surface-1: 230 25% 8%;
-    --surface-2: 230 25% 12%;
-    --surface-3: 230 25% 16%;
-    --surface-elevated: 230 30% 10%;
+    /* Surface Colors - Light Mode */
+    --surface-1: 0 0% 100%;
+    --surface-2: 225 30% 98%;
+    --surface-3: 225 25% 96%;
+    --surface-elevated: 0 0% 100%;
 
     /* Software Vala Branding */
-    --sv-navy: 230 50% 12%;
-    --sv-navy-deep: 230 55% 8%;
-    --sv-navy-light: 230 45% 18%;
-    --sv-blue: 220 85% 45%;
-    --sv-blue-bright: 220 90% 55%;
+    --sv-navy: 225 50% 25%;
+    --sv-navy-deep: 225 55% 18%;
+    --sv-navy-light: 225 45% 35%;
+    --sv-blue: 225 85% 55%;
+    --sv-blue-bright: 225 90% 60%;
     --sv-white: 0 0% 100%;
-    --sv-white-soft: 220 30% 96%;
-    --sv-gray: 220 15% 55%;
-    --sv-success: 150 75% 45%;
+    --sv-white-soft: 225 30% 98%;
+    --sv-gray: 225 15% 55%;
+    --sv-success: 145 75% 45%;
     --sv-warning: 40 95% 50%;
-    --sv-danger: 0 85% 55%;
+    --sv-danger: 0 80% 55%;
     --sv-info: 200 90% 50%;
 
     /* Legacy Compatibility */
-    --sapphire: 220 85% 25%;
-    --sapphire-light: 220 85% 35%;
-    --graphite: 230 25% 8%;
-    --graphite-dark: 230 25% 4%;
-    --electric-blue: 220 100% 55%;
-    --electric-blue-glow: 220 100% 65%;
+    --sapphire: 225 85% 45%;
+    --sapphire-light: 225 85% 55%;
+    --graphite: 225 25% 25%;
+    --graphite-dark: 225 25% 18%;
+    --electric-blue: 225 100% 55%;
+    --electric-blue-glow: 225 100% 65%;
     --gold: 45 100% 55%;
     --gold-glow: 45 100% 65%;
-    --charcoal: 230 20% 8%;
-    --charcoal-light: 230 15% 12%;
+    --charcoal: 225 20% 20%;
+    --charcoal-light: 225 15% 30%;
 
     /* ========================================
        PREMIUM GRADIENTS
        ======================================== */
     
-    --gradient-aurora: linear-gradient(135deg, hsl(265 85% 60%) 0%, hsl(185 100% 50%) 50%, hsl(150 75% 50%) 100%);
+    --gradient-aurora: linear-gradient(135deg, hsl(225 85% 55%) 0%, hsl(250 85% 60%) 50%, hsl(195 90% 50%) 100%);
     --gradient-sunset: linear-gradient(135deg, hsl(340 85% 60%) 0%, hsl(25 95% 55%) 50%, hsl(45 100% 55%) 100%);
-    --gradient-ocean: linear-gradient(135deg, hsl(220 90% 55%) 0%, hsl(185 100% 50%) 50%, hsl(170 80% 45%) 100%);
-    --gradient-cosmic: linear-gradient(135deg, hsl(265 85% 60%) 0%, hsl(280 75% 55%) 50%, hsl(320 80% 60%) 100%);
-    --gradient-emerald: linear-gradient(135deg, hsl(170 80% 45%) 0%, hsl(150 75% 50%) 50%, hsl(80 85% 55%) 100%);
-    --gradient-royal: linear-gradient(135deg, hsl(265 85% 50%) 0%, hsl(240 70% 45%) 100%);
-    --gradient-fire: linear-gradient(135deg, hsl(0 85% 55%) 0%, hsl(25 95% 55%) 50%, hsl(45 100% 55%) 100%);
-    --gradient-midnight: linear-gradient(135deg, hsl(230 25% 5%) 0%, hsl(240 30% 15%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsl(230 25% 15% / 0.8) 0%, hsl(230 25% 8% / 0.6) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(230 25% 12%) 0%, hsl(230 25% 8%) 100%);
+    --gradient-ocean: linear-gradient(135deg, hsl(225 85% 55%) 0%, hsl(195 90% 50%) 50%, hsl(175 80% 45%) 100%);
+    --gradient-cosmic: linear-gradient(135deg, hsl(250 85% 60%) 0%, hsl(265 75% 55%) 50%, hsl(320 80% 60%) 100%);
+    --gradient-emerald: linear-gradient(135deg, hsl(175 80% 45%) 0%, hsl(145 75% 45%) 50%, hsl(80 85% 55%) 100%);
+    --gradient-royal: linear-gradient(135deg, hsl(225 85% 50%) 0%, hsl(250 80% 55%) 100%);
+    --gradient-fire: linear-gradient(135deg, hsl(0 80% 55%) 0%, hsl(25 95% 55%) 50%, hsl(45 100% 55%) 100%);
+    --gradient-midnight: linear-gradient(135deg, hsl(225 50% 25%) 0%, hsl(235 55% 35%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9) 0%, hsl(225 30% 98% / 0.8) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(225 30% 98%) 100%);
+    --gradient-sidebar: linear-gradient(180deg, hsl(225 70% 50%) 0%, hsl(235 75% 55%) 50%, hsl(250 80% 58%) 100%);
     
     /* Status Gradients */
-    --gradient-success: linear-gradient(135deg, hsl(150 80% 45%) 0%, hsl(170 80% 45%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(145 75% 45%) 0%, hsl(175 80% 45%) 100%);
     --gradient-warning: linear-gradient(135deg, hsl(40 95% 50%) 0%, hsl(25 95% 55%) 100%);
-    --gradient-error: linear-gradient(135deg, hsl(0 85% 55%) 0%, hsl(340 85% 60%) 100%);
-    --gradient-info: linear-gradient(135deg, hsl(200 95% 50%) 0%, hsl(220 90% 55%) 100%);
+    --gradient-error: linear-gradient(135deg, hsl(0 80% 55%) 0%, hsl(340 85% 60%) 100%);
+    --gradient-info: linear-gradient(135deg, hsl(200 90% 50%) 0%, hsl(225 85% 55%) 100%);
 
     /* Glass Effects */
-    --glass-bg: 230 25% 10% / 0.7;
-    --glass-border: 265 85% 60% / 0.2;
-    --glass-glow: 265 85% 60% / 0.15;
+    --glass-bg: 0 0% 100% / 0.8;
+    --glass-border: 225 85% 55% / 0.2;
+    --glass-glow: 225 85% 55% / 0.15;
 
-    /* Sidebar Theme */
-    --sidebar-background: 230 25% 6%;
-    --sidebar-foreground: 220 20% 90%;
-    --sidebar-primary: 265 85% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 30% 15%;
-    --sidebar-accent-foreground: 220 20% 95%;
-    --sidebar-border: 230 20% 18%;
-    --sidebar-ring: 265 85% 60%;
+    /* Sidebar Theme - Blue Gradient */
+    --sidebar-background: 225 70% 50%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 225 85% 55%;
+    --sidebar-accent: 225 85% 65%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 225 70% 55%;
+    --sidebar-ring: 0 0% 100%;
   }
 
   /* ========================================
-     LIGHT MODE THEME
+     DARK MODE THEME (Alternative)
      ======================================== */
-  .light {
-    --background: 220 30% 98%;
-    --foreground: 230 25% 10%;
+  .dark {
+    --background: 225 30% 8%;
+    --foreground: 220 20% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 230 25% 10%;
+    --card: 225 25% 12%;
+    --card-foreground: 220 20% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 230 25% 10%;
+    --popover: 225 25% 14%;
+    --popover-foreground: 220 20% 95%;
 
-    --primary: 265 85% 55%;
+    --primary: 225 85% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 92%;
-    --secondary-foreground: 230 25% 15%;
+    --secondary: 225 25% 18%;
+    --secondary-foreground: 220 20% 90%;
 
-    --muted: 220 20% 95%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 225 20% 22%;
+    --muted-foreground: 220 15% 55%;
 
-    --accent: 185 90% 45%;
+    --accent: 250 85% 65%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 80% 50%;
+    --destructive: 0 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 85%;
-    --input: 220 15% 90%;
-    --ring: 265 85% 55%;
+    --border: 225 20% 25%;
+    --input: 225 20% 20%;
+    --ring: 225 85% 60%;
 
-    --sidebar-background: 220 30% 96%;
-    --sidebar-foreground: 230 25% 15%;
-    --sidebar-primary: 265 85% 55%;
+    --sidebar-background: 225 30% 10%;
+    --sidebar-foreground: 220 20% 95%;
+    --sidebar-primary: 225 85% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 92%;
-    --sidebar-accent-foreground: 230 25% 15%;
-    --sidebar-border: 220 15% 88%;
-    --sidebar-ring: 265 85% 55%;
+    --sidebar-accent: 225 25% 18%;
+    --sidebar-accent-foreground: 220 20% 95%;
+    --sidebar-border: 225 20% 22%;
+    --sidebar-ring: 225 85% 60%;
   }
 }
 
