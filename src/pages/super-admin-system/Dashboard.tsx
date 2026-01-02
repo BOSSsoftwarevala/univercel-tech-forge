@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SuperAdminWireframeLayout from "@/components/super-admin-wireframe/SuperAdminWireframeLayout";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DashboardWidget {
   id: string;
@@ -31,6 +32,16 @@ interface LiveActivity {
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
+  const { loading, isBossOwner } = useAuth();
+
+  // Boss Owner should always land on the Crown (Supreme) panel
+  useEffect(() => {
+    if (loading) return;
+    if (isBossOwner) {
+      navigate("/super-admin", { replace: true });
+    }
+  }, [loading, isBossOwner, navigate]);
+
   const [activities, setActivities] = useState<LiveActivity[]>([
     { id: "1", action: "User suspended", target: "USR-1234", time: "2 min ago", type: "warning" },
     { id: "2", action: "New admin created", target: "ADM-5678", time: "5 min ago", type: "info" },
