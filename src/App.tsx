@@ -86,6 +86,7 @@ import SalesCRMAuthPage from "./pages/sales-crm/SalesCRMAuthPage";
 import SimpleHRMDemo from "./pages/simple-hrm/SimpleHRMDemo";
 import CorporateHRMDemo from "./pages/corporate-hrm/CorporateHRMDemo";
 import SaasHRMDemo from "./pages/saas-hrm/SaasHRMDemo";
+import RetailPOSDemo from "./pages/retail-pos/RetailPOSDemo";
 
 import SettingsPage from "./pages/Settings";
 
@@ -366,6 +367,7 @@ const App = () => (
               {/* Sales CRM Demo */}
               <Route path="/sales-crm" element={<SalesCRMDemo />} />
               <Route path="/sales-crm/auth" element={<SalesCRMAuthPage />} />
+              <Route path="/retail-pos" element={<RetailPOSDemo />} />
               {/* Dynamic Demo Routes - MUST come AFTER specific routes */}
               <Route path="/demo-directory" element={<DemoDirectory />} />
               <Route path="/demo/:demoId" element={<SimpleDemoView />} />
