@@ -109,7 +109,9 @@ const GlobalSidebar2035 = ({ collapsed, onToggle, lowDataMode }: SidebarProps) =
       animate={{ width: collapsed ? 64 : 256 }}
       className={cn(
         "fixed left-0 top-0 h-screen z-50 flex flex-col",
-        "bg-gradient-to-b from-[#0d1025] to-[#0a0a1a] backdrop-blur-xl border-r border-white/10"
+        lowDataMode 
+          ? "bg-background border-r border-border" 
+          : "bg-gradient-to-b from-[#0d1025]/95 to-[#0a0a1a]/95 backdrop-blur-xl border-r border-white/5"
       )}
     >
       {/* Logo Area */}
