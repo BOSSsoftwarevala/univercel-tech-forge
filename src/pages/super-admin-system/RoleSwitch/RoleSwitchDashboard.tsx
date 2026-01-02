@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SafeAssistTrigger } from "@/components/support/SafeAssistTrigger";
 import { useAuth } from "@/hooks/useAuth";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import promiseIcon from "@/assets/promise-icon.jpg";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
@@ -84,7 +85,7 @@ const RoleSwitchDashboard = () => {
   const [liveAlerts] = useState(3);
   const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
   const [initialized, setInitialized] = useState(false);
-
+  
   const handlePromiseClick = useCallback(() => {
     if (promiseState === 'idle') {
       setPromiseState('pending');
@@ -105,27 +106,42 @@ const RoleSwitchDashboard = () => {
   }, []);
 
   // Initialize role based on URL or user's actual role
+  const didInitRef = useRef(false);
+  const prevRequestedRoleRef = useRef<ActiveRole | null>(null);
+
   useEffect(() => {
-    if (loading || initialized) return;
-    
-    // If a role is requested via URL, validate access
-    if (requestedRole) {
+    if (loading) return;
+
+    // 1) If URL requests a role, always sync to it (if access allows)
+    if (requestedRole && requestedRole !== prevRequestedRoleRef.current) {
+      prevRequestedRoleRef.current = requestedRole;
+
       if (canAccessView(requestedRole)) {
         setActiveRole(requestedRole);
+        setActiveNav("dashboard");
+        setSelectedSubItem(undefined);
       } else {
-        // User doesn't have access to requested view, use their default
         const defaultRole = getDefaultRole();
         setActiveRole(defaultRole);
+        setActiveNav("dashboard");
+        setSelectedSubItem(undefined);
         toast.error("Access denied to requested view", {
-          description: `Redirecting to ${roleConfigs[defaultRole]?.label || 'default'} view`
+          description: `Redirecting to ${roleConfigs[defaultRole]?.label || "default"} view`,
         });
       }
-    } else {
-      // No role requested, use default based on user's role
-      setActiveRole(getDefaultRole());
+
+      didInitRef.current = true;
+      setInitialized(true);
+      return;
     }
-    setInitialized(true);
-  }, [requestedRole, loading, initialized, canAccessView, getDefaultRole]);
+
+    // 2) First mount with no requested role -> set default once
+    if (!didInitRef.current && !requestedRole) {
+      setActiveRole(getDefaultRole());
+      didInitRef.current = true;
+      setInitialized(true);
+    }
+  }, [requestedRole, loading, canAccessView, getDefaultRole]);
 
   // Session timer (must never trigger navigation)
   useEffect(() => {
@@ -390,7 +406,34 @@ const RoleSwitchDashboard = () => {
               transition={{ duration: 0.2 }}
               className="h-full"
             >
-              {renderRoleView()}
+              <ErrorBoundary
+                onError={(error) => {
+                  // Never allow a crash to become a blank screen
+                  console.error("Role dashboard crashed", { role: activeRole, error });
+                  toast.error("Dashboard failed to load", {
+                    description: "Something went wrong while opening this role.",
+                  });
+                }}
+                fallback={
+                  <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="text-center p-8 bg-card/50 rounded-xl border border-border/50 max-w-md">
+                      <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
+                      <p className="text-muted-foreground mb-6">This dashboard failed to render. You can retry or switch roles.</p>
+                      <div className="flex items-center justify-center gap-3">
+                        <Button variant="outline" onClick={() => window.location.reload()}>
+                          Reload dashboard
+                        </Button>
+                        <Button onClick={() => navigate("/super-admin-system/role-switch", { replace: true })}>
+                          Back to Role Switch
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              >
+                {renderRoleView()}
+              </ErrorBoundary>
             </motion.div>
           </AnimatePresence>
         </main>

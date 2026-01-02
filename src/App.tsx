@@ -636,6 +636,13 @@ const App = () => (
               <Route path="/wireframe/*" element={<WireframeRoutes />} />
 
               {/* Super Admin System Routes */}
+              {/* Explicit dashboard aliases (never allow route-not-found -> blank screen) */}
+              <Route path="/boss/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
+              <Route path="/ceo/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=ceo" replace />} />
+              <Route path="/admin/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=admin" replace />} />
+              <Route path="/continent/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=continent_super_admin" replace />} />
+              <Route path="/country/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=country_head" replace />} />
+
               <Route path="/super-admin-system" element={<Navigate to="/super-admin-system/dashboard" replace />} />
               <Route path="/super-admin-system/login" element={<SuperAdminLogin />} />
               {/* Role switcher - Protected for privileged roles */}
