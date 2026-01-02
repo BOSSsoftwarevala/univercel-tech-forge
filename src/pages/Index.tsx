@@ -2512,6 +2512,13 @@ const Index = () => {
                   Login
                 </Button>
               </Link>
+              {/* Admin/Boss Login */}
+              <Link to="/super-admin-system/login">
+                <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white gap-1 text-xs border border-white/20">
+                  <Shield className="h-3 w-3" />
+                  Admin
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
