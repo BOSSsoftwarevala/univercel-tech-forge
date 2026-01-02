@@ -196,6 +196,7 @@ export function isValidRole(role: string): role is AppRole {
 export function getDashboardRoute(role: AppRole): string {
   const routeMap: Partial<Record<AppRole, string>> = {
     boss_owner: '/super-admin', // Boss Owner uses super-admin dashboard
+    master: '/super-admin', // Master is merged with boss_owner
     ceo: '/super-admin', // CEO uses super-admin dashboard
     area_manager: '/super-admin-system/role-switch?role=country_head', // Redirects to Country Head
     developer: '/developer',

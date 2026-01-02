@@ -6,8 +6,9 @@ import { Loader2 } from 'lucide-react';
 // Strict role-to-dashboard mapping (31 roles - ALL ROLES COVERED)
 // BOSS_OWNER gets the super-admin command center
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
-  // Tier 1: Admin Roles
+  // Tier 1: Admin Roles (master is merged with boss_owner)
   boss_owner: '/super-admin',
+  master: '/super-admin',
   admin: '/super-admin',
   ceo: '/super-admin',
   
