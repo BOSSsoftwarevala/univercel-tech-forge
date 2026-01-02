@@ -84,6 +84,7 @@ import LogisticsDemo from "./pages/demos/LogisticsDemo";
 import SalesCRMDemo from "./pages/sales-crm/SalesCRMDemo";
 import SalesCRMAuthPage from "./pages/sales-crm/SalesCRMAuthPage";
 import SimpleHRMDemo from "./pages/simple-hrm/SimpleHRMDemo";
+import CorporateHRMDemo from "./pages/corporate-hrm/CorporateHRMDemo";
 
 import SettingsPage from "./pages/Settings";
 
