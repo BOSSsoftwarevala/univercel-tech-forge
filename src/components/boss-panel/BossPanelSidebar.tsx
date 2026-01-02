@@ -49,12 +49,12 @@ export function BossPanelSidebar({
     <motion.aside
       initial={false}
       animate={{ width: collapsed ? 80 : 256 }}
-      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#0d0d18]/95 backdrop-blur-xl border-r border-amber-500/10 z-40 flex flex-col"
+      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[#0a2540] via-[#0d3a5c] to-[#0a4a6e] backdrop-blur-xl border-r border-cyan-500/20 z-40 flex flex-col"
     >
       {/* Collapse Toggle */}
       <button
         onClick={() => onCollapsedChange(!collapsed)}
-        className="absolute -right-3 top-6 w-6 h-6 bg-amber-500/20 border border-amber-500/30 rounded-full flex items-center justify-center text-amber-400 hover:bg-amber-500/30 transition-colors"
+        className="absolute -right-3 top-6 w-6 h-6 bg-cyan-500/20 border border-cyan-500/40 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/30 transition-colors"
       >
         {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
       </button>
@@ -72,13 +72,13 @@ export function BossPanelSidebar({
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left",
                 isActive 
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-[0_0_15px_rgba(34,211,238,0.15)]" 
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               )}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && "text-amber-400")} />
+              <Icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-cyan-400" : "text-cyan-500/70")} />
               {!collapsed && (
                 <span className="text-sm font-medium truncate">{item.label}</span>
               )}
@@ -89,11 +89,11 @@ export function BossPanelSidebar({
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-amber-500/10">
-          <div className="text-[10px] text-white/40 uppercase tracking-widest text-center">
+        <div className="p-4 border-t border-cyan-500/20">
+          <div className="text-[10px] text-white/50 uppercase tracking-widest text-center">
             Boss Role Principle
           </div>
-          <div className="text-[9px] text-amber-500/60 text-center mt-1">
+          <div className="text-[9px] text-cyan-400/70 text-center mt-1">
             See Everything • Change Nothing Casually
           </div>
         </div>

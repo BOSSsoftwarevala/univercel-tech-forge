@@ -39,16 +39,16 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-[#0d0d18]/95 backdrop-blur-xl border-b border-amber-500/20 z-50 flex items-center justify-between px-6">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-r from-[#0a2540] via-[#0d3a5c] to-[#0a2540] backdrop-blur-xl border-b border-cyan-500/20 z-50 flex items-center justify-between px-6">
       {/* Left - Logo & System Name */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
-            <Crown className="w-6 h-6 text-black" />
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center">
+            <Crown className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-amber-400">BOSS PANEL</h1>
-            <p className="text-[10px] text-amber-500/60 uppercase tracking-widest">Command Center</p>
+            <h1 className="text-lg font-bold text-cyan-300">BOSS PANEL</h1>
+            <p className="text-[10px] text-cyan-400/60 uppercase tracking-widest">Command Center</p>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           onClick={onStreamingToggle}
           className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
             streamingOn 
-              ? 'bg-green-500/20 border-green-500/50 text-green-400' 
+              ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
               : 'bg-red-500/20 border-red-500/50 text-red-400'
           }`}
           whileHover={{ scale: 1.02 }}
@@ -76,19 +76,19 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       <div className="flex items-center gap-4">
         {/* Global Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400/50" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search leads, tasks, users..."
-            className="w-64 pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+            placeholder="Search leads, tasks, demos..."
+            className="w-64 pl-10 bg-[#0a3a5e]/50 border-cyan-500/30 text-white placeholder:text-cyan-400/40 focus:border-cyan-400/50"
           />
         </div>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative text-white/70 hover:text-white hover:bg-white/10">
+        <Button variant="ghost" size="icon" className="relative text-cyan-400/70 hover:text-cyan-300 hover:bg-cyan-500/10">
           <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white">
             3
           </span>
         </Button>
@@ -104,7 +104,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
               <ShieldAlert className="w-5 h-5" />
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#1a1a2e] border-red-500/30">
+          <AlertDialogContent className="bg-[#0a2540] border-red-500/30">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-red-400">⚠️ Emergency System Lock</AlertDialogTitle>
               <AlertDialogDescription className="text-white/70">
@@ -126,19 +126,19 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
         {/* Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/10">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
-                <User className="w-4 h-4 text-black" />
+            <Button variant="ghost" className="flex items-center gap-2 text-cyan-400/70 hover:text-cyan-300 hover:bg-cyan-500/10">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
               </div>
-              <span className="text-sm font-medium">Boss</span>
+              <span className="text-sm font-medium text-white">Boss</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#1a1a2e] border-white/10" align="end">
-            <DropdownMenuItem className="text-white/70 hover:text-white focus:text-white focus:bg-white/10">
+          <DropdownMenuContent className="bg-[#0a2540] border-cyan-500/20" align="end">
+            <DropdownMenuItem className="text-white/70 hover:text-white focus:text-white focus:bg-cyan-500/10">
               <User className="w-4 h-4 mr-2" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuSeparator className="bg-cyan-500/20" />
             <DropdownMenuItem className="text-red-400 hover:text-red-300 focus:text-red-300 focus:bg-red-500/10">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
