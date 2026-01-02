@@ -232,6 +232,14 @@ import DemoCredentials from "./pages/DemoCredentials";
 import DemoOrderSystem from "./pages/demo-system/DemoOrderSystem";
 import SectorsBrowse from "./pages/SectorsBrowse";
 import SubCategoryDemos from "./pages/SubCategoryDemos";
+// Business Management Software
+import { BusinessLayout } from "./components/business/BusinessLayout";
+import BusinessDashboard from "./pages/business/BusinessDashboard";
+import CustomersPage from "./pages/business/CustomersPage";
+import BillingPage from "./pages/business/BillingPage";
+import ExpensesPage from "./pages/business/ExpensesPage";
+import ReportsPage from "./pages/business/ReportsPage";
+import BusinessSettings from "./pages/business/BusinessSettings";
 import { AIBillingDashboard } from "./components/ai-billing";
 // New Role Pages (25-28)
 import SafeAssistDashboard from "./pages/safe-assist/SafeAssistDashboard";
