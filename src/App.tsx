@@ -85,6 +85,7 @@ import SalesCRMDemo from "./pages/sales-crm/SalesCRMDemo";
 import SalesCRMAuthPage from "./pages/sales-crm/SalesCRMAuthPage";
 import SimpleHRMDemo from "./pages/simple-hrm/SimpleHRMDemo";
 import CorporateHRMDemo from "./pages/corporate-hrm/CorporateHRMDemo";
+import SaasHRMDemo from "./pages/saas-hrm/SaasHRMDemo";
 
 import SettingsPage from "./pages/Settings";
 
