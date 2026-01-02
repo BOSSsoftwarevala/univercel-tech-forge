@@ -465,8 +465,8 @@ const RoleSwitchSidebar = ({
   onNavChange,
   onSubItemClick,
 }: RoleSwitchSidebarProps) => {
-  const currentConfig = roleConfigs[activeRole];
-  const currentNavItems = roleNavItems[activeRole];
+  const currentConfig = roleConfigs[activeRole] ?? roleConfigs.boss_owner;
+  const currentNavItems = roleNavItems[activeRole] ?? [];
   const [internalActiveNav, setInternalActiveNav] = useState("dashboard");
   const [isDrilledDown, setIsDrilledDown] = useState(false);
   
