@@ -249,24 +249,6 @@ export const roleConfigs = {
 
 // Extended navigation items per role - role-specific features
 const roleNavItems = {
-  boss_owner: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "security", label: "Security", icon: Shield },
-    { id: "audit", label: "Audit & Blackbox", icon: Database },
-    { id: "settings", label: "Settings", icon: Settings },
-  ],
-  ceo: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "overview", label: "Global Overview", icon: Globe2 },
-    { id: "insights", label: "AI Insights", icon: Sparkles },
-    { id: "risks", label: "Risks", icon: AlertCircle },
-  ],
-  admin: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "users", label: "Users", icon: Users },
-    { id: "activity", label: "Activity", icon: Activity },
-    { id: "settings", label: "Settings", icon: Settings },
-  ],
   continent_super_admin: [
     {
       id: "dashboard",
