@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Globe2, Bell, Timer, AlertCircle, Shield, Bot, MessageSquare } from "lucide-react";
+import { Globe2, Bell, Timer, AlertCircle, Shield, Bot, MessageSquare, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SafeAssistTrigger } from "@/components/support/SafeAssistTrigger";
+import { useAuth } from "@/hooks/useAuth";
 import promiseIcon from "@/assets/promise-icon.jpg";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
@@ -32,14 +33,47 @@ import CEODashboard from "./CEODashboard";
 import BossOwnerDashboard from "./BossOwnerDashboard";
 import AdminDashboard from "./AdminDashboard";
 
+// Define which roles can switch to which views
+const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
+  boss_owner: Object.keys(roleConfigs) as ActiveRole[], // Boss Owner can view everything
+  master: Object.keys(roleConfigs) as ActiveRole[], // Legacy master role
+  ceo: Object.keys(roleConfigs) as ActiveRole[], // CEO can view everything (read-only)
+  admin: ['admin', 'continent_super_admin', 'country_head', 'franchise_manager', 'sales_support_manager', 'reseller_manager', 'lead_manager', 'pro_manager', 'legal_manager', 'task_management', 'finance_manager', 'developer_management', 'marketing_management', 'customer_support_management', 'role_manager', 'product_manager'],
+  super_admin: ['continent_super_admin', 'country_head', 'franchise_manager', 'sales_support_manager', 'reseller_manager', 'lead_manager'],
+  continent_super_admin: ['continent_super_admin', 'country_head'],
+  country_head: ['country_head'],
+};
+
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { userRole, isBossOwner, loading } = useAuth();
 
   const requestedRole = useMemo(() => {
     const role = new URLSearchParams(location.search).get("role") as ActiveRole | null;
     return role && role in roleConfigs ? role : null;
   }, [location.search]);
+
+  // Determine default role based on user's actual role
+  const getDefaultRole = useCallback((): ActiveRole => {
+    if (isBossOwner) return "boss_owner";
+    if (userRole === 'master') return "boss_owner";
+    if (userRole === 'super_admin') return "continent_super_admin";
+    if (userRole === 'area_manager') return "country_head";
+    if (userRole === 'server_manager') return "server_manager";
+    if (userRole === 'finance_manager') return "finance_manager";
+    if (userRole === 'lead_manager') return "lead_manager";
+    if (userRole === 'legal_compliance') return "legal_manager";
+    return "continent_super_admin";
+  }, [userRole, isBossOwner]);
+
+  // Check if user can access a specific view
+  const canAccessView = useCallback((viewRole: ActiveRole): boolean => {
+    if (isBossOwner) return true;
+    if (userRole === 'ceo') return true; // CEO can view all (read-only)
+    const allowedViews = ROLE_VIEW_ACCESS[userRole || ''] || [];
+    return allowedViews.includes(viewRole);
+  }, [userRole, isBossOwner]);
 
   const [activeRole, setActiveRole] = useState<ActiveRole>("continent_super_admin");
   const [activeNav, setActiveNav] = useState("dashboard");
@@ -49,6 +83,7 @@ const RoleSwitchDashboard = () => {
   const [riskLevel] = useState<"low" | "medium" | "high">("low");
   const [liveAlerts] = useState(3);
   const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
+  const [initialized, setInitialized] = useState(false);
 
   const handlePromiseClick = useCallback(() => {
     if (promiseState === 'idle') {
@@ -69,10 +104,28 @@ const RoleSwitchDashboard = () => {
     });
   }, []);
 
-  // Apply role from URL (prevents accidental switching to legacy pages)
+  // Initialize role based on URL or user's actual role
   useEffect(() => {
-    if (requestedRole) setActiveRole(requestedRole);
-  }, [requestedRole]);
+    if (loading || initialized) return;
+    
+    // If a role is requested via URL, validate access
+    if (requestedRole) {
+      if (canAccessView(requestedRole)) {
+        setActiveRole(requestedRole);
+      } else {
+        // User doesn't have access to requested view, use their default
+        const defaultRole = getDefaultRole();
+        setActiveRole(defaultRole);
+        toast.error("Access denied to requested view", {
+          description: `Redirecting to ${roleConfigs[defaultRole]?.label || 'default'} view`
+        });
+      }
+    } else {
+      // No role requested, use default based on user's role
+      setActiveRole(getDefaultRole());
+    }
+    setInitialized(true);
+  }, [requestedRole, loading, initialized, canAccessView, getDefaultRole]);
 
   // Session timer (must never trigger navigation)
   useEffect(() => {
@@ -102,6 +155,11 @@ const RoleSwitchDashboard = () => {
   };
 
   const handleRoleChange = (role: ActiveRole) => {
+    // Check if user can access this view
+    if (!canAccessView(role)) {
+      toast.error("Access denied to this view");
+      return;
+    }
     // NO REDIRECT - just switch the view in place
     setActiveRole(role);
     setActiveNav("dashboard"); // Reset nav when role changes

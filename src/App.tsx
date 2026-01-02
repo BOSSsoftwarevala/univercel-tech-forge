@@ -638,9 +638,9 @@ const App = () => (
               {/* Super Admin System Routes */}
               <Route path="/super-admin-system" element={<Navigate to="/super-admin-system/dashboard" replace />} />
               <Route path="/super-admin-system/login" element={<SuperAdminLogin />} />
-              {/* Role switcher (some navigations may append extra segments) */}
-              <Route path="/super-admin-system/role-switch" element={<RoleSwitchDashboard />} />
-              <Route path="/super-admin-system/role-switch/*" element={<RoleSwitchDashboard />} />
+              {/* Role switcher - Protected for privileged roles */}
+              <Route path="/super-admin-system/role-switch" element={<RequireRole allowed={['boss_owner', 'ceo', 'admin', 'super_admin', 'master', 'continent_super_admin', 'country_head']}><RoleSwitchDashboard /></RequireRole>} />
+              <Route path="/super-admin-system/role-switch/*" element={<RequireRole allowed={['boss_owner', 'ceo', 'admin', 'super_admin', 'master', 'continent_super_admin', 'country_head']}><RoleSwitchDashboard /></RequireRole>} />
               <Route path="/super-admin-system/dashboard" element={<SuperAdminSystemDashboard />} />
               <Route path="/super-admin-system/users" element={<SuperAdminUsers />} />
               <Route path="/super-admin-system/admins" element={<SuperAdminAdmins />} />
