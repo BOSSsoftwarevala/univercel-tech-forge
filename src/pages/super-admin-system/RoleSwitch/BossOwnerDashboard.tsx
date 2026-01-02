@@ -111,7 +111,7 @@ const BossOwnerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900 p-6">
+    <div className="min-h-full w-full bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900 p-6 overflow-auto">
       {/* Premium Boss Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
