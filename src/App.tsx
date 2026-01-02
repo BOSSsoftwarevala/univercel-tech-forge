@@ -418,19 +418,19 @@ const App = () => (
               <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
               <Route path="/continent-super-admin/*" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
 
-              {/* Super Admin Routes - Boss Owner can access */}
-              <Route path="/admin" element={<RequireRole allowed={["boss_owner"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin" element={<RequireRole allowed={["boss_owner"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/dashboard" element={<RequireRole allowed={["boss_owner"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/command-center" element={<RequireRole allowed={["boss_owner"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["boss_owner"]}><LiveTracking /></RequireRole>} />
-              <Route path="/super-admin/role-manager" element={<RequireRole allowed={["boss_owner"]}><RoleManager /></RequireRole>} />
-              <Route path="/super-admin/user-manager" element={<RequireRole allowed={["boss_owner"]}><UserManager /></RequireRole>} />
-              <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["boss_owner"]}><PermissionMatrix /></RequireRole>} />
-              <Route path="/super-admin/security-center" element={<RequireRole allowed={["boss_owner"]}><SecurityCenter /></RequireRole>} />
-              <Route path="/super-admin/demo-manager" element={<RequireRole allowed={["boss_owner"]}><ProductDemoManager /></RequireRole>} />
-              <Route path="/super-admin/product-manager" element={<RequireRole allowed={["boss_owner"]}><ProductManagerPage /></RequireRole>} />
-              <Route path="/super-admin/system-settings" element={<RequireRole allowed={["boss_owner"]}><SystemSettings /></RequireRole>} />
+              {/* Super Admin Routes - Privileged roles can access */}
+              <Route path="/admin" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/dashboard" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/command-center" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
+              <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><LiveTracking /></RequireRole>} />
+              <Route path="/super-admin/role-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><RoleManager /></RequireRole>} />
+              <Route path="/super-admin/user-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><UserManager /></RequireRole>} />
+              <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><PermissionMatrix /></RequireRole>} />
+              <Route path="/super-admin/security-center" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SecurityCenter /></RequireRole>} />
+              <Route path="/super-admin/demo-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><ProductDemoManager /></RequireRole>} />
+              <Route path="/super-admin/product-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><ProductManagerPage /></RequireRole>} />
+              <Route path="/super-admin/system-settings" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SystemSettings /></RequireRole>} />
               <Route path="/super-admin/system-audit" element={<RequireRole allowed={["boss_owner"]}><SystemAudit /></RequireRole>} />
               <Route path="/super-admin/prime-manager" element={<RequireRole allowed={["boss_owner"]}><PrimeManager /></RequireRole>} />
               <Route path="/super-admin/influencer-manager" element={<RequireRole allowed={["boss_owner"]}><InfluencerManager /></RequireRole>} />
