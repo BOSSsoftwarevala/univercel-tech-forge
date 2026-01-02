@@ -38,6 +38,7 @@ import PendingApproval from "./pages/auth/PendingApproval";
 import BossFortressAuth from "./pages/auth/BossFortressAuth";
 import BossRegister from "./pages/auth/BossRegister";
 import EasyAuth from "./pages/auth/EasyAuth";
+import SessionExpiredPage from "./pages/error/SessionExpiredPage";
 
 // Public Pages
 import PublicDemos from "./pages/demos/PublicDemos";
@@ -398,6 +399,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/account-suspension" element={<AccountSuspension />} />
               <Route path="/access-denied" element={<AccessDenied />} />
+              <Route path="/session-expired" element={<SessionExpiredPage />} />
 
               {/* Boss Fortress Auth - Ultra Secure */}
               <Route path="/boss-fortress" element={<BossFortressAuth />} />

@@ -46,7 +46,7 @@ export function useSessionTimeout(options: SessionTimeoutOptions = {}) {
 
     await supabase.auth.signOut();
     sessionStorage.clear();
-    navigate('/auth');
+    navigate('/session-expired');
   }, [navigate]);
 
   const showWarning = useCallback(() => {
