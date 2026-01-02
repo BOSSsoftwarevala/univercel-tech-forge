@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Package, Plus, MonitorPlay, Upload,
   BarChart3, FileText, Settings, ChevronRight, Lock,
-  ShieldAlert
+  ShieldAlert, Activity
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import AddDemo from "./AddDemo";
 import BulkAdd from "./BulkAdd";
 import ProductAnalytics from "./ProductAnalytics";
 import ProductAuditLogs from "./ProductAuditLogs";
+import HealthCheckPanel from "@/components/demo-manager/HealthCheckPanel";
 
 type MenuItemType = {
   id: string;
@@ -32,6 +33,7 @@ const menuItems: MenuItemType[] = [
   { id: "demo-manager", label: "Demo Manager", icon: MonitorPlay, readOnly: true },
   { id: "add-demo", label: "Add Demo", icon: Plus },
   { id: "bulk-add", label: "Bulk Add", icon: Upload },
+  { id: "health-check", label: "Health Check", icon: Activity },
   { id: "analytics", label: "Analytics", icon: BarChart3, readOnly: true },
   { id: "audit-logs", label: "Audit Logs", icon: FileText, readOnly: true },
   { id: "settings", label: "Settings", icon: Settings, locked: true },
@@ -54,6 +56,8 @@ const ProductDemoManagerLayout = () => {
         return <AddDemo onSuccess={() => setActiveSection("demo-manager")} />;
       case "bulk-add":
         return <BulkAdd />;
+      case "health-check":
+        return <HealthCheckPanel />;
       case "analytics":
         return <ProductAnalytics />;
       case "audit-logs":
