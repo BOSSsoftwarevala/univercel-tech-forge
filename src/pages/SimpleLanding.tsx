@@ -14,16 +14,6 @@ import { LanguageSwitcher } from '@/components/landing/LanguageSwitcher';
 const SimpleLanding = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Floating particles
-  const particles = Array.from({ length: 15 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 3 + 2,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    duration: Math.random() * 20 + 15,
-    delay: Math.random() * 5,
-  }));
-
   const features = [
     { 
       icon: Play, 
@@ -130,28 +120,11 @@ const SimpleLanding = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
-      {/* Animated Background */}
+      {/* Static Background - No animations for speed */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <motion.div 
-          animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/8 rounded-full blur-[100px]" 
-        />
-        <motion.div 
-          animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[80px]" 
-        />
-        {particles.map((particle) => (
-          <motion.div
-            key={particle.id}
-            className="absolute rounded-full bg-cyan-400/15"
-            style={{ width: particle.size, height: particle.size, left: `${particle.x}%`, top: `${particle.y}%` }}
-            animate={{ y: [-15, 15, -15], opacity: [0.15, 0.4, 0.15] }}
-            transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
-          />
-        ))}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/8 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[80px]" />
       </div>
 
       {/* Header */}
