@@ -239,6 +239,17 @@ import { SourceCodeProtection } from "./components/security/SourceCodeProtection
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import QuickSupport from "./components/support/QuickSupport";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
+import { AICEODashboard } from "./pages/ai-ceo";
+import AICEODashboardMain from "./pages/ai-ceo/sections/AICEODashboardMain";
+import AICEOLiveMonitor from "./pages/ai-ceo/sections/AICEOLiveMonitor";
+import AICEODecisionEngine from "./pages/ai-ceo/sections/AICEODecisionEngine";
+import AICEOApprovals from "./pages/ai-ceo/sections/AICEOApprovals";
+import AICEORiskCompliance from "./pages/ai-ceo/sections/AICEORiskCompliance";
+import AICEOPerformance from "./pages/ai-ceo/sections/AICEOPerformance";
+import AICEOPredictions from "./pages/ai-ceo/sections/AICEOPredictions";
+import AICEOReports from "./pages/ai-ceo/sections/AICEOReports";
+import AICEOLearning from "./pages/ai-ceo/sections/AICEOLearning";
+import AICEOSettings from "./pages/ai-ceo/sections/AICEOSettings";
 import DemoCredentials from "./pages/DemoCredentials";
 import DemoOrderSystem from "./pages/demo-system/DemoOrderSystem";
 import SectorsBrowse from "./pages/SectorsBrowse";
@@ -449,6 +460,20 @@ const App = () => (
               {/* Legal Manager Routes */}
               <Route path="/legal-manager" element={<RequireRole allowed={["boss_owner", "legal_manager"]}><LegalManagerDashboard /></RequireRole>} />
               <Route path="/legal-manager/*" element={<RequireRole allowed={["boss_owner", "legal_manager"]}><LegalManagerDashboard /></RequireRole>} />
+
+              {/* AI CEO Routes - Autonomous Intelligence Observer */}
+              <Route path="/ai-ceo" element={<RequireRole allowed={["boss_owner", "ceo"]}><AICEODashboard /></RequireRole>}>
+                <Route index element={<AICEODashboardMain />} />
+                <Route path="live-monitor" element={<AICEOLiveMonitor />} />
+                <Route path="decision-engine" element={<AICEODecisionEngine />} />
+                <Route path="approvals" element={<AICEOApprovals />} />
+                <Route path="risk" element={<AICEORiskCompliance />} />
+                <Route path="performance" element={<AICEOPerformance />} />
+                <Route path="predictions" element={<AICEOPredictions />} />
+                <Route path="reports" element={<AICEOReports />} />
+                <Route path="learning" element={<AICEOLearning />} />
+                <Route path="settings" element={<AICEOSettings />} />
+              </Route>
 
               {/* Continent Super Admin Routes */}
               <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
