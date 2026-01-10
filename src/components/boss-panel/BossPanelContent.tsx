@@ -12,6 +12,7 @@ import { RevenueSnapshot } from './sections/RevenueSnapshot';
 import { AuditBlackbox } from './sections/AuditBlackbox';
 import { SecurityLegal } from './sections/SecurityLegal';
 import { BossSettings } from './sections/BossSettings';
+import { CodePilot } from './sections/CodePilot';
 
 interface BossPanelContext {
   activeSection: BossPanelSection;
@@ -43,6 +44,8 @@ export function BossPanelContent() {
         return <AuditBlackbox />;
       case 'security':
         return <SecurityLegal />;
+      case 'codepilot':
+        return <CodePilot />;
       case 'settings':
         return <BossSettings />;
       default:
