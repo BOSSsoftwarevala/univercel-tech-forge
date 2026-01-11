@@ -47,7 +47,10 @@ import {
   ArrowUpRight,
   Clock,
   Activity,
-  TrendingUp
+  TrendingUp,
+  TestTube,
+  CloudCog,
+  Gauge
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,7 +59,10 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { useCodePilotAI } from '@/hooks/useCodePilotAI';
+import { toast } from 'sonner';
 
 interface CodeSession {
   id: string;
@@ -89,12 +95,17 @@ interface DemoProject {
   preview?: string;
 }
 
+type ActionType = 'generate' | 'review' | 'optimize' | 'test' | 'devops' | 'fix';
+
 export function CodePilot() {
   const [activeTab, setActiveTab] = useState('workspace');
   const [prompt, setPrompt] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [codeOutput, setCodeOutput] = useState('');
+  const [selectedAction, setSelectedAction] = useState<ActionType>('generate');
+  const [codeToReview, setCodeToReview] = useState('');
+  
+  const { isLoading, generateCode, fixIssue, reviewCode, optimizeCode, generateTests, devOpsTask, chat } = useCodePilotAI();
   
   const [sessions] = useState<CodeSession[]>([
     { id: '1', type: 'demo', title: 'E-Commerce Dashboard Demo', status: 'building', timestamp: new Date(), progress: 67 },
@@ -120,35 +131,46 @@ export function CodePilot() {
 
   const handleSubmit = async () => {
     if (!prompt.trim()) return;
-    setIsProcessing(true);
     setCodeOutput('');
     
-    // Simulate streaming code output
-    const sampleCode = `// CodePilot Generated Code
-import React from 'react';
-import { motion } from 'framer-motion';
-
-export function GeneratedComponent() {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="p-6 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800"
-    >
-      <h2 className="text-2xl font-bold text-white">
-        Your Custom Component
-      </h2>
-      {/* More code here... */}
-    </motion.div>
-  );
-}`;
-
-    for (let i = 0; i <= sampleCode.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 10));
-      setCodeOutput(sampleCode.slice(0, i));
+    let result: string | null = null;
+    
+    switch (selectedAction) {
+      case 'generate':
+        result = await generateCode(prompt);
+        break;
+      case 'review':
+        result = await reviewCode(codeToReview || prompt);
+        break;
+      case 'optimize':
+        result = await optimizeCode(codeToReview || prompt);
+        break;
+      case 'test':
+        result = await generateTests(codeToReview || prompt);
+        break;
+      case 'devops':
+        result = await devOpsTask(prompt);
+        break;
+      case 'fix':
+        result = await fixIssue(prompt);
+        break;
+      default:
+        result = await generateCode(prompt);
     }
     
-    setIsProcessing(false);
+    if (result) {
+      setCodeOutput(result);
+      toast.success('Code generated successfully!');
+    }
+  };
+
+  const handleAutoFix = async (issue: IssueReport) => {
+    const result = await fixIssue(issue.description);
+    if (result) {
+      setCodeOutput(result);
+      setActiveTab('workspace');
+      toast.success(`Auto-fix generated for: ${issue.description}`);
+    }
   };
 
   const getSeverityColor = (severity: string) => {
@@ -340,14 +362,31 @@ Example: 'Create a real-time analytics dashboard with user activity charts, conv
                   
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" className="text-slate-500 hover:text-white hover:bg-slate-800">
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-slate-500 hover:text-white hover:bg-slate-800">
-                        <FileCode className="w-4 h-4 mr-2" />
-                        Import
-                      </Button>
+                      <Select value={selectedAction} onValueChange={(v) => setSelectedAction(v as ActionType)}>
+                        <SelectTrigger className="w-40 bg-slate-800/50 border-slate-700 text-white">
+                          <SelectValue placeholder="Action" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-900 border-slate-700">
+                          <SelectItem value="generate" className="text-white hover:bg-slate-800">
+                            <div className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Generate</div>
+                          </SelectItem>
+                          <SelectItem value="review" className="text-white hover:bg-slate-800">
+                            <div className="flex items-center gap-2"><Eye className="w-4 h-4" /> Review</div>
+                          </SelectItem>
+                          <SelectItem value="optimize" className="text-white hover:bg-slate-800">
+                            <div className="flex items-center gap-2"><Gauge className="w-4 h-4" /> Optimize</div>
+                          </SelectItem>
+                          <SelectItem value="test" className="text-white hover:bg-slate-800">
+                            <div className="flex items-center gap-2"><TestTube className="w-4 h-4" /> Tests</div>
+                          </SelectItem>
+                          <SelectItem value="devops" className="text-white hover:bg-slate-800">
+                            <div className="flex items-center gap-2"><CloudCog className="w-4 h-4" /> DevOps</div>
+                          </SelectItem>
+                          <SelectItem value="fix" className="text-white hover:bg-slate-800">
+                            <div className="flex items-center gap-2"><Wrench className="w-4 h-4" /> Fix</div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Button variant="ghost" size="sm" className="text-slate-500 hover:text-white hover:bg-slate-800">
                         <FolderOpen className="w-4 h-4 mr-2" />
                         Templates
@@ -364,18 +403,22 @@ Example: 'Create a real-time analytics dashboard with user activity charts, conv
                       </Button>
                       <Button 
                         onClick={handleSubmit}
-                        disabled={!prompt.trim() || isProcessing}
+                        disabled={!prompt.trim() || isLoading}
                         className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/20"
                       >
-                        {isProcessing ? (
+                        {isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Generating...
+                            Processing...
                           </>
                         ) : (
                           <>
                             <Send className="w-4 h-4 mr-2" />
-                            Generate Code
+                            {selectedAction === 'generate' ? 'Generate Code' : 
+                             selectedAction === 'review' ? 'Review Code' :
+                             selectedAction === 'optimize' ? 'Optimize' :
+                             selectedAction === 'test' ? 'Generate Tests' :
+                             selectedAction === 'devops' ? 'Execute DevOps' : 'Fix Issue'}
                           </>
                         )}
                       </Button>
@@ -384,7 +427,7 @@ Example: 'Create a real-time analytics dashboard with user activity charts, conv
                 </div>
 
                 {/* Code Output Area */}
-                {(codeOutput || isProcessing) && (
+                {(codeOutput || isLoading) && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -394,10 +437,18 @@ Example: 'Create a real-time analytics dashboard with user activity charts, conv
                       <div className="flex items-center gap-2">
                         <FileCode className="w-5 h-5 text-cyan-400" />
                         <span className="text-white font-medium">Generated Code</span>
-                        {isProcessing && <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />}
+                        {isLoading && <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="text-slate-500 hover:text-white">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-slate-500 hover:text-white"
+                          onClick={() => {
+                            navigator.clipboard.writeText(codeOutput);
+                            toast.success('Code copied to clipboard!');
+                          }}
+                        >
                           <Copy className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="sm" className="text-slate-500 hover:text-white">
@@ -614,8 +665,17 @@ Example: 'Create a real-time analytics dashboard with user activity charts, conv
 
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         {issue.status !== 'fixed' && issue.status !== 'verified' && (
-                          <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white">
-                            <Wrench className="w-3 h-3 mr-1" />
+                          <Button 
+                            size="sm" 
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
+                            onClick={() => handleAutoFix(issue)}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                            ) : (
+                              <Wrench className="w-3 h-3 mr-1" />
+                            )}
                             Fix Now
                           </Button>
                         )}
