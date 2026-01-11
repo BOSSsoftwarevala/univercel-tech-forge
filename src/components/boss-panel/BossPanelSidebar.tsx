@@ -14,7 +14,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Code2
+  Code2,
+  Server
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BossPanelSection } from './BossPanelLayout';
@@ -38,6 +39,7 @@ const menuItems: { id: BossPanelSection; label: string; icon: React.ElementType 
   { id: 'audit', label: 'Audit & Blackbox', icon: FileSearch },
   { id: 'security', label: 'Security & Legal', icon: Lock },
   { id: 'codepilot', label: 'CodePilot', icon: Code2 },
+  { id: 'server-hosting', label: 'CodeLab Cloud', icon: Server },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 

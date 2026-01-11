@@ -13,6 +13,7 @@ import { AuditBlackbox } from './sections/AuditBlackbox';
 import { SecurityLegal } from './sections/SecurityLegal';
 import { BossSettings } from './sections/BossSettings';
 import { CodePilot } from './sections/CodePilot';
+import { ServerHosting } from './sections/ServerHosting';
 
 interface BossPanelContext {
   activeSection: BossPanelSection;
@@ -46,6 +47,8 @@ export function BossPanelContent() {
         return <SecurityLegal />;
       case 'codepilot':
         return <CodePilot />;
+      case 'server-hosting':
+        return <ServerHosting />;
       case 'settings':
         return <BossSettings />;
       default:

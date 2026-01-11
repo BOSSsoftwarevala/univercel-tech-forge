@@ -15,6 +15,7 @@ export type BossPanelSection =
   | 'audit'
   | 'security'
   | 'codepilot'
+  | 'server-hosting'
   | 'settings';
 
 interface BossPanelLayoutProps {
