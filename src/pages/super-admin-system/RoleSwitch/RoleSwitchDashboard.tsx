@@ -198,11 +198,11 @@ const RoleSwitchDashboard = () => {
   const renderRoleView = () => {
     switch (activeRole) {
       case "boss_owner":
-        return <BossOwnerDashboard />;
+        return <BossOwnerDashboard activeNav={activeNav} />;
       case "ceo":
-        return <CEODashboard />;
+        return <CEODashboard activeNav={activeNav} />;
       case "admin":
-        return <AdminDashboard />;
+        return <AdminDashboard activeNav={activeNav} />;
       case "continent_super_admin":
         return <ContinentSuperAdminView activeNav={activeNav} selectedSubItem={selectedSubItem} />;
       case "country_head":

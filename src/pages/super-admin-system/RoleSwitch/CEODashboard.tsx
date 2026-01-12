@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Eye, TrendingUp, Globe2, BarChart3, PieChart, AlertTriangle,
@@ -88,11 +88,37 @@ const riskAlerts = [
   { id: 3, level: "low", title: "Currency Fluctuation", description: "USD/EUR volatility may impact projections", deadline: "Ongoing" },
 ];
 
-const CEODashboard = () => {
+interface CEODashboardProps {
+  activeNav?: string;
+}
+
+const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const [selectedSuggestion, setSelectedSuggestion] = useState<typeof aiSuggestions[0] | null>(null);
   const [noteText, setNoteText] = useState("");
   const [showNoteDialog, setShowNoteDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  
+  // Map sidebar navigation to internal tabs
+  const getTabFromNav = (nav?: string): string => {
+    const navToTabMap: Record<string, string> = {
+      'dashboard': 'overview',
+      'overview': 'overview',
+      'revenue': 'regions',
+      'analytics': 'insights',
+      'reports': 'approvals',
+      'settings': 'overview',
+    };
+    return navToTabMap[nav || 'dashboard'] || 'overview';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getTabFromNav(activeNav));
+  
+  // Sync internal tab with sidebar navigation
+  useEffect(() => {
+    if (activeNav) {
+      const mappedTab = getTabFromNav(activeNav);
+      setActiveTab(mappedTab);
+    }
+  }, [activeNav]);
 
   const handleApprove = (id: number) => {
     toast.success("Suggestion approved and sent to Super Admin for implementation");

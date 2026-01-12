@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Crown, Shield, Lock, Archive, AlertTriangle, Users, Globe2,
@@ -52,14 +52,41 @@ const pendingOverrides = [
   { id: 3, type: "Archive Request", requestedBy: "Legal Manager", target: "User Data - ID#45678", reason: "GDPR compliance", daysAgo: 3 },
 ];
 
-const BossOwnerDashboard = () => {
+interface BossOwnerDashboardProps {
+  activeNav?: string;
+}
+
+const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const [selectedModule, setSelectedModule] = useState<typeof systemModules[0] | null>(null);
   const [showLockDialog, setShowLockDialog] = useState(false);
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const [lockReason, setLockReason] = useState("");
   const [archiveTarget, setArchiveTarget] = useState("");
   const [twoFactorConfirmed, setTwoFactorConfirmed] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  
+  // Map sidebar navigation to internal tabs
+  const getTabFromNav = (nav?: string): string => {
+    const navToTabMap: Record<string, string> = {
+      'dashboard': 'overview',
+      'super-admins': 'super-admins',
+      'roles': 'permissions',
+      'modules': 'modules',
+      'audit': 'blackbox',
+      'security': 'security',
+      'settings': 'overview', // fallback to overview for settings
+    };
+    return navToTabMap[nav || 'dashboard'] || 'overview';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getTabFromNav(activeNav));
+  
+  // Sync internal tab with sidebar navigation
+  useEffect(() => {
+    if (activeNav) {
+      const mappedTab = getTabFromNav(activeNav);
+      setActiveTab(mappedTab);
+    }
+  }, [activeNav]);
 
   const handleEmergencyLockdown = () => {
     if (!twoFactorConfirmed) {

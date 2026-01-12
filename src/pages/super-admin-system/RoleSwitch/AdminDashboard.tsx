@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Shield, Users, Activity, FileText, Settings, 
@@ -29,8 +29,33 @@ const recentActivities = [
   { id: 5, action: "Security scan completed", target: "All modules", time: "6 hours ago", status: "success" },
 ];
 
-const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+interface AdminDashboardProps {
+  activeNav?: string;
+}
+
+const AdminDashboard = ({ activeNav }: AdminDashboardProps) => {
+  // Map sidebar navigation to internal tabs
+  const getTabFromNav = (nav?: string): string => {
+    const navToTabMap: Record<string, string> = {
+      'dashboard': 'overview',
+      'users': 'users',
+      'roles': 'roles',
+      'modules': 'modules',
+      'activity': 'activity',
+      'settings': 'overview',
+    };
+    return navToTabMap[nav || 'dashboard'] || 'overview';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getTabFromNav(activeNav));
+  
+  // Sync internal tab with sidebar navigation
+  useEffect(() => {
+    if (activeNav) {
+      const mappedTab = getTabFromNav(activeNav);
+      setActiveTab(mappedTab);
+    }
+  }, [activeNav]);
 
   return (
     <motion.div
