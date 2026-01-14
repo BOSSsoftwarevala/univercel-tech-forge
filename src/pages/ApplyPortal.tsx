@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   Store,
   ShoppingBag,
@@ -18,6 +19,7 @@ import {
   Shield,
   Globe,
   FileCheck,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +36,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const applicationTypes = [
   {
@@ -102,6 +106,7 @@ const countries = [
 // Masking functions imported at top of file from @/lib/masking
 
 const ApplyPortal = () => {
+  const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -113,12 +118,78 @@ const ApplyPortal = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [promiseAcknowledged, setPromiseAcknowledged] = useState(false);
   const [showMasked, setShowMasked] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const liveStats = {
     leads: 1247,
     activeDevelopers: 89,
     availableDemos: 312,
     currentCommissions: 24680,
+  };
+
+  const handleSubmitApplication = async () => {
+    if (!selectedType || !formData.fullName || !formData.email) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Check if user is logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) {
+        // Store form data in sessionStorage and redirect to auth
+        sessionStorage.setItem('pendingApplication', JSON.stringify({
+          type: selectedType,
+          formData,
+          idUploaded,
+          termsAccepted,
+          promiseAcknowledged
+        }));
+        toast.info("Please login or signup to submit your application");
+        navigate(`/auth?redirect=/apply&type=${selectedType}`);
+        return;
+      }
+
+      // Submit application to database
+      const { error } = await supabase
+        .from('reseller_applications')
+        .insert({
+          user_id: session.user.id,
+          application_type: selectedType,
+          full_name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone || null,
+          country: formData.country || null,
+          id_proof_uploaded: idUploaded,
+          terms_accepted: termsAccepted,
+          promise_acknowledged: promiseAcknowledged,
+          status: 'pending'
+        });
+
+      if (error) {
+        console.error("Application submission error:", error);
+        toast.error("Failed to submit application. Please try again.");
+        return;
+      }
+
+      toast.success("Application submitted successfully! We'll review it shortly.");
+      
+      // Reset form
+      setSelectedType(null);
+      setFormData({ fullName: "", email: "", phone: "", country: "" });
+      setIdUploaded(false);
+      setTermsAccepted(false);
+      setPromiseAcknowledged(false);
+
+    } catch (err) {
+      console.error("Submission error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -408,11 +479,21 @@ const ApplyPortal = () => {
                     <div className="mt-6">
                       <Button
                         className="w-full bg-neon-green hover:bg-neon-green/90 text-primary-foreground font-semibold py-6"
-                        disabled={!termsAccepted || !promiseAcknowledged || !formData.fullName || !formData.email}
+                        disabled={!termsAccepted || !promiseAcknowledged || !formData.fullName || !formData.email || isSubmitting}
+                        onClick={handleSubmitApplication}
                       >
-                        <Check className="w-5 h-5 mr-2" />
-                        Submit Application
-                        <ChevronRight className="w-5 h-5 ml-2" />
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-5 h-5 mr-2" />
+                            Submit Application
+                            <ChevronRight className="w-5 h-5 ml-2" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
