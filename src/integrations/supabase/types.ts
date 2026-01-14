@@ -13895,6 +13895,63 @@ export type Database = {
           },
         ]
       }
+      reseller_applications: {
+        Row: {
+          application_type: string
+          country: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          id_proof_uploaded: boolean
+          phone: string | null
+          promise_acknowledged: boolean
+          rejection_reason: string | null
+          reviewer_id: string | null
+          reviewer_notes: string | null
+          status: string
+          terms_accepted: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_type?: string
+          country?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          id_proof_uploaded?: boolean
+          phone?: string | null
+          promise_acknowledged?: boolean
+          rejection_reason?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          terms_accepted?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_type?: string
+          country?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          id_proof_uploaded?: boolean
+          phone?: string | null
+          promise_acknowledged?: boolean
+          rejection_reason?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          terms_accepted?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reseller_commissions: {
         Row: {
           approved_at: string | null
@@ -21516,6 +21573,7 @@ export type Database = {
         | "product_demo_manager"
         | "boss_owner"
         | "ceo"
+        | "reseller_manager"
       critical_action_type:
         | "delete_data"
         | "edit_financial"
@@ -21778,6 +21836,7 @@ export const Constants = {
         "product_demo_manager",
         "boss_owner",
         "ceo",
+        "reseller_manager",
       ],
       critical_action_type: [
         "delete_data",
