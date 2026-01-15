@@ -6,6 +6,7 @@ import {
   CheckCircle2, XCircle, Clock, RotateCcw, Database, Server,
   Fingerprint, ShieldCheck, Ban, History, Download, Upload
 } from "lucide-react";
+import { PendingRequestsBanner } from "@/components/shared/PendingRequestsBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -138,7 +139,11 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   };
 
   return (
-    <div className="min-h-full w-full bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900 p-6 overflow-auto">
+    <div className="min-h-full w-full bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900 overflow-auto">
+      {/* Pending Requests Banner - TOP PRIORITY */}
+      <PendingRequestsBanner />
+      
+      <div className="p-6">
       {/* Premium Boss Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -669,6 +674,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </CardContent>
         </Card>
       </motion.div>
+      </div>
     </div>
   );
 };

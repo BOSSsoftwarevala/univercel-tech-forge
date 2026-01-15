@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import MasterThroneIcon from '@/components/icons/MasterThroneIcon';
+import { PendingRequestsBanner } from '@/components/shared/PendingRequestsBanner';
 
 // Views
 import OverviewView from './views/OverviewView';
@@ -93,6 +94,9 @@ const MasterControlCenter = () => {
 
   return (
     <div className="h-screen w-screen bg-[#0a0a0f] flex flex-col overflow-hidden select-none" onContextMenu={(e) => e.preventDefault()}>
+      {/* Pending Requests Banner - TOP PRIORITY */}
+      <PendingRequestsBanner />
+      
       {/* TOP HEADER - Dark theme */}
       <header className="h-14 bg-[#12121a] flex items-center justify-between px-6 flex-shrink-0 border-b border-gray-800/50">
         <div className="flex items-center gap-4">
