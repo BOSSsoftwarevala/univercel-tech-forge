@@ -7,7 +7,7 @@ type AppRole = Database['public']['Enums']['app_role'];
 
 // Roles that get direct access without approval
 // NOTE: master and super_admin merged into boss_owner
-const PRIVILEGED_ROLES: string[] = ['boss_owner', 'master', 'ceo'];
+const PRIVILEGED_ROLES: string[] = ['boss_owner', 'master', 'super_admin', 'ceo'];
 // Roles that get auto-approved on signup (no waiting)
 const AUTO_APPROVED_ROLES: string[] = ['boss_owner', 'master', 'ceo', 'prime'];
 
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Computed properties (merged master + super_admin into boss_owner)
   const isPrivileged = userRole ? PRIVILEGED_ROLES.includes(userRole) : false;
-  const isBossOwner = userRole === 'boss_owner' || userRole === 'master';
+  const isBossOwner = userRole === 'boss_owner' || userRole === 'master' || userRole === 'super_admin';
   const isCEO = userRole === 'ceo';
 
   // Check if user was force logged out
