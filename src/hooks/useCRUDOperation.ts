@@ -65,7 +65,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
 
       // Replace optimistic with real data
       setLocalData(prev => prev.map(item => 
-        item[primaryKey] === tempId ? (created as T) : item
+        item[primaryKey] === tempId ? (created as unknown as T) : item
       ));
 
       // Log action
@@ -77,7 +77,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
       setSuccess(`${entityType} created successfully`);
       toast.success(`${entityType} created`);
 
-      return { success: true, data: created as T };
+      return { success: true, data: created as unknown as T };
     } catch (err: any) {
       // Rollback optimistic update
       setLocalData(prev => prev.filter(item => item[primaryKey] !== tempId));
@@ -130,7 +130,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
 
       // Replace with confirmed data
       setLocalData(prev => prev.map(item =>
-        item[primaryKey] === id ? { ...(updated as T), _isOptimistic: false } : item
+        item[primaryKey] === id ? { ...(updated as unknown as T), _isOptimistic: false } : item
       ));
 
       // Log action
@@ -142,7 +142,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
       setSuccess(`${entityType} updated`);
       toast.success(`${entityType} updated`);
 
-      return { success: true, data: updated as T };
+      return { success: true, data: updated as unknown as T };
     } catch (err: any) {
       // Rollback
       if (original) {
@@ -203,7 +203,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
 
       // Replace with confirmed data
       setLocalData(prev => prev.map(item =>
-        item[primaryKey] === id ? { ...(updated as T), _isOptimistic: false } : item
+        item[primaryKey] === id ? { ...(updated as unknown as T), _isOptimistic: false } : item
       ));
 
       // Log action
@@ -215,7 +215,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
       setSuccess(`${entityType} disabled`);
       toast.success(`${entityType} disabled`, { description: reason });
 
-      return { success: true, data: updated as T };
+      return { success: true, data: updated as unknown as T };
     } catch (err: any) {
       // Rollback
       if (original) {
@@ -263,7 +263,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
       if (error) throw error;
 
       setLocalData(prev => prev.map(item =>
-        item[primaryKey] === id ? (updated as T) : item
+        item[primaryKey] === id ? (updated as unknown as T) : item
       ));
 
       // Log action
@@ -275,7 +275,7 @@ export function useCRUDOperation<T extends Record<string, any>>(config: CRUDConf
       setSuccess(`${entityType} enabled`);
       toast.success(`${entityType} enabled`);
 
-      return { success: true, data: updated as T };
+      return { success: true, data: updated as unknown as T };
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to enable';
       setError(errorMsg);
