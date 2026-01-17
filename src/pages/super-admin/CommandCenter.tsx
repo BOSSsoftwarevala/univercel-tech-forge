@@ -446,29 +446,26 @@ function CategoryCard({ category }: { category: Category }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-800/80 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-xl"
-      style={{
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
-      }}
+      className="bg-card border border-border rounded-xl overflow-hidden shadow-lg"
     >
       {/* Category Header - Clean Style: Icon + Name Only */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           "w-full flex items-center gap-3 p-4 transition-all",
-          "hover:bg-slate-700/50",
-          isExpanded && "bg-slate-700/30"
+          "hover:bg-secondary",
+          isExpanded && "bg-secondary"
         )}
       >
         <div className={cn("p-2.5 rounded-xl bg-gradient-to-br shadow-lg", category.color)}>
           <Icon className="h-5 w-5 text-white" />
         </div>
-        <h3 className="font-semibold text-white flex-1 text-left">{category.name}</h3>
+        <h3 className="font-semibold text-foreground flex-1 text-left">{category.name}</h3>
         <motion.div
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className="h-5 w-5 text-slate-400" />
+          <ChevronDown className="h-5 w-5 text-muted-foreground" />
         </motion.div>
       </button>
 
@@ -484,18 +481,18 @@ function CategoryCard({ category }: { category: Category }) {
           >
             <div className="px-4 pb-4 space-y-2">
               {category.subs.map((sub) => (
-                <div key={sub.name} className="border-l-2 border-teal-500/30 pl-4">
+                <div key={sub.name} className="border-l-2 border-primary/30 pl-4">
                   {/* Sub Category (Level 2) - Clean */}
                   <button
                     onClick={() => toggleSub(sub.name)}
-                    className="w-full flex items-center gap-2 py-2 text-left hover:text-teal-400 transition-colors group"
+                    className="w-full flex items-center gap-2 py-2 text-left hover:text-primary transition-colors group"
                   >
                     <motion.div
                       animate={{ rotate: expandedSubs.includes(sub.name) ? 90 : 0 }}
                     >
-                      <ChevronRight className="h-4 w-4 text-teal-500" />
+                      <ChevronRight className="h-4 w-4 text-primary" />
                     </motion.div>
-                    <span className="text-sm font-medium text-white group-hover:text-teal-400">{sub.name}</span>
+                    <span className="text-sm font-medium text-foreground group-hover:text-primary">{sub.name}</span>
                   </button>
 
                   {/* Micro Categories (Level 3) */}
@@ -662,13 +659,13 @@ const CategoryPlaceholder = ({ title }: { title: string }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="flex flex-col items-center justify-center min-h-[400px] bg-slate-800/50 rounded-2xl border border-slate-700/50"
+    className="flex flex-col items-center justify-center min-h-[400px] bg-card rounded-2xl border border-border shadow-lg"
   >
-    <div className="w-20 h-20 rounded-2xl bg-teal-500/20 flex items-center justify-center mb-4">
+    <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
       <span className="text-4xl">🚧</span>
     </div>
-    <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-    <p className="text-slate-400">This module is ready for sub/micro/nano mapping</p>
+    <h2 className="text-2xl font-bold text-foreground mb-2">{title}</h2>
+    <p className="text-muted-foreground">This module is ready for sub/micro/nano mapping</p>
   </motion.div>
 );
 
@@ -814,7 +811,7 @@ const SuperAdminCommandCenter = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Top Bar */}
+        {/* Top Bar */}
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <motion.div 
@@ -823,27 +820,27 @@ const SuperAdminCommandCenter = () => {
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring' }}
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg" style={{ boxShadow: '0 8px 24px rgba(20, 184, 166, 0.4)' }}>
+                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-lg">
                   <Shield className="h-6 w-6 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-background flex items-center justify-center">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
                 </div>
               </motion.div>
               
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">
                   {activeCategory ? categoryTitles[activeCategory] || activeCategory.toUpperCase() : 'DASHBOARD COMMAND CENTER'}
                 </h1>
-                <p className="text-sm text-slate-400 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   {activeCategory ? `Managing ${categoryTitles[activeCategory] || activeCategory}` : 'Category Hierarchy Structure • 4-Level System'}
                 </p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
-              <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/30 px-3 py-1">
+              <Badge className="bg-primary/10 text-primary border-primary/30 px-3 py-1">
                 <Activity className="h-3 w-3 mr-1.5 animate-pulse" />
                 LIVE
               </Badge>

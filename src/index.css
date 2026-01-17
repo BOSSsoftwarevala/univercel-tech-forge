@@ -7,160 +7,117 @@
 @layer base {
   :root {
     /* ========================================
-       SOFTWARE VALA - BRAND THEME
-       Blue Primary + Red Accent (Logo Colors)
+       SOFTWARE VALA - PREMIUM BRAND THEME
+       Clean, Professional, WOW-Level Design
        ======================================== */
     
-    /* Core Colors - Clean White Theme */
-    --background: 0 0% 98%;
-    --foreground: 220 25% 12%;
+    /* Core Colors - Clean Light Theme */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 12%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 12%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary - Brand Blue (from logo) */
-    --primary: 217 91% 50%;
+    /* Primary - Premium Blue */
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light Gray */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 25% 25%;
+    /* Secondary - Soft Gray */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 20%;
 
-    /* Muted - Soft Gray */
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 45%;
+    /* Muted - Light Gray */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    /* Accent - Brand Red (from logo) */
-    --accent: 0 84% 60%;
+    /* Accent - Vibrant Blue */
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive - Red */
+    /* Destructive - Clean Red */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 50%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
 
     --radius: 0.75rem;
 
     /* ========================================
-       SOFTWARE VALA BRAND PALETTE
-       Blue + Red Theme
+       PREMIUM SIDEBAR - Brand Blue
        ======================================== */
-    
-    /* Primary Palette - Brand Blue */
-    --sv-primary: 217 91% 50%;
-    --sv-primary-light: 217 91% 60%;
-    --sv-primary-dark: 217 91% 40%;
-    
-    /* Accent Palette - Brand Red */
-    --sv-accent: 0 84% 60%;
-    --sv-accent-light: 0 84% 70%;
-    --sv-accent-dark: 0 84% 50%;
-    
-    /* Sidebar Colors - Dark Navy */
-    --sv-sidebar-start: 220 25% 10%;
-    --sv-sidebar-mid: 220 25% 8%;
-    --sv-sidebar-end: 220 25% 6%;
-
-    /* Aurora Colors - Brand Aligned */
-    --aurora-violet: 217 91% 50%;
-    --aurora-purple: 0 84% 60%;
-    --aurora-blue: 217 91% 50%;
-    --aurora-cyan: 199 89% 48%;
-    --aurora-teal: 173 80% 40%;
-    --aurora-green: 142 71% 45%;
-    --aurora-lime: 84 81% 44%;
-    --aurora-gold: 38 92% 50%;
-    --aurora-orange: 25 95% 53%;
-    --aurora-rose: 0 84% 60%;
-    --aurora-pink: 330 81% 60%;
-    --aurora-magenta: 300 76% 55%;
-
-    /* Status Colors */
-    --status-success: 142 71% 45%;
-    --status-warning: 38 92% 50%;
-    --status-error: 0 84% 60%;
-    --status-info: 217 91% 50%;
-    --status-pending: 38 92% 50%;
-
-    /* Neon Glow Colors - Brand Aligned */
-    --neon-violet: 217 100% 60%;
-    --neon-cyan: 199 100% 55%;
-    --neon-green: 142 100% 50%;
-    --neon-orange: 25 100% 55%;
-    --neon-red: 0 100% 60%;
-    --neon-purple: 0 84% 65%;
-    --neon-blue: 217 100% 60%;
-    --neon-teal: 173 100% 50%;
-    --neon-pink: 330 100% 65%;
-    --neon-gold: 38 100% 55%;
-
-    /* Surface Colors - Light Mode */
-    --surface-1: 0 0% 100%;
-    --surface-2: 225 30% 98%;
-    --surface-3: 225 25% 96%;
-    --surface-elevated: 0 0% 100%;
-
-    /* Software Vala Branding - LOCKED */
-    --sv-navy: 220 25% 20%;
-    --sv-navy-deep: 220 25% 12%;
-    --sv-navy-light: 220 25% 30%;
-    --sv-blue: 217 91% 50%;
-    --sv-blue-bright: 217 91% 60%;
-    --sv-white: 0 0% 100%;
-    --sv-white-soft: 0 0% 98%;
-    --sv-gray: 220 10% 50%;
-    --sv-success: 142 71% 45%;
-    --sv-warning: 38 92% 50%;
-    --sv-danger: 0 84% 60%;
-    --sv-info: 217 91% 50%;
-
-    /* Legacy Compatibility */
-    --sapphire: 225 85% 45%;
-    --sapphire-light: 225 85% 55%;
-    --graphite: 225 25% 25%;
-    --graphite-dark: 225 25% 18%;
-    --electric-blue: 225 100% 55%;
-    --electric-blue-glow: 225 100% 65%;
-    --gold: 45 100% 55%;
-    --gold-glow: 45 100% 65%;
-    --charcoal: 225 20% 20%;
-    --charcoal-light: 225 15% 30%;
+    --sidebar-background: 217 91% 60%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 217 91% 60%;
+    --sidebar-accent: 217 91% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 91% 65%;
+    --sidebar-ring: 0 0% 100%;
 
     /* ========================================
-       PREMIUM GRADIENTS
+       STATUS COLORS - Professional
        ======================================== */
+    --status-success: 142 76% 36%;
+    --status-warning: 38 92% 50%;
+    --status-error: 0 84% 60%;
+    --status-info: 217 91% 60%;
 
-    --gradient-aurora: linear-gradient(135deg, hsl(225 85% 55%) 0%, hsl(250 85% 60%) 50%, hsl(195 90% 50%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(340 85% 60%) 0%, hsl(25 95% 55%) 50%, hsl(45 100% 55%) 100%);
-    --gradient-ocean: linear-gradient(135deg, hsl(225 85% 55%) 0%, hsl(195 90% 50%) 50%, hsl(175 80% 45%) 100%);
-    --gradient-cosmic: linear-gradient(135deg, hsl(250 85% 60%) 0%, hsl(265 75% 55%) 50%, hsl(320 80% 60%) 100%);
-    --gradient-emerald: linear-gradient(135deg, hsl(175 80% 45%) 0%, hsl(145 75% 45%) 50%, hsl(80 85% 55%) 100%);
-    --gradient-royal: linear-gradient(135deg, hsl(225 85% 50%) 0%, hsl(250 80% 55%) 100%);
-    --gradient-fire: linear-gradient(135deg, hsl(0 80% 55%) 0%, hsl(25 95% 55%) 50%, hsl(45 100% 55%) 100%);
-    --gradient-midnight: linear-gradient(135deg, hsl(225 50% 25%) 0%, hsl(235 55% 35%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9) 0%, hsl(225 30% 98% / 0.8) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(225 30% 98%) 100%);
-    --gradient-sidebar: linear-gradient(180deg, hsl(240 18% 10%) 0%, hsl(240 16% 8%) 50%, hsl(240 18% 6%) 100%);
+    /* Premium Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
-    /* Status Gradients */
-    --gradient-success: linear-gradient(135deg, hsl(145 75% 45%) 0%, hsl(175 80% 45%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(40 95% 50%) 0%, hsl(25 95% 55%) 100%);
-    --gradient-error: linear-gradient(135deg, hsl(0 80% 55%) 0%, hsl(340 85% 60%) 100%);
-    --gradient-info: linear-gradient(135deg, hsl(200 90% 50%) 0%, hsl(225 85% 55%) 100%);
+    /* Glass Effect */
+    --glass-bg: 0 0% 100% / 0.9;
+    --glass-border: 214 32% 91%;
 
-    /* Glass Effects */
-    --glass-bg: 0 0% 100% / 0.8;
-    --glass-border: 45 100% 55% / 0.18;
-    --glass-glow: 45 100% 55% / 0.12;
+    /* Legacy Compatibility */
+    --sv-primary: 217 91% 60%;
+    --sv-accent: 0 84% 60%;
+    --neon-teal: 173 80% 40%;
+    --neon-orange: 25 95% 53%;
+    --neon-green: 142 71% 45%;
+    --sapphire: 217 91% 60%;
+    --aurora-violet: 217 91% 60%;
+  }
 
-    /* Sidebar Theme - Brand Blue (like reference designs) */
+  /* Dark Mode - Premium Dark */
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 14%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+
     --sidebar-background: 217 91% 50%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
@@ -169,48 +126,6 @@
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 217 91% 55%;
     --sidebar-ring: 0 0% 100%;
-  }
-
-  /* ========================================
-     DARK MODE THEME (Alternative)
-     ======================================== */
-  .dark {
-    --background: 225 30% 8%;
-    --foreground: 220 20% 95%;
-
-    --card: 225 25% 12%;
-    --card-foreground: 220 20% 95%;
-
-    --popover: 225 25% 14%;
-    --popover-foreground: 220 20% 95%;
-
-    --primary: 225 85% 60%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 225 25% 18%;
-    --secondary-foreground: 220 20% 90%;
-
-    --muted: 225 20% 22%;
-    --muted-foreground: 220 15% 55%;
-
-    --accent: 250 85% 65%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 80% 55%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 225 20% 25%;
-    --input: 225 20% 20%;
-    --ring: 225 85% 60%;
-
-    --sidebar-background: 225 30% 10%;
-    --sidebar-foreground: 220 20% 95%;
-    --sidebar-primary: 225 85% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 25% 18%;
-    --sidebar-accent-foreground: 220 20% 95%;
-    --sidebar-border: 225 20% 22%;
-    --sidebar-ring: 225 85% 60%;
   }
 }
 
