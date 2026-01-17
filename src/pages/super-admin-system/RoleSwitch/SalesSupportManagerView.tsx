@@ -234,209 +234,216 @@ const SalesSupportManagerView = () => {
       <div className={cn("flex-1 overflow-hidden flex flex-col transition-all duration-300", detailPanelOpen ? "mr-0" : "")}>
         <ScrollArea className="flex-1">
           <div className="p-6 space-y-6">
-            {/* Header */}
+            {/* Header - Compact Premium */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
-                  <Headphones className="w-7 h-7 text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                  <Headphones className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">Sales & Support Manager Dashboard</h1>
-                  <p className="text-muted-foreground">Manage all Sales & Support Managers worldwide</p>
+                  <h1 className="text-xl font-semibold text-foreground">Sales & Support</h1>
+                  <p className="text-xs text-muted-foreground">Global Team Management</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <RefreshCw className="w-4 h-4" />
-                  Refresh
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="h-8 px-3 text-xs">
+                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                  Sync
                 </Button>
-                <Button size="sm" className="gap-2 bg-gradient-to-r from-teal-500 to-emerald-600">
-                  <Activity className="w-4 h-4" />
-                  Live Mode
+                <Button size="sm" className="h-8 px-3 text-xs bg-emerald-500 hover:bg-emerald-600 text-white">
+                  <Activity className="w-3.5 h-3.5 mr-1.5" />
+                  Live
                 </Button>
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-5 gap-4">
-              <Card className="bg-gradient-to-br from-teal-500/10 to-emerald-500/10 border-teal-500/30">
-                <CardContent className="p-4">
+            {/* Stats Cards - Clean White Design */}
+            <div className="grid grid-cols-5 gap-3">
+              <Card className="bg-white border border-slate-200 shadow-sm">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Total Managers</p>
-                      <p className="text-3xl font-bold text-teal-400">{totalStats.total}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-slate-500">Managers</p>
+                      <p className="text-2xl font-bold text-slate-800">{totalStats.total}</p>
                     </div>
-                    <Headphones className="w-10 h-10 text-teal-400/30" />
+                    <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+                      <Headphones className="w-4 h-4 text-teal-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-emerald-500/10 border-emerald-500/30">
-                <CardContent className="p-4">
+              <Card className="bg-white border border-slate-200 shadow-sm">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Online</p>
-                      <p className="text-3xl font-bold text-emerald-400">{totalStats.active}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-slate-500">Online</p>
+                      <p className="text-2xl font-bold text-emerald-600">{totalStats.active}</p>
                     </div>
-                    <CheckCircle className="w-10 h-10 text-emerald-400/30" />
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-yellow-500/10 border-yellow-500/30">
-                <CardContent className="p-4">
+              <Card className="bg-white border border-slate-200 shadow-sm">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Away</p>
-                      <p className="text-3xl font-bold text-yellow-400">{totalStats.away}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-slate-500">Away</p>
+                      <p className="text-2xl font-bold text-amber-600">{totalStats.away}</p>
                     </div>
-                    <Clock className="w-10 h-10 text-yellow-400/30" />
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-amber-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-orange-500/10 border-orange-500/30">
-                <CardContent className="p-4">
+              <Card className="bg-white border border-slate-200 shadow-sm">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Active Tickets</p>
-                      <p className="text-3xl font-bold text-orange-400">{totalStats.totalTickets}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-slate-500">Tickets</p>
+                      <p className="text-2xl font-bold text-orange-600">{totalStats.totalTickets}</p>
                     </div>
-                    <Ticket className="w-10 h-10 text-orange-400/30" />
+                    <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
+                      <Ticket className="w-4 h-4 text-orange-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-blue-500/10 border-blue-500/30">
-                <CardContent className="p-4">
+              <Card className="bg-white border border-slate-200 shadow-sm">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Total Leads</p>
-                      <p className="text-3xl font-bold text-blue-400">{totalStats.totalLeads}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-slate-500">Leads</p>
+                      <p className="text-2xl font-bold text-blue-600">{totalStats.totalLeads}</p>
                     </div>
-                    <Users className="w-10 h-10 text-blue-400/30" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <Users className="w-4 h-4 text-blue-600" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Filters */}
-            <Card className="bg-card/50 backdrop-blur border-border/50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search manager or region..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-background/50"
-                    />
-                  </div>
-                  <Select value={filterCountry} onValueChange={setFilterCountry}>
-                    <SelectTrigger className="w-48 bg-background/50">
-                      <SelectValue placeholder="Filter by Country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Countries</SelectItem>
-                      {uniqueCountries.map(country => (
-                        <SelectItem key={country} value={country}>{country}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-40 bg-background/50">
-                      <SelectValue placeholder="Filter by Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="away">Away</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Filters - Clean & Compact */}
+            <div className="flex items-center gap-3 bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Input
+                  placeholder="Search manager..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9 bg-slate-50 border-slate-200 text-sm"
+                />
+              </div>
+              <Select value={filterCountry} onValueChange={setFilterCountry}>
+                <SelectTrigger className="w-40 h-9 bg-slate-50 border-slate-200 text-sm">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  {uniqueCountries.map(country => (
+                    <SelectItem key={country} value={country}>{country}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-32 h-9 bg-slate-50 border-slate-200 text-sm">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="away">Away</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            {/* Sales & Support Managers List - CRM Style Table */}
-            <Card className="bg-card/50 backdrop-blur border-border/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="w-5 h-5 text-teal-400" />
-                  All Sales & Support Managers
+            {/* Managers Table - Clean White Design */}
+            <Card className="bg-white border border-slate-200 shadow-sm overflow-hidden">
+              <CardHeader className="py-3 px-4 border-b border-slate-100">
+                <CardTitle className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-teal-500" />
+                  Team Members
+                  <Badge className="ml-2 bg-slate-100 text-slate-600 text-[10px]">{filteredManagers.length}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-border/50 bg-muted/30">
-                        <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase">Manager</th>
-                        <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase">Region</th>
-                        <th className="text-center p-4 text-xs font-semibold text-muted-foreground uppercase">Tickets</th>
-                        <th className="text-center p-4 text-xs font-semibold text-muted-foreground uppercase">Leads</th>
-                        <th className="text-center p-4 text-xs font-semibold text-muted-foreground uppercase">Conversion</th>
-                        <th className="text-center p-4 text-xs font-semibold text-muted-foreground uppercase">Status</th>
-                        <th className="text-center p-4 text-xs font-semibold text-muted-foreground uppercase">Action</th>
+                      <tr className="bg-slate-50 border-b border-slate-100">
+                        <th className="text-left py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Manager</th>
+                        <th className="text-left py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Region</th>
+                        <th className="text-center py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Tickets</th>
+                        <th className="text-center py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Leads</th>
+                        <th className="text-center py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Conv%</th>
+                        <th className="text-center py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                        <th className="text-center py-2.5 px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredManagers.map((manager) => (
                         <motion.tr
                           key={manager.id}
-                          whileHover={{ backgroundColor: "rgba(20, 184, 166, 0.05)" }}
-                          className="border-b border-border/30 cursor-pointer transition-colors"
+                          whileHover={{ backgroundColor: "#f8fafc" }}
+                          className="border-b border-slate-100 cursor-pointer"
                           onClick={() => handleSelectManager(manager)}
                         >
-                          <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <Avatar className="w-10 h-10 border-2 border-teal-500/30">
-                                <AvatarFallback className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white font-bold text-sm">
+                          <td className="py-2.5 px-4">
+                            <div className="flex items-center gap-2.5">
+                              <Avatar className="w-8 h-8">
+                                <AvatarFallback className="bg-gradient-to-br from-teal-500 to-emerald-500 text-white text-xs font-semibold">
                                   {manager.name.split(' ').map(n => n[0]).join('')}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium text-foreground">{manager.name}</p>
-                                <p className="text-xs text-muted-foreground">{manager.email}</p>
+                                <p className="text-sm font-medium text-slate-800">{manager.name}</p>
+                                <p className="text-[11px] text-slate-500">{manager.email}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="p-4">
+                          <td className="py-2.5 px-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-lg">{manager.flag}</span>
+                              <span className="text-base">{manager.flag}</span>
                               <div>
-                                <p className="text-sm font-medium">{manager.region}</p>
-                                <p className="text-xs text-muted-foreground">{manager.country}</p>
+                                <p className="text-xs font-medium text-slate-700">{manager.region}</p>
+                                <p className="text-[10px] text-slate-400">{manager.country}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="p-4 text-center">
-                            <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-500/10 text-orange-400">
+                          <td className="py-2.5 px-4 text-center">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-xs font-medium">
                               <Ticket className="w-3 h-3" />
-                              <span className="text-sm font-medium">{manager.activeTickets}</span>
-                            </div>
+                              {manager.activeTickets}
+                            </span>
                           </td>
-                          <td className="p-4 text-center">
-                            <span className="text-sm font-medium text-blue-400">{manager.leadsCount}</span>
+                          <td className="py-2.5 px-4 text-center">
+                            <span className="text-sm font-medium text-blue-600">{manager.leadsCount}</span>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="py-2.5 px-4 text-center">
                             <div className="flex items-center justify-center gap-1">
-                              <span className="text-sm font-medium text-emerald-400">{manager.leadConversion}%</span>
-                              <TrendingUp className="w-3 h-3 text-emerald-400" />
+                              <span className="text-sm font-medium text-emerald-600">{manager.leadConversion}%</span>
+                              <TrendingUp className="w-3 h-3 text-emerald-500" />
                             </div>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="py-2.5 px-4 text-center">
                             <Badge 
                               className={cn(
-                                "text-xs",
+                                "text-[10px] font-medium px-2 py-0.5",
                                 manager.status === "active" 
-                                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50"
-                                  : "bg-yellow-500/20 text-yellow-400 border-yellow-500/50"
+                                  ? "bg-emerald-100 text-emerald-700 border-0"
+                                  : "bg-amber-100 text-amber-700 border-0"
                               )}
                             >
                               {manager.status}
                             </Badge>
                           </td>
-                          <td className="p-4 text-center">
-                            <Button variant="ghost" size="sm" className="gap-1 text-teal-400 hover:text-teal-300">
+                          <td className="py-2.5 px-4 text-center">
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-teal-600 hover:text-teal-700 hover:bg-teal-50">
                               View
-                              <ChevronRight className="w-4 h-4" />
+                              <ChevronRight className="w-3.5 h-3.5 ml-1" />
                             </Button>
                           </td>
                         </motion.tr>
@@ -450,7 +457,7 @@ const SalesSupportManagerView = () => {
         </ScrollArea>
       </div>
 
-      {/* Detail Panel */}
+      {/* Detail Panel - Clean White Design */}
       <AnimatePresence>
         {detailPanelOpen && selectedManager && (
           <motion.div
@@ -458,33 +465,33 @@ const SalesSupportManagerView = () => {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 400, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }}
-            className="w-[480px] border-l border-border/50 bg-card/50 backdrop-blur-xl overflow-hidden flex flex-col"
+            className="w-[420px] border-l border-slate-200 bg-white overflow-hidden flex flex-col shadow-xl"
           >
             {/* Panel Header */}
-            <div className="p-4 border-b border-border/50 bg-gradient-to-r from-teal-500/10 to-emerald-500/10">
-              <div className="flex items-center justify-between mb-4">
-                <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50">
-                  Manager Details
+            <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-teal-50 to-emerald-50">
+              <div className="flex items-center justify-between mb-3">
+                <Badge className="bg-teal-100 text-teal-700 border-0 text-[10px] font-medium">
+                  Manager Profile
                 </Badge>
-                <Button variant="ghost" size="icon" onClick={handleClosePanel}>
-                  <X className="w-4 h-4" />
+                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-slate-100" onClick={handleClosePanel}>
+                  <X className="w-4 h-4 text-slate-500" />
                 </Button>
               </div>
-              <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16 border-2 border-teal-500">
-                  <AvatarFallback className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white text-xl font-bold">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-12 h-12 border-2 border-teal-400">
+                  <AvatarFallback className="bg-gradient-to-br from-teal-500 to-emerald-500 text-white text-base font-bold">
                     {selectedManager.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-xl font-bold text-foreground">{selectedManager.name}</h2>
-                  <p className="text-muted-foreground">{selectedManager.region}</p>
+                  <h2 className="text-lg font-semibold text-slate-800">{selectedManager.name}</h2>
+                  <p className="text-xs text-slate-500">{selectedManager.region}</p>
                   <Badge 
                     className={cn(
-                      "mt-1",
+                      "mt-1 text-[10px] border-0",
                       selectedManager.status === "active" 
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-yellow-500/20 text-yellow-400"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-amber-100 text-amber-700"
                     )}
                   >
                     {selectedManager.status}
@@ -494,121 +501,121 @@ const SalesSupportManagerView = () => {
             </div>
 
             <ScrollArea className="flex-1">
-              <div className="p-4 space-y-6">
-                {/* Section 1: Identity */}
+              <div className="p-4 space-y-5">
+                {/* Section 1: Contact */}
                 <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Identity
+                  <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Contact Info
                   </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
-                      <Mail className="w-4 h-4 text-teal-400" />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-50">
+                      <Mail className="w-4 h-4 text-teal-500" />
                       <div>
-                        <p className="text-xs text-muted-foreground">Email</p>
-                        <p className="text-sm font-medium">{selectedManager.email}</p>
+                        <p className="text-[10px] text-slate-400">Email</p>
+                        <p className="text-xs font-medium text-slate-700">{selectedManager.email}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
-                      <Phone className="w-4 h-4 text-teal-400" />
+                    <div className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-50">
+                      <Phone className="w-4 h-4 text-teal-500" />
                       <div>
-                        <p className="text-xs text-muted-foreground">Phone</p>
-                        <p className="text-sm font-medium">{selectedManager.phone}</p>
+                        <p className="text-[10px] text-slate-400">Phone</p>
+                        <p className="text-xs font-medium text-slate-700">{selectedManager.phone}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
-                      <MapPin className="w-4 h-4 text-teal-400" />
+                    <div className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-50">
+                      <MapPin className="w-4 h-4 text-teal-500" />
                       <div>
-                        <p className="text-xs text-muted-foreground">Region</p>
-                        <p className="text-sm font-medium flex items-center gap-2">
-                          <span className="text-lg">{selectedManager.flag}</span>
-                          {selectedManager.region}, {selectedManager.country}
+                        <p className="text-[10px] text-slate-400">Location</p>
+                        <p className="text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                          <span>{selectedManager.flag}</span>
+                          {selectedManager.country}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-slate-100" />
 
                 {/* Section 2: Powers */}
                 <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Powers
+                  <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Permissions
                   </h3>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-1.5">
                     {salesSupportPowers.map((power, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-2 rounded-lg bg-teal-500/5">
-                        <power.icon className="w-4 h-4 text-teal-400" />
-                        <span className="text-sm text-foreground">{power.text}</span>
+                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-teal-50/50">
+                        <power.icon className="w-3.5 h-3.5 text-teal-600" />
+                        <span className="text-[11px] text-slate-600">{power.text}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-slate-100" />
 
                 {/* Section 3: Actions */}
                 <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Actions
+                  <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Quick Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewLeads}>
-                      <Users className="w-4 h-4" />
-                      View Leads
+                    <Button size="sm" className="h-8 text-xs bg-teal-500 hover:bg-teal-600 text-white gap-1.5" onClick={handleViewLeads}>
+                      <Users className="w-3.5 h-3.5" />
+                      Leads
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewTickets}>
-                      <Ticket className="w-4 h-4" />
-                      View Tickets
+                    <Button size="sm" className="h-8 text-xs bg-blue-500 hover:bg-blue-600 text-white gap-1.5" onClick={handleViewTickets}>
+                      <Ticket className="w-3.5 h-3.5" />
+                      Tickets
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleAssignTicket}>
-                      <UserCheck className="w-4 h-4" />
-                      Assign Ticket
+                    <Button variant="outline" size="sm" className="h-8 text-xs border-slate-200 gap-1.5" onClick={handleAssignTicket}>
+                      <UserCheck className="w-3.5 h-3.5" />
+                      Assign
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleCloseTicket}>
-                      <CheckCircle className="w-4 h-4" />
-                      Close Ticket
+                    <Button variant="outline" size="sm" className="h-8 text-xs border-slate-200 gap-1.5" onClick={handleCloseTicket}>
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Close
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start text-orange-400 hover:text-orange-400" onClick={handleEscalateIssue}>
-                      <ArrowUpRight className="w-4 h-4" />
-                      Escalate Issue
+                    <Button variant="outline" size="sm" className="h-8 text-xs border-orange-200 text-orange-600 hover:bg-orange-50 gap-1.5" onClick={handleEscalateIssue}>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      Escalate
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start text-red-400 hover:text-red-400" onClick={handleSuspendAccess}>
-                      <Ban className="w-4 h-4" />
-                      Suspend Access
+                    <Button variant="outline" size="sm" className="h-8 text-xs border-red-200 text-red-600 hover:bg-red-50 gap-1.5" onClick={handleSuspendAccess}>
+                      <Ban className="w-3.5 h-3.5" />
+                      Suspend
                     </Button>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-slate-100" />
 
-                {/* Section 4: Activity Log */}
+                {/* Section 4: Activity */}
                 <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Activity Log
+                  <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Recent Activity
                   </h3>
-                  <div className="space-y-2">
-                    {activityLogs.map((log) => (
-                      <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
+                  <div className="space-y-1.5">
+                    {activityLogs.slice(0, 4).map((log) => (
+                      <div key={log.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-50">
                         <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center",
-                          log.type === "ticket" && "bg-orange-500/20 text-orange-400",
-                          log.type === "lead" && "bg-blue-500/20 text-blue-400",
-                          log.type === "communication" && "bg-purple-500/20 text-purple-400",
-                          log.type === "escalation" && "bg-red-500/20 text-red-400",
-                          log.type === "report" && "bg-emerald-500/20 text-emerald-400",
+                          "w-6 h-6 rounded-full flex items-center justify-center",
+                          log.type === "ticket" && "bg-orange-100 text-orange-600",
+                          log.type === "lead" && "bg-blue-100 text-blue-600",
+                          log.type === "communication" && "bg-purple-100 text-purple-600",
+                          log.type === "escalation" && "bg-red-100 text-red-600",
+                          log.type === "report" && "bg-emerald-100 text-emerald-600",
                         )}>
-                          {log.type === "ticket" && <Ticket className="w-4 h-4" />}
-                          {log.type === "lead" && <Users className="w-4 h-4" />}
-                          {log.type === "communication" && <MessageSquare className="w-4 h-4" />}
-                          {log.type === "escalation" && <ArrowUpRight className="w-4 h-4" />}
-                          {log.type === "report" && <BarChart3 className="w-4 h-4" />}
+                          {log.type === "ticket" && <Ticket className="w-3 h-3" />}
+                          {log.type === "lead" && <Users className="w-3 h-3" />}
+                          {log.type === "communication" && <MessageSquare className="w-3 h-3" />}
+                          {log.type === "escalation" && <ArrowUpRight className="w-3 h-3" />}
+                          {log.type === "report" && <BarChart3 className="w-3 h-3" />}
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{log.action}</p>
-                          <p className="text-xs text-muted-foreground">{log.target}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-slate-700 truncate">{log.action}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{log.target}</p>
                         </div>
-                        <span className="text-xs text-muted-foreground">{log.time}</span>
+                        <span className="text-[10px] text-slate-400 whitespace-nowrap">{log.time}</span>
                       </div>
                     ))}
                   </div>
