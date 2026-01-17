@@ -12,3 +12,4 @@ export { ServerBackups } from './ServerBackups';
 export { ServerLogs } from './ServerLogs';
 export { AIActions } from './AIActions';
 export { ServerSettings } from './ServerSettings';
+export { ServerModuleContainer } from './ServerModuleContainer';
