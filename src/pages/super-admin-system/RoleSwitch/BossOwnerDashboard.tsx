@@ -388,21 +388,23 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* LOCKED: ACTION-FOCUSED KPI GRID - 12 BOXES (4→3→2→1 columns) - HEIGHT 150px FIXED */}
+        {/* LOCKED: GLOBAL BANK AREA — 12 ACTION BOXES (CONTINENT + CHANNEL VIEW) - HEIGHT 150px FIXED */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'SYSTEM HEALTH', value: '99.2%', status: 'ok', icon: Shield, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'System', urgency: 'low' },
-            { label: 'SERVER LOAD', value: '78%', status: 'warning', icon: Server, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'AI-CORE', urgency: 'medium' },
-            { label: 'CRITICAL ALERTS', value: '3', status: 'critical', icon: AlertOctagon, iconBg: '#EF444420', iconColor: '#EF4444', source: 'System', urgency: 'critical' },
-            { label: 'PENDING APPROVALS', value: '7', status: 'action', icon: Gavel, iconBg: '#2563EB20', iconColor: '#2563EB', source: 'Multi', urgency: 'high' },
-            { label: 'FAILED BUILDS', value: '2', status: 'critical', icon: Bug, iconBg: '#EF444420', iconColor: '#EF4444', source: 'CI/CD', urgency: 'high' },
-            { label: 'DEPLOY WAITING', value: '4', status: 'action', icon: Rocket, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'DevOps', urgency: 'medium' },
-            { label: 'PAYMENT PENDING', value: '₹2.4L', status: 'action', icon: CreditCard, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Finance', urgency: 'high' },
-            { label: 'EXPIRY DUE', value: '5', status: 'warning', icon: CalendarClock, iconBg: '#F9731620', iconColor: '#F97316', source: 'System', urgency: 'medium' },
-            { label: 'AI COST SPIKE', value: '+32%', status: 'warning', icon: Zap, iconBg: '#EAB30820', iconColor: '#EAB308', source: 'AI-CORE', urgency: 'medium' },
-            { label: 'OPEN ISSUES', value: '12', status: 'action', icon: AlertTriangle, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Support', urgency: 'medium' },
-            { label: 'SECURITY ALERTS', value: '1', status: 'critical', icon: ShieldAlert, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Security', urgency: 'critical' },
-            { label: 'SLA BREACH', value: '0', status: 'ok', icon: Scale, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'Compliance', urgency: 'low' },
+            // CONTINENT CONTROLS (6)
+            { label: 'AFRICA CONTROL', value: '4', subValues: ['2 Pending', '1 Critical', '1 Waiting'], status: 'action', icon: Globe2, iconBg: '#F9731620', iconColor: '#F97316', source: 'Continent', urgency: 'medium', lastUpdate: '15m ago', actions: ['review', 'approve', 'sendback'] },
+            { label: 'ASIA CONTROL', value: '7', subValues: ['4 Queue', '2 Risk', '1 SLA'], status: 'critical', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'critical', lastUpdate: '5m ago', actions: ['review', 'approve', 'suspend'] },
+            { label: 'EUROPE CONTROL', value: '3', subValues: ['2 Requests', '1 Legal'], status: 'action', icon: Globe2, iconBg: '#2563EB20', iconColor: '#2563EB', source: 'Continent', urgency: 'high', lastUpdate: '30m ago', actions: ['review', 'approve', 'escalate'] },
+            { label: 'NORTH AMERICA', value: '5', subValues: ['3 Pending', '2 Financial'], status: 'action', icon: Globe2, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'Continent', urgency: 'high', lastUpdate: '10m ago', actions: ['review', 'approve', 'reject'] },
+            { label: 'SOUTH AMERICA', value: '2', subValues: ['1 Ops', '1 Backlog'], status: 'warning', icon: Globe2, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Continent', urgency: 'medium', lastUpdate: '1h ago', actions: ['review', 'approve', 'sendback'] },
+            { label: 'MIDDLE EAST', value: '3', subValues: ['2 Security', '1 Override'], status: 'action', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'high', lastUpdate: '20m ago', actions: ['review', 'approve', 'lock'] },
+            // CHANNEL CONTROLS (6)
+            { label: 'CORE ADMIN OPS', value: '6', subValues: ['4 System', '2 Escalations'], status: 'action', icon: Shield, iconBg: '#6366F120', iconColor: '#6366F1', source: 'Global', urgency: 'high', lastUpdate: '8m ago', actions: ['approve', 'reject', 'lock'] },
+            { label: 'FRANCHISE REQUESTS', value: '8', subValues: ['5 New Apps', '3 Renewals'], status: 'action', icon: Users, iconBg: '#0EA5E920', iconColor: '#0EA5E9', source: 'Channel', urgency: 'high', lastUpdate: '12m ago', actions: ['approve', 'reject', 'review'] },
+            { label: 'RESELLER ACTIONS', value: '4', subValues: ['2 Onboard', '2 Disputes'], status: 'warning', icon: CreditCard, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'Channel', urgency: 'medium', lastUpdate: '45m ago', actions: ['approve', 'resolve', 'sendback'] },
+            { label: 'INFLUENCER CONTROL', value: '5', subValues: ['3 Partners', '2 Campaigns'], status: 'action', icon: Zap, iconBg: '#EC489920', iconColor: '#EC4899', source: 'Marketing', urgency: 'medium', lastUpdate: '25m ago', actions: ['approve', 'pause', 'reject'] },
+            { label: 'AI / SYSTEM', value: '9', subValues: ['6 AI Suggested', '3 Risk Flags'], status: 'action', icon: Brain, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'AI-CORE', urgency: 'medium', lastUpdate: '2m ago', actions: ['accept_ai', 'override', 'review'] },
+            { label: 'CRITICAL INTERRUPTS', value: '1', subValues: ['1 Emergency'], status: 'critical', icon: AlertOctagon, iconBg: '#EF444420', iconColor: '#EF4444', source: 'System', urgency: 'critical', lastUpdate: '1m ago', actions: ['stop', 'pause', 'review'] },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             const urgencyColors: Record<string, string> = {
@@ -418,17 +420,17 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                   height: '150px',
                   minHeight: '150px',
                   maxHeight: '150px',
-                  padding: '16px',
+                  padding: '14px',
                   background: '#FFFFFF',
-                  border: `1px solid ${stat.status === 'critical' ? '#FCA5A520' : '#E5E7EB'}`,
+                  border: `1px solid ${stat.status === 'critical' ? '#FCA5A540' : '#E5E7EB'}`,
                   borderRadius: '14px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                  boxShadow: stat.status === 'critical' ? '0 4px 16px rgba(239,68,68,0.12)' : '0 4px 12px rgba(0,0,0,0.06)',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
                 }}
               >
-                {/* Top Row: Label + Icon */}
+                {/* Top Row: Label + Value + Icon */}
                 <div className="flex items-start justify-between">
                   <div style={{ flex: 1, overflow: 'hidden' }}>
                     <p style={{ 
@@ -436,231 +438,101 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                       color: '#6B7280', 
                       textTransform: 'uppercase', 
                       letterSpacing: '0.05em', 
-                      fontWeight: 500, 
+                      fontWeight: 600, 
                       lineHeight: '1',
                     }}>
                       {stat.label}
                     </p>
-                    <p style={{ 
-                      fontSize: '28px', 
-                      fontWeight: 700, 
-                      color: '#111827', 
-                      marginTop: '4px', 
-                      lineHeight: '1',
-                    }}>
-                      {stat.value}
-                    </p>
-                    <p style={{ fontSize: '9px', color: '#9CA3AF', marginTop: '4px' }}>
-                      {stat.source} • <span style={{ color: urgencyColors[stat.urgency] }}>{stat.urgency.toUpperCase()}</span>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p style={{ 
+                        fontSize: '26px', 
+                        fontWeight: 700, 
+                        color: stat.status === 'critical' ? '#EF4444' : '#111827', 
+                        lineHeight: '1',
+                      }}>
+                        {stat.value}
+                      </p>
+                      <span style={{ fontSize: '9px', color: '#9CA3AF' }}>items</span>
+                    </div>
+                    {/* Sub-values summary */}
+                    <p style={{ fontSize: '9px', color: '#6B7280', marginTop: '3px', lineHeight: '1.3' }}>
+                      {stat.subValues?.join(' • ')}
                     </p>
                   </div>
-                  <div 
-                    className="flex items-center justify-center flex-shrink-0"
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '10px',
-                      background: stat.iconBg
-                    }}
-                  >
-                    <Icon style={{ width: '20px', height: '20px', color: stat.iconColor }} />
+                  <div className="flex flex-col items-end gap-1">
+                    <div 
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        background: stat.iconBg
+                      }}
+                    >
+                      <Icon style={{ width: '18px', height: '18px', color: stat.iconColor }} />
+                    </div>
+                    <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{stat.lastUpdate}</span>
                   </div>
                 </div>
                 
-                {/* Bottom Row: Action Buttons - FULL CONTROL SET */}
-                <div className="flex items-center gap-1 mt-auto" style={{ height: '28px', overflow: 'hidden' }}>
-                  {stat.status === 'action' || stat.status === 'critical' ? (
-                    <>
-                      {/* Approve */}
+                {/* Source + Urgency badge */}
+                <div className="flex items-center gap-2 mt-1">
+                  <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{stat.source}</span>
+                  <span style={{ 
+                    fontSize: '8px', 
+                    fontWeight: 600,
+                    color: urgencyColors[stat.urgency],
+                    background: `${urgencyColors[stat.urgency]}15`,
+                    padding: '2px 6px',
+                    borderRadius: '4px'
+                  }}>
+                    {stat.urgency.toUpperCase()}
+                  </span>
+                </div>
+                
+                {/* Bottom Row: Action Buttons - Dynamic based on actions array */}
+                <div className="flex items-center gap-1 mt-auto" style={{ height: '24px', overflow: 'hidden' }}>
+                  {stat.actions?.map((action: string) => {
+                    const actionConfig: Record<string, { icon: string; color: string; bg: string; handler: () => void; title: string }> = {
+                      review: { icon: '👁', color: '#2563EB', bg: '#2563EB15', handler: () => handleKpiReview(stat.label, stat.source), title: 'Review' },
+                      approve: { icon: '✓', color: '#22C55E', bg: '#22C55E15', handler: () => handleKpiApprove(stat.label), title: 'Approve' },
+                      reject: { icon: '✕', color: '#EF4444', bg: '#EF444415', handler: () => { setSelectedKpiForReject(stat.label); setShowRejectDialog(true); }, title: 'Reject' },
+                      sendback: { icon: '↩', color: '#6B7280', bg: '#6B728015', handler: () => handleKpiSendBack(stat.label), title: 'Send Back' },
+                      suspend: { icon: '⏸', color: '#F59E0B', bg: '#F59E0B15', handler: () => handleKpiSuspend(stat.label), title: 'Suspend' },
+                      escalate: { icon: '⬆', color: '#8B5CF6', bg: '#8B5CF615', handler: () => { logAction('escalate', stat.label); toast.warning(`⬆ Escalated: ${stat.label}`); }, title: 'Escalate' },
+                      lock: { icon: '🔒', color: '#EF4444', bg: '#EF444415', handler: () => { logAction('lock', stat.label); toast.error(`🔒 Locked: ${stat.label}`); }, title: 'Lock' },
+                      resolve: { icon: '✓', color: '#22C55E', bg: '#22C55E15', handler: () => { logAction('resolve', stat.label); toast.success(`✓ Resolved: ${stat.label}`); }, title: 'Resolve' },
+                      pause: { icon: '⏸', color: '#F59E0B', bg: '#F59E0B15', handler: () => handleQuickPause(stat.label), title: 'Pause' },
+                      accept_ai: { icon: '🤖', color: '#8B5CF6', bg: '#8B5CF615', handler: () => { logAction('accept_ai', stat.label); toast.success(`🤖 AI Decision Accepted: ${stat.label}`); }, title: 'Accept AI' },
+                      override: { icon: '⚡', color: '#F97316', bg: '#F9731615', handler: () => { logAction('override', stat.label); toast.warning(`⚡ Override Applied: ${stat.label}`); }, title: 'Override' },
+                      stop: { icon: '⏹', color: '#EF4444', bg: '#EF444415', handler: () => handleQuickStop(stat.label), title: 'STOP' },
+                    };
+                    const config = actionConfig[action];
+                    if (!config) return null;
+                    return (
                       <button 
-                        onClick={() => handleKpiApprove(stat.label)}
-                        title="Approve"
+                        key={action}
+                        onClick={config.handler}
+                        title={config.title}
                         style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
+                          height: '22px', 
+                          padding: '0 8px', 
                           fontSize: '9px', 
                           fontWeight: 600,
-                          background: '#22C55E15', 
-                          color: '#22C55E', 
+                          background: config.bg, 
+                          color: config.color, 
                           border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px'
                         }}
                       >
-                        ✓
+                        {config.icon}
                       </button>
-                      {/* Reject */}
-                      <button 
-                        onClick={() => {
-                          setSelectedKpiForReject(stat.label);
-                          setShowRejectDialog(true);
-                        }}
-                        title="Reject"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#EF444415', 
-                          color: '#EF4444', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Suspend */}
-                      <button 
-                        onClick={() => handleKpiSuspend(stat.label)}
-                        title="Suspend"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#F59E0B15', 
-                          color: '#F59E0B', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ⏸
-                      </button>
-                      {/* Review */}
-                      <button 
-                        onClick={() => handleKpiReview(stat.label, stat.source)}
-                        title="Review Details"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#2563EB15', 
-                          color: '#2563EB', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        👁
-                      </button>
-                      {/* Send Back */}
-                      <button 
-                        onClick={() => handleKpiSendBack(stat.label)}
-                        title="Send Back"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#6B728015', 
-                          color: '#6B7280', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ↩
-                      </button>
-                    </>
-                  ) : stat.status === 'warning' ? (
-                    <>
-                      {/* Run/Resume */}
-                      <button 
-                        onClick={() => handleQuickRun(stat.label)}
-                        title="Run/Resume"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#22C55E15', 
-                          color: '#22C55E', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ▶
-                      </button>
-                      {/* Pause */}
-                      <button 
-                        onClick={() => handleQuickPause(stat.label)}
-                        title="Pause"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#F59E0B15', 
-                          color: '#F59E0B', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ⏸
-                      </button>
-                      {/* Stop */}
-                      <button 
-                        onClick={() => handleQuickStop(stat.label)}
-                        title="Stop"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#EF444415', 
-                          color: '#EF4444', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ⏹
-                      </button>
-                      {/* Restart */}
-                      <button 
-                        onClick={() => handleQuickRestart(stat.label)}
-                        title="Restart"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#2563EB15', 
-                          color: '#2563EB', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        🔁
-                      </button>
-                      {/* Force Review */}
-                      <button 
-                        onClick={() => handleForceReview(stat.label)}
-                        title="Force Review"
-                        style={{ 
-                          height: '24px', 
-                          padding: '0 6px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: '#8B5CF615', 
-                          color: '#8B5CF6', 
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ⚠
-                      </button>
-                    </>
-                  ) : (
-                    <span style={{ fontSize: '9px', color: '#22C55E', fontWeight: 500 }}>● OK</span>
-                  )}
+                    );
+                  })}
                 </div>
               </div>
             );
