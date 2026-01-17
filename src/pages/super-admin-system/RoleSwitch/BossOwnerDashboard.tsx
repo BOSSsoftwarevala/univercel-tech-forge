@@ -9,7 +9,7 @@ import {
   CalendarClock, Zap, Bug, Rocket, ShieldAlert, Scale,
   Cpu, Radio, MoreHorizontal, Send, Brain, Lightbulb, Building2
 } from "lucide-react";
-import { PendingRequestsBanner } from "@/components/shared/PendingRequestsBanner";
+// PendingRequestsBanner removed - not shown on Boss/Owner dashboard
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

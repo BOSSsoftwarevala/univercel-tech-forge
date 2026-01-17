@@ -822,8 +822,9 @@ const RoleSwitchSidebar = ({
                             }}
                             className={cn(
                               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                              // FIX: Active state uses ONLY border indicator, no bg fill
                               isActive
-                                ? "bg-white/20 text-white border-l-2 border-white"
+                                ? "text-white border-l-2 border-white"
                                 : "text-white/90 hover:text-white hover:bg-white/10"
                             )}
                           >

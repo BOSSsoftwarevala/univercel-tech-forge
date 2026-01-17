@@ -452,8 +452,8 @@ const RoleSwitchDashboard = () => {
           onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
         />
 
-        {/* Dynamic Role View */}
-        <main className="flex-1 overflow-auto">
+        {/* Dynamic Role View - FORCE FIX: height 100%, overflow auto, no blank areas */}
+        <main className="flex-1 overflow-auto" style={{ minHeight: 0, height: '100%' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeRole}
@@ -461,7 +461,8 @@ const RoleSwitchDashboard = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className="h-full"
+              className="h-full min-h-full"
+              style={{ height: '100%', minHeight: '100%' }}
             >
               <ErrorBoundary
                 onError={(error) => {
