@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { useEnterpriseAudit } from '@/hooks/useEnterpriseAudit';
-import { toast } from 'sonner';
 
 interface SupportManager {
   id: string;
