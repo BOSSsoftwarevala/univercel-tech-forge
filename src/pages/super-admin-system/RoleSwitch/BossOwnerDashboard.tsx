@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Crown, Shield, Lock, Archive, AlertTriangle, Users, Globe2,
   Key, Activity, FileText, Settings, Gavel, Eye, Trash2, Power,
@@ -23,8 +23,10 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCEOSuggestions } from "@/hooks/useCEOSuggestions";
+import { useDashboardContext, type SelectedControlCard } from "@/hooks/useDashboardContext";
 import { FranchiseIntelligenceCenter } from "@/components/franchise-intelligence";
 import { GlobalNetworkMap } from "@/components/boss-panel/sections/GlobalNetworkMap";
+import { cn } from "@/lib/utils";
 // BRAND THEME: Blue Primary + Red Accent (from Software Vala Logo)
 // All colors use CSS variables for consistency across the app
 const COLORS = {
@@ -95,6 +97,9 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const [selectedKpiForReject, setSelectedKpiForReject] = useState<string | null>(null);
   const { user } = useAuth();
   const { suggestions, acknowledgeSuggestion } = useCEOSuggestions();
+  
+  // ENTERPRISE: Global context for selected card
+  const { selectedCard, setSelectedCard, clearSelection } = useDashboardContext();
   
   // Map sidebar navigation to internal tabs
   const getTabFromNav = (nav?: string): string => {
@@ -392,54 +397,102 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* LOCKED: GLOBAL BANK AREA — 12 ACTION BOXES (CONTINENT + CHANNEL VIEW) - HEIGHT 150px FIXED */}
+        {/* ENTERPRISE: GLOBAL CONTROL CARDS — STATUS ONLY (NO ACTIONS) */}
+        {/* RULE: Cards = Status Display | Sidebar = Actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
           {[
             // CONTINENT CONTROLS (6)
-            { label: 'AFRICA CONTROL', value: '4', subValues: ['2 Pending', '1 Critical', '1 Waiting'], status: 'action', icon: Globe2, iconBg: '#F9731620', iconColor: '#F97316', source: 'Continent', urgency: 'medium', lastUpdate: '15m ago', actions: ['review', 'approve', 'sendback'] },
-            { label: 'ASIA CONTROL', value: '7', subValues: ['4 Queue', '2 Risk', '1 SLA'], status: 'critical', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'critical', lastUpdate: '5m ago', actions: ['review', 'approve', 'suspend'] },
-            { label: 'EUROPE CONTROL', value: '3', subValues: ['2 Requests', '1 Legal'], status: 'action', icon: Globe2, iconBg: '#2563EB20', iconColor: '#2563EB', source: 'Continent', urgency: 'high', lastUpdate: '30m ago', actions: ['review', 'approve', 'escalate'] },
-            { label: 'NORTH AMERICA', value: '5', subValues: ['3 Pending', '2 Financial'], status: 'action', icon: Globe2, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'Continent', urgency: 'high', lastUpdate: '10m ago', actions: ['review', 'approve', 'reject'] },
-            { label: 'SOUTH AMERICA', value: '2', subValues: ['1 Ops', '1 Backlog'], status: 'warning', icon: Globe2, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Continent', urgency: 'medium', lastUpdate: '1h ago', actions: ['review', 'approve', 'sendback'] },
-            { label: 'MIDDLE EAST', value: '3', subValues: ['2 Security', '1 Override'], status: 'action', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'high', lastUpdate: '20m ago', actions: ['review', 'approve', 'lock'] },
+            { id: 'africa', label: 'AFRICA CONTROL', value: '4', subValues: ['2 Pending', '1 Critical', '1 Waiting'], status: 'action', icon: Globe2, iconBg: '#F9731620', iconColor: '#F97316', source: 'Continent', urgency: 'medium' as const, lastUpdate: '15m ago', actions: ['review', 'approve', 'sendback'] },
+            { id: 'asia', label: 'ASIA CONTROL', value: '7', subValues: ['4 Queue', '2 Risk', '1 SLA'], status: 'critical', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'critical' as const, lastUpdate: '5m ago', actions: ['review', 'approve', 'suspend'] },
+            { id: 'europe', label: 'EUROPE CONTROL', value: '3', subValues: ['2 Requests', '1 Legal'], status: 'action', icon: Globe2, iconBg: '#2563EB20', iconColor: '#2563EB', source: 'Continent', urgency: 'high' as const, lastUpdate: '30m ago', actions: ['review', 'approve', 'escalate'] },
+            { id: 'north_america', label: 'NORTH AMERICA', value: '5', subValues: ['3 Pending', '2 Financial'], status: 'action', icon: Globe2, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'Continent', urgency: 'high' as const, lastUpdate: '10m ago', actions: ['review', 'approve', 'reject'] },
+            { id: 'south_america', label: 'SOUTH AMERICA', value: '2', subValues: ['1 Ops', '1 Backlog'], status: 'warning', icon: Globe2, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Continent', urgency: 'medium' as const, lastUpdate: '1h ago', actions: ['review', 'approve', 'sendback'] },
+            { id: 'middle_east', label: 'MIDDLE EAST', value: '3', subValues: ['2 Security', '1 Override'], status: 'action', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'high' as const, lastUpdate: '20m ago', actions: ['review', 'approve', 'lock'] },
             // CHANNEL CONTROLS (6)
-            { label: 'CORE ADMIN OPS', value: '6', subValues: ['4 System', '2 Escalations'], status: 'action', icon: Shield, iconBg: '#6366F120', iconColor: '#6366F1', source: 'Global', urgency: 'high', lastUpdate: '8m ago', actions: ['approve', 'reject', 'lock'] },
-            { label: 'FRANCHISE REQUESTS', value: '8', subValues: ['5 New Apps', '3 Renewals'], status: 'action', icon: Users, iconBg: '#0EA5E920', iconColor: '#0EA5E9', source: 'Channel', urgency: 'high', lastUpdate: '12m ago', actions: ['approve', 'reject', 'review'] },
-            { label: 'RESELLER ACTIONS', value: '4', subValues: ['2 Onboard', '2 Disputes'], status: 'warning', icon: CreditCard, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'Channel', urgency: 'medium', lastUpdate: '45m ago', actions: ['approve', 'resolve', 'sendback'] },
-            { label: 'INFLUENCER CONTROL', value: '5', subValues: ['3 Partners', '2 Campaigns'], status: 'action', icon: Zap, iconBg: '#EC489920', iconColor: '#EC4899', source: 'Marketing', urgency: 'medium', lastUpdate: '25m ago', actions: ['approve', 'pause', 'reject'] },
-            { label: 'AI / SYSTEM', value: '9', subValues: ['6 AI Suggested', '3 Risk Flags'], status: 'action', icon: Brain, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'AI-CORE', urgency: 'medium', lastUpdate: '2m ago', actions: ['accept_ai', 'override', 'review'] },
-            { label: 'CRITICAL INTERRUPTS', value: '1', subValues: ['1 Emergency'], status: 'critical', icon: AlertOctagon, iconBg: '#EF444420', iconColor: '#EF4444', source: 'System', urgency: 'critical', lastUpdate: '1m ago', actions: ['stop', 'pause', 'review'] },
+            { id: 'core_admin', label: 'CORE ADMIN OPS', value: '6', subValues: ['4 System', '2 Escalations'], status: 'action', icon: Shield, iconBg: '#6366F120', iconColor: '#6366F1', source: 'Global', urgency: 'high' as const, lastUpdate: '8m ago', actions: ['approve', 'reject', 'lock'] },
+            { id: 'franchise', label: 'FRANCHISE REQUESTS', value: '8', subValues: ['5 New Apps', '3 Renewals'], status: 'action', icon: Users, iconBg: '#0EA5E920', iconColor: '#0EA5E9', source: 'Channel', urgency: 'high' as const, lastUpdate: '12m ago', actions: ['approve', 'reject', 'review'] },
+            { id: 'reseller', label: 'RESELLER ACTIONS', value: '4', subValues: ['2 Onboard', '2 Disputes'], status: 'warning', icon: CreditCard, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'Channel', urgency: 'medium' as const, lastUpdate: '45m ago', actions: ['approve', 'resolve', 'sendback'] },
+            { id: 'influencer', label: 'INFLUENCER CONTROL', value: '5', subValues: ['3 Partners', '2 Campaigns'], status: 'action', icon: Zap, iconBg: '#EC489920', iconColor: '#EC4899', source: 'Marketing', urgency: 'medium' as const, lastUpdate: '25m ago', actions: ['approve', 'pause', 'reject'] },
+            { id: 'ai_system', label: 'AI / SYSTEM', value: '9', subValues: ['6 AI Suggested', '3 Risk Flags'], status: 'action', icon: Brain, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'AI-CORE', urgency: 'medium' as const, lastUpdate: '2m ago', actions: ['accept_ai', 'override', 'review'] },
+            { id: 'critical_interrupts', label: 'CRITICAL INTERRUPTS', value: '1', subValues: ['1 Emergency'], status: 'critical', icon: AlertOctagon, iconBg: '#EF444420', iconColor: '#EF4444', source: 'System', urgency: 'critical' as const, lastUpdate: '1m ago', actions: ['stop', 'pause', 'review'] },
           ].map((stat, idx) => {
             const Icon = stat.icon;
+            const isSelected = selectedCard?.id === stat.id;
             const urgencyColors: Record<string, string> = {
               critical: '#EF4444',
               high: '#F97316',
               medium: '#EAB308',
               low: '#22C55E'
             };
+            
+            // Handle card click - set context for sidebar actions
+            const handleCardClick = () => {
+              const cardData: SelectedControlCard = {
+                id: stat.id,
+                label: stat.label,
+                value: stat.value,
+                severity: stat.urgency,
+                source: stat.source,
+                subValues: stat.subValues,
+                lastUpdate: stat.lastUpdate,
+                actions: stat.actions,
+              };
+              setSelectedCard(isSelected ? null : cardData);
+              if (!isSelected) {
+                toast.info(`Selected: ${stat.label}`, { 
+                  description: 'Use sidebar actions to manage this item',
+                  duration: 2000
+                });
+              }
+            };
+            
             return (
-              <div 
-                key={idx} 
+              <motion.div 
+                key={stat.id}
+                onClick={handleCardClick}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className={cn(
+                  "cursor-pointer transition-all duration-200",
+                  isSelected && "ring-2 ring-blue-500 ring-offset-2"
+                )}
                 style={{
-                  height: '150px',
-                  minHeight: '150px',
-                  maxHeight: '150px',
+                  height: '130px',
+                  minHeight: '130px',
+                  maxHeight: '130px',
                   padding: '14px',
-                  background: '#FFFFFF',
-                  border: `1px solid ${stat.status === 'critical' ? '#FCA5A540' : '#E5E7EB'}`,
+                  background: isSelected ? '#F0F9FF' : '#FFFFFF',
+                  border: `2px solid ${isSelected ? '#3B82F6' : stat.status === 'critical' ? '#FCA5A540' : '#E5E7EB'}`,
                   borderRadius: '14px',
-                  boxShadow: stat.status === 'critical' ? '0 4px 16px rgba(239,68,68,0.12)' : '0 4px 12px rgba(0,0,0,0.06)',
+                  boxShadow: isSelected 
+                    ? '0 8px 24px rgba(59,130,246,0.2)' 
+                    : stat.status === 'critical' 
+                      ? '0 4px 16px rgba(239,68,68,0.12)' 
+                      : '0 4px 12px rgba(0,0,0,0.06)',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
+                  position: 'relative',
                 }}
               >
+                {/* Live Pulse Indicator */}
+                <div 
+                  className="absolute top-3 right-3"
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: stat.status === 'critical' ? '#EF4444' : '#22C55E',
+                    animation: 'pulse 2s infinite',
+                  }}
+                />
+                
                 {/* Top Row: Label + Value + Icon */}
                 <div className="flex items-start justify-between">
                   <div style={{ flex: 1, overflow: 'hidden' }}>
                     <p style={{ 
                       fontSize: '10px', 
-                      color: '#6B7280', 
+                      color: isSelected ? '#1E40AF' : '#6B7280', 
                       textTransform: 'uppercase', 
                       letterSpacing: '0.05em', 
                       fontWeight: 600, 
@@ -449,17 +502,17 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     </p>
                     <div className="flex items-baseline gap-2 mt-1">
                       <p style={{ 
-                        fontSize: '26px', 
+                        fontSize: '28px', 
                         fontWeight: 700, 
-                        color: stat.status === 'critical' ? '#EF4444' : '#111827', 
+                        color: stat.status === 'critical' ? '#EF4444' : isSelected ? '#1E40AF' : '#111827', 
                         lineHeight: '1',
                       }}>
                         {stat.value}
                       </p>
-                      <span style={{ fontSize: '9px', color: '#9CA3AF' }}>items</span>
+                      <span style={{ fontSize: '10px', color: '#9CA3AF' }}>items</span>
                     </div>
                     {/* Sub-values summary */}
-                    <p style={{ fontSize: '9px', color: '#6B7280', marginTop: '3px', lineHeight: '1.3' }}>
+                    <p style={{ fontSize: '9px', color: '#6B7280', marginTop: '4px', lineHeight: '1.4' }}>
                       {stat.subValues?.join(' • ')}
                     </p>
                   </div>
@@ -475,73 +528,42 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     >
                       <Icon style={{ width: '18px', height: '18px', color: stat.iconColor }} />
                     </div>
-                    <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{stat.lastUpdate}</span>
                   </div>
                 </div>
                 
-                {/* Source + Urgency badge */}
-                <div className="flex items-center gap-2 mt-1">
-                  <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{stat.source}</span>
-                  <span style={{ 
-                    fontSize: '8px', 
-                    fontWeight: 600,
-                    color: urgencyColors[stat.urgency],
-                    background: `${urgencyColors[stat.urgency]}15`,
-                    padding: '2px 6px',
-                    borderRadius: '4px'
-                  }}>
-                    {stat.urgency.toUpperCase()}
-                  </span>
+                {/* Bottom Row: Source + Urgency + Last Update */}
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontSize: '9px', color: '#9CA3AF' }}>{stat.source}</span>
+                    <span style={{ 
+                      fontSize: '8px', 
+                      fontWeight: 600,
+                      color: urgencyColors[stat.urgency],
+                      background: `${urgencyColors[stat.urgency]}15`,
+                      padding: '2px 6px',
+                      borderRadius: '4px'
+                    }}>
+                      {stat.urgency.toUpperCase()}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{stat.lastUpdate}</span>
                 </div>
                 
-                {/* Bottom Row: Action Buttons - Dynamic based on actions array */}
-                <div className="flex items-center gap-1 mt-auto" style={{ height: '24px', overflow: 'hidden' }}>
-                  {stat.actions?.map((action: string) => {
-                    const actionConfig: Record<string, { icon: string; color: string; bg: string; handler: () => void; title: string }> = {
-                      review: { icon: '👁', color: '#2563EB', bg: '#2563EB15', handler: () => handleKpiReview(stat.label, stat.source), title: 'Review' },
-                      approve: { icon: '✓', color: '#22C55E', bg: '#22C55E15', handler: () => handleKpiApprove(stat.label), title: 'Approve' },
-                      reject: { icon: '✕', color: '#EF4444', bg: '#EF444415', handler: () => { setSelectedKpiForReject(stat.label); setShowRejectDialog(true); }, title: 'Reject' },
-                      sendback: { icon: '↩', color: '#6B7280', bg: '#6B728015', handler: () => handleKpiSendBack(stat.label), title: 'Send Back' },
-                      suspend: { icon: '⏸', color: '#F59E0B', bg: '#F59E0B15', handler: () => handleKpiSuspend(stat.label), title: 'Suspend' },
-                      escalate: { icon: '⬆', color: '#8B5CF6', bg: '#8B5CF615', handler: () => { logAction('escalate', stat.label); toast.warning(`⬆ Escalated: ${stat.label}`); }, title: 'Escalate' },
-                      lock: { icon: '🔒', color: '#EF4444', bg: '#EF444415', handler: () => { logAction('lock', stat.label); toast.error(`🔒 Locked: ${stat.label}`); }, title: 'Lock' },
-                      resolve: { icon: '✓', color: '#22C55E', bg: '#22C55E15', handler: () => { logAction('resolve', stat.label); toast.success(`✓ Resolved: ${stat.label}`); }, title: 'Resolve' },
-                      pause: { icon: '⏸', color: '#F59E0B', bg: '#F59E0B15', handler: () => handleQuickPause(stat.label), title: 'Pause' },
-                      accept_ai: { icon: '🤖', color: '#8B5CF6', bg: '#8B5CF615', handler: () => { logAction('accept_ai', stat.label); toast.success(`🤖 AI Decision Accepted: ${stat.label}`); }, title: 'Accept AI' },
-                      override: { icon: '⚡', color: '#F97316', bg: '#F9731615', handler: () => { logAction('override', stat.label); toast.warning(`⚡ Override Applied: ${stat.label}`); }, title: 'Override' },
-                      stop: { icon: '⏹', color: '#EF4444', bg: '#EF444415', handler: () => handleQuickStop(stat.label), title: 'STOP' },
-                    };
-                    const config = actionConfig[action];
-                    if (!config) return null;
-                    return (
-                      <button 
-                        key={action}
-                        onClick={config.handler}
-                        title={config.title}
-                        style={{ 
-                          height: '22px', 
-                          padding: '0 8px', 
-                          fontSize: '9px', 
-                          fontWeight: 600,
-                          background: config.bg, 
-                          color: config.color, 
-                          border: 'none',
-                          borderRadius: '5px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '3px'
-                        }}
-                      >
-                        {config.icon}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                {/* Selected indicator overlay */}
+                {isSelected && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(59,130,246,0.05) 0%, transparent 100%)',
+                      borderRadius: '12px',
+                    }}
+                  />
+                )}
+              </motion.div>
             );
           })}
         </div>
+
 
         {/* LOCKED: Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

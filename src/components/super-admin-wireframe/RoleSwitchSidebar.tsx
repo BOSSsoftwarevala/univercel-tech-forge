@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
@@ -12,13 +12,16 @@ import {
   Monitor, Zap, Lock, Key, Gavel, FileCheck, BookOpen,
   Bug, GitBranch, Rocket, Terminal, AlertTriangle, Radio,
   Megaphone, Image, Share2, BarChart, LineChart, Palette, Ticket,
-  Flag, Box, ShoppingCart, Eye, Play, Layers
+  Flag, Box, ShoppingCart, Eye, Play, Layers,
+  CheckCircle, XCircle, ArrowUpRight, Pause, Archive, Ban
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useDashboardContext } from "@/hooks/useDashboardContext";
+import { toast } from "sonner";
 
 
 export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
@@ -437,6 +440,137 @@ const roleNavItems: Record<ActiveRole, Array<{ id: string; label: string; icon: 
   ],
 };
 
+// ============================================
+// ENTERPRISE: Global Actions Panel Component
+// Context-aware actions for selected cards
+// ============================================
+const GlobalActionsPanel = ({ collapsed }: { collapsed: boolean }) => {
+  const { selectedCard, clearSelection } = useDashboardContext();
+  
+  // Action handlers
+  const handleAction = useCallback((actionType: string) => {
+    if (!selectedCard) return;
+    
+    const actionMessages: Record<string, { title: string; type: 'success' | 'error' | 'warning' | 'info' }> = {
+      approve: { title: `✓ Approved: ${selectedCard.label}`, type: 'success' },
+      reject: { title: `✕ Rejected: ${selectedCard.label}`, type: 'error' },
+      override: { title: `⚡ Override Applied: ${selectedCard.label}`, type: 'warning' },
+      assign: { title: `👤 Assigned: ${selectedCard.label}`, type: 'info' },
+      lock: { title: `🔒 Locked: ${selectedCard.label}`, type: 'error' },
+      freeze: { title: `❄️ Frozen: ${selectedCard.label}`, type: 'warning' },
+      escalate: { title: `⬆ Escalated: ${selectedCard.label}`, type: 'warning' },
+      archive: { title: `📦 Archived: ${selectedCard.label}`, type: 'info' },
+    };
+    
+    const msg = actionMessages[actionType] || { title: `Action: ${actionType}`, type: 'info' as const };
+    toast[msg.type](msg.title, { description: `Applied to ${selectedCard.value} items` });
+    clearSelection();
+  }, [selectedCard, clearSelection]);
+
+  const actions = [
+    { id: 'approve', label: 'Approve', icon: CheckCircle, color: 'bg-emerald-500 hover:bg-emerald-600', textColor: 'text-white' },
+    { id: 'reject', label: 'Reject', icon: XCircle, color: 'bg-red-500 hover:bg-red-600', textColor: 'text-white' },
+    { id: 'override', label: 'Override', icon: Zap, color: 'bg-orange-500 hover:bg-orange-600', textColor: 'text-white' },
+    { id: 'assign', label: 'Assign', icon: UserCheck, color: 'bg-blue-500 hover:bg-blue-600', textColor: 'text-white' },
+    { id: 'lock', label: 'Lock', icon: Lock, color: 'bg-slate-600 hover:bg-slate-700', textColor: 'text-white' },
+    { id: 'freeze', label: 'Freeze', icon: Pause, color: 'bg-cyan-500 hover:bg-cyan-600', textColor: 'text-white' },
+    { id: 'escalate', label: 'Escalate', icon: ArrowUpRight, color: 'bg-purple-500 hover:bg-purple-600', textColor: 'text-white' },
+    { id: 'archive', label: 'Archive', icon: Archive, color: 'bg-amber-500 hover:bg-amber-600', textColor: 'text-white' },
+  ];
+
+  if (collapsed) {
+    return (
+      <div className="p-2 border-t border-white/20">
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <div className={cn(
+              "w-full h-8 rounded-lg flex items-center justify-center",
+              selectedCard ? "bg-emerald-500/30" : "bg-white/10"
+            )}>
+              <Zap className={cn("w-4 h-4", selectedCard ? "text-emerald-300" : "text-white/50")} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="right" sideOffset={10}>
+            {selectedCard ? `Actions for: ${selectedCard.label}` : 'Select a card first'}
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-t border-white/20 bg-white/5">
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Zap className="w-3.5 h-3.5 text-amber-300" />
+          <span className="text-[10px] font-semibold text-white/80 uppercase tracking-wider">
+            Global Actions
+          </span>
+        </div>
+        {selectedCard && (
+          <button 
+            onClick={clearSelection}
+            className="text-[9px] text-white/60 hover:text-white/90 transition-colors"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Context Info */}
+      {selectedCard ? (
+        <div className="px-3 pb-2">
+          <div className="p-2 rounded-lg bg-blue-500/20 border border-blue-400/30">
+            <p className="text-[10px] text-blue-200 font-medium truncate">{selectedCard.label}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[9px] text-white/70">{selectedCard.value} items</span>
+              <span className={cn(
+                "text-[8px] font-semibold px-1.5 py-0.5 rounded",
+                selectedCard.severity === 'critical' ? 'bg-red-500/30 text-red-300' :
+                selectedCard.severity === 'high' ? 'bg-orange-500/30 text-orange-300' :
+                selectedCard.severity === 'medium' ? 'bg-yellow-500/30 text-yellow-300' :
+                'bg-green-500/30 text-green-300'
+              )}>
+                {selectedCard.severity.toUpperCase()}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="px-3 pb-2">
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10">
+            <p className="text-[9px] text-white/50 text-center">Select a card to enable actions</p>
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons Grid */}
+      <div className="px-3 pb-3 grid grid-cols-2 gap-1.5">
+        {actions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <button
+              key={action.id}
+              onClick={() => handleAction(action.id)}
+              disabled={!selectedCard}
+              className={cn(
+                "flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[10px] font-medium transition-all",
+                selectedCard 
+                  ? `${action.color} ${action.textColor} shadow-sm`
+                  : "bg-white/10 text-white/40 cursor-not-allowed"
+              )}
+            >
+              <Icon className="w-3 h-3" />
+              {action.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const RoleSwitchSidebar = ({
   activeRole,
   onRoleChange,
@@ -775,6 +909,8 @@ const RoleSwitchSidebar = ({
         )}
       </AnimatePresence>
 
+      {/* ENTERPRISE: Global Actions Panel - Context Aware */}
+      <GlobalActionsPanel collapsed={collapsed} />
 
       {/* Footer */}
       <div className="p-3 border-t border-white/20 space-y-2">
