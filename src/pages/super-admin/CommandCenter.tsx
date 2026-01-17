@@ -419,16 +419,16 @@ const categories: Category[] = [
 // CATEGORY CARD COMPONENT (Expandable 4-Level)
 // ==========================================
 
-// Premium gradient color palette for cards
+// Premium gradient color palette for cards - ULTRA VIBRANT
 const gradientPalettes = [
-  'from-violet-400 to-purple-500',
-  'from-sky-400 to-blue-500', 
-  'from-emerald-400 to-teal-500',
-  'from-rose-400 to-pink-500',
-  'from-amber-400 to-orange-500',
-  'from-indigo-400 to-violet-500',
-  'from-teal-400 to-cyan-500',
-  'from-fuchsia-400 to-pink-500',
+  'from-violet-500 via-purple-500 to-fuchsia-500',
+  'from-blue-500 via-cyan-400 to-teal-400',
+  'from-emerald-500 via-green-400 to-teal-400',
+  'from-rose-500 via-pink-500 to-fuchsia-400',
+  'from-amber-500 via-orange-400 to-yellow-400',
+  'from-indigo-500 via-purple-500 to-pink-400',
+  'from-cyan-500 via-blue-400 to-indigo-500',
+  'from-pink-500 via-rose-400 to-red-400',
 ];
 
 function CategoryCard({ category, index }: { category: Category; index: number }) {
@@ -452,41 +452,43 @@ function CategoryCard({ category, index }: { category: Category; index: number }
 
   return (
     <div className="group relative">
-      {/* Card with soft gradient background */}
+      {/* Premium Card with vivid gradient */}
       <div 
         className={cn(
           "relative rounded-2xl overflow-hidden transition-all duration-300",
-          "shadow-lg hover:shadow-xl hover:scale-[1.02]",
+          "shadow-lg hover:shadow-2xl hover:-translate-y-1",
           "bg-gradient-to-br",
           gradient
         )}
       >
-        {/* Subtle glass overlay */}
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+        {/* Glossy overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/10" />
         
         {/* Card Content */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="relative w-full flex items-center gap-4 p-5 text-left"
         >
-          {/* Icon Container */}
-          <div className="w-12 h-12 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-inner">
-            <Icon className="h-6 w-6 text-white drop-shadow-sm" />
+          {/* Icon Container - Glass effect */}
+          <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20">
+            <Icon className="h-7 w-7 text-white drop-shadow-md" />
           </div>
           
           {/* Text */}
           <div className="flex-1">
-            <h3 className="font-semibold text-white text-lg drop-shadow-sm">{category.name}</h3>
-            <p className="text-white/80 text-sm">{category.subs.length} module{category.subs.length > 1 ? 's' : ''}</p>
+            <h3 className="font-bold text-white text-lg drop-shadow-sm tracking-tight">{category.name}</h3>
+            <p className="text-white/80 text-sm font-medium">{category.subs.length} module{category.subs.length > 1 ? 's' : ''}</p>
           </div>
           
           {/* Chevron */}
-          <ChevronDown 
-            className={cn(
-              "h-5 w-5 text-white/80 transition-transform duration-200",
-              isExpanded && "rotate-180"
-            )} 
-          />
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <ChevronDown 
+              className={cn(
+                "h-5 w-5 text-white transition-transform duration-300",
+                isExpanded && "rotate-180"
+              )} 
+            />
+          </div>
         </button>
 
         {/* Expanded Content */}
@@ -501,16 +503,16 @@ function CategoryCard({ category, index }: { category: Category; index: number }
             >
               <div className="px-5 pb-5 space-y-2">
                 {category.subs.map((sub) => (
-                  <div key={sub.name} className="border-l-2 border-white/30 pl-4">
+                  <div key={sub.name} className="border-l-2 border-white/40 pl-4">
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleSub(sub.name); }}
-                      className="w-full flex items-center gap-2 py-2 text-left hover:bg-white/10 rounded-lg px-2 -ml-2 transition-colors group/sub"
+                      className="w-full flex items-center gap-2 py-2 text-left hover:bg-white/15 rounded-lg px-2 -ml-2 transition-colors group/sub"
                     >
                       <ChevronRight className={cn(
                         "h-4 w-4 text-white/80 transition-transform",
                         expandedSubs.includes(sub.name) && "rotate-90"
                       )} />
-                      <span className="text-sm font-medium text-white">{sub.name}</span>
+                      <span className="text-sm font-semibold text-white">{sub.name}</span>
                     </button>
 
                     {/* Micros */}
@@ -526,7 +528,7 @@ function CategoryCard({ category, index }: { category: Category; index: number }
                             <div key={micro.name}>
                               <button
                                 onClick={(e) => { e.stopPropagation(); toggleMicro(micro.name); }}
-                                className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-white/10 rounded px-2 transition-colors"
+                                className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-white/15 rounded px-2 transition-colors"
                               >
                                 <ChevronRight className={cn(
                                   "h-3 w-3 text-white/70 transition-transform",
@@ -547,7 +549,7 @@ function CategoryCard({ category, index }: { category: Category; index: number }
                                     {micro.nanos.map((nano) => (
                                       <div
                                         key={nano.name}
-                                        className="text-xs text-white/80 py-1 px-2 rounded bg-white/10 hover:bg-white/20 cursor-pointer transition-colors"
+                                        className="text-xs text-white/90 py-1.5 px-3 rounded-lg bg-white/15 hover:bg-white/25 cursor-pointer transition-colors font-medium"
                                       >
                                         {nano.name}
                                       </div>
@@ -573,8 +575,16 @@ function CategoryCard({ category, index }: { category: Category; index: number }
 
 
 // ==========================================
-// HEADER STAT CARD
+// HEADER STAT CARD - ULTRA PREMIUM
 // ==========================================
+
+const statGradients = [
+  'from-violet-500 to-purple-600',
+  'from-blue-500 to-cyan-500',
+  'from-emerald-500 to-teal-500',
+  'from-rose-500 to-pink-500',
+  'from-amber-500 to-orange-500',
+];
 
 const HeaderStatCard = ({ 
   title, 
@@ -582,7 +592,8 @@ const HeaderStatCard = ({
   subValue, 
   icon: Icon, 
   trend, 
-  trendUp = true 
+  trendUp = true,
+  gradientIndex = 0 
 }: {
   title: string;
   value: string;
@@ -590,31 +601,38 @@ const HeaderStatCard = ({
   icon: LucideIcon;
   trend?: string;
   trendUp?: boolean;
+  gradientIndex?: number;
 }) => (
-  <div className="relative p-4 rounded-2xl bg-card border border-border shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
-    <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+  <div className={cn(
+    "relative p-5 rounded-2xl overflow-hidden transition-all duration-300",
+    "bg-gradient-to-br shadow-lg hover:shadow-xl hover:-translate-y-0.5",
+    statGradients[gradientIndex % statGradients.length]
+  )}>
+    {/* Glossy overlay */}
+    <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/10" />
     
-    <div className="flex items-start justify-between mb-2">
-      <div className="p-2.5 rounded-xl bg-primary/10">
-        <Icon className="h-5 w-5 text-primary" />
-      </div>
-      {trend && (
-        <Badge 
-          variant="outline" 
-          className={`text-xs ${trendUp ? 'text-green-600 border-green-200 bg-green-50' : 'text-red-600 border-red-200 bg-red-50'}`}
-        >
-          {trendUp ? '↑' : '↓'} {trend}
-        </Badge>
-      )}
-    </div>
-    
-    <div className="space-y-1 mt-3">
-      <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{title}</p>
-      <div className="flex items-baseline gap-2">
-        <p className="text-2xl font-bold text-foreground">{value}</p>
-        {subValue && (
-          <span className="text-sm text-muted-foreground">{subValue}</span>
+    <div className="relative">
+      <div className="flex items-start justify-between mb-3">
+        <div className="w-12 h-12 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-inner border border-white/20">
+          <Icon className="h-6 w-6 text-white drop-shadow-sm" />
+        </div>
+        {trend && (
+          <Badge 
+            className={`text-xs font-bold ${trendUp ? 'bg-white/25 text-white border-white/30' : 'bg-red-500/30 text-white border-red-300/30'}`}
+          >
+            {trendUp ? '↑' : '↓'} {trend}
+          </Badge>
         )}
+      </div>
+      
+      <div className="space-y-1">
+        <p className="text-xs text-white/80 uppercase tracking-wider font-semibold">{title}</p>
+        <div className="flex items-baseline gap-2">
+          <p className="text-3xl font-bold text-white drop-shadow-sm">{value}</p>
+          {subValue && (
+            <span className="text-sm text-white/70 font-medium">{subValue}</span>
+          )}
+        </div>
       </div>
     </div>
   </div>
@@ -843,25 +861,72 @@ const SuperAdminCommandCenter = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Badge className="bg-primary/10 text-primary border-primary/30 px-3 py-1">
+              <Badge className="bg-emerald-500 text-white border-emerald-400 px-3 py-1.5 shadow-md">
                 <Activity className="h-3 w-3 mr-1.5 animate-pulse" />
                 LIVE
               </Badge>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="gap-2 border-teal-500/30 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20"
+                className="gap-2 border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 font-medium"
                 onClick={() => setShowAudit(true)}
               >
                 <ScanLine className="w-4 h-4" />
                 Run Audit
               </Button>
-              <Button variant="outline" size="sm" className="gap-2 border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700">
+              <Button variant="outline" size="sm" className="gap-2 border-border bg-card text-foreground hover:bg-secondary font-medium shadow-sm">
                 <RefreshCw className="w-4 h-4" />
                 Refresh
               </Button>
             </div>
           </div>
+
+          {/* PREMIUM STATS ROW */}
+          {!activeCategory && (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+              <HeaderStatCard 
+                title="Total Leads" 
+                value={liveStats.totalLeads.toLocaleString()} 
+                icon={Target} 
+                trend="12.5%" 
+                trendUp={true}
+                gradientIndex={0}
+              />
+              <HeaderStatCard 
+                title="Active Developers" 
+                value={liveStats.activeDevelopers.toString()} 
+                icon={Code2} 
+                trend="8%" 
+                trendUp={true}
+                gradientIndex={1}
+              />
+              <HeaderStatCard 
+                title="Demos Online" 
+                value={liveStats.demosOnline.toString()} 
+                icon={Globe} 
+                trend="5.2%" 
+                trendUp={true}
+                gradientIndex={2}
+              />
+              <HeaderStatCard 
+                title="Tasks Done" 
+                value={liveStats.tasksCompleted.toString()} 
+                icon={CheckCircle} 
+                trend="15%" 
+                trendUp={true}
+                gradientIndex={3}
+              />
+              <HeaderStatCard 
+                title="Revenue Today" 
+                value="₹12.4L" 
+                subValue="+8.3%"
+                icon={DollarSign} 
+                trend="23%" 
+                trendUp={true}
+                gradientIndex={4}
+              />
+            </div>
+          )}
 
           {/* Categories Grid - Premium Gradient Cards */}
           {!activeCategory && (

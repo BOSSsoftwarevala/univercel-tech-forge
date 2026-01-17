@@ -56,8 +56,8 @@ export function BossPanelSidebar({
     <motion.aside
       initial={false}
       animate={{ width: collapsed ? 80 : 260 }}
-      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col"
-      style={{ background: 'hsl(217 91% 50%)' }}
+      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col border-r border-blue-400/30"
+      style={{ background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)' }}
     >
       {/* Collapse Toggle */}
       <button

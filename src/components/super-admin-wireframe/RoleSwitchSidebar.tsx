@@ -480,14 +480,15 @@ const RoleSwitchSidebar = ({
       transition={{ duration: 0.2 }}
       className={cn(
         "flex flex-col border-r transition-colors duration-300",
-        "bg-sidebar border-sidebar-border"
+        "border-blue-400/30"
       )}
+      style={{ background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)' }}
     >
-      {/* Header - Generic Control Panel (no role name to avoid duplication) */}
-      <div className="p-4 border-b border-sidebar-border/50">
+      {/* Header - Premium Control Panel */}
+      <div className="p-4 border-b border-white/15 bg-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white">
-            <currentConfig.icon className="w-5 h-5" style={{ color: 'hsl(var(--sidebar-background))' }} />
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white shadow-lg">
+            <currentConfig.icon className="w-5 h-5 text-blue-600" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -497,8 +498,8 @@ const RoleSwitchSidebar = ({
                 exit={{ opacity: 0 }}
                 className="flex-1"
               >
-                <h2 className="text-sm font-bold text-white">Control Panel</h2>
-                <p className="text-xs text-white/80">Navigation Menu</p>
+                <h2 className="text-base font-bold text-white tracking-tight">Control Panel</h2>
+                <p className="text-xs text-white/70 font-medium">Super Admin Console</p>
               </motion.div>
             )}
           </AnimatePresence>

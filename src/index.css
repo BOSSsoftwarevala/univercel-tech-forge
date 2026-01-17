@@ -7,98 +7,104 @@
 @layer base {
   :root {
     /* ========================================
-       SOFTWARE VALA - PREMIUM WOW THEME
-       Glassmorphism + Soft Gradients + Light
+       SOFTWARE VALA - ULTRA PREMIUM THEME
+       Clean • Professional • WOW Factor
        ======================================== */
     
-    /* Core Colors - Premium Light */
-    --background: 220 20% 97%;
-    --foreground: 224 71% 15%;
+    /* Core Colors - Ultra Clean Light */
+    --background: 222 47% 97%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71% 15%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary - Premium Indigo */
-    --primary: 243 75% 59%;
+    /* Primary - Royal Blue */
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Soft Lavender */
-    --secondary: 240 20% 96%;
-    --secondary-foreground: 224 71% 20%;
+    /* Secondary - Soft Slate */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 20%;
 
-    /* Muted - Soft Gray */
+    /* Muted - Clean Gray */
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
 
-    /* Accent - Vibrant Violet */
-    --accent: 258 90% 66%;
+    /* Accent - Electric Violet */
+    --accent: 262 83% 58%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive - Coral */
-    --destructive: 0 72% 63%;
+    /* Destructive - Clean Red */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 220 14% 90%;
-    --input: 220 14% 90%;
-    --ring: 243 75% 59%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
     /* ========================================
-       PREMIUM SIDEBAR - Deep Indigo
+       PREMIUM SIDEBAR - Deep Ocean Blue
        ======================================== */
-    --sidebar-background: 243 75% 59%;
+    --sidebar-background: 217 91% 50%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 243 75% 59%;
-    --sidebar-accent: 243 75% 50%;
+    --sidebar-primary-foreground: 217 91% 50%;
+    --sidebar-accent: 217 91% 45%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 243 60% 65%;
+    --sidebar-border: 217 80% 55%;
     --sidebar-ring: 0 0% 100%;
 
     /* ========================================
-       GRADIENT CARD COLORS - Soft & Premium
+       PREMIUM CARD GRADIENTS - Vibrant
        ======================================== */
-    --gradient-purple: linear-gradient(135deg, hsl(258 75% 70%) 0%, hsl(243 75% 65%) 100%);
-    --gradient-blue: linear-gradient(135deg, hsl(210 90% 70%) 0%, hsl(220 85% 65%) 100%);
-    --gradient-teal: linear-gradient(135deg, hsl(173 70% 55%) 0%, hsl(188 75% 50%) 100%);
-    --gradient-coral: linear-gradient(135deg, hsl(15 85% 70%) 0%, hsl(0 75% 65%) 100%);
-    --gradient-green: linear-gradient(135deg, hsl(152 65% 55%) 0%, hsl(168 70% 45%) 100%);
-    --gradient-amber: linear-gradient(135deg, hsl(38 92% 65%) 0%, hsl(25 95% 60%) 100%);
-    --gradient-rose: linear-gradient(135deg, hsl(340 80% 70%) 0%, hsl(350 85% 60%) 100%);
-    --gradient-indigo: linear-gradient(135deg, hsl(243 75% 65%) 0%, hsl(258 80% 55%) 100%);
+    --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-blue: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-teal: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --gradient-coral: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-green: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --gradient-amber: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-rose: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    --gradient-indigo: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-sky: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    --gradient-orange: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+    --gradient-pink: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-mint: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
 
     /* ========================================
        STATUS COLORS - Professional
        ======================================== */
-    --status-success: 152 65% 45%;
-    --status-warning: 38 92% 55%;
-    --status-error: 0 72% 55%;
-    --status-info: 210 90% 55%;
+    --status-success: 142 76% 36%;
+    --status-warning: 38 92% 50%;
+    --status-error: 0 84% 60%;
+    --status-info: 217 91% 60%;
 
-    /* Premium Shadows - Soft & Elegant */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08);
-    --shadow-lg: 0 10px 24px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 40px -8px rgb(0 0 0 / 0.12);
+    /* Premium Shadows - Ultra Soft */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+    --shadow-card: 0 2px 8px -2px rgb(0 0 0 / 0.06), 0 4px 16px -4px rgb(0 0 0 / 0.08);
     --shadow-glow: 0 0 40px -12px;
 
     /* Glass Effect */
-    --glass-bg: 0 0% 100% / 0.85;
+    --glass-bg: 0 0% 100% / 0.9;
     --glass-border: 0 0% 100% / 0.2;
 
     /* Legacy Compatibility */
-    --sv-primary: 243 75% 59%;
-    --sv-accent: 258 90% 66%;
-    --neon-teal: 173 70% 45%;
+    --sv-primary: 221 83% 53%;
+    --sv-accent: 262 83% 58%;
+    --neon-teal: 173 80% 40%;
     --neon-orange: 25 95% 53%;
-    --neon-green: 152 65% 45%;
+    --neon-green: 142 76% 36%;
     --sapphire: 217 91% 60%;
-    --aurora-violet: 258 90% 66%;
+    --aurora-violet: 262 83% 58%;
+    --aurora-gold: 45 93% 47%;
   }
 
   /* Dark Mode - Premium Dark */
