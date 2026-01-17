@@ -597,9 +597,11 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            {/* Global Operations Map */}
-            <GlobalNetworkMap className="w-full" />
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            {/* Global Operations Map - FULL WIDTH, NO GAP */}
+            <div className="-mx-6" style={{ width: 'calc(100% + 48px)' }}>
+              <GlobalNetworkMap className="w-full" />
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Pending Overrides */}

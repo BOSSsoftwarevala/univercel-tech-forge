@@ -1,4 +1,10 @@
-import React, { useState, useMemo } from 'react';
+/**
+ * ORION-STYLE GLOBAL NETWORK MAP
+ * Enterprise-grade live world map with zero gaps
+ * Dark theme, hex dots, animated connections
+ */
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ComposableMap,
@@ -6,7 +12,6 @@ import {
   Geography,
   Marker,
   Line,
-  ZoomableGroup,
 } from 'react-simple-maps';
 import { 
   Users, 
@@ -15,120 +20,81 @@ import {
   ShoppingCart,
   Activity,
   Globe2,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw
+  Zap,
+  Server,
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// BRAND THEME: Blue + Red colors
-const globalMarkers = [
+// Live region data with real-time simulation
+const regionData = [
   { 
-    id: 'chicago',
-    name: 'Chicago', 
-    coordinates: [-87.6298, 41.8781] as [number, number], 
-    value: '98,320,300',
-    color: 'hsl(217, 91%, 50%)', // Primary Blue
-    icon: ShoppingCart,
-    size: 'large'
+    id: 'na',
+    name: 'North America', 
+    coordinates: [-100, 40] as [number, number],
+    status: 'healthy',
+    transactions: 2847392,
+    users: 1243567,
+    growth: 12.4,
   },
   { 
-    id: 'canada',
-    name: 'Canada', 
-    coordinates: [-106.3468, 56.1304] as [number, number], 
-    value: '6,097,321',
-    color: 'hsl(199, 89%, 48%)', // Cyan
-    icon: Users,
-    size: 'medium'
+    id: 'eu',
+    name: 'Europe', 
+    coordinates: [10, 50] as [number, number],
+    status: 'healthy',
+    transactions: 1923847,
+    users: 892341,
+    growth: 8.7,
   },
   { 
-    id: 'berlin',
-    name: 'Berlin', 
-    coordinates: [13.4050, 52.5200] as [number, number], 
-    value: '76,541,106',
-    color: 'hsl(0, 84%, 60%)', // Brand Red
-    icon: TrendingUp,
-    size: 'large'
+    id: 'asia',
+    name: 'Asia Pacific', 
+    coordinates: [105, 35] as [number, number],
+    status: 'warning',
+    transactions: 3421098,
+    users: 2134567,
+    growth: 23.1,
   },
   { 
-    id: 'russia',
-    name: 'Russia', 
-    coordinates: [105.3188, 61.5240] as [number, number], 
-    value: '66,097,321',
-    color: 'hsl(0, 84%, 60%)', // Brand Red
-    icon: Activity,
-    size: 'large'
+    id: 'sa',
+    name: 'South America', 
+    coordinates: [-60, -15] as [number, number],
+    status: 'healthy',
+    transactions: 892341,
+    users: 456123,
+    growth: 15.2,
   },
   { 
-    id: 'morocco',
-    name: 'Morocco', 
-    coordinates: [-7.0926, 31.7917] as [number, number], 
-    value: '4,591,031',
-    color: 'hsl(142, 71%, 45%)', // Success Green
-    icon: Globe2,
-    size: 'medium'
+    id: 'africa',
+    name: 'Africa', 
+    coordinates: [20, 5] as [number, number],
+    status: 'healthy',
+    transactions: 567234,
+    users: 234567,
+    growth: 31.4,
   },
   { 
-    id: 'manaus',
-    name: 'Manaus', 
-    coordinates: [-60.0217, -3.1190] as [number, number], 
-    value: '12,320,300',
-    color: 'hsl(38, 92%, 50%)', // Warning Orange
-    icon: DollarSign,
-    size: 'medium'
-  },
-  { 
-    id: 'shanghai',
-    name: 'Shanghai', 
-    coordinates: [121.4737, 31.2304] as [number, number], 
-    value: '239,570,110',
-    color: 'hsl(0, 84%, 60%)', // Brand Red
-    icon: TrendingUp,
-    size: 'large'
-  },
-  { 
-    id: 'giza',
-    name: 'Giza', 
-    coordinates: [31.2089, 30.0131] as [number, number], 
-    value: '10,547,980',
-    color: 'hsl(199, 89%, 48%)', // Cyan
-    icon: Users,
-    size: 'medium'
-  },
-  { 
-    id: 'queenstown',
-    name: 'Queensland', 
-    coordinates: [153.0251, -27.4698] as [number, number], 
-    value: '6,097,321',
-    color: 'hsl(217, 91%, 50%)', // Primary Blue
-    icon: Activity,
-    size: 'medium'
+    id: 'oceania',
+    name: 'Oceania', 
+    coordinates: [135, -25] as [number, number],
+    status: 'healthy',
+    transactions: 234123,
+    users: 123456,
+    growth: 9.8,
   },
 ];
 
-// Connection lines between cities
+// Connection lines between regions
 const connections = [
-  { from: [-87.6298, 41.8781], to: [13.4050, 52.5200] },
-  { from: [13.4050, 52.5200], to: [105.3188, 61.5240] },
-  { from: [-106.3468, 56.1304], to: [13.4050, 52.5200] },
-  { from: [-7.0926, 31.7917], to: [31.2089, 30.0131] },
-];
-
-// Stats cards data - Brand colors
-const statsCards = [
-  { label: 'Transactions', value: '343,054', icon: Activity, gradient: 'from-primary to-primary/70' },
-  { label: 'Purchases', value: '44,430', icon: ShoppingCart, gradient: 'from-destructive to-destructive/70' },
-  { label: 'Dynamic', value: '12,503', icon: TrendingUp, gradient: 'from-amber-500 to-amber-400' },
-];
-
-// Country activity list
-const countryActivity = [
-  { country: 'United States', value: '4,504,210', percent: 55 },
-  { country: 'France', value: '2,100,950', percent: 25 },
-  { country: 'China', value: '1,960,240', percent: 15 },
-  { country: 'Brazil', value: '1,504,210', percent: 15 },
+  { from: [-100, 40], to: [10, 50], active: true },
+  { from: [10, 50], to: [105, 35], active: true },
+  { from: [-100, 40], to: [-60, -15], active: true },
+  { from: [10, 50], to: [20, 5], active: false },
+  { from: [105, 35], to: [135, -25], active: true },
+  { from: [20, 5], to: [105, 35], active: false },
 ];
 
 interface GlobalNetworkMapProps {
@@ -136,102 +102,170 @@ interface GlobalNetworkMapProps {
 }
 
 export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
-  const [zoom, setZoom] = useState(1);
-  const [center, setCenter] = useState<[number, number]>([0, 20]);
-  const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [liveData, setLiveData] = useState(regionData);
+  const [pulsePhase, setPulsePhase] = useState(0);
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.5, 8));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.5, 1));
-  const handleReset = () => {
-    setZoom(1);
-    setCenter([0, 20]);
+  // Simulate live data updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveData(prev => prev.map(region => ({
+        ...region,
+        transactions: region.transactions + Math.floor(Math.random() * 100),
+        users: region.users + Math.floor(Math.random() * 10),
+      })));
+      setPulsePhase(p => (p + 1) % 360);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate totals
+  const totals = useMemo(() => ({
+    transactions: liveData.reduce((acc, r) => acc + r.transactions, 0),
+    users: liveData.reduce((acc, r) => acc + r.users, 0),
+    avgGrowth: (liveData.reduce((acc, r) => acc + r.growth, 0) / liveData.length).toFixed(1),
+  }), [liveData]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'healthy': return '#10B981';
+      case 'warning': return '#F59E0B';
+      case 'critical': return '#EF4444';
+      default: return '#6B7280';
+    }
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
   };
 
   return (
-    <div className={`bg-sidebar rounded-3xl overflow-hidden ${className}`}>
-      {/* Header */}
-      <div className="p-6 pb-0">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">General Statistics</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-muted-foreground">All users</span>
-              <span className="text-xs text-primary cursor-pointer hover:underline">DETAIL →</span>
+    <div className={cn(
+      "relative w-full overflow-hidden rounded-2xl",
+      "bg-[#0a0e1a]",
+      className
+    )}>
+      {/* GRID LAYOUT: Stats Panel + Map - NO GAP */}
+      <div className="grid grid-cols-[280px_1fr] min-h-[70vh]">
+        {/* LEFT STATS PANEL */}
+        <div className="bg-[#0d1321] border-r border-slate-800/50 p-5 flex flex-col">
+          {/* Header */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Globe2 className="w-5 h-5 text-blue-400" />
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Global Network</span>
             </div>
-            <p className="text-4xl font-bold text-foreground mt-2">7,541,390</p>
+            <h2 className="text-3xl font-bold text-white">
+              {formatNumber(totals.transactions)}
+            </h2>
+            <p className="text-xs text-slate-500">Total Transactions</p>
           </div>
-          
-          {/* Zoom Controls */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleZoomIn}
-              className="bg-white/5 hover:bg-white/10 text-foreground rounded-xl"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleZoomOut}
-              className="bg-white/5 hover:bg-white/10 text-foreground rounded-xl"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleReset}
-              className="bg-white/5 hover:bg-white/10 text-foreground rounded-xl"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
 
-        {/* Current Activity Bar - Brand colors */}
-        <div className="mb-4">
-          <p className="text-xs text-muted-foreground mb-2">Current activity</p>
-          <div className="flex h-2 rounded-full overflow-hidden bg-muted">
-            <div className="bg-primary w-[35%]" />
-            <div className="bg-primary/70 w-[25%]" />
-            <div className="bg-destructive w-[20%]" />
-            <div className="bg-amber-500 w-[20%]" />
+          {/* Live Activity Bar */}
+          <div className="mb-6">
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Live Activity</p>
+            <div className="flex h-1.5 rounded-full overflow-hidden bg-slate-800">
+              <motion.div 
+                className="bg-emerald-500"
+                animate={{ width: ['30%', '35%', '30%'] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+              <motion.div 
+                className="bg-blue-500"
+                animate={{ width: ['25%', '22%', '25%'] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              />
+              <motion.div 
+                className="bg-amber-500"
+                animate={{ width: ['20%', '23%', '20%'] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <motion.div 
+                className="bg-rose-500"
+                animate={{ width: ['15%', '12%', '15%'] }}
+                transition={{ duration: 2.8, repeat: Infinity }}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Country List */}
-        <div className="space-y-2 mb-4">
-          {countryActivity.map((item, i) => (
-            <div key={item.country} className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  i === 0 ? 'bg-primary' : i === 1 ? 'bg-primary/70' : i === 2 ? 'bg-destructive' : 'bg-amber-500'
-                }`} />
-                <span className="text-muted-foreground">{item.country}</span>
+          {/* Region List */}
+          <div className="space-y-2 flex-1">
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-3">Regions</p>
+            {liveData.map((region, i) => (
+              <motion.div
+                key={region.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className={cn(
+                  "p-3 rounded-lg cursor-pointer transition-all",
+                  hoveredRegion === region.id 
+                    ? "bg-slate-700/50 border border-slate-600" 
+                    : "bg-slate-800/30 border border-transparent hover:bg-slate-800/50"
+                )}
+                onMouseEnter={() => setHoveredRegion(region.id)}
+                onMouseLeave={() => setHoveredRegion(null)}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: getStatusColor(region.status) }}
+                    />
+                    <span className="text-xs font-medium text-slate-300">{region.name}</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400">+{region.growth}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-white">{formatNumber(region.transactions)}</span>
+                  <span className="text-[10px] text-slate-500">{formatNumber(region.users)} users</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Bottom Stats */}
+          <div className="mt-4 pt-4 border-t border-slate-800">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-blue-500/10 rounded-lg p-3">
+                <Users className="w-4 h-4 text-blue-400 mb-1" />
+                <p className="text-lg font-bold text-white">{formatNumber(totals.users)}</p>
+                <p className="text-[10px] text-slate-500">Total Users</p>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-foreground font-medium">{item.value}</span>
-                <span className="text-muted-foreground w-8 text-right">{item.percent}%</span>
+              <div className="bg-emerald-500/10 rounded-lg p-3">
+                <TrendingUp className="w-4 h-4 text-emerald-400 mb-1" />
+                <p className="text-lg font-bold text-white">{totals.avgGrowth}%</p>
+                <p className="text-[10px] text-slate-500">Avg Growth</p>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
 
-      {/* Map Container */}
-      <div className="relative h-[400px]">
-        <ComposableMap
-          projection="geoMercator"
-          projectionConfig={{
-            scale: 140 * zoom,
-            center: center,
-          }}
-          style={{ width: '100%', height: '100%' }}
-        >
-          <ZoomableGroup zoom={zoom} center={center} onMoveEnd={({ coordinates }) => setCenter(coordinates as [number, number])}>
-            {/* Geography */}
+        {/* MAP CONTAINER - FULL WIDTH, NO PADDING */}
+        <div className="relative bg-[#0a0e1a]">
+          {/* Hex Grid Background Pattern */}
+          <div 
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '24px 24px',
+            }}
+          />
+
+          {/* Map */}
+          <ComposableMap
+            projection="geoMercator"
+            projectionConfig={{
+              scale: 150,
+              center: [20, 20],
+            }}
+            style={{ width: '100%', height: '100%' }}
+          >
+            {/* Geography - Transparent with glowing borders */}
             <Geographies geography={geoUrl}>
               {({ geographies }) =>
                 geographies.map((geo) => (
@@ -239,11 +273,11 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
                     key={geo.rsmKey}
                     geography={geo}
                     fill="transparent"
-                    stroke="#1e293b"
+                    stroke="rgba(59, 130, 246, 0.15)"
                     strokeWidth={0.5}
                     style={{
                       default: { outline: 'none' },
-                      hover: { outline: 'none', fill: 'rgba(59, 130, 246, 0.1)' },
+                      hover: { outline: 'none', fill: 'rgba(59, 130, 246, 0.05)' },
                       pressed: { outline: 'none' },
                     }}
                   />
@@ -251,100 +285,88 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
               }
             </Geographies>
 
-            {/* Hexagonal dot pattern overlay - simulated with small circles */}
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={`hex-${geo.rsmKey}`}
-                    geography={geo}
-                    fill="url(#hexPattern)"
-                    stroke="none"
-                    style={{
-                      default: { outline: 'none' },
-                      hover: { outline: 'none' },
-                      pressed: { outline: 'none' },
-                    }}
-                  />
-                ))
-              }
-            </Geographies>
-
-            {/* Connection Lines */}
+            {/* Animated Connection Lines */}
             {connections.map((conn, i) => (
               <Line
                 key={i}
                 from={conn.from as [number, number]}
                 to={conn.to as [number, number]}
-                stroke="rgba(236, 72, 153, 0.4)"
-                strokeWidth={1}
+                stroke={conn.active ? "rgba(59, 130, 246, 0.4)" : "rgba(100, 116, 139, 0.2)"}
+                strokeWidth={conn.active ? 1.5 : 0.5}
                 strokeLinecap="round"
-                strokeDasharray="4 2"
+                strokeDasharray={conn.active ? "6 4" : "2 4"}
               />
             ))}
 
-            {/* City Markers */}
-            {globalMarkers.map((marker) => {
-              const Icon = marker.icon;
-              const isHovered = hoveredMarker === marker.id;
-              const markerSize = marker.size === 'large' ? 40 : 32;
+            {/* Region Markers */}
+            {liveData.map((region) => {
+              const isHovered = hoveredRegion === region.id;
+              const statusColor = getStatusColor(region.status);
               
               return (
                 <Marker 
-                  key={marker.id} 
-                  coordinates={marker.coordinates}
-                  onMouseEnter={() => setHoveredMarker(marker.id)}
-                  onMouseLeave={() => setHoveredMarker(null)}
+                  key={region.id} 
+                  coordinates={region.coordinates}
+                  onMouseEnter={() => setHoveredRegion(region.id)}
+                  onMouseLeave={() => setHoveredRegion(null)}
                 >
-                  {/* Pulse effect */}
+                  {/* Outer pulse ring */}
                   <motion.circle
-                    r={markerSize / 2 + 8}
-                    fill={marker.color}
-                    opacity={0.2}
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.1, 0.2] }}
-                    transition={{ duration: 2, repeat: Infinity }}
+                    r={isHovered ? 35 : 25}
+                    fill={statusColor}
+                    opacity={0.1}
+                    animate={{ 
+                      scale: [1, 1.4, 1],
+                      opacity: [0.1, 0.05, 0.1]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: Math.random() * 2
+                    }}
                   />
-                  
-                  {/* Main marker */}
-                  <motion.g
-                    initial={{ scale: 0 }}
-                    animate={{ scale: isHovered ? 1.2 : 1 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <circle
-                      r={markerSize / 2}
-                      fill={marker.color}
-                      className="drop-shadow-lg"
-                    />
-                    <foreignObject
-                      x={-10}
-                      y={-10}
-                      width={20}
-                      height={20}
-                    >
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Icon className="w-3 h-3 text-white" />
-                      </div>
-                    </foreignObject>
-                  </motion.g>
 
-                  {/* Label */}
+                  {/* Middle ring */}
+                  <motion.circle
+                    r={isHovered ? 20 : 14}
+                    fill={statusColor}
+                    opacity={0.2}
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                    }}
+                    transition={{ 
+                      duration: 1.5,
+                      repeat: Infinity,
+                    }}
+                  />
+
+                  {/* Core dot */}
+                  <motion.circle
+                    r={isHovered ? 10 : 6}
+                    fill={statusColor}
+                    className="drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                    animate={{ scale: isHovered ? 1.3 : 1 }}
+                    transition={{ type: 'spring', stiffness: 400 }}
+                  />
+
+                  {/* Label on hover */}
                   <AnimatePresence>
-                    {(isHovered || marker.size === 'large') && (
+                    {isHovered && (
                       <motion.g
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                       >
                         <foreignObject
-                          x={-60}
-                          y={markerSize / 2 + 5}
-                          width={120}
-                          height={50}
+                          x={-70}
+                          y={20}
+                          width={140}
+                          height={60}
                         >
-                          <div className="text-center">
-                            <p className="text-[10px] text-slate-400">{marker.name}</p>
-                            <p className="text-xs font-bold text-white">{marker.value}</p>
+                          <div className="bg-slate-900/95 border border-slate-700 rounded-lg p-2 text-center shadow-xl">
+                            <p className="text-[10px] text-slate-400">{region.name}</p>
+                            <p className="text-sm font-bold text-white">{formatNumber(region.transactions)}</p>
+                            <p className="text-[9px] text-emerald-400">+{region.growth}% growth</p>
                           </div>
                         </foreignObject>
                       </motion.g>
@@ -353,61 +375,47 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
                 </Marker>
               );
             })}
-          </ZoomableGroup>
+          </ComposableMap>
 
-          {/* SVG Defs for patterns */}
-          <defs>
-            <pattern id="hexPattern" patternUnits="userSpaceOnUse" width="8" height="8">
-              <circle cx="4" cy="4" r="1.5" fill="rgba(59, 130, 246, 0.3)" />
-            </pattern>
-          </defs>
-        </ComposableMap>
+          {/* Gradient overlays for depth */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#0a0e1a] to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0a0e1a] to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[#0a0e1a] to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#0a0e1a] to-transparent pointer-events-none" />
 
-        {/* Gradient overlays for depth */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0a0e1a] via-transparent to-transparent" />
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0e1a]/50 via-transparent to-transparent" />
-      </div>
+          {/* Live indicator */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-slate-900/80 border border-slate-700 rounded-full px-3 py-1.5">
+            <motion.div 
+              className="w-2 h-2 rounded-full bg-emerald-500"
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            />
+            <span className="text-[10px] font-medium text-slate-300">LIVE</span>
+          </div>
 
-      {/* Bottom Stats */}
-      <div className="p-6 pt-4">
-        <div className="flex items-center justify-between">
-          {/* Stats Cards */}
-          <div className="flex gap-3">
-            {statsCards.map((stat, i) => {
-              const Icon = stat.icon;
-              return (
+          {/* Quick Stats Bar */}
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex items-center justify-between bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 backdrop-blur-sm">
+              {[
+                { label: 'Transactions/sec', value: '12.4K', icon: Activity, color: 'text-blue-400' },
+                { label: 'Active Sessions', value: '847K', icon: Users, color: 'text-emerald-400' },
+                { label: 'Revenue/hr', value: '$2.3M', icon: DollarSign, color: 'text-amber-400' },
+                { label: 'API Calls', value: '98.7M', icon: Zap, color: 'text-purple-400' },
+                { label: 'Server Load', value: '67%', icon: Server, color: 'text-cyan-400' },
+                { label: 'Security Score', value: '98/100', icon: Shield, color: 'text-emerald-400' },
+              ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`bg-gradient-to-br ${stat.gradient} rounded-2xl p-4 min-w-[100px]`}
+                  transition={{ delay: 0.1 * i }}
+                  className="text-center"
                 >
-                  <Icon className="w-5 h-5 text-white/80 mb-2" />
-                  <p className="text-xl font-bold text-white">{stat.value}</p>
-                  <p className="text-xs text-white/70">{stat.label}</p>
+                  <stat.icon className={cn("w-4 h-4 mx-auto mb-1", stat.color)} />
+                  <p className="text-sm font-bold text-white">{stat.value}</p>
+                  <p className="text-[9px] text-slate-500">{stat.label}</p>
                 </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Right side totals */}
-          <div className="flex items-center gap-8">
-            <div className="text-right">
-              <p className="text-xs text-slate-400">All users</p>
-              <p className="text-xl font-bold text-white">1,430,205</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-slate-400">Unique</p>
-              <p className="text-xl font-bold text-white">45,549</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-slate-400">New users</p>
-              <p className="text-xl font-bold text-white">32,950</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-slate-400">Trend</p>
-              <p className="text-xl font-bold text-emerald-400">95%</p>
+              ))}
             </div>
           </div>
         </div>
@@ -415,3 +423,5 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
     </div>
   );
 }
+
+export default GlobalNetworkMap;
