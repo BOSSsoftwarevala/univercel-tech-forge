@@ -864,19 +864,28 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 <div className="p-4">
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { icon: Users, label: "Super Admin Registry", desc: "Full control" },
-                      { icon: Lock, label: "Role & Permission Lock", desc: "Final authority" },
-                      { icon: Settings, label: "System Modules", desc: "Enable/disable" },
-                      { icon: Database, label: "Audit & Blackbox", desc: "Full access" },
-                      { icon: Shield, label: "Security Control", desc: "Emergency actions" },
-                      { icon: Gavel, label: "Legal Control", desc: "Compliance" },
-                      { icon: Power, label: "Emergency Lockdown", desc: "System freeze" },
-                      { icon: RotateCcw, label: "Final Override", desc: "Logged + 2FA" },
+                      { icon: Users, label: "Super Admin Registry", desc: "Full control", tab: "super-admins" },
+                      { icon: Lock, label: "Role & Permission Lock", desc: "Final authority", tab: "permissions" },
+                      { icon: Settings, label: "System Modules", desc: "Enable/disable", tab: "modules" },
+                      { icon: Database, label: "Audit & Blackbox", desc: "Full access", tab: "blackbox" },
+                      { icon: Shield, label: "Security Control", desc: "Emergency actions", tab: "security" },
+                      { icon: Gavel, label: "Legal Control", desc: "Compliance", tab: "security" },
+                      { icon: Power, label: "Emergency Lockdown", desc: "System freeze", action: "emergency" },
+                      { icon: RotateCcw, label: "Final Override", desc: "Logged + 2FA", tab: "overview" },
                     ].map((power, i) => (
                       <div 
                         key={i} 
-                        className="p-3 rounded-lg"
+                        className="p-3 rounded-lg cursor-pointer hover:border-blue-500/60 transition-all"
                         style={{ background: COLORS.backgroundSecondary, border: `1px solid ${COLORS.brand}30` }}
+                        onClick={async () => {
+                          if (power.action === 'emergency') {
+                            setShowLockDialog(true);
+                          } else if (power.tab) {
+                            await logAction('navigate_power', power.label);
+                            setActiveTab(power.tab);
+                            toast.info(`Navigating to: ${power.label}`);
+                          }
+                        }}
                       >
                         <power.icon style={{ width: '20px', height: '20px', color: COLORS.brand, marginBottom: '8px' }} />
                         <p style={{ fontSize: '14px', fontWeight: 500, color: COLORS.textPrimary }}>{power.label}</p>
@@ -1066,6 +1075,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                         <Button 
                           size="sm"
                           disabled={!module.locked}
+                          onClick={async () => {
+                            await logAction('module_disable', module.id, { name: module.name });
+                            toast.error(`⛔ Disabled: ${module.name}`, { description: 'Module has been disabled. Only Boss can re-enable.' });
+                          }}
                           style={{
                             background: COLORS.danger,
                             color: COLORS.textPrimary,
@@ -1229,16 +1242,20 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 </div>
                 <div className="p-4 space-y-3">
                   {[
-                    { icon: FileText, label: "Terms of Service Management" },
-                    { icon: FileText, label: "Privacy Policy Control" },
-                    { icon: FileText, label: "Compliance Documents" },
-                    { icon: Ban, label: "GDPR Data Requests" },
+                    { icon: FileText, label: "Terms of Service Management", action: "manage_tos" },
+                    { icon: FileText, label: "Privacy Policy Control", action: "manage_privacy_policy" },
+                    { icon: FileText, label: "Compliance Documents", action: "manage_compliance_docs" },
+                    { icon: Ban, label: "GDPR Data Requests", action: "manage_gdpr_requests" },
                   ].map((item, i) => {
                     const Icon = item.icon;
                     return (
                       <Button 
                         key={i}
                         className="w-full justify-start"
+                        onClick={async () => {
+                          await logAction(item.action, 'legal_control');
+                          toast.info(`Opening: ${item.label}`, { description: 'Loading legal control module...' });
+                        }}
                         style={{
                           background: COLORS.backgroundSecondary,
                           color: COLORS.textPrimary,
