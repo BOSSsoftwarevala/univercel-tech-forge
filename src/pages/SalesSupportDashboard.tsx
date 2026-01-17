@@ -2,75 +2,92 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import SalesSupportSidebar from "@/components/sales-support/SalesSupportSidebar";
 import SalesSupportTopBar from "@/components/sales-support/SalesSupportTopBar";
-import LeadInbox from "@/components/sales-support/LeadInbox";
-import SalesScriptConsole from "@/components/sales-support/SalesScriptConsole";
-import DemoDispatchCenter from "@/components/sales-support/DemoDispatchCenter";
-import CommunicationHub from "@/components/sales-support/CommunicationHub";
-import AISalesCopilot from "@/components/sales-support/AISalesCopilot";
-import ConversionPipeline from "@/components/sales-support/ConversionPipeline";
-import CommissionBoard from "@/components/sales-support/CommissionBoard";
-import EscalationTree from "@/components/sales-support/EscalationTree";
-import SalesPerformanceDashboard from "@/components/sales-support/SalesPerformanceDashboard";
 import { Card, CardContent } from "@/components/ui/card";
-import { Inbox, TrendingUp, DollarSign, Clock, Target, Users } from "lucide-react";
+import { Inbox, TrendingUp, DollarSign, Clock, AlertTriangle, Ticket, Phone, Mail } from "lucide-react";
+import { toast } from "sonner";
+
+// Import all SSM modules
+import {
+  SupportTeamModule,
+  SalesTeamModule,
+  SupportTicketsModule,
+  SalesLeadsModule,
+  CRMCustomersModule,
+  CallCenterModule,
+  EmailQueueModule,
+  LiveChatModule,
+  EscalationsModule,
+  SLAComplianceModule,
+  AIInsightsModule,
+  SSMSettingsModule,
+} from "@/components/sales-support/modules";
+import SalesPerformanceDashboard from "@/components/sales-support/SalesPerformanceDashboard";
+import LeadInbox from "@/components/sales-support/LeadInbox";
 
 const SalesSupportDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
+
+  // Clickable KPI cards that navigate to filtered views
+  const handleKPIClick = (section: string) => {
+    setActiveSection(section);
+    toast.info(`Navigating to ${section.replace('-', ' ')}`);
+  };
 
   const renderContent = () => {
     switch (activeSection) {
       case "overview":
         return (
           <div className="space-y-6">
+            {/* Clickable KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-slate-900/50 border-cyan-500/20">
+              <Card className="bg-slate-900/50 border-cyan-500/20 cursor-pointer hover:bg-slate-800/50 transition-colors" onClick={() => handleKPIClick("support-tickets")}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                      <Inbox className="w-5 h-5 text-cyan-400" />
+                      <Ticket className="w-5 h-5 text-cyan-400" />
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-cyan-100">25</div>
-                      <div className="text-xs text-slate-400">New Leads</div>
+                      <div className="text-2xl font-bold text-cyan-100">12</div>
+                      <div className="text-xs text-slate-400">Tickets Waiting</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-900/50 border-emerald-500/20">
+              <Card className="bg-slate-900/50 border-red-500/20 cursor-pointer hover:bg-slate-800/50 transition-colors" onClick={() => handleKPIClick("escalations")}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-emerald-400" />
+                    <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                      <AlertTriangle className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-100">68%</div>
-                      <div className="text-xs text-slate-400">Conversion Rate</div>
+                      <div className="text-2xl font-bold text-red-100">3</div>
+                      <div className="text-xs text-slate-400">SLA Breach Risk</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-900/50 border-amber-500/20">
+              <Card className="bg-slate-900/50 border-amber-500/20 cursor-pointer hover:bg-slate-800/50 transition-colors" onClick={() => handleKPIClick("call-center")}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                      <DollarSign className="w-5 h-5 text-amber-400" />
+                      <Phone className="w-5 h-5 text-amber-400" />
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-amber-100">$4,890</div>
-                      <div className="text-xs text-slate-400">Commission</div>
+                      <div className="text-2xl font-bold text-amber-100">5</div>
+                      <div className="text-xs text-slate-400">Missed Calls</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-900/50 border-purple-500/20">
+              <Card className="bg-slate-900/50 border-purple-500/20 cursor-pointer hover:bg-slate-800/50 transition-colors" onClick={() => handleKPIClick("sales-leads")}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-purple-400" />
+                      <TrendingUp className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-purple-100">3 min</div>
-                      <div className="text-xs text-slate-400">Avg Response</div>
+                      <div className="text-2xl font-bold text-purple-100">8</div>
+                      <div className="text-xs text-slate-400">Hot Sales Leads</div>
                     </div>
                   </div>
                 </CardContent>
@@ -81,24 +98,22 @@ const SalesSupportDashboard = () => {
             </div>
           </div>
         );
-      case "lead-inbox": return <LeadInbox />;
-      case "scripts": return <SalesScriptConsole />;
-      case "demo-dispatch": return <DemoDispatchCenter />;
-      case "communication": return <CommunicationHub />;
-      case "ai-copilot": return <AISalesCopilot />;
-      case "tickets": return <LeadInbox />;
-      case "pipeline": return <ConversionPipeline />;
-      case "commission": return <CommissionBoard />;
-      case "masking": return <CommunicationHub />;
-      case "followup": return <DemoDispatchCenter />;
-      case "knowledge": return <SalesScriptConsole />;
-      case "qualification": return <AISalesCopilot />;
-      case "feedback": return <SalesPerformanceDashboard />;
-      case "escalation": return <EscalationTree />;
-      case "announcements": return <LeadInbox />;
+      case "support-team": return <SupportTeamModule />;
+      case "sales-team": return <SalesTeamModule />;
+      case "support-tickets": return <SupportTicketsModule />;
+      case "sales-leads": return <SalesLeadsModule />;
+      case "crm": return <CRMCustomersModule />;
+      case "call-center": return <CallCenterModule />;
+      case "email-queue": return <EmailQueueModule />;
+      case "live-chat": return <LiveChatModule />;
+      case "escalations": return <EscalationsModule />;
+      case "sla-compliance": return <SLAComplianceModule />;
       case "performance": return <SalesPerformanceDashboard />;
-      case "call-scripts": return <SalesScriptConsole />;
-      case "complaints": return <EscalationTree />;
+      case "reports": return <SalesPerformanceDashboard />;
+      case "support-activity": return <SupportTicketsModule />;
+      case "sales-activity": return <SalesLeadsModule />;
+      case "ai-insights": return <AIInsightsModule />;
+      case "settings": return <SSMSettingsModule />;
       default: return <LeadInbox />;
     }
   };

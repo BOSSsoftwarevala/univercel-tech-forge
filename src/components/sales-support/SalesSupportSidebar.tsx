@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { 
-  Headset, LayoutDashboard, Inbox, FileText, Send, MessageCircle, Bot, Ticket,
-  GitBranch, Wallet, Shield, Clock, BookOpen, Sparkles, MessageSquare, Bell,
-  BarChart3, Phone, AlertCircle, Settings
+  Headset, LayoutDashboard, Inbox, FileText, MessageCircle, Bot, Ticket,
+  Shield, BarChart3, Phone, AlertCircle, Settings, Users, Mail, Activity,
+  TrendingUp, UserRound
 } from "lucide-react";
 
 interface SalesSupportSidebarProps {
@@ -11,26 +11,25 @@ interface SalesSupportSidebarProps {
 }
 
 const SalesSupportSidebar = ({ activeSection, setActiveSection }: SalesSupportSidebarProps) => {
+  // Enterprise SSM Module Navigation - Final Locked List
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: LayoutDashboard },
-    { id: "lead-inbox", label: "Lead Inbox", icon: Inbox },
-    { id: "scripts", label: "Sales Scripts", icon: FileText },
-    { id: "demo-dispatch", label: "Demo Dispatch", icon: Send },
-    { id: "communication", label: "Communication Hub", icon: MessageCircle },
-    { id: "ai-copilot", label: "AI Sales Copilot", icon: Bot },
-    { id: "tickets", label: "Issue Tracker", icon: Ticket },
-    { id: "pipeline", label: "Conversion Pipeline", icon: GitBranch },
-    { id: "commission", label: "Commission Board", icon: Wallet },
-    { id: "masking", label: "Masking Compliance", icon: Shield },
-    { id: "followup", label: "Follow-Up", icon: Clock },
-    { id: "knowledge", label: "Knowledge Base", icon: BookOpen },
-    { id: "qualification", label: "Lead Qualifier", icon: Sparkles },
-    { id: "feedback", label: "Customer Feedback", icon: MessageSquare },
-    { id: "escalation", label: "Escalation Tree", icon: AlertCircle },
-    { id: "announcements", label: "Announcements", icon: Bell },
+    { id: "support-team", label: "Support Team", icon: Headset },
+    { id: "sales-team", label: "Sales Team", icon: Users },
+    { id: "support-tickets", label: "Support Tickets", icon: Ticket },
+    { id: "sales-leads", label: "Sales Leads", icon: Inbox },
+    { id: "crm", label: "CRM / Customers", icon: UserRound },
+    { id: "call-center", label: "Call Center", icon: Phone },
+    { id: "email-queue", label: "Email Queue", icon: Mail },
+    { id: "live-chat", label: "Live Chat", icon: MessageCircle },
+    { id: "escalations", label: "Escalations", icon: AlertCircle },
+    { id: "sla-compliance", label: "SLAs & Compliance", icon: Shield },
     { id: "performance", label: "Performance", icon: BarChart3 },
-    { id: "call-scripts", label: "Call Scripts AI", icon: Phone },
-    { id: "complaints", label: "Complaint Hub", icon: AlertCircle },
+    { id: "reports", label: "Reports", icon: FileText },
+    { id: "support-activity", label: "Support Activity", icon: Activity },
+    { id: "sales-activity", label: "Sales Activity", icon: TrendingUp },
+    { id: "ai-insights", label: "AI Insights", icon: Bot },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (
