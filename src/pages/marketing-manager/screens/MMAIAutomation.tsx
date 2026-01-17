@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+import { useSystemActions } from '@/hooks/useSystemActions';
 import {
   Sparkles, Brain, TrendingUp, DollarSign, Target, Shield,
   AlertTriangle, CheckCircle2, Loader2, RefreshCw, Zap,
@@ -38,6 +39,7 @@ interface AIInsight {
 }
 
 const MMAIAutomation: React.FC = () => {
+  const { executeAction, actions } = useSystemActions();
   const [modules, setModules] = useState<AIModule[]>([
     {
       id: 'campaign-opt',
@@ -139,16 +141,31 @@ const MMAIAutomation: React.FC = () => {
   const [autoApply, setAutoApply] = useState(false);
   const [running, setRunning] = useState(false);
 
-  const toggleModule = (id: string) => {
+  const toggleModule = useCallback(async (id: string, name: string) => {
     setModules(prev => prev.map(m => 
       m.id === id ? { ...m, enabled: !m.enabled } : m
     ));
-    toast.success('Module setting updated');
-  };
+    const module = modules.find(m => m.id === id);
+    await executeAction({
+      module: "marketing",
+      action: module?.enabled ? "disable" : "enable",
+      entityType: "ai_module",
+      entityId: id,
+      entityName: name,
+    });
+    toast.success('AI module setting updated');
+  }, [executeAction, modules]);
 
-  const runAllAI = async () => {
+  const runAllAI = useCallback(async () => {
     setRunning(true);
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await executeAction({
+      module: "marketing",
+      action: "sync",
+      entityType: "ai_automation",
+      entityId: "all",
+    });
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
     setModules(prev => prev.map(m => ({
       ...m,
       status: m.enabled ? 'running' : 'idle',
@@ -157,16 +174,25 @@ const MMAIAutomation: React.FC = () => {
     })));
     toast.success('AI analysis complete - 3 new insights generated');
     setRunning(false);
-  };
+  }, [executeAction]);
 
-  const handleInsightAction = (insight: AIInsight) => {
+  const handleInsightAction = useCallback(async (insight: AIInsight) => {
+    await executeAction({
+      module: "marketing",
+      action: "update",
+      entityType: "ai_insight",
+      entityId: insight.id,
+      entityName: insight.title,
+      data: { action: insight.action }
+    });
     toast.success(`Action executed: ${insight.action}`);
     setInsights(prev => prev.filter(i => i.id !== insight.id));
-  };
+  }, [executeAction]);
 
-  const dismissInsight = (id: string) => {
+  const dismissInsight = useCallback(async (id: string) => {
+    await actions.softDelete("marketing", "ai_insight", id);
     setInsights(prev => prev.filter(i => i.id !== id));
-  };
+  }, [actions]);
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -287,7 +313,7 @@ const MMAIAutomation: React.FC = () => {
                         </div>
                         <Switch
                           checked={module.enabled}
-                          onCheckedChange={() => toggleModule(module.id)}
+                          onCheckedChange={() => toggleModule(module.id, module.name)}
                         />
                       </div>
                       

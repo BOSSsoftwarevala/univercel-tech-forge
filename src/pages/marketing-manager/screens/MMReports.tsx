@@ -1,9 +1,38 @@
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, RefreshCw, Filter, Calendar } from "lucide-react";
+import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMReports = () => {
+  const { executeAction, actions } = useSystemActions();
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("daily");
+
+  const handleRefreshReport = useCallback(async (period: string) => {
+    setLoading(true);
+    await actions.refresh("marketing", "report");
+    toast.success(`${period} report refreshed`);
+    setLoading(false);
+  }, [actions]);
+
+  const handleFilterChange = useCallback(async (filter: string) => {
+    await executeAction({
+      module: "marketing",
+      action: "read",
+      entityType: "report",
+      entityId: filter,
+    });
+    toast.info(`Filter applied: ${filter}`);
+  }, [executeAction]);
+
+  const handleDateRangeSelect = useCallback(async () => {
+    await actions.read("marketing", "report", "custom_range", "Custom Date Range");
+    toast.info("Date range selector opened");
+  }, [actions]);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

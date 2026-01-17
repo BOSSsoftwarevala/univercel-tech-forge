@@ -1,23 +1,64 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Clock, Plus } from "lucide-react";
+import { Calendar, Clock, Plus, Edit, Trash2, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMSchedules = () => {
-  const [schedules] = useState([
+  const { executeAction, actions } = useSystemActions();
+  const [loading, setLoading] = useState(false);
+  const [schedules, setSchedules] = useState([
     { id: "SCH001", campaign: "Summer Sale 2025", startDate: "2025-06-01", endDate: "2025-06-30", timeWindow: "09:00 - 21:00", frequencyCap: "3/day", status: "active" },
     { id: "SCH002", campaign: "Festival Promo", startDate: "2025-07-10", endDate: "2025-07-20", timeWindow: "00:00 - 23:59", frequencyCap: "5/day", status: "scheduled" },
     { id: "SCH003", campaign: "Flash Sale", startDate: "2025-06-15", endDate: "2025-06-15", timeWindow: "12:00 - 18:00", frequencyCap: "2/hour", status: "scheduled" },
     { id: "SCH004", campaign: "Weekend Boost", startDate: "2025-06-07", endDate: "2025-06-08", timeWindow: "10:00 - 22:00", frequencyCap: "4/day", status: "completed" },
   ]);
 
-  const handleSchedule = () => {
-    toast.info("Schedule request submitted for approval");
-  };
+  const handleSchedule = useCallback(async () => {
+    setLoading(true);
+    await executeAction({
+      module: "marketing",
+      action: "create",
+      entityType: "schedule",
+      entityId: "new",
+    });
+    toast.success("Schedule request submitted for approval");
+    setLoading(false);
+  }, [executeAction]);
+
+  const handleEditSchedule = useCallback(async (id: string, name: string) => {
+    await executeAction({
+      module: "marketing",
+      action: "update",
+      entityType: "schedule",
+      entityId: id,
+      entityName: name,
+    });
+    toast.info(`Edit schedule: ${name}`);
+  }, [executeAction]);
+
+  const handleToggleStatus = useCallback(async (id: string, name: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "paused" : "active";
+    await executeAction({
+      module: "marketing",
+      action: newStatus === "active" ? "resume" : "pause",
+      entityType: "schedule",
+      entityId: id,
+      entityName: name,
+    });
+    setSchedules(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
+    toast.success(`Schedule ${newStatus === "active" ? "activated" : "paused"}`);
+  }, [executeAction]);
+
+  const handleDeleteSchedule = useCallback(async (id: string, name: string) => {
+    await actions.softDelete("marketing", "schedule", id, name);
+    setSchedules(prev => prev.filter(s => s.id !== id));
+    toast.success("Schedule deleted");
+  }, [actions]);
 
   return (
     <motion.div

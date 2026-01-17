@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MapPin, Globe, Users } from "lucide-react";
+import { MapPin, Globe, Users, Edit, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMLocationTargeting = () => {
-  const [targets] = useState([
+  const { executeAction, actions } = useSystemActions();
+  const [loading, setLoading] = useState(false);
+  const [targets, setTargets] = useState([
     { id: "LOC001", continent: "Asia", country: "India", city: "Mumbai", audience: "2.5M", language: "Hindi, English", currency: "INR", status: "active" },
     { id: "LOC002", continent: "Asia", country: "India", city: "Delhi", audience: "3.1M", language: "Hindi, English", currency: "INR", status: "active" },
     { id: "LOC003", continent: "Europe", country: "UK", city: "London", audience: "1.8M", language: "English", currency: "GBP", status: "active" },
@@ -16,9 +19,39 @@ const MMLocationTargeting = () => {
     { id: "LOC005", continent: "Middle East", country: "UAE", city: "Dubai", audience: "0.9M", language: "Arabic, English", currency: "AED", status: "active" },
   ]);
 
-  const handleSetTarget = () => {
-    toast.info("Location targeting request submitted for approval");
-  };
+  const handleSetTarget = useCallback(async () => {
+    setLoading(true);
+    await executeAction({
+      module: "marketing",
+      action: "create",
+      entityType: "location_target",
+      entityId: "new",
+    });
+    toast.success("Location targeting request submitted for approval");
+    setLoading(false);
+  }, [executeAction]);
+
+  const handleEditTarget = useCallback(async (id: string, city: string) => {
+    await executeAction({
+      module: "marketing",
+      action: "update",
+      entityType: "location_target",
+      entityId: id,
+      entityName: city,
+    });
+    toast.info(`Editing target: ${city}`);
+  }, [executeAction]);
+
+  const handleViewTarget = useCallback(async (id: string, city: string) => {
+    await actions.read("marketing", "location_target", id, city);
+    toast.info(`Viewing: ${city}`);
+  }, [actions]);
+
+  const handleDeleteTarget = useCallback(async (id: string, city: string) => {
+    await actions.softDelete("marketing", "location_target", id, city);
+    setTargets(prev => prev.filter(t => t.id !== id));
+    toast.success("Location target deleted");
+  }, [actions]);
 
   return (
     <motion.div

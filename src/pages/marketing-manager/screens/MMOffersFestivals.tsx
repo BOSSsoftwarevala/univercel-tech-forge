@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Sparkles, Plus } from "lucide-react";
+import { Sparkles, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMOffersFestivals = () => {
-  const [festivals] = useState([
+  const { executeAction, actions } = useSystemActions();
+  const [loading, setLoading] = useState(false);
+  const [festivals, setFestivals] = useState([
     { id: "FES001", name: "Diwali 2025", autoColor: "#FFD700", autoTheme: "Golden Sparkle", discount: "40%", sector: "All", status: "scheduled" },
     { id: "FES002", name: "Christmas 2025", autoColor: "#FF0000", autoTheme: "Red & White", discount: "30%", sector: "Retail", status: "scheduled" },
     { id: "FES003", name: "New Year 2026", autoColor: "#C0C0C0", autoTheme: "Silver Celebration", discount: "25%", sector: "All", status: "draft" },
@@ -22,9 +25,39 @@ const MMOffersFestivals = () => {
     { tier: "Platinum", minSpend: "₹25,000", discount: "40%" },
   ]);
 
-  const handleProposeOffer = () => {
-    toast.info("Offer proposal submitted for approval");
-  };
+  const handleProposeOffer = useCallback(async () => {
+    setLoading(true);
+    await executeAction({
+      module: "marketing",
+      action: "create",
+      entityType: "offer",
+      entityId: "new",
+    });
+    toast.success("Offer proposal submitted for approval");
+    setLoading(false);
+  }, [executeAction]);
+
+  const handleViewFestival = useCallback(async (id: string, name: string) => {
+    await actions.read("marketing", "festival", id, name);
+    toast.info(`Viewing: ${name}`);
+  }, [actions]);
+
+  const handleEditFestival = useCallback(async (id: string, name: string) => {
+    await executeAction({
+      module: "marketing",
+      action: "update",
+      entityType: "festival",
+      entityId: id,
+      entityName: name,
+    });
+    toast.info(`Edit festival: ${name}`);
+  }, [executeAction]);
+
+  const handleDeleteFestival = useCallback(async (id: string, name: string) => {
+    await actions.softDelete("marketing", "festival", id, name);
+    setFestivals(prev => prev.filter(f => f.id !== id));
+    toast.success("Festival deleted");
+  }, [actions]);
 
   return (
     <motion.div

@@ -1,14 +1,42 @@
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, MousePointer, Target, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Eye, MousePointer, Target, TrendingUp, RefreshCw, Download, Filter } from "lucide-react";
+import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMPerformance = () => {
+  const { executeAction, actions } = useSystemActions();
+  const [loading, setLoading] = useState(false);
   const metrics = [
     { label: "Total Reach", value: "4.2M", icon: Eye, change: "+12%", positive: true },
     { label: "CTR", value: "3.8%", icon: MousePointer, change: "+0.4%", positive: true },
     { label: "Conversions", value: "12,450", icon: Target, change: "+8%", positive: true },
     { label: "ROI", value: "4.2x", icon: TrendingUp, change: "+0.3x", positive: true },
   ];
+
+  const handleRefresh = useCallback(async () => {
+    setLoading(true);
+    await actions.refresh("marketing", "performance");
+    toast.success("Analytics refreshed");
+    setLoading(false);
+  }, [actions]);
+
+  const handleDrillDown = useCallback(async (channel: string) => {
+    await actions.read("marketing", "performance", channel, channel);
+    toast.info(`Drilling into ${channel} analytics...`);
+  }, [actions]);
+
+  const handleExportRequest = useCallback(async () => {
+    await executeAction({
+      module: "marketing",
+      action: "export",
+      entityType: "performance_report",
+      entityId: "request",
+    });
+    toast.info("Export request submitted for approval");
+  }, [executeAction]);
 
   return (
     <motion.div

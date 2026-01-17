@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+import { useSystemActions } from '@/hooks/useSystemActions';
 import {
   ChevronRight, ChevronDown, Plus, Edit2, Trash2, Eye, 
   Megaphone, Layers, Image, MousePointerClick, Target,
@@ -134,6 +135,7 @@ const mockHierarchy: HierarchyItem[] = [
 ];
 
 const MMCampaignHierarchy: React.FC = () => {
+  const { executeAction, actions } = useSystemActions();
   const [hierarchy, setHierarchy] = useState<HierarchyItem[]>(mockHierarchy);
   const [selectedItem, setSelectedItem] = useState<HierarchyItem | null>(null);
 
@@ -152,23 +154,44 @@ const MMCampaignHierarchy: React.FC = () => {
     setHierarchy(updateExpanded(hierarchy));
   };
 
-  const handleStatusToggle = (id: string, currentStatus: string) => {
+  const handleStatusToggle = useCallback(async (id: string, name: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+    await executeAction({
+      module: "marketing",
+      action: newStatus === 'active' ? 'resume' : 'pause',
+      entityType: "campaign_item",
+      entityId: id,
+      entityName: name,
+    });
     toast.success(`Status changed to ${newStatus}`);
-  };
+  }, [executeAction]);
 
-  const handleCreate = (parentId: string, type: string) => {
+  const handleCreate = useCallback(async (parentId: string, type: string) => {
+    await executeAction({
+      module: "marketing",
+      action: "create",
+      entityType: type,
+      entityId: parentId,
+    });
     toast.info(`Creating new ${type}...`);
-  };
+  }, [executeAction]);
 
-  const handleEdit = (item: HierarchyItem) => {
+  const handleEdit = useCallback(async (item: HierarchyItem) => {
     setSelectedItem(item);
+    await executeAction({
+      module: "marketing",
+      action: "update",
+      entityType: item.type,
+      entityId: item.id,
+      entityName: item.name,
+    });
     toast.info(`Editing ${item.name}`);
-  };
+  }, [executeAction]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback(async (id: string, name: string) => {
+    await actions.softDelete("marketing", "campaign_item", id, name);
     toast.success('Item deleted (soft delete)');
-  };
+  }, [actions]);
 
   const renderItem = (item: HierarchyItem, depth: number = 0) => {
     const config = typeConfig[item.type];
@@ -225,7 +248,7 @@ const MMCampaignHierarchy: React.FC = () => {
 
           {/* Actions */}
           <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1">
-            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); handleStatusToggle(item.id, item.status); }}>
+            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); handleStatusToggle(item.id, item.name, item.status); }}>
               {item.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
             </Button>
             <DropdownMenu>
@@ -243,7 +266,7 @@ const MMCampaignHierarchy: React.FC = () => {
                     <Plus className="w-3 h-3 mr-2" /> Add {typeConfig[getChildType(item.type)]?.label}
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={() => handleDelete(item.id)} className="text-red-400">
+                <DropdownMenuItem onClick={() => handleDelete(item.id, item.name)} className="text-red-400">
                   <Trash2 className="w-3 h-3 mr-2" /> Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>

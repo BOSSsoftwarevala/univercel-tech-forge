@@ -1,38 +1,69 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Image, Video, FileText, Upload, RefreshCw } from "lucide-react";
+import { Image, Video, FileText, Upload, RefreshCw, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMCreativesLibrary = () => {
-  const [banners] = useState([
+  const { executeAction, actions } = useSystemActions();
+  const [loading, setLoading] = useState(false);
+  const [banners, setBanners] = useState([
     { id: "BNR001", name: "Summer Sale Banner", size: "1200x628", format: "PNG", status: "approved" },
     { id: "BNR002", name: "Festival Header", size: "1920x400", format: "JPG", status: "approved" },
     { id: "BNR003", name: "Mobile Promo", size: "600x600", format: "PNG", status: "pending" },
   ]);
 
-  const [videos] = useState([
+  const [videos, setVideos] = useState([
     { id: "VID001", name: "Product Demo 30s", duration: "0:30", format: "MP4", status: "approved" },
     { id: "VID002", name: "Brand Story", duration: "1:00", format: "MP4", status: "approved" },
     { id: "VID003", name: "Testimonial Clip", duration: "0:45", format: "MP4", status: "pending" },
   ]);
 
-  const [copies] = useState([
+  const [copies, setCopies] = useState([
     { id: "CPY001", name: "Email Subject Lines", variants: 5, status: "approved" },
     { id: "CPY002", name: "Social Media Posts", variants: 12, status: "approved" },
     { id: "CPY003", name: "Ad Headlines", variants: 8, status: "pending" },
   ]);
 
-  const handleUpload = () => {
-    toast.info("Upload request submitted for approval");
-  };
+  const handleUpload = useCallback(async () => {
+    setLoading(true);
+    await executeAction({
+      module: "marketing",
+      action: "create",
+      entityType: "creative",
+      entityId: "new",
+    });
+    toast.success("Upload request submitted for approval");
+    setLoading(false);
+  }, [executeAction]);
 
-  const handleReplace = (id: string) => {
-    toast.info(`Replace request for ${id} submitted for approval`);
-  };
+  const handleReplace = useCallback(async (id: string, name: string) => {
+    await executeAction({
+      module: "marketing",
+      action: "update",
+      entityType: "creative",
+      entityId: id,
+      entityName: name,
+    });
+    toast.info(`Replace request for ${name} submitted for approval`);
+  }, [executeAction]);
+
+  const handleView = useCallback(async (id: string, name: string) => {
+    await actions.read("marketing", "creative", id, name);
+    toast.info(`Viewing: ${name}`);
+  }, [actions]);
+
+  const handleDelete = useCallback(async (id: string, name: string, type: string) => {
+    await actions.softDelete("marketing", "creative", id, name);
+    if (type === "banner") setBanners(prev => prev.filter(b => b.id !== id));
+    if (type === "video") setVideos(prev => prev.filter(v => v.id !== id));
+    if (type === "copy") setCopies(prev => prev.filter(c => c.id !== id));
+    toast.success(`${type} deleted`);
+  }, [actions]);
 
   return (
     <motion.div
@@ -79,7 +110,7 @@ const MMCreativesLibrary = () => {
                       <Badge className={banner.status === "approved" ? "bg-emerald-500/20 text-emerald-400" : "bg-yellow-500/20 text-yellow-400"}>
                         {banner.status}
                       </Badge>
-                      <Button size="sm" variant="ghost" onClick={() => handleReplace(banner.id)}>
+                      <Button size="sm" variant="ghost" onClick={() => handleReplace(banner.id, banner.name)}>
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
@@ -105,7 +136,7 @@ const MMCreativesLibrary = () => {
                       <Badge className={video.status === "approved" ? "bg-emerald-500/20 text-emerald-400" : "bg-yellow-500/20 text-yellow-400"}>
                         {video.status}
                       </Badge>
-                      <Button size="sm" variant="ghost" onClick={() => handleReplace(video.id)}>
+                      <Button size="sm" variant="ghost" onClick={() => handleReplace(video.id, video.name)}>
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
@@ -131,7 +162,7 @@ const MMCreativesLibrary = () => {
                       <Badge className={copy.status === "approved" ? "bg-emerald-500/20 text-emerald-400" : "bg-yellow-500/20 text-yellow-400"}>
                         {copy.status}
                       </Badge>
-                      <Button size="sm" variant="ghost" onClick={() => handleReplace(copy.id)}>
+                      <Button size="sm" variant="ghost" onClick={() => handleReplace(copy.id, copy.name)}>
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
