@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, Phone, MessageCircle, User, ChevronDown, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import GlobalNotificationHeader from "@/components/shared/GlobalNotificationHeader";
 import type { NotificationAlert } from "@/components/shared/GlobalNotificationHeader";
 
@@ -14,9 +16,29 @@ interface SalesSupportTopBarProps {
 
 const SalesSupportTopBar = ({
   notifications = [],
-  onDismissNotification = () => {},
-  onNotificationAction = () => {}
+  onDismissNotification,
+  onNotificationAction
 }: SalesSupportTopBarProps) => {
+  const [localNotifications, setLocalNotifications] = useState(notifications);
+
+  useEffect(() => {
+    setLocalNotifications(notifications);
+  }, [notifications]);
+
+  const handleDismiss = (id: string) => {
+    setLocalNotifications(prev => prev.filter(n => n.id !== id));
+    onDismissNotification?.(id);
+    toast.info('Notification dismissed');
+  };
+
+  const handleAction = (id: string) => {
+    const notification = localNotifications.find(n => n.id === id);
+    if (notification) {
+      toast.success(`Action: ${notification.actionLabel || 'Viewed'}`);
+      setLocalNotifications(prev => prev.filter(n => n.id !== id));
+    }
+    onNotificationAction?.(id);
+  };
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -49,9 +71,9 @@ const SalesSupportTopBar = ({
         {/* Global Notification Header */}
         <GlobalNotificationHeader
           userRole="support"
-          notifications={notifications}
-          onDismiss={onDismissNotification}
-          onAction={onNotificationAction}
+          notifications={localNotifications}
+          onDismiss={handleDismiss}
+          onAction={handleAction}
         />
         
         <div className="h-8 w-px bg-slate-700 mx-2" />

@@ -36,11 +36,29 @@ const DeveloperTopBarComplete = ({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [availability, setAvailability] = useState<'available' | 'busy' | 'away'>('available');
+  const [localNotifications, setLocalNotifications] = useState(notifications);
+
+  useEffect(() => {
+    setLocalNotifications(notifications);
+  }, [notifications]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleDismissNotification = (id: string) => {
+    setLocalNotifications(prev => prev.filter(n => n.id !== id));
+    toast.info('Notification dismissed');
+  };
+
+  const handleNotificationAction = (id: string) => {
+    const notification = localNotifications.find(n => n.id === id);
+    if (notification) {
+      toast.success(`Action taken: ${notification.actionLabel || 'View'}`);
+      setLocalNotifications(prev => prev.filter(n => n.id !== id));
+    }
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -137,9 +155,9 @@ const DeveloperTopBarComplete = ({
         {/* Notifications */}
         <GlobalNotificationHeader
           userRole="developer"
-          notifications={notifications}
-          onDismiss={() => {}}
-          onAction={() => {}}
+          notifications={localNotifications}
+          onDismiss={handleDismissNotification}
+          onAction={handleNotificationAction}
           showPromiseButton={true}
         />
 

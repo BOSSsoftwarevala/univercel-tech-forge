@@ -12,6 +12,7 @@ import { TimerWidget } from '../components/TimerWidget';
 import { WalletChip } from '../components/WalletChip';
 import { DataTable } from '../components/DataTable';
 import { WireframeModal } from '../components/WireframeModal';
+import { toast } from 'sonner';
 
 const mockTasks = [
   { id: 'T-1234', title: 'API Integration for CRM', status: 'in_progress', stack: ['PHP', 'MySQL'], deadline: '2 hours', progress: 65, client: 'CLI***042' },
@@ -25,7 +26,18 @@ const skillTags = ['PHP', 'Node', 'React', 'Python', 'Java', 'MySQL', 'MongoDB',
 export function DeveloperScreen() {
   const [showPromiseModal, setShowPromiseModal] = useState(false);
   const [activeTask, setActiveTask] = useState(mockTasks[0]);
+  const [timerStatus, setTimerStatus] = useState<'running' | 'paused'>('running');
   const isDark = true;
+
+  const handlePause = () => {
+    setTimerStatus('paused');
+    toast.info('Timer paused');
+  };
+
+  const handleStop = () => {
+    setTimerStatus('paused');
+    toast.success('Task completed!');
+  };
 
   const statusColors = {
     pending: 'bg-amber-500',
@@ -61,11 +73,11 @@ export function DeveloperScreen() {
             taskId={activeTask.id}
             taskTitle={activeTask.title}
             elapsedTime="02:34:12"
-            status="running"
+            status={timerStatus}
             progress={activeTask.progress}
             deadline={activeTask.deadline}
-            onPause={() => {}}
-            onStop={() => {}}
+            onPause={handlePause}
+            onStop={handleStop}
             isDark={isDark}
           />
         </div>
