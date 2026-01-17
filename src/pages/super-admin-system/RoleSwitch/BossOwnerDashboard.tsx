@@ -398,24 +398,31 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* ENTERPRISE: GLOBAL CONTROL CARDS — STATUS ONLY (NO ACTIONS) */}
-        {/* RULE: Cards = Status Display | Sidebar = Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
+        {/* ═══════════════════════════════════════════════════════════════════
+            BOSS KPI GRID — 12 ACTION-ONLY BOXES (LOCKED)
+            RULE: Same size, same font, same color — only content changes
+            ═══════════════════════════════════════════════════════════════════ */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
           {[
-            // CONTINENT CONTROLS (6)
-            { id: 'africa', label: 'AFRICA CONTROL', value: '4', subValues: ['2 Pending', '1 Critical', '1 Waiting'], status: 'action', icon: Globe2, iconBg: '#F9731620', iconColor: '#F97316', source: 'Continent', urgency: 'medium' as const, lastUpdate: '15m ago', actions: ['review', 'approve', 'sendback'] },
-            { id: 'asia', label: 'ASIA CONTROL', value: '7', subValues: ['4 Queue', '2 Risk', '1 SLA'], status: 'critical', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'critical' as const, lastUpdate: '5m ago', actions: ['review', 'approve', 'suspend'] },
-            { id: 'europe', label: 'EUROPE CONTROL', value: '3', subValues: ['2 Requests', '1 Legal'], status: 'action', icon: Globe2, iconBg: '#2563EB20', iconColor: '#2563EB', source: 'Continent', urgency: 'high' as const, lastUpdate: '30m ago', actions: ['review', 'approve', 'escalate'] },
-            { id: 'north_america', label: 'NORTH AMERICA', value: '5', subValues: ['3 Pending', '2 Financial'], status: 'action', icon: Globe2, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'Continent', urgency: 'high' as const, lastUpdate: '10m ago', actions: ['review', 'approve', 'reject'] },
-            { id: 'south_america', label: 'SOUTH AMERICA', value: '2', subValues: ['1 Ops', '1 Backlog'], status: 'warning', icon: Globe2, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Continent', urgency: 'medium' as const, lastUpdate: '1h ago', actions: ['review', 'approve', 'sendback'] },
-            { id: 'middle_east', label: 'MIDDLE EAST', value: '3', subValues: ['2 Security', '1 Override'], status: 'action', icon: Globe2, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Continent', urgency: 'high' as const, lastUpdate: '20m ago', actions: ['review', 'approve', 'lock'] },
-            // CHANNEL CONTROLS (6)
-            { id: 'core_admin', label: 'CORE ADMIN OPS', value: '6', subValues: ['4 System', '2 Escalations'], status: 'action', icon: Shield, iconBg: '#6366F120', iconColor: '#6366F1', source: 'Global', urgency: 'high' as const, lastUpdate: '8m ago', actions: ['approve', 'reject', 'lock'] },
-            { id: 'franchise', label: 'FRANCHISE REQUESTS', value: '8', subValues: ['5 New Apps', '3 Renewals'], status: 'action', icon: Users, iconBg: '#0EA5E920', iconColor: '#0EA5E9', source: 'Channel', urgency: 'high' as const, lastUpdate: '12m ago', actions: ['approve', 'reject', 'review'] },
-            { id: 'reseller', label: 'RESELLER ACTIONS', value: '4', subValues: ['2 Onboard', '2 Disputes'], status: 'warning', icon: CreditCard, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'Channel', urgency: 'medium' as const, lastUpdate: '45m ago', actions: ['approve', 'resolve', 'sendback'] },
-            { id: 'influencer', label: 'INFLUENCER CONTROL', value: '5', subValues: ['3 Partners', '2 Campaigns'], status: 'action', icon: Zap, iconBg: '#EC489920', iconColor: '#EC4899', source: 'Marketing', urgency: 'medium' as const, lastUpdate: '25m ago', actions: ['approve', 'pause', 'reject'] },
-            { id: 'ai_system', label: 'AI / SYSTEM', value: '9', subValues: ['6 AI Suggested', '3 Risk Flags'], status: 'action', icon: Brain, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'AI-CORE', urgency: 'medium' as const, lastUpdate: '2m ago', actions: ['accept_ai', 'override', 'review'] },
-            { id: 'critical_interrupts', label: 'CRITICAL INTERRUPTS', value: '1', subValues: ['1 Emergency'], status: 'critical', icon: AlertOctagon, iconBg: '#EF444420', iconColor: '#EF4444', source: 'System', urgency: 'critical' as const, lastUpdate: '1m ago', actions: ['stop', 'pause', 'review'] },
+            // ROW 1: System & Infrastructure
+            { id: 'system_health', label: 'System Health', value: '98%', subValues: ['All services up'], status: 'healthy', icon: Activity, source: 'System', urgency: 'low' as const, lastUpdate: '1m ago', actions: ['review', 'refresh'] },
+            { id: 'server_risk', label: 'Server Load / Risk', value: '2', subValues: ['1 High Load', '1 Warning'], status: 'warning', icon: Server, source: 'Infra', urgency: 'medium' as const, lastUpdate: '3m ago', actions: ['review', 'restart', 'scale'] },
+            { id: 'critical_alerts', label: 'Critical Alerts', value: '3', subValues: ['1 Security', '2 System'], status: 'critical', icon: AlertTriangle, source: 'Global', urgency: 'critical' as const, lastUpdate: '2m ago', actions: ['acknowledge', 'escalate', 'resolve'] },
+            { id: 'pending_approvals', label: 'Pending Approvals', value: '12', subValues: ['5 Financial', '4 Access', '3 Deploy'], status: 'action', icon: CheckCircle2, source: 'Approval', urgency: 'high' as const, lastUpdate: '5m ago', actions: ['approve', 'reject', 'review'] },
+            
+            // ROW 2: Development & Deployment
+            { id: 'failed_builds', label: 'Failed Builds', value: '2', subValues: ['1 Frontend', '1 API'], status: 'warning', icon: Bug, source: 'DevOps', urgency: 'high' as const, lastUpdate: '15m ago', actions: ['retry', 'review', 'cancel'] },
+            { id: 'deploy_waiting', label: 'Deployment Waiting', value: '4', subValues: ['2 Staged', '2 Ready'], status: 'action', icon: Rocket, source: 'Pipeline', urgency: 'medium' as const, lastUpdate: '10m ago', actions: ['deploy', 'rollback', 'review'] },
+            
+            // ROW 3: Finance & Business
+            { id: 'payment_pending', label: 'Payment Pending', value: '8', subValues: ['₹2.4L Total', '3 Overdue'], status: 'action', icon: CreditCard, source: 'Finance', urgency: 'high' as const, lastUpdate: '30m ago', actions: ['approve', 'reject', 'hold'] },
+            { id: 'expiry_renewal', label: 'Expiry / Renewal Due', value: '6', subValues: ['4 This Week', '2 Urgent'], status: 'warning', icon: CalendarClock, source: 'Billing', urgency: 'medium' as const, lastUpdate: '1h ago', actions: ['renew', 'notify', 'review'] },
+            { id: 'ai_cost_spike', label: 'AI / API Cost Spike', value: '↑23%', subValues: ['Above threshold'], status: 'warning', icon: Brain, source: 'AI-Core', urgency: 'medium' as const, lastUpdate: '20m ago', actions: ['review', 'limit', 'optimize'] },
+            
+            // ROW 4: Issues & Compliance
+            { id: 'open_issues', label: 'Open Issues', value: '15', subValues: ['7 P1', '5 P2', '3 P3'], status: 'action', icon: Archive, source: 'Support', urgency: 'high' as const, lastUpdate: '8m ago', actions: ['assign', 'escalate', 'close'] },
+            { id: 'security_warnings', label: 'Security Warnings', value: '4', subValues: ['2 Auth', '1 Access', '1 Data'], status: 'critical', icon: ShieldAlert, source: 'Security', urgency: 'critical' as const, lastUpdate: '5m ago', actions: ['investigate', 'block', 'resolve'] },
+            { id: 'sla_breach', label: 'Compliance / SLA Breach', value: '1', subValues: ['Response time SLA'], status: 'critical', icon: Scale, source: 'Legal', urgency: 'critical' as const, lastUpdate: '12m ago', actions: ['review', 'mitigate', 'report'] },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             const isSelected = selectedCard?.id === stat.id;
@@ -448,15 +455,15 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 className={cn(
-                  "cursor-pointer transition-all duration-200",
+                  "cursor-pointer transition-all duration-200 group",
                   isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background"
                 )}
                 style={{
-                  height: '130px',
-                  minHeight: '130px',
-                  maxHeight: '130px',
+                  height: '140px',
+                  minHeight: '140px',
+                  maxHeight: '140px',
                   padding: '14px',
-                  background: isSelected ? 'hsl(var(--card))' : 'hsl(var(--card))',
+                  background: 'hsl(var(--card))',
                   border: `1px solid ${isSelected ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
                   borderRadius: '14px',
                   boxShadow: isSelected 
@@ -475,8 +482,12 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
-                    background: stat.status === 'critical' ? 'hsl(var(--destructive))' : 'hsl(var(--status-success))',
-                    animation: 'pulse 2s infinite',
+                    background: stat.status === 'critical' 
+                      ? 'hsl(var(--destructive))' 
+                      : stat.status === 'warning' 
+                        ? 'hsl(38 92% 50%)' 
+                        : 'hsl(var(--status-success))',
+                    animation: stat.status === 'critical' ? 'pulse 1s infinite' : 'pulse 2s infinite',
                   }}
                 />
                 
@@ -488,44 +499,66 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     </p>
                     <div className="flex items-baseline gap-2 mt-1">
                       <p className={cn(
-                        "text-[28px] font-bold leading-none",
-                        stat.status === 'critical' ? "text-destructive" : "text-foreground"
+                        "text-[26px] font-bold leading-none",
+                        stat.status === 'critical' && "text-destructive",
+                        stat.status === 'healthy' && "text-green-500"
                       )}>
                         {stat.value}
                       </p>
-                      <span className="text-[10px] text-muted-foreground">items</span>
                     </div>
                     {/* Sub-values summary */}
-                    <p className="text-[9px] text-muted-foreground mt-1 leading-relaxed">
+                    <p className="text-[9px] text-muted-foreground mt-1 leading-relaxed line-clamp-1">
                       {stat.subValues?.join(' • ')}
                     </p>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <div 
-                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted"
-                    >
-                      <Icon className="w-[18px] h-[18px] text-muted-foreground" />
-                    </div>
+                  <div 
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted"
+                  >
+                    <Icon className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </div>
                 
                 {/* Bottom Row: Source + Urgency + Last Update */}
-                <div className="flex items-center justify-between mt-auto">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-muted-foreground">{stat.source}</span>
+                <div className="flex items-center justify-between mt-auto pt-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] text-muted-foreground">{stat.source}</span>
                     <Badge 
                       variant="outline" 
                       className={cn(
-                        "text-[8px] font-semibold px-1.5 py-0 h-4",
+                        "text-[7px] font-semibold px-1 py-0 h-3.5",
                         stat.urgency === 'critical' && "border-destructive/50 text-destructive bg-destructive/10",
                         stat.urgency === 'high' && "border-orange-500/50 text-orange-600 bg-orange-500/10",
-                        stat.urgency === 'medium' && "border-amber-500/50 text-amber-600 bg-amber-500/10"
+                        stat.urgency === 'medium' && "border-amber-500/50 text-amber-600 bg-amber-500/10",
+                        stat.urgency === 'low' && "border-green-500/50 text-green-600 bg-green-500/10"
                       )}
                     >
                       {stat.urgency.toUpperCase()}
                     </Badge>
                   </div>
                   <span className="text-[8px] text-muted-foreground">{stat.lastUpdate}</span>
+                </div>
+
+                {/* HOVER: Inline Action Buttons */}
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 px-2">
+                  {stat.actions?.slice(0, 3).map((action, i) => (
+                    <Button
+                      key={action}
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 px-2 text-[8px] bg-muted/80 hover:bg-primary hover:text-primary-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (action === 'approve') handleKpiApprove(stat.label);
+                        else if (action === 'reject') {
+                          setSelectedKpiForReject(stat.label);
+                          setShowRejectDialog(true);
+                        }
+                        else toast.info(`${action}: ${stat.label}`);
+                      }}
+                    >
+                      {action}
+                    </Button>
+                  ))}
                 </div>
               </motion.div>
             );

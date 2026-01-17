@@ -243,12 +243,16 @@ export const roleConfigs = {
 const roleNavItems: Record<ActiveRole, Array<{ id: string; label: string; icon: any; subItems?: Array<{ id: string; label: string; status: string }> }>> = {
   boss_owner: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "super-admins", label: "Super Admins", icon: Users },
-    { id: "franchise-intel", label: "Franchise Intelligence", icon: Building2 },
-    { id: "roles", label: "Roles & Permissions", icon: Key },
-    { id: "modules", label: "System Modules", icon: Cpu },
-    { id: "audit", label: "Audit & Blackbox", icon: Database },
-    { id: "security", label: "Security & Legal", icon: Shield },
+    { id: "approvals", label: "Approvals", icon: CheckCircle },
+    { id: "server-control", label: "Server Control", icon: Server },
+    { id: "dev-control", label: "Development Control", icon: Code2 },
+    { id: "franchise-control", label: "Franchise Control", icon: Building2 },
+    { id: "reseller-control", label: "Reseller Control", icon: Handshake },
+    { id: "finance", label: "Finance & Wallet", icon: Wallet },
+    { id: "marketing", label: "Marketing / Leads", icon: Target },
+    { id: "product-demo", label: "Product & Demo", icon: Box },
+    { id: "support-overview", label: "Support Overview", icon: Headphones },
+    { id: "security", label: "Security / Black Box", icon: Shield },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   ceo: [
