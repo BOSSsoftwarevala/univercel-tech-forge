@@ -32,8 +32,8 @@ export function BossPanelLayout({ children }: BossPanelLayoutProps) {
     <div 
       className="min-h-screen flex flex-col"
       style={{ 
-        background: '#0B0F1A',
-        color: '#FFFFFF'
+        background: '#F8FAFC',
+        color: '#1E293B'
       }}
     >
       {/* Fixed Global Header - LOCKED 64px */}
@@ -51,12 +51,12 @@ export function BossPanelLayout({ children }: BossPanelLayoutProps) {
           onCollapsedChange={setSidebarCollapsed}
         />
 
-        {/* Main Content */}
+        {/* Main Content - White background like reference */}
         <main 
           className="flex-1 p-6 transition-all duration-300"
           style={{ 
             marginLeft: sidebarCollapsed ? '80px' : '260px',
-            background: '#0B0F1A'
+            background: '#F8FAFC'
           }}
         >
           {children || <Outlet context={{ activeSection, streamingOn }} />}
