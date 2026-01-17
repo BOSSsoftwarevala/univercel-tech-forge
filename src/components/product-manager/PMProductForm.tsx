@@ -108,7 +108,9 @@ const PMProductForm: React.FC<PMProductFormProps> = ({ productId, onSave, onCanc
         lifetime_price: data.lifetime_price || 0,
         monthly_price: data.monthly_price || 0,
         status: data.status || 'draft',
-        features: Array.isArray(data.features_json) ? data.features_json : [],
+        features: Array.isArray(data.features_json) 
+          ? (data.features_json as unknown[]).map(f => String(f)) 
+          : [],
         demo_ids: data.demo_mappings?.map((m: any) => m.demo_id) || [],
       });
     }
