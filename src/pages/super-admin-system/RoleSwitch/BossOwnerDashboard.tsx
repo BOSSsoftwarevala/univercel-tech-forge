@@ -252,8 +252,8 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
       className="min-h-full w-full overflow-auto"
       style={{ background: COLORS.background }}
     >
-      {/* Pending Requests Banner - TOP PRIORITY */}
-      <PendingRequestsBanner />
+      {/* FIX-01: Red Payment Banner REMOVED from Boss/Owner dashboard */}
+      {/* Banner should appear ONLY on Billing page - not here */}
       
       <div className="p-6">
         {/* LOCKED: Premium Boss Header */}
@@ -285,13 +285,14 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            {/* FIX-02: WRAP all buttons inside single FlexRow container - vertically center aligned */}
+            <div className="flex items-center gap-3 flex-wrap">
               <div 
-                className="flex items-center gap-2 px-4 py-2"
+                className="flex items-center gap-2 px-4 py-2 h-[44px]"
                 style={{
                   background: 'rgba(37, 99, 235, 0.15)',
                   border: `1px solid rgba(37, 99, 235, 0.5)`,
-                  borderRadius: '8px'
+                  borderRadius: '12px'
                 }}
               >
                 <Crown style={{ width: '16px', height: '16px', color: COLORS.brand }} />
@@ -565,8 +566,8 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 mt-0">
-            {/* Global Operations Map - FULL WIDTH, NO GAP */}
-            <div className="-mx-6" style={{ width: 'calc(100% + 48px)' }}>
+            {/* FIX-06: Global Operations Map - FULL WIDTH, NO GAP, NO EXTRA TOP MARGIN */}
+            <div className="-mx-6 -mt-0" style={{ width: 'calc(100% + 48px)', marginTop: 0, paddingTop: 0 }}>
               <GlobalNetworkMap className="w-full" />
             </div>
 

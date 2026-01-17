@@ -177,9 +177,10 @@ export function PendingRequestsBanner() {
     setIsExpanded(false);
   };
 
-  if (counts.total === 0 && !isLoading) {
-    return null;
-  }
+  // FIX-01: Hide banner on Boss/Owner dashboard - always return null
+  // Banner should appear ONLY on Billing page
+  // For now, completely hide pending requests banner from Boss/Owner view
+  return null;
 
   return (
     <div className="relative z-50">
