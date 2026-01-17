@@ -418,12 +418,6 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           ].map((stat, idx) => {
             const Icon = stat.icon;
             const isSelected = selectedCard?.id === stat.id;
-            const urgencyColors: Record<string, string> = {
-              critical: '#EF4444',
-              high: '#F97316',
-              medium: '#EAB308',
-              low: '#22C55E'
-            };
             
             // Handle card click - set context for sidebar actions
             const handleCardClick = () => {
@@ -454,35 +448,33 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 whileTap={{ scale: 0.98 }}
                 className={cn(
                   "cursor-pointer transition-all duration-200",
-                  isSelected && "ring-2 ring-blue-500 ring-offset-2"
+                  isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background"
                 )}
                 style={{
                   height: '130px',
                   minHeight: '130px',
                   maxHeight: '130px',
                   padding: '14px',
-                  background: isSelected ? '#F0F9FF' : '#FFFFFF',
-                  border: `2px solid ${isSelected ? '#3B82F6' : stat.status === 'critical' ? '#FCA5A540' : '#E5E7EB'}`,
+                  background: isSelected ? 'hsl(var(--card))' : 'hsl(var(--card))',
+                  border: `1px solid ${isSelected ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
                   borderRadius: '14px',
                   boxShadow: isSelected 
-                    ? '0 8px 24px rgba(59,130,246,0.2)' 
-                    : stat.status === 'critical' 
-                      ? '0 4px 16px rgba(239,68,68,0.12)' 
-                      : '0 4px 12px rgba(0,0,0,0.06)',
+                    ? '0 8px 24px hsl(var(--primary) / 0.15)' 
+                    : '0 4px 12px hsl(0 0% 0% / 0.06)',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
                   position: 'relative',
                 }}
               >
-                {/* Live Pulse Indicator */}
+                {/* Live Pulse Indicator - Status Dot */}
                 <div 
                   className="absolute top-3 right-3"
                   style={{
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
-                    background: stat.status === 'critical' ? '#EF4444' : '#22C55E',
+                    background: stat.status === 'critical' ? 'hsl(var(--destructive))' : 'hsl(var(--status-success))',
                     animation: 'pulse 2s infinite',
                   }}
                 />
@@ -490,43 +482,28 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 {/* Top Row: Label + Value + Icon */}
                 <div className="flex items-start justify-between">
                   <div style={{ flex: 1, overflow: 'hidden' }}>
-                    <p style={{ 
-                      fontSize: '10px', 
-                      color: isSelected ? '#1E40AF' : '#6B7280', 
-                      textTransform: 'uppercase', 
-                      letterSpacing: '0.05em', 
-                      fontWeight: 600, 
-                      lineHeight: '1',
-                    }}>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-semibold leading-none">
                       {stat.label}
                     </p>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <p style={{ 
-                        fontSize: '28px', 
-                        fontWeight: 700, 
-                        color: stat.status === 'critical' ? '#EF4444' : isSelected ? '#1E40AF' : '#111827', 
-                        lineHeight: '1',
-                      }}>
+                      <p className={cn(
+                        "text-[28px] font-bold leading-none",
+                        stat.status === 'critical' ? "text-destructive" : "text-foreground"
+                      )}>
                         {stat.value}
                       </p>
-                      <span style={{ fontSize: '10px', color: '#9CA3AF' }}>items</span>
+                      <span className="text-[10px] text-muted-foreground">items</span>
                     </div>
                     {/* Sub-values summary */}
-                    <p style={{ fontSize: '9px', color: '#6B7280', marginTop: '4px', lineHeight: '1.4' }}>
+                    <p className="text-[9px] text-muted-foreground mt-1 leading-relaxed">
                       {stat.subValues?.join(' • ')}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <div 
-                      className="flex items-center justify-center flex-shrink-0"
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '10px',
-                        background: stat.iconBg
-                      }}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted"
                     >
-                      <Icon style={{ width: '18px', height: '18px', color: stat.iconColor }} />
+                      <Icon className="w-[18px] h-[18px] text-muted-foreground" />
                     </div>
                   </div>
                 </div>
@@ -534,31 +511,21 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 {/* Bottom Row: Source + Urgency + Last Update */}
                 <div className="flex items-center justify-between mt-auto">
                   <div className="flex items-center gap-2">
-                    <span style={{ fontSize: '9px', color: '#9CA3AF' }}>{stat.source}</span>
-                    <span style={{ 
-                      fontSize: '8px', 
-                      fontWeight: 600,
-                      color: urgencyColors[stat.urgency],
-                      background: `${urgencyColors[stat.urgency]}15`,
-                      padding: '2px 6px',
-                      borderRadius: '4px'
-                    }}>
+                    <span className="text-[9px] text-muted-foreground">{stat.source}</span>
+                    <Badge 
+                      variant="outline" 
+                      className={cn(
+                        "text-[8px] font-semibold px-1.5 py-0 h-4",
+                        stat.urgency === 'critical' && "border-destructive/50 text-destructive bg-destructive/10",
+                        stat.urgency === 'high' && "border-orange-500/50 text-orange-600 bg-orange-500/10",
+                        stat.urgency === 'medium' && "border-amber-500/50 text-amber-600 bg-amber-500/10"
+                      )}
+                    >
                       {stat.urgency.toUpperCase()}
-                    </span>
+                    </Badge>
                   </div>
-                  <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{stat.lastUpdate}</span>
+                  <span className="text-[8px] text-muted-foreground">{stat.lastUpdate}</span>
                 </div>
-                
-                {/* Selected indicator overlay */}
-                {isSelected && (
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(59,130,246,0.05) 0%, transparent 100%)',
-                      borderRadius: '12px',
-                    }}
-                  />
-                )}
               </motion.div>
             );
           })}
