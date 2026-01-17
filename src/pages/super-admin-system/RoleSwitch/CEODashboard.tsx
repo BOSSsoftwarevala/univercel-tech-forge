@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { 
   Eye, TrendingUp, Globe2, BarChart3, PieChart, AlertTriangle,
@@ -15,6 +15,8 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 // Mock KPI data
 const kpiData = {
@@ -96,6 +98,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const [selectedSuggestion, setSelectedSuggestion] = useState<typeof aiSuggestions[0] | null>(null);
   const [noteText, setNoteText] = useState("");
   const [showNoteDialog, setShowNoteDialog] = useState(false);
+  const { user } = useAuth();
   
   // Map sidebar navigation to internal tabs
   const getTabFromNav = (nav?: string): string => {
@@ -120,19 +123,47 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
     }
   }, [activeNav]);
 
-  const handleApprove = (id: number) => {
+  // Audit logging for CEO actions
+  const logAction = useCallback(async (action: string, target: string, meta?: Record<string, any>) => {
+    try {
+      await supabase.from('audit_logs').insert({
+        user_id: user?.id,
+        role: 'ceo' as any,
+        module: 'ceo-dashboard',
+        action,
+        meta_json: { target, timestamp: new Date().toISOString(), ...meta }
+      });
+    } catch (error) {
+      console.error('Audit log error:', error);
+    }
+  }, [user?.id]);
+
+  const handleApprove = async (id: number) => {
+    const suggestion = aiSuggestions.find(s => s.id === id);
+    await logAction('suggestion_approve', suggestion?.title || `suggestion_${id}`, { 
+      suggestionId: id, 
+      type: suggestion?.type,
+      confidence: suggestion?.confidence 
+    });
     toast.success("Suggestion approved and sent to Super Admin for implementation");
   };
 
-  const handleReject = (id: number, reason: string) => {
+  const handleReject = async (id: number, reason: string) => {
+    const suggestion = aiSuggestions.find(s => s.id === id);
+    await logAction('suggestion_reject', suggestion?.title || `suggestion_${id}`, { 
+      suggestionId: id, 
+      reason,
+      type: suggestion?.type 
+    });
     toast.info("Suggestion rejected with feedback");
   };
 
-  const handleAddNote = () => {
+  const handleAddNote = async () => {
     if (noteText.length < 10) {
       toast.error("Note must be at least 10 characters");
       return;
     }
+    await logAction('strategic_note_add', 'ceo_notes', { notePreview: noteText.substring(0, 50) });
     toast.success("Strategic note added to CEO board");
     setNoteText("");
     setShowNoteDialog(false);
@@ -442,14 +473,20 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                         <Button
                           size="sm"
                           className="bg-emerald-600 hover:bg-emerald-700"
-                          onClick={() => toast.success("Approved!")}
+                          onClick={async () => {
+                            await logAction('strategic_approval_approve', item.title, { amount: item.amount, submittedBy: item.submittedBy });
+                            toast.success("Approved!");
+                          }}
                         >
                           <CheckCircle2 className="w-4 h-4" />
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => toast.info("Rejected")}
+                          onClick={async () => {
+                            await logAction('strategic_approval_reject', item.title, { amount: item.amount, submittedBy: item.submittedBy });
+                            toast.info("Rejected");
+                          }}
                         >
                           <XCircle className="w-4 h-4" />
                         </Button>
