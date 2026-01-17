@@ -592,31 +592,61 @@ const RoleSwitchSidebar = ({
   // STEP 2 FIX: Auto drill-down when a role is active (Boss should start drilled in)
   const [isDrilledDown, setIsDrilledDown] = useState(true);
   
+  // STEP 5: Track which categories are expanded (for subcategory expansion)
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['dashboard']));
+  
   // Use external activeNav if provided, otherwise use internal state
   const activeNav = externalActiveNav ?? internalActiveNav;
   
   // STEP 2 FIX: When role changes, auto drill-down to show that role's features
   useEffect(() => {
     setIsDrilledDown(true);
+    // Reset expanded categories when role changes
+    setExpandedCategories(new Set(['dashboard']));
   }, [activeRole]);
 
-  const handleNavClick = (navId: string) => {
+  // STEP 5: Toggle category expansion
+  const toggleCategoryExpansion = useCallback((categoryId: string) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set<string>();
+      // Only allow ONE category expanded at a time
+      if (!prev.has(categoryId)) {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleNavClick = useCallback((navId: string, hasSubItems: boolean = false) => {
+    // If item has sub-items, toggle expansion instead of navigating
+    if (hasSubItems) {
+      toggleCategoryExpansion(navId);
+      return;
+    }
+    
     if (onNavChange) {
       onNavChange(navId);
     } else {
       setInternalActiveNav(navId);
     }
-  };
+    
+    // Show toast for navigation feedback
+    toast.success(`Navigating to ${navId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`);
+  }, [onNavChange, toggleCategoryExpansion]);
 
-  const handleRoleSelect = (roleId: ActiveRole) => {
+  const handleRoleSelect = useCallback((roleId: ActiveRole) => {
     onRoleChange(roleId);
     setIsDrilledDown(true);
-    handleNavClick("dashboard");
-  };
+    if (onNavChange) {
+      onNavChange("dashboard");
+    } else {
+      setInternalActiveNav("dashboard");
+    }
+  }, [onRoleChange, onNavChange]);
 
-  const handleBackToRoles = () => {
+  const handleBackToRoles = useCallback(() => {
     setIsDrilledDown(false);
-  };
+  }, []);
 
   return (
     <motion.aside
@@ -691,13 +721,20 @@ const RoleSwitchSidebar = ({
                               handleRoleSelect(role.id as ActiveRole);
                             }}
                             className={cn(
-                              "w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-all duration-150",
-                              // FIX-05: Active state uses ONLY border indicator, NO background fill
+                              "w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-all duration-150 relative",
+                              // STEP 5: Active state with background highlight + left indicator
                               isActive
-                                ? "border-l-2 border-white text-white"
-                                : "text-white/90 hover:bg-white/15 hover:text-white border-l-2 border-transparent"
+                                ? "bg-white/15 text-white font-semibold"
+                                : "text-white/90 hover:bg-white/15 hover:text-white"
                             )}
                           >
+                            {/* STEP 5: Left indicator bar for active state */}
+                            {isActive && (
+                              <motion.div 
+                                layoutId="role-active-indicator"
+                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-white rounded-r-full"
+                              />
+                            )}
                             <div className={cn(
                               "w-6 h-6 rounded-md flex items-center justify-center transition-all flex-shrink-0",
                               isActive 
@@ -714,7 +751,7 @@ const RoleSwitchSidebar = ({
                                   exit={{ opacity: 0 }}
                                   className="flex-1 text-left min-w-0"
                                 >
-                                  <span className="text-xs font-medium block text-white truncate">{role.label}</span>
+                                  <span className={cn("text-xs block text-white truncate", isActive ? "font-semibold" : "font-medium")}>{role.label}</span>
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -815,6 +852,7 @@ const RoleSwitchSidebar = ({
                   const Icon = item.icon;
                   const isActive = activeNav === item.id;
                   const hasSubItems = 'subItems' in item && Array.isArray(item.subItems);
+                  const isExpanded = expandedCategories.has(item.id);
 
                   return (
                     <motion.div
@@ -829,16 +867,24 @@ const RoleSwitchSidebar = ({
                             type="button"
                             onClick={(e) => {
                               e.preventDefault();
-                              handleNavClick(item.id);
+                              handleNavClick(item.id, hasSubItems);
                             }}
                             className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                              // FIX: Active state uses ONLY border indicator, no bg fill
+                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative",
+                              // STEP 5 FIX: Active state with left indicator bar + bold text
                               isActive
-                                ? "text-white border-l-2 border-white"
-                                : "text-white/90 hover:text-white hover:bg-white/10"
+                                ? "text-white font-semibold bg-white/15"
+                                : "text-white/90 hover:text-white hover:bg-white/10",
+                              collapsed ? "justify-center" : ""
                             )}
                           >
+                            {/* STEP 5: Left indicator bar for active state */}
+                            {isActive && (
+                              <motion.div 
+                                layoutId="sidebar-active-indicator"
+                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full"
+                              />
+                            )}
                             <Icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-white" : "text-white/80")} />
                             <AnimatePresence>
                               {!collapsed && (
@@ -846,12 +892,21 @@ const RoleSwitchSidebar = ({
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}
                                   exit={{ opacity: 0 }}
-                                  className="text-sm font-medium truncate"
+                                  className={cn("text-sm truncate flex-1 text-left", isActive ? "font-semibold" : "font-medium")}
                                 >
                                   {item.label}
                                 </motion.span>
                               )}
                             </AnimatePresence>
+                            {/* STEP 5: Chevron for items with sub-items */}
+                            {hasSubItems && !collapsed && (
+                              <motion.div
+                                animate={{ rotate: isExpanded ? 90 : 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <ChevronRight className="w-4 h-4 text-white/70" />
+                              </motion.div>
+                            )}
                           </button>
                         </TooltipTrigger>
                         {collapsed && (
@@ -861,58 +916,58 @@ const RoleSwitchSidebar = ({
                         )}
                       </Tooltip>
                       
-                      {/* Sub-items for Dashboard */}
-                      {hasSubItems && isActive && !collapsed && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="mt-2 space-y-1.5"
-                        >
-                          {(item as any).subItems.map((subItem: { id: string; label: string; status: string }, subIdx: number) => (
-                            <motion.button
-                              key={subItem.id}
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: subIdx * 0.02 }}
-                              onClick={() => onSubItemClick?.(subItem.id)}
-                              className={cn(
-                                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all group",
-                                "bg-sidebar-accent/35 border-sidebar-border/40 hover:bg-sidebar-accent/55 hover:border-sidebar-border/60"
-                              )}
-                            >
-                              {/* Globe Icon */}
-                              <div className="w-8 h-8 rounded-lg bg-aurora-gold/15 flex items-center justify-center text-lg flex-shrink-0">
-                                🌍
-                              </div>
-
-                              {/* Name */}
-                              <div className="flex-1 text-left min-w-0">
-                                <span className="text-sm text-sidebar-foreground font-medium truncate block">
-                                  {subItem.label.replace(" Super Admin", "")}
-                                </span>
-                                <span className="text-xs text-muted-foreground">Super Admin</span>
-                              </div>
-
-                              {/* Status & Arrow */}
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <div className="relative">
+                      {/* STEP 5: Sub-items - expand when category is expanded OR when active */}
+                      <AnimatePresence>
+                        {hasSubItems && (isExpanded || isActive) && !collapsed && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="mt-1 ml-3 pl-3 border-l border-white/20 space-y-1"
+                          >
+                            {(item as any).subItems.map((subItem: { id: string; label: string; status: string }, subIdx: number) => (
+                              <motion.button
+                                key={subItem.id}
+                                initial={{ opacity: 0, x: -5 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: subIdx * 0.02 }}
+                                onClick={() => {
+                                  onSubItemClick?.(subItem.id);
+                                  toast.success(`Selected: ${subItem.label}`);
+                                }}
+                                className={cn(
+                                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all group",
+                                  "bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/20"
+                                )}
+                              >
+                                {/* Status indicator */}
+                                <div className="relative flex-shrink-0">
                                   <div
                                     className={cn(
-                                      "w-3 h-3 rounded-full",
-                                      subItem.status === "active" ? "bg-status-success" : "bg-muted-foreground/40"
+                                      "w-2.5 h-2.5 rounded-full",
+                                      subItem.status === "active" ? "bg-emerald-400" : "bg-white/40"
                                     )}
                                   />
                                   {subItem.status === "active" && (
-                                    <div className="absolute inset-0 w-3 h-3 rounded-full bg-status-success animate-ping opacity-40" />
+                                    <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping opacity-40" />
                                   )}
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/70 group-hover:text-aurora-gold transition-colors" />
-                              </div>
-                            </motion.button>
-                          ))}
-                        </motion.div>
-                      )}
+
+                                {/* Name */}
+                                <div className="flex-1 text-left min-w-0">
+                                  <span className="text-xs text-white/90 font-medium truncate block">
+                                    {subItem.label}
+                                  </span>
+                                </div>
+
+                                {/* Arrow */}
+                                <ChevronRight className="w-3 h-3 text-white/50 group-hover:text-white/80 transition-colors flex-shrink-0" />
+                              </motion.button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </motion.div>
                   );
                 })}
