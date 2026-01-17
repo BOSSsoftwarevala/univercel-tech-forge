@@ -1,43 +1,43 @@
 import { useState } from "react";
 import { MarketingModuleSidebar } from "./MarketingModuleSidebar";
-import { MarketingOverview } from "./MarketingOverview";
+import { MarketingDashboard } from "./MarketingDashboard";
 import { SEOManager } from "./SEOManager";
 import { AdsManager } from "./AdsManager";
 import { ContentStudio } from "./ContentStudio";
-import { KeywordResearch } from "./KeywordResearch";
-import { GeoTargeting } from "./GeoTargeting";
+import { KeywordPlanner } from "./KeywordPlanner";
+import { CountryStrategy } from "./CountryStrategy";
+import { LeadFunnel } from "./LeadFunnel";
+import { Performance } from "./Performance";
 import { BudgetControl } from "./BudgetControl";
-import { LeadAttribution } from "./LeadAttribution";
-import { MarketingReports } from "./MarketingReports";
 import { MarketingSettings } from "./MarketingSettings";
 
 export const MarketingModuleContainer = () => {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   const renderContent = () => {
     switch (activeSection) {
-      case "overview":
-        return <MarketingOverview />;
+      case "dashboard":
+        return <MarketingDashboard />;
       case "seo-manager":
         return <SEOManager />;
       case "ads-manager":
         return <AdsManager />;
       case "content-studio":
         return <ContentStudio />;
-      case "keyword-research":
-        return <KeywordResearch />;
-      case "geo-targeting":
-        return <GeoTargeting />;
+      case "keyword-planner":
+        return <KeywordPlanner />;
+      case "country-strategy":
+        return <CountryStrategy />;
+      case "lead-funnel":
+        return <LeadFunnel />;
+      case "performance":
+        return <Performance />;
       case "budget-control":
         return <BudgetControl />;
-      case "lead-attribution":
-        return <LeadAttribution />;
-      case "reports":
-        return <MarketingReports />;
       case "settings":
         return <MarketingSettings />;
       default:
-        return <MarketingOverview />;
+        return <MarketingDashboard />;
     }
   };
 
