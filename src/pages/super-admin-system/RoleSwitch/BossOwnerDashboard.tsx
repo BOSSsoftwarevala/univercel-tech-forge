@@ -291,7 +291,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* LOCKED: Authority Stats Grid - 6 Boxes (2 per row, 3 rows) */}
+        {/* LOCKED: Authority Stats Grid - 6 Boxes (2 per row, 3 rows) - SIZE NORMALIZED */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {[
             { label: 'SUPER ADMINS', value: mockSuperAdmins.length.toString(), icon: Users, iconBg: '#2563EB20', iconColor: '#2563EB' },
@@ -305,25 +305,31 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
             return (
               <div 
                 key={idx} 
-                className="p-5"
                 style={{
+                  height: '100px',
+                  minHeight: '100px',
+                  maxHeight: '100px',
+                  padding: '20px 24px',
                   background: '#FFFFFF',
                   border: '1px solid #E5E7EB',
                   borderRadius: '14px',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>
+                <div className="flex items-center justify-between w-full">
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500, lineHeight: '1' }}>
                       {stat.label}
                     </p>
-                    <p style={{ fontSize: '32px', fontWeight: 700, color: '#111827', marginTop: '4px' }}>
+                    <p style={{ fontSize: '32px', fontWeight: 700, color: '#111827', marginTop: '8px', lineHeight: '1' }}>
                       {stat.value}
                     </p>
                   </div>
                   <div 
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center flex-shrink-0"
                     style={{
                       width: '52px',
                       height: '52px',
