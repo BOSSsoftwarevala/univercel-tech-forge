@@ -142,21 +142,35 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
     }
   }, [activeNav, isModuleView]);
 
+  // Handle back navigation - clears the module view and returns to boss dashboard
+  const handleModuleBack = useCallback(() => {
+    // This will be called by the module sidebar's "Back to Boss" button
+    // We need to signal to the parent to reset the nav
+    if (typeof window !== 'undefined') {
+      // Update URL to clear the nav param - parent will pick this up
+      const url = new URL(window.location.href);
+      url.searchParams.delete('nav');
+      window.history.pushState({}, '', url.toString());
+      // Trigger a re-render by dispatching a popstate event
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  }, []);
+
   // If this is a module view, render the module container with onBack callback
-  // The onBack will be handled by the parent RoleSwitchDashboard via URL change
+  // This ensures ONLY the module is visible - complete isolation
   if (isModuleView && activeNav) {
     const moduleType = moduleRoutes[activeNav];
     switch (moduleType) {
       case 'server':
-        return <ServerModuleContainer />;
+        return <ServerModuleContainer onBack={handleModuleBack} />;
       case 'development':
-        return <DevModuleContainer />;
+        return <DevModuleContainer onBack={handleModuleBack} />;
       case 'product-demo':
-        return <ProductDemoModuleContainer />;
+        return <ProductDemoModuleContainer onBack={handleModuleBack} />;
       case 'leads':
-        return <LeadModuleContainer />;
+        return <LeadModuleContainer onBack={handleModuleBack} />;
       case 'marketing':
-        return <MarketingModuleContainer />;
+        return <MarketingModuleContainer onBack={handleModuleBack} />;
     }
   }
 

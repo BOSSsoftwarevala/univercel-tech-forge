@@ -181,9 +181,28 @@ const RoleSwitchDashboard = () => {
     toast.success(`Switched to ${roleConfigs[role].label} view`);
   };
 
-  const handleNavChange = (navId: string) => {
+  const handleNavChange = useCallback((navId: string) => {
     setActiveNav(navId);
-  };
+    setSelectedSubItem(undefined); // Reset sub-item on nav change
+  }, []);
+  
+  // Listen for popstate events to handle back navigation from modules
+  useEffect(() => {
+    const handlePopState = () => {
+      const url = new URL(window.location.href);
+      const navParam = url.searchParams.get('nav');
+      if (!navParam) {
+        // No nav param means we're back to dashboard
+        setActiveNav('dashboard');
+        setSelectedSubItem(undefined);
+      } else {
+        setActiveNav(navParam);
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const currentConfig = roleConfigs[activeRole];
 
