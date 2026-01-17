@@ -2,16 +2,15 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Globe2, Bell, Timer, AlertCircle, Shield, Bot, MessageSquare, Loader2 } from "lucide-react";
+import { Globe2, Timer, AlertCircle, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { SafeAssistTrigger } from "@/components/support/SafeAssistTrigger";
 import { useAuth } from "@/hooks/useAuth";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { RouteNotFoundScreen, LoadingSkeleton } from "@/components/shared/RouteLoadingFallback";
-import promiseIcon from "@/assets/promise-icon.jpg";
+import GlobalHeaderActions from "@/components/shared/GlobalHeaderActions";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
@@ -83,27 +82,15 @@ const RoleSwitchDashboard = () => {
   const [sessionTime, setSessionTime] = useState(0);
   const [riskLevel] = useState<"low" | "medium" | "high">("low");
   const [liveAlerts] = useState(3);
-  const [promiseState, setPromiseState] = useState<'idle' | 'pending' | 'active'>('idle');
   const [initialized, setInitialized] = useState(false);
-  
-  const handlePromiseClick = useCallback(() => {
-    if (promiseState === 'idle') {
-      setPromiseState('pending');
-      toast.success('Promise mode activated');
-    } else if (promiseState === 'pending') {
-      setPromiseState('active');
-      toast.success('Task is now active');
-    } else {
-      setPromiseState('idle');
-      toast.info('Promise mode deactivated');
-    }
-  }, [promiseState]);
 
-  const handleChatbotClick = useCallback(() => {
-    toast.success('AI Assistant Ready', {
-      description: 'How can I help you today?'
-    });
-  }, []);
+  // STEP 8: Derive user role for header actions
+  const getHeaderRole = useCallback((): 'boss' | 'employee' | 'client' | 'super_admin' | 'manager' => {
+    if (isBossOwner || activeRole === 'boss_owner') return 'boss';
+    if (activeRole === 'ceo' || activeRole === 'continent_super_admin') return 'super_admin';
+    if (activeRole === 'server_manager' || activeRole === 'developer_management') return 'manager';
+    return 'employee';
+  }, [isBossOwner, activeRole]);
 
   // Initialize role based on URL or user's actual role
   const didInitRef = useRef(false);
@@ -382,129 +369,15 @@ const RoleSwitchDashboard = () => {
           </div>
         </div>
 
-        {/* Right - Action Icons (Icon-Only, Same Size) */}
-        <div className="flex items-center gap-3">
-          {/* Promise/Task Icon */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handlePromiseClick}
-            className={cn(
-              "relative w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md group",
-              promiseState === 'active'
-                ? 'bg-gradient-to-br from-green-600 to-emerald-600 border border-green-400/50'
-                : promiseState === 'pending'
-                ? 'bg-gradient-to-br from-amber-500 to-orange-500 border border-amber-400/50 animate-pulse'
-                : 'bg-secondary/80 border border-border/50 hover:border-primary/50'
-            )}
-            title={promiseState === 'active' ? 'Task Active' : promiseState === 'pending' ? 'Task Pending' : 'No Tasks'}
-          >
-            <img src={promiseIcon} alt="Promise" className="w-5 h-5 rounded-full object-cover" />
-            {promiseState !== 'idle' && (
-              <span className={cn(
-                "absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center",
-                promiseState === 'active' ? "bg-green-400 text-green-900" : "bg-amber-400 text-amber-900"
-              )}>
-                1
-              </span>
-            )}
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              {promiseState === 'active' ? 'Task Active' : promiseState === 'pending' ? 'Task Pending' : 'Tasks'}
-            </div>
-          </motion.button>
-
-          {/* Safe Assist Icon */}
-          <SafeAssistTrigger variant="compact" />
-
-          {/* AI Assistant Icon */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleChatbotClick}
-            className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg border border-purple-400/30 group"
-            title="AI Assistant"
-          >
-            <Bot className="w-5 h-5 text-white" />
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              AI Assistant
-            </div>
-          </motion.button>
-
-          {/* Alerts Icon */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              toast.info(`${liveAlerts} Active Alerts`, {
-                description: 'View all system alerts and notifications',
-              });
-            }}
-            className={cn(
-              "relative w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md group",
-              liveAlerts > 0
-                ? "bg-gradient-to-br from-red-600 to-rose-600 border border-red-400/50"
-                : "bg-secondary/80 border border-border/50"
-            )}
-            title={liveAlerts > 0 ? `${liveAlerts} Alerts` : 'No Alerts'}
-          >
-            <Bell className={cn("w-5 h-5", liveAlerts > 0 ? "text-white" : "text-muted-foreground")} />
-            {liveAlerts > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-red-600 text-xs rounded-full flex items-center justify-center font-bold shadow-md">
-                {liveAlerts}
-              </span>
-            )}
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              {liveAlerts > 0 ? `${liveAlerts} Alerts` : 'Alerts'}
-            </div>
-          </motion.button>
-
-          {/* Internal Chat Icon */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/internal-chat')}
-            className="relative w-10 h-10 rounded-xl bg-secondary/80 border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all group"
-            title="Internal Chat"
-          >
-            <MessageSquare className="w-5 h-5 text-muted-foreground" />
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              Internal Chat
-            </div>
-          </motion.button>
-
-          {/* Divider */}
-          <div className="w-px h-8 bg-border/50" />
-
-          {/* Profile Avatar */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              toast.success('Profile Menu', {
-                description: 'Account settings and preferences',
-                action: {
-                  label: 'Settings',
-                  onClick: () => navigate('/settings'),
-                }
-              });
-            }}
-            className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br cursor-pointer shadow-lg group relative",
-              currentConfig.themeColor
-            )}
-            title="Profile"
-          >
-            <Shield className="w-5 h-5 text-white" />
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              Profile
-            </div>
-          </motion.button>
-        </div>
+        {/* Right - STEP 8: Global Header Actions with role-based visibility */}
+        <GlobalHeaderActions
+          userRole={getHeaderRole()}
+          onLogout={handleLogout}
+          profileGradient={currentConfig.themeColor}
+          taskCount={2}
+          alertCount={liveAlerts}
+          chatUnread={5}
+        />
       </header>
       {/* Main Content Area */}
       {(() => {
