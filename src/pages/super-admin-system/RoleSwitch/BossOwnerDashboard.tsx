@@ -35,6 +35,11 @@ import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContaine
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
 // Route fallback components
 import { ComingSoonScreen, ContentSkeleton } from "@/components/shared/RouteLoadingFallback";
+// KPI Components
+import { KPIGrid, KPIBox, KPIActionButton } from "@/components/boss/KPIGrid";
+import { BossEmptyState, KPIGridSkeleton } from "@/components/boss/BossEmptyState";
+import { useKPIActions, KPIAction } from "@/hooks/useKPIActions";
+import { Check, X, Eye as EyeIcon, Pause as PauseIcon, RotateCw } from "lucide-react";
 // BRAND THEME: Blue Primary + Red Accent (from Software Vala Logo)
 // All colors use CSS variables for consistency across the app
 const COLORS = {
