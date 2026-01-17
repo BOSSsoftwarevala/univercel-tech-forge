@@ -697,6 +697,12 @@
    ======================================== */
 
 /* Buzzer Blocking Overlay */
+/*
+  IMPORTANT:
+  We keep the visual dim/blur effect, but we DO NOT capture pointer events here.
+  A bug can leave `body.buzzer-blocking` enabled without a visible buzzer UI,
+  which would make the entire app feel "unclickable".
+*/
 body.buzzer-blocking::before {
   content: '';
   position: fixed;
@@ -704,15 +710,17 @@ body.buzzer-blocking::before {
   background: hsl(var(--background) / 0.8);
   backdrop-filter: blur(8px);
   z-index: 40;
-  pointer-events: all;
+  pointer-events: none;
 }
 
 body.buzzer-blocking {
   overflow: hidden;
 }
 
+/* Ensure the buzzer UI itself stays clickable above the visual overlay */
 body.buzzer-blocking .buzzer-alert-container {
   z-index: 60 !important;
+  pointer-events: auto;
 }
 
 /* Focus Accessibility */
