@@ -1,16 +1,18 @@
 /**
- * PRODUCT & DEMO MODULE CONTAINER
+ * PRODUCT & DEMO MODULE CONTAINER (Step 8)
  */
 import React, { useState } from 'react';
 import { ProductDemoModuleSidebar, type ProductDemoSection } from './ProductDemoModuleSidebar';
-import { ProductDemoOverview } from './ProductDemoOverview';
+import { ProductDashboard } from './ProductDashboard';
 import { AllProducts } from './AllProducts';
-import { Categories } from './Categories';
-import { DemoManagement } from './DemoManagement';
 import { ProductDemoFactory } from './ProductDemoFactory';
+import { Categories } from './Categories';
+import { FeaturesLibrary } from './FeaturesLibrary';
 import { PricingManagement } from './PricingManagement';
-import { Technologies } from './Technologies';
-import { OrdersLink } from './OrdersLink';
+import { Versions } from './Versions';
+import { Issues } from './Issues';
+import { Approvals } from './Approvals';
+import { ProductReports } from './ProductReports';
 import { ProductDemoSettings } from './ProductDemoSettings';
 
 interface ProductDemoModuleContainerProps {
@@ -18,22 +20,24 @@ interface ProductDemoModuleContainerProps {
 }
 
 export const ProductDemoModuleContainer: React.FC<ProductDemoModuleContainerProps> = ({ 
-  initialSection = 'overview' 
+  initialSection = 'dashboard' 
 }) => {
   const [activeSection, setActiveSection] = useState<ProductDemoSection>(initialSection);
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'overview': return <ProductDemoOverview />;
-      case 'all-products': return <AllProducts />;
-      case 'categories': return <Categories />;
-      case 'demos': return <DemoManagement />;
+      case 'dashboard': return <ProductDashboard />;
+      case 'products': return <AllProducts />;
       case 'demo-factory': return <ProductDemoFactory />;
+      case 'categories': return <Categories />;
+      case 'features': return <FeaturesLibrary />;
       case 'pricing': return <PricingManagement />;
-      case 'technologies': return <Technologies />;
-      case 'orders': return <OrdersLink />;
+      case 'versions': return <Versions />;
+      case 'issues': return <Issues />;
+      case 'approvals': return <Approvals />;
+      case 'reports': return <ProductReports />;
       case 'settings': return <ProductDemoSettings />;
-      default: return <ProductDemoOverview />;
+      default: return <ProductDashboard />;
     }
   };
 

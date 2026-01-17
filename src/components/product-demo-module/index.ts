@@ -1,11 +1,13 @@
 export { ProductDemoModuleSidebar, type ProductDemoSection } from './ProductDemoModuleSidebar';
-export { ProductDemoOverview } from './ProductDemoOverview';
+export { ProductDashboard } from './ProductDashboard';
 export { AllProducts } from './AllProducts';
 export { Categories } from './Categories';
-export { DemoManagement } from './DemoManagement';
 export { ProductDemoFactory } from './ProductDemoFactory';
+export { FeaturesLibrary } from './FeaturesLibrary';
 export { PricingManagement } from './PricingManagement';
-export { Technologies } from './Technologies';
-export { OrdersLink } from './OrdersLink';
+export { Versions } from './Versions';
+export { Issues } from './Issues';
+export { Approvals } from './Approvals';
+export { ProductReports } from './ProductReports';
 export { ProductDemoSettings } from './ProductDemoSettings';
 export { ProductDemoModuleContainer } from './ProductDemoModuleContainer';
