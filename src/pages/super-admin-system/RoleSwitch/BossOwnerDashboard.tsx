@@ -32,6 +32,7 @@ import { ServerModuleContainer } from "@/components/server-module/ServerModuleCo
 import { DevModuleContainer } from "@/components/development-module/DevModuleContainer";
 import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
+import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
 // BRAND THEME: Blue Primary + Red Accent (from Software Vala Logo)
 // All colors use CSS variables for consistency across the app
 const COLORS = {
@@ -107,10 +108,11 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const { selectedCard, setSelectedCard, clearSelection } = useDashboardContext();
   
   // Module routing - these sidebar items open full module views
-  const moduleRoutes: Record<string, 'server' | 'development' | 'product-demo' | 'marketing'> = {
+  const moduleRoutes: Record<string, 'server' | 'development' | 'product-demo' | 'leads' | 'marketing'> = {
     'server-control': 'server',
     'dev-control': 'development',
     'product-demo': 'product-demo',
+    'leads': 'leads',
     'marketing': 'marketing',
   };
   
@@ -150,8 +152,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
         return <DevModuleContainer />;
       case 'product-demo':
         return <ProductDemoModuleContainer />;
-      case 'marketing':
+      case 'leads':
         return <LeadModuleContainer />;
+      case 'marketing':
+        return <MarketingModuleContainer />;
     }
   }
 
