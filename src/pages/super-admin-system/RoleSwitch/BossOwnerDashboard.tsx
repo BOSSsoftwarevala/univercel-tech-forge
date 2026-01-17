@@ -4,7 +4,10 @@ import {
   Crown, Shield, Lock, Archive, AlertTriangle, Users, Globe2,
   Key, Activity, FileText, Settings, Gavel, Eye, Trash2, Power,
   CheckCircle2, XCircle, Clock, RotateCcw, Database, Server,
-  Fingerprint, ShieldCheck, Ban, History, Download, Upload
+  Fingerprint, ShieldCheck, Ban, History, Download, Upload,
+  Play, Pause, Square, RefreshCw, AlertOctagon, CreditCard,
+  CalendarClock, Zap, Bug, Rocket, ShieldAlert, Scale,
+  Cpu, Radio
 } from "lucide-react";
 import { PendingRequestsBanner } from "@/components/shared/PendingRequestsBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -291,17 +294,29 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* LOCKED: Authority Stats Grid - RESPONSIVE (4→3→2→1 columns) - HEIGHT 150px FIXED */}
+        {/* LOCKED: ACTION-FOCUSED KPI GRID - 12 BOXES (4→3→2→1 columns) - HEIGHT 150px FIXED */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'SUPER ADMINS', value: mockSuperAdmins.length.toString(), icon: Users, iconBg: '#2563EB20', iconColor: '#2563EB' },
-            { label: 'LOCKED MODULES', value: '2', icon: Lock, iconBg: '#F59E0B20', iconColor: '#F59E0B' },
-            { label: 'PENDING OVERRIDES', value: '3', icon: Gavel, iconBg: '#10B98120', iconColor: '#10B981' },
-            { label: 'BLACKBOX EVENTS', value: blackboxEntries.length.toString(), icon: Database, iconBg: '#A855F720', iconColor: '#A855F7' },
-            { label: 'ACTIVE SESSIONS', value: '47', icon: Activity, iconBg: '#06B6D420', iconColor: '#06B6D4' },
-            { label: 'SYSTEM HEALTH', value: '99.9%', icon: Shield, iconBg: '#22C55E20', iconColor: '#22C55E' },
+            { label: 'SYSTEM HEALTH', value: '99.2%', status: 'ok', icon: Shield, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'System', urgency: 'low' },
+            { label: 'SERVER LOAD', value: '78%', status: 'warning', icon: Server, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'AI-CORE', urgency: 'medium' },
+            { label: 'CRITICAL ALERTS', value: '3', status: 'critical', icon: AlertOctagon, iconBg: '#EF444420', iconColor: '#EF4444', source: 'System', urgency: 'critical' },
+            { label: 'PENDING APPROVALS', value: '7', status: 'action', icon: Gavel, iconBg: '#2563EB20', iconColor: '#2563EB', source: 'Multi', urgency: 'high' },
+            { label: 'FAILED BUILDS', value: '2', status: 'critical', icon: Bug, iconBg: '#EF444420', iconColor: '#EF4444', source: 'CI/CD', urgency: 'high' },
+            { label: 'DEPLOY WAITING', value: '4', status: 'action', icon: Rocket, iconBg: '#8B5CF620', iconColor: '#8B5CF6', source: 'DevOps', urgency: 'medium' },
+            { label: 'PAYMENT PENDING', value: '₹2.4L', status: 'action', icon: CreditCard, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Finance', urgency: 'high' },
+            { label: 'EXPIRY DUE', value: '5', status: 'warning', icon: CalendarClock, iconBg: '#F9731620', iconColor: '#F97316', source: 'System', urgency: 'medium' },
+            { label: 'AI COST SPIKE', value: '+32%', status: 'warning', icon: Zap, iconBg: '#EAB30820', iconColor: '#EAB308', source: 'AI-CORE', urgency: 'medium' },
+            { label: 'OPEN ISSUES', value: '12', status: 'action', icon: AlertTriangle, iconBg: '#F59E0B20', iconColor: '#F59E0B', source: 'Support', urgency: 'medium' },
+            { label: 'SECURITY ALERTS', value: '1', status: 'critical', icon: ShieldAlert, iconBg: '#EF444420', iconColor: '#EF4444', source: 'Security', urgency: 'critical' },
+            { label: 'SLA BREACH', value: '0', status: 'ok', icon: Scale, iconBg: '#22C55E20', iconColor: '#22C55E', source: 'Compliance', urgency: 'low' },
           ].map((stat, idx) => {
             const Icon = stat.icon;
+            const urgencyColors: Record<string, string> = {
+              critical: '#EF4444',
+              high: '#F97316',
+              medium: '#EAB308',
+              low: '#22C55E'
+            };
             return (
               <div 
                 key={idx} 
@@ -309,55 +324,146 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                   height: '150px',
                   minHeight: '150px',
                   maxHeight: '150px',
-                  padding: '24px',
+                  padding: '16px',
                   background: '#FFFFFF',
-                  border: '1px solid #E5E7EB',
+                  border: `1px solid ${stat.status === 'critical' ? '#FCA5A520' : '#E5E7EB'}`,
                   borderRadius: '14px',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
                   overflow: 'hidden',
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
                 }}
               >
-                <div className="flex items-center justify-between w-full">
+                {/* Top Row: Label + Icon */}
+                <div className="flex items-start justify-between">
                   <div style={{ flex: 1, overflow: 'hidden' }}>
                     <p style={{ 
-                      fontSize: '11px', 
+                      fontSize: '10px', 
                       color: '#6B7280', 
                       textTransform: 'uppercase', 
                       letterSpacing: '0.05em', 
                       fontWeight: 500, 
                       lineHeight: '1',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
                     }}>
                       {stat.label}
                     </p>
                     <p style={{ 
-                      fontSize: '32px', 
+                      fontSize: '28px', 
                       fontWeight: 700, 
                       color: '#111827', 
-                      marginTop: '12px', 
+                      marginTop: '4px', 
                       lineHeight: '1',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
                     }}>
                       {stat.value}
+                    </p>
+                    <p style={{ fontSize: '9px', color: '#9CA3AF', marginTop: '4px' }}>
+                      {stat.source} • <span style={{ color: urgencyColors[stat.urgency] }}>{stat.urgency.toUpperCase()}</span>
                     </p>
                   </div>
                   <div 
                     className="flex items-center justify-center flex-shrink-0"
                     style={{
-                      width: '52px',
-                      height: '52px',
-                      borderRadius: '14px',
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
                       background: stat.iconBg
                     }}
                   >
-                    <Icon style={{ width: '26px', height: '26px', color: stat.iconColor }} />
+                    <Icon style={{ width: '20px', height: '20px', color: stat.iconColor }} />
                   </div>
+                </div>
+                
+                {/* Bottom Row: Action Buttons */}
+                <div className="flex items-center gap-1 mt-auto" style={{ height: '28px' }}>
+                  {stat.status === 'action' || stat.status === 'critical' ? (
+                    <>
+                      <button 
+                        onClick={() => toast.success(`Approved: ${stat.label}`)}
+                        style={{ 
+                          height: '24px', 
+                          padding: '0 8px', 
+                          fontSize: '9px', 
+                          fontWeight: 600,
+                          background: '#22C55E15', 
+                          color: '#22C55E', 
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ✓
+                      </button>
+                      <button 
+                        onClick={() => toast.error(`Rejected: ${stat.label}`)}
+                        style={{ 
+                          height: '24px', 
+                          padding: '0 8px', 
+                          fontSize: '9px', 
+                          fontWeight: 600,
+                          background: '#EF444415', 
+                          color: '#EF4444', 
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ✕
+                      </button>
+                      <button 
+                        onClick={() => toast.info(`Review: ${stat.label}`)}
+                        style={{ 
+                          height: '24px', 
+                          padding: '0 8px', 
+                          fontSize: '9px', 
+                          fontWeight: 600,
+                          background: '#2563EB15', 
+                          color: '#2563EB', 
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        👁
+                      </button>
+                    </>
+                  ) : stat.status === 'warning' ? (
+                    <>
+                      <button 
+                        onClick={() => toast.info(`Paused: ${stat.label}`)}
+                        style={{ 
+                          height: '24px', 
+                          padding: '0 8px', 
+                          fontSize: '9px', 
+                          fontWeight: 600,
+                          background: '#F59E0B15', 
+                          color: '#F59E0B', 
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ⏸
+                      </button>
+                      <button 
+                        onClick={() => toast.info(`Force Review: ${stat.label}`)}
+                        style={{ 
+                          height: '24px', 
+                          padding: '0 8px', 
+                          fontSize: '9px', 
+                          fontWeight: 600,
+                          background: '#2563EB15', 
+                          color: '#2563EB', 
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ⚠
+                      </button>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '9px', color: '#22C55E', fontWeight: 500 }}>● OK</span>
+                  )}
                 </div>
               </div>
             );
