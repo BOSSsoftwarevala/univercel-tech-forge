@@ -46,6 +46,7 @@ import SimpleDemoList from "./pages/SimpleDemoList";
 import SimpleDemoView from "./pages/SimpleDemoView";
 import SimpleCheckout from "./pages/SimpleCheckout";
 import SimpleUserDashboard from "./pages/SimpleUserDashboard";
+import UserDashboard from "./pages/user/UserDashboard";
 import DemoAccess from "./pages/DemoAccess";
 import DemoDirectory from "./pages/DemoDirectory";
 import DemoLogin from "./pages/DemoLogin";
@@ -393,6 +394,7 @@ const App = () => (
               <Route path="/demo/:demoId" element={<SimpleDemoView />} />
               <Route path="/checkout/:demoId" element={<SimpleCheckout />} />
               <Route path="/user-dashboard" element={<SimpleUserDashboard />} />
+              <Route path="/user/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
               <Route path="/demo-login" element={<DemoLogin />} />
               <Route path="/showcase" element={<Index />} />
               <Route path="/premium-demos" element={<PremiumDemoShowcase />} />
