@@ -285,8 +285,14 @@ const RoleSwitchDashboard = () => {
         {/* Center - Status Icons (Icon-Only) */}
         <div className="flex items-center gap-3">
           {/* System Status */}
-          <motion.div
+          <motion.button
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              toast.success('System Status: Healthy', {
+                description: 'All services operational. Last check: 1 minute ago',
+              });
+            }}
             className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center cursor-pointer group"
             title="System Healthy"
           >
@@ -296,11 +302,21 @@ const RoleSwitchDashboard = () => {
             <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
               System Healthy
             </div>
-          </motion.div>
+          </motion.button>
 
           {/* Risk Level */}
-          <motion.div
+          <motion.button
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              toast.info(`Risk Level: ${riskLevel.toUpperCase()}`, {
+                description: riskLevel === 'low' 
+                  ? 'No immediate threats detected' 
+                  : riskLevel === 'medium' 
+                    ? 'Some activities require attention' 
+                    : 'Critical issues need immediate attention',
+              });
+            }}
             className={cn(
               "relative w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer group border",
               riskLevel === 'low' ? "bg-emerald-500/10 border-emerald-500/20" :
@@ -319,7 +335,7 @@ const RoleSwitchDashboard = () => {
             <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
               Risk: {riskLevel.toUpperCase()}
             </div>
-          </motion.div>
+          </motion.button>
 
           {/* Session Timer */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
@@ -382,6 +398,11 @@ const RoleSwitchDashboard = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              toast.info(`${liveAlerts} Active Alerts`, {
+                description: 'View all system alerts and notifications',
+              });
+            }}
             className={cn(
               "relative w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md group",
               liveAlerts > 0
@@ -421,10 +442,20 @@ const RoleSwitchDashboard = () => {
           <div className="w-px h-8 bg-border/50" />
 
           {/* Profile Avatar */}
-          <motion.div
+          <motion.button
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              toast.success('Profile Menu', {
+                description: 'Account settings and preferences',
+                action: {
+                  label: 'Settings',
+                  onClick: () => navigate('/settings'),
+                }
+              });
+            }}
             className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br cursor-pointer shadow-lg group",
+              "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br cursor-pointer shadow-lg group relative",
               currentConfig.themeColor
             )}
             title="Profile"
@@ -434,7 +465,7 @@ const RoleSwitchDashboard = () => {
             <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
               Profile
             </div>
-          </motion.div>
+          </motion.button>
         </div>
       </header>
       {/* Main Content Area */}
