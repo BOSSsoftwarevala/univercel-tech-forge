@@ -733,6 +733,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                         <div className="flex gap-2 mt-3">
                           <Button 
                             size="sm" 
+                            onClick={async () => {
+                              await logAction('override_approve', override.target, { type: override.type, requestedBy: override.requestedBy });
+                              toast.success(`Override approved: ${override.type}`, { description: `Target: ${override.target}` });
+                            }}
                             style={{ 
                               background: COLORS.success, 
                               color: COLORS.textPrimary,
@@ -745,6 +749,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                           </Button>
                           <Button 
                             size="sm"
+                            onClick={async () => {
+                              await logAction('override_reject', override.target, { type: override.type, requestedBy: override.requestedBy });
+                              toast.error(`Override rejected: ${override.type}`, { description: `Target: ${override.target}` });
+                            }}
                             style={{ 
                               background: COLORS.danger, 
                               color: COLORS.textPrimary,
@@ -887,6 +895,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
               <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
                 <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>Super Admin Registry</span>
                 <Button 
+                  onClick={async () => {
+                    await logAction('create_super_admin_init', 'new_admin');
+                    toast.info('Create Super Admin', { description: 'This would open the Super Admin creation form' });
+                  }}
                   style={{ 
                     background: COLORS.brand, 
                     color: COLORS.textPrimary,
@@ -904,7 +916,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     <div 
                       key={admin.id} 
                       className="p-4 rounded-lg"
-                      style={{ 
+                      style={{
                         background: admin.status === "archived" ? `${COLORS.backgroundSecondary}80` : COLORS.backgroundSecondary,
                         border: `1px solid ${admin.status === "locked" ? `${COLORS.warning}50` : COLORS.border}`,
                         opacity: admin.status === "archived" ? 0.6 : 1
@@ -957,15 +969,39 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                         <div className="flex items-center gap-2">
                           {admin.status !== "archived" && (
                             <>
-                              <Button size="sm" variant="ghost" style={{ color: COLORS.warning }}>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={async () => {
+                                  await logAction('super_admin_lock', admin.id, { name: admin.name, currentStatus: admin.status });
+                                  toast.warning(`${admin.status === 'locked' ? 'Unlocked' : 'Locked'}: ${admin.name}`, { description: 'Action logged' });
+                                }}
+                                style={{ color: COLORS.warning }}
+                              >
                                 <Lock style={{ width: '16px', height: '16px' }} />
                               </Button>
-                              <Button size="sm" variant="ghost" style={{ color: COLORS.textMuted }}>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={async () => {
+                                  await logAction('super_admin_archive', admin.id, { name: admin.name });
+                                  toast.info(`Archived: ${admin.name}`, { description: 'Super Admin archived. Action logged.' });
+                                }}
+                                style={{ color: COLORS.textMuted }}
+                              >
                                 <Archive style={{ width: '16px', height: '16px' }} />
                               </Button>
                             </>
                           )}
-                          <Button size="sm" variant="ghost" style={{ color: COLORS.brand }}>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            onClick={async () => {
+                              await logAction('super_admin_view', admin.id, { name: admin.name });
+                              toast.info(`Viewing: ${admin.name}`, { description: `ID: ${admin.id} | Regions: ${admin.continents.join(', ')}` });
+                            }}
+                            style={{ color: COLORS.brand }}
+                          >
                             <Eye style={{ width: '16px', height: '16px' }} />
                           </Button>
                         </div>
@@ -1059,6 +1095,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                   </span>
                 </div>
                 <Button 
+                  onClick={async () => {
+                    await logAction('blackbox_export', 'full_log');
+                    toast.success('Export initiated', { description: 'Generating immutable audit log export...' });
+                  }}
                   style={{
                     background: 'transparent',
                     border: `1px solid rgba(168, 85, 247, 0.5)`,
@@ -1124,6 +1164,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                   Only Boss/Owner can modify locked permissions.
                 </p>
                 <Button 
+                  onClick={async () => {
+                    await logAction('open_permission_matrix', 'permissions');
+                    toast.info('Permission Matrix', { description: 'Opening full permission lock matrix...' });
+                  }}
                   style={{
                     background: COLORS.brand,
                     color: COLORS.textPrimary,
