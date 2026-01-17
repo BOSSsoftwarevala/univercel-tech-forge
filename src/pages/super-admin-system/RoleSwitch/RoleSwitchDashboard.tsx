@@ -205,7 +205,7 @@ const RoleSwitchDashboard = () => {
       case "country_head":
         return <CountryHeadDashboard />;
       case "server_manager":
-        return <ServerManagerView />;
+        return <ServerManagerView activeNav={activeNav} />;
       case "franchise_manager":
         return <FranchiseManagerView />;
       case "sales_support_manager":
