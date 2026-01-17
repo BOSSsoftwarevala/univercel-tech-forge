@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSystemActions } from '@/hooks/useSystemActions';
 import {
   Globe,
   Facebook,
@@ -23,6 +24,8 @@ import {
   Loader2,
   Link2,
   Zap,
+  Plus,
+  Settings,
 } from 'lucide-react';
 
 interface LeadSource {
@@ -39,6 +42,7 @@ interface LeadSource {
 }
 
 const MMLeadSources: React.FC = () => {
+  const { actions, executeAction, isLoading } = useSystemActions();
   const [sources, setSources] = useState<LeadSource[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<string | null>(null);
@@ -153,31 +157,57 @@ const MMLeadSources: React.FC = () => {
     setLoading(false);
   };
 
-  const handleSync = async (sourceId: string) => {
+  const handleSync = useCallback(async (sourceId: string, sourceName: string) => {
     setSyncing(sourceId);
     try {
+      await executeAction({
+        module: 'marketing',
+        action: 'sync',
+        entityType: 'LeadSource',
+        entityId: sourceId,
+        entityName: sourceName,
+        successMessage: `${sourceName} synced successfully`
+      });
       await new Promise(resolve => setTimeout(resolve, 1500));
       setSources(prev => prev.map(s => 
         s.id === sourceId 
           ? { ...s, last_sync: new Date().toISOString(), leads_today: s.leads_today + Math.floor(Math.random() * 5) }
           : s
       ));
-      toast.success('Source synced successfully');
-    } catch (error) {
-      toast.error('Sync failed');
     } finally {
       setSyncing(null);
     }
-  };
+  }, [executeAction]);
 
-  const toggleSource = (sourceId: string, connected: boolean) => {
+  const toggleSource = useCallback((sourceId: string, sourceName: string, connected: boolean) => {
+    if (connected) {
+      actions.enable('marketing', 'LeadSource', sourceId, sourceName);
+    } else {
+      actions.disable('marketing', 'LeadSource', sourceId, sourceName);
+    }
     setSources(prev => prev.map(s => 
       s.id === sourceId 
         ? { ...s, connected, status: connected ? 'active' : 'paused' }
         : s
     ));
-    toast.success(connected ? 'Source activated' : 'Source paused');
-  };
+  }, [actions]);
+
+  const handleAddSource = useCallback(() => {
+    actions.create('marketing', 'LeadSource', { type: 'new' }, 'New Lead Source');
+  }, [actions]);
+
+  const handleRefreshAll = useCallback(() => {
+    actions.refresh('marketing', 'LeadSources');
+    fetchLeadSources();
+  }, [actions]);
+
+  const handleConfigureRules = useCallback(() => {
+    actions.update('marketing', 'LeadPipelineRules', 'config', { action: 'configure' });
+  }, [actions]);
+
+  const handleViewSource = useCallback((sourceId: string, sourceName: string) => {
+    actions.read('marketing', 'LeadSource', sourceId, sourceName);
+  }, [actions]);
 
   const totalLeadsToday = sources.reduce((sum, s) => sum + s.leads_today, 0);
   const totalLeads = sources.reduce((sum, s) => sum + s.leads_total, 0);
@@ -262,7 +292,7 @@ const MMLeadSources: React.FC = () => {
                 </div>
                 <Switch
                   checked={source.connected}
-                  onCheckedChange={(checked) => toggleSource(source.id, checked)}
+                  onCheckedChange={(checked) => toggleSource(source.id, source.name, checked)}
                 />
               </div>
 
@@ -291,7 +321,7 @@ const MMLeadSources: React.FC = () => {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={() => handleSync(source.id)}
+                    onClick={() => handleSync(source.id, source.name)}
                     disabled={!source.connected || syncing === source.id}
                   >
                     {syncing === source.id ? (

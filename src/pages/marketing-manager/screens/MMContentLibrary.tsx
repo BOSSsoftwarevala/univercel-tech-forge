@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSystemActions } from '@/hooks/useSystemActions';
 import {
   Image,
   Video,
@@ -28,6 +29,7 @@ import {
   Loader2,
   Plus,
   FolderOpen,
+  RefreshCw,
 } from 'lucide-react';
 
 interface ContentItem {
@@ -52,6 +54,7 @@ interface BrandRule {
 }
 
 const MMContentLibrary: React.FC = () => {
+  const { actions, executeAction, isLoading } = useSystemActions();
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [content, setContent] = useState<ContentItem[]>([]);
@@ -92,17 +95,38 @@ const MMContentLibrary: React.FC = () => {
     setBrandRules(mockRules);
   };
 
-  const handleAIContentSuggestion = async () => {
+  const handleAIContentSuggestion = useCallback(async () => {
     setGenerating(true);
     try {
+      await executeAction({
+        module: 'marketing',
+        action: 'create',
+        entityType: 'AIContentSuggestion',
+        successMessage: 'AI generated 3 content suggestions'
+      });
       await new Promise(resolve => setTimeout(resolve, 2000));
-      toast.success('AI generated 3 content suggestions');
-    } catch (error) {
-      toast.error('Generation failed');
     } finally {
       setGenerating(false);
     }
-  };
+  }, [executeAction]);
+
+  const handleUpload = useCallback(() => {
+    actions.create('marketing', 'ContentAsset', { type: 'upload' }, 'New Asset');
+  }, [actions]);
+
+  const handleRefresh = useCallback(() => {
+    actions.refresh('marketing', 'ContentLibrary');
+    fetchContent();
+  }, [actions]);
+
+  const handleDownload = useCallback((id: string, name: string) => {
+    actions.export('marketing', 'ContentAsset', 'file');
+  }, [actions]);
+
+  const handleDelete = useCallback((id: string, name: string) => {
+    actions.softDelete('marketing', 'ContentAsset', id, name);
+    setContent(prev => prev.filter(c => c.id !== id));
+  }, [actions]);
 
   const filteredContent = content.filter(item => {
     if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;

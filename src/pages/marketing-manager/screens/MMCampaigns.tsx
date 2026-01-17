@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pause, Eye, Play } from "lucide-react";
+import { Plus, Pause, Eye, Play, RefreshCw, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSystemActions } from "@/hooks/useSystemActions";
 
 const MMCampaigns = () => {
-  const [campaigns] = useState([
+  const { actions, executeAction, isLoading } = useSystemActions();
+  const [campaigns, setCampaigns] = useState([
     { id: "CMP001", name: "Summer Sale 2025", channel: "Social Media", status: "active", start: "2025-06-01", end: "2025-06-30", kpi: "10K leads" },
     { id: "CMP002", name: "Festival Promo", channel: "Email", status: "scheduled", start: "2025-07-10", end: "2025-07-20", kpi: "5K signups" },
     { id: "CMP003", name: "Brand Awareness", channel: "Display", status: "active", start: "2025-05-15", end: "2025-08-15", kpi: "2M reach" },
@@ -26,21 +28,31 @@ const MMCampaigns = () => {
     }
   };
 
-  const handleCreateCampaign = () => {
-    toast.info("Campaign creation request submitted for approval");
-  };
+  const handleCreateCampaign = useCallback(() => {
+    actions.create('marketing', 'Campaign', { status: 'draft' }, 'New Campaign');
+  }, [actions]);
 
-  const handlePause = (id: string) => {
-    toast.success(`Campaign ${id} paused`);
-  };
+  const handlePause = useCallback((id: string, name: string) => {
+    actions.pause('marketing', 'Campaign', id, name);
+    setCampaigns(prev => prev.map(c => c.id === id ? { ...c, status: 'paused' } : c));
+  }, [actions]);
 
-  const handleResume = (id: string) => {
-    toast.success(`Campaign ${id} resumed`);
-  };
+  const handleResume = useCallback((id: string, name: string) => {
+    actions.resume('marketing', 'Campaign', id, name);
+    setCampaigns(prev => prev.map(c => c.id === id ? { ...c, status: 'active' } : c));
+  }, [actions]);
 
-  const handleView = (id: string) => {
-    toast.info(`Viewing campaign ${id}`);
-  };
+  const handleView = useCallback((id: string, name: string) => {
+    actions.read('marketing', 'Campaign', id, name);
+  }, [actions]);
+
+  const handleRefresh = useCallback(() => {
+    actions.refresh('marketing', 'Campaigns');
+  }, [actions]);
+
+  const handleExport = useCallback(() => {
+    actions.export('marketing', 'Campaigns', 'csv');
+  }, [actions]);
 
   return (
     <motion.div
@@ -50,10 +62,20 @@ const MMCampaigns = () => {
     >
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-white">Campaign Management</h2>
-        <Button onClick={handleCreateCampaign} className="bg-emerald-600 hover:bg-emerald-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Campaign
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button onClick={handleCreateCampaign} className="bg-emerald-600 hover:bg-emerald-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Campaign
+          </Button>
+        </div>
       </div>
 
       <Card className="bg-slate-900/50 border-slate-700/50">
@@ -86,15 +108,15 @@ const MMCampaigns = () => {
                   <TableCell className="text-slate-300">{campaign.kpi}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" onClick={() => handleView(campaign.id)}>
+                      <Button size="sm" variant="ghost" onClick={() => handleView(campaign.id, campaign.name)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       {campaign.status === "active" ? (
-                        <Button size="sm" variant="ghost" onClick={() => handlePause(campaign.id)}>
+                        <Button size="sm" variant="ghost" onClick={() => handlePause(campaign.id, campaign.name)}>
                           <Pause className="h-4 w-4 text-yellow-400" />
                         </Button>
                       ) : campaign.status === "paused" ? (
-                        <Button size="sm" variant="ghost" onClick={() => handleResume(campaign.id)}>
+                        <Button size="sm" variant="ghost" onClick={() => handleResume(campaign.id, campaign.name)}>
                           <Play className="h-4 w-4 text-emerald-400" />
                         </Button>
                       ) : null}
