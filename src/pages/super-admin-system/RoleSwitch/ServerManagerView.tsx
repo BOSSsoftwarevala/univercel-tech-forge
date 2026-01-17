@@ -1,47 +1,31 @@
 /**
  * SERVER MANAGER VIEW
  * Content-only component for use within RoleSwitchDashboard
- * NO internal sidebar or header - uses parent layout
+ * Uses the new ultra-simple ServerModuleContainer
  */
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Server, Database, HardDrive, Monitor, Cpu, Shield, Activity, Settings,
-  CheckCircle, AlertTriangle, Zap, RefreshCw, Plus, Eye, MoreHorizontal,
-  Cloud, Globe, Lock, Wifi, Clock, TrendingUp, BarChart3
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
+import React from 'react';
+import { ServerModuleContainer } from '@/components/server-module/ServerModuleContainer';
 
 interface ServerManagerViewProps {
   activeNav?: string;
 }
 
-// Mock server data
-const mockServers = [
-  { id: 'srv-1', name: 'Production Primary', region: 'US-East', status: 'online', cpu: 45, ram: 62, disk: 38, uptime: '99.99%' },
-  { id: 'srv-2', name: 'Production Secondary', region: 'US-West', status: 'online', cpu: 32, ram: 48, disk: 41, uptime: '99.97%' },
-  { id: 'srv-3', name: 'EU Gateway', region: 'EU-West', status: 'online', cpu: 58, ram: 71, disk: 55, uptime: '99.95%' },
-  { id: 'srv-4', name: 'Asia Pacific Node', region: 'AP-South', status: 'warning', cpu: 78, ram: 85, disk: 67, uptime: '99.89%' },
-  { id: 'srv-5', name: 'Backup Server', region: 'US-Central', status: 'online', cpu: 12, ram: 25, disk: 82, uptime: '100%' },
-];
-
-const mockDatabases = [
-  { id: 'db-1', name: 'Primary PostgreSQL', type: 'PostgreSQL', status: 'healthy', size: '2.4 TB', connections: 156 },
-  { id: 'db-2', name: 'Redis Cache', type: 'Redis', status: 'healthy', size: '128 GB', connections: 842 },
-  { id: 'db-3', name: 'Analytics Store', type: 'ClickHouse', status: 'healthy', size: '8.1 TB', connections: 24 },
-];
-
 const ServerManagerView: React.FC<ServerManagerViewProps> = ({ activeNav = 'dashboard' }) => {
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+  // Map old nav values to new section values if needed
+  const getSectionFromNav = (nav: string) => {
+    const mapping: Record<string, any> = {
+      'dashboard': 'overview',
+      'servers': 'active-servers',
+      'databases': 'overview',
+      'storage': 'overview',
+      'monitoring': 'health-load',
+      'performance': 'health-load',
+      'security': 'security',
+      'activity': 'logs',
+      'settings': 'settings',
+    };
+    return mapping[nav] || 'overview';
   };
 
   const getStatusColor = (status: string) => {
