@@ -476,19 +476,19 @@ const RoleSwitchSidebar = ({
   return (
     <motion.aside
       initial={false}
-      animate={{ width: collapsed ? 72 : 280 }}
-      transition={{ duration: 0.2 }}
+      animate={{ width: collapsed ? 60 : 240 }}
+      transition={{ duration: 0.15 }}
       className={cn(
-        "flex flex-col border-r transition-colors duration-300",
+        "flex flex-col border-r transition-colors duration-200",
         "border-blue-400/30"
       )}
       style={{ background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)' }}
     >
-      {/* Header - Premium Control Panel */}
-      <div className="p-4 border-b border-white/15 bg-white/5">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white shadow-lg">
-            <currentConfig.icon className="w-5 h-5 text-blue-600" />
+      {/* Header - Compact Control Panel */}
+      <div className="p-3 border-b border-white/15 bg-white/5">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white shadow-md flex-shrink-0">
+            <currentConfig.icon className="w-4 h-4 text-blue-600" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -496,10 +496,10 @@ const RoleSwitchSidebar = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex-1"
+                className="flex-1 min-w-0"
               >
-                <h2 className="text-base font-bold text-white tracking-tight">Control Panel</h2>
-                <p className="text-xs text-white/70 font-medium">Super Admin Console</p>
+                <h2 className="text-sm font-bold text-white tracking-tight truncate">Control Panel</h2>
+                <p className="text-[10px] text-white/70 font-medium">Super Admin</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -517,21 +517,21 @@ const RoleSwitchSidebar = ({
             className="flex-1 overflow-hidden"
           >
             <ScrollArea className="h-full">
-              <div className="p-3">
+              <div className="p-2">
                 <AnimatePresence>
                   {!collapsed && (
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 px-2"
+                      className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mb-2 px-2"
                     >
-                      Switch Role View
+                      Switch Role
                     </motion.p>
                   )}
                 </AnimatePresence>
                 
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {Object.values(roleConfigs).map((role) => {
                     const Icon = role.icon;
                     const isActive = activeRole === role.id;
@@ -546,19 +546,19 @@ const RoleSwitchSidebar = ({
                               handleRoleSelect(role.id as ActiveRole);
                             }}
                             className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                              "w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-all duration-150",
                               isActive
-                                ? "border-l-4 bg-white/20 border-white text-white"
-                                : "text-white/90 hover:bg-white/15 hover:text-white border-l-4 border-transparent"
+                                ? "border-l-2 bg-white/20 border-white text-white"
+                                : "text-white/90 hover:bg-white/15 hover:text-white border-l-2 border-transparent"
                             )}
                           >
                             <div className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                              "w-6 h-6 rounded-md flex items-center justify-center transition-all flex-shrink-0",
                               isActive 
                                 ? "bg-white"
                                 : "bg-white/20"
                             )}>
-                              <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-white")} />
+                              <Icon className={cn("w-3 h-3", isActive ? "text-primary" : "text-white")} />
                             </div>
                             <AnimatePresence>
                               {!collapsed && (
@@ -566,23 +566,21 @@ const RoleSwitchSidebar = ({
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}
                                   exit={{ opacity: 0 }}
-                                  className="flex-1 text-left"
+                                  className="flex-1 text-left min-w-0"
                                 >
-                                  <span className="text-sm font-medium block text-white">{role.label}</span>
-                                  <span className="text-xs text-white/70">{role.description}</span>
+                                  <span className="text-xs font-medium block text-white truncate">{role.label}</span>
                                 </motion.div>
                               )}
                             </AnimatePresence>
                             {!collapsed && (
-                              <ChevronRight className="w-4 h-4 text-white/70" />
+                              <ChevronRight className="w-3 h-3 text-white/70 flex-shrink-0" />
                             )}
                           </button>
                         </TooltipTrigger>
                         {collapsed && (
-                          <TooltipContent side="right" sideOffset={10}>
+                          <TooltipContent side="right" sideOffset={8}>
                             <div>
-                              <p className="font-medium">{role.label}</p>
-                              <p className="text-xs text-muted-foreground">{role.description}</p>
+                              <p className="font-medium text-sm">{role.label}</p>
                             </div>
                           </TooltipContent>
                         )}

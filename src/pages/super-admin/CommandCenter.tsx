@@ -10,7 +10,7 @@ import {
   Clock, RefreshCw, DollarSign, AlertTriangle, ChevronRight, ScanLine,
   Server, Megaphone, MonitorPlay, Handshake, LayoutDashboard, CheckCircle,
   ClipboardList, UserCog, ChevronDown, Terminal, ShoppingCart, LifeBuoy,
-  FileCheck, User, Layout, Bot, Share2, Code, Hammer, Trophy
+  FileCheck, User, Layout, Bot, Share2, Code, Hammer, Trophy, Layers, Eye
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
@@ -452,39 +452,39 @@ function CategoryCard({ category, index }: { category: Category; index: number }
 
   return (
     <div className="group relative">
-      {/* Premium Card with vivid gradient */}
+      {/* Compact Premium Card - SMALLER SIZE like reference */}
       <div 
         className={cn(
-          "relative rounded-2xl overflow-hidden transition-all duration-300",
-          "shadow-lg hover:shadow-2xl hover:-translate-y-1",
+          "relative rounded-xl overflow-hidden transition-all duration-200",
+          "shadow-md hover:shadow-lg hover:-translate-y-0.5",
           "bg-gradient-to-br",
           gradient
         )}
       >
         {/* Glossy overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-black/5" />
         
-        {/* Card Content */}
+        {/* Card Content - COMPACT */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="relative w-full flex items-center gap-4 p-5 text-left"
+          className="relative w-full flex items-center gap-2.5 p-3 text-left"
         >
-          {/* Icon Container - Glass effect */}
-          <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20">
-            <Icon className="h-7 w-7 text-white drop-shadow-md" />
+          {/* Icon Container - Smaller */}
+          <div className="w-9 h-9 rounded-lg bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-sm border border-white/20 flex-shrink-0">
+            <Icon className="h-4 w-4 text-white drop-shadow-sm" />
           </div>
           
-          {/* Text */}
-          <div className="flex-1">
-            <h3 className="font-bold text-white text-lg drop-shadow-sm tracking-tight">{category.name}</h3>
-            <p className="text-white/80 text-sm font-medium">{category.subs.length} module{category.subs.length > 1 ? 's' : ''}</p>
+          {/* Text - Compact */}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-white text-xs drop-shadow-sm tracking-tight truncate leading-tight">{category.name}</h3>
+            <p className="text-white/70 text-[10px]">{category.subs.length} module{category.subs.length > 1 ? 's' : ''}</p>
           </div>
           
-          {/* Chevron */}
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+          {/* Chevron - Smaller */}
+          <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <ChevronDown 
               className={cn(
-                "h-5 w-5 text-white transition-transform duration-300",
+                "h-3 w-3 text-white transition-transform duration-200",
                 isExpanded && "rotate-180"
               )} 
             />
@@ -928,11 +928,14 @@ const SuperAdminCommandCenter = () => {
             </div>
           )}
 
-          {/* Categories Grid - Premium Gradient Cards */}
+          {/* Categories Grid - COMPACT Layout like reference */}
           {!activeCategory && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-foreground mb-4">System Modules</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="mb-5">
+              <h2 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-primary" />
+                System Modules
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
                 {categories.map((category, index) => (
                   <CategoryCard key={category.id} category={category} index={index} />
                 ))}
@@ -940,162 +943,107 @@ const SuperAdminCommandCenter = () => {
             </div>
           )}
 
-          {/* Live Activity Feed & Top Performers - Only show when no category selected */}
+          {/* LIVE ACTIVITY - Regional Control Cards like reference image */}
           {!activeCategory && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Live Activity Feed - Left Side (Takes 2 columns) */}
-              <div 
-                className="lg:col-span-2 p-5 rounded-2xl bg-card border border-border shadow-lg"
-              >
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg">
-                        <Activity className="h-5 w-5 text-white" />
-                      </div>
-                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500 border-2 border-card animate-pulse" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-foreground">Live Activity Stream</h3>
-                      <p className="text-xs text-muted-foreground">Real-time updates from all modules</p>
-                    </div>
-                  </div>
-                  <Badge className="bg-green-100 text-green-700 border-green-200">
-                    <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse" />
-                    STREAMING
-                  </Badge>
-                </div>
-
-                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                  {[
-                    { type: 'lead', icon: UserPlus, message: 'New lead received from Mumbai', user: 'Raj Patel', time: 'Just now', color: 'from-blue-400 to-cyan-500' },
-                    { type: 'promise', icon: CheckCircle, message: 'Promise completed - CRM Integration', user: 'Sarah Chen', time: '2s ago', color: 'from-emerald-400 to-teal-500' },
-                    { type: 'developer', icon: Code, message: 'Developer joined the platform', user: 'Alex Kumar', time: '5s ago', color: 'from-violet-400 to-purple-500' },
-                    { type: 'sale', icon: Star, message: 'Reseller closed deal - ₹2,50,000', user: 'Vikram Singh', time: '12s ago', color: 'from-amber-400 to-orange-500' },
-                    { type: 'development', icon: Hammer, message: 'Development completed - E-comm v3', user: 'Mike Johnson', time: '18s ago', color: 'from-rose-400 to-pink-500' },
-                  ].map((activity, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-4 p-3 rounded-xl bg-secondary/50 border border-border hover:bg-secondary hover:border-primary/30 transition-all cursor-pointer"
-                    >
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${activity.color} shadow-md`}>
-                        <activity.icon className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-foreground font-medium truncate">{activity.message}</p>
-                        <p className="text-xs text-muted-foreground">by {activity.user}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-xs text-muted-foreground">{activity.time}</span>
-                        <div className="w-2 h-2 rounded-full bg-green-500 mx-auto mt-1" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Top Performers - Right Side */}
-              <div className="p-5 rounded-2xl bg-card border border-border shadow-lg">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
-                    <Trophy className="h-5 w-5 text-white" />
+            <div className="space-y-4">
+              {/* Section Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md">
+                    <Globe className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-foreground">Top Performers</h3>
-                    <p className="text-xs text-muted-foreground">This week's stars 🌟</p>
+                    <h3 className="font-bold text-foreground text-base">Live Activity</h3>
+                    <p className="text-[10px] text-muted-foreground">Regional control & monitoring</p>
                   </div>
                 </div>
+                <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse" />
+                  LIVE
+                </Badge>
+              </div>
 
-                {/* Developers Section */}
-                <div className="mb-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Code className="h-4 w-4 text-violet-500" />
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Top Developers</span>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { name: 'Alex Kumar', avatar: '👨‍💻', tasks: 47, streak: '🔥 12 days', rank: 1 },
-                      { name: 'Sarah Chen', avatar: '👩‍💻', tasks: 42, streak: '⚡ 8 days', rank: 2 },
-                      { name: 'Mike Johnson', avatar: '🧑‍💻', tasks: 38, streak: '🚀 5 days', rank: 3 },
-                    ].map((dev, idx) => (
-                      <div
-                        key={idx}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01] cursor-pointer ${
-                          idx === 0 
-                            ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200' 
-                            : 'bg-secondary/50 border-border hover:border-primary/30'
-                        }`}
-                      >
-                        <div className="relative">
-                          <span className="text-2xl">{dev.avatar}</span>
-                          {idx === 0 && (
-                            <span className="absolute -top-1 -right-1 text-sm">👑</span>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{dev.name}</p>
-                          <p className="text-xs text-muted-foreground">{dev.tasks} tasks • {dev.streak}</p>
-                        </div>
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                          idx === 0 ? 'bg-amber-500 text-white' : idx === 1 ? 'bg-gray-300 text-gray-700' : 'bg-amber-700 text-white'
-                        }`}>
-                          #{dev.rank}
-                        </div>
+              {/* Regional Control Cards Grid - White cards like reference */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[
+                  { region: 'AFRICA CONTROL', items: 4, details: '2 Pending • 1 Critical • 1 Waiting', status: 'MEDIUM', statusColor: 'text-amber-600 bg-amber-100', time: '15m ago', icon: Globe },
+                  { region: 'ASIA CONTROL', items: 7, details: '4 Queue • 2 Risk • 1 SLA', status: 'CRITICAL', statusColor: 'text-red-600 bg-red-100', time: '5m ago', icon: Globe },
+                  { region: 'EUROPE CONTROL', items: 3, details: '2 Requests • 1 Legal', status: 'HIGH', statusColor: 'text-red-500 bg-red-50', time: '30m ago', icon: Globe },
+                  { region: 'NORTH AMERICA', items: 5, details: '3 Pending • 2 Financial', status: 'HIGH', statusColor: 'text-red-500 bg-red-50', time: '10m ago', icon: Globe },
+                  { region: 'SOUTH AMERICA', items: 2, details: '1 Ops • 1 Backlog', status: 'MEDIUM', statusColor: 'text-amber-600 bg-amber-100', time: '1h ago', icon: Globe },
+                  { region: 'MIDDLE EAST', items: 3, details: '2 Security • 1 Override', status: 'HIGH', statusColor: 'text-red-500 bg-red-50', time: '23m ago', icon: Globe },
+                  { region: 'CORE ADMIN OPS', items: 6, details: '4 System • 2 Escalations', status: 'HIGH', statusColor: 'text-red-500 bg-red-50', time: '8m ago', icon: Shield },
+                  { region: 'FRANCHISE REQUESTS', items: 8, details: '5 New Apps • 3 Renewals', status: 'HIGH', statusColor: 'text-red-500 bg-red-50', time: '12m ago', icon: Building2 },
+                  { region: 'RESELLER ACTIONS', items: 4, details: '2 Onboard • 2 Disputes', status: 'MEDIUM', statusColor: 'text-amber-600 bg-amber-100', time: '45m ago', icon: Users },
+                ].map((card, idx) => (
+                  <div
+                    key={idx}
+                    className="relative p-3 rounded-lg bg-card border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group"
+                  >
+                    {/* Card Header */}
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{card.region}</h4>
+                        <p className="text-2xl font-bold text-foreground mt-0.5">{card.items}<span className="text-xs font-normal text-muted-foreground ml-1">items</span></p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Resellers Section */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="h-4 w-4 text-teal-500" />
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Top Resellers</span>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { name: 'Vikram Singh', avatar: '🦸', sales: '₹12.5L', leads: 28, badge: '💎 Diamond' },
-                      { name: 'Rohan Mehta', avatar: '🦹', sales: '₹9.8L', leads: 22, badge: '🥇 Gold' },
-                      { name: 'Priya Sharma', avatar: '🧙', sales: '₹7.2L', leads: 18, badge: '🥈 Silver' },
-                    ].map((reseller, idx) => (
-                      <div
-                        key={idx}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01] cursor-pointer ${
-                          idx === 0 
-                            ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200' 
-                            : 'bg-secondary/50 border-border hover:border-primary/30'
-                        }`}
-                      >
-                        <span className="text-2xl">{reseller.avatar}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-foreground truncate">{reseller.name}</p>
-                            <span className="text-xs">{reseller.badge}</span>
-                          </div>
-                          <p className="text-xs text-muted-foreground">{reseller.sales} • {reseller.leads} leads</p>
-                        </div>
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      <div className="p-1.5 rounded-md bg-primary/10 border border-primary/20">
+                        <card.icon className="h-3 w-3 text-primary" />
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    </div>
 
-                {/* Fun Stats */}
-                <div className="mt-5 p-4 rounded-xl bg-secondary/50 border border-border">
-                  <p className="text-xs text-muted-foreground text-center mb-2">🎉 Today's Highlights</p>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                      <p className="text-lg font-bold text-primary">{liveStats.totalLeads.toLocaleString()}</p>
-                      <p className="text-[10px] text-muted-foreground">Leads</p>
+                    {/* Details */}
+                    <p className="text-[10px] text-muted-foreground mb-2">{card.details}</p>
+
+                    {/* Status & Time Row */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[9px] text-muted-foreground">Continent</span>
+                        <Badge className={cn("text-[9px] px-1 py-0 font-semibold h-4", card.statusColor)}>
+                          {card.status}
+                        </Badge>
+                      </div>
+                      <span className="text-[9px] text-muted-foreground">{card.time}</span>
                     </div>
-                    <div>
-                      <p className="text-lg font-bold text-violet-500">{liveStats.activeDevelopers}</p>
-                      <p className="text-[10px] text-muted-foreground">Devs Online</p>
+
+                    {/* Action Buttons Row */}
+                    <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-border">
+                      <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-blue-100">
+                        <Eye className="h-3 w-3 text-blue-600" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-green-100">
+                        <CheckCircle className="h-3 w-3 text-green-600" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-orange-100">
+                        <RefreshCw className="h-3 w-3 text-orange-600" />
+                      </Button>
                     </div>
-                    <div>
-                      <p className="text-lg font-bold text-amber-500">{liveStats.tasksCompleted}</p>
-                      <p className="text-[10px] text-muted-foreground">Tasks Done</p>
-                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Today's Summary Stats */}
+              <div className="p-4 rounded-lg bg-secondary/50 border border-border">
+                <p className="text-xs text-muted-foreground text-center mb-3">🎉 Today's Highlights</p>
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-3 text-center">
+                  <div>
+                    <p className="text-xl font-bold text-primary">{liveStats.totalLeads.toLocaleString()}</p>
+                    <p className="text-[10px] text-muted-foreground">Total Leads</p>
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold text-violet-500">{liveStats.activeDevelopers}</p>
+                    <p className="text-[10px] text-muted-foreground">Active Devs</p>
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold text-emerald-500">{liveStats.demosOnline}</p>
+                    <p className="text-[10px] text-muted-foreground">Demos Live</p>
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold text-amber-500">{liveStats.tasksCompleted}</p>
+                    <p className="text-[10px] text-muted-foreground">Tasks Done</p>
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold text-rose-500">₹{(liveStats.totalRevenue / 100000).toFixed(1)}L</p>
+                    <p className="text-[10px] text-muted-foreground">Revenue</p>
                   </div>
                 </div>
               </div>
