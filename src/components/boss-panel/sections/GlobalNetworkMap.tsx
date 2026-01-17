@@ -23,14 +23,14 @@ import { Button } from '@/components/ui/button';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// Global data points with coordinates
+// BRAND THEME: Blue + Red colors
 const globalMarkers = [
   { 
     id: 'chicago',
     name: 'Chicago', 
     coordinates: [-87.6298, 41.8781] as [number, number], 
     value: '98,320,300',
-    color: '#F97316',
+    color: 'hsl(217, 91%, 50%)', // Primary Blue
     icon: ShoppingCart,
     size: 'large'
   },
@@ -39,7 +39,7 @@ const globalMarkers = [
     name: 'Canada', 
     coordinates: [-106.3468, 56.1304] as [number, number], 
     value: '6,097,321',
-    color: '#8B5CF6',
+    color: 'hsl(199, 89%, 48%)', // Cyan
     icon: Users,
     size: 'medium'
   },
@@ -48,7 +48,7 @@ const globalMarkers = [
     name: 'Berlin', 
     coordinates: [13.4050, 52.5200] as [number, number], 
     value: '76,541,106',
-    color: '#EC4899',
+    color: 'hsl(0, 84%, 60%)', // Brand Red
     icon: TrendingUp,
     size: 'large'
   },
@@ -57,7 +57,7 @@ const globalMarkers = [
     name: 'Russia', 
     coordinates: [105.3188, 61.5240] as [number, number], 
     value: '66,097,321',
-    color: '#EF4444',
+    color: 'hsl(0, 84%, 60%)', // Brand Red
     icon: Activity,
     size: 'large'
   },
@@ -66,7 +66,7 @@ const globalMarkers = [
     name: 'Morocco', 
     coordinates: [-7.0926, 31.7917] as [number, number], 
     value: '4,591,031',
-    color: '#10B981',
+    color: 'hsl(142, 71%, 45%)', // Success Green
     icon: Globe2,
     size: 'medium'
   },
@@ -75,7 +75,7 @@ const globalMarkers = [
     name: 'Manaus', 
     coordinates: [-60.0217, -3.1190] as [number, number], 
     value: '12,320,300',
-    color: '#F59E0B',
+    color: 'hsl(38, 92%, 50%)', // Warning Orange
     icon: DollarSign,
     size: 'medium'
   },
@@ -84,7 +84,7 @@ const globalMarkers = [
     name: 'Shanghai', 
     coordinates: [121.4737, 31.2304] as [number, number], 
     value: '239,570,110',
-    color: '#EF4444',
+    color: 'hsl(0, 84%, 60%)', // Brand Red
     icon: TrendingUp,
     size: 'large'
   },
@@ -93,7 +93,7 @@ const globalMarkers = [
     name: 'Giza', 
     coordinates: [31.2089, 30.0131] as [number, number], 
     value: '10,547,980',
-    color: '#06B6D4',
+    color: 'hsl(199, 89%, 48%)', // Cyan
     icon: Users,
     size: 'medium'
   },
@@ -102,7 +102,7 @@ const globalMarkers = [
     name: 'Queensland', 
     coordinates: [153.0251, -27.4698] as [number, number], 
     value: '6,097,321',
-    color: '#8B5CF6',
+    color: 'hsl(217, 91%, 50%)', // Primary Blue
     icon: Activity,
     size: 'medium'
   },
@@ -116,11 +116,11 @@ const connections = [
   { from: [-7.0926, 31.7917], to: [31.2089, 30.0131] },
 ];
 
-// Stats cards data
+// Stats cards data - Brand colors
 const statsCards = [
-  { label: 'Transactions', value: '343,054', icon: Activity, gradient: 'from-blue-600 to-cyan-500' },
-  { label: 'Purchases', value: '44,430', icon: ShoppingCart, gradient: 'from-purple-600 to-pink-500' },
-  { label: 'Dynamic', value: '12,503', icon: TrendingUp, gradient: 'from-orange-600 to-amber-500' },
+  { label: 'Transactions', value: '343,054', icon: Activity, gradient: 'from-primary to-primary/70' },
+  { label: 'Purchases', value: '44,430', icon: ShoppingCart, gradient: 'from-destructive to-destructive/70' },
+  { label: 'Dynamic', value: '12,503', icon: TrendingUp, gradient: 'from-amber-500 to-amber-400' },
 ];
 
 // Country activity list
@@ -148,17 +148,17 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
   };
 
   return (
-    <div className={`bg-[#0a0e1a] rounded-3xl overflow-hidden ${className}`}>
+    <div className={`bg-sidebar rounded-3xl overflow-hidden ${className}`}>
       {/* Header */}
       <div className="p-6 pb-0">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-white">General Statistics</h2>
+            <h2 className="text-2xl font-bold text-foreground">General Statistics</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-slate-400">All users</span>
-              <span className="text-xs text-cyan-400 cursor-pointer hover:underline">DETAIL →</span>
+              <span className="text-sm text-muted-foreground">All users</span>
+              <span className="text-xs text-primary cursor-pointer hover:underline">DETAIL →</span>
             </div>
-            <p className="text-4xl font-bold text-white mt-2">7,541,390</p>
+            <p className="text-4xl font-bold text-foreground mt-2">7,541,390</p>
           </div>
           
           {/* Zoom Controls */}
@@ -167,7 +167,7 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
               variant="ghost"
               size="icon"
               onClick={handleZoomIn}
-              className="bg-white/5 hover:bg-white/10 text-white rounded-xl"
+              className="bg-white/5 hover:bg-white/10 text-foreground rounded-xl"
             >
               <ZoomIn className="w-4 h-4" />
             </Button>
@@ -175,7 +175,7 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
               variant="ghost"
               size="icon"
               onClick={handleZoomOut}
-              className="bg-white/5 hover:bg-white/10 text-white rounded-xl"
+              className="bg-white/5 hover:bg-white/10 text-foreground rounded-xl"
             >
               <ZoomOut className="w-4 h-4" />
             </Button>
@@ -183,21 +183,21 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
               variant="ghost"
               size="icon"
               onClick={handleReset}
-              className="bg-white/5 hover:bg-white/10 text-white rounded-xl"
+              className="bg-white/5 hover:bg-white/10 text-foreground rounded-xl"
             >
               <RotateCcw className="w-4 h-4" />
             </Button>
           </div>
         </div>
 
-        {/* Current Activity Bar */}
+        {/* Current Activity Bar - Brand colors */}
         <div className="mb-4">
-          <p className="text-xs text-slate-400 mb-2">Current activity</p>
-          <div className="flex h-2 rounded-full overflow-hidden bg-slate-800">
-            <div className="bg-blue-500 w-[35%]" />
-            <div className="bg-purple-500 w-[25%]" />
-            <div className="bg-pink-500 w-[20%]" />
-            <div className="bg-orange-500 w-[20%]" />
+          <p className="text-xs text-muted-foreground mb-2">Current activity</p>
+          <div className="flex h-2 rounded-full overflow-hidden bg-muted">
+            <div className="bg-primary w-[35%]" />
+            <div className="bg-primary/70 w-[25%]" />
+            <div className="bg-destructive w-[20%]" />
+            <div className="bg-amber-500 w-[20%]" />
           </div>
         </div>
 
@@ -207,13 +207,13 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
             <div key={item.country} className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${
-                  i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-purple-500' : i === 2 ? 'bg-pink-500' : 'bg-orange-500'
+                  i === 0 ? 'bg-primary' : i === 1 ? 'bg-primary/70' : i === 2 ? 'bg-destructive' : 'bg-amber-500'
                 }`} />
-                <span className="text-slate-300">{item.country}</span>
+                <span className="text-muted-foreground">{item.country}</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-white font-medium">{item.value}</span>
-                <span className="text-slate-500 w-8 text-right">{item.percent}%</span>
+                <span className="text-foreground font-medium">{item.value}</span>
+                <span className="text-muted-foreground w-8 text-right">{item.percent}%</span>
               </div>
             </div>
           ))}

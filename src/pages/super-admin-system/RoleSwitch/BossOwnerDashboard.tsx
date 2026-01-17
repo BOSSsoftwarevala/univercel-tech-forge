@@ -25,27 +25,28 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCEOSuggestions } from "@/hooks/useCEOSuggestions";
 import { FranchiseIntelligenceCenter } from "@/components/franchise-intelligence";
 import { GlobalNetworkMap } from "@/components/boss-panel/sections/GlobalNetworkMap";
-// LOCKED: Color System
+// BRAND THEME: Blue Primary + Red Accent (from Software Vala Logo)
+// All colors use CSS variables for consistency across the app
 const COLORS = {
-  background: '#0B0F1A',
-  backgroundSecondary: '#111827',
-  surface: '#0F172A',
-  border: '#1F2937',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#BFC7D5',
-  textMuted: '#6B7280',
-  brand: '#2563EB',
-  danger: '#EF4444',
-  success: '#10B981',
-  warning: '#F59E0B',
+  background: 'hsl(220, 25%, 8%)',
+  backgroundSecondary: 'hsl(220, 25%, 12%)',
+  surface: 'hsl(220, 25%, 10%)',
+  border: 'hsl(220, 25%, 18%)',
+  textPrimary: 'hsl(0, 0%, 100%)',
+  textSecondary: 'hsl(220, 15%, 75%)',
+  textMuted: 'hsl(220, 10%, 50%)',
+  brand: 'hsl(217, 91%, 50%)',      // Brand Blue - matches --primary
+  danger: 'hsl(0, 84%, 60%)',        // Brand Red - matches --destructive
+  success: 'hsl(142, 71%, 45%)',
+  warning: 'hsl(38, 92%, 50%)',
 };
 
-// LOCKED: Box Style
+// Box Style using brand colors
 const boxStyle: React.CSSProperties = {
   background: COLORS.surface,
   border: `1px solid ${COLORS.border}`,
   borderRadius: '14px',
-  boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+  boxShadow: '0 8px 24px hsla(220, 25%, 5%, 0.35)',
 };
 
 // Mock Super Admins

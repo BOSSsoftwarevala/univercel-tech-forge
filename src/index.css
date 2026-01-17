@@ -7,98 +7,99 @@
 @layer base {
   :root {
     /* ========================================
-       SOFTWARE VALA - MODERN SAAS THEME
-       Blue/Purple Professional Design
+       SOFTWARE VALA - BRAND THEME
+       Blue Primary + Red Accent (Logo Colors)
        ======================================== */
     
-    /* Core Colors - Clean Light Theme */
-    --background: 225 30% 96%;
-    --foreground: 225 30% 15%;
+    /* Core Colors - Clean White Theme */
+    --background: 0 0% 98%;
+    --foreground: 220 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 225 30% 15%;
+    --card-foreground: 220 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 225 30% 15%;
+    --popover-foreground: 220 25% 12%;
 
-    /* Primary - Royal Blue */
-    --primary: 225 85% 55%;
+    /* Primary - Brand Blue (from logo) */
+    --primary: 217 91% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light Blue Gray */
-    --secondary: 225 25% 92%;
-    --secondary-foreground: 225 30% 25%;
+    /* Secondary - Light Gray */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 25% 25%;
 
     /* Muted - Soft Gray */
-    --muted: 225 20% 94%;
-    --muted-foreground: 225 15% 50%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
 
-    /* Accent - Purple Blue */
-    --accent: 250 85% 60%;
+    /* Accent - Brand Red (from logo) */
+    --accent: 0 84% 60%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive - Vibrant Red */
-    --destructive: 0 80% 55%;
+    /* Destructive - Red */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 225 20% 88%;
-    --input: 225 20% 92%;
-    --ring: 225 85% 55%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 50%;
 
     --radius: 0.75rem;
 
     /* ========================================
-       SOFTWARE VALA COLOR PALETTE
+       SOFTWARE VALA BRAND PALETTE
+       Blue + Red Theme
        ======================================== */
     
-    /* Primary Palette */
-    --sv-primary: 225 85% 55%;
-    --sv-primary-light: 225 85% 65%;
-    --sv-primary-dark: 225 85% 45%;
+    /* Primary Palette - Brand Blue */
+    --sv-primary: 217 91% 50%;
+    --sv-primary-light: 217 91% 60%;
+    --sv-primary-dark: 217 91% 40%;
     
-    /* Accent Palette */
-    --sv-accent: 250 85% 60%;
-    --sv-accent-light: 250 85% 70%;
-    --sv-accent-dark: 250 85% 50%;
+    /* Accent Palette - Brand Red */
+    --sv-accent: 0 84% 60%;
+    --sv-accent-light: 0 84% 70%;
+    --sv-accent-dark: 0 84% 50%;
     
-    /* Sidebar Gradient Colors (Boss Gold / Black) */
-    --sv-sidebar-start: 240 18% 10%;
-    --sv-sidebar-mid: 240 16% 8%;
-    --sv-sidebar-end: 240 18% 6%;
+    /* Sidebar Colors - Dark Navy */
+    --sv-sidebar-start: 220 25% 10%;
+    --sv-sidebar-mid: 220 25% 8%;
+    --sv-sidebar-end: 220 25% 6%;
 
-    /* Aurora Colors - Dynamic Gradient Palette */
-    --aurora-violet: 250 85% 60%;
-    --aurora-purple: 265 75% 55%;
-    --aurora-blue: 225 85% 55%;
-    --aurora-cyan: 195 90% 50%;
-    --aurora-teal: 175 80% 45%;
-    --aurora-green: 145 75% 45%;
-    --aurora-lime: 80 85% 55%;
-    --aurora-gold: 45 100% 55%;
-    --aurora-orange: 25 95% 55%;
-    --aurora-rose: 340 85% 60%;
-    --aurora-pink: 320 80% 60%;
-    --aurora-magenta: 300 85% 55%;
+    /* Aurora Colors - Brand Aligned */
+    --aurora-violet: 217 91% 50%;
+    --aurora-purple: 0 84% 60%;
+    --aurora-blue: 217 91% 50%;
+    --aurora-cyan: 199 89% 48%;
+    --aurora-teal: 173 80% 40%;
+    --aurora-green: 142 71% 45%;
+    --aurora-lime: 84 81% 44%;
+    --aurora-gold: 38 92% 50%;
+    --aurora-orange: 25 95% 53%;
+    --aurora-rose: 0 84% 60%;
+    --aurora-pink: 330 81% 60%;
+    --aurora-magenta: 300 76% 55%;
 
     /* Status Colors */
-    --status-success: 145 75% 45%;
-    --status-warning: 40 95% 50%;
-    --status-error: 0 80% 55%;
-    --status-info: 200 90% 50%;
-    --status-pending: 45 100% 55%;
+    --status-success: 142 71% 45%;
+    --status-warning: 38 92% 50%;
+    --status-error: 0 84% 60%;
+    --status-info: 217 91% 50%;
+    --status-pending: 38 92% 50%;
 
-    /* Neon Glow Colors */
-    --neon-violet: 250 100% 70%;
-    --neon-cyan: 195 100% 60%;
-    --neon-green: 145 100% 50%;
-    --neon-orange: 25 100% 60%;
+    /* Neon Glow Colors - Brand Aligned */
+    --neon-violet: 217 100% 60%;
+    --neon-cyan: 199 100% 55%;
+    --neon-green: 142 100% 50%;
+    --neon-orange: 25 100% 55%;
     --neon-red: 0 100% 60%;
-    --neon-purple: 265 100% 65%;
-    --neon-blue: 225 100% 65%;
-    --neon-teal: 175 100% 55%;
-    --neon-pink: 320 100% 65%;
-    --neon-gold: 45 100% 60%;
+    --neon-purple: 0 84% 65%;
+    --neon-blue: 217 100% 60%;
+    --neon-teal: 173 100% 50%;
+    --neon-pink: 330 100% 65%;
+    --neon-gold: 38 100% 55%;
 
     /* Surface Colors - Light Mode */
     --surface-1: 0 0% 100%;
@@ -106,19 +107,19 @@
     --surface-3: 225 25% 96%;
     --surface-elevated: 0 0% 100%;
 
-    /* Software Vala Branding */
-    --sv-navy: 225 50% 25%;
-    --sv-navy-deep: 225 55% 18%;
-    --sv-navy-light: 225 45% 35%;
-    --sv-blue: 225 85% 55%;
-    --sv-blue-bright: 225 90% 60%;
+    /* Software Vala Branding - LOCKED */
+    --sv-navy: 220 25% 20%;
+    --sv-navy-deep: 220 25% 12%;
+    --sv-navy-light: 220 25% 30%;
+    --sv-blue: 217 91% 50%;
+    --sv-blue-bright: 217 91% 60%;
     --sv-white: 0 0% 100%;
-    --sv-white-soft: 225 30% 98%;
-    --sv-gray: 225 15% 55%;
-    --sv-success: 145 75% 45%;
-    --sv-warning: 40 95% 50%;
-    --sv-danger: 0 80% 55%;
-    --sv-info: 200 90% 50%;
+    --sv-white-soft: 0 0% 98%;
+    --sv-gray: 220 10% 50%;
+    --sv-success: 142 71% 45%;
+    --sv-warning: 38 92% 50%;
+    --sv-danger: 0 84% 60%;
+    --sv-info: 217 91% 50%;
 
     /* Legacy Compatibility */
     --sapphire: 225 85% 45%;
@@ -159,15 +160,15 @@
     --glass-border: 45 100% 55% / 0.18;
     --glass-glow: 45 100% 55% / 0.12;
 
-    /* Sidebar Theme - Boss Gold / Black */
-    --sidebar-background: 240 18% 7%;
+    /* Sidebar Theme - Dark Navy with Blue Accent */
+    --sidebar-background: 220 25% 8%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 45 100% 55%;
-    --sidebar-primary-foreground: 240 18% 7%;
-    --sidebar-accent: 240 16% 12%;
+    --sidebar-primary: 217 91% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 25% 14%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 45 100% 55% / 0.18;
-    --sidebar-ring: 45 100% 55%;
+    --sidebar-border: 220 25% 18%;
+    --sidebar-ring: 217 91% 50%;
   }
 
   /* ========================================

@@ -49,7 +49,7 @@ interface BossPanelHeaderProps {
   onStreamingToggle: () => void;
 }
 
-// LOCKED: Header height 64px Desktop, colors #0B0F1A → #111827
+// BRAND THEME: Dark header with blue accent
 export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHeaderProps) {
   const [isLocking, setIsLocking] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -105,59 +105,39 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   };
 
   return (
-    <header 
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6"
-      style={{ 
-        height: '64px',
-        background: 'linear-gradient(to right, #0B0F1A, #111827)'
-      }}
-    >
-      {/* LEFT: Logo Icon Only - LOCKED */}
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16 bg-gradient-to-r from-sidebar to-sidebar-accent">
+      {/* LEFT: Logo Icon Only */}
       <div className="flex items-center gap-3">
-        <div 
-          className="flex items-center justify-center"
-          style={{ 
-            width: '40px', 
-            height: '40px', 
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #2563EB, #1D4ED8)'
-          }}
-        >
-          <span className="text-white font-bold text-lg">S</span>
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80">
+          <span className="text-primary-foreground font-bold text-lg">S</span>
         </div>
       </div>
 
-      {/* CENTER: Live Status - LOCKED */}
+      {/* CENTER: Live Status */}
       <button
         onClick={onStreamingToggle}
-        className="flex items-center gap-2 px-4 py-2 rounded-full transition-all"
-        style={{
-          height: '36px',
-          background: streamingOn ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-          border: `1px solid ${streamingOn ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`,
-          color: streamingOn ? '#10B981' : '#EF4444'
-        }}
+        className={`flex items-center gap-2 px-4 py-2 h-9 rounded-full transition-all border ${
+          streamingOn 
+            ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-500' 
+            : 'bg-destructive/15 border-destructive/50 text-destructive'
+        }`}
       >
-        <Radio 
-          style={{ width: '16px', height: '16px' }} 
-          className={streamingOn ? 'animate-pulse' : ''} 
-        />
-        <span style={{ fontSize: '13px', fontWeight: 500 }}>
+        <Radio className={`w-4 h-4 ${streamingOn ? 'animate-pulse' : ''}`} />
+        <span className="text-[13px] font-medium">
           {streamingOn ? 'LIVE' : 'PAUSED'}
         </span>
       </button>
 
-      {/* RIGHT: Icon-only actions - LOCKED sizes 20-22px */}
+      {/* RIGHT: Icon-only actions */}
       <div className="flex items-center gap-1">
         {/* Assist (UltraViewer) */}
         <Button 
           variant="ghost" 
           size="icon"
           onClick={() => setShowAssist(true)}
-          className="hover:bg-white/5"
-          style={{ width: '40px', height: '40px' }}
+          className="hover:bg-white/5 w-10 h-10"
         >
-          <Headphones style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+          <Headphones className="w-5 h-5 text-muted-foreground" />
         </Button>
 
         {/* Promise Tracker */}
@@ -165,10 +145,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowPromise(true)}
-          className="hover:bg-white/5"
-          style={{ width: '40px', height: '40px' }}
+          className="hover:bg-white/5 w-10 h-10"
         >
-          <ListChecks style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+          <ListChecks className="w-5 h-5 text-muted-foreground" />
         </Button>
 
         {/* Internal Chat Bot */}
@@ -176,10 +155,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowChat(true)}
-          className="hover:bg-white/5"
-          style={{ width: '40px', height: '40px' }}
+          className="hover:bg-white/5 w-10 h-10"
         >
-          <MessageSquare style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+          <MessageSquare className="w-5 h-5 text-muted-foreground" />
         </Button>
 
         {/* Notifications / Buzzer */}
@@ -187,23 +165,10 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowNotifications(true)}
-          className="relative hover:bg-white/5"
-          style={{ width: '40px', height: '40px' }}
+          className="relative hover:bg-white/5 w-10 h-10"
         >
-          <Bell style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
-          <span 
-            className="absolute flex items-center justify-center text-white"
-            style={{
-              top: '4px',
-              right: '4px',
-              width: '16px',
-              height: '16px',
-              fontSize: '10px',
-              fontWeight: 600,
-              background: '#EF4444',
-              borderRadius: '50%'
-            }}
-          >
+          <Bell className="w-5 h-5 text-muted-foreground" />
+          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold text-white bg-destructive rounded-full">
             3
           </span>
         </Button>
@@ -213,10 +178,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowLanguage(true)}
-          className="hover:bg-white/5"
-          style={{ width: '40px', height: '40px' }}
+          className="hover:bg-white/5 w-10 h-10"
         >
-          <Globe style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+          <Globe className="w-5 h-5 text-muted-foreground" />
         </Button>
 
         {/* Currency */}
@@ -224,10 +188,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowCurrency(true)}
-          className="hover:bg-white/5"
-          style={{ width: '40px', height: '40px' }}
+          className="hover:bg-white/5 w-10 h-10"
         >
-          <Banknote style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+          <Banknote className="w-5 h-5 text-muted-foreground" />
         </Button>
 
         {/* Emergency Lock */}
@@ -236,41 +199,34 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
             <Button 
               variant="ghost" 
               size="icon"
-              className="hover:bg-red-500/10"
-              style={{ width: '40px', height: '40px' }}
+              className="hover:bg-destructive/10 w-10 h-10"
             >
-              <ShieldAlert style={{ width: '20px', height: '20px', color: '#EF4444' }} />
+              <ShieldAlert className="w-5 h-5 text-destructive" />
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent style={{ background: '#0B0F1A', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+          <AlertDialogContent className="bg-sidebar border-destructive/30">
             <AlertDialogHeader>
-              <AlertDialogTitle style={{ color: '#EF4444' }}>⚠️ Emergency System Lock</AlertDialogTitle>
-              <AlertDialogDescription style={{ color: '#BFC7D5' }}>
+              <AlertDialogTitle className="text-destructive">⚠️ Emergency System Lock</AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground">
                 This will immediately lock down all system operations. Only you can unlock it.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel 
-                style={{ 
-                  background: '#1E293B', 
-                  border: '1px solid #1F2937',
-                  color: '#FFFFFF'
-                }}
-              >
+              <AlertDialogCancel className="bg-sidebar-accent border-sidebar-border text-foreground">
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction 
+              <AlertDialogAction
                 onClick={handleEmergencyLock}
                 disabled={isLocking}
-                style={{ background: '#EF4444', color: '#FFFFFF' }}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 {isLocking ? (
                   <>
-                    <Loader2 style={{ width: '16px', height: '16px', marginRight: '8px' }} className="animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     Locking...
                   </>
                 ) : (
-                  'Confirm Lock'
+                  'ACTIVATE LOCKDOWN'
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -282,45 +238,34 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="hover:bg-white/5"
-              style={{ width: '40px', height: '40px', padding: 0 }}
+              className="hover:bg-white/5 w-10 h-10 p-0"
             >
-              <div 
-                className="flex items-center justify-center"
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #2563EB, #1D4ED8)'
-                }}
-              >
-                <User style={{ width: '16px', height: '16px', color: '#FFFFFF' }} />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/80">
+                <User className="w-4 h-4 text-primary-foreground" />
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="end"
-            style={{ background: '#0B0F1A', border: '1px solid #1F2937' }}
+            className="bg-sidebar border-sidebar-border"
           >
             <DropdownMenuItem 
               onClick={() => navigate('/settings')}
-              style={{ color: '#BFC7D5', cursor: 'pointer' }}
-              className="hover:bg-white/5 focus:bg-white/5"
+              className="text-muted-foreground hover:bg-white/5 focus:bg-white/5 cursor-pointer"
             >
-              <User style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+              <User className="w-4 h-4 mr-2" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuSeparator style={{ background: '#1F2937' }} />
+            <DropdownMenuSeparator className="bg-sidebar-border" />
             <DropdownMenuItem 
               onClick={handleLogout}
               disabled={isLoggingOut}
-              style={{ color: '#EF4444', cursor: 'pointer' }}
-              className="hover:bg-red-500/10 focus:bg-red-500/10"
+              className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10 cursor-pointer"
             >
               {isLoggingOut ? (
-                <Loader2 style={{ width: '16px', height: '16px', marginRight: '8px' }} className="animate-spin" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
-                <LogOut style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+                <LogOut className="w-4 h-4 mr-2" />
               )}
               {isLoggingOut ? 'Logging out...' : 'Logout'}
             </DropdownMenuItem>
