@@ -7,7 +7,7 @@ import {
   Fingerprint, ShieldCheck, Ban, History, Download, Upload,
   Play, Pause, Square, RefreshCw, AlertOctagon, CreditCard,
   CalendarClock, Zap, Bug, Rocket, ShieldAlert, Scale,
-  Cpu, Radio, MoreHorizontal, Send
+  Cpu, Radio, MoreHorizontal, Send, Brain, Lightbulb
 } from "lucide-react";
 import { PendingRequestsBanner } from "@/components/shared/PendingRequestsBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,9 +19,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-
+import { useCEOSuggestions } from "@/hooks/useCEOSuggestions";
 // LOCKED: Color System
 const COLORS = {
   background: '#0B0F1A',
@@ -90,6 +91,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedKpiForReject, setSelectedKpiForReject] = useState<string | null>(null);
   const { user } = useAuth();
+  const { suggestions, acknowledgeSuggestion } = useCEOSuggestions();
   
   // Map sidebar navigation to internal tabs
   const getTabFromNav = (nav?: string): string => {
@@ -756,6 +758,89 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </ScrollArea>
+              </div>
+
+              {/* CEO AI Recommendations */}
+              <div style={boxStyle}>
+                <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                  <Brain style={{ width: '20px', height: '20px', color: '#8B5CF6' }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                    CEO AI Recommendations
+                  </span>
+                  <Badge style={{ marginLeft: 'auto', background: '#8B5CF620', color: '#8B5CF6' }}>
+                    {suggestions.filter(s => s.status === 'pending').length} Pending
+                  </Badge>
+                </div>
+                <ScrollArea className="h-64 p-4">
+                  <div className="space-y-3">
+                    {suggestions.filter(s => s.status === 'pending').slice(0, 4).map((suggestion) => (
+                      <div 
+                        key={suggestion.id} 
+                        className="p-3 rounded-lg"
+                        style={{ background: COLORS.backgroundSecondary, border: `1px solid #8B5CF630` }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge style={{ 
+                            background: suggestion.impact === 'high' ? '#EF444420' : '#F59E0B20',
+                            color: suggestion.impact === 'high' ? '#EF4444' : '#F59E0B'
+                          }}>
+                            {suggestion.impact} impact
+                          </Badge>
+                          <span style={{ fontSize: '11px', color: COLORS.textMuted }}>
+                            {suggestion.confidence}% confidence
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '14px', color: COLORS.textPrimary, marginBottom: '4px', fontWeight: 500 }}>
+                          {suggestion.title}
+                        </p>
+                        <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '8px' }}>
+                          {suggestion.description.slice(0, 80)}...
+                        </p>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            onClick={() => {
+                              acknowledgeSuggestion(suggestion.id, 'approved');
+                            }}
+                            style={{ 
+                              background: COLORS.success, 
+                              color: COLORS.textPrimary,
+                              height: '28px',
+                              borderRadius: '6px',
+                              fontSize: '11px'
+                            }}
+                          >
+                            <CheckCircle2 style={{ width: '12px', height: '12px', marginRight: '4px' }} />
+                            Approve
+                          </Button>
+                          <Button 
+                            size="sm"
+                            onClick={() => {
+                              acknowledgeSuggestion(suggestion.id, 'rejected');
+                            }}
+                            style={{ 
+                              background: 'transparent',
+                              border: `1px solid ${COLORS.danger}50`,
+                              color: COLORS.danger,
+                              height: '28px',
+                              borderRadius: '6px',
+                              fontSize: '11px'
+                            }}
+                          >
+                            <XCircle style={{ width: '12px', height: '12px', marginRight: '4px' }} />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {suggestions.filter(s => s.status === 'pending').length === 0 && (
+                      <div className="text-center py-8">
+                        <Lightbulb style={{ width: '32px', height: '32px', color: COLORS.textMuted, margin: '0 auto 8px' }} />
+                        <p style={{ fontSize: '14px', color: COLORS.textMuted }}>No pending CEO recommendations</p>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </div>
