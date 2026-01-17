@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Product, ProductStatus } from '@/components/product-manager/types/productTypes';
 
 interface ActionState {
   loading: boolean;
@@ -31,7 +32,7 @@ export const useProductActions = () => {
   }, []);
 
   // Create product
-  const createProduct = useCallback(async (productData: Partial<Product>): Promise<Product | null> => {
+  const createProduct = useCallback(async (productData: Partial<Product>): Promise<any | null> => {
     setActionState({ loading: true, error: null });
     try {
       // Generate product code
@@ -107,7 +108,7 @@ export const useProductActions = () => {
   }, [logAction]);
 
   // Duplicate product
-  const duplicateProduct = useCallback(async (productId: string): Promise<Product | null> => {
+  const duplicateProduct = useCallback(async (productId: string): Promise<any | null> => {
     setActionState({ loading: true, error: null });
     try {
       const { data: original, error: fetchError } = await supabase
@@ -257,7 +258,7 @@ export const useProductActions = () => {
   }, []);
 
   // AI Duplicate detection
-  const aiDetectDuplicates = useCallback(async (productName: string): Promise<Product[]> => {
+  const aiDetectDuplicates = useCallback(async (productName: string): Promise<any[]> => {
     setActionState({ loading: true, error: null });
     try {
       const { data } = await supabase
@@ -275,7 +276,7 @@ export const useProductActions = () => {
   }, []);
 
   // Bulk actions
-  const bulkUpdateStatus = useCallback(async (productIds: string[], status: ProductStatus): Promise<boolean> => {
+  const bulkUpdateStatus = useCallback(async (productIds: string[], status: string): Promise<boolean> => {
     setActionState({ loading: true, error: null });
     try {
       const { error } = await supabase
