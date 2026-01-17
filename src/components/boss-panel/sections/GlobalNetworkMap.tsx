@@ -143,10 +143,10 @@ export function GlobalNetworkMap({ className }: GlobalNetworkMapProps) {
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden rounded-2xl",
+      "relative w-full overflow-hidden",
       "bg-[#0a0e1a]",
       className
-    )}>
+    )} style={{ margin: 0, padding: 0 }}>
       {/* GRID LAYOUT: Stats Panel + Map - NO GAP */}
       <div className="grid grid-cols-[280px_1fr] min-h-[70vh]">
         {/* LEFT STATS PANEL */}
