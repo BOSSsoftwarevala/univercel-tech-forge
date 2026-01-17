@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
   MapPin, TrendingUp, Activity, AlertTriangle,
-  Clock, CheckCircle2, X, Eye, Ban, RotateCcw, Send, Pause, RefreshCw,
+  Clock, CheckCircle2, X, Eye, RotateCcw, Send, Pause, RefreshCw,
   FileWarning, Calendar, Zap, Server, Lock, Shield,
   Target, DollarSign, ChevronLeft
 } from "lucide-react";
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ContinentConfig, CountryData, MapMarker, ActionKPI, MARKER_COLORS, generateMarkers } from "./types";
+import ContinentSidebar, { ContinentSidebarSection } from "./ContinentSidebar";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -31,6 +32,8 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeSection, setActiveSection] = useState<ContinentSidebarSection>("dashboard");
   
   const markers = useMemo(() => generateMarkers(config.countries), [config.countries]);
   
@@ -108,7 +111,20 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
   }), [config.accentColor]);
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-950 via-slate-900/50 to-slate-950">
+    <div className="h-full flex bg-gradient-to-br from-slate-950 via-slate-900/50 to-slate-950">
+      {/* Left Sidebar - Continent Scoped */}
+      <ContinentSidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        continentName={config.name}
+        continentIcon={config.icon}
+        themeGradient={config.themeGradient}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -493,6 +509,7 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
       </div>
     </div>
   );

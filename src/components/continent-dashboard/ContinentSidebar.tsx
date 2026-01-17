@@ -30,6 +30,7 @@ interface ContinentSidebarProps {
   onToggleCollapse: () => void;
   continentName: string;
   continentIcon: string;
+  themeGradient?: string;
 }
 
 const sidebarItems: { id: ContinentSidebarSection; label: string; icon: any }[] = [
@@ -54,7 +55,8 @@ const ContinentSidebar = ({
   collapsed,
   onToggleCollapse,
   continentName,
-  continentIcon
+  continentIcon,
+  themeGradient = "from-red-500 to-orange-600"
 }: ContinentSidebarProps) => {
   return (
     <motion.aside
@@ -66,7 +68,7 @@ const ContinentSidebar = ({
       <div className="p-3 border-b border-slate-700/50 flex items-center justify-between">
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center text-xl">
+            <div className={cn("w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-xl", themeGradient)}>
               {continentIcon}
             </div>
             <div className="truncate">
