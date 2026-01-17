@@ -1,12 +1,12 @@
 export { MarketingModuleSidebar } from "./MarketingModuleSidebar";
-export { MarketingOverview } from "./MarketingOverview";
+export { MarketingDashboard } from "./MarketingDashboard";
 export { SEOManager } from "./SEOManager";
 export { AdsManager } from "./AdsManager";
 export { ContentStudio } from "./ContentStudio";
-export { KeywordResearch } from "./KeywordResearch";
-export { GeoTargeting } from "./GeoTargeting";
+export { KeywordPlanner } from "./KeywordPlanner";
+export { CountryStrategy } from "./CountryStrategy";
+export { LeadFunnel } from "./LeadFunnel";
+export { Performance } from "./Performance";
 export { BudgetControl } from "./BudgetControl";
-export { LeadAttribution } from "./LeadAttribution";
-export { MarketingReports } from "./MarketingReports";
 export { MarketingSettings } from "./MarketingSettings";
 export { MarketingModuleContainer } from "./MarketingModuleContainer";

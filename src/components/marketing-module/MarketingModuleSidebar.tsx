@@ -7,10 +7,10 @@ import {
   FileSearch,
   Globe2,
   Wallet,
-  Link2,
+  TrendingUp,
   BarChart3,
   Settings,
-  TrendingUp
+  Target
 } from "lucide-react";
 
 interface MarketingModuleSidebarProps {
@@ -19,15 +19,15 @@ interface MarketingModuleSidebarProps {
 }
 
 const sidebarItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "seo-manager", label: "SEO Manager", icon: Search },
   { id: "ads-manager", label: "Ads Manager", icon: Megaphone },
   { id: "content-studio", label: "Content Studio", icon: PenTool },
-  { id: "keyword-research", label: "Keyword Research", icon: FileSearch },
-  { id: "geo-targeting", label: "Geo Targeting", icon: Globe2 },
+  { id: "keyword-planner", label: "Keyword Planner", icon: FileSearch },
+  { id: "country-strategy", label: "Country Strategy", icon: Globe2 },
+  { id: "lead-funnel", label: "Lead Funnel", icon: Target },
+  { id: "performance", label: "Performance", icon: BarChart3 },
   { id: "budget-control", label: "Budget Control", icon: Wallet },
-  { id: "lead-attribution", label: "Lead Attribution", icon: Link2 },
-  { id: "reports", label: "Reports", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
