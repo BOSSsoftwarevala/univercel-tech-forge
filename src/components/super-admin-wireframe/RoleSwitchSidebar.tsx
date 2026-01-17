@@ -523,7 +523,7 @@ const RoleSwitchSidebar = ({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2"
+                      className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 px-2"
                     >
                       Switch Role View
                     </motion.p>
@@ -554,10 +554,10 @@ const RoleSwitchSidebar = ({
                             <div className={cn(
                               "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
                               isActive 
-                                ? cn("bg-gradient-to-br", role.themeColor)
-                                : "bg-sidebar-accent"
+                                ? "bg-white"
+                                : "bg-white/20"
                             )}>
-                              <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-muted-foreground")} />
+                              <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-white")} />
                             </div>
                             <AnimatePresence>
                               {!collapsed && (
@@ -567,13 +567,13 @@ const RoleSwitchSidebar = ({
                                   exit={{ opacity: 0 }}
                                   className="flex-1 text-left"
                                 >
-                                  <span className="text-sm font-medium block">{role.label}</span>
-                                  <span className="text-xs text-muted-foreground">{role.description}</span>
+                                  <span className="text-sm font-medium block text-white">{role.label}</span>
+                                  <span className="text-xs text-white/70">{role.description}</span>
                                 </motion.div>
                               )}
                             </AnimatePresence>
                             {!collapsed && (
-                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                              <ChevronRight className="w-4 h-4 text-white/70" />
                             )}
                           </button>
                         </TooltipTrigger>
@@ -602,7 +602,7 @@ const RoleSwitchSidebar = ({
             className="flex-1 overflow-hidden flex flex-col"
           >
             {/* Back button and active role header */}
-            <div className="p-3 border-b border-sidebar-border/50">
+            <div className="p-3 border-b border-white/20">
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <Button
@@ -610,7 +610,7 @@ const RoleSwitchSidebar = ({
                     size="sm"
                     onClick={handleBackToRoles}
                     className={cn(
-                      "w-full gap-2 mb-3",
+                      "w-full gap-2 mb-3 text-white hover:bg-white/20 hover:text-white",
                       collapsed ? "justify-center px-0" : "justify-start"
                     )}
                   >
@@ -626,17 +626,9 @@ const RoleSwitchSidebar = ({
               </Tooltip>
 
               {/* Current Role Badge */}
-              <div className={cn(
-                "flex items-center gap-3 p-3 rounded-xl",
-                currentConfig.bgAccent,
-                "border",
-                currentConfig.borderAccent
-              )}>
-                <div className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br",
-                  currentConfig.themeColor
-                )}>
-                  <currentConfig.icon className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/20 border border-white/30">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white">
+                  <currentConfig.icon className="w-5 h-5 text-primary" />
                 </div>
                 <AnimatePresence>
                   {!collapsed && (
@@ -646,10 +638,10 @@ const RoleSwitchSidebar = ({
                       exit={{ opacity: 0 }}
                       className="flex-1"
                     >
-                      <span className={cn("text-sm font-bold block", currentConfig.accentColor)}>
+                      <span className="text-sm font-bold block text-white">
                         {currentConfig.label}
                       </span>
-                      <Badge variant="outline" className={cn("text-xs mt-1", currentConfig.accentColor, currentConfig.borderAccent)}>
+                      <Badge variant="outline" className="text-xs mt-1 text-white border-white/50">
                         Active
                       </Badge>
                     </motion.div>
@@ -666,7 +658,7 @@ const RoleSwitchSidebar = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-5"
+                    className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 px-5"
                   >
                     {currentConfig.shortLabel} Features
                   </motion.p>
@@ -697,11 +689,11 @@ const RoleSwitchSidebar = ({
                             className={cn(
                               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                               isActive
-                                ? cn(currentConfig.bgAccent, currentConfig.accentColor, "border-l-2", currentConfig.borderAccent)
-                                : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/50"
+                                ? "bg-white/20 text-white border-l-2 border-white"
+                                : "text-white/90 hover:text-white hover:bg-white/10"
                             )}
                           >
-                            <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && currentConfig.accentColor)} />
+                            <Icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-white" : "text-white/80")} />
                             <AnimatePresence>
                               {!collapsed && (
                                 <motion.span
@@ -786,13 +778,13 @@ const RoleSwitchSidebar = ({
 
 
       {/* Footer */}
-      <div className="p-3 border-t border-sidebar-border/50 space-y-2">
+      <div className="p-3 border-t border-white/20 space-y-2">
         {/* Collapse Toggle */}
         <Button
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className={cn("w-full", collapsed ? "justify-center" : "justify-start")}
+          className={cn("w-full text-white hover:bg-white/20 hover:text-white", collapsed ? "justify-center" : "justify-start")}
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           {!collapsed && <span className="ml-2">Collapse</span>}
@@ -805,7 +797,7 @@ const RoleSwitchSidebar = ({
               variant="ghost"
               onClick={onLogout}
               className={cn(
-                "w-full text-destructive hover:text-destructive hover:bg-destructive/10",
+                "w-full text-white/80 hover:text-white hover:bg-red-500/30",
                 collapsed ? "justify-center px-0" : "justify-start gap-3"
               )}
             >
