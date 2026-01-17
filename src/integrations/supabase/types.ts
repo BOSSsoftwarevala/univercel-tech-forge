@@ -11851,6 +11851,887 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_ai_services: {
+        Row: {
+          api_key_ref: string | null
+          auto_stop_on_unpaid: boolean | null
+          cost_month: number | null
+          cost_today: number | null
+          created_at: string | null
+          id: string
+          last_used_at: string | null
+          linked_module: string | null
+          model: string | null
+          name: string
+          paid_status: string | null
+          provider: string | null
+          risk_level: string | null
+          status: string | null
+          type: string
+          updated_at: string | null
+          usage_month: number | null
+          usage_today: number | null
+        }
+        Insert: {
+          api_key_ref?: string | null
+          auto_stop_on_unpaid?: boolean | null
+          cost_month?: number | null
+          cost_today?: number | null
+          created_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          linked_module?: string | null
+          model?: string | null
+          name: string
+          paid_status?: string | null
+          provider?: string | null
+          risk_level?: string | null
+          status?: string | null
+          type: string
+          updated_at?: string | null
+          usage_month?: number | null
+          usage_today?: number | null
+        }
+        Update: {
+          api_key_ref?: string | null
+          auto_stop_on_unpaid?: boolean | null
+          cost_month?: number | null
+          cost_today?: number | null
+          created_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          linked_module?: string | null
+          model?: string | null
+          name?: string
+          paid_status?: string | null
+          provider?: string | null
+          risk_level?: string | null
+          status?: string | null
+          type?: string
+          updated_at?: string | null
+          usage_month?: number | null
+          usage_today?: number | null
+        }
+        Relationships: []
+      }
+      platform_api_services: {
+        Row: {
+          api_key_ref: string | null
+          auto_stop_on_unpaid: boolean | null
+          billing_status: string | null
+          cost_per_call: number | null
+          created_at: string | null
+          endpoint: string | null
+          id: string
+          last_call_at: string | null
+          linked_ai_id: string | null
+          linked_module: string | null
+          monthly_cost: number | null
+          name: string
+          provider: string | null
+          status: string | null
+          type: string | null
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          api_key_ref?: string | null
+          auto_stop_on_unpaid?: boolean | null
+          billing_status?: string | null
+          cost_per_call?: number | null
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          last_call_at?: string | null
+          linked_ai_id?: string | null
+          linked_module?: string | null
+          monthly_cost?: number | null
+          name: string
+          provider?: string | null
+          status?: string | null
+          type?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          api_key_ref?: string | null
+          auto_stop_on_unpaid?: boolean | null
+          billing_status?: string | null
+          cost_per_call?: number | null
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          last_call_at?: string | null
+          linked_ai_id?: string | null
+          linked_module?: string | null
+          monthly_cost?: number | null
+          name?: string
+          provider?: string | null
+          status?: string | null
+          type?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_api_services_linked_ai_id_fkey"
+            columns: ["linked_ai_id"]
+            isOneToOne: false
+            referencedRelation: "platform_ai_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_apk_builds: {
+        Row: {
+          app_name: string
+          build_type: string | null
+          built_at: string | null
+          created_at: string | null
+          demo_id: string | null
+          download_count: number | null
+          download_url: string | null
+          error_log: string | null
+          file_size: string | null
+          id: string
+          license_locked: boolean | null
+          product_id: string | null
+          progress: number | null
+          signed: boolean | null
+          status: string | null
+          version: string | null
+        }
+        Insert: {
+          app_name: string
+          build_type?: string | null
+          built_at?: string | null
+          created_at?: string | null
+          demo_id?: string | null
+          download_count?: number | null
+          download_url?: string | null
+          error_log?: string | null
+          file_size?: string | null
+          id?: string
+          license_locked?: boolean | null
+          product_id?: string | null
+          progress?: number | null
+          signed?: boolean | null
+          status?: string | null
+          version?: string | null
+        }
+        Update: {
+          app_name?: string
+          build_type?: string | null
+          built_at?: string | null
+          created_at?: string | null
+          demo_id?: string | null
+          download_count?: number | null
+          download_url?: string | null
+          error_log?: string | null
+          file_size?: string | null
+          id?: string
+          license_locked?: boolean | null
+          product_id?: string | null
+          progress?: number | null
+          signed?: boolean | null
+          status?: string | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_apk_builds_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "platform_demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_apk_builds_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "platform_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_approvals: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          priority: string | null
+          rejection_reason: string | null
+          request_data: Json
+          request_type: string
+          requester_id: string | null
+          requester_role: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: string | null
+          rejection_reason?: string | null
+          request_data?: Json
+          request_type: string
+          requester_id?: string | null
+          requester_role?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: string | null
+          rejection_reason?: string | null
+          request_data?: Json
+          request_type?: string
+          requester_id?: string | null
+          requester_role?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_automation_rules: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          name: string
+          trigger_condition: string
+          trigger_count: number | null
+          trigger_module: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name: string
+          trigger_condition: string
+          trigger_count?: number | null
+          trigger_module?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name?: string
+          trigger_condition?: string
+          trigger_count?: number | null
+          trigger_module?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_billing: {
+        Row: {
+          amount: number
+          auto_deduct: boolean | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          invoice_number: string | null
+          module: string
+          module_id: string | null
+          paid: boolean | null
+          paid_at: string | null
+          paid_by: string | null
+          payment_method: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          auto_deduct?: boolean | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          module: string
+          module_id?: string | null
+          paid?: boolean | null
+          paid_at?: string | null
+          paid_by?: string | null
+          payment_method?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          auto_deduct?: boolean | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          module?: string
+          module_id?: string | null
+          paid?: boolean | null
+          paid_at?: string | null
+          paid_by?: string | null
+          payment_method?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_demos: {
+        Row: {
+          auto_repair: boolean | null
+          created_at: string | null
+          error_log: string | null
+          health_status: string | null
+          id: string
+          last_health_check: string | null
+          name: string
+          product_id: string | null
+          server_id: string | null
+          updated_at: string | null
+          url: string | null
+          version: string | null
+        }
+        Insert: {
+          auto_repair?: boolean | null
+          created_at?: string | null
+          error_log?: string | null
+          health_status?: string | null
+          id?: string
+          last_health_check?: string | null
+          name: string
+          product_id?: string | null
+          server_id?: string | null
+          updated_at?: string | null
+          url?: string | null
+          version?: string | null
+        }
+        Update: {
+          auto_repair?: boolean | null
+          created_at?: string | null
+          error_log?: string | null
+          health_status?: string | null
+          id?: string
+          last_health_check?: string | null
+          name?: string
+          product_id?: string | null
+          server_id?: string | null
+          updated_at?: string | null
+          url?: string | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_demos_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "platform_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_files: {
+        Row: {
+          ai_analysis: Json | null
+          ai_processed: boolean | null
+          created_at: string | null
+          id: string
+          linked_id: string | null
+          linked_module: string | null
+          mime_type: string | null
+          name: string
+          size_bytes: number | null
+          storage_path: string | null
+          type: string | null
+          updated_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          ai_processed?: boolean | null
+          created_at?: string | null
+          id?: string
+          linked_id?: string | null
+          linked_module?: string | null
+          mime_type?: string | null
+          name: string
+          size_bytes?: number | null
+          storage_path?: string | null
+          type?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          ai_processed?: boolean | null
+          created_at?: string | null
+          id?: string
+          linked_id?: string | null
+          linked_module?: string | null
+          mime_type?: string | null
+          name?: string
+          size_bytes?: number | null
+          storage_path?: string | null
+          type?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      platform_leads: {
+        Row: {
+          assigned_to: string | null
+          company: string | null
+          converted_at: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          main_category: string | null
+          metadata: Json | null
+          micro_category: string | null
+          name: string | null
+          nano_category: string | null
+          notes: string | null
+          phone: string | null
+          product_interest: string | null
+          score: number | null
+          source: string
+          status: string | null
+          sub_category: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          company?: string | null
+          converted_at?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          main_category?: string | null
+          metadata?: Json | null
+          micro_category?: string | null
+          name?: string | null
+          nano_category?: string | null
+          notes?: string | null
+          phone?: string | null
+          product_interest?: string | null
+          score?: number | null
+          source: string
+          status?: string | null
+          sub_category?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          company?: string | null
+          converted_at?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          main_category?: string | null
+          metadata?: Json | null
+          micro_category?: string | null
+          name?: string | null
+          nano_category?: string | null
+          notes?: string | null
+          phone?: string | null
+          product_interest?: string | null
+          score?: number | null
+          source?: string
+          status?: string | null
+          sub_category?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_leads_product_interest_fkey"
+            columns: ["product_interest"]
+            isOneToOne: false
+            referencedRelation: "platform_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string | null
+          actor_type: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          is_sealed: boolean | null
+          module: string | null
+          new_value: Json | null
+          old_value: Json | null
+          payload: Json | null
+          severity: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role?: string | null
+          actor_type?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_sealed?: boolean | null
+          module?: string | null
+          new_value?: Json | null
+          old_value?: Json | null
+          payload?: Json | null
+          severity?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          actor_type?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_sealed?: boolean | null
+          module?: string | null
+          new_value?: Json | null
+          old_value?: Json | null
+          payload?: Json | null
+          severity?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      platform_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          dismissed: boolean | null
+          id: string
+          message: string | null
+          module: string | null
+          seen: boolean | null
+          seen_at: string | null
+          title: string
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          dismissed?: boolean | null
+          id?: string
+          message?: string | null
+          module?: string | null
+          seen?: boolean | null
+          seen_at?: string | null
+          title: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          dismissed?: boolean | null
+          id?: string
+          message?: string | null
+          module?: string | null
+          seen?: boolean | null
+          seen_at?: string | null
+          title?: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      platform_permissions: {
+        Row: {
+          action: string
+          allowed: boolean | null
+          created_at: string | null
+          id: string
+          module: string
+          role_id: string | null
+        }
+        Insert: {
+          action: string
+          allowed?: boolean | null
+          created_at?: string | null
+          id?: string
+          module: string
+          role_id?: string | null
+        }
+        Update: {
+          action?: string
+          allowed?: boolean | null
+          created_at?: string | null
+          id?: string
+          module?: string
+          role_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "platform_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_products: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          created_by: string | null
+          demo_status: string | null
+          description: string | null
+          id: string
+          live_status: string | null
+          metadata: Json | null
+          name: string
+          updated_at: string | null
+          version: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          demo_status?: string | null
+          description?: string | null
+          id?: string
+          live_status?: string | null
+          metadata?: Json | null
+          name: string
+          updated_at?: string | null
+          version?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          demo_status?: string | null
+          description?: string | null
+          id?: string
+          live_status?: string | null
+          metadata?: Json | null
+          name?: string
+          updated_at?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
+      platform_roles: {
+        Row: {
+          approval_required: boolean | null
+          created_at: string | null
+          hierarchy_level: number | null
+          id: string
+          permission_json: Json | null
+          role_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          approval_required?: boolean | null
+          created_at?: string | null
+          hierarchy_level?: number | null
+          id?: string
+          permission_json?: Json | null
+          role_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          approval_required?: boolean | null
+          created_at?: string | null
+          hierarchy_level?: number | null
+          id?: string
+          permission_json?: Json | null
+          role_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_seo_tasks: {
+        Row: {
+          auto_fix: boolean | null
+          created_at: string | null
+          domain: string | null
+          fix_status: string | null
+          fixed_at: string | null
+          fixed_by: string | null
+          id: string
+          issue: string | null
+          issue_type: string | null
+          keyword: string | null
+          page: string
+          seo_score: number | null
+          severity: string | null
+          traffic: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_fix?: boolean | null
+          created_at?: string | null
+          domain?: string | null
+          fix_status?: string | null
+          fixed_at?: string | null
+          fixed_by?: string | null
+          id?: string
+          issue?: string | null
+          issue_type?: string | null
+          keyword?: string | null
+          page: string
+          seo_score?: number | null
+          severity?: string | null
+          traffic?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_fix?: boolean | null
+          created_at?: string | null
+          domain?: string | null
+          fix_status?: string | null
+          fixed_at?: string | null
+          fixed_by?: string | null
+          id?: string
+          issue?: string | null
+          issue_type?: string | null
+          keyword?: string | null
+          page?: string
+          seo_score?: number | null
+          severity?: string | null
+          traffic?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_servers: {
+        Row: {
+          auto_scale: boolean | null
+          cost_monthly: number | null
+          cpu_usage: number | null
+          created_at: string | null
+          disk_usage: number | null
+          domain: string | null
+          id: string
+          ip: string | null
+          last_heartbeat: string | null
+          name: string | null
+          provider: string | null
+          ram_usage: number | null
+          region: string | null
+          ssl_enabled: boolean | null
+          ssl_expiry: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_scale?: boolean | null
+          cost_monthly?: number | null
+          cpu_usage?: number | null
+          created_at?: string | null
+          disk_usage?: number | null
+          domain?: string | null
+          id?: string
+          ip?: string | null
+          last_heartbeat?: string | null
+          name?: string | null
+          provider?: string | null
+          ram_usage?: number | null
+          region?: string | null
+          ssl_enabled?: boolean | null
+          ssl_expiry?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_scale?: boolean | null
+          cost_monthly?: number | null
+          cpu_usage?: number | null
+          created_at?: string | null
+          disk_usage?: number | null
+          domain?: string | null
+          id?: string
+          ip?: string | null
+          last_heartbeat?: string | null
+          name?: string | null
+          provider?: string | null
+          ram_usage?: number | null
+          region?: string | null
+          ssl_enabled?: boolean | null
+          ssl_expiry?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_voice_commands: {
+        Row: {
+          ai_interpretation: Json | null
+          command_text: string
+          command_type: string | null
+          created_at: string | null
+          executed_action: string | null
+          id: string
+          result: Json | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ai_interpretation?: Json | null
+          command_text: string
+          command_type?: string | null
+          created_at?: string | null
+          executed_action?: string | null
+          id?: string
+          result?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ai_interpretation?: Json | null
+          command_text?: string
+          command_type?: string | null
+          created_at?: string | null
+          executed_action?: string | null
+          id?: string
+          result?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       prime_feature_access: {
         Row: {
           created_at: string
@@ -21109,6 +21990,7 @@ export type Database = {
         Args: { p_action_type: string; p_user_id: string }
         Returns: boolean
       }
+      is_platform_admin: { Args: { user_id: string }; Returns: boolean }
       is_prime_user: { Args: { _user_id: string }; Returns: boolean }
       is_reseller: { Args: { _user_id: string }; Returns: boolean }
       is_server_manager: { Args: { _user_id: string }; Returns: boolean }
