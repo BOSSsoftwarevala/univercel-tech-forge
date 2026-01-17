@@ -259,15 +259,15 @@ const RoleSwitchDashboard = () => {
       activeRole === "role_manager" ? "bg-gradient-to-br from-violet-950/20 via-background to-purple-950/20" :
       activeRole === "product_manager" ? "bg-gradient-to-br from-indigo-950/20 via-background to-violet-950/20" : "bg-background"
     )}>
-      {/* TOP BAR */}
+      {/* TOP BAR - Icon-Only Enterprise Header */}
       <header className={cn(
         "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
         "bg-gradient-to-r from-[#0d0d14] via-[#12121a] to-[#0d0d14] border-amber-500/20"
       )}>
-        {/* Left - Current Role Badge */}
+        {/* Left - Current Role Identity */}
         <div className="flex items-center gap-4">
           <div className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br",
+            "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
             currentConfig.themeColor
           )}>
             <currentConfig.icon className="w-5 h-5 text-white" />
@@ -282,99 +282,159 @@ const RoleSwitchDashboard = () => {
           </Badge>
         </div>
 
-        {/* Center - Status */}
-        <div className="flex items-center gap-6">
-          {/* Live Alerts */}
-          <div className="flex items-center gap-2">
-            <Bell className="w-4 h-4 text-orange-400 animate-pulse" />
-            <span className="text-sm font-mono text-orange-400">{liveAlerts} Live Alerts</span>
-          </div>
+        {/* Center - Status Icons (Icon-Only) */}
+        <div className="flex items-center gap-3">
+          {/* System Status */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center cursor-pointer group"
+            title="System Healthy"
+          >
+            <Shield className="w-5 h-5 text-emerald-400" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              System Healthy
+            </div>
+          </motion.div>
 
-          {/* Risk Indicator */}
-          <Badge className={cn("font-mono uppercase", riskColors[riskLevel])}>
-            <AlertCircle className="w-3 h-3 mr-1" />
-            Risk: {riskLevel}
-          </Badge>
+          {/* Risk Level */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className={cn(
+              "relative w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer group border",
+              riskLevel === 'low' ? "bg-emerald-500/10 border-emerald-500/20" :
+              riskLevel === 'medium' ? "bg-amber-500/10 border-amber-500/20" :
+              "bg-red-500/10 border-red-500/20"
+            )}
+            title={`Risk: ${riskLevel}`}
+          >
+            <AlertCircle className={cn(
+              "w-5 h-5",
+              riskLevel === 'low' ? "text-emerald-400" :
+              riskLevel === 'medium' ? "text-amber-400" :
+              "text-red-400"
+            )} />
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              Risk: {riskLevel.toUpperCase()}
+            </div>
+          </motion.div>
 
           {/* Session Timer */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <Timer className={cn("w-4 h-4", currentConfig.accentColor)} />
             <span className="text-sm font-mono text-foreground">{formatTime(sessionTime)}</span>
           </div>
         </div>
 
-        {/* Right - Action Buttons & Profile */}
+        {/* Right - Action Icons (Icon-Only, Same Size) */}
         <div className="flex items-center gap-3">
-          {/* Promise Button */}
+          {/* Promise/Task Icon */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handlePromiseClick}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all shadow-md",
+              "relative w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md group",
               promiseState === 'active'
-                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white border border-green-400/50'
+                ? 'bg-gradient-to-br from-green-600 to-emerald-600 border border-green-400/50'
                 : promiseState === 'pending'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border border-amber-400/50 animate-pulse'
-                : 'bg-secondary/80 text-foreground border border-border/50 hover:border-primary/50'
+                ? 'bg-gradient-to-br from-amber-500 to-orange-500 border border-amber-400/50 animate-pulse'
+                : 'bg-secondary/80 border border-border/50 hover:border-primary/50'
             )}
+            title={promiseState === 'active' ? 'Task Active' : promiseState === 'pending' ? 'Task Pending' : 'No Tasks'}
           >
             <img src={promiseIcon} alt="Promise" className="w-5 h-5 rounded-full object-cover" />
-            <span className="hidden lg:inline">
-              {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
-            </span>
+            {promiseState !== 'idle' && (
+              <span className={cn(
+                "absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center",
+                promiseState === 'active' ? "bg-green-400 text-green-900" : "bg-amber-400 text-amber-900"
+              )}>
+                1
+              </span>
+            )}
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              {promiseState === 'active' ? 'Task Active' : promiseState === 'pending' ? 'Task Pending' : 'Tasks'}
+            </div>
           </motion.button>
 
-          {/* Safe Assist Button */}
+          {/* Safe Assist Icon */}
           <SafeAssistTrigger variant="compact" />
 
-          {/* AI Chatbot Button */}
+          {/* AI Assistant Icon */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleChatbotClick}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white font-medium text-sm shadow-lg border border-purple-400/30"
+            className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg border border-purple-400/30 group"
+            title="AI Assistant"
           >
-            <Bot className="w-4 h-4" />
-            <span className="hidden lg:inline">AI Chat</span>
+            <Bot className="w-5 h-5 text-white" />
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              AI Assistant
+            </div>
           </motion.button>
 
-          {/* Alerts Button */}
+          {/* Alerts Icon */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              "relative flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all shadow-md",
+              "relative w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md group",
               liveAlerts > 0
-                ? "bg-gradient-to-r from-red-600 to-rose-600 text-white border border-red-400/50"
-                : "bg-secondary/80 text-foreground border border-border/50"
+                ? "bg-gradient-to-br from-red-600 to-rose-600 border border-red-400/50"
+                : "bg-secondary/80 border border-border/50"
             )}
+            title={liveAlerts > 0 ? `${liveAlerts} Alerts` : 'No Alerts'}
           >
-            <Bell className="w-4 h-4" />
-            <span className="hidden lg:inline">Alerts</span>
+            <Bell className={cn("w-5 h-5", liveAlerts > 0 ? "text-white" : "text-muted-foreground")} />
             {liveAlerts > 0 && (
-              <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-red-600 text-xs rounded-full flex items-center justify-center font-bold shadow-md">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-red-600 text-xs rounded-full flex items-center justify-center font-bold shadow-md">
                 {liveAlerts}
               </span>
             )}
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              {liveAlerts > 0 ? `${liveAlerts} Alerts` : 'Alerts'}
+            </div>
           </motion.button>
 
-          {/* Internal Chat */}
-          <Button variant="ghost" size="icon" onClick={() => navigate('/internal-chat')}>
-            <MessageSquare className="w-5 h-5" />
-          </Button>
+          {/* Internal Chat Icon */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/internal-chat')}
+            className="relative w-10 h-10 rounded-xl bg-secondary/80 border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all group"
+            title="Internal Chat"
+          >
+            <MessageSquare className="w-5 h-5 text-muted-foreground" />
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              Internal Chat
+            </div>
+          </motion.button>
 
-          {/* Profile */}
-          <div className="text-right hidden md:block">
-            <p className="text-sm font-medium">Boss</p>
-            <p className="text-xs text-muted-foreground font-mono">BO-XXXX-001</p>
-          </div>
-          <div className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br",
-            currentConfig.themeColor
-          )}>
+          {/* Divider */}
+          <div className="w-px h-8 bg-border/50" />
+
+          {/* Profile Avatar */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br cursor-pointer shadow-lg group",
+              currentConfig.themeColor
+            )}
+            title="Profile"
+          >
             <Shield className="w-5 h-5 text-white" />
-          </div>
+            {/* Tooltip */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              Profile
+            </div>
+          </motion.div>
         </div>
       </header>
 
