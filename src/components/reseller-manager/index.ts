@@ -13,3 +13,7 @@ export { RMComplianceStatus } from './RMComplianceStatus';
 export { RMEscalations } from './RMEscalations';
 export { RMLeadQualityAlerts } from './RMLeadQualityAlerts';
 export { RMReportsAudit } from './RMReportsAudit';
+export { CategoryHierarchyView } from './CategoryHierarchyView';
+export { CategoryCard } from './CategoryCard';
+export { CategoryBreadcrumb } from './CategoryBreadcrumb';
+export { CategoryDataTable } from './CategoryDataTable';
