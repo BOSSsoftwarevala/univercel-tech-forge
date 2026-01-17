@@ -27,6 +27,7 @@ interface BossPanelSidebarProps {
   onCollapsedChange: (collapsed: boolean) => void;
 }
 
+// LOCKED: Menu items with fixed icons (20px)
 const menuItems: { id: BossPanelSection; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'live-activity', label: 'Live Activity Stream', icon: Activity },
@@ -43,6 +44,8 @@ const menuItems: { id: BossPanelSection; label: string; icon: React.ElementType 
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+// LOCKED: Sidebar width 260px expanded, 80px collapsed
+// LOCKED: Background #0B0F1A
 export function BossPanelSidebar({ 
   activeSection, 
   onSectionChange, 
@@ -52,18 +55,34 @@ export function BossPanelSidebar({
   return (
     <motion.aside
       initial={false}
-      animate={{ width: collapsed ? 80 : 256 }}
-      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[#0d0d14] via-[#12121a] to-[#0a0a10] backdrop-blur-xl border-r border-amber-500/15 z-40 flex flex-col"
+      animate={{ width: collapsed ? 80 : 260 }}
+      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col"
+      style={{ 
+        background: '#0B0F1A',
+        borderRight: '1px solid #1F2937'
+      }}
     >
-      {/* Collapse Toggle */}
+      {/* Collapse Toggle - LOCKED */}
       <button
         onClick={() => onCollapsedChange(!collapsed)}
-        className="absolute -right-3 top-6 w-6 h-6 bg-amber-500/20 border border-amber-500/40 rounded-full flex items-center justify-center text-amber-400 hover:bg-amber-500/30 transition-colors"
+        className="absolute -right-3 top-6 flex items-center justify-center transition-colors hover:bg-[#1E293B]"
+        style={{
+          width: '24px',
+          height: '24px',
+          background: '#111827',
+          border: '1px solid #1F2937',
+          borderRadius: '50%',
+          color: '#9CA3AF'
+        }}
       >
-        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        {collapsed ? (
+          <ChevronRight style={{ width: '14px', height: '14px' }} />
+        ) : (
+          <ChevronLeft style={{ width: '14px', height: '14px' }} />
+        )}
       </button>
 
-      {/* Navigation */}
+      {/* Navigation - LOCKED */}
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -75,29 +94,59 @@ export function BossPanelSidebar({
               onClick={() => onSectionChange(item.id)}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left",
-                isActive 
-                  ? "bg-amber-500/20 text-amber-300 border border-amber-400/40 shadow-[0_0_15px_rgba(245,158,11,0.15)]" 
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+                collapsed && "justify-center"
               )}
-              whileHover={{ x: 4 }}
+              style={{
+                background: isActive ? '#1E293B' : 'transparent',
+                borderLeft: isActive ? '3px solid #2563EB' : '3px solid transparent',
+                color: isActive ? '#FFFFFF' : '#BFC7D5'
+              }}
+              whileHover={{ 
+                backgroundColor: '#111827',
+                color: '#FFFFFF'
+              }}
               whileTap={{ scale: 0.98 }}
             >
-              <Icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-amber-400" : "text-amber-500/50")} />
+              <Icon 
+                style={{ 
+                  width: '20px', 
+                  height: '20px', 
+                  flexShrink: 0,
+                  color: isActive ? '#2563EB' : '#9CA3AF'
+                }} 
+              />
               {!collapsed && (
-                <span className="text-sm font-medium truncate">{item.label}</span>
+                <span 
+                  className="truncate"
+                  style={{ 
+                    fontSize: '14px', 
+                    fontWeight: 500 
+                  }}
+                >
+                  {item.label}
+                </span>
               )}
             </motion.button>
           );
         })}
       </nav>
 
-      {/* Footer */}
+      {/* Footer - LOCKED */}
       {!collapsed && (
-        <div className="p-4 border-t border-amber-500/15">
-          <div className="text-[10px] text-white/40 uppercase tracking-widest text-center">
+        <div 
+          className="p-4"
+          style={{ borderTop: '1px solid #1F2937' }}
+        >
+          <div 
+            className="text-center uppercase tracking-widest"
+            style={{ fontSize: '10px', color: '#6B7280' }}
+          >
             Boss Role Principle
           </div>
-          <div className="text-[9px] text-amber-400/60 text-center mt-1">
+          <div 
+            className="text-center mt-1"
+            style={{ fontSize: '9px', color: '#2563EB' }}
+          >
             See Everything • Change Nothing Casually
           </div>
         </div>

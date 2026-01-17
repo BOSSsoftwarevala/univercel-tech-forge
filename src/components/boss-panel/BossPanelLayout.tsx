@@ -22,21 +22,28 @@ interface BossPanelLayoutProps {
   children?: React.ReactNode;
 }
 
+// LOCKED: Background #0B0F1A, text #FFFFFF
 export function BossPanelLayout({ children }: BossPanelLayoutProps) {
   const [activeSection, setActiveSection] = useState<BossPanelSection>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [streamingOn, setStreamingOn] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a10] via-[#0d0d14] to-[#0a0a10] text-white flex flex-col">
-      {/* Fixed Global Header */}
+    <div 
+      className="min-h-screen flex flex-col"
+      style={{ 
+        background: '#0B0F1A',
+        color: '#FFFFFF'
+      }}
+    >
+      {/* Fixed Global Header - LOCKED 64px */}
       <BossPanelHeader 
         streamingOn={streamingOn}
         onStreamingToggle={() => setStreamingOn(!streamingOn)}
       />
 
-      <div className="flex flex-1 pt-16">
-        {/* Left Sidebar */}
+      <div className="flex flex-1" style={{ paddingTop: '64px' }}>
+        {/* Left Sidebar - LOCKED 260px/80px */}
         <BossPanelSidebar 
           activeSection={activeSection}
           onSectionChange={setActiveSection}
@@ -45,7 +52,13 @@ export function BossPanelLayout({ children }: BossPanelLayoutProps) {
         />
 
         {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'} p-6`}>
+        <main 
+          className="flex-1 p-6 transition-all duration-300"
+          style={{ 
+            marginLeft: sidebarCollapsed ? '80px' : '260px',
+            background: '#0B0F1A'
+          }}
+        >
           {children || <Outlet context={{ activeSection, streamingOn }} />}
         </main>
       </div>

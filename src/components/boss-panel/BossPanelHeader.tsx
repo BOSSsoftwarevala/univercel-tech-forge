@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Search, 
   Bell, 
   ShieldAlert, 
   LogOut, 
   User,
   Radio,
-  Crown,
-  Loader2
+  Loader2,
+  Headphones,
+  MessageSquare,
+  ListChecks,
+  Globe,
+  Banknote
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,9 +41,8 @@ interface BossPanelHeaderProps {
   onStreamingToggle: () => void;
 }
 
+// LOCKED: Header height 64px Desktop, colors #0B0F1A → #111827
 export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHeaderProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
   const [isLocking, setIsLocking] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
@@ -51,7 +51,6 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const handleEmergencyLock = async () => {
     setIsLocking(true);
     try {
-      // Log the emergency lock action
       await supabase.from('audit_logs').insert({
         user_id: user?.id,
         role: 'boss_owner' as any,
@@ -61,7 +60,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       });
       
       toast.success('🔒 EMERGENCY LOCK ACTIVATED', {
-        description: 'All system operations have been frozen. Only you can unlock.',
+        description: 'All system operations have been frozen.',
         duration: 5000
       });
     } catch (error) {
@@ -92,145 +91,246 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   };
 
   const handleNotificationsClick = () => {
-    setShowNotifications(!showNotifications);
-    toast.info('Notifications panel', {
-      description: '3 unread notifications'
-    });
+    toast.info('Notifications', { description: '3 critical alerts pending' });
   };
 
-  const handleProfileClick = () => {
-    navigate('/settings');
+  const handleAssistClick = () => {
+    toast.info('Assist Mode', { description: 'UltraViewer assist ready' });
+  };
+
+  const handlePromiseClick = () => {
+    toast.info('Promise Tracker', { description: '12 active promises' });
+  };
+
+  const handleChatClick = () => {
+    toast.info('Internal Chat', { description: 'Opening chat bot...' });
+  };
+
+  const handleLanguageClick = () => {
+    toast.info('Language', { description: 'English (US)' });
+  };
+
+  const handleCurrencyClick = () => {
+    toast.info('Currency', { description: 'USD ($)' });
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-r from-[#0d0d14] via-[#12121a] to-[#0d0d14] backdrop-blur-xl border-b border-amber-500/20 z-50 flex items-center justify-between px-6">
-      {/* Left - Logo & System Name */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-            <Crown className="w-6 h-6 text-black" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-amber-400">BOSS PANEL</h1>
-            <p className="text-[10px] text-amber-500/60 uppercase tracking-widest">Command Center</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Center - Live Status */}
-      <div className="flex items-center gap-4">
-        <motion.button
-          onClick={onStreamingToggle}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
-            streamingOn 
-              ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
-              : 'bg-red-500/20 border-red-500/50 text-red-400'
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+    <header 
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6"
+      style={{ 
+        height: '64px',
+        background: 'linear-gradient(to right, #0B0F1A, #111827)'
+      }}
+    >
+      {/* LEFT: Logo Icon Only - LOCKED */}
+      <div className="flex items-center gap-3">
+        <div 
+          className="flex items-center justify-center"
+          style={{ 
+            width: '40px', 
+            height: '40px', 
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, #2563EB, #1D4ED8)'
+          }}
         >
-          <Radio className={`w-4 h-4 ${streamingOn ? 'animate-pulse' : ''}`} />
-          <span className="text-sm font-medium">
-            {streamingOn ? 'LIVE STREAMING' : 'STREAM PAUSED'}
-          </span>
-        </motion.button>
+          <span className="text-white font-bold text-lg">S</span>
+        </div>
       </div>
 
-      {/* Right - Search, Notifications, Emergency, Profile */}
-      <div className="flex items-center gap-4">
-        {/* Global Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400/50" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search leads, tasks, demos..."
-            className="w-64 pl-10 bg-black/30 border-amber-500/20 text-white placeholder:text-amber-400/40 focus:border-amber-400/50"
-          />
-        </div>
+      {/* CENTER: Live Status - LOCKED */}
+      <button
+        onClick={onStreamingToggle}
+        className="flex items-center gap-2 px-4 py-2 rounded-full transition-all"
+        style={{
+          height: '36px',
+          background: streamingOn ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+          border: `1px solid ${streamingOn ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`,
+          color: streamingOn ? '#10B981' : '#EF4444'
+        }}
+      >
+        <Radio 
+          style={{ width: '16px', height: '16px' }} 
+          className={streamingOn ? 'animate-pulse' : ''} 
+        />
+        <span style={{ fontSize: '13px', fontWeight: 500 }}>
+          {streamingOn ? 'LIVE' : 'PAUSED'}
+        </span>
+      </button>
 
-        {/* Notifications */}
+      {/* RIGHT: Icon-only actions - LOCKED sizes 20-22px */}
+      <div className="flex items-center gap-1">
+        {/* Assist (UltraViewer) */}
         <Button 
           variant="ghost" 
-          size="icon" 
-          className="relative text-amber-400/70 hover:text-amber-300 hover:bg-amber-500/10"
-          onClick={handleNotificationsClick}
+          size="icon"
+          onClick={handleAssistClick}
+          className="hover:bg-white/5"
+          style={{ width: '40px', height: '40px' }}
         >
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white">
+          <Headphones style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+        </Button>
+
+        {/* Promise Tracker */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={handlePromiseClick}
+          className="hover:bg-white/5"
+          style={{ width: '40px', height: '40px' }}
+        >
+          <ListChecks style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+        </Button>
+
+        {/* Internal Chat Bot */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={handleChatClick}
+          className="hover:bg-white/5"
+          style={{ width: '40px', height: '40px' }}
+        >
+          <MessageSquare style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+        </Button>
+
+        {/* Notifications / Buzzer */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={handleNotificationsClick}
+          className="relative hover:bg-white/5"
+          style={{ width: '40px', height: '40px' }}
+        >
+          <Bell style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+          <span 
+            className="absolute flex items-center justify-center text-white"
+            style={{
+              top: '4px',
+              right: '4px',
+              width: '16px',
+              height: '16px',
+              fontSize: '10px',
+              fontWeight: 600,
+              background: '#EF4444',
+              borderRadius: '50%'
+            }}
+          >
             3
           </span>
         </Button>
 
-        {/* Emergency Lock Button */}
+        {/* Language */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={handleLanguageClick}
+          className="hover:bg-white/5"
+          style={{ width: '40px', height: '40px' }}
+        >
+          <Globe style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+        </Button>
+
+        {/* Currency */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={handleCurrencyClick}
+          className="hover:bg-white/5"
+          style={{ width: '40px', height: '40px' }}
+        >
+          <Banknote style={{ width: '20px', height: '20px', color: '#9CA3AF' }} />
+        </Button>
+
+        {/* Emergency Lock */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button 
               variant="ghost" 
-              size="icon" 
-              className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
+              size="icon"
+              className="hover:bg-red-500/10"
+              style={{ width: '40px', height: '40px' }}
             >
-              <ShieldAlert className="w-5 h-5" />
+              <ShieldAlert style={{ width: '20px', height: '20px', color: '#EF4444' }} />
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0d0d14] border-red-500/30">
+          <AlertDialogContent style={{ background: '#0B0F1A', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-red-400">⚠️ Emergency System Lock</AlertDialogTitle>
-              <AlertDialogDescription className="text-white/70">
+              <AlertDialogTitle style={{ color: '#EF4444' }}>⚠️ Emergency System Lock</AlertDialogTitle>
+              <AlertDialogDescription style={{ color: '#BFC7D5' }}>
                 This will immediately lock down all system operations. Only you can unlock it.
-                All active sessions will be terminated and pending transactions frozen.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <AlertDialogCancel 
+                style={{ 
+                  background: '#1E293B', 
+                  border: '1px solid #1F2937',
+                  color: '#FFFFFF'
+                }}
+              >
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction 
-                className="bg-red-600 hover:bg-red-700 text-white"
                 onClick={handleEmergencyLock}
                 disabled={isLocking}
+                style={{ background: '#EF4444', color: '#FFFFFF' }}
               >
                 {isLocking ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 style={{ width: '16px', height: '16px', marginRight: '8px' }} className="animate-spin" />
                     Locking...
                   </>
                 ) : (
-                  'Confirm Emergency Lock'
+                  'Confirm Lock'
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
-        {/* Profile Dropdown */}
+        {/* Profile Avatar */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 text-amber-400/70 hover:text-amber-300 hover:bg-amber-500/10">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                <User className="w-4 h-4 text-black" />
+            <Button 
+              variant="ghost" 
+              className="hover:bg-white/5"
+              style={{ width: '40px', height: '40px', padding: 0 }}
+            >
+              <div 
+                className="flex items-center justify-center"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #2563EB, #1D4ED8)'
+                }}
+              >
+                <User style={{ width: '16px', height: '16px', color: '#FFFFFF' }} />
               </div>
-              <span className="text-sm font-medium text-white">Boss</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#0d0d14] border-amber-500/20" align="end">
+          <DropdownMenuContent 
+            align="end"
+            style={{ background: '#0B0F1A', border: '1px solid #1F2937' }}
+          >
             <DropdownMenuItem 
-              className="text-white/70 hover:text-white focus:text-white focus:bg-amber-500/10 cursor-pointer"
-              onClick={handleProfileClick}
+              onClick={() => navigate('/settings')}
+              style={{ color: '#BFC7D5', cursor: 'pointer' }}
+              className="hover:bg-white/5 focus:bg-white/5"
             >
-              <User className="w-4 h-4 mr-2" />
+              <User style={{ width: '16px', height: '16px', marginRight: '8px' }} />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-amber-500/20" />
+            <DropdownMenuSeparator style={{ background: '#1F2937' }} />
             <DropdownMenuItem 
-              className="text-red-400 hover:text-red-300 focus:text-red-300 focus:bg-red-500/10 cursor-pointer"
               onClick={handleLogout}
               disabled={isLoggingOut}
+              style={{ color: '#EF4444', cursor: 'pointer' }}
+              className="hover:bg-red-500/10 focus:bg-red-500/10"
             >
               {isLoggingOut ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 style={{ width: '16px', height: '16px', marginRight: '8px' }} className="animate-spin" />
               ) : (
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut style={{ width: '16px', height: '16px', marginRight: '8px' }} />
               )}
               {isLoggingOut ? 'Logging out...' : 'Logout'}
             </DropdownMenuItem>
