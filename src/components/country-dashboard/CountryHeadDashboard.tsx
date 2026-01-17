@@ -5,7 +5,7 @@ import {
   MapPin, Users, Building2, TrendingUp, TrendingDown, Activity, AlertTriangle,
   Clock, CheckCircle2, X, Eye, RotateCcw, Send, Pause, RefreshCw, Minus,
   FileWarning, Calendar, Zap, Server, Lock, Shield, Store, Target, DollarSign,
-  ChevronLeft
+  ChevronLeft, Bell, AlertCircle, Brain, ChevronRight, Layers, Globe
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,12 +22,24 @@ import CountryHeadSidebar, { CountryHeadSection } from "./CountryHeadSidebar";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
+// Activity item interface
+interface ActivityItem {
+  id: string;
+  type: "approval" | "rejection" | "alert" | "warning" | "ai_suggestion";
+  source: "user" | "ai" | "system";
+  message: string;
+  target: string;
+  urgency: "low" | "medium" | "high" | "critical";
+  timestamp: string;
+  actionable: boolean;
+}
+
 interface CountryHeadDashboardProps {
-  countryCode: string;
+  countryCode?: string;
   onBack?: () => void;
 }
 
-const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps) => {
+const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboardProps) => {
   const config = countryConfigs[countryCode] || countryConfigs.IN;
   
   const [selectedRegion, setSelectedRegion] = useState<RegionData | null>(null);
@@ -35,25 +47,58 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeSection, setActiveSection] = useState<CountryHeadSection>("dashboard");
+  const [filterType, setFilterType] = useState<"all" | "franchise" | "reseller" | "influencer">("all");
   
   const entities = useMemo(() => generateCountryEntities(config.regions), [config.regions]);
   
-  // 12 Action KPI Boxes for Country Head
+  const filteredEntities = useMemo(() => {
+    if (filterType === "all") return entities;
+    return entities.filter(e => e.type === filterType);
+  }, [entities, filterType]);
+
+  // Calculate summary metrics
+  const totalRegions = config.regions.length;
+  const totalAreas = config.regions.reduce((sum, r) => sum + r.cities, 0);
+  const totalFranchises = config.regions.reduce((sum, r) => sum + r.franchises, 0);
+  const totalResellers = config.regions.reduce((sum, r) => sum + r.resellers, 0);
+  const totalInfluencers = config.regions.reduce((sum, r) => sum + r.influencers, 0);
+  const pendingApprovals = config.regions.reduce((sum, r) => sum + r.pendingApprovals, 0);
+  const openIssues = config.regions.reduce((sum, r) => sum + r.openIssues, 0);
+  const avgPerformance = Math.round(config.regions.reduce((sum, r) => sum + r.performance, 0) / config.regions.length);
+  
+  // Determine risk level
+  const riskLevel: "low" | "medium" | "high" = 
+    openIssues > 5 ? "high" : 
+    openIssues > 2 || pendingApprovals > 10 ? "medium" : "low";
+  
+  const liveAlertCount = openIssues + Math.floor(Math.random() * 3);
+
+  // 12 KPI Boxes following strict spec
   const actionKPIs: CountryActionKPI[] = useMemo(() => [
     { 
-      id: "pending_approvals", 
-      title: "Pending Approvals", 
-      count: config.regions.reduce((sum, r) => sum + r.pendingApprovals, 0), 
-      icon: Clock, 
-      color: "from-amber-500 to-orange-500", 
-      trend: "up",
+      id: "total_regions", 
+      title: "Total Regions", 
+      count: totalRegions, 
+      icon: Layers, 
+      color: "from-blue-500 to-cyan-500", 
+      trend: "stable",
       source: "system",
-      lastUpdate: "2 min ago" 
+      lastUpdate: "Real-time" 
+    },
+    { 
+      id: "total_areas", 
+      title: "Total Areas", 
+      count: totalAreas, 
+      icon: Globe, 
+      color: "from-indigo-500 to-purple-500", 
+      trend: "stable",
+      source: "system",
+      lastUpdate: "Real-time" 
     },
     { 
       id: "active_franchises", 
       title: "Active Franchises", 
-      count: config.regions.reduce((sum, r) => sum + r.franchises, 0), 
+      count: totalFranchises, 
       icon: Building2, 
       color: "from-emerald-500 to-green-500", 
       trend: "up",
@@ -63,42 +108,42 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
     { 
       id: "active_resellers", 
       title: "Active Resellers", 
-      count: config.regions.reduce((sum, r) => sum + r.resellers, 0), 
+      count: totalResellers, 
       icon: Store, 
-      color: "from-blue-500 to-cyan-500", 
-      trend: "stable",
+      color: "from-blue-500 to-blue-600", 
+      trend: "up",
       source: "system",
       lastUpdate: "5 min ago" 
     },
     { 
       id: "influencers", 
       title: "Influencers", 
-      count: config.regions.reduce((sum, r) => sum + r.influencers, 0), 
+      count: totalInfluencers, 
       icon: Target, 
-      color: "from-purple-500 to-violet-500", 
+      color: "from-orange-500 to-amber-500", 
       trend: "up",
       source: "system",
       lastUpdate: "10 min ago" 
     },
     { 
-      id: "open_issues", 
-      title: "Open Issues", 
-      count: config.regions.reduce((sum, r) => sum + r.openIssues, 0), 
-      icon: AlertTriangle, 
-      color: "from-red-500 to-rose-500", 
-      trend: "down",
-      source: "ai",
-      lastUpdate: "3 min ago" 
+      id: "pending_approvals", 
+      title: "Pending Approvals", 
+      count: pendingApprovals, 
+      icon: Clock, 
+      color: "from-amber-500 to-orange-500", 
+      trend: pendingApprovals > 5 ? "up" : "stable",
+      source: "system",
+      lastUpdate: "2 min ago" 
     },
     { 
-      id: "escalations", 
-      title: "Escalations", 
-      count: Math.floor(Math.random() * 5) + 1, 
-      icon: FileWarning, 
-      color: "from-orange-600 to-red-500", 
-      trend: "stable",
-      source: "human",
-      lastUpdate: "15 min ago" 
+      id: "open_issues", 
+      title: "Open Issues", 
+      count: openIssues, 
+      icon: AlertTriangle, 
+      color: "from-red-500 to-rose-500", 
+      trend: openIssues > 0 ? "up" : "down",
+      source: "ai",
+      lastUpdate: "3 min ago" 
     },
     { 
       id: "payment_pending", 
@@ -112,7 +157,7 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
     },
     { 
       id: "renewals_due", 
-      title: "Renewals Due", 
+      title: "Expiry/Renewal Due", 
       count: Math.floor(Math.random() * 8) + 2, 
       icon: Calendar, 
       color: "from-teal-500 to-cyan-500", 
@@ -121,46 +166,48 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
       lastUpdate: "1 hour ago" 
     },
     { 
-      id: "performance_score", 
-      title: "Performance Score", 
-      count: Math.round(config.regions.reduce((sum, r) => sum + r.performance, 0) / config.regions.length), 
+      id: "live_alerts", 
+      title: "Live Alerts", 
+      count: liveAlertCount, 
+      icon: Bell, 
+      color: "from-rose-600 to-red-500", 
+      trend: liveAlertCount > 3 ? "up" : "down",
+      source: "ai",
+      lastUpdate: "1 min ago" 
+    },
+    { 
+      id: "performance", 
+      title: "Performance %", 
+      count: avgPerformance, 
       icon: TrendingUp, 
       color: "from-emerald-600 to-green-500", 
-      trend: "up",
+      trend: avgPerformance > 85 ? "up" : "stable",
       source: "ai",
       lastUpdate: "5 min ago" 
     },
     { 
-      id: "user_activity", 
-      title: "User Activity", 
-      count: Math.floor(Math.random() * 500) + 200, 
-      icon: Activity, 
-      color: "from-indigo-500 to-blue-500", 
-      trend: "up",
-      source: "system",
-      lastUpdate: "1 min ago" 
-    },
-    { 
-      id: "security_alerts", 
-      title: "Security Alerts", 
-      count: Math.floor(Math.random() * 3), 
-      icon: Lock, 
-      color: "from-rose-600 to-red-500", 
-      trend: "down",
+      id: "ai_risk_summary", 
+      title: "AI Risk Summary", 
+      count: riskLevel === "high" ? 3 : riskLevel === "medium" ? 2 : 1, 
+      icon: Brain, 
+      color: riskLevel === "high" ? "from-red-600 to-rose-500" : 
+             riskLevel === "medium" ? "from-amber-600 to-orange-500" : 
+             "from-green-500 to-emerald-500", 
+      trend: riskLevel === "high" ? "up" : "down",
       source: "ai",
-      lastUpdate: "2 hours ago" 
+      lastUpdate: "Real-time" 
     },
-    { 
-      id: "compliance_status", 
-      title: "Compliance Status", 
-      count: 95, 
-      icon: Shield, 
-      color: "from-green-500 to-emerald-500", 
-      trend: "stable",
-      source: "system",
-      lastUpdate: "Today" 
-    },
-  ], [config.regions]);
+  ], [totalRegions, totalAreas, totalFranchises, totalResellers, totalInfluencers, pendingApprovals, openIssues, avgPerformance, liveAlertCount, riskLevel]);
+
+  // Live activity items
+  const activityItems: ActivityItem[] = useMemo(() => [
+    { id: "1", type: "approval", source: "user", message: "Franchise approved", target: "Mumbai Franchise #12", urgency: "low", timestamp: "2 min ago", actionable: false },
+    { id: "2", type: "alert", source: "ai", message: "Payment delay detected", target: "Delhi Reseller #5", urgency: "high", timestamp: "5 min ago", actionable: true },
+    { id: "3", type: "ai_suggestion", source: "ai", message: "Recommend renewal reminder", target: "8 franchises expiring soon", urgency: "medium", timestamp: "10 min ago", actionable: true },
+    { id: "4", type: "warning", source: "system", message: "Compliance check pending", target: "West Region", urgency: "medium", timestamp: "15 min ago", actionable: true },
+    { id: "5", type: "rejection", source: "user", message: "Application rejected", target: "New Influencer #45", urgency: "low", timestamp: "20 min ago", actionable: false },
+    { id: "6", type: "alert", source: "system", message: "Server load spike", target: "API Gateway", urgency: "critical", timestamp: "25 min ago", actionable: true },
+  ], []);
 
   const getMarkerColor = (entity: CountryEntity): string => {
     if (entity.type === "issue") return MARKER_COLORS.issue;
@@ -206,6 +253,26 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
     }
   }, [config.name]);
 
+  const handleActivityAction = useCallback(async (item: ActivityItem, action: string) => {
+    try {
+      await supabase.from('audit_logs').insert([{
+        action: `activity_${action}`,
+        module: 'country_head_dashboard',
+        meta_json: { 
+          activity_id: item.id,
+          activity_type: item.type,
+          target: item.target,
+          country: config.name,
+          action,
+          timestamp: new Date().toISOString()
+        }
+      }]);
+      toast.success(`Activity "${action}" completed`);
+    } catch (error) {
+      toast.error("Action failed");
+    }
+  }, [config.name]);
+
   const getTrendIcon = (trend?: "up" | "down" | "stable") => {
     if (trend === "up") return <TrendingUp className="w-3 h-3 text-emerald-400" />;
     if (trend === "down") return <TrendingDown className="w-3 h-3 text-red-400" />;
@@ -218,12 +285,35 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
       ai: "bg-purple-500/20 text-purple-400",
       system: "bg-slate-500/20 text-slate-400"
     };
-    return <span className={cn("text-[8px] px-1 py-0.5 rounded", colors[source])}>{source.toUpperCase()}</span>;
+    return <span className={cn("text-[8px] px-1 py-0.5 rounded uppercase", colors[source])}>{source}</span>;
+  };
+
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case "critical": return "bg-red-500/20 text-red-400 border-red-500/50";
+      case "high": return "bg-orange-500/20 text-orange-400 border-orange-500/50";
+      case "medium": return "bg-amber-500/20 text-amber-400 border-amber-500/50";
+      default: return "bg-slate-500/20 text-slate-400 border-slate-500/50";
+    }
+  };
+
+  const getRiskBadge = () => {
+    const config = {
+      low: { bg: "bg-emerald-500/20", text: "text-emerald-400", border: "border-emerald-500/50", label: "Low Risk" },
+      medium: { bg: "bg-amber-500/20", text: "text-amber-400", border: "border-amber-500/50", label: "Medium Risk" },
+      high: { bg: "bg-red-500/20", text: "text-red-400", border: "border-red-500/50", label: "High Risk" }
+    };
+    const c = config[riskLevel];
+    return (
+      <Badge className={cn(c.bg, c.text, c.border, "border")}>
+        {c.label}
+      </Badge>
+    );
   };
 
   return (
     <div className="h-full flex bg-gradient-to-br from-slate-950 via-cyan-950/10 to-slate-950">
-      {/* Left Sidebar - Country Scoped */}
+      {/* LEFT SIDEBAR — Country-Scoped Only */}
       <CountryHeadSidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
@@ -234,31 +324,51 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
         themeGradient={config.themeGradient}
       />
 
-      {/* Main Content Area */}
+      {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
+        {/* 1️⃣ HEADER BAR — Sticky */}
+        <div className="sticky top-0 z-10 p-4 border-b border-slate-700/50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
             {onBack && (
               <Button variant="ghost" size="icon" onClick={onBack} className="text-slate-400 hover:text-white">
                 <ChevronLeft className="w-5 h-5" />
               </Button>
             )}
+            {/* Country Flag Icon */}
             <div className={cn(
-              "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center text-2xl",
+              "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-lg",
               config.themeGradient
             )}>
               {config.flag}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">{config.name} Live Map</h1>
-              <p className="text-sm text-slate-400">{config.continent} • Country Head Operations</p>
+              {/* Country Name — Bold */}
+              <h1 className="text-xl font-bold text-white">{config.name}</h1>
+              {/* Continent Label — Muted */}
+              <p className="text-sm text-slate-400">{config.continent} • Country Head Dashboard</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/50">
-              COUNTRY SCOPE
-            </Badge>
+          
+          <div className="flex items-center gap-3">
+            {/* Risk Indicator Chip */}
+            {getRiskBadge()}
+            
+            {/* Live Alerts Badge */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 border-slate-600 relative"
+              onClick={() => toast.info(`${liveAlertCount} live alerts`)}
+            >
+              <Bell className="w-4 h-4 text-amber-400" />
+              <span className="text-slate-300">Alerts</span>
+              {liveAlertCount > 0 && (
+                <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                  {liveAlertCount}
+                </span>
+              )}
+            </Button>
+            
             <Button 
               variant="outline" 
               size="sm" 
@@ -272,39 +382,39 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
           </div>
         </div>
 
-        {/* 12 KPI Action Boxes */}
+        {/* 3️⃣ KPI GRID — 3×4 Responsive */}
         <div className="p-4 border-b border-slate-700/50">
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-12 gap-3">
             {actionKPIs.map((kpi) => (
               <motion.div
                 key={kpi.id}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 className="cursor-pointer"
-                onClick={() => toast.info(`Viewing ${kpi.title}`)}
+                onClick={() => toast.info(`Viewing ${kpi.title}: ${kpi.count}`)}
               >
-                <Card className="bg-slate-900/50 border-slate-700/50 hover:border-cyan-500/30 transition-all h-full">
-                  <CardContent className="p-2">
+                <Card className="bg-slate-900/60 border-slate-700/50 hover:border-cyan-500/40 transition-all h-full shadow-lg">
+                  <CardContent className="p-3">
                     <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-gradient-to-br",
+                      "w-9 h-9 rounded-lg flex items-center justify-center mb-2 bg-gradient-to-br shadow-md",
                       kpi.color
                     )}>
                       <kpi.icon className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex items-center gap-1">
                       <p className={cn(
-                        "text-lg font-bold",
+                        "text-xl font-bold",
                         kpi.count > 0 ? "text-white" : "text-slate-500"
                       )}>
-                        {kpi.id === "performance_score" || kpi.id === "compliance_status" 
-                          ? `${kpi.count}%` 
-                          : kpi.count}
+                        {kpi.id === "performance" ? `${kpi.count}%` : 
+                         kpi.id === "ai_risk_summary" ? ["Low", "Med", "High"][kpi.count - 1] : 
+                         kpi.count}
                       </p>
                       {getTrendIcon(kpi.trend)}
                     </div>
-                    <p className="text-[10px] text-slate-400 truncate">{kpi.title}</p>
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-[8px] text-slate-500">{kpi.lastUpdate}</p>
+                    <p className="text-[11px] text-slate-400 truncate mt-1">{kpi.title}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-[9px] text-slate-500">{kpi.lastUpdate}</p>
                       {getSourceBadge(kpi.source)}
                     </div>
                   </CardContent>
@@ -314,9 +424,9 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
           </div>
         </div>
 
-        {/* Main Content: Map + Detail Panel */}
+        {/* MAIN CONTENT: Map + Activity Panel + Detail Panel */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Center: Live Country Map */}
+          {/* 4️⃣ COUNTRY MAP — Core Feature */}
           <div className="flex-1 relative">
             <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-slate-900/50">
               <ComposableMap
@@ -361,34 +471,34 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                         className="cursor-pointer"
                       >
                         <circle
-                          r={12}
+                          r={14}
                           fill={getRegionColor(region)}
                           stroke="#fff"
                           strokeWidth={2}
-                          opacity={0.8}
+                          opacity={0.85}
                         />
                         <text
                           textAnchor="middle"
                           y={4}
-                          style={{ fontSize: 8, fill: "#fff", fontWeight: "bold" }}
+                          style={{ fontSize: 9, fill: "#fff", fontWeight: "bold" }}
                         >
                           {region.franchises}
                         </text>
-                        {/* Pulse animation for active regions */}
+                        {/* Pulse animation — soft, not flashy */}
                         <motion.circle
-                          r={12}
+                          r={14}
                           fill="transparent"
                           stroke={getRegionColor(region)}
                           strokeWidth={2}
-                          animate={{ r: [12, 20, 12], opacity: [0.8, 0, 0.8] }}
-                          transition={{ duration: 2, repeat: Infinity }}
+                          animate={{ r: [14, 22, 14], opacity: [0.7, 0, 0.7] }}
+                          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                         />
                       </motion.g>
                     </Marker>
                   ))}
                   
-                  {/* Entity Markers */}
-                  {entities.map((entity) => (
+                  {/* Entity Markers — Filtered */}
+                  {filteredEntities.map((entity) => (
                     <Marker 
                       key={entity.id} 
                       coordinates={[entity.lng, entity.lat]}
@@ -397,11 +507,11 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                       <motion.g
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        whileHover={{ scale: 1.3 }}
+                        whileHover={{ scale: 1.4 }}
                         className="cursor-pointer"
                       >
                         <circle
-                          r={entity.type === "issue" ? 6 : 4}
+                          r={entity.type === "issue" ? 7 : 5}
                           fill={getMarkerColor(entity)}
                           stroke="#fff"
                           strokeWidth={1}
@@ -410,8 +520,8 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                         {entity.openIssues > 0 && entity.type !== "issue" && (
                           <circle
                             r={3}
-                            cx={4}
-                            cy={-4}
+                            cx={5}
+                            cy={-5}
                             fill="#ef4444"
                             stroke="#fff"
                             strokeWidth={0.5}
@@ -422,6 +532,27 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                   ))}
                 </ZoomableGroup>
               </ComposableMap>
+            </div>
+
+            {/* Map Filters */}
+            <div className="absolute top-4 left-4 bg-slate-900/90 rounded-lg p-3 border border-slate-700/50">
+              <p className="text-xs font-medium text-white mb-2">Filter</p>
+              <div className="flex flex-col gap-1">
+                {["all", "franchise", "reseller", "influencer"].map((type) => (
+                  <Button
+                    key={type}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "justify-start text-xs h-7",
+                      filterType === type ? "bg-cyan-500/20 text-cyan-400" : "text-slate-400"
+                    )}
+                    onClick={() => setFilterType(type as typeof filterType)}
+                  >
+                    {type === "all" ? "All" : type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Map Legend */}
@@ -457,22 +588,112 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <p className="text-slate-400">Regions</p>
-                  <p className="font-bold text-white">{config.regions.length}</p>
+                  <p className="font-bold text-white">{totalRegions}</p>
                 </div>
                 <div>
                   <p className="text-slate-400">Franchises</p>
-                  <p className="font-bold text-emerald-400">{config.regions.reduce((s, r) => s + r.franchises, 0)}</p>
+                  <p className="font-bold text-emerald-400">{totalFranchises}</p>
                 </div>
                 <div>
                   <p className="text-slate-400">Resellers</p>
-                  <p className="font-bold text-blue-400">{config.regions.reduce((s, r) => s + r.resellers, 0)}</p>
+                  <p className="font-bold text-blue-400">{totalResellers}</p>
                 </div>
                 <div>
                   <p className="text-slate-400">Influencers</p>
-                  <p className="font-bold text-orange-400">{config.regions.reduce((s, r) => s + r.influencers, 0)}</p>
+                  <p className="font-bold text-orange-400">{totalInfluencers}</p>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* 5️⃣ LIVE ACTIVITY & ESCALATION PANEL */}
+          <div className="w-72 border-l border-slate-700/50 bg-slate-900/80 flex flex-col">
+            <div className="p-3 border-b border-slate-700/50">
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Activity className="w-4 h-4 text-cyan-400" />
+                Live Activity & Escalations
+              </h3>
+            </div>
+            <ScrollArea className="flex-1">
+              <div className="p-2 space-y-2">
+                {activityItems.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-slate-600/50 transition-all"
+                  >
+                    <div className="flex items-start gap-2 mb-2">
+                      <div className={cn(
+                        "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0",
+                        item.type === "approval" ? "bg-emerald-500/20" :
+                        item.type === "rejection" ? "bg-red-500/20" :
+                        item.type === "alert" ? "bg-orange-500/20" :
+                        item.type === "warning" ? "bg-amber-500/20" :
+                        "bg-purple-500/20"
+                      )}>
+                        {item.type === "approval" ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> :
+                         item.type === "rejection" ? <X className="w-3 h-3 text-red-400" /> :
+                         item.type === "alert" ? <AlertCircle className="w-3 h-3 text-orange-400" /> :
+                         item.type === "warning" ? <AlertTriangle className="w-3 h-3 text-amber-400" /> :
+                         <Brain className="w-3 h-3 text-purple-400" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-white truncate">{item.message}</p>
+                        <p className="text-[10px] text-slate-400 truncate">{item.target}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge className={cn("text-[9px] px-1 py-0 h-4", getUrgencyColor(item.urgency))}>
+                          {item.urgency}
+                        </Badge>
+                        <span className={cn(
+                          "text-[9px] px-1 py-0.5 rounded uppercase",
+                          item.source === "ai" ? "bg-purple-500/20 text-purple-400" :
+                          item.source === "user" ? "bg-blue-500/20 text-blue-400" :
+                          "bg-slate-500/20 text-slate-400"
+                        )}>
+                          {item.source}
+                        </span>
+                      </div>
+                      <span className="text-[9px] text-slate-500">{item.timestamp}</span>
+                    </div>
+                    
+                    {/* 6️⃣ INLINE ACTION SYSTEM */}
+                    {item.actionable && (
+                      <div className="flex gap-1 mt-2">
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-6 px-2 text-[10px] text-emerald-400 hover:bg-emerald-500/20"
+                          onClick={() => handleActivityAction(item, "approve")}
+                        >
+                          Approve
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-6 px-2 text-[10px] text-red-400 hover:bg-red-500/20"
+                          onClick={() => handleActivityAction(item, "reject")}
+                        >
+                          Reject
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-6 px-2 text-[10px] text-amber-400 hover:bg-amber-500/20"
+                          onClick={() => handleActivityAction(item, "escalate")}
+                        >
+                          Escalate
+                        </Button>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
 
           {/* Right: Region/Entity Detail Panel */}
@@ -530,7 +751,7 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                           
                           <div className="grid grid-cols-2 gap-3">
                             <div className="p-2 rounded-lg bg-slate-800/50">
-                              <p className="text-xs text-slate-400">Cities</p>
+                              <p className="text-xs text-slate-400">Cities/Areas</p>
                               <p className="text-lg font-bold text-white">{selectedRegion.cities}</p>
                             </div>
                             <div className="p-2 rounded-lg bg-slate-800/50">
@@ -572,7 +793,7 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                           )}
                         </div>
 
-                        {/* Region Actions */}
+                        {/* 6️⃣ Region Actions — MANDATORY */}
                         <div className="space-y-2">
                           <p className="text-xs font-medium text-slate-400 uppercase">Actions</p>
                           <div className="grid grid-cols-2 gap-2">
@@ -581,23 +802,23 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                               className="bg-emerald-600 hover:bg-emerald-700 gap-1"
                               onClick={() => handleAction("approve", selectedRegion.id, "region")}
                             >
-                              <CheckCircle2 className="w-3 h-3" /> Approve All
+                              <CheckCircle2 className="w-3 h-3" /> Approve
                             </Button>
                             <Button 
                               size="sm" 
                               variant="outline"
-                              className="border-cyan-500/50 text-cyan-400 gap-1"
-                              onClick={() => handleAction("view", selectedRegion.id, "region")}
+                              className="border-red-500/50 text-red-400 gap-1"
+                              onClick={() => handleAction("reject", selectedRegion.id, "region")}
                             >
-                              <Eye className="w-3 h-3" /> View Details
+                              <X className="w-3 h-3" /> Reject
                             </Button>
                             <Button 
                               size="sm" 
                               variant="outline"
-                              className="border-amber-500/50 text-amber-400 gap-1"
-                              onClick={() => handleAction("suspend", selectedRegion.id, "region")}
+                              className="border-slate-500/50 text-slate-300 gap-1"
+                              onClick={() => handleAction("sendback", selectedRegion.id, "region")}
                             >
-                              <Pause className="w-3 h-3" /> Suspend
+                              <RotateCcw className="w-3 h-3" /> Send Back
                             </Button>
                             <Button 
                               size="sm" 
@@ -679,39 +900,21 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                           )}
                         </div>
 
-                        {/* Entity Actions */}
+                        {/* 6️⃣ Entity Actions — MANDATORY */}
                         <div className="space-y-2">
                           <p className="text-xs font-medium text-slate-400 uppercase">Actions</p>
                           <div className="grid grid-cols-2 gap-2">
-                            {selectedEntity.status === "pending" && (
-                              <Button 
-                                size="sm" 
-                                className="bg-emerald-600 hover:bg-emerald-700 gap-1"
-                                onClick={() => handleAction("approve", selectedEntity.id, "entity")}
-                              >
-                                <CheckCircle2 className="w-3 h-3" /> Approve
-                              </Button>
-                            )}
                             <Button 
                               size="sm" 
-                              variant="outline"
-                              className="border-cyan-500/50 text-cyan-400 gap-1"
-                              onClick={() => handleAction("review", selectedEntity.id, "entity")}
+                              className="bg-emerald-600 hover:bg-emerald-700 gap-1"
+                              onClick={() => handleAction("approve", selectedEntity.id, "entity")}
                             >
-                              <Eye className="w-3 h-3" /> Review
+                              <CheckCircle2 className="w-3 h-3" /> Approve
                             </Button>
                             <Button 
                               size="sm" 
                               variant="outline"
-                              className="border-amber-500/50 text-amber-400 gap-1"
-                              onClick={() => handleAction("suspend", selectedEntity.id, "entity")}
-                            >
-                              <Pause className="w-3 h-3" /> Suspend
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              className="border-rose-500/50 text-rose-400 gap-1"
+                              className="border-red-500/50 text-red-400 gap-1"
                               onClick={() => handleAction("reject", selectedEntity.id, "entity")}
                             >
                               <X className="w-3 h-3" /> Reject
@@ -719,7 +922,7 @@ const CountryHeadDashboard = ({ countryCode, onBack }: CountryHeadDashboardProps
                             <Button 
                               size="sm" 
                               variant="outline"
-                              className="border-slate-500/50 text-slate-400 gap-1"
+                              className="border-slate-500/50 text-slate-300 gap-1"
                               onClick={() => handleAction("sendback", selectedEntity.id, "entity")}
                             >
                               <RotateCcw className="w-3 h-3" /> Send Back
