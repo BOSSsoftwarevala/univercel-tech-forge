@@ -1,7 +1,7 @@
-import { ServerManagementDashboard } from "@/components/server-management";
+import { SimpleServerDashboard } from "@/components/server-management";
 
 const ServerManagerView = () => {
-  return <ServerManagementDashboard />;
+  return <SimpleServerDashboard />;
 };
 
 export default ServerManagerView;
