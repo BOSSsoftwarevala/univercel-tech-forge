@@ -252,6 +252,16 @@ export function useSystemActions() {
         successMessage: `${entityType} created successfully`
       }), [executeAction]),
 
+    read: useCallback((module: SystemModule, entityType: string, entityId?: string, name?: string) =>
+      executeAction({
+        module,
+        action: 'read',
+        entityType,
+        entityId,
+        entityName: name,
+        successMessage: `${entityType} loaded successfully`
+      }), [executeAction]),
+
     update: useCallback((module: SystemModule, entityType: string, entityId: string, data?: Record<string, unknown>, name?: string) =>
       executeAction({
         module,

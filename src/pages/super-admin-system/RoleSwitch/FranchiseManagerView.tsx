@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -17,6 +17,8 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSystemActions } from "@/hooks/useSystemActions";
+import { toast } from "sonner";
 
 // Mock data for franchise managers
 const franchiseManagersData = [
@@ -149,6 +151,9 @@ const FranchiseManagerView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCountry, setFilterCountry] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  
+  // System actions hook for audit logging and API connections
+  const { executeAction, actions } = useSystemActions();
 
   const handleSelectManager = (manager: typeof franchiseManagersData[0]) => {
     setSelectedManager(manager);
@@ -159,6 +164,58 @@ const FranchiseManagerView = () => {
     setDetailPanelOpen(false);
     setSelectedManager(null);
   };
+
+  // Action handlers with audit logging
+  const handleViewActivity = useCallback(async () => {
+    if (!selectedManager) return;
+    await executeAction({
+      module: 'franchise',
+      action: 'read',
+      entityType: 'Activity Log',
+      entityId: selectedManager.id,
+      entityName: selectedManager.franchiseName,
+      successMessage: `Viewing activity for ${selectedManager.franchiseName}`
+    });
+  }, [selectedManager, executeAction]);
+
+  const handleViewOutlets = useCallback(async () => {
+    if (!selectedManager) return;
+    await executeAction({
+      module: 'franchise',
+      action: 'read',
+      entityType: 'Outlets',
+      entityId: selectedManager.id,
+      entityName: selectedManager.franchiseName,
+      successMessage: `${selectedManager.totalOutlets} outlets for ${selectedManager.franchiseName}`
+    });
+  }, [selectedManager, executeAction]);
+
+  const handleViewRevenue = useCallback(async () => {
+    if (!selectedManager) return;
+    await executeAction({
+      module: 'franchise',
+      action: 'read',
+      entityType: 'Revenue Report',
+      entityId: selectedManager.id,
+      entityName: selectedManager.franchiseName,
+      successMessage: `Revenue: ${selectedManager.revenue}`
+    });
+  }, [selectedManager, executeAction]);
+
+  const handleAssignStaff = useCallback(async () => {
+    if (!selectedManager) return;
+    await actions.assign('franchise', 'Staff', selectedManager.id, 'unassigned', selectedManager.franchiseName);
+  }, [selectedManager, actions]);
+
+  const handleSuspend = useCallback(async () => {
+    if (!selectedManager) return;
+    actions.suspend('franchise', 'Franchise', selectedManager.id, selectedManager.franchiseName);
+  }, [selectedManager, actions]);
+
+  const handleLockAccess = useCallback(async () => {
+    if (!selectedManager) return;
+    await actions.lock('franchise', 'Franchise Access', selectedManager.id, selectedManager.franchiseName);
+  }, [selectedManager, actions]);
 
   const filteredManagers = franchiseManagersData.filter(fm => {
     const matchesSearch = 
@@ -499,27 +556,27 @@ const FranchiseManagerView = () => {
                     Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewActivity}>
                       <Eye className="w-4 h-4" />
                       View Activity
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewOutlets}>
                       <Store className="w-4 h-4" />
                       View Outlets
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewRevenue}>
                       <DollarSign className="w-4 h-4" />
                       View Revenue
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleAssignStaff}>
                       <Users className="w-4 h-4" />
                       Assign Staff
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start text-orange-400 hover:text-orange-400">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start text-orange-400 hover:text-orange-400" onClick={handleSuspend}>
                       <Ban className="w-4 h-4" />
                       Suspend
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start text-red-400 hover:text-red-400">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start text-red-400 hover:text-red-400" onClick={handleLockAccess}>
                       <Lock className="w-4 h-4" />
                       Lock Access
                     </Button>

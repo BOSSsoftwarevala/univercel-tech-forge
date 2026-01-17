@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -16,6 +16,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSystemActions } from "@/hooks/useSystemActions";
+import { toast } from "sonner";
 
 // Mock data for sales & support managers
 const salesSupportManagersData = [
@@ -148,6 +150,9 @@ const SalesSupportManagerView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCountry, setFilterCountry] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  
+  // System actions hook for audit logging and API connections
+  const { executeAction, actions } = useSystemActions();
 
   const handleSelectManager = (manager: typeof salesSupportManagersData[0]) => {
     setSelectedManager(manager);
@@ -158,6 +163,51 @@ const SalesSupportManagerView = () => {
     setDetailPanelOpen(false);
     setSelectedManager(null);
   };
+
+  // Action handlers with audit logging
+  const handleViewLeads = useCallback(async () => {
+    if (!selectedManager) return;
+    await executeAction({
+      module: 'support',
+      action: 'read',
+      entityType: 'Leads',
+      entityId: selectedManager.id,
+      entityName: selectedManager.name,
+      successMessage: `${selectedManager.leadsCount} leads assigned to ${selectedManager.name}`
+    });
+  }, [selectedManager, executeAction]);
+
+  const handleViewTickets = useCallback(async () => {
+    if (!selectedManager) return;
+    await executeAction({
+      module: 'support',
+      action: 'read',
+      entityType: 'Tickets',
+      entityId: selectedManager.id,
+      entityName: selectedManager.name,
+      successMessage: `${selectedManager.activeTickets} active tickets`
+    });
+  }, [selectedManager, executeAction]);
+
+  const handleAssignTicket = useCallback(async () => {
+    if (!selectedManager) return;
+    await actions.assign('support', 'Ticket', selectedManager.id, 'unassigned', selectedManager.name);
+  }, [selectedManager, actions]);
+
+  const handleCloseTicket = useCallback(async () => {
+    if (!selectedManager) return;
+    await actions.update('support', 'Ticket', selectedManager.id, { status: 'closed' }, selectedManager.name);
+  }, [selectedManager, actions]);
+
+  const handleEscalateIssue = useCallback(async () => {
+    if (!selectedManager) return;
+    await actions.escalate('support', 'Issue', selectedManager.id, 'critical', selectedManager.name);
+  }, [selectedManager, actions]);
+
+  const handleSuspendAccess = useCallback(async () => {
+    if (!selectedManager) return;
+    actions.suspend('support', 'Support Access', selectedManager.id, selectedManager.name);
+  }, [selectedManager, actions]);
 
   const filteredManagers = salesSupportManagersData.filter(ssm => {
     const matchesSearch = 
@@ -503,27 +553,27 @@ const SalesSupportManagerView = () => {
                     Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewLeads}>
                       <Users className="w-4 h-4" />
                       View Leads
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleViewTickets}>
                       <Ticket className="w-4 h-4" />
                       View Tickets
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleAssignTicket}>
                       <UserCheck className="w-4 h-4" />
                       Assign Ticket
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleCloseTicket}>
                       <CheckCircle className="w-4 h-4" />
                       Close Ticket
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start text-orange-400 hover:text-orange-400">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start text-orange-400 hover:text-orange-400" onClick={handleEscalateIssue}>
                       <ArrowUpRight className="w-4 h-4" />
                       Escalate Issue
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2 justify-start text-red-400 hover:text-red-400">
+                    <Button variant="outline" size="sm" className="gap-2 justify-start text-red-400 hover:text-red-400" onClick={handleSuspendAccess}>
                       <Ban className="w-4 h-4" />
                       Suspend Access
                     </Button>
