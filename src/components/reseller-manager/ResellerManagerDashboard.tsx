@@ -6,8 +6,8 @@ import { AllResellersView } from './AllResellersView';
 import { CommissionsPayoutsView } from './CommissionsPayoutsView';
 import { IssuesEscalationsView } from './IssuesEscalationsView';
 import { AIInsightsView } from './AIInsightsView';
-import RMComplianceStatus from './RMComplianceStatus';
-import RMAIFraudFlags from './RMAIFraudFlags';
+import { RMComplianceStatus } from './RMComplianceStatus';
+import { RMAIFraudFlags } from './RMAIFraudFlags';
 
 export function ResellerManagerDashboard() {
   const [activeSection, setActiveSection] = useState<ResellerManagerSection>('dashboard');
