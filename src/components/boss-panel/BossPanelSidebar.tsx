@@ -56,15 +56,19 @@ export function BossPanelSidebar({
     <motion.aside
       initial={false}
       animate={{ width: collapsed ? 80 : 260 }}
-      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col bg-sidebar border-r border-sidebar-border"
+      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col"
+      style={{ background: 'hsl(217 91% 50%)' }}
     >
       {/* Collapse Toggle */}
       <button
         onClick={() => onCollapsedChange(!collapsed)}
-        className="absolute -right-3 top-6 flex items-center justify-center transition-colors bg-sidebar-accent hover:bg-sidebar-accent/80 border border-sidebar-border rounded-full text-muted-foreground"
+        className="absolute -right-3 top-6 flex items-center justify-center transition-colors rounded-full"
         style={{
           width: '24px',
           height: '24px',
+          background: 'hsl(217 91% 45%)',
+          border: '2px solid white',
+          color: 'white'
         }}
       >
         {collapsed ? (
@@ -86,21 +90,18 @@ export function BossPanelSidebar({
               onClick={() => onSectionChange(item.id)}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left",
-                collapsed && "justify-center",
-                isActive 
-                  ? "bg-sidebar-accent text-sidebar-foreground border-l-[3px] border-l-primary" 
-                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground border-l-[3px] border-l-transparent"
+                collapsed && "justify-center"
               )}
+              style={{
+                background: isActive ? 'rgba(255,255,255,0.2)' : 'transparent',
+                color: 'white',
+                borderLeft: isActive ? '3px solid white' : '3px solid transparent'
+              }}
               whileTap={{ scale: 0.98 }}
             >
-              <Icon 
-                className={cn(
-                  "w-5 h-5 flex-shrink-0",
-                  isActive ? "text-primary" : "text-muted-foreground"
-                )}
-              />
+              <Icon className="w-5 h-5 flex-shrink-0 text-white" />
               {!collapsed && (
-                <span className="truncate text-sm font-medium">
+                <span className="truncate text-sm font-medium text-white">
                   {item.label}
                 </span>
               )}
@@ -111,11 +112,11 @@ export function BossPanelSidebar({
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="text-center uppercase tracking-widest text-[10px] text-muted-foreground">
+        <div className="p-4 border-t border-white/20">
+          <div className="text-center uppercase tracking-widest text-[10px] text-white/70">
             Boss Role Principle
           </div>
-          <div className="text-center mt-1 text-[9px] text-primary">
+          <div className="text-center mt-1 text-[9px] text-white">
             See Everything • Change Nothing Casually
           </div>
         </div>

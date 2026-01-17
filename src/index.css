@@ -160,15 +160,15 @@
     --glass-border: 45 100% 55% / 0.18;
     --glass-glow: 45 100% 55% / 0.12;
 
-    /* Sidebar Theme - Dark Navy with Blue Accent */
-    --sidebar-background: 220 25% 8%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 217 91% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 25% 14%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 25% 18%;
-    --sidebar-ring: 217 91% 50%;
+    /* Sidebar Theme - Brand Blue (like reference designs) */
+    --sidebar-background: 217 91% 50%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 217 91% 50%;
+    --sidebar-accent: 217 91% 45%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 91% 55%;
+    --sidebar-ring: 0 0% 100%;
   }
 
   /* ========================================

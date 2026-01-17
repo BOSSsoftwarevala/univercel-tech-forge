@@ -105,11 +105,14 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16 bg-gradient-to-r from-sidebar to-sidebar-accent">
+    <header 
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
+      style={{ background: 'hsl(217 91% 50%)' }}
+    >
       {/* LEFT: Logo Icon Only */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80">
-          <span className="text-primary-foreground font-bold text-lg">S</span>
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white">
+          <span className="font-bold text-lg" style={{ color: 'hsl(217 91% 50%)' }}>S</span>
         </div>
       </div>
 
@@ -135,9 +138,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowAssist(true)}
-          className="hover:bg-white/5 w-10 h-10"
+          className="hover:bg-white/20 w-10 h-10"
         >
-          <Headphones className="w-5 h-5 text-muted-foreground" />
+          <Headphones className="w-5 h-5 text-white" />
         </Button>
 
         {/* Promise Tracker */}
@@ -145,9 +148,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowPromise(true)}
-          className="hover:bg-white/5 w-10 h-10"
+          className="hover:bg-white/20 w-10 h-10"
         >
-          <ListChecks className="w-5 h-5 text-muted-foreground" />
+          <ListChecks className="w-5 h-5 text-white" />
         </Button>
 
         {/* Internal Chat Bot */}
@@ -155,9 +158,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowChat(true)}
-          className="hover:bg-white/5 w-10 h-10"
+          className="hover:bg-white/20 w-10 h-10"
         >
-          <MessageSquare className="w-5 h-5 text-muted-foreground" />
+          <MessageSquare className="w-5 h-5 text-white" />
         </Button>
 
         {/* Notifications / Buzzer */}
@@ -165,10 +168,10 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowNotifications(true)}
-          className="relative hover:bg-white/5 w-10 h-10"
+          className="relative hover:bg-white/20 w-10 h-10"
         >
-          <Bell className="w-5 h-5 text-muted-foreground" />
-          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold text-white bg-destructive rounded-full">
+          <Bell className="w-5 h-5 text-white" />
+          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold bg-red-500 text-white rounded-full">
             3
           </span>
         </Button>
@@ -178,9 +181,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowLanguage(true)}
-          className="hover:bg-white/5 w-10 h-10"
+          className="hover:bg-white/20 w-10 h-10"
         >
-          <Globe className="w-5 h-5 text-muted-foreground" />
+          <Globe className="w-5 h-5 text-white" />
         </Button>
 
         {/* Currency */}
@@ -188,9 +191,9 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           variant="ghost" 
           size="icon"
           onClick={() => setShowCurrency(true)}
-          className="hover:bg-white/5 w-10 h-10"
+          className="hover:bg-white/20 w-10 h-10"
         >
-          <Banknote className="w-5 h-5 text-muted-foreground" />
+          <Banknote className="w-5 h-5 text-white" />
         </Button>
 
         {/* Emergency Lock */}
@@ -238,10 +241,10 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="hover:bg-white/5 w-10 h-10 p-0"
+              className="hover:bg-white/20 w-10 h-10 p-0"
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/80">
-                <User className="w-4 h-4 text-primary-foreground" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white">
+                <User className="w-4 h-4" style={{ color: 'hsl(217 91% 50%)' }} />
               </div>
             </Button>
           </DropdownMenuTrigger>
