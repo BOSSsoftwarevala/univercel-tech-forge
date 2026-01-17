@@ -90,6 +90,7 @@ const PMDemoManagement: React.FC = () => {
         title: formData.title,
         url: formData.url,
         status: 'active' as const,
+        category: 'product_demo',
       }]);
 
       if (error) throw error;
@@ -335,7 +336,7 @@ const PMDemoManagement: React.FC = () => {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             {demo.status === 'active' ? (
-                              <DropdownMenuItem onClick={() => handleToggleStatus(demo, 'paused')}>
+                              <DropdownMenuItem onClick={() => handleToggleStatus(demo, 'inactive')}>
                                 <Pause className="w-4 h-4 mr-2" />
                                 Pause
                               </DropdownMenuItem>
