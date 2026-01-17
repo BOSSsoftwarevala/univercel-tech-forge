@@ -12,13 +12,33 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+
+// LOCKED: Color System
+const COLORS = {
+  background: '#0B0F1A',
+  backgroundSecondary: '#111827',
+  surface: '#0F172A',
+  border: '#1F2937',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#BFC7D5',
+  textMuted: '#6B7280',
+  brand: '#2563EB',
+  danger: '#EF4444',
+  success: '#10B981',
+  warning: '#F59E0B',
+};
+
+// LOCKED: Box Style
+const boxStyle: React.CSSProperties = {
+  background: COLORS.surface,
+  border: `1px solid ${COLORS.border}`,
+  borderRadius: '14px',
+  boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+};
 
 // Mock Super Admins
 const mockSuperAdmins = [
@@ -58,11 +78,8 @@ interface BossOwnerDashboardProps {
 }
 
 const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
-  const [selectedModule, setSelectedModule] = useState<typeof systemModules[0] | null>(null);
   const [showLockDialog, setShowLockDialog] = useState(false);
-  const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const [lockReason, setLockReason] = useState("");
-  const [archiveTarget, setArchiveTarget] = useState("");
   const [twoFactorConfirmed, setTwoFactorConfirmed] = useState(false);
   
   // Map sidebar navigation to internal tabs
@@ -74,14 +91,13 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
       'modules': 'modules',
       'audit': 'blackbox',
       'security': 'security',
-      'settings': 'overview', // fallback to overview for settings
+      'settings': 'overview',
     };
     return navToTabMap[nav || 'dashboard'] || 'overview';
   };
   
   const [activeTab, setActiveTab] = useState(getTabFromNav(activeNav));
   
-  // Sync internal tab with sidebar navigation
   useEffect(() => {
     if (activeNav) {
       const mappedTab = getTabFromNav(activeNav);
@@ -106,19 +122,6 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
     setTwoFactorConfirmed(false);
   };
 
-  const handleArchive = () => {
-    if (!twoFactorConfirmed) {
-      toast.error("2FA verification required for archive operation");
-      return;
-    }
-    toast.success("📦 Archived successfully", {
-      description: "Action logged to immutable blackbox",
-    });
-    setShowArchiveDialog(false);
-    setArchiveTarget("");
-    setTwoFactorConfirmed(false);
-  };
-
   const handleModuleLock = (moduleId: string) => {
     toast.success(`Module ${moduleId} lock toggled`);
   };
@@ -131,221 +134,287 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "critical": return "bg-red-500/20 text-red-400 border-red-500/50";
-      case "high": return "bg-amber-500/20 text-amber-400 border-amber-500/50";
-      case "medium": return "bg-blue-500/20 text-blue-400 border-blue-500/50";
-      default: return "bg-slate-500/20 text-slate-400 border-slate-500/50";
+      case "critical": return { background: 'rgba(239, 68, 68, 0.15)', color: COLORS.danger, border: 'rgba(239, 68, 68, 0.5)' };
+      case "high": return { background: 'rgba(245, 158, 11, 0.15)', color: COLORS.warning, border: 'rgba(245, 158, 11, 0.5)' };
+      case "medium": return { background: 'rgba(37, 99, 235, 0.15)', color: COLORS.brand, border: 'rgba(37, 99, 235, 0.5)' };
+      default: return { background: 'rgba(107, 114, 128, 0.15)', color: COLORS.textMuted, border: 'rgba(107, 114, 128, 0.5)' };
     }
   };
 
   return (
-    <div className="min-h-full w-full bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900 overflow-auto">
+    <div 
+      className="min-h-full w-full overflow-auto"
+      style={{ background: COLORS.background }}
+    >
       {/* Pending Requests Banner - TOP PRIORITY */}
       <PendingRequestsBanner />
       
       <div className="p-6">
-      {/* Premium Boss Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-600 flex items-center justify-center shadow-2xl shadow-amber-500/30">
-              <Crown className="w-8 h-8 text-white" />
+        {/* LOCKED: Premium Boss Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div 
+                className="flex items-center justify-center"
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '16px',
+                  background: `linear-gradient(135deg, ${COLORS.brand}, #1D4ED8)`,
+                  boxShadow: `0 8px 24px rgba(37, 99, 235, 0.3)`
+                }}
+              >
+                <Crown style={{ width: '32px', height: '32px', color: COLORS.textPrimary }} />
+              </div>
+              <div>
+                <h1 style={{ fontSize: '28px', fontWeight: 700, color: COLORS.textPrimary }}>
+                  Boss / Owner
+                </h1>
+                <p style={{ fontSize: '14px', color: COLORS.brand }}>
+                  Final Authority • Approve / Lock / Archive
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">Boss / Owner</h1>
-              <p className="text-amber-400/80">Final Authority • Approve / Lock / Archive</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/50 px-4 py-2">
-              <Crown className="w-4 h-4 mr-2" />
-              SUPREME AUTHORITY
-            </Badge>
-            
-            {/* Emergency Lockdown */}
-            <Dialog open={showLockDialog} onOpenChange={setShowLockDialog}>
-              <DialogTrigger asChild>
-                <Button variant="destructive" className="gap-2">
-                  <Lock className="w-4 h-4" />
-                  Emergency Lockdown
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-zinc-900 border-red-500/30">
-                <DialogHeader>
-                  <DialogTitle className="text-white flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-500" />
-                    Activate Emergency Lockdown
-                  </DialogTitle>
-                  <DialogDescription className="text-zinc-400">
-                    This will suspend ALL system operations immediately.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-                    <p className="text-red-400 text-sm">
-                      ⚠️ CRITICAL: Only Boss/Owner can unlock the system after activation.
-                    </p>
-                  </div>
-                  <Textarea
-                    placeholder="Enter detailed reason for lockdown (min 20 characters)..."
-                    value={lockReason}
-                    onChange={(e) => setLockReason(e.target.value)}
-                    className="bg-zinc-800 border-zinc-700 text-white"
-                    rows={4}
-                  />
-                  <div className="flex items-center gap-3 p-3 bg-zinc-800 rounded-lg">
-                    <Fingerprint className="w-5 h-5 text-amber-400" />
-                    <span className="text-sm text-zinc-300">2FA Verification Required</span>
-                    <Switch
-                      checked={twoFactorConfirmed}
-                      onCheckedChange={setTwoFactorConfirmed}
-                    />
-                  </div>
+            <div className="flex items-center gap-3">
+              <div 
+                className="flex items-center gap-2 px-4 py-2"
+                style={{
+                  background: 'rgba(37, 99, 235, 0.15)',
+                  border: `1px solid rgba(37, 99, 235, 0.5)`,
+                  borderRadius: '8px'
+                }}
+              >
+                <Crown style={{ width: '16px', height: '16px', color: COLORS.brand }} />
+                <span style={{ fontSize: '12px', fontWeight: 600, color: COLORS.brand }}>
+                  SUPREME AUTHORITY
+                </span>
+              </div>
+              
+              {/* Emergency Lockdown - LOCKED */}
+              <Dialog open={showLockDialog} onOpenChange={setShowLockDialog}>
+                <DialogTrigger asChild>
                   <Button 
-                    onClick={handleEmergencyLockdown}
-                    variant="destructive" 
-                    className="w-full"
-                    disabled={lockReason.length < 20 || !twoFactorConfirmed}
+                    className="gap-2"
+                    style={{ 
+                      background: COLORS.danger, 
+                      color: COLORS.textPrimary,
+                      height: '44px',
+                      borderRadius: '12px'
+                    }}
                   >
-                    <Lock className="w-4 h-4 mr-2" />
-                    Confirm Emergency Lockdown
+                    <Lock style={{ width: '16px', height: '16px' }} />
+                    Emergency Lockdown
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent style={{ background: COLORS.background, border: `1px solid ${COLORS.danger}30` }}>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2" style={{ color: COLORS.danger }}>
+                      <AlertTriangle style={{ width: '20px', height: '20px' }} />
+                      Activate Emergency Lockdown
+                    </DialogTitle>
+                    <DialogDescription style={{ color: COLORS.textSecondary }}>
+                      This will suspend ALL system operations immediately.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div 
+                      className="p-4 rounded-lg"
+                      style={{ 
+                        background: 'rgba(239, 68, 68, 0.1)', 
+                        border: `1px solid rgba(239, 68, 68, 0.3)` 
+                      }}
+                    >
+                      <p style={{ fontSize: '14px', color: COLORS.danger }}>
+                        ⚠️ CRITICAL: Only Boss/Owner can unlock the system after activation.
+                      </p>
+                    </div>
+                    <Textarea
+                      placeholder="Enter detailed reason for lockdown (min 20 characters)..."
+                      value={lockReason}
+                      onChange={(e) => setLockReason(e.target.value)}
+                      style={{ 
+                        background: COLORS.backgroundSecondary, 
+                        border: `1px solid ${COLORS.border}`,
+                        color: COLORS.textPrimary
+                      }}
+                      rows={4}
+                    />
+                    <div 
+                      className="flex items-center gap-3 p-3 rounded-lg"
+                      style={{ background: COLORS.backgroundSecondary }}
+                    >
+                      <Fingerprint style={{ width: '20px', height: '20px', color: COLORS.brand }} />
+                      <span style={{ fontSize: '14px', color: COLORS.textSecondary }}>2FA Verification Required</span>
+                      <Switch
+                        checked={twoFactorConfirmed}
+                        onCheckedChange={setTwoFactorConfirmed}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleEmergencyLockdown}
+                      className="w-full"
+                      style={{ 
+                        background: COLORS.danger, 
+                        color: COLORS.textPrimary,
+                        height: '44px',
+                        borderRadius: '12px'
+                      }}
+                      disabled={lockReason.length < 20 || !twoFactorConfirmed}
+                    >
+                      <Lock style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+                      Confirm Emergency Lockdown
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-            {/* Freeze System */}
-            <Button 
-              variant="outline" 
-              className="border-red-500/50 text-red-400 hover:bg-red-500/10 gap-2"
-              onClick={handleFreezeSystem}
-            >
-              <Power className="w-4 h-4" />
-              Freeze System
-            </Button>
+              {/* Freeze System - LOCKED */}
+              <Button 
+                onClick={handleFreezeSystem}
+                className="gap-2"
+                style={{
+                  background: 'transparent',
+                  border: `1px solid rgba(239, 68, 68, 0.5)`,
+                  color: COLORS.danger,
+                  height: '44px',
+                  borderRadius: '12px'
+                }}
+              >
+                <Power style={{ width: '16px', height: '16px' }} />
+                Freeze System
+              </Button>
+            </div>
           </div>
+        </motion.div>
+
+        {/* LOCKED: Authority Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: 'Super Admins', value: mockSuperAdmins.length.toString(), sub: '3 Active', icon: Users, iconColor: COLORS.brand },
+            { label: 'Locked Modules', value: '2', sub: 'of 6 total', icon: Lock, iconColor: COLORS.warning },
+            { label: 'Pending Overrides', value: '3', sub: 'Requires approval', icon: Gavel, iconColor: COLORS.danger },
+            { label: 'Blackbox Events', value: blackboxEntries.length.toString(), sub: 'Immutable logs', icon: Database, iconColor: '#A855F7' },
+          ].map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div key={idx} style={boxStyle} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p style={{ fontSize: '10px', color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {stat.label}
+                    </p>
+                    <p style={{ fontSize: '24px', fontWeight: 700, color: COLORS.textPrimary, marginTop: '4px' }}>
+                      {stat.value}
+                    </p>
+                    <p style={{ fontSize: '12px', color: COLORS.textMuted }}>{stat.sub}</p>
+                  </div>
+                  <div 
+                    className="flex items-center justify-center"
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      background: `${stat.iconColor}20`
+                    }}
+                  >
+                    <Icon style={{ width: '24px', height: '24px', color: stat.iconColor }} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </motion.div>
 
-      {/* Authority Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-zinc-900/50 border-amber-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">Super Admins</p>
-                <p className="text-2xl font-bold text-white mt-1">{mockSuperAdmins.length}</p>
-                <p className="text-xs text-emerald-400">3 Active</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* LOCKED: Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList 
+            className="p-1"
+            style={{ 
+              background: COLORS.backgroundSecondary, 
+              border: `1px solid ${COLORS.border}` 
+            }}
+          >
+            {[
+              { value: 'overview', label: 'Dashboard' },
+              { value: 'super-admins', label: 'Super Admins' },
+              { value: 'permissions', label: 'Roles & Permission Lock' },
+              { value: 'modules', label: 'System Modules' },
+              { value: 'blackbox', label: 'Audit & Blackbox' },
+              { value: 'security', label: 'Security & Legal' },
+            ].map(tab => (
+              <TabsTrigger 
+                key={tab.value} 
+                value={tab.value}
+                style={{ 
+                  color: activeTab === tab.value ? COLORS.brand : COLORS.textSecondary,
+                  background: activeTab === tab.value ? `${COLORS.brand}20` : 'transparent'
+                }}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        <Card className="bg-zinc-900/50 border-amber-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">Locked Modules</p>
-                <p className="text-2xl font-bold text-amber-400 mt-1">2</p>
-                <p className="text-xs text-zinc-500">of 6 total</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                <Lock className="w-6 h-6 text-amber-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-zinc-900/50 border-amber-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">Pending Overrides</p>
-                <p className="text-2xl font-bold text-red-400 mt-1">3</p>
-                <p className="text-xs text-zinc-500">Requires approval</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
-                <Gavel className="w-6 h-6 text-red-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-zinc-900/50 border-amber-500/20 backdrop-blur-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">Blackbox Events</p>
-                <p className="text-2xl font-bold text-white mt-1">{blackboxEntries.length}</p>
-                <p className="text-xs text-zinc-500">Immutable logs</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                <Database className="w-6 h-6 text-purple-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-zinc-800/50 border border-zinc-700/50 p-1">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400">
-            Dashboard
-          </TabsTrigger>
-          <TabsTrigger value="super-admins" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400">
-            Super Admins
-          </TabsTrigger>
-          <TabsTrigger value="permissions" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400">
-            Roles & Permission Lock
-          </TabsTrigger>
-          <TabsTrigger value="modules" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400">
-            System Modules
-          </TabsTrigger>
-          <TabsTrigger value="blackbox" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400">
-            Audit & Blackbox
-          </TabsTrigger>
-          <TabsTrigger value="security" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400">
-            Security & Legal
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Pending Overrides */}
-            <Card className="bg-zinc-900/50 border-zinc-700/50">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Gavel className="w-5 h-5 text-amber-400" />
-                  Final Override Queue
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-64">
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Pending Overrides */}
+              <div style={boxStyle}>
+                <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                  <Gavel style={{ width: '20px', height: '20px', color: COLORS.brand }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                    Final Override Queue
+                  </span>
+                </div>
+                <ScrollArea className="h-64 p-4">
                   <div className="space-y-3">
                     {pendingOverrides.map((override) => (
-                      <div key={override.id} className="p-3 rounded-lg bg-zinc-800/50 border border-amber-500/20">
+                      <div 
+                        key={override.id} 
+                        className="p-3 rounded-lg"
+                        style={{ background: COLORS.backgroundSecondary, border: `1px solid ${COLORS.brand}30` }}
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <Badge className="bg-amber-500/20 text-amber-400">{override.type}</Badge>
-                          <span className="text-xs text-zinc-500">{override.daysAgo} days ago</span>
+                          <span 
+                            className="px-2 py-1 rounded text-xs font-medium"
+                            style={{ background: `${COLORS.brand}20`, color: COLORS.brand }}
+                          >
+                            {override.type}
+                          </span>
+                          <span style={{ fontSize: '12px', color: COLORS.textMuted }}>{override.daysAgo} days ago</span>
                         </div>
-                        <p className="text-sm text-white mb-1">Target: {override.target}</p>
-                        <p className="text-xs text-zinc-400">By: {override.requestedBy}</p>
-                        <p className="text-xs text-zinc-500 mt-2">{override.reason}</p>
+                        <p style={{ fontSize: '14px', color: COLORS.textPrimary, marginBottom: '4px' }}>
+                          Target: {override.target}
+                        </p>
+                        <p style={{ fontSize: '12px', color: COLORS.textMuted }}>By: {override.requestedBy}</p>
+                        <p style={{ fontSize: '12px', color: COLORS.textMuted, marginTop: '8px' }}>{override.reason}</p>
                         <div className="flex gap-2 mt-3">
-                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                          <Button 
+                            size="sm" 
+                            style={{ 
+                              background: COLORS.success, 
+                              color: COLORS.textPrimary,
+                              height: '32px',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            <CheckCircle2 style={{ width: '14px', height: '14px', marginRight: '4px' }} />
                             Approve
                           </Button>
-                          <Button size="sm" variant="destructive">
-                            <XCircle className="w-3 h-3 mr-1" />
+                          <Button 
+                            size="sm"
+                            style={{ 
+                              background: COLORS.danger, 
+                              color: COLORS.textPrimary,
+                              height: '32px',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            <XCircle style={{ width: '14px', height: '14px', marginRight: '4px' }} />
                             Reject
                           </Button>
                         </div>
@@ -353,82 +422,113 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     ))}
                   </div>
                 </ScrollArea>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Boss Powers */}
-            <Card className="bg-zinc-900/50 border-zinc-700/50">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-400" />
-                  Boss Authority Powers
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { icon: Users, label: "Super Admin Registry", desc: "Full control" },
-                    { icon: Lock, label: "Role & Permission Lock", desc: "Final authority" },
-                    { icon: Settings, label: "System Modules", desc: "Enable/disable" },
-                    { icon: Database, label: "Audit & Blackbox", desc: "Full access" },
-                    { icon: Shield, label: "Security Control", desc: "Emergency actions" },
-                    { icon: Gavel, label: "Legal Control", desc: "Compliance" },
-                    { icon: Power, label: "Emergency Lockdown", desc: "System freeze" },
-                    { icon: RotateCcw, label: "Final Override", desc: "Logged + 2FA" },
-                  ].map((power, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-zinc-800/50 border border-amber-500/20">
-                      <power.icon className="w-5 h-5 text-amber-400 mb-2" />
-                      <p className="text-sm font-medium text-white">{power.label}</p>
-                      <p className="text-xs text-zinc-400">{power.desc}</p>
-                    </div>
-                  ))}
+              {/* Boss Powers */}
+              <div style={boxStyle}>
+                <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                  <Crown style={{ width: '20px', height: '20px', color: COLORS.brand }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                    Boss Authority Powers
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                <div className="p-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { icon: Users, label: "Super Admin Registry", desc: "Full control" },
+                      { icon: Lock, label: "Role & Permission Lock", desc: "Final authority" },
+                      { icon: Settings, label: "System Modules", desc: "Enable/disable" },
+                      { icon: Database, label: "Audit & Blackbox", desc: "Full access" },
+                      { icon: Shield, label: "Security Control", desc: "Emergency actions" },
+                      { icon: Gavel, label: "Legal Control", desc: "Compliance" },
+                      { icon: Power, label: "Emergency Lockdown", desc: "System freeze" },
+                      { icon: RotateCcw, label: "Final Override", desc: "Logged + 2FA" },
+                    ].map((power, i) => (
+                      <div 
+                        key={i} 
+                        className="p-3 rounded-lg"
+                        style={{ background: COLORS.backgroundSecondary, border: `1px solid ${COLORS.brand}30` }}
+                      >
+                        <power.icon style={{ width: '20px', height: '20px', color: COLORS.brand, marginBottom: '8px' }} />
+                        <p style={{ fontSize: '14px', fontWeight: 500, color: COLORS.textPrimary }}>{power.label}</p>
+                        <p style={{ fontSize: '12px', color: COLORS.textMuted }}>{power.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
 
-        {/* Super Admins Tab */}
-        <TabsContent value="super-admins" className="space-y-6">
-          <Card className="bg-zinc-900/50 border-zinc-700/50">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white">Super Admin Registry</CardTitle>
-              <Button className="bg-amber-500 hover:bg-amber-600 text-black">
-                <Users className="w-4 h-4 mr-2" />
-                Create Super Admin
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[400px]">
+          {/* Super Admins Tab */}
+          <TabsContent value="super-admins" className="space-y-6">
+            <div style={boxStyle}>
+              <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>Super Admin Registry</span>
+                <Button 
+                  style={{ 
+                    background: COLORS.brand, 
+                    color: COLORS.textPrimary,
+                    height: '40px',
+                    borderRadius: '10px'
+                  }}
+                >
+                  <Users style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+                  Create Super Admin
+                </Button>
+              </div>
+              <ScrollArea className="h-[400px] p-4">
                 <div className="space-y-3">
                   {mockSuperAdmins.map((admin) => (
-                    <div key={admin.id} className={`p-4 rounded-lg border ${
-                      admin.status === "active" ? "bg-zinc-800/50 border-zinc-700/30" :
-                      admin.status === "locked" ? "bg-amber-500/5 border-amber-500/30" :
-                      "bg-zinc-900/50 border-zinc-800/50 opacity-60"
-                    }`}>
+                    <div 
+                      key={admin.id} 
+                      className="p-4 rounded-lg"
+                      style={{ 
+                        background: admin.status === "archived" ? `${COLORS.backgroundSecondary}80` : COLORS.backgroundSecondary,
+                        border: `1px solid ${admin.status === "locked" ? `${COLORS.warning}50` : COLORS.border}`,
+                        opacity: admin.status === "archived" ? 0.6 : 1
+                      }}
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                            <span className="text-white font-bold">{admin.name.split(" ").map(n => n[0]).join("")}</span>
+                          <div 
+                            className="flex items-center justify-center"
+                            style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: `linear-gradient(135deg, ${COLORS.brand}, #7C3AED)`
+                            }}
+                          >
+                            <span style={{ color: COLORS.textPrimary, fontWeight: 700 }}>
+                              {admin.name.split(" ").map(n => n[0]).join("")}
+                            </span>
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-white">{admin.name}</h4>
-                              <Badge className={
-                                admin.status === "active" ? "bg-emerald-500/20 text-emerald-400" :
-                                admin.status === "locked" ? "bg-amber-500/20 text-amber-400" :
-                                "bg-zinc-500/20 text-zinc-400"
-                              }>
+                              <h4 style={{ fontWeight: 500, color: COLORS.textPrimary }}>{admin.name}</h4>
+                              <span 
+                                className="px-2 py-1 rounded text-xs"
+                                style={{
+                                  background: admin.status === "active" ? `${COLORS.success}20` : 
+                                             admin.status === "locked" ? `${COLORS.warning}20` : `${COLORS.textMuted}20`,
+                                  color: admin.status === "active" ? COLORS.success : 
+                                         admin.status === "locked" ? COLORS.warning : COLORS.textMuted
+                                }}
+                              >
                                 {admin.status}
-                              </Badge>
+                              </span>
                             </div>
-                            <p className="text-sm text-zinc-400">{admin.id}</p>
+                            <p style={{ fontSize: '14px', color: COLORS.textMuted }}>{admin.id}</p>
                             <div className="flex gap-1 mt-1">
                               {admin.continents.map((c, i) => (
-                                <Badge key={i} variant="outline" className="text-xs border-zinc-600 text-zinc-400">
+                                <span 
+                                  key={i} 
+                                  className="px-2 py-0.5 rounded text-xs"
+                                  style={{ border: `1px solid ${COLORS.border}`, color: COLORS.textMuted }}
+                                >
                                   {c}
-                                </Badge>
+                                </span>
                               ))}
                             </div>
                           </div>
@@ -436,16 +536,16 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                         <div className="flex items-center gap-2">
                           {admin.status !== "archived" && (
                             <>
-                              <Button size="sm" variant="ghost" className="text-amber-400 hover:bg-amber-500/10">
-                                <Lock className="w-4 h-4" />
+                              <Button size="sm" variant="ghost" style={{ color: COLORS.warning }}>
+                                <Lock style={{ width: '16px', height: '16px' }} />
                               </Button>
-                              <Button size="sm" variant="ghost" className="text-zinc-400 hover:bg-zinc-500/10">
-                                <Archive className="w-4 h-4" />
+                              <Button size="sm" variant="ghost" style={{ color: COLORS.textMuted }}>
+                                <Archive style={{ width: '16px', height: '16px' }} />
                               </Button>
                             </>
                           )}
-                          <Button size="sm" variant="ghost" className="text-blue-400 hover:bg-blue-500/10">
-                            <Eye className="w-4 h-4" />
+                          <Button size="sm" variant="ghost" style={{ color: COLORS.brand }}>
+                            <Eye style={{ width: '16px', height: '16px' }} />
                           </Button>
                         </div>
                       </div>
@@ -453,227 +553,288 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                   ))}
                 </div>
               </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        {/* Modules Tab */}
-        <TabsContent value="modules" className="space-y-6">
-          <Card className="bg-zinc-900/50 border-zinc-700/50">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Server className="w-5 h-5 text-amber-400" />
-                System Modules Control
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {systemModules.map((module) => (
-                  <div key={module.id} className={`p-4 rounded-lg border ${
-                    module.locked ? "bg-amber-500/5 border-amber-500/30" : "bg-zinc-800/50 border-zinc-700/30"
-                  }`}>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium text-white">{module.name}</h4>
-                      {module.locked && <Lock className="w-4 h-4 text-amber-400" />}
-                    </div>
-                    <Badge className={
-                      module.status === "active" ? "bg-emerald-500/20 text-emerald-400" :
-                      "bg-amber-500/20 text-amber-400"
-                    }>
-                      {module.status}
-                    </Badge>
-                    <p className="text-xs text-zinc-500 mt-2">Modified: {module.lastModified}</p>
-                    <div className="flex gap-2 mt-3">
-                      <Button 
-                        size="sm" 
-                        variant={module.locked ? "default" : "outline"}
-                        className={module.locked ? "bg-amber-600 hover:bg-amber-700" : ""}
-                        onClick={() => handleModuleLock(module.id)}
-                      >
-                        {module.locked ? "Unlock" : "Lock"}
-                      </Button>
-                      <Button size="sm" variant="destructive" disabled={!module.locked}>
-                        Disable
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+          {/* Modules Tab */}
+          <TabsContent value="modules" className="space-y-6">
+            <div style={boxStyle}>
+              <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                <Server style={{ width: '20px', height: '20px', color: COLORS.brand }} />
+                <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                  System Modules Control
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Blackbox Tab */}
-        <TabsContent value="blackbox" className="space-y-6">
-          <Card className="bg-zinc-900/50 border-zinc-700/50">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white flex items-center gap-2">
-                <Database className="w-5 h-5 text-purple-400" />
-                Immutable Blackbox Audit Log
-              </CardTitle>
-              <Button variant="outline" className="border-purple-500/50 text-purple-400">
-                <Download className="w-4 h-4 mr-2" />
-                Export Full Log
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[400px]">
-                <div className="space-y-3">
-                  {blackboxEntries.map((entry) => (
-                    <div key={entry.id} className="p-4 rounded-lg bg-zinc-800/50 border border-purple-500/20 font-mono">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge className={getSeverityColor(entry.severity)}>
-                          {entry.severity.toUpperCase()}
-                        </Badge>
-                        <span className="text-xs text-zinc-500">{entry.timestamp}</span>
+              <div className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {systemModules.map((module) => (
+                    <div 
+                      key={module.id} 
+                      className="p-4 rounded-lg"
+                      style={{ 
+                        background: module.locked ? `${COLORS.warning}08` : COLORS.backgroundSecondary,
+                        border: `1px solid ${module.locked ? `${COLORS.warning}50` : COLORS.border}`
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 style={{ fontWeight: 500, color: COLORS.textPrimary }}>{module.name}</h4>
+                        {module.locked && <Lock style={{ width: '16px', height: '16px', color: COLORS.warning }} />}
                       </div>
-                      <p className="text-white text-sm mb-1">{entry.action}</p>
-                      <p className="text-xs text-zinc-400">Actor: {entry.actor} | Target: {entry.target}</p>
-                      <p className="text-xs text-purple-400 mt-2">Hash: {entry.hash}</p>
+                      <span 
+                        className="px-2 py-1 rounded text-xs"
+                        style={{
+                          background: module.status === "active" ? `${COLORS.success}20` : `${COLORS.warning}20`,
+                          color: module.status === "active" ? COLORS.success : COLORS.warning
+                        }}
+                      >
+                        {module.status}
+                      </span>
+                      <p style={{ fontSize: '12px', color: COLORS.textMuted, marginTop: '8px' }}>
+                        Modified: {module.lastModified}
+                      </p>
+                      <div className="flex gap-2 mt-3">
+                        <Button 
+                          size="sm"
+                          onClick={() => handleModuleLock(module.id)}
+                          style={{
+                            background: module.locked ? COLORS.warning : 'transparent',
+                            border: module.locked ? 'none' : `1px solid ${COLORS.border}`,
+                            color: module.locked ? '#000' : COLORS.textPrimary,
+                            height: '32px',
+                            borderRadius: '8px'
+                          }}
+                        >
+                          {module.locked ? "Unlock" : "Lock"}
+                        </Button>
+                        <Button 
+                          size="sm"
+                          disabled={!module.locked}
+                          style={{
+                            background: COLORS.danger,
+                            color: COLORS.textPrimary,
+                            height: '32px',
+                            borderRadius: '8px',
+                            opacity: module.locked ? 1 : 0.5
+                          }}
+                        >
+                          Disable
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </div>
+            </div>
+          </TabsContent>
 
-        {/* Permissions Tab */}
-        <TabsContent value="permissions" className="space-y-6">
-          <Card className="bg-zinc-900/50 border-zinc-700/50">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Key className="w-5 h-5 text-amber-400" />
-                Role & Permission Lock Matrix
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="p-8 rounded-lg bg-gradient-to-br from-zinc-800 to-zinc-900 border border-amber-500/20 text-center">
-                <Lock className="w-16 h-16 text-amber-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Permission Lock System</h3>
-                <p className="text-zinc-400 mb-6">
+          {/* Blackbox Tab */}
+          <TabsContent value="blackbox" className="space-y-6">
+            <div style={boxStyle}>
+              <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                <div className="flex items-center gap-2">
+                  <Database style={{ width: '20px', height: '20px', color: '#A855F7' }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                    Immutable Blackbox Audit Log
+                  </span>
+                </div>
+                <Button 
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid rgba(168, 85, 247, 0.5)`,
+                    color: '#A855F7',
+                    height: '40px',
+                    borderRadius: '10px'
+                  }}
+                >
+                  <Download style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+                  Export Full Log
+                </Button>
+              </div>
+              <ScrollArea className="h-[400px] p-4">
+                <div className="space-y-3">
+                  {blackboxEntries.map((entry) => {
+                    const severityStyle = getSeverityColor(entry.severity);
+                    return (
+                      <div 
+                        key={entry.id} 
+                        className="p-4 rounded-lg font-mono"
+                        style={{ background: COLORS.backgroundSecondary, border: `1px solid rgba(168, 85, 247, 0.3)` }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span 
+                            className="px-2 py-1 rounded text-xs font-medium"
+                            style={{ 
+                              background: severityStyle.background, 
+                              color: severityStyle.color,
+                              border: `1px solid ${severityStyle.border}`
+                            }}
+                          >
+                            {entry.severity.toUpperCase()}
+                          </span>
+                          <span style={{ fontSize: '12px', color: COLORS.textMuted }}>{entry.timestamp}</span>
+                        </div>
+                        <p style={{ fontSize: '14px', color: COLORS.textPrimary, marginBottom: '4px' }}>{entry.action}</p>
+                        <p style={{ fontSize: '12px', color: COLORS.textMuted }}>Actor: {entry.actor} | Target: {entry.target}</p>
+                        <p style={{ fontSize: '12px', color: '#A855F7', marginTop: '8px' }}>Hash: {entry.hash}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
+          </TabsContent>
+
+          {/* Permissions Tab */}
+          <TabsContent value="permissions" className="space-y-6">
+            <div style={boxStyle}>
+              <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                <Key style={{ width: '20px', height: '20px', color: COLORS.brand }} />
+                <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                  Role & Permission Lock Matrix
+                </span>
+              </div>
+              <div className="p-8 text-center">
+                <Lock style={{ width: '64px', height: '64px', color: COLORS.brand, margin: '0 auto 16px' }} />
+                <h3 style={{ fontSize: '20px', fontWeight: 700, color: COLORS.textPrimary, marginBottom: '8px' }}>
+                  Permission Lock System
+                </h3>
+                <p style={{ fontSize: '14px', color: COLORS.textMuted, marginBottom: '24px', maxWidth: '400px', margin: '0 auto 24px' }}>
                   Lock specific roles and permissions to prevent changes by Super Admins.
                   Only Boss/Owner can modify locked permissions.
                 </p>
-                <Button className="bg-amber-500 hover:bg-amber-600 text-black">
-                  <Lock className="w-4 h-4 mr-2" />
+                <Button 
+                  style={{
+                    background: COLORS.brand,
+                    color: COLORS.textPrimary,
+                    height: '44px',
+                    borderRadius: '12px'
+                  }}
+                >
+                  <Lock style={{ width: '16px', height: '16px', marginRight: '8px' }} />
                   Open Permission Matrix
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        {/* Security Tab */}
-        <TabsContent value="security" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="bg-zinc-900/50 border-zinc-700/50">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-emerald-400" />
-                  Security Control Panel
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {[
-                  { label: "Two-Factor Authentication", status: true },
-                  { label: "Biometric Login Required", status: true },
-                  { label: "IP Whitelist Active", status: true },
-                  { label: "Session Timeout (15 min)", status: true },
-                  { label: "Audit Trail Encryption", status: true },
-                ].map((setting, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/50">
-                    <span className="text-white">{setting.label}</span>
-                    <Badge className={setting.status ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"}>
-                      {setting.status ? "Enabled" : "Disabled"}
-                    </Badge>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div style={boxStyle}>
+                <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                  <Shield style={{ width: '20px', height: '20px', color: COLORS.success }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                    Security Control Panel
+                  </span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {[
+                    { label: "Two-Factor Authentication", status: true },
+                    { label: "Biometric Login Required", status: true },
+                    { label: "IP Whitelist Active", status: true },
+                    { label: "Session Timeout (15 min)", status: true },
+                    { label: "Audit Trail Encryption", status: true },
+                  ].map((setting, i) => (
+                    <div 
+                      key={i} 
+                      className="flex items-center justify-between p-3 rounded-lg"
+                      style={{ background: COLORS.backgroundSecondary }}
+                    >
+                      <span style={{ color: COLORS.textPrimary }}>{setting.label}</span>
+                      <span 
+                        className="px-2 py-1 rounded text-xs"
+                        style={{
+                          background: setting.status ? `${COLORS.success}20` : `${COLORS.danger}20`,
+                          color: setting.status ? COLORS.success : COLORS.danger
+                        }}
+                      >
+                        {setting.status ? "Enabled" : "Disabled"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-            <Card className="bg-zinc-900/50 border-zinc-700/50">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Gavel className="w-5 h-5 text-rose-400" />
-                  Legal Control
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full justify-start bg-zinc-800 hover:bg-zinc-700 text-white">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Terms of Service Management
-                </Button>
-                <Button className="w-full justify-start bg-zinc-800 hover:bg-zinc-700 text-white">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Privacy Policy Control
-                </Button>
-                <Button className="w-full justify-start bg-zinc-800 hover:bg-zinc-700 text-white">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Compliance Documents
-                </Button>
-                <Button className="w-full justify-start bg-zinc-800 hover:bg-zinc-700 text-white">
-                  <Ban className="w-4 h-4 mr-2" />
-                  GDPR Data Requests
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+              <div style={boxStyle}>
+                <div className="p-4 flex items-center gap-2" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                  <Gavel style={{ width: '20px', height: '20px', color: '#F43F5E' }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: COLORS.textPrimary }}>
+                    Legal Control
+                  </span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {[
+                    { icon: FileText, label: "Terms of Service Management" },
+                    { icon: FileText, label: "Privacy Policy Control" },
+                    { icon: FileText, label: "Compliance Documents" },
+                    { icon: Ban, label: "GDPR Data Requests" },
+                  ].map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <Button 
+                        key={i}
+                        className="w-full justify-start"
+                        style={{
+                          background: COLORS.backgroundSecondary,
+                          color: COLORS.textPrimary,
+                          height: '44px',
+                          borderRadius: '10px',
+                          border: 'none'
+                        }}
+                      >
+                        <Icon style={{ width: '16px', height: '16px', marginRight: '8px', color: COLORS.textMuted }} />
+                        {item.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
-      {/* Boss Authority Summary */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mt-8"
-      >
-        <Card className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border-amber-500/30">
-          <CardContent className="p-6">
+        {/* LOCKED: Boss Authority Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8"
+        >
+          <div 
+            className="p-6 rounded-xl"
+            style={{
+              background: `linear-gradient(135deg, ${COLORS.brand}15, ${COLORS.brand}08)`,
+              border: `1px solid ${COLORS.brand}30`
+            }}
+          >
             <div className="flex items-center gap-4 mb-4">
-              <Crown className="w-8 h-8 text-amber-400" />
+              <Crown style={{ width: '32px', height: '32px', color: COLORS.brand }} />
               <div>
-                <h3 className="text-lg font-bold text-white">Boss / Owner Authority</h3>
-                <p className="text-sm text-amber-400">Final Authority Level</p>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: COLORS.textPrimary }}>Boss / Owner Authority</h3>
+                <p style={{ fontSize: '14px', color: COLORS.brand }}>Final Authority Level</p>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                "Approve Everything",
+                "Lock Any Module",
+                "Archive Anything",
+                "Emergency Lockdown",
+                "Full Blackbox Access",
+                "Override with 2FA",
+                "Freeze System",
+              ].map((power, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <CheckCircle2 style={{ width: '16px', height: '16px', color: COLORS.success }} />
+                  <span style={{ fontSize: '14px', color: COLORS.textSecondary }}>{power}</span>
+                </div>
+              ))}
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Approve Everything</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Lock Any Module</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Archive Anything</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Emergency Lockdown</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Full Blackbox Access</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Override with 2FA</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300">Freeze System</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <span className="text-sm text-amber-300">All Actions Logged</span>
+                <AlertTriangle style={{ width: '16px', height: '16px', color: COLORS.warning }} />
+                <span style={{ fontSize: '14px', color: COLORS.warning }}>All Actions Logged</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
