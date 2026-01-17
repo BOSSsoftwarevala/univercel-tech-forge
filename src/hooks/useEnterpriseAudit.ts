@@ -17,7 +17,8 @@ export type AuditModule =
   | 'finance'
   | 'ai_system'
   | 'data_protection'
-  | 'system';
+  | 'system'
+  | 'vala_builder';
 
 export interface AuditEntry {
   action: string;
