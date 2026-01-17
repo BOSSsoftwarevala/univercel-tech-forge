@@ -851,8 +851,17 @@ const RoleSwitchSidebar = ({
     });
   }, []);
 
-  // STEP 7: Handle subcategory click (Level 3) - THIS LOADS THE SCREEN
-  const handleSubCategoryClick = useCallback((subCategoryId: string, subCategoryLabel: string) => {
+  // STEP 10: Handle subcategory click (Level 3) - THIS LOADS THE SCREEN with proper action mapping
+  const handleSubCategoryClick = useCallback((subCategoryId: string, subCategoryLabel: string, status?: string) => {
+    // STEP 10: Check if feature is locked/coming-soon
+    if (status === 'locked' || status === 'coming-soon') {
+      toast.info('Coming Soon', { 
+        description: `${subCategoryLabel} will be available soon`,
+        duration: 2000
+      });
+      return;
+    }
+    
     setActiveSubCategory(subCategoryId);
     
     if (onNavChange) {
@@ -864,8 +873,11 @@ const RoleSwitchSidebar = ({
     // Also call the sub-item click handler
     onSubItemClick?.(subCategoryId);
     
-    // Show toast for navigation feedback
-    toast.success(`Loading: ${subCategoryLabel}`, { description: 'Screen loading...' });
+    // STEP 10: Show loading feedback with action type
+    toast.success(`Loading: ${subCategoryLabel}`, { 
+      description: 'Screen loading...',
+      duration: 1500 
+    });
   }, [onNavChange, onSubItemClick]);
 
   const handleRoleSelect = useCallback((roleId: ActiveRole) => {
