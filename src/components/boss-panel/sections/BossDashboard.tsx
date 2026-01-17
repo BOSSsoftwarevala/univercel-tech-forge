@@ -34,6 +34,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { GlobalNetworkMap } from './GlobalNetworkMap';
 
 // Summary cards with modern styling
 const summaryCards = [
@@ -117,6 +118,9 @@ export function BossDashboard() {
           </span>
         </div>
       </div>
+
+      {/* Global Network Map - Full Width */}
+      <GlobalNetworkMap className="w-full" />
 
       {/* Main Grid */}
       <div className="grid grid-cols-12 gap-6">
