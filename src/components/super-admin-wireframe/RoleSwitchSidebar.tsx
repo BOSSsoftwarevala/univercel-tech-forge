@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 
-export type ActiveRole = "boss_owner" | "ceo" | "admin" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
+export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -57,17 +57,6 @@ export const roleConfigs = {
     bgAccent: "bg-emerald-500/10",
     borderAccent: "border-emerald-500/50",
     description: "Vision & Oversight • Read-only",
-  },
-  admin: {
-    id: "admin",
-    label: "Admin",
-    shortLabel: "ADM",
-    icon: Shield,
-    themeColor: "from-purple-500 via-violet-500 to-indigo-600",
-    accentColor: "text-purple-400",
-    bgAccent: "bg-purple-500/10",
-    borderAccent: "border-purple-500/50",
-    description: "Administrative Operations",
   },
   continent_super_admin: {
     id: "continent_super_admin",
@@ -264,14 +253,6 @@ const roleNavItems: Record<ActiveRole, Array<{ id: string; label: string; icon: 
     { id: "revenue", label: "Revenue Insights", icon: TrendingUp },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "reports", label: "Reports", icon: FileText },
-    { id: "settings", label: "Settings", icon: Settings },
-  ],
-  admin: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "users", label: "User Management", icon: Users },
-    { id: "roles", label: "Roles & Access", icon: Shield },
-    { id: "modules", label: "Modules", icon: Cpu },
-    { id: "activity", label: "Activity Log", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ],
   continent_super_admin: [
