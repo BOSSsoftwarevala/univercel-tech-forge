@@ -291,37 +291,47 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* LOCKED: Authority Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* LOCKED: Authority Stats Grid - 6 Boxes (2 per row, 3 rows) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {[
-            { label: 'Super Admins', value: mockSuperAdmins.length.toString(), sub: '3 Active', icon: Users, iconColor: COLORS.brand },
-            { label: 'Locked Modules', value: '2', sub: 'of 6 total', icon: Lock, iconColor: COLORS.warning },
-            { label: 'Pending Overrides', value: '3', sub: 'Requires approval', icon: Gavel, iconColor: COLORS.danger },
-            { label: 'Blackbox Events', value: blackboxEntries.length.toString(), sub: 'Immutable logs', icon: Database, iconColor: '#A855F7' },
+            { label: 'SUPER ADMINS', value: mockSuperAdmins.length.toString(), icon: Users, iconBg: '#2563EB20', iconColor: '#2563EB' },
+            { label: 'LOCKED MODULES', value: '2', icon: Lock, iconBg: '#F59E0B20', iconColor: '#F59E0B' },
+            { label: 'PENDING OVERRIDES', value: '3', icon: Gavel, iconBg: '#10B98120', iconColor: '#10B981' },
+            { label: 'BLACKBOX EVENTS', value: blackboxEntries.length.toString(), icon: Database, iconBg: '#A855F720', iconColor: '#A855F7' },
+            { label: 'ACTIVE SESSIONS', value: '47', icon: Activity, iconBg: '#06B6D420', iconColor: '#06B6D4' },
+            { label: 'SYSTEM HEALTH', value: '99.9%', icon: Shield, iconBg: '#22C55E20', iconColor: '#22C55E' },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             return (
-              <div key={idx} style={boxStyle} className="p-4">
+              <div 
+                key={idx} 
+                className="p-5"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '14px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                }}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p style={{ fontSize: '10px', color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <p style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>
                       {stat.label}
                     </p>
-                    <p style={{ fontSize: '24px', fontWeight: 700, color: COLORS.textPrimary, marginTop: '4px' }}>
+                    <p style={{ fontSize: '32px', fontWeight: 700, color: '#111827', marginTop: '4px' }}>
                       {stat.value}
                     </p>
-                    <p style={{ fontSize: '12px', color: COLORS.textMuted }}>{stat.sub}</p>
                   </div>
                   <div 
                     className="flex items-center justify-center"
                     style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      background: `${stat.iconColor}20`
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '14px',
+                      background: stat.iconBg
                     }}
                   >
-                    <Icon style={{ width: '24px', height: '24px', color: stat.iconColor }} />
+                    <Icon style={{ width: '26px', height: '26px', color: stat.iconColor }} />
                   </div>
                 </div>
               </div>
