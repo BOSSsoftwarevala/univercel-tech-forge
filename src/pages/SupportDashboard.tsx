@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Inbox, AlertCircle, MessageCircle, 
   ArrowUpRight, BookOpen, BarChart3, Heart, FileText, Settings, LogOut, Lock,
-  ArrowLeft, KeyRound
+  ArrowLeft, KeyRound, Hash, Users, Clock, Zap, MessageSquare, Shield, Activity
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -16,23 +16,30 @@ import SolutionWiki from '@/components/support/SolutionWiki';
 import PerformancePanel from '@/components/support/PerformancePanel';
 import SupportNotifications from '@/components/support/SupportNotifications';
 import AITroubleshooter from '@/components/support/AITroubleshooter';
+import TokenSystem from '@/components/support/TokenSystem';
+import OmniChannelInbox from '@/components/support/OmniChannelInbox';
+import Customer360Panel from '@/components/support/Customer360Panel';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'inbox', label: 'Ticket Inbox', icon: Inbox, badge: '12' },
+  { id: 'tokens', label: 'Token System', icon: Hash, badge: '5' },
   { id: 'priority', label: 'Priority Queue', icon: AlertCircle, badge: '3' },
-  { id: 'chat', label: 'Chat / Call Support', icon: MessageCircle },
-  { id: 'escalation', label: 'Developer Escalation', icon: ArrowUpRight },
-  { id: 'wiki', label: 'Solution Wiki', icon: BookOpen },
-  { id: 'performance', label: 'Performance', icon: BarChart3 },
+  { id: 'omnichannel', label: 'Omni-Channel', icon: MessageSquare, badge: '6' },
+  { id: 'sla', label: 'SLA Management', icon: Clock },
+  { id: 'escalation', label: 'Escalations', icon: ArrowUpRight },
+  { id: 'wiki', label: 'Knowledge Base', icon: BookOpen },
+  { id: 'ai', label: 'AI Automation', icon: Zap },
+  { id: 'performance', label: 'Analytics', icon: BarChart3 },
   { id: 'behavior', label: 'Behavior Score', icon: Heart },
-  { id: 'logs', label: 'Logs', icon: FileText },
+  { id: 'activity', label: 'Support Activity', icon: Activity },
 ];
 
 const SupportDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showCustomer360, setShowCustomer360] = useState(false);
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
@@ -48,12 +55,22 @@ const SupportDashboard = () => {
         return <SupportMetrics />;
       case 'inbox':
         return <TicketInbox />;
+      case 'tokens':
+        return <TokenSystem />;
       case 'priority':
+        return <PriorityQueue />;
+      case 'omnichannel':
+        return <OmniChannelInbox />;
+      case 'sla':
+      case 'escalation':
         return <PriorityQueue />;
       case 'wiki':
         return <SolutionWiki />;
+      case 'ai':
+        return <PerformancePanel />;
       case 'performance':
       case 'behavior':
+      case 'activity':
         return <PerformancePanel />;
       default:
         return <SupportMetrics />;
@@ -240,6 +257,10 @@ const SupportDashboard = () => {
         {showAIPanel && (
           <AITroubleshooter isOpen={showAIPanel} onClose={() => setShowAIPanel(false)} />
         )}
+        <Customer360Panel 
+          isOpen={showCustomer360} 
+          onClose={() => setShowCustomer360(false)} 
+        />
       </AnimatePresence>
     </div>
   );
