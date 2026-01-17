@@ -3,53 +3,83 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-// Strict role-to-dashboard mapping (31 roles - ALL ROLES COVERED)
-// BOSS_OWNER gets the super-admin command center
+// ============================================
+// ROLE → DASHBOARD ROUTING (ENTERPRISE LOCKED)
+// ============================================
+// Every role MUST have a valid dashboard route
+// NO BLANK SCREEN • NO DEAD END • NO FALLBACK LOOP
+
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
-  // Tier 1: Admin Roles (master is merged with boss_owner)
+  // ═══════════════════════════════════════════
+  // TIER 1: BOSS / SUPER ADMIN
+  // ═══════════════════════════════════════════
   boss_owner: '/super-admin',
   master: '/super-admin',
+  super_admin: '/super-admin',
   admin: '/super-admin',
   ceo: '/super-admin',
-  
-  // Tier 2: Partner Roles
+
+  // ═══════════════════════════════════════════
+  // TIER 2: COUNTRY / AREA MANAGEMENT
+  // ═══════════════════════════════════════════
+  country_head: '/super-admin-system/role-switch?role=country_head',
+  area_manager: '/super-admin-system/role-switch?role=country_head',
+
+  // ═══════════════════════════════════════════
+  // TIER 3: PARTNER ROLES
+  // ═══════════════════════════════════════════
   franchise: '/franchise',
   reseller: '/reseller',
+  reseller_manager: '/reseller',
   influencer: '/influencer',
-  
-  // Tier 3: User Roles
+
+  // ═══════════════════════════════════════════
+  // TIER 4: DEVELOPMENT & TECHNICAL
+  // ═══════════════════════════════════════════
   developer: '/developer',
-  prime: '/prime',
-  client: '/demos/public',
-  support: '/support',
-  
-  // Tier 4: Manager Roles
-  lead_manager: '/lead-manager',
-  task_manager: '/task-manager',
-  seo_manager: '/seo',
-  finance_manager: '/finance',
-  hr_manager: '/hr',
-  legal_compliance: '/legal',
-  marketing_manager: '/marketing',
-  client_success: '/client-success',
-  rnd_manager: '/rnd-dashboard',
-  r_and_d: '/rnd-dashboard',
-  performance_manager: '/performance',
-  demo_manager: '/demo-manager',
-  ai_manager: '/ai-console',
-  api_security: '/api-integrations',
-  
-  // Tier 5: Specialized Roles
-  area_manager: '/super-admin-system/role-switch?role=country_head', // Merged into Country Head
-  country_head: '/super-admin-system/role-switch?role=country_head',
   server_manager: '/server-manager',
-  product_demo_manager: '/product-demo-manager',
-  
-  // Tier 6: Support System Roles
+  api_security: '/api-integrations',
+  ai_manager: '/ai-console',
+  r_and_d: '/rnd-dashboard',
+  rnd_manager: '/rnd-dashboard',
+
+  // ═══════════════════════════════════════════
+  // TIER 5: SALES & MARKETING
+  // ═══════════════════════════════════════════
+  lead_manager: '/lead-manager',
+  marketing_manager: '/marketing',
+  seo_manager: '/seo',
+  client_success: '/client-success',
+  performance_manager: '/performance',
+
+  // ═══════════════════════════════════════════
+  // TIER 6: SUPPORT & SERVICE
+  // ═══════════════════════════════════════════
+  support: '/support',
   safe_assist: '/safe-assist',
   assist_manager: '/assist-manager',
   promise_tracker: '/promise-tracker',
   promise_management: '/promise-management',
+
+  // ═══════════════════════════════════════════
+  // TIER 7: PRODUCT & DEMO
+  // ═══════════════════════════════════════════
+  demo_manager: '/demo-manager',
+  product_demo_manager: '/product-demo-manager',
+
+  // ═══════════════════════════════════════════
+  // TIER 8: OPERATIONS & COMPLIANCE
+  // ═══════════════════════════════════════════
+  task_manager: '/task-manager',
+  finance_manager: '/finance',
+  hr_manager: '/hr',
+  legal_compliance: '/legal',
+
+  // ═══════════════════════════════════════════
+  // TIER 9: END USER ROLES
+  // ═══════════════════════════════════════════
+  prime: '/prime',
+  client: '/user/dashboard',
 };
 
 /**
@@ -126,13 +156,19 @@ const Dashboard = () => {
         hasNavigated.current = true;
         navigate(targetRoute, { replace: true });
       } else {
-        console.warn(`[Dashboard] Unknown role: ${userRole}`);
+        // FALLBACK: Unknown role → User dashboard (NO blank screen)
+        console.warn(`[Dashboard] Unknown role: ${userRole}, using fallback`);
         hasNavigated.current = true;
-        navigate('/demos/public', { replace: true });
+        navigate('/user/dashboard', { replace: true });
       }
+    } else if (approvalStatus === 'rejected') {
+      // Rejected → Show clear message
+      console.log(`[Dashboard] ${userRole} rejected`);
+      hasNavigated.current = true;
+      navigate('/pending-approval?status=rejected', { replace: true });
     } else {
-      // Pending or rejected - go to pending approval page
-      console.log(`[Dashboard] ${userRole} approval status: ${approvalStatus}`);
+      // Pending → Approval page
+      console.log(`[Dashboard] ${userRole} pending approval`);
       hasNavigated.current = true;
       navigate('/pending-approval', { replace: true });
     }
