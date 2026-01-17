@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContinentDashboard from "@/components/super-admin-wireframe/ContinentDashboard";
+import { AsiaSuperAdminDashboard } from "@/components/continent-dashboard";
 
 // Country data for each continent
 const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
@@ -366,6 +367,17 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
 
   // Directly compute continent from selectedSubItem for immediate response
   const currentContinent = selectedSubItem ? continentMap[selectedSubItem] : showContinentDashboard;
+
+  // If Asia is selected, render the enhanced Asia dashboard
+  if (currentContinent === "Asia") {
+    return (
+      <AsiaSuperAdminDashboard 
+        onBack={() => {
+          setShowContinentDashboard(null);
+        }} 
+      />
+    );
+  }
 
   // Stats calculations
   const totalCSAs = continentSuperAdmins.length;
