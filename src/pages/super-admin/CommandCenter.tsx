@@ -419,11 +419,24 @@ const categories: Category[] = [
 // CATEGORY CARD COMPONENT (Expandable 4-Level)
 // ==========================================
 
-function CategoryCard({ category }: { category: Category }) {
+// Premium gradient color palette for cards
+const gradientPalettes = [
+  'from-violet-400 to-purple-500',
+  'from-sky-400 to-blue-500', 
+  'from-emerald-400 to-teal-500',
+  'from-rose-400 to-pink-500',
+  'from-amber-400 to-orange-500',
+  'from-indigo-400 to-violet-500',
+  'from-teal-400 to-cyan-500',
+  'from-fuchsia-400 to-pink-500',
+];
+
+function CategoryCard({ category, index }: { category: Category; index: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
   const [expandedMicros, setExpandedMicros] = useState<string[]>([]);
   const Icon = category.icon;
+  const gradient = gradientPalettes[index % gradientPalettes.length];
 
   const toggleSub = (subName: string) => {
     setExpandedSubs(prev => 
@@ -437,124 +450,127 @@ function CategoryCard({ category }: { category: Category }) {
     );
   };
 
-  const totalMicros = category.subs.reduce((acc, s) => acc + s.micros.length, 0);
-  const totalNanos = category.subs.reduce((acc, s) => 
-    acc + s.micros.reduce((acc2, m) => acc2 + m.nanos.length, 0), 0
-  );
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-card border border-border rounded-xl overflow-hidden shadow-lg"
-    >
-      {/* Category Header - Clean Style: Icon + Name Only */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
+    <div className="group relative">
+      {/* Card with soft gradient background */}
+      <div 
         className={cn(
-          "w-full flex items-center gap-3 p-4 transition-all",
-          "hover:bg-secondary",
-          isExpanded && "bg-secondary"
+          "relative rounded-2xl overflow-hidden transition-all duration-300",
+          "shadow-lg hover:shadow-xl hover:scale-[1.02]",
+          "bg-gradient-to-br",
+          gradient
         )}
       >
-        <div className={cn("p-2.5 rounded-xl bg-gradient-to-br shadow-lg", category.color)}>
-          <Icon className="h-5 w-5 text-white" />
-        </div>
-        <h3 className="font-semibold text-foreground flex-1 text-left">{category.name}</h3>
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+        {/* Subtle glass overlay */}
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+        
+        {/* Card Content */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="relative w-full flex items-center gap-4 p-5 text-left"
         >
-          <ChevronDown className="h-5 w-5 text-muted-foreground" />
-        </motion.div>
-      </button>
+          {/* Icon Container */}
+          <div className="w-12 h-12 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-inner">
+            <Icon className="h-6 w-6 text-white drop-shadow-sm" />
+          </div>
+          
+          {/* Text */}
+          <div className="flex-1">
+            <h3 className="font-semibold text-white text-lg drop-shadow-sm">{category.name}</h3>
+            <p className="text-white/80 text-sm">{category.subs.length} module{category.subs.length > 1 ? 's' : ''}</p>
+          </div>
+          
+          {/* Chevron */}
+          <ChevronDown 
+            className={cn(
+              "h-5 w-5 text-white/80 transition-transform duration-200",
+              isExpanded && "rotate-180"
+            )} 
+          />
+        </button>
 
-      {/* Expanded Content */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4 space-y-2">
-              {category.subs.map((sub) => (
-                <div key={sub.name} className="border-l-2 border-primary/30 pl-4">
-                  {/* Sub Category (Level 2) - Clean */}
-                  <button
-                    onClick={() => toggleSub(sub.name)}
-                    className="w-full flex items-center gap-2 py-2 text-left hover:text-primary transition-colors group"
-                  >
-                    <motion.div
-                      animate={{ rotate: expandedSubs.includes(sub.name) ? 90 : 0 }}
+        {/* Expanded Content */}
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="px-5 pb-5 space-y-2">
+                {category.subs.map((sub) => (
+                  <div key={sub.name} className="border-l-2 border-white/30 pl-4">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSub(sub.name); }}
+                      className="w-full flex items-center gap-2 py-2 text-left hover:bg-white/10 rounded-lg px-2 -ml-2 transition-colors group/sub"
                     >
-                      <ChevronRight className="h-4 w-4 text-primary" />
-                    </motion.div>
-                    <span className="text-sm font-medium text-foreground group-hover:text-primary">{sub.name}</span>
-                  </button>
+                      <ChevronRight className={cn(
+                        "h-4 w-4 text-white/80 transition-transform",
+                        expandedSubs.includes(sub.name) && "rotate-90"
+                      )} />
+                      <span className="text-sm font-medium text-white">{sub.name}</span>
+                    </button>
 
-                  {/* Micro Categories (Level 3) */}
-                  <AnimatePresence>
-                    {expandedSubs.includes(sub.name) && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="ml-4 space-y-1 overflow-hidden"
-                      >
-                        {sub.micros.map((micro) => (
-                          <div key={micro.name} className="border-l border-cyan-500/30 pl-3">
-                            {/* Micro Category - Clean */}
-                            <button
-                              onClick={() => toggleMicro(`${sub.name}-${micro.name}`)}
-                              className="w-full flex items-center gap-2 py-1.5 text-left hover:text-cyan-400 transition-colors group"
-                            >
-                              <motion.div
-                                animate={{ rotate: expandedMicros.includes(`${sub.name}-${micro.name}`) ? 90 : 0 }}
+                    {/* Micros */}
+                    <AnimatePresence>
+                      {expandedSubs.includes(sub.name) && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="ml-4 mt-1 space-y-1"
+                        >
+                          {sub.micros.map((micro) => (
+                            <div key={micro.name}>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleMicro(micro.name); }}
+                                className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-white/10 rounded px-2 transition-colors"
                               >
-                                <ChevronRight className="h-3 w-3 text-cyan-500/70" />
-                              </motion.div>
-                              <span className="text-xs text-slate-300 group-hover:text-cyan-400">{micro.name}</span>
-                            </button>
-
-                            {/* Nano Categories (Level 4) */}
-                            <AnimatePresence>
-                              {expandedMicros.includes(`${sub.name}-${micro.name}`) && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  className="ml-4 py-1 space-y-1 overflow-hidden"
-                                >
-                                  {micro.nanos.map((nano) => (
-                                    <motion.div
-                                      key={nano.name}
-                                      whileHover={{ x: 4 }}
-                                      className="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-slate-900/50 border border-slate-700/50 hover:border-teal-500/30 cursor-pointer transition-all group"
-                                    >
-                                      <div className="h-1.5 w-1.5 rounded-full bg-teal-500/60 group-hover:bg-teal-400" />
-                                      <span className="text-[11px] text-slate-400 group-hover:text-teal-300">{nano.name}</span>
-                                    </motion.div>
-                                  ))}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+                                <ChevronRight className={cn(
+                                  "h-3 w-3 text-white/70 transition-transform",
+                                  expandedMicros.includes(micro.name) && "rotate-90"
+                                )} />
+                                <span className="text-xs font-medium text-white/90">{micro.name}</span>
+                              </button>
+                              
+                              {/* Nanos */}
+                              <AnimatePresence>
+                                {expandedMicros.includes(micro.name) && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="ml-5 mt-1 space-y-1"
+                                  >
+                                    {micro.nanos.map((nano) => (
+                                      <div
+                                        key={nano.name}
+                                        className="text-xs text-white/80 py-1 px-2 rounded bg-white/10 hover:bg-white/20 cursor-pointer transition-colors"
+                                      >
+                                        {nano.name}
+                                      </div>
+                                    ))}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
+
 
 // ==========================================
 // HEADER STAT CARD
@@ -575,46 +591,33 @@ const HeaderStatCard = ({
   trend?: string;
   trendUp?: boolean;
 }) => (
-  <motion.div 
-    className="relative p-4 rounded-xl bg-slate-800/60 border border-slate-700/50 backdrop-blur-sm overflow-hidden group"
-    whileHover={{ scale: 1.02, y: -2 }}
-    style={{
-      boxShadow: '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
-    }}
-  >
-    <div className="absolute top-0 right-0 w-16 h-16 bg-teal-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+  <div className="relative p-4 rounded-2xl bg-card border border-border shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
+    <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
     
     <div className="flex items-start justify-between mb-2">
-      <div className="p-2 rounded-lg bg-slate-700/50">
-        <Icon className="h-4 w-4 text-teal-400" />
+      <div className="p-2.5 rounded-xl bg-primary/10">
+        <Icon className="h-5 w-5 text-primary" />
       </div>
       {trend && (
         <Badge 
           variant="outline" 
-          className={`text-[10px] ${trendUp ? 'text-emerald-400 border-emerald-500/30' : 'text-rose-400 border-rose-500/30'}`}
+          className={`text-xs ${trendUp ? 'text-green-600 border-green-200 bg-green-50' : 'text-red-600 border-red-200 bg-red-50'}`}
         >
           {trendUp ? '↑' : '↓'} {trend}
         </Badge>
       )}
     </div>
     
-    <div className="space-y-0.5">
-      <p className="text-[10px] text-slate-400 uppercase tracking-wider">{title}</p>
-      <div className="flex items-baseline gap-1.5">
-        <motion.p 
-          className="text-xl font-bold text-white"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring' }}
-        >
-          {value}
-        </motion.p>
+    <div className="space-y-1 mt-3">
+      <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{title}</p>
+      <div className="flex items-baseline gap-2">
+        <p className="text-2xl font-bold text-foreground">{value}</p>
         {subValue && (
-          <span className="text-xs text-slate-400">{subValue}</span>
+          <span className="text-sm text-muted-foreground">{subValue}</span>
         )}
       </div>
     </div>
-  </motion.div>
+  </div>
 );
 
 // ==========================================
@@ -860,97 +863,89 @@ const SuperAdminCommandCenter = () => {
             </div>
           </div>
 
+          {/* Categories Grid - Premium Gradient Cards */}
+          {!activeCategory && (
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-foreground mb-4">System Modules</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {categories.map((category, index) => (
+                  <CategoryCard key={category.id} category={category} index={index} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Live Activity Feed & Top Performers - Only show when no category selected */}
           {!activeCategory && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Live Activity Feed - Left Side (Takes 2 columns) */}
-              <motion.div 
-                className="lg:col-span-2 p-5 rounded-2xl bg-slate-800/60 border border-teal-500/20 backdrop-blur-xl"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+              <div 
+                className="lg:col-span-2 p-5 rounded-2xl bg-card border border-border shadow-lg"
               >
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg" style={{ boxShadow: '0 4px 20px rgba(20, 184, 166, 0.4)' }}>
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg">
                         <Activity className="h-5 w-5 text-white" />
                       </div>
-                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-800 animate-pulse" />
+                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500 border-2 border-card animate-pulse" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white">Live Activity Stream</h3>
-                      <p className="text-xs text-slate-400">Real-time updates from all modules</p>
+                      <h3 className="font-bold text-foreground">Live Activity Stream</h3>
+                      <p className="text-xs text-muted-foreground">Real-time updates from all modules</p>
                     </div>
                   </div>
-                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 animate-pulse">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping" />
+                  <Badge className="bg-green-100 text-green-700 border-green-200">
+                    <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse" />
                     STREAMING
                   </Badge>
                 </div>
 
-                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                   {[
-                    { type: 'lead', icon: UserPlus, message: 'New lead received from Mumbai', user: 'Raj Patel', time: 'Just now', color: 'from-blue-500 to-cyan-500' },
-                    { type: 'promise', icon: CheckCircle, message: 'Promise completed - CRM Integration', user: 'Sarah Chen', time: '2s ago', color: 'from-emerald-500 to-teal-500' },
-                    { type: 'developer', icon: Code, message: 'Developer joined the platform', user: 'Alex Kumar', time: '5s ago', color: 'from-purple-500 to-pink-500' },
-                    { type: 'sale', icon: Star, message: 'Reseller closed deal - ₹2,50,000', user: 'Vikram Singh', time: '12s ago', color: 'from-amber-500 to-orange-500' },
-                    { type: 'development', icon: Hammer, message: 'Development completed - E-comm v3', user: 'Mike Johnson', time: '18s ago', color: 'from-rose-500 to-red-500' },
-                    { type: 'lead', icon: UserPlus, message: 'Lead qualified from Delhi NCR', user: 'Priya Sharma', time: '25s ago', color: 'from-blue-500 to-cyan-500' },
-                    { type: 'promise', icon: CheckCircle, message: 'Demo scheduled for tomorrow', user: 'David Lee', time: '32s ago', color: 'from-emerald-500 to-teal-500' },
-                    { type: 'sale', icon: Star, message: 'New franchise signed - Bangalore', user: 'Rohan Mehta', time: '45s ago', color: 'from-amber-500 to-orange-500' },
-                    { type: 'developer', icon: Code, message: 'Task completed - API Integration', user: 'Lisa Wang', time: '1m ago', color: 'from-purple-500 to-pink-500' },
-                    { type: 'development', icon: Hammer, message: 'Project deployed to production', user: 'Chris Brown', time: '2m ago', color: 'from-rose-500 to-red-500' },
+                    { type: 'lead', icon: UserPlus, message: 'New lead received from Mumbai', user: 'Raj Patel', time: 'Just now', color: 'from-blue-400 to-cyan-500' },
+                    { type: 'promise', icon: CheckCircle, message: 'Promise completed - CRM Integration', user: 'Sarah Chen', time: '2s ago', color: 'from-emerald-400 to-teal-500' },
+                    { type: 'developer', icon: Code, message: 'Developer joined the platform', user: 'Alex Kumar', time: '5s ago', color: 'from-violet-400 to-purple-500' },
+                    { type: 'sale', icon: Star, message: 'Reseller closed deal - ₹2,50,000', user: 'Vikram Singh', time: '12s ago', color: 'from-amber-400 to-orange-500' },
+                    { type: 'development', icon: Hammer, message: 'Development completed - E-comm v3', user: 'Mike Johnson', time: '18s ago', color: 'from-rose-400 to-pink-500' },
                   ].map((activity, idx) => (
-                    <motion.div
+                    <div
                       key={idx}
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 + idx * 0.05 }}
-                      className="flex items-center gap-4 p-3 rounded-xl bg-slate-700/30 border border-slate-600/30 hover:bg-slate-700/50 hover:border-teal-500/30 transition-all group cursor-pointer"
+                      className="flex items-center gap-4 p-3 rounded-xl bg-secondary/50 border border-border hover:bg-secondary hover:border-primary/30 transition-all cursor-pointer"
                     >
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${activity.color} shadow-lg`}>
+                      <div className={`p-2 rounded-lg bg-gradient-to-br ${activity.color} shadow-md`}>
                         <activity.icon className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white font-medium truncate">{activity.message}</p>
-                        <p className="text-xs text-slate-400">by {activity.user}</p>
+                        <p className="text-sm text-foreground font-medium truncate">{activity.message}</p>
+                        <p className="text-xs text-muted-foreground">by {activity.user}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-xs text-slate-500">{activity.time}</span>
-                        <motion.div 
-                          className="w-2 h-2 rounded-full bg-emerald-500 mx-auto mt-1"
-                          animate={{ scale: [1, 1.5, 1] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: idx * 0.2 }}
-                        />
+                        <span className="text-xs text-muted-foreground">{activity.time}</span>
+                        <div className="w-2 h-2 rounded-full bg-green-500 mx-auto mt-1" />
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
 
               {/* Top Performers - Right Side */}
-              <motion.div 
-                className="p-5 rounded-2xl bg-slate-800/60 border border-amber-500/20 backdrop-blur-xl"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
+              <div className="p-5 rounded-2xl bg-card border border-border shadow-lg">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg" style={{ boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4)' }}>
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
                     <Trophy className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white">Top Performers</h3>
-                    <p className="text-xs text-slate-400">This week's stars 🌟</p>
+                    <h3 className="font-bold text-foreground">Top Performers</h3>
+                    <p className="text-xs text-muted-foreground">This week's stars 🌟</p>
                   </div>
                 </div>
 
                 {/* Developers Section */}
                 <div className="mb-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Code className="h-4 w-4 text-purple-400" />
-                    <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Top Developers</span>
+                    <Code className="h-4 w-4 text-violet-500" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Top Developers</span>
                   </div>
                   <div className="space-y-2">
                     {[
@@ -958,17 +953,12 @@ const SuperAdminCommandCenter = () => {
                       { name: 'Sarah Chen', avatar: '👩‍💻', tasks: 42, streak: '⚡ 8 days', rank: 2 },
                       { name: 'Mike Johnson', avatar: '🧑‍💻', tasks: 38, streak: '🚀 5 days', rank: 3 },
                     ].map((dev, idx) => (
-                      <motion.div
+                      <div
                         key={idx}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4 + idx * 0.1 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01] cursor-pointer ${
                           idx === 0 
-                            ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/10 border-amber-500/40' 
-                            : idx === 1 
-                            ? 'bg-slate-700/40 border-slate-500/30' 
-                            : 'bg-slate-700/30 border-slate-600/20'
+                            ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200' 
+                            : 'bg-secondary/50 border-border hover:border-primary/30'
                         }`}
                       >
                         <div className="relative">
@@ -978,15 +968,15 @@ const SuperAdminCommandCenter = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{dev.name}</p>
-                          <p className="text-xs text-slate-400">{dev.tasks} tasks • {dev.streak}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{dev.name}</p>
+                          <p className="text-xs text-muted-foreground">{dev.tasks} tasks • {dev.streak}</p>
                         </div>
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                          idx === 0 ? 'bg-amber-500 text-black' : idx === 1 ? 'bg-slate-400 text-black' : 'bg-amber-700 text-white'
+                          idx === 0 ? 'bg-amber-500 text-white' : idx === 1 ? 'bg-gray-300 text-gray-700' : 'bg-amber-700 text-white'
                         }`}>
                           #{dev.rank}
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -994,8 +984,8 @@ const SuperAdminCommandCenter = () => {
                 {/* Resellers Section */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Users className="h-4 w-4 text-teal-400" />
-                    <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Top Resellers</span>
+                    <Users className="h-4 w-4 text-teal-500" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Top Resellers</span>
                   </div>
                   <div className="space-y-2">
                     {[
@@ -1003,60 +993,47 @@ const SuperAdminCommandCenter = () => {
                       { name: 'Rohan Mehta', avatar: '🦹', sales: '₹9.8L', leads: 22, badge: '🥇 Gold' },
                       { name: 'Priya Sharma', avatar: '🧙', sales: '₹7.2L', leads: 18, badge: '🥈 Silver' },
                     ].map((reseller, idx) => (
-                      <motion.div
+                      <div
                         key={idx}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.6 + idx * 0.1 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01] cursor-pointer ${
                           idx === 0 
-                            ? 'bg-gradient-to-r from-teal-500/20 to-cyan-500/10 border-teal-500/40' 
-                            : 'bg-slate-700/30 border-slate-600/20'
+                            ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200' 
+                            : 'bg-secondary/50 border-border hover:border-primary/30'
                         }`}
                       >
                         <span className="text-2xl">{reseller.avatar}</span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-white truncate">{reseller.name}</p>
+                            <p className="text-sm font-medium text-foreground truncate">{reseller.name}</p>
                             <span className="text-xs">{reseller.badge}</span>
                           </div>
-                          <p className="text-xs text-slate-400">{reseller.sales} • {reseller.leads} leads</p>
+                          <p className="text-xs text-muted-foreground">{reseller.sales} • {reseller.leads} leads</p>
                         </div>
-                        <motion.div
-                          animate={{ rotate: [0, 10, -10, 0] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: idx * 0.3 }}
-                        >
-                          <TrendingUp className="h-4 w-4 text-emerald-400" />
-                        </motion.div>
-                      </motion.div>
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Fun Stats */}
-                <motion.div 
-                  className="mt-5 p-4 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.9 }}
-                >
-                  <p className="text-xs text-slate-400 text-center mb-2">🎉 Today's Highlights</p>
+                <div className="mt-5 p-4 rounded-xl bg-secondary/50 border border-border">
+                  <p className="text-xs text-muted-foreground text-center mb-2">🎉 Today's Highlights</p>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <p className="text-lg font-bold text-teal-400">{liveStats.totalLeads.toLocaleString()}</p>
-                      <p className="text-[10px] text-slate-500">Leads</p>
+                      <p className="text-lg font-bold text-primary">{liveStats.totalLeads.toLocaleString()}</p>
+                      <p className="text-[10px] text-muted-foreground">Leads</p>
                     </div>
                     <div>
-                      <p className="text-lg font-bold text-purple-400">{liveStats.activeDevelopers}</p>
-                      <p className="text-[10px] text-slate-500">Devs Online</p>
+                      <p className="text-lg font-bold text-violet-500">{liveStats.activeDevelopers}</p>
+                      <p className="text-[10px] text-muted-foreground">Devs Online</p>
                     </div>
                     <div>
-                      <p className="text-lg font-bold text-amber-400">{liveStats.tasksCompleted}</p>
-                      <p className="text-[10px] text-slate-500">Tasks Done</p>
+                      <p className="text-lg font-bold text-amber-500">{liveStats.tasksCompleted}</p>
+                      <p className="text-[10px] text-muted-foreground">Tasks Done</p>
                     </div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
           )}
         </motion.div>

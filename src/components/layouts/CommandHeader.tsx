@@ -112,24 +112,24 @@ const CommandHeader = memo(() => {
   };
 
   return (
-    <header className="h-16 border-b border-sidebar-border bg-sidebar flex items-center justify-between px-4 sticky top-0 z-50">
+    <header className="h-16 border-b border-sidebar-border bg-sidebar flex items-center justify-between px-4 sticky top-0 z-50 shadow-lg">
       {/* Left: Logo & Breadcrumb */}
       <div className="flex items-center gap-4">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
-            <span className="font-bold text-lg" style={{ color: 'hsl(var(--sidebar-background))' }}>SV</span>
+          <div className="w-10 h-10 rounded-xl bg-white/95 flex items-center justify-center shadow-md">
+            <span className="font-bold text-lg text-primary">SV</span>
           </div>
           <span className="font-mono font-bold text-lg hidden md:block text-sidebar-foreground">Software Vala</span>
         </Link>
         
         {/* Breadcrumb */}
-        <div className="hidden lg:flex items-center gap-2 text-sm text-sidebar-foreground/80">
+        <div className="hidden lg:flex items-center gap-2 text-sm text-sidebar-foreground/70">
           <span>/</span>
           <span className="capitalize">{location.pathname.split('/')[1] || 'Home'}</span>
           {location.pathname.split('/')[2] && (
             <>
               <span>/</span>
-              <span className="capitalize text-sidebar-foreground">{location.pathname.split('/')[2].replace('-', ' ')}</span>
+              <span className="capitalize text-sidebar-foreground font-medium">{location.pathname.split('/')[2].replace('-', ' ')}</span>
             </>
           )}
         </div>
@@ -138,10 +138,10 @@ const CommandHeader = memo(() => {
       {/* Center: Search */}
       <div className="flex-1 max-w-xl mx-4 hidden md:block">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
           <Input
             placeholder="Search leads, tasks, demos..."
-            className="pl-10 bg-secondary/50 border-border/50 focus:border-primary/50"
+            className="pl-10 bg-white/15 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:bg-white/20"
           />
         </div>
       </div>
