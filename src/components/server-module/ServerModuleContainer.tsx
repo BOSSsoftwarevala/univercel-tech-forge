@@ -21,10 +21,12 @@ import {
 
 interface ServerModuleContainerProps {
   initialSection?: ServerModuleSection;
+  onBack?: () => void;
 }
 
 export const ServerModuleContainer: React.FC<ServerModuleContainerProps> = ({
-  initialSection = 'overview'
+  initialSection = 'overview',
+  onBack
 }) => {
   const [activeSection, setActiveSection] = useState<ServerModuleSection>(initialSection);
 
@@ -58,6 +60,7 @@ export const ServerModuleContainer: React.FC<ServerModuleContainerProps> = ({
       <ServerModuleSidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}
+        onBack={onBack}
       />
       <div className="flex-1 p-6 overflow-auto">{renderContent()}</div>
     </div>

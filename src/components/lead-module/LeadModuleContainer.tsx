@@ -14,8 +14,14 @@ import { Conversions } from './Conversions';
 import { LeadReports } from './LeadReports';
 import { LeadSettings } from './LeadSettings';
 
-export const LeadModuleContainer: React.FC<{ initialSection?: LeadSection }> = ({ 
-  initialSection = 'dashboard' 
+interface LeadModuleContainerProps {
+  initialSection?: LeadSection;
+  onBack?: () => void;
+}
+
+export const LeadModuleContainer: React.FC<LeadModuleContainerProps> = ({ 
+  initialSection = 'dashboard',
+  onBack
 }) => {
   const [activeSection, setActiveSection] = useState<LeadSection>(initialSection);
 
@@ -37,7 +43,11 @@ export const LeadModuleContainer: React.FC<{ initialSection?: LeadSection }> = (
 
   return (
     <div className="flex h-full min-h-[calc(100vh-120px)]">
-      <LeadModuleSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      <LeadModuleSidebar 
+        activeSection={activeSection} 
+        onSectionChange={setActiveSection}
+        onBack={onBack}
+      />
       <div className="flex-1 p-6 overflow-auto">{renderContent()}</div>
     </div>
   );

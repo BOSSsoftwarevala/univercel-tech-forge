@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
@@ -588,10 +588,17 @@ const RoleSwitchSidebar = ({
   const currentConfig = roleConfigs[activeRole] ?? roleConfigs.boss_owner;
   const currentNavItems = roleNavItems[activeRole] ?? [];
   const [internalActiveNav, setInternalActiveNav] = useState("dashboard");
-  const [isDrilledDown, setIsDrilledDown] = useState(false);
+  
+  // STEP 2 FIX: Auto drill-down when a role is active (Boss should start drilled in)
+  const [isDrilledDown, setIsDrilledDown] = useState(true);
   
   // Use external activeNav if provided, otherwise use internal state
   const activeNav = externalActiveNav ?? internalActiveNav;
+  
+  // STEP 2 FIX: When role changes, auto drill-down to show that role's features
+  useEffect(() => {
+    setIsDrilledDown(true);
+  }, [activeRole]);
 
   const handleNavClick = (navId: string) => {
     if (onNavChange) {

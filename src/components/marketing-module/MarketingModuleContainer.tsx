@@ -11,7 +11,11 @@ import { Performance } from "./Performance";
 import { BudgetControl } from "./BudgetControl";
 import { MarketingSettings } from "./MarketingSettings";
 
-export const MarketingModuleContainer = () => {
+interface MarketingModuleContainerProps {
+  onBack?: () => void;
+}
+
+export const MarketingModuleContainer: React.FC<MarketingModuleContainerProps> = ({ onBack }) => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const renderContent = () => {
@@ -45,7 +49,8 @@ export const MarketingModuleContainer = () => {
     <div className="flex h-full min-h-[calc(100vh-120px)]">
       <MarketingModuleSidebar 
         activeSection={activeSection} 
-        setActiveSection={setActiveSection} 
+        setActiveSection={setActiveSection}
+        onBack={onBack}
       />
       <div className="flex-1 p-6 overflow-auto">{renderContent()}</div>
     </div>

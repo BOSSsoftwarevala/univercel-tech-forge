@@ -16,10 +16,12 @@ import { ProductArchive } from './ProductArchive';
 
 interface ProductDemoModuleContainerProps {
   initialSection?: ProductDemoSection;
+  onBack?: () => void;
 }
 
 export const ProductDemoModuleContainer: React.FC<ProductDemoModuleContainerProps> = ({ 
-  initialSection = 'dashboard' 
+  initialSection = 'dashboard',
+  onBack
 }) => {
   const [activeSection, setActiveSection] = useState<ProductDemoSection>(initialSection);
 
@@ -41,7 +43,7 @@ export const ProductDemoModuleContainer: React.FC<ProductDemoModuleContainerProp
 
   return (
     <div className="flex h-full min-h-[calc(100vh-120px)]">
-      <ProductDemoModuleSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      <ProductDemoModuleSidebar activeSection={activeSection} onSectionChange={setActiveSection} onBack={onBack} />
       <div className="flex-1 p-6 overflow-auto">{renderContent()}</div>
     </div>
   );

@@ -18,10 +18,12 @@ import { DevSettings } from './DevSettings';
 
 interface DevModuleContainerProps {
   initialSection?: DevSection;
+  onBack?: () => void;
 }
 
 export const DevModuleContainer: React.FC<DevModuleContainerProps> = ({
-  initialSection = 'overview'
+  initialSection = 'overview',
+  onBack
 }) => {
   const [activeSection, setActiveSection] = useState<DevSection>(initialSection);
 
@@ -54,13 +56,11 @@ export const DevModuleContainer: React.FC<DevModuleContainerProps> = ({
 
   return (
     <div className="flex h-full bg-background/50 rounded-xl border border-border/50 overflow-hidden">
-      {/* Sidebar */}
       <DevModuleSidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}
+        onBack={onBack}
       />
-      
-      {/* Content Area */}
       <div className="flex-1 p-6 overflow-y-auto">
         {renderContent()}
       </div>
