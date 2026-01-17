@@ -291,8 +291,8 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
           </div>
         </motion.div>
 
-        {/* LOCKED: Authority Stats Grid - 6 Boxes (2 per row, 3 rows) - SIZE NORMALIZED */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* LOCKED: Authority Stats Grid - RESPONSIVE (4→3→2→1 columns) - HEIGHT 150px FIXED */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mb-6">
           {[
             { label: 'SUPER ADMINS', value: mockSuperAdmins.length.toString(), icon: Users, iconBg: '#2563EB20', iconColor: '#2563EB' },
             { label: 'LOCKED MODULES', value: '2', icon: Lock, iconBg: '#F59E0B20', iconColor: '#F59E0B' },
@@ -306,10 +306,10 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
               <div 
                 key={idx} 
                 style={{
-                  height: '100px',
-                  minHeight: '100px',
-                  maxHeight: '100px',
-                  padding: '20px 24px',
+                  height: '150px',
+                  minHeight: '150px',
+                  maxHeight: '150px',
+                  padding: '24px',
                   background: '#FFFFFF',
                   border: '1px solid #E5E7EB',
                   borderRadius: '14px',
@@ -320,11 +320,30 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                 }}
               >
                 <div className="flex items-center justify-between w-full">
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: '11px', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500, lineHeight: '1' }}>
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <p style={{ 
+                      fontSize: '11px', 
+                      color: '#6B7280', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.05em', 
+                      fontWeight: 500, 
+                      lineHeight: '1',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
                       {stat.label}
                     </p>
-                    <p style={{ fontSize: '32px', fontWeight: 700, color: '#111827', marginTop: '8px', lineHeight: '1' }}>
+                    <p style={{ 
+                      fontSize: '32px', 
+                      fontWeight: 700, 
+                      color: '#111827', 
+                      marginTop: '12px', 
+                      lineHeight: '1',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
                       {stat.value}
                     </p>
                   </div>
