@@ -27,6 +27,10 @@ import { useDashboardContext, type SelectedControlCard } from "@/hooks/useDashbo
 import { FranchiseIntelligenceCenter } from "@/components/franchise-intelligence";
 import { GlobalNetworkMap } from "@/components/boss-panel/sections/GlobalNetworkMap";
 import { cn } from "@/lib/utils";
+// Module Containers for Boss navigation
+import { ServerModuleContainer } from "@/components/server-module/ServerModuleContainer";
+import { DevModuleContainer } from "@/components/development-module/DevModuleContainer";
+import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 // BRAND THEME: Blue Primary + Red Accent (from Software Vala Logo)
 // All colors use CSS variables for consistency across the app
 const COLORS = {
@@ -101,7 +105,16 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   // ENTERPRISE: Global context for selected card
   const { selectedCard, setSelectedCard, clearSelection } = useDashboardContext();
   
-  // Map sidebar navigation to internal tabs
+  // Module routing - these sidebar items open full module views
+  const moduleRoutes: Record<string, 'server' | 'development' | 'product-demo'> = {
+    'server-control': 'server',
+    'dev-control': 'development',
+    'product-demo': 'product-demo',
+  };
+  
+  const isModuleView = activeNav && activeNav in moduleRoutes;
+  
+  // Map sidebar navigation to internal tabs (for non-module views)
   const getTabFromNav = (nav?: string): string => {
     const navToTabMap: Record<string, string> = {
       'dashboard': 'overview',
@@ -119,11 +132,24 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const [activeTab, setActiveTab] = useState(getTabFromNav(activeNav));
   
   useEffect(() => {
-    if (activeNav) {
+    if (activeNav && !isModuleView) {
       const mappedTab = getTabFromNav(activeNav);
       setActiveTab(mappedTab);
     }
-  }, [activeNav]);
+  }, [activeNav, isModuleView]);
+
+  // If this is a module view, render the module container
+  if (isModuleView && activeNav) {
+    const moduleType = moduleRoutes[activeNav];
+    switch (moduleType) {
+      case 'server':
+        return <ServerModuleContainer />;
+      case 'development':
+        return <DevModuleContainer />;
+      case 'product-demo':
+        return <ProductDemoModuleContainer />;
+    }
+  }
 
   // ===== ACTION HANDLERS WITH AUDIT LOGGING =====
   const logAction = useCallback(async (action: string, target: string, meta?: Record<string, any>) => {
