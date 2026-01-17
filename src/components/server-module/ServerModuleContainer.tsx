@@ -54,19 +54,12 @@ export const ServerModuleContainer: React.FC<ServerModuleContainerProps> = ({
   };
 
   return (
-    <div className="flex h-full bg-background">
-      {/* Sidebar */}
+    <div className="flex h-full min-h-[calc(100vh-120px)]">
       <ServerModuleSidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
-      
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto p-6">
-        {renderContent()}
-      </div>
+      <div className="flex-1 p-6 overflow-auto">{renderContent()}</div>
     </div>
   );
 };
-
-export default ServerModuleContainer;
