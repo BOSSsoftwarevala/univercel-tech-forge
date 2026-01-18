@@ -3,12 +3,15 @@ import {
   Crown, Shield, Lock, Users, Globe2, Activity, Server,
   Database, CreditCard, Brain, TrendingUp, Building2,
   DollarSign, Wallet, BarChart3, ShieldAlert, FileText,
-  Scale, Cpu, Clock, ArrowLeft
+  Scale, Cpu, Clock, ArrowLeft, Eye, Edit3, RefreshCw,
+  Play, StopCircle, Pause
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +20,20 @@ import { ValaAIModuleContainer } from "@/components/vala-ai-module/ValaAIModuleC
 import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+
+// ===== BOX TYPES =====
+type BoxType = 'data' | 'process' | 'ai' | 'approval' | 'live';
+type BoxStatus = 'active' | 'pending' | 'suspended' | 'stopped' | 'error';
+
+const STATUS_COLORS: Record<BoxStatus, string> = {
+  active: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50',
+  pending: 'bg-amber-500/20 text-amber-400 border-amber-500/50',
+  suspended: 'bg-orange-500/20 text-orange-400 border-orange-500/50',
+  stopped: 'bg-slate-500/20 text-slate-400 border-slate-500/50',
+  error: 'bg-red-500/20 text-red-400 border-red-500/50',
+};
 
 // ===== THEME: Dark + Software Vala Logo Colors (Blue Primary + Red Accent) =====
 const T = {
@@ -32,20 +49,9 @@ const T = {
   green: '#22c55e',
 };
 
-// ===== DATA CARD =====
-const DataCard = memo(({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
-  <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-    <div className="flex items-center gap-2 px-4 py-3" style={{ background: T.primary }}>
-      <span style={{ color: T.text }}>{icon}</span>
-      <span className="text-xs font-bold uppercase tracking-wider" style={{ color: T.text }}>{title}</span>
-    </div>
-    <div className="p-4">{children}</div>
-  </div>
-));
-
 // ===== CHART =====
 const Chart = memo(({ type = 'bar' }: { type?: 'bar' | 'line' }) => (
-  <div className="flex items-end justify-around gap-1 p-3 rounded" style={{ height: 120, background: 'rgba(37,99,235,0.05)' }}>
+  <div className="flex items-end justify-around gap-1 p-3 rounded" style={{ height: 80, background: 'rgba(37,99,235,0.05)' }}>
     {type === 'bar' ? (
       [35, 60, 40, 75, 50, 65, 85, 55, 70, 80, 45, 90].map((h, i) => (
         <div key={i} style={{ width: '100%', height: `${h}%`, background: i === 11 ? T.primary : 'rgba(37,99,235,0.25)', borderRadius: '2px 2px 0 0' }} />
@@ -60,13 +66,24 @@ const Chart = memo(({ type = 'bar' }: { type?: 'bar' | 'line' }) => (
   </div>
 ));
 
-// ===== STAT ROW =====
-const StatRow = ({ l1, v1, l2, v2, c1 = T.primary, c2 = T.text }: { l1: string; v1: string; l2: string; v2: string; c1?: string; c2?: string }) => (
-  <div className="grid grid-cols-2 gap-3 mt-3">
-    <div><span className="text-[10px] block" style={{ color: T.dim }}>{l1}</span><span className="text-lg font-bold" style={{ color: c1 }}>{v1}</span></div>
-    <div><span className="text-[10px] block" style={{ color: T.dim }}>{l2}</span><span className="text-lg font-bold" style={{ color: c2 }}>{v2}</span></div>
-  </div>
-);
+// ===== ACTION BUTTON COMPONENT =====
+const ActionBtn = memo(({ icon: Icon, label, onClick, variant = 'default', loading = false }: {
+  icon: React.ElementType; label: string; onClick: () => void; variant?: 'default' | 'destructive' | 'outline'; loading?: boolean;
+}) => (
+  <Button
+    size="sm"
+    variant={variant}
+    className={cn(
+      "h-7 px-2 text-xs gap-1 font-medium",
+      variant === 'destructive' && "bg-red-600 hover:bg-red-700"
+    )}
+    onClick={onClick}
+    disabled={loading}
+  >
+    <Icon className={cn("w-3 h-3", loading && "animate-spin")} />
+    {label}
+  </Button>
+));
 
 interface Props { activeNav?: string; }
 
@@ -104,6 +121,13 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
       await supabase.from('audit_logs').insert({ user_id: user?.id, role: 'boss_owner' as any, module: 'boss-dashboard', action, meta_json: { target, timestamp: new Date().toISOString(), ...meta } });
     } catch (e) { console.error(e); }
   };
+
+  // === BOX ACTION HANDLER ===
+  const handleBoxAction = useCallback(async (actionType: string, entityId: string) => {
+    await logAction(actionType, entityId);
+    toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)} action executed for ${entityId}`);
+    // Add real action logic here based on actionType
+  }, [user]);
 
   const lockdown = async () => {
     if (!confirmed) return toast.error("2FA required");
@@ -156,189 +180,282 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
         </div>
       </div>
 
-      {/* ===== ROW 2: KEY STATS — 4 EQUAL LARGE CARDS ===== */}
+      {/* ===== ROW 2: KEY STATS — 4 EQUAL LARGE CARDS WITH ACTIONS ===== */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         {/* REVENUE */}
-        <div style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, padding: '20px' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <DollarSign size={18} style={{ color: '#60a5fa' }} />
-            <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>REVENUE</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <DollarSign size={18} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>REVENUE</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Active</Badge>
+            </div>
+            <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>$2.4M</p>
+            <p className="text-xs" style={{ color: '#22c55e' }}>+24% from last month</p>
+            <Chart type="bar" />
           </div>
-          <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>$2.4M</p>
-          <p className="text-xs" style={{ color: '#22c55e' }}>+24% from last month</p>
-          <Chart type="bar" />
-        </div>
+          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'revenue')} />
+            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'revenue')} />
+            <ActionBtn icon={RefreshCw} label="Update" onClick={() => handleBoxAction('update', 'revenue')} />
+          </div>
+        </motion.div>
 
         {/* USERS */}
-        <div style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, padding: '20px' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Users size={18} style={{ color: '#60a5fa' }} />
-            <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>USERS</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Users size={18} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>USERS</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Active</Badge>
+            </div>
+            <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>12.5K</p>
+            <p className="text-xs" style={{ color: '#22c55e' }}>+2,847 new this week</p>
+            <Chart type="line" />
           </div>
-          <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>12.5K</p>
-          <p className="text-xs" style={{ color: '#22c55e' }}>+2,847 new this week</p>
-          <Chart type="line" />
-        </div>
+          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'users')} />
+            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'users')} />
+            <ActionBtn icon={RefreshCw} label="Update" onClick={() => handleBoxAction('update', 'users')} />
+          </div>
+        </motion.div>
 
         {/* FRANCHISES */}
-        <div style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, padding: '20px' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Building2 size={18} style={{ color: '#60a5fa' }} />
-            <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>FRANCHISES</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Building2 size={18} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>FRANCHISES</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Active</Badge>
+            </div>
+            <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>128</p>
+            <p className="text-xs" style={{ color: '#60a5fa' }}>45 countries active</p>
+            <Chart type="bar" />
           </div>
-          <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>128</p>
-          <p className="text-xs" style={{ color: '#60a5fa' }}>45 countries active</p>
-          <Chart type="bar" />
-        </div>
+          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'franchises')} />
+            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'franchises')} />
+            <ActionBtn icon={RefreshCw} label="Update" onClick={() => handleBoxAction('update', 'franchises')} />
+          </div>
+        </motion.div>
 
         {/* SYSTEM */}
-        <div style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, padding: '20px' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Server size={18} style={{ color: '#60a5fa' }} />
-            <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>SYSTEM</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Server size={18} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>SYSTEM</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Active</Badge>
+            </div>
+            <p className="text-2xl font-bold mb-1" style={{ color: '#22c55e' }}>99.9%</p>
+            <p className="text-xs" style={{ color: '#e2e8f0' }}>Uptime • 124ms response</p>
+            <Chart type="line" />
           </div>
-          <p className="text-2xl font-bold mb-1" style={{ color: '#22c55e' }}>99.9%</p>
-          <p className="text-xs" style={{ color: '#e2e8f0' }}>Uptime • 124ms response</p>
-          <Chart type="line" />
-        </div>
+          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'system')} />
+            <ActionBtn icon={Play} label="Start" onClick={() => handleBoxAction('start', 'system')} />
+            <ActionBtn icon={StopCircle} label="Stop" onClick={() => handleBoxAction('stop', 'system')} variant="destructive" />
+          </div>
+        </motion.div>
       </div>
 
-      {/* ===== ROW 3: OPERATIONAL AUTHORITY — 6 MEDIUM CARDS (2 ROWS × 3) ===== */}
+      {/* ===== ROW 3: OPERATIONAL AUTHORITY — 6 MEDIUM CARDS WITH ACTIONS ===== */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {/* CEO */}
-        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px' }}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Crown size={16} style={{ color: T.primary }} />
-              <span className="text-sm font-semibold" style={{ color: T.text }}>CEO</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Crown size={16} style={{ color: T.primary }} />
+                <span className="text-sm font-semibold" style={{ color: T.text }}>CEO</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Active</Badge>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>ACTIVE</span>
+            <p className="text-lg font-bold" style={{ color: T.text }}>12 Tasks</p>
+            <p className="text-xs" style={{ color: T.muted }}>3 pending approval</p>
           </div>
-          <p className="text-lg font-bold" style={{ color: T.text }}>12 Tasks</p>
-          <p className="text-xs" style={{ color: T.muted }}>3 pending approval</p>
-        </div>
+          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'ceo')} />
+            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'ceo')} />
+          </div>
+        </motion.div>
 
         {/* VALA AI */}
-        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px' }}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Brain size={16} style={{ color: T.primary }} />
-              <span className="text-sm font-semibold" style={{ color: T.text }}>VALA AI</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Brain size={16} style={{ color: T.primary }} />
+                <span className="text-sm font-semibold" style={{ color: T.text }}>VALA AI</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Running</Badge>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(37, 99, 235, 0.15)', color: T.primary }}>RUNNING</span>
+            <p className="text-lg font-bold" style={{ color: T.text }}>847 Requests</p>
+            <p className="text-xs" style={{ color: T.muted }}>AI processing active</p>
           </div>
-          <p className="text-lg font-bold" style={{ color: T.text }}>847 Requests</p>
-          <p className="text-xs" style={{ color: T.muted }}>AI processing active</p>
-        </div>
+          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'vala-ai')} />
+            <ActionBtn icon={Play} label="Start AI" onClick={() => handleBoxAction('startAi', 'vala-ai')} />
+            <ActionBtn icon={StopCircle} label="Stop AI" onClick={() => handleBoxAction('stopAi', 'vala-ai')} variant="destructive" />
+          </div>
+        </motion.div>
 
         {/* SERVER */}
-        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px' }}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Cpu size={16} style={{ color: T.primary }} />
-              <span className="text-sm font-semibold" style={{ color: T.text }}>SERVER</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Cpu size={16} style={{ color: T.primary }} />
+                <span className="text-sm font-semibold" style={{ color: T.text }}>SERVER</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>Healthy</Badge>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>HEALTHY</span>
+            <p className="text-lg font-bold" style={{ color: '#22c55e' }}>42%</p>
+            <p className="text-xs" style={{ color: T.muted }}>CPU Load • 8GB RAM used</p>
           </div>
-          <p className="text-lg font-bold" style={{ color: '#22c55e' }}>42%</p>
-          <p className="text-xs" style={{ color: T.muted }}>CPU Load • 8GB RAM used</p>
-        </div>
+          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'server')} />
+            <ActionBtn icon={Play} label="Start" onClick={() => handleBoxAction('start', 'server')} />
+            <ActionBtn icon={StopCircle} label="Stop" onClick={() => handleBoxAction('stop', 'server')} variant="destructive" />
+          </div>
+        </motion.div>
 
         {/* SALES & SUPPORT */}
-        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px' }}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <CreditCard size={16} style={{ color: T.primary }} />
-              <span className="text-sm font-semibold" style={{ color: T.text }}>SALES & SUPPORT</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <CreditCard size={16} style={{ color: T.primary }} />
+                <span className="text-sm font-semibold" style={{ color: T.text }}>SALES & SUPPORT</span>
+              </div>
+              <Badge className={STATUS_COLORS['pending']}>24 Open</Badge>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(37, 99, 235, 0.15)', color: T.primary }}>24 OPEN</span>
+            <p className="text-lg font-bold" style={{ color: T.text }}>$1.2M</p>
+            <p className="text-xs" style={{ color: T.muted }}>Today's transactions</p>
           </div>
-          <p className="text-lg font-bold" style={{ color: T.text }}>$1.2M</p>
-          <p className="text-xs" style={{ color: T.muted }}>Today's transactions</p>
-        </div>
+          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'sales')} />
+            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'sales')} />
+          </div>
+        </motion.div>
 
         {/* FRANCHISE OPS */}
-        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px' }}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Globe2 size={16} style={{ color: T.primary }} />
-              <span className="text-sm font-semibold" style={{ color: T.text }}>FRANCHISE OPS</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Globe2 size={16} style={{ color: T.primary }} />
+                <span className="text-sm font-semibold" style={{ color: T.text }}>FRANCHISE OPS</span>
+              </div>
+              <Badge className={STATUS_COLORS['active']}>128</Badge>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>128</span>
+            <p className="text-lg font-bold" style={{ color: T.text }}>Mumbai</p>
+            <p className="text-xs" style={{ color: T.muted }}>Top performer • $18.7K avg</p>
           </div>
-          <p className="text-lg font-bold" style={{ color: T.text }}>Mumbai</p>
-          <p className="text-xs" style={{ color: T.muted }}>Top performer • $18.7K avg</p>
-        </div>
+          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'franchise-ops')} />
+            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'franchise-ops')} />
+          </div>
+        </motion.div>
 
         {/* SYSTEM HEALTH */}
-        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px' }}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <ShieldAlert size={16} style={{ color: T.primary }} />
-              <span className="text-sm font-semibold" style={{ color: T.text }}>SYSTEM HEALTH</span>
+        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <ShieldAlert size={16} style={{ color: T.primary }} />
+                <span className="text-sm font-semibold" style={{ color: T.text }}>SYSTEM HEALTH</span>
+              </div>
+              <Badge className={STATUS_COLORS['error']}>3 Alerts</Badge>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(220, 38, 38, 0.15)', color: T.accent }}>3 ALERTS</span>
+            <p className="text-lg font-bold" style={{ color: '#22c55e' }}>47</p>
+            <p className="text-xs" style={{ color: T.muted }}>Issues resolved today</p>
           </div>
-          <p className="text-lg font-bold" style={{ color: '#22c55e' }}>47</p>
-          <p className="text-xs" style={{ color: T.muted }}>Issues resolved today</p>
-        </div>
+          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
+            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'system-health')} />
+            <ActionBtn icon={Pause} label="Pause" onClick={() => handleBoxAction('pause', 'system-health')} />
+          </div>
+        </motion.div>
       </div>
 
-      {/* ===== ROW 4: ACTIVITY & ALERTS — FULL WIDTH PANEL ===== */}
-      <div style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
+      {/* ===== ROW 4: ACTIVITY & ALERTS — FULL WIDTH PANEL WITH ACTIONS ===== */}
+      <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
         <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.15)' }}>
           <div className="flex items-center gap-2">
             <Activity size={16} style={{ color: '#60a5fa' }} />
             <span className="text-sm font-semibold tracking-wider" style={{ color: '#60a5fa' }}>ACTIVITY & ALERTS</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>AI: ONLINE</span>
-            <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(37, 99, 235, 0.15)', color: '#60a5fa' }}>5 PENDING</span>
-            <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(220, 38, 38, 0.15)', color: '#dc2626' }}>3 ALERTS</span>
+            <Badge className={STATUS_COLORS['active']}>AI: Online</Badge>
+            <Badge className={STATUS_COLORS['pending']}>5 Pending</Badge>
+            <Badge className={STATUS_COLORS['error']}>3 Alerts</Badge>
           </div>
         </div>
         <div className="p-4 grid grid-cols-4 gap-4">
           {/* AI Status */}
-          <div className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
             <div className="flex items-center gap-2 mb-2">
               <Brain size={14} style={{ color: '#60a5fa' }} />
               <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>AI STATUS</span>
             </div>
             <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>Processing 12 requests</p>
             <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>Avg response: 1.2s</p>
-          </div>
+            <div className="mt-3 flex gap-1">
+              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'ai-status')} />
+              <ActionBtn icon={FileText} label="Logs" onClick={() => handleBoxAction('viewLogs', 'ai-status')} />
+            </div>
+          </motion.div>
 
           {/* Pending Actions */}
-          <div className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
             <div className="flex items-center gap-2 mb-2">
               <Clock size={14} style={{ color: '#60a5fa' }} />
               <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>PENDING ACTIONS</span>
             </div>
             <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>5 items need review</p>
             <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>3 high priority</p>
-          </div>
+            <div className="mt-3 flex gap-1">
+              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'pending-actions')} />
+            </div>
+          </motion.div>
 
           {/* Alerts */}
-          <div className="p-3 rounded" style={{ background: 'rgba(220, 38, 38, 0.05)', border: '1px solid rgba(220, 38, 38, 0.1)' }}>
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(220, 38, 38, 0.05)', border: '1px solid rgba(220, 38, 38, 0.1)' }}>
             <div className="flex items-center gap-2 mb-2">
               <ShieldAlert size={14} style={{ color: '#dc2626' }} />
               <span className="text-xs font-medium" style={{ color: '#dc2626' }}>ALERTS</span>
             </div>
             <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>3 security alerts</p>
             <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>1 critical • 2 warnings</p>
-          </div>
+            <div className="mt-3 flex gap-1">
+              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'alerts')} />
+              <ActionBtn icon={Pause} label="Pause" onClick={() => handleBoxAction('pause', 'alerts')} />
+            </div>
+          </motion.div>
 
           {/* Logs */}
-          <div className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
             <div className="flex items-center gap-2 mb-2">
               <FileText size={14} style={{ color: '#60a5fa' }} />
               <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>LOGS</span>
             </div>
             <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>1,247 entries today</p>
             <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>Last: 2 mins ago</p>
-          </div>
+            <div className="mt-3 flex gap-1">
+              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'logs')} />
+              <ActionBtn icon={RefreshCw} label="Refresh" onClick={() => handleBoxAction('update', 'logs')} />
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
