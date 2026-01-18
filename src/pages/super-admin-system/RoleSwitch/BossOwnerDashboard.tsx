@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ServerModuleContainer } from "@/components/server-module/ServerModuleContainer";
-import { ValaAIModuleContainer } from "@/components/vala-ai-module/ValaAIModuleContainer";
+import ValaAIDashboard from "./ValaAIDashboard";
 import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
@@ -293,11 +293,17 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
   // If module is selected, show module container with back button
   if (activeNav && activeNav in modules) {
     switch (modules[activeNav]) {
-      case 'server': return <ServerModuleContainer onBack={goBack} />;
-      case 'vala-ai': return <ValaAIModuleContainer onBack={goBack} />;
-      case 'product-demo': return <ProductDemoModuleContainer onBack={goBack} />;
-      case 'leads': return <LeadModuleContainer onBack={goBack} />;
-      case 'marketing': return <MarketingModuleContainer onBack={goBack} />;
+      case 'server':
+        return <ServerModuleContainer onBack={goBack} />;
+      case 'vala-ai':
+        // CRITICAL: VALA AI is its own AI-only screen (no developer widgets)
+        return <ValaAIDashboard />;
+      case 'product-demo':
+        return <ProductDemoModuleContainer onBack={goBack} />;
+      case 'leads':
+        return <LeadModuleContainer onBack={goBack} />;
+      case 'marketing':
+        return <MarketingModuleContainer onBack={goBack} />;
     }
   }
 
