@@ -53,8 +53,8 @@ const COLORS = {
   iconColor: '#60a5fa',
 };
 
-// ===== 21 ROLE CATEGORIES (EXACT ORDER - LOCKED) =====
-// IDs MUST match ActiveRole type in RoleSwitchSidebar.tsx
+// ===== ROLE CATEGORIES (EXACT ORDER - LOCKED) =====
+// IDs MUST match ActiveRole type in RoleSwitchSidebarNew.tsx
 const ROLE_CATEGORIES = [
   { id: 'boss_owner', label: 'Boss / Owner', icon: Crown },
   { id: 'ceo', label: 'CEO', icon: Eye },
@@ -80,6 +80,7 @@ const ROLE_CATEGORIES = [
   { id: 'promise_tracker_manager', label: 'Promise Tracker', icon: Timer },
   { id: 'assist_manager', label: 'Assist Manager', icon: MonitorPlay },
   { id: 'internal_chatbot', label: 'Internal Chat Bot', icon: MessageSquare },
+  { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
