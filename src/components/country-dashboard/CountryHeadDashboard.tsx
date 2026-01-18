@@ -231,8 +231,9 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
   }, []);
 
   const handleAction = useCallback(async (actionType: string, targetId: string, targetType: string, reason?: string) => {
+    console.log(`[CountryHead] handleAction called: ${actionType} on ${targetType}:${targetId}`);
     try {
-      await supabase.from('audit_logs').insert([{
+      const { error } = await supabase.from('audit_logs').insert([{
         action: `country_${targetType}_${actionType}`,
         module: 'country_head_dashboard',
         meta_json: { 
@@ -245,17 +246,26 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
         }
       }]);
       
+      if (error) {
+        console.error(`[CountryHead] DB error:`, error);
+        toast.error("Failed to execute action: " + error.message);
+        return;
+      }
+      
+      console.log(`[CountryHead] Action logged successfully`);
       toast.success(`Action "${actionType}" executed successfully`);
       setSelectedRegion(null);
       setSelectedEntity(null);
     } catch (error) {
+      console.error(`[CountryHead] Action error:`, error);
       toast.error("Failed to execute action");
     }
   }, [config.name]);
 
   const handleActivityAction = useCallback(async (item: ActivityItem, action: string) => {
+    console.log(`[CountryHead] handleActivityAction called: ${action} on activity ${item.id}`);
     try {
-      await supabase.from('audit_logs').insert([{
+      const { error } = await supabase.from('audit_logs').insert([{
         action: `activity_${action}`,
         module: 'country_head_dashboard',
         meta_json: { 
@@ -267,8 +277,17 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
           timestamp: new Date().toISOString()
         }
       }]);
+      
+      if (error) {
+        console.error(`[CountryHead] DB error:`, error);
+        toast.error("Action failed: " + error.message);
+        return;
+      }
+      
+      console.log(`[CountryHead] Activity action logged successfully`);
       toast.success(`Activity "${action}" completed`);
     } catch (error) {
+      console.error(`[CountryHead] Activity action error:`, error);
       toast.error("Action failed");
     }
   }, [config.name]);

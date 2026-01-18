@@ -634,22 +634,21 @@
 /* Buzzer Blocking Overlay */
 /*
   IMPORTANT:
-  We keep the visual dim/blur effect, but we DO NOT capture pointer events here.
-  A bug can leave `body.buzzer-blocking` enabled without a visible buzzer UI,
-  which would make the entire app feel "unclickable".
+  We DISABLE the blocking overlay entirely to prevent "dead button" issues.
+  The buzzer-blocking class was causing clicks to be blocked even when
+  pointer-events: none was set, due to browser stacking context issues.
+  
+  SOLUTION: Remove the overlay completely and rely only on the buzzer UI
+  to get user attention via animations and toasts.
 */
 body.buzzer-blocking::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: hsl(var(--background) / 0.8);
-  backdrop-filter: blur(8px);
-  z-index: 40;
-  pointer-events: none;
+  /* Overlay disabled - was causing click blocking issues */
+  display: none;
 }
 
 body.buzzer-blocking {
-  overflow: hidden;
+  /* Remove overflow: hidden to allow normal scrolling and interaction */
+  /* overflow: hidden; -- DISABLED */
 }
 
 /* Ensure the buzzer UI itself stays clickable above the visual overlay */

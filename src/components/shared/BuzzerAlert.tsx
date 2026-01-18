@@ -48,11 +48,13 @@ const BuzzerAlert: React.FC<BuzzerAlertProps> = ({
   const urgentCount = pendingBuzzers.filter(b => b.priority === 'urgent').length;
   const highPriorityCount = pendingBuzzers.filter(b => b.priority === 'urgent' || b.priority === 'high').length;
 
-  // BUG FIX: Block interaction until urgent/high priority alerts are acknowledged
-  // This prevents users from dismissing critical alerts without accepting them
+  // DISABLED: The blocking overlay was causing "dead button" issues across the app.
+  // Users reported buttons not working because the overlay was blocking all clicks.
+  // Solution: Rely on visual alerts (toasts, animations) instead of blocking interaction.
+  // The buzzer UI itself should be attention-grabbing enough without blocking the app.
+  /*
   useEffect(() => {
     if (highPriorityCount > 0) {
-      // Add class to body to indicate blocking state
       document.body.classList.add('buzzer-blocking');
     } else {
       document.body.classList.remove('buzzer-blocking');
@@ -61,6 +63,12 @@ const BuzzerAlert: React.FC<BuzzerAlertProps> = ({
       document.body.classList.remove('buzzer-blocking');
     };
   }, [highPriorityCount]);
+  */
+  
+  // Cleanup: Remove any existing buzzer-blocking class on mount to fix stuck state
+  useEffect(() => {
+    document.body.classList.remove('buzzer-blocking');
+  }, []);
 
   // Play buzzer sound for urgent alerts
   useEffect(() => {

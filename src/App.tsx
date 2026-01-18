@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import InfluencerCommandCenter from "@/pages/InfluencerCommandCenter";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -316,6 +317,19 @@ const queryClient = new QueryClient({
   },
 });
 
+// Cleanup component to remove any stuck blocking classes on app mount
+const BlockingClassCleanup = () => {
+  React.useEffect(() => {
+    // Remove any stuck buzzer-blocking class that could prevent button clicks
+    document.body.classList.remove('buzzer-blocking');
+    // Clean up on unmount too
+    return () => {
+      document.body.classList.remove('buzzer-blocking');
+    };
+  }, []);
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -331,6 +345,7 @@ const App = () => (
                     <NotificationProvider>
                       <TranslationProvider>
                         <GlobalRealtimeProvider>
+                          <BlockingClassCleanup />
                           <SystemNotificationsInitializer />
                           <GlobalOfferPopup />
                           <FloatingAIChatbotWrapper />
