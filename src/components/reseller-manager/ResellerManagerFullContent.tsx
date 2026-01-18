@@ -92,31 +92,67 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
     return { total, active, pending, suspended, revenue };
   }, [items]);
 
-  const logAction = (action: string, target: string) => {
-    console.log(`[AUDIT] ${new Date().toISOString()} - ${action}: ${target}`);
-    toast.success(`${action} executed`, {
-      description: target,
-      duration: 2000,
-    });
+  const logAction = (action: string, target: string, variant: 'success' | 'info' | 'warning' | 'error' = 'success') => {
+    const timestamp = new Date().toISOString();
+    console.log(`[AUDIT] ${timestamp} - ${action}: ${target}`);
+    
+    // Show toast with appropriate styling
+    if (variant === 'success') {
+      toast.success(`✓ ${action}`, {
+        description: `${target} • ${new Date().toLocaleTimeString()}`,
+        duration: 3000,
+      });
+    } else if (variant === 'warning') {
+      toast.warning(`⚠ ${action}`, {
+        description: `${target} • ${new Date().toLocaleTimeString()}`,
+        duration: 3000,
+      });
+    } else if (variant === 'error') {
+      toast.error(`✗ ${action}`, {
+        description: `${target} • ${new Date().toLocaleTimeString()}`,
+        duration: 3000,
+      });
+    } else {
+      toast.info(`ℹ ${action}`, {
+        description: `${target} • ${new Date().toLocaleTimeString()}`,
+        duration: 3000,
+      });
+    }
   };
 
-  const updateStatus = (id: string, nextStatus: (typeof items)[number]['status']) => {
+  const updateStatus = (id: string, nextStatus: (typeof items)[number]['status'], action: string) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    
     setItems(prev => prev.map(i => (i.id === id ? { ...i, status: nextStatus } : i)));
+    
+    // Show appropriate toast
+    if (action === 'Approve') {
+      logAction('Approved', item.name, 'success');
+    } else if (action === 'Suspend') {
+      logAction('Suspended', item.name, 'warning');
+    } else if (action === 'Activate') {
+      logAction('Activated', item.name, 'success');
+    } else if (action === 'Reject') {
+      logAction('Rejected', item.name, 'error');
+    } else {
+      logAction(action, item.name);
+    }
   };
 
   const confirmDelete = (id: string, name: string) => {
     toast(`Delete ${name}?`, {
       description: 'This action cannot be undone.',
       action: {
-        label: 'Delete',
+        label: 'Confirm Delete',
         onClick: () => {
           setItems(prev => prev.filter(i => i.id !== id));
-          logAction('Delete', name);
+          logAction('Deleted', name, 'error');
         },
       },
       cancel: {
         label: 'Cancel',
-        onClick: () => logAction('Delete Cancelled', name),
+        onClick: () => toast.info('Delete cancelled'),
       },
       duration: 6000,
     });
@@ -226,10 +262,10 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
                     
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1">
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => logAction('View', item.name)}>
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => logAction('Viewing', item.name, 'info')}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => logAction('Edit', item.name)}>
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => logAction('Editing', item.name, 'info')}>
                         <Edit className="w-4 h-4" />
                       </Button>
                       {item.status === 'pending' && (
@@ -238,28 +274,25 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
                             size="sm"
                             variant="ghost"
                             className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300"
-                            onClick={() => {
-                              updateStatus(item.id, 'active');
-                              logAction('Approve', item.name);
-                            }}
+                            onClick={() => updateStatus(item.id, 'active', 'Approve')}
                           >
                             <CheckCircle className="w-4 h-4" />
                           </Button>
                           <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
-                            onClick={() => logAction('Reject', item.name)}>
+                            onClick={() => updateStatus(item.id, 'suspended', 'Reject')}>
                             <XCircle className="w-4 h-4" />
                           </Button>
                         </>
                       )}
                       {item.status === 'active' && (
                         <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-yellow-400 hover:text-yellow-300"
-                          onClick={() => logAction('Suspend', item.name)}>
+                          onClick={() => updateStatus(item.id, 'suspended', 'Suspend')}>
                           <Ban className="w-4 h-4" />
                         </Button>
                       )}
                       {item.status === 'suspended' && (
                         <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300"
-                          onClick={() => logAction('Activate', item.name)}>
+                          onClick={() => updateStatus(item.id, 'active', 'Activate')}>
                           <Play className="w-4 h-4" />
                         </Button>
                       )}
@@ -272,7 +305,7 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
                         <Trash2 className="w-4 h-4" />
                       </Button>
                       <Button size="sm" variant="ghost" className="h-8 w-8 p-0"
-                        onClick={() => logAction('History', item.name)}>
+                        onClick={() => logAction('View History', item.name, 'info')}>
                         <History className="w-4 h-4" />
                       </Button>
                     </div>
@@ -286,7 +319,7 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
         {/* Quick Actions */}
         <div className="grid grid-cols-3 gap-4">
           <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20 cursor-pointer hover:border-amber-500/40 transition-all"
-            onClick={() => logAction('View', 'Add New Reseller')}
+            onClick={() => logAction('Navigate', 'Add New Reseller Form', 'info')}
           >
             <CardContent className="p-4 flex items-center gap-3">
               <Users className="w-8 h-8 text-amber-400" />
@@ -297,18 +330,18 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-emerald-500/20 cursor-pointer hover:border-emerald-500/40 transition-all"
-            onClick={() => logAction('Approve', 'Bulk Pending Approvals')}
+            onClick={() => logAction('Bulk Approve', `${stats.pending} pending resellers`, 'success')}
           >
             <CardContent className="p-4 flex items-center gap-3">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
               <div>
                 <p className="font-medium text-foreground">Approve Pending</p>
-                <p className="text-xs text-muted-foreground">32 awaiting</p>
+                <p className="text-xs text-muted-foreground">{stats.pending} awaiting</p>
               </div>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/20 cursor-pointer hover:border-blue-500/40 transition-all"
-            onClick={() => logAction('Approve', 'Process Payouts')}
+            onClick={() => logAction('Process Payouts', 'Initiating payout batch', 'success')}
           >
             <CardContent className="p-4 flex items-center gap-3">
               <DollarSign className="w-8 h-8 text-blue-400" />
