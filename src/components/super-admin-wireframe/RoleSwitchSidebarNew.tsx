@@ -84,7 +84,8 @@ export type ActiveRole =
   | "api_ai_manager"
   | "promise_tracker_manager"
   | "assist_manager"
-  | "internal_chatbot";
+  | "internal_chatbot"
+  | "influencer_manager";
 
 interface SubCategory {
   id: string;
@@ -296,6 +297,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "ICB",
     icon: MessageSquare,
     description: "Secure Internal Chat System",
+  },
+  influencer_manager: {
+    id: "influencer_manager",
+    label: "Influencer Manager",
+    shortLabel: "IM",
+    icon: Users,
+    description: "Influencer & Campaign Management",
   },
 };
 
