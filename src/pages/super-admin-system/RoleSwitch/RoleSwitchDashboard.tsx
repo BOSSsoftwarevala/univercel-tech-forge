@@ -32,7 +32,7 @@ import ICBFullLayout from "@/components/internal-chatbot/ICBFullLayout";
 import DMFullLayout from "@/components/developer-management/DMFullLayout";
 import PROFullLayout from "@/components/pro-manager/PROFullLayout";
 import LegalManagerView from "./LegalManagerView";
-import TaskManagementView from "./TaskManagementView";
+import TMFullLayout from "@/components/task-manager/TMFullLayout";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
@@ -452,7 +452,7 @@ const RoleSwitchDashboard = () => {
       case "legal_manager":
         return <LMEnterpriseLayout />;
       case "task_management":
-        return <TaskManagementView />;
+        return <TMFullLayout />;
       case "finance_manager":
         return <FinanceManagerDashboard />;
       case "vala_ai_management":
