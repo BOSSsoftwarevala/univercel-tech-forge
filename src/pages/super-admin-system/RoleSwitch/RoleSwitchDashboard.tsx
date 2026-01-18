@@ -29,6 +29,7 @@ import LMFullLayout from "@/components/lead-manager/LMFullLayout";
 import PTFullLayout from "@/components/promise-tracker/PTFullLayout";
 import AMFullLayout from "@/components/assist-manager/AMFullLayout";
 import ICBFullLayout from "@/components/internal-chatbot/ICBFullLayout";
+import DMFullLayout from "@/components/developer-management/DMFullLayout";
 import ProManagerView from "./ProManagerView";
 import LegalManagerView from "./LegalManagerView";
 import TaskManagementView from "./TaskManagementView";
@@ -467,7 +468,7 @@ const RoleSwitchDashboard = () => {
       case "demo_manager":
         return <DemoManagerDashboard />;
       case "developer_management":
-        return <DeveloperManagementDashboard />;
+        return <DMFullLayout />;
       case "api_ai_manager":
         return <AAMEnterpriseLayout />;
       case "promise_tracker_manager":
@@ -625,20 +626,7 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT B1.1: Developer Manager Sidebar (dedicated sidebar for this module) */}
-        {activeRole === "developer_management" && (
-          <>
-            <DeveloperManagerSidebar
-              activeSection={activeNav}
-              onSectionChange={handleNavChange}
-              collapsed={collapsed}
-              onCollapsedChange={setCollapsed}
-              onBackToControlPanel={handleBackToControlPanel}
-            />
-            {/* Spacer to offset Developer Manager sidebar */}
-            <div className="flex-shrink-0" style={{ width: collapsed ? 80 : 260 }} />
-          </>
-        )}
+        {/* CONTEXT B1.1: Developer Management uses DMFullLayout with built-in sidebar */}
 
         {/* CONTEXT B1.2: VALA AI Sidebar (dedicated sidebar for AI Product Engine) */}
         {activeRole === "vala_ai_management" && (
