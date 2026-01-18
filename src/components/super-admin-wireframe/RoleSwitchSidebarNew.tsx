@@ -82,7 +82,8 @@ export type ActiveRole =
   | "role_manager"
   | "api_ai_manager"
   | "promise_tracker_manager"
-  | "assist_manager";
+  | "assist_manager"
+  | "internal_chatbot";
 
 interface SubCategory {
   id: string;
@@ -287,6 +288,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "AM",
     icon: Headphones,
     description: "VALA Connect Remote Assist",
+  },
+  internal_chatbot: {
+    id: "internal_chatbot",
+    label: "Internal Chat Bot",
+    shortLabel: "ICB",
+    icon: MessageSquare,
+    description: "Secure Internal Chat System",
   },
 };
 
