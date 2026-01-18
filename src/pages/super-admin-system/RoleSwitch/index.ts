@@ -9,7 +9,7 @@ export { default as ProManagerView } from "./ProManagerView";
 export { default as LegalManagerView } from "./LegalManagerView";
 export { default as TaskManagementView } from "./TaskManagementView";
 export { default as FinanceManagerDashboard } from "./FinanceManagerDashboard";
-export { default as DeveloperManagementDashboard } from "./DeveloperManagementDashboard";
+export { default as ValaAIDashboard } from "./ValaAIDashboard";
 export { default as MarketingManagementDashboard } from "./MarketingManagementDashboard";
 export { default as CustomerSupportManagementDashboard } from "./CustomerSupportManagementDashboard";
 export { default as RoleManagerDashboard } from "./RoleManagerDashboard";

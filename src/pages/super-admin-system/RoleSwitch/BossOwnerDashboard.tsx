@@ -29,7 +29,7 @@ import { GlobalNetworkMap } from "@/components/boss-panel/sections/GlobalNetwork
 import { cn } from "@/lib/utils";
 // Module Containers for Boss navigation
 import { ServerModuleContainer } from "@/components/server-module/ServerModuleContainer";
-import { DevModuleContainer } from "@/components/development-module/DevModuleContainer";
+import { ValaAIModuleContainer } from "@/components/vala-ai-module/ValaAIModuleContainer";
 import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
@@ -115,9 +115,9 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const { selectedCard, setSelectedCard, clearSelection } = useDashboardContext();
   
   // Module routing - these sidebar items open full module views
-  const moduleRoutes: Record<string, 'server' | 'development' | 'product-demo' | 'leads' | 'marketing'> = {
+  const moduleRoutes: Record<string, 'server' | 'vala-ai' | 'product-demo' | 'leads' | 'marketing'> = {
     'server-control': 'server',
-    'dev-control': 'development',
+    'vala-ai': 'vala-ai',
     'product-demo': 'product-demo',
     'leads': 'leads',
     'marketing': 'marketing',
@@ -194,8 +194,8 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
     switch (moduleType) {
       case 'server':
         return <ServerModuleContainer onBack={handleModuleBack} />;
-      case 'development':
-        return <DevModuleContainer onBack={handleModuleBack} />;
+      case 'vala-ai':
+        return <ValaAIModuleContainer onBack={handleModuleBack} />;
       case 'product-demo':
         return <ProductDemoModuleContainer onBack={handleModuleBack} />;
       case 'leads':

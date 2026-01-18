@@ -27,7 +27,7 @@ import ProManagerView from "./ProManagerView";
 import LegalManagerView from "./LegalManagerView";
 import TaskManagementView from "./TaskManagementView";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
-import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
+import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
 import RoleManagerDashboard from "./RoleManagerDashboard";
@@ -366,8 +366,8 @@ const RoleSwitchDashboard = () => {
         return <TaskManagementView />;
       case "finance_manager":
         return <FinanceManagerDashboard />;
-      case "developer_management":
-        return <DeveloperManagementDashboard />;
+      case "vala_ai_management":
+        return <ValaAIDashboard />;
       case "marketing_management":
         return <MarketingManagementDashboard />;
       case "customer_support_management":
