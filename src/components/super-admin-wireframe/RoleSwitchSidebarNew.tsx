@@ -81,7 +81,8 @@ export type ActiveRole =
   | "customer_support_management"
   | "role_manager"
   | "api_ai_manager"
-  | "promise_tracker_manager";
+  | "promise_tracker_manager"
+  | "assist_manager";
 
 interface SubCategory {
   id: string;
@@ -279,6 +280,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "PT",
     icon: Timer,
     description: "Promise & Commitment Tracking",
+  },
+  assist_manager: {
+    id: "assist_manager",
+    label: "Assist Manager",
+    shortLabel: "AM",
+    icon: Headphones,
+    description: "VALA Connect Remote Assist",
   },
 };
 
