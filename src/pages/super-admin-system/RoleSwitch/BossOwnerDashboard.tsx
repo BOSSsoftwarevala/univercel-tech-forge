@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useCallback, memo, useMemo } from "react";
 import { 
   Crown, Shield, Lock, Archive, AlertTriangle, Users, Globe2,
   Key, Activity, FileText, Settings, Gavel, Eye, Trash2, Power,
@@ -348,9 +347,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
       
       <div className="p-6">
         {/* LOCKED: Premium Boss Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="mb-8"
         >
           <div className="flex items-center justify-between">
@@ -487,7 +484,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
               </Button>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* ═══════════════════════════════════════════════════════════════════
             BOSS KPI GRID — 12 ACTION-ONLY BOXES (LOCKED)
@@ -540,13 +537,11 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
             };
             
             return (
-              <motion.div 
+              <div 
                 key={stat.id}
                 onClick={handleCardClick}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
                 className={cn(
-                  "cursor-pointer transition-all duration-200 group",
+                  "cursor-pointer transition-all duration-200 group hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]",
                   isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background"
                 )}
                 style={{
@@ -651,7 +646,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
                     </Button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -1277,9 +1272,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
         </Tabs>
 
         {/* LOCKED: Boss Authority Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="mt-8"
         >
           <div 
@@ -1317,7 +1310,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Reject Dialog - Mandatory Reason */}
         <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
