@@ -8,7 +8,7 @@ import { Eye, Edit } from "lucide-react";
 import { toast } from "sonner";
 
 const LegalPoliciesTerms = () => {
-  const [policies] = useState([
+  const [policies, setPolicies] = useState([
     { id: "POL001", name: "Terms of Service", version: "3.2", region: "Global", status: "active", lastUpdated: "2025-06-15" },
     { id: "POL002", name: "Privacy Policy", version: "4.1", region: "Global", status: "active", lastUpdated: "2025-06-10" },
     { id: "POL003", name: "GDPR Addendum", version: "2.0", region: "EU", status: "active", lastUpdated: "2025-05-20" },
@@ -17,13 +17,24 @@ const LegalPoliciesTerms = () => {
     { id: "POL006", name: "CCPA Disclosure", version: "1.5", region: "USA", status: "active", lastUpdated: "2025-03-15" },
     { id: "POL007", name: "Data Processing Agreement", version: "3.0", region: "Global", status: "draft", lastUpdated: "2025-06-20" },
   ]);
+  const [viewingPolicy, setViewingPolicy] = useState<string | null>(null);
 
   const handleProposeUpdate = (id: string) => {
-    toast.info(`Update proposal for policy ${id} submitted for approval`);
+    const policy = policies.find(p => p.id === id);
+    if (policy) {
+      setPolicies(prev => prev.map(p => 
+        p.id === id ? { ...p, status: 'review' } : p
+      ));
+      toast.success(`Update proposal for "${policy.name}" submitted for boss approval`);
+    }
   };
 
   const handleView = (id: string) => {
-    toast.info(`Viewing policy ${id}`);
+    const policy = policies.find(p => p.id === id);
+    if (policy) {
+      setViewingPolicy(id);
+      toast.success(`Viewing: ${policy.name} v${policy.version}`);
+    }
   };
 
   return (

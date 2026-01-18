@@ -65,7 +65,9 @@ const mockContent: ContentItem[] = [
 ];
 
 const MMContentQueue = () => {
-  const [content] = useState<ContentItem[]>(mockContent);
+  const [content, setContent] = useState<ContentItem[]>(mockContent);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [historyId, setHistoryId] = useState<string | null>(null);
 
   const getTypeIcon = (type: ContentItem["type"]) => {
     switch (type) {
@@ -92,23 +94,30 @@ const MMContentQueue = () => {
   };
 
   const handleEdit = (id: string) => {
+    setEditingId(id);
+    const item = content.find(c => c.id === id);
     toast({
-      title: "Opening Editor",
-      description: `Opening content editor for ${id}. Versioning is enabled.`,
+      title: "Editor Opened",
+      description: `Editing "${item?.title}" (v${item?.version}). Changes will create new version.`,
     });
   };
 
   const handleViewHistory = (id: string) => {
+    setHistoryId(id);
+    const item = content.find(c => c.id === id);
     toast({
       title: "Version History",
-      description: `Viewing version history for ${id}.`,
+      description: `${item?.title} has ${item?.version} versions. Viewing history.`,
     });
   };
 
   const handleSubmitApproval = (id: string) => {
+    setContent(prev => prev.map(c => 
+      c.id === id ? { ...c, status: 'pending_approval' as const } : c
+    ));
     toast({
       title: "Submitted for Approval",
-      description: `Content ${id} submitted for approval. Action logged.`,
+      description: `Content submitted. Awaiting boss approval.`,
     });
   };
 

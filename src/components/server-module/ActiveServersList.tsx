@@ -79,18 +79,35 @@ const getProgressColor = (value: number) => {
 
 export const ActiveServersList: React.FC = () => {
   const [servers, setServers] = useState<ServerData[]>(mockServers);
+  const [selectedServer, setSelectedServer] = useState<ServerData | null>(null);
+  const [pausedServers, setPausedServers] = useState<Set<string>>(new Set());
 
   const handlePauseMonitoring = (id: string) => {
-    toast.info('Monitoring paused for server');
+    const isPaused = pausedServers.has(id);
+    if (isPaused) {
+      setPausedServers(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      toast.success('Monitoring resumed');
+    } else {
+      setPausedServers(prev => new Set(prev).add(id));
+      toast.info('Monitoring paused for server');
+    }
   };
 
   const handleRemove = (id: string) => {
     setServers(prev => prev.filter(s => s.id !== id));
-    toast.success('Server removed');
+    toast.success('Server removed from monitoring');
   };
 
   const handleView = (id: string) => {
-    toast.info('Opening server details...');
+    const server = servers.find(s => s.id === id);
+    if (server) {
+      setSelectedServer(server);
+      toast.success(`Viewing: ${server.name}`);
+    }
   };
 
   return (

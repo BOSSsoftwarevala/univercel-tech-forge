@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Rocket, Brain, Zap, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { RequirementInput } from '@/components/auto-dev/RequirementInput';
 import { AnalysisResult } from '@/components/auto-dev/AnalysisResult';
@@ -9,6 +9,7 @@ import { useAutoDevEngine } from '@/hooks/useAutoDevEngine';
 import { toast } from 'sonner';
 
 export default function AutoDevEngine() {
+  const navigate = useNavigate();
   const { isLoading, analysis, parseRequirement, reset } = useAutoDevEngine();
   const [showInput, setShowInput] = useState(true);
 
@@ -20,10 +21,11 @@ export default function AutoDevEngine() {
   };
 
   const handleApprove = () => {
-    toast.success('Project approved! Build process will start shortly.', {
-      description: 'Your project specification has been saved and queued for development.'
+    toast.success('Project approved! Build process starting...', {
+      description: 'Your project is now in the VALA AI build queue.'
     });
-    // Future: Navigate to build progress page
+    // Navigate to VALA AI live builds to track progress
+    navigate('/super-admin-system/role-switch?role=developer_manager&nav=vala-ai');
   };
 
   const handleEdit = () => {

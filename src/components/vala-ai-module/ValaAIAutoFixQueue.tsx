@@ -45,6 +45,7 @@ const getStatusConfig = (status: FixJob['status']) => {
 
 export const ValaAIAutoFixQueue: React.FC = () => {
   const [jobs, setJobs] = useState<FixJob[]>(mockFixJobs);
+  const [selectedJob, setSelectedJob] = useState<FixJob | null>(null);
 
   const handleRetry = (jobId: string) => {
     setJobs(prev => prev.map(j => 
@@ -54,11 +55,20 @@ export const ValaAIAutoFixQueue: React.FC = () => {
   };
 
   const handlePause = (jobId: string) => {
-    toast.info('Fix job paused');
+    setJobs(prev => prev.map(j => 
+      j.id === jobId && (j.status === 'in-progress' || j.status === 'testing')
+        ? { ...j, status: 'queued' as const }
+        : j
+    ));
+    toast.info('Fix job paused and moved to queue');
   };
 
   const handleView = (jobId: string) => {
-    toast.info('Opening fix details...');
+    const job = jobs.find(j => j.id === jobId);
+    if (job) {
+      setSelectedJob(job);
+      toast.success(`Viewing: ${job.issueTitle}`);
+    }
   };
 
   const queuedCount = jobs.filter(j => j.status === 'queued').length;
