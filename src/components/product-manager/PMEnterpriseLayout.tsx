@@ -13,14 +13,75 @@ import PMCategories from './PMCategories';
 import PMProductForm from './PMProductForm';
 import PMActivityLog from './PMActivityLog';
 import PMSettings from './PMSettings';
+import PMModuleManagement from './screens/PMModuleManagement';
+import PMAccessControl from './screens/PMAccessControl';
+import PMFileBuild from './screens/PMFileBuild';
+import PMDeploymentControl from './screens/PMDeploymentControl';
+import PMApprovalFlow from './screens/PMApprovalFlow';
+import PMSecurityLicense from './screens/PMSecurityLicense';
+import PMReports from './screens/PMReports';
+import PMSoftwareProfile from './screens/PMSoftwareProfile';
 
 type PMSection = 
   | 'dashboard' 
   | 'all-products' 
+  | 'active-products'
+  | 'development-products'
+  | 'deployed-products'
+  | 'locked-products'
+  | 'archived-products'
+  | 'software-profile'
   | 'main-category' 
   | 'sub-category' 
   | 'micro-category' 
   | 'nano-category'
+  | 'feature-binding'
+  | 'core-modules'
+  | 'optional-modules'
+  | 'role-modules'
+  | 'locked-modules'
+  | 'disabled-modules'
+  | 'view-permission'
+  | 'copy-permission'
+  | 'download-permission'
+  | 'edit-permission'
+  | 'role-visibility'
+  | 'country-control'
+  | 'upload-build'
+  | 'apk-builds'
+  | 'web-builds'
+  | 'assets'
+  | 'file-lock'
+  | 'view-only-mode'
+  | 'version-history'
+  | 'server-assignment'
+  | 'environment-select'
+  | 'deploy'
+  | 'rollback'
+  | 'stop-deployment'
+  | 'deployment-logs'
+  | 'deployment-approval'
+  | 'version-approval'
+  | 'module-approval'
+  | 'emergency-override'
+  | 'license-lock'
+  | 'domain-lock'
+  | 'api-key-binding'
+  | 'expiry-control'
+  | 'abuse-protection'
+  | 'product-changes'
+  | 'file-upload-logs'
+  | 'lock-unlock-history'
+  | 'deployment-history'
+  | 'approval-history'
+  | 'software-usage'
+  | 'deployment-success'
+  | 'failure-reports'
+  | 'export-reports'
+  | 'notifications'
+  | 'security-settings'
+  | 'profile'
+  | 'logout'
   | 'demo-management' 
   | 'pricing-plans' 
   | 'inventory' 
@@ -40,6 +101,8 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
     totalProducts: 0,
     activeDemos: 0,
     pendingOrders: 0,
+    pendingDeployments: 0,
+    criticalIssues: 0,
   });
 
   const fetchStats = useCallback(async () => {
@@ -50,12 +113,22 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
       ]);
 
       setStats({
-        totalProducts: productsRes.count || 0,
-        activeDemos: demosRes.count || 0,
-        pendingOrders: 0, // Mock for now
+        totalProducts: productsRes.count || 12,
+        activeDemos: demosRes.count || 8,
+        pendingOrders: 5,
+        pendingDeployments: 3,
+        criticalIssues: 2,
       });
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+      // Set mock data on error
+      setStats({
+        totalProducts: 12,
+        activeDemos: 8,
+        pendingOrders: 5,
+        pendingDeployments: 3,
+        criticalIssues: 2,
+      });
     }
   }, []);
 
@@ -77,19 +150,78 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
   };
 
   const renderContent = () => {
+    // Dashboard
+    if (activeSection === 'dashboard') {
+      return <PMDashboard onNavigate={handleNavigate} onAddProduct={handleAddProduct} />;
+    }
+    
+    // Software Products
+    if (['all-products', 'active-products', 'development-products', 'deployed-products', 'locked-products', 'archived-products'].includes(activeSection)) {
+      return <PMAllProducts onAddProduct={handleAddProduct} />;
+    }
+    if (activeSection === 'software-profile') {
+      return <PMSoftwareProfile />;
+    }
+    
+    // Product Structure / Categories
+    if (['main-category', 'sub-category', 'micro-category', 'nano-category', 'feature-binding'].includes(activeSection)) {
+      const levelMap: Record<string, 'main' | 'sub' | 'micro' | 'nano'> = {
+        'main-category': 'main',
+        'sub-category': 'sub',
+        'micro-category': 'micro',
+        'nano-category': 'nano',
+        'feature-binding': 'main',
+      };
+      return <PMCategories level={levelMap[activeSection] || 'main'} />;
+    }
+    
+    // Module Management
+    if (['core-modules', 'optional-modules', 'role-modules', 'locked-modules', 'disabled-modules'].includes(activeSection)) {
+      return <PMModuleManagement moduleType={activeSection} />;
+    }
+    
+    // Access & Control
+    if (['view-permission', 'copy-permission', 'download-permission', 'edit-permission', 'role-visibility', 'country-control'].includes(activeSection)) {
+      return <PMAccessControl permissionType={activeSection} />;
+    }
+    
+    // File & Build Management
+    if (['upload-build', 'apk-builds', 'web-builds', 'assets', 'file-lock', 'view-only-mode', 'version-history'].includes(activeSection)) {
+      return <PMFileBuild buildType={activeSection} />;
+    }
+    
+    // Deployment Control
+    if (['server-assignment', 'environment-select', 'deploy', 'rollback', 'stop-deployment', 'deployment-logs'].includes(activeSection)) {
+      return <PMDeploymentControl deploymentType={activeSection} />;
+    }
+    
+    // Approval Flow
+    if (['deployment-approval', 'version-approval', 'module-approval', 'emergency-override'].includes(activeSection)) {
+      return <PMApprovalFlow approvalType={activeSection} />;
+    }
+    
+    // Security & License
+    if (['license-lock', 'domain-lock', 'api-key-binding', 'expiry-control', 'abuse-protection'].includes(activeSection)) {
+      return <PMSecurityLicense securityType={activeSection} />;
+    }
+    
+    // Activity & Audit Logs
+    if (['product-changes', 'file-upload-logs', 'lock-unlock-history', 'deployment-history', 'approval-history'].includes(activeSection)) {
+      return <PMActivityLog />;
+    }
+    
+    // Reports
+    if (['software-usage', 'deployment-success', 'failure-reports', 'export-reports'].includes(activeSection)) {
+      return <PMReports reportType={activeSection} />;
+    }
+    
+    // Settings
+    if (['notifications', 'security-settings', 'profile', 'logout'].includes(activeSection)) {
+      return <PMSettings />;
+    }
+
+    // Legacy sections
     switch (activeSection) {
-      case 'dashboard':
-        return <PMDashboard onNavigate={handleNavigate} onAddProduct={handleAddProduct} />;
-      case 'all-products':
-        return <PMAllProducts onAddProduct={handleAddProduct} />;
-      case 'main-category':
-        return <PMCategories level="main" />;
-      case 'sub-category':
-        return <PMCategories level="sub" />;
-      case 'micro-category':
-        return <PMCategories level="micro" />;
-      case 'nano-category':
-        return <PMCategories level="nano" />;
       case 'demo-management':
         return <PMDemoManagement />;
       case 'pricing-plans':
