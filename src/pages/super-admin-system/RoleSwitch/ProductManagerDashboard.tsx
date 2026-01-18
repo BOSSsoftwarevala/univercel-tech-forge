@@ -22,7 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
-// Mock products data
+// Mock products data - Including School Management System (LIVE)
 const mockProducts = [
   { 
     id: "PRD-001", 
@@ -36,6 +36,8 @@ const mockProducts = [
     lastUpdated: "2 days ago",
     price: "₹2,50,000",
     rating: 4.8,
+    hasDemoMode: true,
+    hasLiveMode: true,
   },
   { 
     id: "PRD-002", 
@@ -49,6 +51,8 @@ const mockProducts = [
     lastUpdated: "5 days ago",
     price: "₹1,50,000",
     rating: 4.6,
+    hasDemoMode: true,
+    hasLiveMode: true,
   },
   { 
     id: "PRD-003", 
@@ -62,6 +66,8 @@ const mockProducts = [
     lastUpdated: "1 hour ago",
     price: "₹75,000",
     rating: 0,
+    hasDemoMode: false,
+    hasLiveMode: false,
   },
   { 
     id: "PRD-004", 
@@ -75,6 +81,8 @@ const mockProducts = [
     lastUpdated: "1 week ago",
     price: "₹1,25,000",
     rating: 4.5,
+    hasDemoMode: true,
+    hasLiveMode: true,
   },
   { 
     id: "PRD-005", 
@@ -88,6 +96,8 @@ const mockProducts = [
     lastUpdated: "3 days ago",
     price: "₹3,00,000",
     rating: 4.9,
+    hasDemoMode: true,
+    hasLiveMode: true,
   },
   { 
     id: "PRD-006", 
@@ -101,10 +111,33 @@ const mockProducts = [
     lastUpdated: "2 weeks ago",
     price: "₹95,000",
     rating: 4.2,
+    hasDemoMode: true,
+    hasLiveMode: false,
+  },
+  // ===== SCHOOL MANAGEMENT SYSTEM - LIVE =====
+  { 
+    id: "PRD-007", 
+    name: "School Management System", 
+    category: "Software",
+    subCategory: "ERP",
+    status: "active",
+    demos: 89,
+    activeUsers: 2450,
+    version: "v2.0.0",
+    lastUpdated: "1 day ago",
+    price: "₹1,85,000",
+    rating: 4.9,
+    hasDemoMode: true,
+    hasLiveMode: true,
+    isEducation: true,
+    modules: 16,
+    roles: 12,
+    demoUrl: "/school-software",
+    liveUrl: "/school-software/dashboard",
   },
 ];
 
-// Mock demos data
+// Mock demos data - Including School Management System Demo
 const mockDemos = [
   { 
     id: "DEM-001", 
@@ -120,7 +153,8 @@ const mockDemos = [
     url: "demo.erp.example.com",
     username: "demo_user",
     password: "demo123",
-    conversionRate: 18.5
+    conversionRate: 18.5,
+    mode: "demo"
   },
   { 
     id: "DEM-002", 
@@ -136,7 +170,8 @@ const mockDemos = [
     url: "demo.crm.example.com",
     username: "demo_crm",
     password: "crm456",
-    conversionRate: 22.3
+    conversionRate: 22.3,
+    mode: "demo"
   },
   { 
     id: "DEM-003", 
@@ -152,7 +187,8 @@ const mockDemos = [
     url: "demo.hr.example.com",
     username: "demo_hr",
     password: "hr789",
-    conversionRate: 15.2
+    conversionRate: 15.2,
+    mode: "demo"
   },
   { 
     id: "DEM-004", 
@@ -168,7 +204,65 @@ const mockDemos = [
     url: "demo.ecom.example.com",
     username: "demo_ecom",
     password: "ecom321",
-    conversionRate: 25.8
+    conversionRate: 25.8,
+    mode: "demo"
+  },
+  // ===== SCHOOL MANAGEMENT SYSTEM DEMOS =====
+  { 
+    id: "DEM-005", 
+    name: "School ERP - Visitor Demo", 
+    product: "School Management System",
+    productId: "PRD-007",
+    type: "role_based",
+    status: "active",
+    users: 89,
+    validity: "Unlimited",
+    expiresIn: "Never",
+    lastUsed: "5 min ago",
+    url: "/school-software",
+    username: "visitor",
+    password: "none",
+    conversionRate: 32.5,
+    mode: "demo",
+    demoRoles: ["principal", "teacher", "student", "parent", "accountant", "librarian", "transport", "admin"],
+    isEducation: true,
+    modules: 16
+  },
+  { 
+    id: "DEM-006", 
+    name: "School ERP - Principal View", 
+    product: "School Management System",
+    productId: "PRD-007",
+    type: "role_based",
+    status: "active",
+    users: 45,
+    validity: "Unlimited",
+    expiresIn: "Never",
+    lastUsed: "10 min ago",
+    url: "/school-software/dashboard?role=principal&mode=visitor",
+    username: "demo_principal",
+    password: "auto",
+    conversionRate: 28.3,
+    mode: "demo",
+    isEducation: true
+  },
+  { 
+    id: "DEM-007", 
+    name: "School ERP - Teacher View", 
+    product: "School Management System",
+    productId: "PRD-007",
+    type: "role_based",
+    status: "active",
+    users: 32,
+    validity: "Unlimited",
+    expiresIn: "Never",
+    lastUsed: "15 min ago",
+    url: "/school-software/dashboard?role=teacher&mode=visitor",
+    username: "demo_teacher",
+    password: "auto",
+    conversionRate: 22.1,
+    mode: "demo",
+    isEducation: true
   },
 ];
 
