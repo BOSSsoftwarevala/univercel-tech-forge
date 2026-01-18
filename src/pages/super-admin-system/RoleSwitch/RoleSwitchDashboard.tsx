@@ -489,150 +489,98 @@ const RoleSwitchDashboard = () => {
       // ALL dashboards use the same dark background for consistency
       "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     )}>
-      {/* TOP BAR - Icon-Only Enterprise Header */}
+      {/* TOP HEADER - Software Vala Enterprise Header */}
       <header className={cn(
         "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
-        "bg-gradient-to-r from-[#0d0d14] via-[#12121a] to-[#0d0d14] border-amber-500/20"
+        "bg-gradient-to-r from-[#0a1628] via-[#0d1b2a] to-[#0a1628] border-[#1e3a5f]",
+        // When in Control Panel view, offset header for fixed sidebar
+        isInControlPanelView && "ml-[320px]"
       )}>
-        {/* Left - Role Identity + Breadcrumb */}
+        {/* LEFT: Back Button (when in module) OR Logo + Brand */}
         <div className="flex items-center gap-4">
-          {/* Home Button - Returns to Control Panel */}
+          {/* Back Button - Only visible in module view */}
           {!isInControlPanelView && (
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleBackToControlPanel}
-              className="w-9 h-9 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all group"
-              title="Return to Control Panel"
+              className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center transition-all group"
+              title="← Back to Control Panel"
             >
-              <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+              <ArrowLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
             </motion.button>
           )}
           
-          {/* Back Button - Returns to previous view within role */}
-          {!isInControlPanelView && (activeNav !== 'dashboard' || selectedSubItem) && (
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleBack}
-              className="w-9 h-9 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all group"
-              title="Go Back"
-            >
-              <Home className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
-            </motion.button>
-          )}
-          
-          {/* Divider */}
-          {(activeNav !== 'dashboard' || activeRole !== 'boss_owner') && (
-            <div className="w-px h-8 bg-border/30" />
-          )}
-          
-          {/* Role Icon */}
-          <div className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
-            currentConfig.themeColor
-          )}>
-            {(() => {
-              const Icon = currentConfig.icon;
-              return <Icon className="w-5 h-5 text-white" />;
-            })()}
+          {/* SV Logo + Brand Text */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <span className="text-white font-bold text-lg">SV</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white tracking-tight">Software Vala</h1>
+              <p className="text-xs text-white/60 font-medium">
+                {isInControlPanelView ? 'Super Admin' : (currentConfig.label || 'Module')}
+              </p>
+            </div>
           </div>
-          
-          {/* Breadcrumb Trail - STEP 9: Shows navigation path */}
-          <nav className="flex items-center gap-1">
-            {breadcrumbItems.map((item, index) => (
-              <div key={index} className="flex items-center gap-1">
-                {index > 0 && (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-                )}
-                <motion.button
-                  whileHover={!item.isActive ? { scale: 1.02 } : undefined}
-                  onClick={item.onClick}
-                  disabled={item.isActive || !item.onClick}
-                  className={cn(
-                    "px-2 py-1 rounded-md text-sm transition-all",
-                    item.isActive
-                      ? "font-semibold text-foreground cursor-default"
-                      : item.onClick
-                      ? "text-muted-foreground hover:text-foreground hover:bg-secondary/50 cursor-pointer"
-                      : "text-muted-foreground cursor-default"
-                  )}
-                >
-                  {item.label}
-                </motion.button>
-              </div>
-            ))}
-          </nav>
-          
-          {/* Scope Badge */}
-          <Badge variant="outline" className={cn("ml-2", currentConfig.accentColor, currentConfig.borderAccent)}>
-            <Globe2 className="w-3 h-3 mr-1" />
-            {isInModuleView ? navLabels[activeNav]?.toUpperCase() || 'MODULE' : 'GLOBAL SCOPE'}
-          </Badge>
         </div>
 
-        {/* Center - Status Icons (Icon-Only) - FIX: All have real navigation */}
+        {/* CENTER: Module Name (only in module view) */}
+        {!isInControlPanelView && (
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <span className="text-lg font-semibold text-white">{currentConfig.label}</span>
+          </div>
+        )}
+
+        {/* RIGHT: Status Icons + Notifications + Profile */}
         <div className="flex items-center gap-3">
-          {/* System Status - FIX: Navigate to system health page */}
+          {/* System Status Icon */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setActiveNav('system-health');
-              toast.success('Opening System Health Monitor');
-            }}
-            className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center cursor-pointer group"
+            className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
             title="System Healthy"
           >
             <Shield className="w-5 h-5 text-emerald-400" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              System Health - Click to view
-            </div>
           </motion.button>
 
-          {/* Risk Level - FIX: Navigate to risk dashboard */}
+          {/* Risk Level Icon */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setActiveNav('risk-assessment');
-              toast.info('Opening Risk Assessment Dashboard');
-            }}
-            className={cn(
-              "relative w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer group border",
-              riskLevel === 'low' ? "bg-emerald-500/10 border-emerald-500/20" :
-              riskLevel === 'medium' ? "bg-amber-500/10 border-amber-500/20" :
-              "bg-red-500/10 border-red-500/20"
-            )}
-            title={`Risk: ${riskLevel}`}
+            className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
+            title="Low Risk"
           >
-            <AlertCircle className={cn(
-              "w-5 h-5",
-              riskLevel === 'low' ? "text-emerald-400" :
-              riskLevel === 'medium' ? "text-amber-400" :
-              "text-red-400"
-            )} />
-            {/* Tooltip */}
-            <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              Risk: {riskLevel.toUpperCase()} - Click to view
-            </div>
+            <AlertCircle className="w-5 h-5 text-emerald-400" />
           </motion.button>
 
-          {/* Session Timer */}
-          <SessionTimerDisplay accentColor={currentConfig.accentColor} />
-        </div>
+          {/* Notification Badge */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center"
+            title="Notifications"
+          >
+            <AlertCircle className="w-5 h-5 text-amber-400" />
+            {liveAlerts > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                {liveAlerts}
+              </span>
+            )}
+          </motion.button>
 
-        {/* Right - STEP 8: Global Header Actions with role-based visibility */}
-        <GlobalHeaderActions
-          userRole={getHeaderRole()}
-          onLogout={handleLogout}
-          profileGradient={currentConfig.themeColor}
-          taskCount={2}
-          alertCount={liveAlerts}
-          chatUnread={5}
-        />
+          {/* Profile Icon */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLogout}
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg"
+            title="Profile"
+          >
+            <Crown className="w-5 h-5 text-white" />
+          </motion.button>
+        </div>
       </header>
       
       {/* STEP 9: SINGLE-CONTEXT LAYOUT - Only ONE active view at a time */}
