@@ -16,6 +16,7 @@ export type SidebarType = 'global' | 'category';
 export type CategorySidebarId = 
   | 'server-manager'
   | 'dev-control'
+  | 'vala-ai'
   | 'franchise-manager'
   | 'reseller-manager'
   | 'lead-manager'

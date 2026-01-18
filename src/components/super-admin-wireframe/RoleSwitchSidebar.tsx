@@ -24,7 +24,7 @@ import { useDashboardContext } from "@/hooks/useDashboardContext";
 import { toast } from "sonner";
 
 
-export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
+export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "vala_ai_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -576,15 +576,15 @@ const roleNavStructure: Record<ActiveRole, Module[]> = {
       ]
     },
   ],
-  developer_management: [
+  vala_ai_management: [
     {
-      id: "development",
-      label: "Development",
+      id: "vala-ai",
+      label: "VALA AI",
       icon: Terminal,
       categories: [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, subCategories: [{ id: "dev-mgmt-dash", label: "Dev Dashboard", status: "active" }] },
-        { id: "developers", label: "Developers", icon: Code2, subCategories: [{ id: "dev-team", label: "Dev Team", status: "active" }] },
-        { id: "bugs", label: "Bugs", icon: Bug, subCategories: [{ id: "bug-tracker", label: "Bug Tracker", status: "active" }] },
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, subCategories: [{ id: "vala-ai-dash", label: "AI Dashboard", status: "active" }] },
+        { id: "ai-requests", label: "AI Requests", icon: Code2, subCategories: [{ id: "ai-req", label: "AI Requests", status: "active" }] },
+        { id: "ai-models", label: "AI Models", icon: Cpu, subCategories: [{ id: "ai-models", label: "AI Models", status: "active" }] },
       ]
     },
   ],

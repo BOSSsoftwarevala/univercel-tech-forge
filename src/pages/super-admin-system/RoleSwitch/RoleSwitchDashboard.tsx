@@ -92,7 +92,7 @@ const RoleSwitchDashboard = () => {
   const getHeaderRole = useCallback((): 'boss' | 'employee' | 'client' | 'super_admin' | 'manager' => {
     if (isBossOwner || activeRole === 'boss_owner') return 'boss';
     if (activeRole === 'ceo' || activeRole === 'continent_super_admin') return 'super_admin';
-    if (activeRole === 'server_manager' || activeRole === 'developer_management') return 'manager';
+    if (activeRole === 'server_manager' || activeRole === 'vala_ai_management') return 'manager';
     return 'employee';
   }, [isBossOwner, activeRole]);
 
@@ -396,7 +396,7 @@ const RoleSwitchDashboard = () => {
       activeRole === "boss_owner" ? "bg-gradient-to-br from-amber-950/30 via-zinc-950 to-orange-950/20" :
       activeRole === "ceo" ? "bg-gradient-to-br from-emerald-950/20 via-background to-teal-950/20" :
       activeRole === "country_head" ? "bg-gradient-to-br from-orange-950/20 via-background to-amber-950/20" :
-      activeRole === "server_manager" || activeRole === "developer_management" ? "bg-zinc-950" : 
+      activeRole === "server_manager" || activeRole === "vala_ai_management" ? "bg-zinc-950" : 
       activeRole === "marketing_management" ? "bg-gradient-to-br from-pink-950/20 via-background to-rose-950/20" :
       activeRole === "customer_support_management" ? "bg-gradient-to-br from-blue-950/20 via-background to-indigo-950/20" :
       activeRole === "role_manager" ? "bg-gradient-to-br from-violet-950/20 via-background to-purple-950/20" :

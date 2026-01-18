@@ -1,37 +1,37 @@
 /**
- * DEVELOPMENT MANAGER VIEW
+ * VALA AI MANAGER VIEW
  * Content-only component for use within RoleSwitchDashboard
- * Uses the new DevModuleContainer
+ * Uses the ValaAIModuleContainer
  */
 
 import React from 'react';
-import { DevModuleContainer } from '@/components/development-module/DevModuleContainer';
+import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
+import type { ValaAISection } from '@/components/vala-ai-module/ValaAISidebar';
 
-interface DevelopmentManagerViewProps {
+interface ValaAIManagerViewProps {
   activeNav?: string;
 }
 
-const DevelopmentManagerView: React.FC<DevelopmentManagerViewProps> = ({ activeNav = 'overview' }) => {
-  const getSectionFromNav = (nav: string): any => {
-    const mapping: Record<string, any> = {
+const ValaAIManagerView: React.FC<ValaAIManagerViewProps> = ({ activeNav = 'overview' }) => {
+  const getSectionFromNav = (nav: string): ValaAISection => {
+    const mapping: Record<string, ValaAISection> = {
       'dashboard': 'overview',
       'overview': 'overview',
-      'start-build': 'start-build',
-      'active-builds': 'active-builds',
-      'demo-factory': 'demo-factory',
-      'bug-fix': 'bug-fix',
-      'testing': 'testing',
-      'deployment': 'deployment',
-      'versions': 'versions',
-      'logs': 'logs',
-      'settings': 'settings',
+      'ai-requests': 'ai-requests',
+      'ai-tasks': 'ai-tasks',
+      'ai-models': 'ai-models',
+      'ai-alerts': 'ai-alerts',
+      'ai-usage': 'ai-usage',
+      'ai-credits': 'ai-credits',
+      'ai-api': 'ai-api',
+      'ai-automation': 'ai-automation',
     };
     return mapping[nav] || 'overview';
   };
 
   return (
-    <DevModuleContainer initialSection={getSectionFromNav(activeNav)} />
+    <ValaAIModuleContainer initialSection={getSectionFromNav(activeNav)} />
   );
 };
 
-export default DevelopmentManagerView;
+export default ValaAIManagerView;
