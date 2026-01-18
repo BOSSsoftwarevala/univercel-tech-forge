@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Users, Edit, Eye, Ticket, History, Star, DollarSign, Phone, Mail } from "lucide-react";
+import { Users, Edit, Eye, Ticket, History, Star, DollarSign, Phone, Mail, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Customer {
   id: string;
@@ -32,13 +35,34 @@ const CRMCustomersModule = () => {
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const handleEditProfile = (customerId: string) => {
-    toast.info(`Opening profile editor for ${customerId}`, { description: "Profile editor loaded" });
+    const customer = customers.find(c => c.id === customerId);
+    if (customer) {
+      setSelectedCustomer(customer);
+      setEditDrawerOpen(true);
+    }
   };
 
   const handleViewHistory = (customerId: string) => {
-    toast.info(`Viewing history for ${customerId}`, { description: "Purchase and ticket history loaded" });
+    const customer = customers.find(c => c.id === customerId);
+    if (customer) {
+      setSelectedCustomer(customer);
+      setHistoryDrawerOpen(true);
+    }
+  };
+
+  const handleSaveProfile = () => {
+    if (selectedCustomer) {
+      setCustomers(customers.map(c => 
+        c.id === selectedCustomer.id ? selectedCustomer : c
+      ));
+      toast.success("Profile updated", { description: `${selectedCustomer.company} saved successfully` });
+      setEditDrawerOpen(false);
+    }
   };
 
   const handleRaiseTicket = (customerId: string) => {
@@ -49,11 +73,13 @@ const CRMCustomersModule = () => {
   };
 
   const handleCall = (customerId: string, phone: string) => {
+    window.open(`tel:${phone}`, '_self');
     toast.info(`Initiating call to ${phone}`, { description: "Call center connecting..." });
   };
 
   const handleEmail = (customerId: string, email: string) => {
-    toast.info(`Opening email composer for ${email}`, { description: "Email template loaded" });
+    window.open(`mailto:${email}`, '_blank');
+    toast.info(`Opening email composer for ${email}`, { description: "Email client opened" });
   };
 
   const getStatusColor = (status: string) => {
@@ -191,6 +217,105 @@ const CRMCustomersModule = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Profile Drawer */}
+      <Sheet open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
+        <SheetContent className="bg-slate-900 border-slate-700">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-100">Edit Customer Profile</SheetTitle>
+            <SheetDescription className="text-slate-400">
+              Update customer information for {selectedCustomer?.company}
+            </SheetDescription>
+          </SheetHeader>
+          {selectedCustomer && (
+            <div className="space-y-4 mt-6">
+              <div className="space-y-2">
+                <Label className="text-slate-300">Company Name</Label>
+                <Input 
+                  value={selectedCustomer.company}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, company: e.target.value})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Contact Person</Label>
+                <Input 
+                  value={selectedCustomer.contact}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, contact: e.target.value})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Email</Label>
+                <Input 
+                  value={selectedCustomer.email}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, email: e.target.value})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Phone</Label>
+                <Input 
+                  value={selectedCustomer.phone}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, phone: e.target.value})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handleSaveProfile} className="flex-1 bg-cyan-500 hover:bg-cyan-600">
+                  Save Changes
+                </Button>
+                <Button variant="outline" onClick={() => setEditDrawerOpen(false)} className="border-slate-600">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* History Drawer */}
+      <Sheet open={historyDrawerOpen} onOpenChange={setHistoryDrawerOpen}>
+        <SheetContent className="bg-slate-900 border-slate-700">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-100">Customer History</SheetTitle>
+            <SheetDescription className="text-slate-400">
+              Purchase and ticket history for {selectedCustomer?.company}
+            </SheetDescription>
+          </SheetHeader>
+          {selectedCustomer && (
+            <ScrollArea className="h-[calc(100vh-150px)] mt-6">
+              <div className="space-y-4">
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardContent className="p-4">
+                    <h4 className="text-cyan-300 font-medium mb-2">Summary</h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="text-slate-400">Total Purchases:</div>
+                      <div className="text-slate-100">${selectedCustomer.totalPurchases.toLocaleString()}</div>
+                      <div className="text-slate-400">Support Tickets:</div>
+                      <div className="text-slate-100">{selectedCustomer.ticketCount}</div>
+                      <div className="text-slate-400">Support Score:</div>
+                      <div className="text-slate-100">{selectedCustomer.supportScore}%</div>
+                      <div className="text-slate-400">Last Contact:</div>
+                      <div className="text-slate-100">{selectedCustomer.lastContact}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardContent className="p-4">
+                    <h4 className="text-cyan-300 font-medium mb-2">Recent Activity</h4>
+                    <div className="space-y-2 text-sm text-slate-400">
+                      <p>• Last purchase: 2 weeks ago</p>
+                      <p>• Support ticket opened: {selectedCustomer.lastContact}</p>
+                      <p>• Contract renewed: 3 months ago</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </ScrollArea>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

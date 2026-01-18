@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Edit, Pause, Play, FileText, Clock, AlertTriangle, CheckCircle, TrendingUp } from "lucide-react";
+import { Shield, Edit, Pause, Play, FileText, Clock, AlertTriangle, CheckCircle, TrendingUp, X, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface SLARule {
   id: string;
@@ -30,6 +33,9 @@ const SLAComplianceModule = () => {
     { id: "SLA-005", name: "VIP Customer", description: "Enhanced SLA for VIP customers", responseTime: 10, resolutionTime: 30, priority: "critical", isActive: false, compliance: 85, breaches: 5, totalTickets: 33 },
   ]);
 
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [selectedSLA, setSelectedSLA] = useState<SLARule | null>(null);
+
   const handleToggleSLA = (slaId: string) => {
     const sla = slaRules.find(s => s.id === slaId);
     toast.loading(`${sla?.isActive ? "Pausing" : "Activating"} SLA...`, { id: `toggle-${slaId}` });
@@ -40,13 +46,38 @@ const SLAComplianceModule = () => {
   };
 
   const handleEditSLA = (slaId: string) => {
-    toast.info(`Opening SLA editor for ${slaId}`, { description: "SLA configuration loaded" });
+    const sla = slaRules.find(s => s.id === slaId);
+    if (sla) {
+      setSelectedSLA(sla);
+      setEditDrawerOpen(true);
+    }
+  };
+
+  const handleSaveSLA = () => {
+    if (selectedSLA) {
+      setSlaRules(slaRules.map(s => 
+        s.id === selectedSLA.id ? selectedSLA : s
+      ));
+      toast.success("SLA updated", { description: `${selectedSLA.name} saved successfully` });
+      setEditDrawerOpen(false);
+    }
   };
 
   const handleGenerateReport = () => {
     toast.loading("Generating compliance report...", { id: "report" });
     setTimeout(() => {
-      toast.success("Report generated", { id: "report", description: "SLA_Compliance_Report.pdf ready for download" });
+      // Create downloadable report
+      const content = `SLA Compliance Report\nGenerated: ${new Date().toLocaleString()}\n\nRules:\n${slaRules.map(s => `${s.name}: ${s.compliance}% compliance`).join('\n')}`;
+      const blob = new Blob([content], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'SLA_Compliance_Report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Report generated", { id: "report", description: "SLA_Compliance_Report.pdf downloaded" });
     }, 1500);
   };
 
@@ -191,6 +222,65 @@ const SLAComplianceModule = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* SLA Edit Drawer */}
+      <Sheet open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
+        <SheetContent className="bg-slate-900 border-slate-700">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-100">Edit SLA Rule</SheetTitle>
+            <SheetDescription className="text-slate-400">
+              Configure SLA parameters for {selectedSLA?.name}
+            </SheetDescription>
+          </SheetHeader>
+          {selectedSLA && (
+            <div className="space-y-4 mt-6">
+              <div className="space-y-2">
+                <Label className="text-slate-300">Rule Name</Label>
+                <Input 
+                  value={selectedSLA.name}
+                  onChange={(e) => setSelectedSLA({...selectedSLA, name: e.target.value})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Description</Label>
+                <Input 
+                  value={selectedSLA.description}
+                  onChange={(e) => setSelectedSLA({...selectedSLA, description: e.target.value})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Response Time (minutes)</Label>
+                <Input 
+                  type="number"
+                  value={selectedSLA.responseTime}
+                  onChange={(e) => setSelectedSLA({...selectedSLA, responseTime: parseInt(e.target.value) || 0})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Resolution Time (minutes)</Label>
+                <Input 
+                  type="number"
+                  value={selectedSLA.resolutionTime}
+                  onChange={(e) => setSelectedSLA({...selectedSLA, resolutionTime: parseInt(e.target.value) || 0})}
+                  className="bg-slate-800 border-slate-600"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handleSaveSLA} className="flex-1 bg-cyan-500 hover:bg-cyan-600">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
+                <Button variant="outline" onClick={() => setEditDrawerOpen(false)} className="border-slate-600">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

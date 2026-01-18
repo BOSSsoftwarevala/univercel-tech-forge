@@ -37,9 +37,18 @@ const FranchiseLandingFooter = () => {
             <ul className="space-y-2">
               {['Benefits', 'Earnings', 'Features', 'Process', 'Apply Now'].map((link) => (
                 <li key={link}>
-                  <a href={`#${link.toLowerCase().replace(' ', '-')}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <button 
+                    onClick={() => {
+                      const targetId = link.toLowerCase().replace(' ', '-');
+                      const element = document.getElementById(targetId);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors text-left"
+                  >
                     {link}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>

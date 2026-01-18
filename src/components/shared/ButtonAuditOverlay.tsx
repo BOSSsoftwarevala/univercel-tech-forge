@@ -49,7 +49,7 @@ interface ButtonAuditOverlayProps {
   enabled?: boolean;
 }
 
-export const ButtonAuditOverlay: React.FC<ButtonAuditOverlayProps> = ({
+const ButtonAuditOverlayInner: React.FC<ButtonAuditOverlayProps> = ({
   enabled = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -303,5 +303,12 @@ export const ButtonAuditOverlay: React.FC<ButtonAuditOverlayProps> = ({
     </>
   );
 };
+
+// Wrapped export with forwardRef to fix AnimatePresence warning
+export const ButtonAuditOverlay = React.forwardRef<HTMLDivElement, ButtonAuditOverlayProps>((props, ref) => {
+  return <ButtonAuditOverlayInner {...props} />;
+});
+
+ButtonAuditOverlay.displayName = 'ButtonAuditOverlay';
 
 export default ButtonAuditOverlay;

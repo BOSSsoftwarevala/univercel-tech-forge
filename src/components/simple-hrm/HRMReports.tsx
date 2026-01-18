@@ -39,7 +39,26 @@ export default function HRMReports() {
   const [activeReport, setActiveReport] = useState('attendance');
 
   const handleDownload = (reportType: string) => {
-    console.log('Download report:', reportType);
+    const reportNames: Record<string, string> = {
+      attendance: 'Attendance_Report',
+      salary: 'Salary_Report', 
+      leave: 'Leave_Report',
+      employee: 'Employee_Report'
+    };
+    
+    const fileName = `${reportNames[reportType] || 'Report'}_${selectedMonth}.pdf`;
+    
+    // Create downloadable content
+    const content = `Report: ${reportType}\nPeriod: ${selectedMonth}\nGenerated: ${new Date().toLocaleString()}`;
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
