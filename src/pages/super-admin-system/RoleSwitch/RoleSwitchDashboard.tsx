@@ -139,13 +139,12 @@ const RoleSwitchDashboard = () => {
   const isInModuleView = activeRole === 'boss_owner' && moduleViewIds.includes(activeNav);
   
   // SINGLE-CONTEXT ENFORCEMENT: Use sidebar store for context control
-  const { 
-    showGlobalSidebar, 
-    enterCategory, 
+  const {
+    showGlobalSidebar,
+    enterCategory,
     exitToGlobal,
-    activeContext,
-    activeSidebar,
-    canTransition
+    categoryCollapsed,
+    canTransition,
   } = useSidebarStore();
   
   // Category mapping for module navigation - ALL modules must be mapped
@@ -568,43 +567,52 @@ const RoleSwitchDashboard = () => {
         </div>
       </header>
       
-      {/* STEP 9: SINGLE-CONTEXT LAYOUT - Only ONE active view at a time */}
-      {/* GOLDEN RULE: Control Panel OR Role Dashboard, NEVER both */}
-      {/* CLICK BEHAVIOR: When clicking role button, sidebar COMPLETELY REMOVED, module takes full width */}
+      {/* STEP 9: SINGLE-CONTEXT LAYOUT - Exactly ONE sidebar visible at all times */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* CONTEXT A: Control Panel Sidebar - ONLY visible when no role selected */}
-        {/* Full height (100vh), fixed left, premium card-style buttons */}
+        {/* CONTEXT A: Control Panel Sidebar - visible when no role selected */}
         {isInControlPanelView && (
           <>
             <ControlPanelSidebar
               activeRole={undefined}
               onRoleSelect={(roleId) => {
-                // RoleId now matches ActiveRole directly - no mapping needed
                 handleRoleChange(roleId as ActiveRole);
               }}
               onLogout={handleLogout}
             />
-            {/* Spacer to offset fixed sidebar */}
+            {/* Spacer to offset fixed Control Panel sidebar */}
             <div className="w-[320px] flex-shrink-0" />
           </>
         )}
-        
-        {/* CONTEXT B: NO SIDEBAR when role is selected */}
-        {/* Module dashboard takes FULL WIDTH - no sidebar, no left panel, no right panel */}
 
-        {/* CONTEXT B: Module Content - Takes full width when in module view */}
-        {/* Module sidebar is rendered INSIDE the module container, not here */}
-        <main 
-          className={cn(
-            "flex-1 overflow-auto",
-            // Full width in module context - no leftover columns
-            isInModuleView && "w-full"
-          )} 
-          style={{ 
-            minHeight: 0, 
+        {/* CONTEXT B: Role Sidebar (for ALL role dashboards except full-screen modules) */}
+        {!isInControlPanelView && !isInModuleView && activeRole && (
+          <>
+            <RoleSwitchSidebar
+              activeRole={activeRole}
+              onRoleChange={handleRoleChange}
+              collapsed={collapsed}
+              onToggleCollapse={() => setCollapsed((prev) => !prev)}
+              onLogout={handleLogout}
+              activeNav={activeNav}
+              onNavChange={handleNavChange}
+              onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
+            />
+            {/* Spacer to offset fixed RoleSwitchSidebar (matches its internal widths) */}
+            <div className="flex-shrink-0" style={{ width: collapsed ? 70 : 280 }} />
+          </>
+        )}
+
+        {/* CONTEXT C: Module Sidebar (rendered inside module containers). */}
+        {/* Spacer ensures module sidebar never overlaps content even when fixed. */}
+        {isInModuleView && (
+          <div className="flex-shrink-0" style={{ width: categoryCollapsed ? 80 : 260 }} />
+        )}
+
+        <main
+          className="flex-1 overflow-auto"
+          style={{
+            minHeight: 0,
             height: '100%',
-            // Ensure no fixed-width leftovers when context switches
-            width: isInModuleView ? '100%' : undefined
           }}
         >
           <ErrorBoundary
@@ -619,20 +627,19 @@ const RoleSwitchDashboard = () => {
                 <div className="text-center p-8 bg-card/50 rounded-xl border border-border/50 max-w-md">
                   <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
-                  <p className="text-muted-foreground mb-6">This dashboard failed to render. You can retry or switch roles.</p>
+                  <p className="text-muted-foreground mb-6">
+                    This dashboard failed to render. You can retry or switch roles.
+                  </p>
                   <div className="flex items-center justify-center gap-3">
                     <Button variant="outline" onClick={() => window.location.reload()}>
                       Reload dashboard
                     </Button>
-                    <Button onClick={handleHome}>
-                      Back to Boss Dashboard
-                    </Button>
+                    <Button onClick={handleHome}>Back to Boss Dashboard</Button>
                   </div>
                 </div>
               </div>
             }
           >
-            {/* SINGLE VIEW RENDER: No AnimatePresence to prevent ghost renders */}
             {renderRoleView()}
           </ErrorBoundary>
         </main>

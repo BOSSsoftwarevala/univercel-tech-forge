@@ -46,15 +46,16 @@ export function CategorySidebarWrapper({
   return (
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
-      animate={{ 
-        x: 0, 
+      animate={{
+        x: 0,
         opacity: 1,
         width: categoryCollapsed ? 80 : 260,
       }}
       exit={{ x: -20, opacity: 0 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "h-full flex flex-col border-r border-border/50 bg-card/95 backdrop-blur-xl z-40",
+        // CRITICAL: Sidebar must be full-height, fixed, and never overlapped by content
+        "fixed left-0 top-0 h-screen flex flex-col border-r border-border/50 bg-card/95 text-card-foreground backdrop-blur-xl z-50",
         className
       )}
     >
