@@ -46,12 +46,20 @@ const NotFound = () => {
   const isSuperAdminLikePath = location.pathname.startsWith('/super-admin-system');
   const hasEncodedQueryInPath = location.pathname.includes('%3F');
 
-  // Fix broken links like /role-switch%3Frole=boss_owner ("?" encoded into the pathname)
+  // Admin routes must never get stuck on a 404 screen.
+  // If a broken link encodes the query string into the pathname ("%3F"), decode and retry.
+  // Otherwise, always send the user to the role switch entry (which will handle auth).
   useEffect(() => {
-    if (!hasEncodedQueryInPath) return;
-    const decodedPath = decodeURIComponent(location.pathname);
-    navigate(decodedPath, { replace: true });
-  }, [hasEncodedQueryInPath, location.pathname, navigate]);
+    if (!isSuperAdminLikePath) return;
+
+    if (hasEncodedQueryInPath) {
+      const decodedPath = decodeURIComponent(location.pathname);
+      navigate(decodedPath, { replace: true });
+      return;
+    }
+
+    navigate('/super-admin-system/role-switch?role=boss_owner', { replace: true });
+  }, [isSuperAdminLikePath, hasEncodedQueryInPath, location.pathname, navigate]);
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
@@ -59,74 +67,26 @@ const NotFound = () => {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (isSuperAdminLikePath) return; // handled by the admin redirect effect above
+
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
-          // If user is in the admin area, never kick them to public home.
-          // Always offer a recovery route that includes the required sidebar.
-          if (isSuperAdminLikePath) {
-            navigate('/super-admin-system/role-switch?role=boss_owner', { replace: true });
-            return 0;
-          }
-
           navigate('/', { replace: true });
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+
     return () => clearInterval(timer);
   }, [navigate, isSuperAdminLikePath]);
 
-  // ADMIN SAFETY RULE: No admin screen should appear without a sidebar.
-  // If an admin path ever hits NotFound, show a simple recovery sidebar.
   if (isSuperAdminLikePath) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="flex min-h-screen">
-          <aside className="w-72 flex-shrink-0 border-r border-border bg-background text-foreground">
-            <div className="p-5 border-b border-border">
-              <div className="text-lg font-semibold">Admin Navigation</div>
-              <div className="text-sm text-muted-foreground">Recovery Sidebar</div>
-            </div>
-            <nav className="p-3 space-y-2">
-              <Button
-                className="w-full justify-start"
-                onClick={() => navigate('/super-admin-system/role-switch?role=boss_owner', { replace: true })}
-              >
-                Go to Control Panel
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => navigate('/super-admin-system/login', { replace: true })}
-              >
-                Login
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => navigate(-1)}
-              >
-                Go Back
-              </Button>
-            </nav>
-            <div className="mt-auto p-4 border-t border-border text-xs text-muted-foreground">
-              Auto-recovering in <span className="font-mono text-foreground">{countdown}s</span>
-            </div>
-          </aside>
-
-          <main className="flex-1 flex items-center justify-center p-6">
-            <div className="max-w-xl text-center">
-              <h1 className="text-6xl font-black tracking-tight text-foreground">404</h1>
-              <p className="mt-2 text-lg text-muted-foreground">This admin page route was not found.</p>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Path: <code className="px-2 py-1 rounded bg-muted">{location.pathname}</code>
-              </p>
-            </div>
-          </main>
-        </div>
-      </div>
+      <main className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-sm text-muted-foreground">Redirecting…</div>
+      </main>
     );
   }
 
