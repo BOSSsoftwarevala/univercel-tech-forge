@@ -231,8 +231,20 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
   }, []);
 
   // Module routing
+  // NOTE: Sidebar may set activeNav to either the parent id ("vala-ai") OR a sub-category id ("ai-overview", etc.)
+  // All VALA AI related nav ids must resolve to the same isolated AI-only module.
   const modules: Record<string, 'server' | 'vala-ai' | 'product-demo' | 'leads' | 'marketing'> = {
-    'server-control': 'server', 'vala-ai': 'vala-ai', 'product-demo': 'product-demo', 'leads': 'leads', 'marketing': 'marketing'
+    'server-control': 'server',
+
+    // VALA AI (parent + sub-items)
+    'vala-ai': 'vala-ai',
+    'ai-overview': 'vala-ai',
+    'ai-requests': 'vala-ai',
+    'ai-models': 'vala-ai',
+
+    'product-demo': 'product-demo',
+    'leads': 'leads',
+    'marketing': 'marketing'
   };
 
   const goBack = useCallback(() => {
