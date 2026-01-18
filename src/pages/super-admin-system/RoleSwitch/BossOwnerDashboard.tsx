@@ -157,38 +157,48 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
 
       {/* MAIN LAYOUT: KEY STATS Sidebar + 2-Column Cards Grid */}
       <div className="flex gap-5">
-        {/* KEY STATS Sidebar */}
+        {/* KEY STATS Sidebar - Dark Navy Theme */}
         <div className="w-56 flex-shrink-0">
-          <div style={{ background: T.primary, borderRadius: 8, overflow: 'hidden' }}>
-            <div className="px-4 py-3 text-center font-bold text-sm tracking-wider" style={{ background: T.primary, color: T.text }}>KEY STATS</div>
-            <div className="p-4 space-y-4" style={{ background: T.primary }}>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                <div className="flex items-center gap-2"><BarChart3 size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>TOTAL REVENUE</span></div>
-                <span className="font-bold" style={{ color: T.text }}>$2.4M</span>
+          <div style={{ 
+            background: 'linear-gradient(180deg, #0a1628 0%, #0d1a2d 100%)', 
+            borderRadius: 8, 
+            overflow: 'hidden',
+            border: '1px solid rgba(37, 99, 235, 0.2)',
+            boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div className="px-4 py-3 text-center font-semibold text-sm tracking-wider" style={{ 
+              background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', 
+              color: '#60a5fa',
+              borderBottom: '1px solid rgba(37, 99, 235, 0.15)'
+            }}>KEY STATS</div>
+            <div className="p-4 space-y-1" style={{ background: 'transparent' }}>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                <div className="flex items-center gap-2"><BarChart3 size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>TOTAL REVENUE</span></div>
+                <span className="font-bold text-sm" style={{ color: '#e2e8f0' }}>$2.4M</span>
               </div>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                <div className="flex items-center gap-2"><TrendingUp size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>GROWTH</span></div>
-                <span className="font-bold" style={{ color: T.green }}>+24%</span>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                <div className="flex items-center gap-2"><TrendingUp size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>GROWTH</span></div>
+                <span className="font-bold text-sm" style={{ color: '#22c55e' }}>+24%</span>
               </div>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                <div className="flex items-center gap-2"><Users size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>ACTIVE USERS</span></div>
-                <span className="font-bold" style={{ color: T.text }}>12.5K</span>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                <div className="flex items-center gap-2"><Users size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>ACTIVE USERS</span></div>
+                <span className="font-bold text-sm" style={{ color: '#e2e8f0' }}>12.5K</span>
               </div>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                <div className="flex items-center gap-2"><Globe2 size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>COUNTRIES</span></div>
-                <span className="font-bold" style={{ color: T.text }}>45</span>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                <div className="flex items-center gap-2"><Globe2 size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>COUNTRIES</span></div>
+                <span className="font-bold text-sm" style={{ color: '#e2e8f0' }}>45</span>
               </div>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                <div className="flex items-center gap-2"><Building2 size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>FRANCHISES</span></div>
-                <span className="font-bold" style={{ color: T.text }}>128</span>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                <div className="flex items-center gap-2"><Building2 size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>FRANCHISES</span></div>
+                <span className="font-bold text-sm" style={{ color: '#e2e8f0' }}>128</span>
               </div>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                <div className="flex items-center gap-2"><Wallet size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>WALLET</span></div>
-                <span className="font-bold" style={{ color: T.text }}>$456K</span>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                <div className="flex items-center gap-2"><Wallet size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>WALLET</span></div>
+                <span className="font-bold text-sm" style={{ color: '#e2e8f0' }}>$456K</span>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-2"><Activity size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>UPTIME</span></div>
-                <span className="font-bold" style={{ color: T.green }}>99.9%</span>
+              <div className="flex items-center justify-between py-2.5 px-2 rounded">
+                <div className="flex items-center gap-2"><Activity size={14} style={{ color: '#60a5fa' }} /><span className="text-xs font-medium" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>UPTIME</span></div>
+                <span className="font-bold text-sm" style={{ color: '#22c55e' }}>99.9%</span>
               </div>
             </div>
           </div>
