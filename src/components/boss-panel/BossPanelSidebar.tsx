@@ -68,7 +68,7 @@ export function BossPanelSidebar({
   return (
     <motion.aside
       initial={false}
-      animate={{ width: collapsed ? 80 : 260 }}
+      animate={{ width: collapsed ? 200 : 260 }}
       className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col"
       style={{ 
         background: SIDEBAR_COLORS.bgGradient,
@@ -105,8 +105,7 @@ export function BossPanelSidebar({
               key={item.id}
               onClick={() => onSectionChange(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left",
-                collapsed && "justify-center"
+                "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left"
               )}
               style={{
                 background: isActive ? SIDEBAR_COLORS.activeHighlight : 'transparent',
@@ -116,27 +115,23 @@ export function BossPanelSidebar({
               whileTap={{ scale: 0.98 }}
             >
               <Icon className="w-5 h-5 flex-shrink-0" style={{ color: isActive ? '#ffffff' : SIDEBAR_COLORS.iconColor }} />
-              {!collapsed && (
-                <span className="truncate text-sm font-medium" style={{ color: SIDEBAR_COLORS.text }}>
-                  {item.label}
-                </span>
-              )}
+              <span className="truncate text-sm font-medium" style={{ color: SIDEBAR_COLORS.text }}>
+                {item.label}
+              </span>
             </motion.button>
           );
         })}
       </nav>
 
       {/* Footer */}
-      {!collapsed && (
-        <div className="p-4" style={{ borderTop: `1px solid ${SIDEBAR_COLORS.border}` }}>
-          <div className="text-center uppercase tracking-widest text-[10px]" style={{ color: SIDEBAR_COLORS.textMuted }}>
-            Boss Role Principle
-          </div>
-          <div className="text-center mt-1 text-[9px]" style={{ color: SIDEBAR_COLORS.text }}>
-            See Everything • Change Nothing Casually
-          </div>
+      <div className="p-4" style={{ borderTop: `1px solid ${SIDEBAR_COLORS.border}` }}>
+        <div className="text-center uppercase tracking-widest text-[10px]" style={{ color: SIDEBAR_COLORS.textMuted }}>
+          Boss Role Principle
         </div>
-      )}
+        <div className="text-center mt-1 text-[9px]" style={{ color: SIDEBAR_COLORS.text }}>
+          See Everything • Change Nothing Casually
+        </div>
+      </div>
     </motion.aside>
   );
 }
