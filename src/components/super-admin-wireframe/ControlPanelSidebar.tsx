@@ -170,9 +170,10 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
 
   return (
     <aside
-      className="flex flex-col h-screen flex-shrink-0 fixed left-0 top-16 bottom-0 z-40"
+      className="flex flex-col flex-shrink-0 fixed left-0 top-0 z-40"
       style={{
         width: 320,
+        height: '100vh',
         background: COLORS.bgGradient,
         borderRight: `1px solid ${COLORS.border}`,
       }}
