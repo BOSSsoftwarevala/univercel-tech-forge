@@ -127,7 +127,16 @@ const ControlDashboard = () => {
       case "regional": return <RegionalWorkspace />;
       case "ai_head": return <AIHeadWorkspace />;
       case "master_admin": return <MasterAdminWorkspace />;
-      default: return null;
+      default: 
+        return (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center p-8 bg-slate-800/50 rounded-xl border border-slate-700/50 max-w-md">
+              <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-slate-100 mb-2">Select a Workspace</h2>
+              <p className="text-muted-foreground">Choose a role workspace from the options above to get started.</p>
+            </div>
+          </div>
+        );
     }
   };
 

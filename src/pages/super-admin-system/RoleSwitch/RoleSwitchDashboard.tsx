@@ -149,9 +149,10 @@ const RoleSwitchDashboard = () => {
     }
   }, [isInModuleView, activeNav, showGlobalSidebar, enterCategory, categoryMap, canTransition]);
   
-  // VISIBILITY RULE: Global sidebar visible ONLY in Boss context
-  // Uses activeContext from store (not just activeSidebar) for strict enforcement
-  const shouldShowGlobalSidebar = activeContext === 'boss' && activeSidebar === 'global' && !isInModuleView;
+  // VISIBILITY RULE: Global sidebar visible ONLY in Boss context AND boss_owner role
+  // Uses activeContext from store AND role check for strict enforcement
+  // CRITICAL: Non-boss roles (continent_super_admin, country_head, etc.) have their OWN sidebars
+  const shouldShowGlobalSidebar = activeRole === 'boss_owner' && activeContext === 'boss' && activeSidebar === 'global' && !isInModuleView;
 
   // STEP 9: Navigation labels for breadcrumb
   const navLabels: Record<string, string> = useMemo(() => ({
