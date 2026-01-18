@@ -140,8 +140,14 @@ const RoleSwitchDashboard = () => {
   // SINGLE-CONTEXT ENFORCEMENT: Role dashboards should NOT show role switcher
   // When user is in any specific role dashboard (not boss_owner), they see only that role's sidebar
   // Role switching ONLY happens in Control Panel
-  const isInModuleView = (activeRole === 'boss_owner' && moduleViewIds.includes(activeNav)) || 
-    (activeRole !== 'boss_owner' && activeRole !== null);
+  // FIXED: Hide RoleSwitchSidebarNew in ALL cases except when boss_owner is on main dashboard
+  const isInModuleView = useMemo(() => {
+    // Boss viewing a module (server-control, vala-ai, etc.)
+    if (activeRole === 'boss_owner' && moduleViewIds.includes(activeNav)) return true;
+    // Any role that is NOT boss_owner (they have their own sidebar)
+    if (activeRole !== 'boss_owner' && activeRole !== null) return true;
+    return false;
+  }, [activeRole, activeNav, moduleViewIds]);
   
   // SINGLE-CONTEXT ENFORCEMENT: Use sidebar store for context control
   const {
