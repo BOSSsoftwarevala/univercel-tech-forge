@@ -39,6 +39,7 @@ import PendingApproval from "./pages/auth/PendingApproval";
 import BossFortressAuth from "./pages/auth/BossFortressAuth";
 import BossRegister from "./pages/auth/BossRegister";
 import EasyAuth from "./pages/auth/EasyAuth";
+import RoleBasedLogin from "./pages/auth/RoleBasedLogin";
 import SessionExpiredPage from "./pages/error/SessionExpiredPage";
 
 // Public Pages
@@ -415,8 +416,9 @@ const App = () => (
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/get-started" element={<ClientPortal />} />
 
-              {/* Global Auth Routes - Redirects to unified /auth */}
-              <Route path="/login" element={<Navigate to="/auth" replace />} />
+              {/* Global Auth Routes */}
+              <Route path="/login" element={<RoleBasedLogin />} />
+              <Route path="/role-login" element={<RoleBasedLogin />} />
               <Route path="/register" element={<Navigate to="/auth" replace />} />
               <Route path="/easy-login" element={<EasyAuth />} />
               <Route path="/quick-signup" element={<EasyAuth />} />
