@@ -33,7 +33,8 @@ import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
 import RoleManagerDashboard from "./RoleManagerDashboard";
-import CountryHeadDashboard from "./CountryHeadDashboard";
+// CRITICAL: Use the full-featured CountryHeadDashboard with built-in sidebar + interactive map
+import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDashboard";
 import ProductManagerDashboard from "./ProductManagerDashboard";
 import DemoManagerDashboard from "./DemoManagerDashboard";
 import CEODashboard from "./CEODashboard";
@@ -428,7 +429,13 @@ const RoleSwitchDashboard = () => {
       case "continent_super_admin":
         return <ContinentSuperAdminView activeNav={activeNav} selectedSubItem={selectedSubItem} />;
       case "country_head":
-        return <CountryHeadDashboard />;
+        // Full dashboard with sidebar + interactive map; back returns to Continent Admin
+        return (
+          <CountryHeadDashboard 
+            countryCode="IN" 
+            onBack={() => handleRoleChange("continent_super_admin")} 
+          />
+        );
       case "server_manager":
         return <ServerManagerView activeNav={activeNav} />;
       case "franchise_manager":
