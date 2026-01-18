@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 const settingsSections = [
   {
@@ -219,13 +220,17 @@ const SaasSettings: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 {[
-                  { icon: Shield, label: 'Security Settings', href: '#' },
-                  { icon: CreditCard, label: 'Billing & Plans', href: '#' },
-                  { icon: Database, label: 'Data Export', href: '#' },
-                  { icon: HelpCircle, label: 'Help Center', href: '#' },
+                  { icon: Shield, label: 'Security Settings', action: () => toast.success('Opening Security Settings...') },
+                  { icon: CreditCard, label: 'Billing & Plans', action: () => toast.success('Opening Billing & Plans...') },
+                  { icon: Database, label: 'Data Export', action: () => {
+                    toast.loading('Preparing data export...', { id: 'export' });
+                    setTimeout(() => toast.success('Export ready! Downloading...', { id: 'export' }), 1500);
+                  }},
+                  { icon: HelpCircle, label: 'Help Center', action: () => window.open('https://help.softwarevala.com', '_blank') },
                 ].map((item, index) => (
                   <button
                     key={index}
+                    onClick={item.action}
                     className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors text-left"
                   >
                     <div className="flex items-center gap-3">
@@ -254,11 +259,17 @@ const SaasSettings: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
-                  <button className="p-4 rounded-xl border-2 border-violet-500 bg-white text-center">
+                  <button 
+                    onClick={() => toast.success('Light theme applied')}
+                    className="p-4 rounded-xl border-2 border-violet-500 bg-white text-center"
+                  >
                     <Sun className="w-6 h-6 text-amber-500 mx-auto mb-2" />
                     <span className="text-sm font-medium text-slate-900">Light</span>
                   </button>
-                  <button className="p-4 rounded-xl border-2 border-slate-200 bg-slate-100 text-center hover:border-slate-300 transition-colors">
+                  <button 
+                    onClick={() => toast.success('Dark theme applied')}
+                    className="p-4 rounded-xl border-2 border-slate-200 bg-slate-100 text-center hover:border-slate-300 transition-colors"
+                  >
                     <Moon className="w-6 h-6 text-slate-500 mx-auto mb-2" />
                     <span className="text-sm font-medium text-slate-700">Dark</span>
                   </button>
@@ -268,7 +279,13 @@ const SaasSettings: React.FC = () => {
           </motion.div>
 
           {/* Save Button */}
-          <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg shadow-violet-200">
+          <Button 
+            onClick={() => {
+              toast.loading('Saving changes...', { id: 'save' });
+              setTimeout(() => toast.success('Settings saved successfully!', { id: 'save' }), 1000);
+            }}
+            className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg shadow-violet-200"
+          >
             Save Changes
           </Button>
         </div>

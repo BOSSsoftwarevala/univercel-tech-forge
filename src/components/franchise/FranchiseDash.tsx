@@ -3,6 +3,7 @@ import {
   Users, TrendingUp, Wallet, Target, MapPin,
   FileText, Clock, AlertTriangle, Zap, Award
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const FranchiseDash = () => {
   const stats = [
@@ -156,7 +157,8 @@ const FranchiseDash = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 hover:border-indigo-500/40 transition-all"
+          onClick={() => toast.info('Opening 12 pending follow-ups...')}
+          className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 hover:border-indigo-500/40 transition-all text-left"
         >
           <Clock className="w-6 h-6 text-indigo-400 mb-2" />
           <p className="text-sm font-medium text-white">Pending Follow-ups</p>
@@ -165,7 +167,8 @@ const FranchiseDash = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all"
+          onClick={() => toast.success('Contract active until Dec 2025')}
+          className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all text-left"
         >
           <FileText className="w-6 h-6 text-emerald-400 mb-2" />
           <p className="text-sm font-medium text-white">Contract Status</p>
@@ -174,7 +177,8 @@ const FranchiseDash = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:border-amber-500/40 transition-all"
+          onClick={() => toast.warning('2 escalations require attention')}
+          className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:border-amber-500/40 transition-all text-left"
         >
           <AlertTriangle className="w-6 h-6 text-amber-400 mb-2" />
           <p className="text-sm font-medium text-white">Open Escalations</p>
@@ -183,7 +187,8 @@ const FranchiseDash = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all"
+          onClick={() => toast.success('Training progress: 92% complete - 1 module remaining')}
+          className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all text-left"
         >
           <Award className="w-6 h-6 text-purple-400 mb-2" />
           <p className="text-sm font-medium text-white">Training Score</p>

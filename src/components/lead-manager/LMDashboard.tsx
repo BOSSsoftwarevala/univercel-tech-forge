@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, TrendingUp, Target, AlertTriangle, Clock, CheckCircle,
-  XCircle, Zap, Globe, Brain, Phone, Mail
+  XCircle, Zap, Globe, Brain, Phone, Mail, X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { leadSourcesConfig, pipelineStages, sampleLeads } from './data/leadData';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { toast } from 'sonner';
 
 const LMDashboard = () => {
+  const [selectedLead, setSelectedLead] = useState<typeof sampleLeads[0] | null>(null);
   const totalLeads = leadSourcesConfig.reduce((sum, src) => sum + src.totalLeads, 0);
   const avgConversion = leadSourcesConfig.reduce((sum, src) => sum + src.conversionRate, 0) / leadSourcesConfig.length;
 
@@ -20,6 +25,10 @@ const LMDashboard = () => {
     { label: 'Won This Month', value: '28', icon: CheckCircle, color: 'emerald', change: '+4' },
     { label: 'At Risk', value: '12', icon: AlertTriangle, color: 'red', change: '+2' },
   ];
+
+  const handleLeadClick = (lead: typeof sampleLeads[0]) => {
+    setSelectedLead(lead);
+  };
 
   return (
     <div className="space-y-6">
@@ -135,6 +144,7 @@ const LMDashboard = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
+                onClick={() => handleLeadClick(lead)}
                 className="p-3 rounded-lg bg-accent/50 border border-border hover:border-primary/30 transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-2">
@@ -215,6 +225,84 @@ const LMDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Lead Details Sheet */}
+      <Sheet open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              Lead Details
+            </SheetTitle>
+            <SheetDescription>View and manage lead information</SheetDescription>
+          </SheetHeader>
+          {selectedLead && (
+            <div className="space-y-4 mt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg font-bold text-primary">
+                  {selectedLead.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">{selectedLead.name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedLead.company}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground">AI Score</p>
+                  <p className="text-lg font-bold text-primary">{selectedLead.aiScore}%</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Conversion</p>
+                  <p className="text-lg font-bold text-emerald-400">{selectedLead.conversionProbability}%</p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-xs text-muted-foreground mb-1">Last Activity</p>
+                <p className="text-sm text-foreground">{selectedLead.lastActivityTime}</p>
+              </div>
+
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1" 
+                  onClick={() => {
+                    window.location.href = `tel:+91-9876543210`;
+                    toast.success('Initiating call...');
+                  }}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Call
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => {
+                    window.location.href = `mailto:${selectedLead.name.toLowerCase().replace(' ', '.')}@company.com`;
+                    toast.success('Opening email client...');
+                  }}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email
+                </Button>
+              </div>
+
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  toast.success('Lead scheduled for follow-up');
+                  setSelectedLead(null);
+                }}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Schedule Follow-up
+              </Button>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

@@ -2,15 +2,18 @@
  * PRODUCT DASHBOARD
  * Enhanced overview with action buttons (Step 8 spec)
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Package, Monitor, AlertTriangle, Clock, Rocket,
-  Plus, Wrench, Eye, CheckCircle 
+  Plus, Wrench, Eye, CheckCircle, X
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const metrics = [
   { 
@@ -51,20 +54,25 @@ const metrics = [
 ];
 
 export const ProductDashboard: React.FC = () => {
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showCreateDemo, setShowCreateDemo] = useState(false);
+  const [showFixDemo, setShowFixDemo] = useState(false);
+  const [showIssues, setShowIssues] = useState(false);
+
   const handleAddProduct = () => {
-    toast.info('Opening Add Product form...');
+    setShowAddProduct(true);
   };
 
   const handleCreateDemo = () => {
-    toast.info('Opening Demo Factory...');
+    setShowCreateDemo(true);
   };
 
   const handleFixDemo = () => {
-    toast.info('Opening Demo Repair tool...');
+    setShowFixDemo(true);
   };
 
   const handleViewIssues = () => {
-    toast.info('Navigating to Issues...');
+    setShowIssues(true);
   };
 
   return (
@@ -197,6 +205,164 @@ export const ProductDashboard: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Product Sheet */}
+      <Sheet open={showAddProduct} onOpenChange={setShowAddProduct}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Plus className="w-5 h-5 text-violet-400" />
+              Add New Product
+            </SheetTitle>
+            <SheetDescription>Add a new product to the catalog</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-4 mt-6">
+            <div className="space-y-2">
+              <Label>Product Name</Label>
+              <Input placeholder="Enter product name" />
+            </div>
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Input placeholder="e.g., ERP, CRM, HRM" />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Input placeholder="Brief description" />
+            </div>
+            <Button 
+              className="w-full" 
+              onClick={() => {
+                toast.success('Product added successfully!');
+                setShowAddProduct(false);
+              }}
+            >
+              Add Product
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Create Demo Sheet */}
+      <Sheet open={showCreateDemo} onOpenChange={setShowCreateDemo}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Monitor className="w-5 h-5 text-emerald-400" />
+              Create Demo Instance
+            </SheetTitle>
+            <SheetDescription>Spin up a new demo environment</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-4 mt-6">
+            <div className="space-y-2">
+              <Label>Product</Label>
+              <Input placeholder="Select product" />
+            </div>
+            <div className="space-y-2">
+              <Label>Domain Prefix</Label>
+              <Input placeholder="demo-xxx" />
+            </div>
+            <Button 
+              className="w-full bg-emerald-600 hover:bg-emerald-700" 
+              onClick={() => {
+                toast.loading('Creating demo...', { id: 'demo' });
+                setTimeout(() => {
+                  toast.success('Demo created successfully!', { id: 'demo' });
+                  setShowCreateDemo(false);
+                }, 1500);
+              }}
+            >
+              Create Demo
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Fix Demo Sheet */}
+      <Sheet open={showFixDemo} onOpenChange={setShowFixDemo}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Wrench className="w-5 h-5 text-amber-400" />
+              Demo Repair Tool
+            </SheetTitle>
+            <SheetDescription>Diagnose and fix demo issues</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-4 mt-6">
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <p className="text-sm font-medium text-amber-400 mb-2">3 Demos Need Attention</p>
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Gym Management #12</span>
+                  <Button size="sm" variant="outline" className="h-6 text-xs" onClick={() => toast.success('Repair started')}>
+                    Repair
+                  </Button>
+                </div>
+                <div className="flex justify-between">
+                  <span>School ERP #45</span>
+                  <Button size="sm" variant="outline" className="h-6 text-xs" onClick={() => toast.success('Repair started')}>
+                    Repair
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => {
+                toast.loading('Running diagnostics...', { id: 'diag' });
+                setTimeout(() => {
+                  toast.success('All issues fixed!', { id: 'diag' });
+                  setShowFixDemo(false);
+                }, 2000);
+              }}
+            >
+              Fix All Issues
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* View Issues Sheet */}
+      <Sheet open={showIssues} onOpenChange={setShowIssues}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-400" />
+              Active Issues
+            </SheetTitle>
+            <SheetDescription>Current product and demo issues</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-3 mt-6">
+            {[
+              { id: 'ISS-001', title: 'Payment timeout on School ERP', severity: 'high' },
+              { id: 'ISS-002', title: 'Login loop on Gym demo', severity: 'medium' },
+              { id: 'ISS-003', title: 'Slow dashboard load', severity: 'low' },
+            ].map((issue) => (
+              <div key={issue.id} className="p-3 rounded-lg bg-muted/50 border border-border">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-mono text-muted-foreground">{issue.id}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded ${
+                    issue.severity === 'high' ? 'bg-red-500/20 text-red-400' :
+                    issue.severity === 'medium' ? 'bg-amber-500/20 text-amber-400' :
+                    'bg-blue-500/20 text-blue-400'
+                  }`}>
+                    {issue.severity}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground">{issue.title}</p>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="mt-2 h-7 text-xs"
+                  onClick={() => toast.success(`Marked ${issue.id} as resolved`)}
+                >
+                  Mark Resolved
+                </Button>
+              </div>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
