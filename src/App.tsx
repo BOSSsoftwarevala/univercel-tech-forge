@@ -485,11 +485,11 @@ const App = () => (
               <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
               <Route path="/continent-super-admin/*" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
 
-              {/* Super Admin Routes - Privileged roles can access */}
-              <Route path="/admin" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/dashboard" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
-              <Route path="/super-admin/command-center" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SuperAdminCommandCenter /></RequireRole>} />
+              {/* Super Admin Routes - Redirect to unified RoleSwitchDashboard to prevent duplicate layouts */}
+              <Route path="/admin" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
+              <Route path="/super-admin" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
+              <Route path="/super-admin/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
+              <Route path="/super-admin/command-center" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
               <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><LiveTracking /></RequireRole>} />
               <Route path="/super-admin/role-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><RoleManager /></RequireRole>} />
               <Route path="/super-admin/user-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><UserManager /></RequireRole>} />

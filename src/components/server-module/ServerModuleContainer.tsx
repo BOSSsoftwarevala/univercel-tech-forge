@@ -56,7 +56,7 @@ export const ServerModuleContainer: React.FC<ServerModuleContainerProps> = ({
   };
 
   return (
-    <div className="flex h-full min-h-[calc(100vh-120px)]">
+    <div className="flex h-full w-full">
       <ServerModuleSidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}

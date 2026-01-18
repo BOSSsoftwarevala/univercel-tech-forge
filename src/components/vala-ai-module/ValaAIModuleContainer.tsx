@@ -52,7 +52,7 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
   };
 
   return (
-    <div className="flex h-full bg-background/50 rounded-xl border border-border/50 overflow-hidden">
+    <div className="flex h-full w-full">
       <ValaAISidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}

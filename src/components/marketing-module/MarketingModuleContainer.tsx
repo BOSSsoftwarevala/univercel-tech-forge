@@ -46,7 +46,7 @@ export const MarketingModuleContainer: React.FC<MarketingModuleContainerProps> =
   };
 
   return (
-    <div className="flex h-full min-h-[calc(100vh-120px)]">
+    <div className="flex h-full w-full">
       <MarketingModuleSidebar 
         activeSection={activeSection} 
         setActiveSection={setActiveSection}

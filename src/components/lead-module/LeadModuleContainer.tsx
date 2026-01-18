@@ -42,7 +42,7 @@ export const LeadModuleContainer: React.FC<LeadModuleContainerProps> = ({
   };
 
   return (
-    <div className="flex h-full min-h-[calc(100vh-120px)]">
+    <div className="flex h-full w-full">
       <LeadModuleSidebar 
         activeSection={activeSection} 
         onSectionChange={setActiveSection}
