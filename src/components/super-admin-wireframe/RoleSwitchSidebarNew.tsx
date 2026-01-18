@@ -39,6 +39,7 @@ import {
   Zap,
   TrendingUp,
   Map,
+  Timer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -79,7 +80,8 @@ export type ActiveRole =
   | "marketing_management"
   | "customer_support_management"
   | "role_manager"
-  | "api_ai_manager";
+  | "api_ai_manager"
+  | "promise_tracker_manager";
 
 interface SubCategory {
   id: string;
@@ -270,6 +272,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "AAM",
     icon: Zap,
     description: "API & AI Cost Control",
+  },
+  promise_tracker_manager: {
+    id: "promise_tracker_manager",
+    label: "Promise Tracker",
+    shortLabel: "PT",
+    icon: Timer,
+    description: "Promise & Commitment Tracking",
   },
 };
 

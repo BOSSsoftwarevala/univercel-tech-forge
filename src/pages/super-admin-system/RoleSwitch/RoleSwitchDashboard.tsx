@@ -26,6 +26,7 @@ import SalesSupportManagerView from "./SalesSupportManagerView";
 import ResellerManagerFullView from "./ResellerManagerFullView";
 import LeadManagerView from "./LeadManagerView";
 import LMFullLayout from "@/components/lead-manager/LMFullLayout";
+import PTFullLayout from "@/components/promise-tracker/PTFullLayout";
 import ProManagerView from "./ProManagerView";
 import LegalManagerView from "./LegalManagerView";
 import TaskManagementView from "./TaskManagementView";
@@ -467,6 +468,8 @@ const RoleSwitchDashboard = () => {
         return <DeveloperManagementDashboard />;
       case "api_ai_manager":
         return <AAMEnterpriseLayout />;
+      case "promise_tracker_manager":
+        return <PTFullLayout />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
