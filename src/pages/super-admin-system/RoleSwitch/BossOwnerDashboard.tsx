@@ -155,22 +155,54 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
         </div>
       </div>
 
-      {/* FULL WIDTH: 2-Column Cards Grid */}
-      <div className="grid grid-cols-2 gap-5">
-        <DataCard title="REVENUE" icon={<DollarSign size={14} />}><Chart type="bar" /><StatRow l1="THIS MONTH" v1="$847K" l2="LAST MONTH" v2="$692K" /></DataCard>
-        <DataCard title="USERS" icon={<Users size={14} />}><Chart type="line" /><StatRow l1="NEW USERS" v1="+2,847" l2="ACTIVE TODAY" v2="8,421" /></DataCard>
-        <DataCard title="FRANCHISES" icon={<Building2 size={14} />}><Chart type="bar" /><StatRow l1="TOP" v1="Mumbai" l2="AVG REV" v2="$18.7K" /></DataCard>
-        <DataCard title="SYSTEM" icon={<Server size={14} />}><Chart type="line" /><StatRow l1="LOAD" v1="42%" l2="RESPONSE" v2="124ms" c1={T.green} /></DataCard>
-        <DataCard title="SECURITY" icon={<ShieldAlert size={14} />}><Chart type="bar" /><StatRow l1="CRITICAL" v1="3" l2="RESOLVED" v2="47" c1={T.accent} c2={T.green} /></DataCard>
-        <DataCard title="TRANSACTIONS" icon={<CreditCard size={14} />}><Chart type="line" /><StatRow l1="TODAY" v1="$1.2M" l2="PENDING" v2="$89K" c2={T.primary} /></DataCard>
-        <DataCard title="AI INSIGHTS" icon={<Brain size={14} />}><Chart type="bar" /><StatRow l1="PREDICTIONS" v1="156" l2="ACCURACY" v2="94.2%" c2={T.green} /></DataCard>
-        <DataCard title="MARKETING" icon={<TrendingUp size={14} />}><Chart type="line" /><StatRow l1="SPEND" v1="$45K" l2="RETURN" v2="$312K" /></DataCard>
-        <DataCard title="APPROVALS" icon={<Clock size={14} />}><Chart type="bar" /><StatRow l1="WAITING" v1="23" l2="URGENT" v2="5" c1={T.primary} c2={T.accent} /></DataCard>
-        <DataCard title="GLOBAL" icon={<Globe2 size={14} />}><Chart type="line" /><StatRow l1="COUNTRIES" v1="45" l2="NEW" v2="+7" c2={T.green} /></DataCard>
-        <DataCard title="SUPPORT" icon={<FileText size={14} />}><Chart type="bar" /><StatRow l1="OPEN" v1="89" l2="AVG TIME" v2="2.4h" c1={T.primary} /></DataCard>
-        <DataCard title="COMPLIANCE" icon={<Scale size={14} />}><Chart type="line" /><StatRow l1="SCORE" v1="98%" l2="AUDITS" v2="24/24" c1={T.green} /></DataCard>
-        <DataCard title="DEV ACTIVITY" icon={<Cpu size={14} />}><Chart type="bar" /><StatRow l1="COMMITS" v1="47" l2="DEPLOYS" v2="12" c2={T.green} /></DataCard>
-        <DataCard title="INFRA" icon={<Database size={14} />}><Chart type="line" /><StatRow l1="STORAGE" v1="2.4TB" l2="BANDWIDTH" v2="847GB" /></DataCard>
+      {/* MAIN LAYOUT: KEY STATS Sidebar + 2-Column Cards Grid */}
+      <div className="flex gap-5">
+        {/* KEY STATS Sidebar */}
+        <div className="w-56 flex-shrink-0">
+          <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+            <div className="px-4 py-3 text-center font-bold text-sm tracking-wider" style={{ background: T.primary, color: T.text }}>KEY STATS</div>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2"><BarChart3 size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>TOTAL REVENUE</span></div>
+                <span className="font-bold" style={{ color: T.primary }}>$2.4M</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2"><TrendingUp size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>GROWTH</span></div>
+                <span className="font-bold" style={{ color: T.green }}>+24%</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2"><Users size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>ACTIVE USERS</span></div>
+                <span className="font-bold" style={{ color: T.text }}>12.5K</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2"><Globe2 size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>COUNTRIES</span></div>
+                <span className="font-bold" style={{ color: T.text }}>45</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2"><Building2 size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>FRANCHISES</span></div>
+                <span className="font-bold" style={{ color: T.text }}>128</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2"><Wallet size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>WALLET</span></div>
+                <span className="font-bold" style={{ color: T.primary }}>$456K</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-2"><Activity size={14} style={{ color: T.dim }} /><span className="text-xs" style={{ color: T.muted }}>UPTIME</span></div>
+                <span className="font-bold" style={{ color: T.green }}>99.9%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Cards Grid - 2 Columns */}
+        <div className="flex-1 grid grid-cols-2 gap-5">
+          <DataCard title="REVENUE" icon={<DollarSign size={14} />}><Chart type="bar" /><StatRow l1="THIS MONTH" v1="$847K" l2="LAST MONTH" v2="$692K" /></DataCard>
+          <DataCard title="USERS" icon={<Users size={14} />}><Chart type="line" /><StatRow l1="NEW USERS" v1="+2,847" l2="ACTIVE TODAY" v2="8,421" /></DataCard>
+          <DataCard title="FRANCHISES" icon={<Building2 size={14} />}><Chart type="bar" /><StatRow l1="TOP" v1="Mumbai" l2="AVG REV" v2="$18.7K" /></DataCard>
+          <DataCard title="SYSTEM" icon={<Server size={14} />}><Chart type="line" /><StatRow l1="LOAD" v1="42%" l2="RESPONSE" v2="124ms" c1={T.green} /></DataCard>
+          <DataCard title="SECURITY" icon={<ShieldAlert size={14} />}><Chart type="bar" /><StatRow l1="CRITICAL" v1="3" l2="RESOLVED" v2="47" c1={T.accent} c2={T.green} /></DataCard>
+          <DataCard title="TRANSACTIONS" icon={<CreditCard size={14} />}><Chart type="line" /><StatRow l1="TODAY" v1="$1.2M" l2="PENDING" v2="$89K" c2={T.primary} /></DataCard>
+        </div>
       </div>
     </div>
   );
