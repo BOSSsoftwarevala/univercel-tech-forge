@@ -6,7 +6,6 @@ import {
   Bug,
   Rocket,
   Box,
-  Brain,
   CheckSquare,
   Activity,
   ChevronLeft,
@@ -24,13 +23,13 @@ interface DeveloperManagerSidebarProps {
   onBackToControlPanel: () => void;
 }
 
+// NO AI ELEMENTS - Pure Developer Operations
 const menuItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "developers", label: "Developers", icon: Users },
   { id: "bugs", label: "Bugs / Issues", icon: Bug },
   { id: "releases", label: "Releases", icon: Rocket },
   { id: "products", label: "Products", icon: Box },
-  { id: "ai-tasks", label: "AI Tasks", icon: Brain },
   { id: "approvals", label: "Approvals", icon: CheckSquare },
   { id: "activity-logs", label: "Activity Logs", icon: Activity },
 ];
@@ -89,7 +88,7 @@ const DeveloperManagerSidebar = ({
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Developer Manager</p>
-              <p className="text-[11px] text-white/50">VALA AI • Ops</p>
+              <p className="text-[11px] text-white/50">Human Operations</p>
             </div>
           </div>
         </div>
