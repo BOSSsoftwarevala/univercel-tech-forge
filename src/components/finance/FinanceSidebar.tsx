@@ -3,7 +3,8 @@
  * SINGLE-CONTEXT ENFORCEMENT: Uses sidebar store for strict isolation
  */
 
-import { 
+import React from 'react';
+import {
   LayoutDashboard, 
   DollarSign,
   Wallet,
@@ -26,7 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { useSidebarStore, useShouldRenderSidebar } from "@/stores/sidebarStore";
+import { useSidebarStore } from "@/stores/sidebarStore";
 
 type FinanceView = 
   | "revenue" 
@@ -49,21 +50,21 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
   const navigate = useNavigate();
   
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use dedicated hook for strict visibility check
-  const shouldRender = useShouldRenderSidebar('category', 'finance-manager');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('finance-manager');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - triggers FULL context switch to Boss
   const handleBack = () => {
     exitToGlobal();
     onBack?.();
   };
-  
-  // STRICT ISOLATION: Only render when in Module context with matching category
-  if (!shouldRender) {
-    return null;
-  }
   
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Finance Manager';
   const maskedId = user?.id ? `FIN-${user.id.substring(0, 4).toUpperCase()}` : 'FIN-0000';
@@ -85,47 +86,48 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
   ];
 
   return (
-    <aside className="w-64 bg-card/50 border-r border-border/50 flex flex-col">
+    <aside className="w-64 flex flex-col h-full" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)', borderRight: '1px solid #1e3a5f' }}>
       {/* Back Button */}
-      <div className="p-2 border-b border-border/50">
+      <div className="p-2" style={{ borderBottom: '1px solid #1e3a5f' }}>
         <motion.button
           onClick={handleBack}
           whileHover={{ x: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all"
+          style={{ color: 'rgba(255, 255, 255, 0.7)' }}
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Boss</span>
+          <span>← Back to Control Panel</span>
         </motion.button>
       </div>
       
       {/* Logo */}
-      <div className="p-4 border-b border-border/50">
+      <div className="p-4" style={{ borderBottom: '1px solid #1e3a5f' }}>
         <div className="flex items-center gap-3">
-          <DollarSign className="w-5 h-5 text-primary" />
+          <DollarSign className="w-5 h-5" style={{ color: '#60a5fa' }} />
           <div>
-            <h2 className="text-sm font-semibold text-foreground">Finance Manager</h2>
-            <p className="text-xs text-muted-foreground">Financial Operations</p>
+            <h2 className="text-sm font-semibold" style={{ color: '#ffffff' }}>Finance Manager</h2>
+            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Financial Operations</p>
           </div>
         </div>
       </div>
 
       {/* User Info */}
-      <div className="p-4 border-b border-border/50">
-        <div className="bg-muted/50 rounded-lg p-3">
+      <div className="p-4" style={{ borderBottom: '1px solid #1e3a5f' }}>
+        <div className="rounded-lg p-3" style={{ background: 'rgba(30, 58, 95, 0.3)' }}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground truncate">{userName}</span>
-            <Badge variant="outline" className="text-[10px]">
+            <span className="text-sm font-medium truncate" style={{ color: '#ffffff' }}>{userName}</span>
+            <Badge variant="outline" className="text-[10px]" style={{ borderColor: '#1e3a5f', color: 'rgba(255, 255, 255, 0.7)' }}>
               FINANCE
             </Badge>
           </div>
-          <span className="text-xs text-muted-foreground font-mono">{maskedId}</span>
+          <span className="text-xs font-mono" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{maskedId}</span>
         </div>
       </div>
 
       {/* Finance Modules Navigation */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+        <p className="text-xs font-semibold uppercase tracking-wider mb-2 px-2" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
           Finance Modules
         </p>
         {financeViews.map((view) => {
@@ -136,34 +138,27 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
               onClick={() => onViewChange(view.id)}
               whileHover={{ x: 2 }}
               whileTap={{ scale: 0.98 }}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                isActive
-                  ? "bg-primary/20 text-primary border border-primary/30"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              )}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all"
+              style={{
+                background: isActive ? '#2563eb' : 'transparent',
+                color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+              }}
             >
-              <view.icon className="w-4 h-4" />
+              <view.icon className="w-4 h-4" style={{ color: isActive ? '#ffffff' : '#60a5fa' }} />
               <span>{view.label}</span>
-              {isActive && (
-                <motion.div
-                  layoutId="finance-active"
-                  className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"
-                />
-              )}
             </motion.button>
           );
         })}
       </nav>
 
       {/* Gateway Status */}
-      <div className="p-4 border-t border-border/50">
-        <div className="bg-muted/30 rounded-lg p-3">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Payment Gateways</p>
+      <div className="p-4" style={{ borderTop: '1px solid #1e3a5f' }}>
+        <div className="rounded-lg p-3" style={{ background: 'rgba(30, 58, 95, 0.3)' }}>
+          <p className="text-xs font-medium mb-2" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Payment Gateways</p>
           <div className="space-y-1.5">
             {['Razorpay', 'Stripe', 'PayPal'].map((gateway) => (
               <div key={gateway} className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{gateway}</span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{gateway}</span>
                 <span className="flex items-center gap-1 text-emerald-500">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Active

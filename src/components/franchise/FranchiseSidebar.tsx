@@ -3,7 +3,7 @@
  * SINGLE-CONTEXT ENFORCEMENT: Uses sidebar store for strict isolation
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { useSidebarStore, useShouldRenderSidebar } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -70,21 +70,21 @@ export const FranchiseSidebar = ({
   const { signOut } = useAuth();
   
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use dedicated hook for strict visibility check
-  const shouldRender = useShouldRenderSidebar('category', 'franchise-manager');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('franchise-manager');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - triggers FULL context switch to Boss
   const handleBack = () => {
     exitToGlobal();
     onBack?.();
   };
-  
-  // STRICT ISOLATION: Only render when in Module context with matching category
-  if (!shouldRender) {
-    return null;
-  }
 
   const handleLogout = async () => {
     await signOut();
@@ -93,29 +93,30 @@ export const FranchiseSidebar = ({
   };
 
   return (
-    <aside className={`w-64 bg-card/50 border-r border-border/50 flex flex-col h-full`}>
+    <aside className="w-64 flex flex-col h-full" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)', borderRight: '1px solid #1e3a5f' }}>
       {/* Back Button */}
-      <div className="p-2 border-b border-border/50">
+      <div className="p-2" style={{ borderBottom: '1px solid #1e3a5f' }}>
         <motion.button
           onClick={handleBack}
           whileHover={{ x: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all"
+          style={{ color: 'rgba(255, 255, 255, 0.7)' }}
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Boss</span>
+          <span>← Back to Control Panel</span>
         </motion.button>
       </div>
       
       {/* Header */}
-      <div className="p-4 border-b border-border/50">
+      <div className="p-4" style={{ borderBottom: '1px solid #1e3a5f' }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-            <MapPin className="w-5 h-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(37, 99, 235, 0.2)' }}>
+            <MapPin className="w-5 h-5" style={{ color: '#60a5fa' }} />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-foreground">Franchise Portal</h2>
-            <p className="text-xs text-muted-foreground">Territory Management</p>
+            <h2 className="text-sm font-semibold" style={{ color: '#ffffff' }}>Franchise Portal</h2>
+            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Territory Management</p>
           </div>
         </div>
       </div>
@@ -129,28 +130,22 @@ export const FranchiseSidebar = ({
             <motion.button
               key={item.id}
               onClick={() => onItemChange(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all relative ${
-                isActive
-                  ? 'bg-primary/20 text-primary border border-primary/30'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              }`}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all relative"
+              style={{
+                background: isActive ? '#2563eb' : 'transparent',
+                color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+              }}
               whileHover={{ x: 2 }}
               whileTap={{ scale: 0.98 }}
             >
-              <IconComponent className="w-4 h-4 flex-shrink-0" />
+              <IconComponent className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? '#ffffff' : '#60a5fa' }} />
               <span className="font-medium flex-1 text-left truncate">
                 {item.label}
               </span>
               {item.badge && (
-                <span className="px-2 py-0.5 rounded-full text-xs bg-primary/20 text-primary">
+                <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: 'rgba(37, 99, 235, 0.3)', color: '#60a5fa' }}>
                   {item.badge}
                 </span>
-              )}
-              {isActive && (
-                <motion.div
-                  layoutId="franchiseActiveIndicator"
-                  className="w-1.5 h-1.5 rounded-full bg-primary"
-                />
               )}
             </motion.button>
           );
@@ -158,20 +153,21 @@ export const FranchiseSidebar = ({
       </nav>
 
       {/* Performance Widget */}
-      <div className="mx-3 mb-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+      <div className="mx-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(30, 58, 95, 0.3)', border: '1px solid #1e3a5f' }}>
         <div className="flex items-center gap-2 mb-2">
           <Star className="w-4 h-4 text-amber-500" />
-          <span className="text-xs text-muted-foreground">Performance</span>
+          <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Performance</span>
         </div>
-        <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(30, 58, 95, 0.5)' }}>
           <motion.div 
-            className="h-full bg-primary rounded-full"
+            className="h-full rounded-full"
+            style={{ background: '#2563eb' }}
             initial={{ width: 0 }}
             animate={{ width: '85%' }}
             transition={{ duration: 1, delay: 0.5 }}
           />
         </div>
-        <p className="text-xs text-primary mt-1">Rating: 4.8/5.0</p>
+        <p className="text-xs mt-1" style={{ color: '#60a5fa' }}>Rating: 4.8/5.0</p>
       </div>
     </aside>
   );

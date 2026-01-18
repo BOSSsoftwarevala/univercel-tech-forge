@@ -2,6 +2,7 @@
  * RESELLER MANAGER SIDEBAR
  * SINGLE SIDEBAR ENFORCEMENT: Uses sidebar store
  */
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +24,7 @@ import {
   Store,
   ArrowLeft,
 } from 'lucide-react';
-import { useSidebarStore, useShouldRenderSidebar } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 export type ResellerManagerSection = 
   | 'dashboard'
@@ -66,21 +67,21 @@ export function ResellerManagerSidebar({
   onBack,
 }: ResellerManagerSidebarProps) {
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use dedicated hook for strict visibility check
-  const shouldRender = useShouldRenderSidebar('category', 'reseller-manager');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('reseller-manager');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - triggers FULL context switch to Boss
   const handleBack = () => {
     exitToGlobal();
     onBack?.();
   };
-  
-  // STRICT ISOLATION: Only render when in Module context with matching category
-  if (!shouldRender) {
-    return null;
-  }
 
   return (
     <motion.aside
