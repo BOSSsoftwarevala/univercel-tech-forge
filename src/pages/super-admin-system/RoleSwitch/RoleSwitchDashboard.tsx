@@ -470,6 +470,8 @@ const RoleSwitchDashboard = () => {
         return <AAMEnterpriseLayout />;
       case "promise_tracker_manager":
         return <PTFullLayout />;
+      case "assist_manager":
+        return <AMFullLayout />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
