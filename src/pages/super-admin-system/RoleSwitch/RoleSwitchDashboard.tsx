@@ -35,6 +35,7 @@ import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashb
 import RoleManagerDashboard from "./RoleManagerDashboard";
 import CountryHeadDashboard from "./CountryHeadDashboard";
 import ProductManagerDashboard from "./ProductManagerDashboard";
+import DemoManagerDashboard from "./DemoManagerDashboard";
 import CEODashboard from "./CEODashboard";
 import BossOwnerDashboard from "./BossOwnerDashboard";
 import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
@@ -446,6 +447,8 @@ const RoleSwitchDashboard = () => {
         return <RoleManagerDashboard />;
       case "product_manager":
         return <ProductManagerDashboard />;
+      case "demo_manager":
+        return <DemoManagerDashboard />;
       case "developer_management":
         return <DeveloperManagementDashboard />;
       case null:
