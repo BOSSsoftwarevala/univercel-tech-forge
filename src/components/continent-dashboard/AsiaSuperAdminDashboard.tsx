@@ -204,6 +204,13 @@ const AsiaSuperAdminDashboard = ({ onBack }: AsiaSuperAdminDashboardProps) => {
     setDrawerOpen(true);
   }, []);
 
+  const handleKpiClick = useCallback((kpi: ActionKPI) => {
+    toast.info(kpi.title, {
+      description: "Opening panel…",
+      duration: 2000,
+    });
+  }, []);
+
   const getMarkerColor = (type: string): string => {
     return MARKER_COLORS[type as keyof typeof MARKER_COLORS] || "#6b7280";
   };
@@ -255,6 +262,15 @@ const AsiaSuperAdminDashboard = ({ onBack }: AsiaSuperAdminDashboardProps) => {
               transition={{ delay: index * 0.02 }}
               whileHover={{ scale: 1.02, y: -2 }}
               className="cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleKpiClick(kpi)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleKpiClick(kpi);
+                }
+              }}
             >
               <Card className="bg-slate-900/50 border-slate-700/50 hover:border-red-500/30 transition-all h-full">
                 <CardContent className="p-2">

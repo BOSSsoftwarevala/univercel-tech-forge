@@ -98,6 +98,25 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
     setDrawerOpen(true);
   }, []);
 
+  const handleKpiClick = useCallback((kpi: ActionKPI) => {
+    const idToSection: Partial<Record<ActionKPI["id"], ContinentSidebarSection>> = {
+      pending_approvals: "pending_approvals",
+      critical_issues: "critical_issues",
+      payment_pending: "payments",
+      compliance: "compliance",
+    };
+
+    const targetSection = idToSection[kpi.id];
+    if (targetSection) {
+      setActiveSection(targetSection);
+    }
+
+    toast.info(kpi.title, {
+      description: targetSection ? `Opening ${targetSection.replace(/_/g, " ")}…` : "No panel linked yet.",
+      duration: 2000,
+    });
+  }, [setActiveSection]);
+
   const getMarkerColor = (type: string): string => {
     return MARKER_COLORS[type as keyof typeof MARKER_COLORS] || "#6b7280";
   };
@@ -170,6 +189,15 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
               transition={{ delay: index * 0.02 }}
               whileHover={{ scale: 1.02, y: -2 }}
               className="cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleKpiClick(kpi)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleKpiClick(kpi);
+                }
+              }}
             >
               <Card className="bg-slate-900/50 border-slate-700/50 hover:border-slate-600/50 transition-all h-full">
                 <CardContent className="p-2">
