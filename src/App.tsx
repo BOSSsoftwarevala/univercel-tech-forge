@@ -96,6 +96,10 @@ import AccountingDemo from "./pages/accounting/AccountingDemo";
 import ProAccountingDemo from "./pages/pro-accounting/ProAccountingDemo";
 import AutoDevEngine from "./pages/auto-dev/AutoDevEngine";
 
+// School Management Software - LIVE SYSTEM (NOT DEMO)
+import SchoolSoftwareHomepage from "./pages/school-software/SchoolSoftwareHomepage";
+import SchoolSoftwareDashboard from "./pages/school-software/SchoolSoftwareDashboard";
+
 import SettingsPage from "./pages/Settings";
 
 // Super Admin Pages
@@ -369,6 +373,10 @@ const App = () => (
               <Route path="/demo/school-large" element={<SchoolLargeDemo />} />
               <Route path="/demo/education" element={<EducationDemoHub />} />
               <Route path="/demos/education" element={<EducationDemoHub />} />
+              
+              {/* School Management Software - LIVE SYSTEM (NOT DEMO) */}
+              <Route path="/school-software" element={<SchoolSoftwareHomepage />} />
+              <Route path="/school-software/dashboard" element={<SchoolSoftwareDashboard />} />
               <Route path="/demo/hospital-hms" element={<HospitalHMSDemo />} />
               <Route path="/demo/ecommerce-store" element={<EcommerceStoreDemo />} />
               <Route path="/demo/hotel-booking" element={<HotelBookingDemo />} />
