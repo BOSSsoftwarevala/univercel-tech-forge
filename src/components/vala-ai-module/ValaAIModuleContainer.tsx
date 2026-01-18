@@ -1,24 +1,22 @@
 /**
  * VALA AI MODULE CONTAINER
  * Main container that combines sidebar + content
- * STEP 05: Added AI Support Bot & History panels
+ * RENAMED: From Development Manager to VALA AI
  */
 
 import React, { useState } from 'react';
 import { ValaAISidebar, ValaAISection } from './ValaAISidebar';
-import { ValaAIOverview } from './ValaAIOverview';
-import { AIRequestsPanel } from './AIRequestsPanel';
-import { AITasksPanel } from './AITasksPanel';
-import { AIModelsPanel } from './AIModelsPanel';
-import { AIAlertsPanel } from './AIAlertsPanel';
-import { AIUsagePanel } from './AIUsagePanel';
-import { AICreditsPanel } from './AICreditsPanel';
-import { AIAPIPanel } from './AIAPIPanel';
-import { AIAutomationPanel } from './AIAutomationPanel';
+import { ValaAIHome } from './ValaAIHome';
+import { ValaAINewProject } from './ValaAINewProject';
+import { ValaAILiveBuilds } from './ValaAILiveBuilds';
+import { ValaAIIssueInbox } from './ValaAIIssueInbox';
+import { ValaAIAutoFixQueue } from './ValaAIAutoFixQueue';
 import { AIClientDeployPanel } from './AIClientDeployPanel';
 import { AIDeploymentHistoryPanel } from './AIDeploymentHistoryPanel';
-import { AIClientSupportBot } from './AIClientSupportBot';
-import { AISupportHistoryPanel } from './AISupportHistoryPanel';
+import { DevVersions } from './DevVersions';
+import { DevLogs } from './DevLogs';
+import { DevSettings } from './DevSettings';
+import { DemoFactory } from './DemoFactory';
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
@@ -26,41 +24,35 @@ interface ValaAIModuleContainerProps {
 }
 
 export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
-  initialSection = 'overview',
+  initialSection = 'home',
   onBack
 }) => {
   const [activeSection, setActiveSection] = useState<ValaAISection>(initialSection);
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'overview':
-        return <ValaAIOverview />;
-      case 'ai-requests':
-        return <AIRequestsPanel />;
-      case 'ai-tasks':
-        return <AITasksPanel />;
-      case 'ai-models':
-        return <AIModelsPanel />;
-      case 'ai-alerts':
-        return <AIAlertsPanel />;
-      case 'ai-usage':
-        return <AIUsagePanel />;
-      case 'ai-credits':
-        return <AICreditsPanel />;
-      case 'ai-api':
-        return <AIAPIPanel />;
-      case 'ai-automation':
-        return <AIAutomationPanel />;
-      case 'ai-deploy':
+      case 'home':
+        return <ValaAIHome />;
+      case 'new-project':
+        return <ValaAINewProject />;
+      case 'live-builds':
+        return <ValaAILiveBuilds />;
+      case 'active-demos':
+        return <DemoFactory />;
+      case 'issue-inbox':
+        return <ValaAIIssueInbox />;
+      case 'auto-fix-queue':
+        return <ValaAIAutoFixQueue />;
+      case 'deployment':
         return <AIClientDeployPanel />;
-      case 'ai-deploy-history':
-        return <AIDeploymentHistoryPanel />;
-      case 'ai-support-bot':
-        return <AIClientSupportBot />;
-      case 'ai-support-history':
-        return <AISupportHistoryPanel />;
+      case 'versions':
+        return <DevVersions />;
+      case 'logs':
+        return <DevLogs />;
+      case 'settings':
+        return <DevSettings />;
       default:
-        return <ValaAIOverview />;
+        return <ValaAIHome />;
     }
   };
 

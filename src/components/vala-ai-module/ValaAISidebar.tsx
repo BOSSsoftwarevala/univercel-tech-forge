@@ -1,45 +1,40 @@
 /**
- * VALA AI MODULE SIDEBAR
- * Sidebar for VALA AI Management
- * STEP 05: Added AI Support Bot for Prime members
+ * VALA AI SIDEBAR
+ * Single Workspace - AI Command Center
+ * RENAMED FROM: Development Manager
  * SINGLE SIDEBAR ENFORCEMENT: Uses sidebar store
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LayoutDashboard, 
-  Brain,
-  ListTodo,
-  Cpu,
-  AlertTriangle,
-  BarChart3,
-  Wallet,
-  Webhook,
-  Cog,
-  ArrowLeft,
+  Home,
+  Plus,
+  PlayCircle,
+  Monitor,
+  Inbox,
+  Wrench,
   Rocket,
-  History,
-  MessageSquare,
-  FileText
+  GitBranch,
+  FileText,
+  Settings,
+  ArrowLeft,
+  Brain
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
 
 export type ValaAISection = 
-  | 'overview' 
-  | 'ai-requests' 
-  | 'ai-tasks' 
-  | 'ai-models' 
-  | 'ai-alerts' 
-  | 'ai-usage' 
-  | 'ai-credits' 
-  | 'ai-api' 
-  | 'ai-automation'
-  | 'ai-deploy'
-  | 'ai-deploy-history'
-  | 'ai-support-bot'
-  | 'ai-support-history';
+  | 'home' 
+  | 'new-project' 
+  | 'live-builds' 
+  | 'active-demos' 
+  | 'issue-inbox' 
+  | 'auto-fix-queue' 
+  | 'deployment' 
+  | 'versions'
+  | 'logs'
+  | 'settings';
 
 interface ValaAISidebarProps {
   activeSection: ValaAISection;
@@ -47,20 +42,17 @@ interface ValaAISidebarProps {
   onBack?: () => void;
 }
 
-const sidebarItems: { id: ValaAISection; label: string; icon: React.ElementType }[] = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'ai-requests', label: 'AI Requests', icon: Brain },
-  { id: 'ai-tasks', label: 'AI Tasks Running', icon: ListTodo },
-  { id: 'ai-models', label: 'AI Models Active', icon: Cpu },
-  { id: 'ai-alerts', label: 'AI Alerts', icon: AlertTriangle },
-  { id: 'ai-usage', label: 'AI Usage Today', icon: BarChart3 },
-  { id: 'ai-credits', label: 'AI Credits Balance', icon: Wallet },
-  { id: 'ai-api', label: 'AI API Calls', icon: Webhook },
-  { id: 'ai-automation', label: 'AI Automation Jobs', icon: Cog },
-  { id: 'ai-deploy', label: 'Client Auto-Deploy', icon: Rocket },
-  { id: 'ai-deploy-history', label: 'Deployment History', icon: History },
-  { id: 'ai-support-bot', label: 'AI Support Bot', icon: MessageSquare },
-  { id: 'ai-support-history', label: 'Support History', icon: FileText },
+const sidebarItems: { id: ValaAISection; label: string; icon: React.ElementType; badge?: string }[] = [
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'new-project', label: 'New Project', icon: Plus },
+  { id: 'live-builds', label: 'Live Builds', icon: PlayCircle },
+  { id: 'active-demos', label: 'Active Demos', icon: Monitor },
+  { id: 'issue-inbox', label: 'Issue Inbox', icon: Inbox },
+  { id: 'auto-fix-queue', label: 'Auto Fix Queue', icon: Wrench },
+  { id: 'deployment', label: 'Deployment', icon: Rocket },
+  { id: 'versions', label: 'Versions', icon: GitBranch },
+  { id: 'logs', label: 'Logs', icon: FileText, badge: 'Read-only' },
+  { id: 'settings', label: 'Settings', icon: Settings, badge: 'Limited' },
 ];
 
 export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
@@ -105,6 +97,7 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
           <Brain className="w-4 h-4 text-primary" />
           VALA AI
         </h2>
+        <p className="text-xs text-muted-foreground mt-1">AI Command Center</p>
       </div>
       
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
@@ -126,11 +119,16 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
               whileTap={{ scale: 0.98 }}
             >
               <Icon className="w-4 h-4" />
-              <span>{item.label}</span>
+              <span className="flex-1 text-left">{item.label}</span>
+              {item.badge && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                  {item.badge}
+                </span>
+              )}
               {isItemActive && (
                 <motion.div
                   layoutId="vala-ai-active-indicator"
-                  className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"
+                  className="w-1.5 h-1.5 rounded-full bg-primary"
                 />
               )}
             </motion.button>

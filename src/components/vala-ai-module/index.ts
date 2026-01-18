@@ -3,13 +3,9 @@
  */
 
 export { ValaAISidebar, type ValaAISection } from './ValaAISidebar';
-export { ValaAIOverview } from './ValaAIOverview';
-export { AIRequestsPanel } from './AIRequestsPanel';
-export { AITasksPanel } from './AITasksPanel';
-export { AIModelsPanel } from './AIModelsPanel';
-export { AIAlertsPanel } from './AIAlertsPanel';
-export { AIUsagePanel } from './AIUsagePanel';
-export { AICreditsPanel } from './AICreditsPanel';
-export { AIAPIPanel } from './AIAPIPanel';
-export { AIAutomationPanel } from './AIAutomationPanel';
+export { ValaAIHome } from './ValaAIHome';
+export { ValaAINewProject } from './ValaAINewProject';
+export { ValaAILiveBuilds } from './ValaAILiveBuilds';
+export { ValaAIIssueInbox } from './ValaAIIssueInbox';
+export { ValaAIAutoFixQueue } from './ValaAIAutoFixQueue';
 export { ValaAIModuleContainer } from './ValaAIModuleContainer';
