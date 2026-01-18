@@ -914,18 +914,18 @@ const RoleSwitchSidebar = ({
     <aside
       className={cn(
         "flex flex-col border-r transition-all duration-150",
-        "border-blue-400/30"
+        "border-primary/30"
       )}
-      style={{ 
-        background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)',
-        width: collapsed ? 60 : 240 
+      style={{
+        background: "hsl(var(--primary))",
+        width: collapsed ? 60 : 240,
       }}
     >
       {/* ================================================== */}
       {/* SECTION 1: ROLE AUTHORITY - STICKY AT TOP */}
       {/* Boss/Owner card always pinned, visually dominant */}
       {/* ================================================== */}
-      <div className="sticky top-0 z-20 bg-gradient-to-b from-blue-600/95 to-blue-700/95 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 bg-primary/95 backdrop-blur-sm">
         {/* Boss/Owner Primary Role Card - Always Visible */}
         <div className="p-3 border-b border-white/20">
           <div className="flex items-center gap-2">
@@ -1022,7 +1022,7 @@ const RoleSwitchSidebar = ({
       {/* SECTION 2: SYSTEM STATUS - Below Role Authority */}
       {/* Compact status indicators */}
       {/* ================================================== */}
-      <div className="px-3 py-2 border-b border-white/10 bg-white/5">
+      <div className="px-3 py-2 border-b border-white/10 bg-white/10">
         <div className="flex items-center gap-2">
           {!collapsed ? (
             <>
@@ -1031,10 +1031,10 @@ const RoleSwitchSidebar = ({
                 <span className="text-[10px] text-white/80 font-medium">RUNNING</span>
               </div>
               <Separator orientation="vertical" className="h-3 bg-white/20" />
-              <div className="flex items-center gap-1.5">
-                <Activity className="w-3 h-3 text-blue-400" />
-                <span className="text-[10px] text-white/80">AI: ACTIVE</span>
-              </div>
+                <div className="flex items-center gap-1.5">
+                  <Activity className="w-3 h-3 text-white/80" />
+                  <span className="text-[10px] text-white/80">AI: ACTIVE</span>
+                </div>
               <Separator orientation="vertical" className="h-3 bg-white/20" />
               <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/20">
                 <span className="text-[9px] text-emerald-400 font-medium">HEALTHY</span>
