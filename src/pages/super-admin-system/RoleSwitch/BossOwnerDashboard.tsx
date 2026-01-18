@@ -104,30 +104,34 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
   const [loadingApprovals, setLoadingApprovals] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  // === FETCH PAID PENDING APPROVALS ONLY ===
+  // === FETCH ALL PENDING APPROVALS (paid OR 7+ days old auto-approve) ===
+  const isAutoApproveEligible = (createdAt: string) => {
+    const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceCreation >= 7;
+  };
+
   useEffect(() => {
     const fetchApprovals = async () => {
       setLoadingApprovals(true);
       try {
-        // Fetch PAID applications that are pending approval
+        // Fetch ALL pending applications (paid or waiting 7+ days = auto eligible)
         const resellerQuery = supabase
           .from('reseller_applications')
           .select('*')
           .eq('status', 'pending')
-          .eq('payment_status', 'paid')
-          .limit(20);
+          .limit(50);
         
         const franchiseQuery = supabase
           .from('franchise_accounts')
           .select('*')
           .eq('status', 'pending')
-          .limit(20);
+          .limit(50);
         
         const influencerQuery = supabase
           .from('influencer_accounts')
           .select('*')
           .eq('status', 'pending')
-          .limit(20);
+          .limit(50);
 
         const [resellerRes, franchiseRes, influencerRes] = await Promise.all([
           resellerQuery,
@@ -135,19 +139,25 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           influencerQuery,
         ]);
         
-        console.log('Paid approvals fetched:', {
+        // Add auto_approve_eligible flag to each application
+        const processApprovals = (data: any[]) => data.map(item => ({
+          ...item,
+          auto_approve_eligible: item.payment_status === 'paid' || isAutoApproveEligible(item.created_at)
+        }));
+        
+        console.log('All pending approvals fetched:', {
           resellers: resellerRes.data?.length || 0,
           franchises: franchiseRes.data?.length || 0,
           influencers: influencerRes.data?.length || 0
         });
         
         setApprovals({
-          resellers: (resellerRes.data as any[]) || [],
-          franchises: (franchiseRes.data as any[]) || [],
-          influencers: (influencerRes.data as any[]) || [],
+          resellers: processApprovals((resellerRes.data as any[]) || []),
+          franchises: processApprovals((franchiseRes.data as any[]) || []),
+          influencers: processApprovals((influencerRes.data as any[]) || []),
         });
       } catch (e) {
-        console.error('Error fetching paid approvals:', e);
+        console.error('Error fetching approvals:', e);
       } finally {
         setLoadingApprovals(false);
       }
@@ -555,12 +565,12 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
       >
         <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(34, 197, 94, 0.2)' }}>
           <div className="flex items-center gap-2">
-            <DollarSign size={16} style={{ color: '#22c55e' }} />
-            <span className="text-sm font-semibold tracking-wider" style={{ color: '#22c55e' }}>PAID APPROVALS WAITING</span>
+            <Clock size={16} style={{ color: '#22c55e' }} />
+            <span className="text-sm font-semibold tracking-wider" style={{ color: '#22c55e' }}>PENDING APPROVALS (Paid OR 7+ Days)</span>
           </div>
           <div className="flex items-center gap-3">
             <Badge className={totalPendingApprovals > 0 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : STATUS_COLORS['active']}>
-              💰 {totalPendingApprovals} Paid & Waiting
+              ⏰ {totalPendingApprovals} Waiting
             </Badge>
             <Button size="sm" variant="outline" className="h-7 text-xs border-emerald-500/30 hover:bg-emerald-500/10" onClick={() => window.location.reload()}>
               <RefreshCw size={12} className="mr-1" /> Refresh
@@ -580,33 +590,46 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           </div>
         ) : (
           <div className="p-4 grid grid-cols-3 gap-4">
-            {/* RESELLER APPROVALS - PAID */}
+            {/* RESELLER APPROVALS */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
               <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <Store size={14} style={{ color: '#22c55e' }} />
-                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>PAID RESELLER APPLICATIONS</span>
+                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>RESELLER APPLICATIONS</span>
                 <Badge className="ml-auto text-[10px] bg-emerald-500/20 text-emerald-400">{approvals.resellers.length}</Badge>
               </div>
               <ScrollArea className="h-[280px]">
                 {approvals.resellers.length === 0 ? (
-                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No paid resellers waiting</p>
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No resellers waiting</p>
                 ) : (
                   <div className="space-y-2">
                     {approvals.resellers.map((item: any) => (
-                      <div key={item.id} className="p-3 rounded-lg" style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.15)' }}>
+                      <div key={item.id} className="p-3 rounded-lg" style={{ 
+                        background: item.payment_status === 'paid' ? 'rgba(34, 197, 94, 0.08)' : 'rgba(251, 191, 36, 0.08)', 
+                        border: item.payment_status === 'paid' ? '1px solid rgba(34, 197, 94, 0.15)' : '1px solid rgba(251, 191, 36, 0.15)' 
+                      }}>
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="text-sm font-semibold" style={{ color: T.text }}>{item.full_name || item.business_name || 'Reseller'}</p>
                             <p className="text-[11px]" style={{ color: T.muted }}>{item.email}</p>
                             <p className="text-[10px]" style={{ color: T.dim }}>{item.phone} • {item.country}</p>
                           </div>
-                          <Badge className="bg-emerald-500/30 text-emerald-300 text-[10px]">
-                            <DollarSign className="w-3 h-3 mr-0.5" />
-                            {item.payment_amount ? `₹${item.payment_amount.toLocaleString()}` : 'PAID'}
-                          </Badge>
+                          {item.payment_status === 'paid' ? (
+                            <Badge className="bg-emerald-500/30 text-emerald-300 text-[10px]">
+                              <DollarSign className="w-3 h-3 mr-0.5" />
+                              {item.payment_amount ? `₹${item.payment_amount.toLocaleString()}` : 'PAID'}
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-amber-500/30 text-amber-300 text-[10px]">
+                              <Clock className="w-3 h-3 mr-0.5" />
+                              7+ Days
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-[9px] mt-1" style={{ color: T.dim }}>
-                          Paid: {item.payment_date ? new Date(item.payment_date).toLocaleString() : 'Recently'}
+                          {item.payment_status === 'paid' 
+                            ? `Paid: ${item.payment_date ? new Date(item.payment_date).toLocaleString() : 'Recently'}`
+                            : `Applied: ${new Date(item.created_at).toLocaleDateString()} (Auto-eligible)`
+                          }
                         </p>
                         <div className="flex gap-1 mt-2">
                           <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('reseller', item.id, 'approve')} disabled={processingId === item.id}>
@@ -623,32 +646,45 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
               </ScrollArea>
             </div>
 
-            {/* FRANCHISE APPROVALS - PAID */}
+            {/* FRANCHISE APPROVALS */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
               <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <Building2 size={14} style={{ color: '#22c55e' }} />
-                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>PAID FRANCHISE APPLICATIONS</span>
+                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>FRANCHISE APPLICATIONS</span>
                 <Badge className="ml-auto text-[10px] bg-emerald-500/20 text-emerald-400">{approvals.franchises.length}</Badge>
               </div>
               <ScrollArea className="h-[280px]">
                 {approvals.franchises.length === 0 ? (
-                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No paid franchises waiting</p>
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No franchises waiting</p>
                 ) : (
                   <div className="space-y-2">
                     {approvals.franchises.map((item: any) => (
-                      <div key={item.id} className="p-3 rounded-lg" style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.15)' }}>
+                      <div key={item.id} className="p-3 rounded-lg" style={{ 
+                        background: item.payment_status === 'paid' ? 'rgba(34, 197, 94, 0.08)' : 'rgba(251, 191, 36, 0.08)', 
+                        border: item.payment_status === 'paid' ? '1px solid rgba(34, 197, 94, 0.15)' : '1px solid rgba(251, 191, 36, 0.15)' 
+                      }}>
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="text-sm font-semibold" style={{ color: T.text }}>{item.company_name || item.franchise_name || 'Franchise'}</p>
                             <p className="text-[11px]" style={{ color: T.muted }}>{item.country || item.region || 'Unknown location'}</p>
                           </div>
-                          <Badge className="bg-emerald-500/30 text-emerald-300 text-[10px]">
-                            <DollarSign className="w-3 h-3 mr-0.5" />
-                            {item.payment_amount ? `₹${item.payment_amount.toLocaleString()}` : 'PAID'}
-                          </Badge>
+                          {item.payment_status === 'paid' ? (
+                            <Badge className="bg-emerald-500/30 text-emerald-300 text-[10px]">
+                              <DollarSign className="w-3 h-3 mr-0.5" />
+                              {item.payment_amount ? `₹${item.payment_amount.toLocaleString()}` : 'PAID'}
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-amber-500/30 text-amber-300 text-[10px]">
+                              <Clock className="w-3 h-3 mr-0.5" />
+                              7+ Days
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-[9px] mt-1" style={{ color: T.dim }}>
-                          Paid: {item.payment_date ? new Date(item.payment_date).toLocaleString() : 'Recently'}
+                          {item.payment_status === 'paid' 
+                            ? `Paid: ${item.payment_date ? new Date(item.payment_date).toLocaleString() : 'Recently'}`
+                            : `Applied: ${new Date(item.created_at).toLocaleDateString()} (Auto-eligible)`
+                          }
                         </p>
                         <div className="flex gap-1 mt-2">
                           <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('franchise', item.id, 'approve')} disabled={processingId === item.id}>
@@ -665,32 +701,45 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
               </ScrollArea>
             </div>
 
-            {/* INFLUENCER APPROVALS - PAID */}
+            {/* INFLUENCER APPROVALS */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
               <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <Megaphone size={14} style={{ color: '#22c55e' }} />
-                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>PAID INFLUENCER APPLICATIONS</span>
+                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>INFLUENCER APPLICATIONS</span>
                 <Badge className="ml-auto text-[10px] bg-emerald-500/20 text-emerald-400">{approvals.influencers.length}</Badge>
               </div>
               <ScrollArea className="h-[280px]">
                 {approvals.influencers.length === 0 ? (
-                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No paid influencers waiting</p>
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No influencers waiting</p>
                 ) : (
                   <div className="space-y-2">
                     {approvals.influencers.map((item: any) => (
-                      <div key={item.id} className="p-3 rounded-lg" style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.15)' }}>
+                      <div key={item.id} className="p-3 rounded-lg" style={{ 
+                        background: item.payment_status === 'paid' ? 'rgba(34, 197, 94, 0.08)' : 'rgba(251, 191, 36, 0.08)', 
+                        border: item.payment_status === 'paid' ? '1px solid rgba(34, 197, 94, 0.15)' : '1px solid rgba(251, 191, 36, 0.15)' 
+                      }}>
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="text-sm font-semibold" style={{ color: T.text }}>{item.name || item.influencer_name || 'Influencer'}</p>
                             <p className="text-[11px]" style={{ color: T.muted }}>{item.platform || 'Unknown platform'} • {item.followers || '0'} followers</p>
                           </div>
-                          <Badge className="bg-emerald-500/30 text-emerald-300 text-[10px]">
-                            <DollarSign className="w-3 h-3 mr-0.5" />
-                            {item.payment_amount ? `₹${item.payment_amount.toLocaleString()}` : 'PAID'}
-                          </Badge>
+                          {item.payment_status === 'paid' ? (
+                            <Badge className="bg-emerald-500/30 text-emerald-300 text-[10px]">
+                              <DollarSign className="w-3 h-3 mr-0.5" />
+                              {item.payment_amount ? `₹${item.payment_amount.toLocaleString()}` : 'PAID'}
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-amber-500/30 text-amber-300 text-[10px]">
+                              <Clock className="w-3 h-3 mr-0.5" />
+                              7+ Days
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-[9px] mt-1" style={{ color: T.dim }}>
-                          Paid: {item.payment_date ? new Date(item.payment_date).toLocaleString() : 'Recently'}
+                          {item.payment_status === 'paid' 
+                            ? `Paid: ${item.payment_date ? new Date(item.payment_date).toLocaleString() : 'Recently'}`
+                            : `Applied: ${new Date(item.created_at).toLocaleDateString()} (Auto-eligible)`
+                          }
                         </p>
                         <div className="flex gap-1 mt-2">
                           <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('influencer', item.id, 'approve')} disabled={processingId === item.id}>
