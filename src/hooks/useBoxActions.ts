@@ -9,7 +9,11 @@
 
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
-import type { BoxStatus, BoxType, PermissionLevel } from '@/components/shared/ActionBox';
+
+// Types moved inline since ActionBox was removed
+export type BoxType = 'approval' | 'process' | 'ai' | 'live' | 'data';
+export type BoxStatus = 'active' | 'pending' | 'suspended' | 'stopped';
+export type PermissionLevel = 'boss' | 'ceo' | 'manager' | 'readonly';
 
 export interface ActionResult {
   success: boolean;
