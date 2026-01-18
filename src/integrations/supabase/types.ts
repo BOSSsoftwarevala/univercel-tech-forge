@@ -15173,6 +15173,10 @@ export type Database = {
           full_name: string
           id: string
           id_proof_uploaded: boolean
+          payment_amount: number | null
+          payment_date: string | null
+          payment_reference: string | null
+          payment_status: string | null
           phone: string | null
           promise_acknowledged: boolean
           rejection_reason: string | null
@@ -15191,6 +15195,10 @@ export type Database = {
           full_name: string
           id?: string
           id_proof_uploaded?: boolean
+          payment_amount?: number | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
           phone?: string | null
           promise_acknowledged?: boolean
           rejection_reason?: string | null
@@ -15209,6 +15217,10 @@ export type Database = {
           full_name?: string
           id?: string
           id_proof_uploaded?: boolean
+          payment_amount?: number | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
           phone?: string | null
           promise_acknowledged?: boolean
           rejection_reason?: string | null
