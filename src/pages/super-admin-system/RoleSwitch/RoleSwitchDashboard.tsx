@@ -33,6 +33,7 @@ import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
 import RoleManagerDashboard from "./RoleManagerDashboard";
+import RMEnterpriseLayout from "@/components/role-manager/RMEnterpriseLayout";
 // CRITICAL: Use the full-featured CountryHeadDashboard with built-in sidebar + interactive map
 import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDashboard";
 import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
@@ -456,7 +457,7 @@ const RoleSwitchDashboard = () => {
       case "customer_support_management":
         return <CustomerSupportManagementDashboard />;
       case "role_manager":
-        return <RoleManagerDashboard />;
+        return <RMEnterpriseLayout />;
       case "product_manager":
         return <PMEnterpriseLayout />;
       case "demo_manager":
