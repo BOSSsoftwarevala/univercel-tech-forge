@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TopControlBar from '@/components/layout/TopControlBar';
-import Sidebar from '@/components/layout/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import FranchiseTable from '@/components/franchise/FranchiseTable';
 import FranchiseFilters from '@/components/franchise/FranchiseFilters';
@@ -265,13 +264,8 @@ const FranchiseManagement = () => {
   return (
     <div className="min-h-screen bg-background grid-lines">
       <TopControlBar />
-      <Sidebar 
-        activeItem={activeItem} 
-        onItemClick={handleItemClick}
-        collapsed={sidebarCollapsed}
-      />
       
-      <main className={`pt-14 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+      <main className="pt-14 transition-all duration-300 ml-4">
         <div className="p-6 space-y-6">
           {/* Header */}
           <motion.div 
