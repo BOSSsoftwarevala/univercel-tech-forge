@@ -914,10 +914,9 @@ const RoleSwitchSidebar = ({
     <aside
       className={cn(
         "flex flex-col border-r transition-all duration-150",
-        "border-primary/30"
+        "border-blue-500/30 bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800"
       )}
       style={{
-        background: "hsl(var(--primary))",
         width: collapsed ? 60 : 240,
       }}
     >
@@ -925,7 +924,7 @@ const RoleSwitchSidebar = ({
       {/* SECTION 1: ROLE AUTHORITY - STICKY AT TOP */}
       {/* Boss/Owner card always pinned, visually dominant */}
       {/* ================================================== */}
-      <div className="sticky top-0 z-20 bg-primary/95 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 bg-blue-600/95 backdrop-blur-sm">
         {/* Boss/Owner Primary Role Card - Always Visible */}
         <div className="p-3 border-b border-white/20">
           <div className="flex items-center gap-2">
@@ -1022,7 +1021,7 @@ const RoleSwitchSidebar = ({
       {/* SECTION 2: SYSTEM STATUS - Below Role Authority */}
       {/* Compact status indicators */}
       {/* ================================================== */}
-      <div className="px-3 py-2 border-b border-white/10 bg-white/10">
+      <div className="px-3 py-2 border-b border-blue-500/30 bg-blue-500/20">
         <div className="flex items-center gap-2">
           {!collapsed ? (
             <>
