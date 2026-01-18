@@ -35,7 +35,7 @@ import {
   Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
   Headphones, Handshake, Target, Box, Terminal, 
   Star, Scale, ListTodo, DollarSign, Code2, 
-  Megaphone, HeartHandshake, Users, LogOut, Zap
+  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -77,6 +77,7 @@ const ROLE_CATEGORIES = [
   { id: 'customer_support_management', label: 'Customer Support Management', icon: HeartHandshake },
   { id: 'role_manager', label: 'Role Manager', icon: Users },
   { id: 'api_ai_manager', label: 'API & AI Manager', icon: Zap },
+  { id: 'promise_tracker_manager', label: 'Promise Tracker', icon: Timer },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
