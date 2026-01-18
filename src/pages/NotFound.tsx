@@ -43,6 +43,8 @@ const NotFound = () => {
   const [message] = useState(() => funMessages[Math.floor(Math.random() * funMessages.length)]);
   const [countdown, setCountdown] = useState(15);
 
+  const isSuperAdminLikePath = location.pathname.startsWith('/super-admin-system');
+
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
     document.title = "Oops! Page Not Found | Software Vala";
@@ -52,6 +54,13 @@ const NotFound = () => {
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
+          // If user is in the admin area, never kick them to public home.
+          // Always offer a recovery route that includes the required sidebar.
+          if (isSuperAdminLikePath) {
+            navigate('/super-admin-system/role-switch?role=boss_owner', { replace: true });
+            return 0;
+          }
+
           navigate('/', { replace: true });
           return 0;
         }
@@ -59,14 +68,66 @@ const NotFound = () => {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, [navigate, isSuperAdminLikePath]);
+
+  // ADMIN SAFETY RULE: No admin screen should appear without a sidebar.
+  // If an admin path ever hits NotFound, show a simple recovery sidebar.
+  if (isSuperAdminLikePath) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex min-h-screen">
+          <aside className="w-72 flex-shrink-0 border-r border-border bg-background text-foreground">
+            <div className="p-5 border-b border-border">
+              <div className="text-lg font-semibold">Admin Navigation</div>
+              <div className="text-sm text-muted-foreground">Recovery Sidebar</div>
+            </div>
+            <nav className="p-3 space-y-2">
+              <Button
+                className="w-full justify-start"
+                onClick={() => navigate('/super-admin-system/role-switch?role=boss_owner', { replace: true })}
+              >
+                Go to Control Panel
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => navigate('/super-admin-system/login', { replace: true })}
+              >
+                Login
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => navigate(-1)}
+              >
+                Go Back
+              </Button>
+            </nav>
+            <div className="mt-auto p-4 border-t border-border text-xs text-muted-foreground">
+              Auto-recovering in <span className="font-mono text-foreground">{countdown}s</span>
+            </div>
+          </aside>
+
+          <main className="flex-1 flex items-center justify-center p-6">
+            <div className="max-w-xl text-center">
+              <h1 className="text-6xl font-black tracking-tight text-foreground">404</h1>
+              <p className="mt-2 text-lg text-muted-foreground">This admin page route was not found.</p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Path: <code className="px-2 py-1 rounded bg-muted">{location.pathname}</code>
+              </p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4 overflow-hidden">
       {/* Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          animate={{ 
+          animate={{
             rotate: 360,
             scale: [1, 1.1, 1],
           }}
@@ -88,7 +149,7 @@ const NotFound = () => {
         <motion.div
           key={i}
           initial={{ opacity: 0 }}
-          animate={{ 
+          animate={{
             opacity: [0.3, 0.6, 0.3],
             y: [-20, 20, -20],
             x: [0, Math.sin(i) * 30, 0]
@@ -100,9 +161,9 @@ const NotFound = () => {
             ease: "easeInOut"
           }}
           className="absolute"
-          style={{ 
-            top: `${20 + Math.random() * 60}%`, 
-            left: `${10 + Math.random() * 80}%` 
+          style={{
+            top: `${20 + Math.random() * 60}%`,
+            left: `${10 + Math.random() * 80}%`
           }}
         >
           <Sparkles className="w-6 h-6 text-primary/30" />
@@ -122,7 +183,7 @@ const NotFound = () => {
           transition={{ duration: 0.5, type: "spring" }}
           className="relative mb-8"
         >
-          <h1 
+          <h1
             className="text-[150px] md:text-[200px] font-black leading-none"
             style={{
               background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280, 100%, 60%) 50%, hsl(var(--primary)) 100%)',
