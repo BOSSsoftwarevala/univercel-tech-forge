@@ -4,7 +4,7 @@
  * Shows when no specific continent is selected
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -91,6 +92,38 @@ const GlobalContinentDashboard = ({ onBack, onContinentClick }: GlobalContinentD
       onContinentClick(continent.id);
     }
   };
+
+  // Button action handlers
+  const handleBoxAction = useCallback((action: string, boxId: string, boxTitle: string) => {
+    switch (action) {
+      case "View":
+        toast.info(`Viewing ${boxTitle}`, {
+          description: `Opening ${boxTitle.toLowerCase()} management panel...`,
+          duration: 2000
+        });
+        break;
+      case "Approve":
+        toast.success(`Approve ${boxTitle}`, {
+          description: `Opening approval queue for ${boxTitle.toLowerCase()}...`,
+          duration: 2000
+        });
+        break;
+      case "Reject":
+        toast.warning(`Reject ${boxTitle}`, {
+          description: `Opening rejection panel for ${boxTitle.toLowerCase()}...`,
+          duration: 2000
+        });
+        break;
+      case "Suspend":
+        toast.warning(`Suspend ${boxTitle}`, {
+          description: `Opening suspension controls for ${boxTitle.toLowerCase()}...`,
+          duration: 2000
+        });
+        break;
+      default:
+        toast.info(`${action} ${boxTitle}`, { duration: 2000 });
+    }
+  }, []);
 
   return (
     <div className="h-full flex bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -410,6 +443,7 @@ const GlobalContinentDashboard = ({ onBack, onContinentClick }: GlobalContinentD
                             key={action}
                             variant="outline"
                             size="sm"
+                            onClick={() => handleBoxAction(action, box.id, box.title)}
                             className={cn(
                               "flex-1 text-xs",
                               action === "View" && "border-blue-500/50 text-blue-400 hover:bg-blue-500/10",
