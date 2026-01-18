@@ -2,10 +2,10 @@
  * CONTROL PANEL CONTENT
  * Main content component for the black sidebar Control Panel
  * Contains all live operational sections
+ * OPTIMIZED: Memoized components, simplified structure
  */
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { memo, useCallback } from 'react';
 import { Activity, MessageCircle, ListTodo, Clock, Zap, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -28,7 +28,7 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-const Section: React.FC<SectionProps> = ({ icon: Icon, title, collapsed, children }) => {
+const Section = memo<SectionProps>(({ icon: Icon, title, collapsed, children }) => {
   if (collapsed) return null;
   
   return (
@@ -40,70 +40,69 @@ const Section: React.FC<SectionProps> = ({ icon: Icon, title, collapsed, childre
       {children}
     </div>
   );
-};
+});
 
-export const ControlPanelContent: React.FC<ControlPanelContentProps> = ({ collapsed = false }) => {
+Section.displayName = 'Section';
+
+const CollapsedView = memo(() => {
   const navigate = useNavigate();
 
-  const handleSystemStatus = () => {
+  const handleSystemStatus = useCallback(() => {
     toast.info('All systems operational');
-  };
+  }, []);
 
-  const handleOpenChat = () => {
+  const handleOpenChat = useCallback(() => {
     toast.success('Opening live chat...');
-  };
+  }, []);
 
-  const handleOpenTasks = () => {
+  const handleOpenTasks = useCallback(() => {
     navigate('/boss/tasks');
-  };
+  }, [navigate]);
 
-  const handleOpenAlerts = () => {
+  const handleOpenAlerts = useCallback(() => {
     navigate('/boss/alerts');
-  };
+  }, [navigate]);
 
+  return (
+    <div className="flex flex-col items-center gap-3 py-3">
+      <button 
+        className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center cursor-pointer transition-transform active:scale-95"
+        title="System Online"
+        onClick={handleSystemStatus}
+      >
+        <Activity className="w-4 h-4 text-emerald-400" />
+      </button>
+      <button 
+        className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center cursor-pointer transition-transform active:scale-95"
+        title="Live Chat"
+        onClick={handleOpenChat}
+      >
+        <MessageCircle className="w-4 h-4 text-blue-400" />
+      </button>
+      <button 
+        className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center cursor-pointer transition-transform active:scale-95"
+        title="Tasks"
+        onClick={handleOpenTasks}
+      >
+        <ListTodo className="w-4 h-4 text-amber-400" />
+      </button>
+      <button 
+        className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center cursor-pointer relative transition-transform active:scale-95"
+        title="Alerts"
+        onClick={handleOpenAlerts}
+      >
+        <Bell className="w-4 h-4 text-red-400" />
+        <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 text-[8px] text-white flex items-center justify-center">3</span>
+      </button>
+    </div>
+  );
+});
+
+CollapsedView.displayName = 'CollapsedView';
+
+export const ControlPanelContent: React.FC<ControlPanelContentProps> = memo(({ collapsed = false }) => {
   if (collapsed) {
-    // Collapsed view - show only icons with click handlers
-    return (
-      <div className="flex flex-col items-center gap-3 py-3">
-        <motion.button 
-          className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center cursor-pointer"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          title="System Online"
-          onClick={handleSystemStatus}
-        >
-          <Activity className="w-4 h-4 text-emerald-400" />
-        </motion.button>
-        <motion.button 
-          className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center cursor-pointer"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          title="Live Chat"
-          onClick={handleOpenChat}
-        >
-          <MessageCircle className="w-4 h-4 text-blue-400" />
-        </motion.button>
-        <motion.button 
-          className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center cursor-pointer"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          title="Tasks"
-          onClick={handleOpenTasks}
-        >
-          <ListTodo className="w-4 h-4 text-amber-400" />
-        </motion.button>
-        <motion.button 
-          className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center cursor-pointer relative"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          title="Alerts"
-          onClick={handleOpenAlerts}
-        >
-          <Bell className="w-4 h-4 text-red-400" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 text-[8px] text-white flex items-center justify-center">3</span>
-        </motion.button>
-      </div>
-    );
+    return <CollapsedView />;
   }
 
   return (
@@ -139,4 +138,6 @@ export const ControlPanelContent: React.FC<ControlPanelContentProps> = ({ collap
       </Section>
     </div>
   );
-};
+});
+
+ControlPanelContent.displayName = 'ControlPanelContent';

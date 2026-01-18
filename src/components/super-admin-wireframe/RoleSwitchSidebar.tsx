@@ -910,15 +910,15 @@ const RoleSwitchSidebar = ({
   }, []);
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: collapsed ? 60 : 240 }}
-      transition={{ duration: 0.15 }}
+    <aside
       className={cn(
-        "flex flex-col border-r transition-colors duration-200",
+        "flex flex-col border-r transition-all duration-150",
         "border-blue-400/30"
       )}
-      style={{ background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)' }}
+      style={{ 
+        background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)',
+        width: collapsed ? 60 : 240 
+      }}
     >
       {/* ================================================== */}
       {/* SECTION 1: ROLE AUTHORITY - STICKY AT TOP */}
@@ -935,33 +935,22 @@ const RoleSwitchSidebar = ({
             )}>
               <Crown className="w-5 h-5 text-white drop-shadow-md" />
             </div>
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex-1 min-w-0"
-                >
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-bold text-white tracking-tight">Boss / Owner</h2>
-                    <Badge className="text-[9px] px-1.5 py-0 bg-amber-500/30 text-amber-200 border-amber-400/50">
-                      FINAL AUTHORITY
-                    </Badge>
-                  </div>
-                  <p className="text-[10px] text-white/70 font-medium">System Owner • Full Control</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {!collapsed && (
+              <div className="flex-1 min-w-0 transition-opacity duration-150">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-white tracking-tight">Boss / Owner</h2>
+                  <Badge className="text-[9px] px-1.5 py-0 bg-amber-500/30 text-amber-200 border-amber-400/50">
+                    FINAL AUTHORITY
+                  </Badge>
+                </div>
+                <p className="text-[10px] text-white/70 font-medium">System Owner • Full Control</p>
+              </div>
+            )}
           </div>
           
           {/* Boss Authority Actions - Lock / Archive / Override */}
           {!collapsed && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="flex items-center gap-1.5 mt-2"
-            >
+            <div className="flex items-center gap-1.5 mt-2">
               <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 text-[10px] font-medium transition-colors">
                 <Lock className="w-3 h-3" />
                 Lock
@@ -974,24 +963,17 @@ const RoleSwitchSidebar = ({
                 <Zap className="w-3 h-3" />
                 Override
               </button>
-            </motion.div>
+            </div>
           )}
         </div>
         
         {/* Role Switcher - Below Boss Card */}
         <div className="p-2 border-b border-white/15">
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-[9px] font-semibold text-white/60 uppercase tracking-wider mb-1.5 px-1"
-              >
-                Switch Role
-              </motion.p>
-            )}
-          </AnimatePresence>
+          {!collapsed && (
+            <p className="text-[9px] font-semibold text-white/60 uppercase tracking-wider mb-1.5 px-1">
+              Switch Role
+            </p>
+          )}
           <div className="space-y-0.5 max-h-[120px] overflow-y-auto">
             {Object.values(roleConfigs).filter(r => r.id !== 'boss_owner').slice(0, 4).map((role) => {
               const Icon = role.icon;
@@ -1362,7 +1344,7 @@ const RoleSwitchSidebar = ({
           )}
         </Tooltip>
       </div>
-    </motion.aside>
+    </aside>
   );
 };
 

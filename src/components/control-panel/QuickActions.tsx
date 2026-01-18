@@ -1,10 +1,10 @@
 /**
  * QUICK ACTIONS
  * Icon-only vertical action buttons with tooltips
+ * OPTIMIZED: Removed framer-motion whileHover/whileTap
  */
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { memo, useCallback } from 'react';
 import { Play, Pause, StopCircle, Lock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -26,39 +26,50 @@ const actions: QuickAction[] = [
   { id: 'escalate', icon: AlertTriangle, label: 'Escalate', color: 'text-orange-400', hoverColor: 'hover:bg-orange-500/20' },
 ];
 
-export const QuickActions: React.FC = () => {
-  const handleAction = (action: QuickAction) => {
+const ActionButton = memo<{ action: QuickAction; onClick: () => void }>(({ action, onClick }) => {
+  const Icon = action.icon;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={onClick}
+          className={cn(
+            "w-7 h-7 rounded-md flex items-center justify-center bg-white/5 border border-white/10 transition-all",
+            action.hoverColor,
+            "active:scale-95"
+          )}
+        >
+          <Icon className={cn("w-3.5 h-3.5", action.color)} />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="text-xs">
+        {action.label}
+      </TooltipContent>
+    </Tooltip>
+  );
+});
+
+ActionButton.displayName = 'ActionButton';
+
+export const QuickActions: React.FC = memo(() => {
+  const handleAction = useCallback((action: QuickAction) => {
     toast.success(`${action.label} action triggered`, {
       description: 'Processing your request...',
       duration: 2000,
     });
-  };
+  }, []);
 
   return (
     <div className="flex items-center justify-center gap-1">
-      {actions.map((action) => {
-        const Icon = action.icon;
-        return (
-          <Tooltip key={action.id}>
-            <TooltipTrigger asChild>
-              <motion.button
-                onClick={() => handleAction(action)}
-                className={cn(
-                  "w-7 h-7 rounded-md flex items-center justify-center bg-white/5 border border-white/10 transition-colors",
-                  action.hoverColor
-                )}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Icon className={cn("w-3.5 h-3.5", action.color)} />
-              </motion.button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs">
-              {action.label}
-            </TooltipContent>
-          </Tooltip>
-        );
-      })}
+      {actions.map((action) => (
+        <ActionButton
+          key={action.id}
+          action={action}
+          onClick={() => handleAction(action)}
+        />
+      ))}
     </div>
   );
-};
+});
+
+QuickActions.displayName = 'QuickActions';
