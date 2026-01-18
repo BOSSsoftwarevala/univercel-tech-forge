@@ -1,8 +1,18 @@
 /**
- * CONTROL PANEL DASHBOARD - STRUCTURAL REBUILD
+ * CONTROL PANEL DASHBOARD - FORCE STRUCTURE REBUILD
+ * ===================================================
  * EXACT: 2 COLUMNS × 7 ROWS = 14 BOXES
  * ALL BOXES SAME SIZE - NO EXCEPTIONS
  * LOCKED STRUCTURE - BOSS APPROVAL REQUIRED FOR CHANGES
+ * 
+ * BOX MAP (LOCKED):
+ * [1] KEY STATS         [2] SYSTEM HEALTH
+ * [3] LIVE ACTIVITY     [4] APPROVALS
+ * [5] CEO OVERVIEW      [6] VALA AI STATUS
+ * [7] SERVER MGMT       [8] CONTINENT/COUNTRY
+ * [9] FRANCHISE         [10] SALES & SUPPORT
+ * [11] PRODUCT MGR      [12] DEMO/LIVE SOFTWARE
+ * [13] FINANCE          [14] ALERT SUMMARY
  */
 
 import { memo } from "react";
@@ -10,7 +20,6 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   TrendingUp,
-  Users,
   Server,
   Brain,
   Activity,
@@ -24,20 +33,11 @@ import {
   DollarSign,
   AlertTriangle,
   Cpu,
-  HardDrive,
   Zap,
-  Clock,
-  Shield,
-  Wallet,
-  BarChart3,
-  MapPin,
-  Ticket,
-  Package,
-  RefreshCw,
   FileCheck,
 } from "lucide-react";
 
-// ===== LOCKED COLORS =====
+// ===== LOCKED COLORS (DO NOT CHANGE) =====
 const COLORS = {
   bg: '#0a1628',
   cardBg: '#0f1d2f',
@@ -53,16 +53,17 @@ const COLORS = {
   cyan: '#06b6d4',
 };
 
-// ===== BOX HEIGHT - UNIFORM FOR ALL =====
+// ===== UNIFORM BOX HEIGHT =====
 const BOX_HEIGHT = 'h-[200px]';
 
-// ===== REUSABLE STAT ROW =====
-const StatRow = ({ label, value, color = COLORS.text }: { label: string; value: string; color?: string }) => (
+// ===== STAT ROW COMPONENT =====
+const StatRow = memo(({ label, value, color = COLORS.text }: { label: string; value: string; color?: string }) => (
   <div className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
     <span className="text-sm text-white/60">{label}</span>
     <span className="text-sm font-semibold" style={{ color }}>{value}</span>
   </div>
-);
+));
+StatRow.displayName = 'StatRow';
 
 // ===== BOX 1: KEY STATS =====
 const Box1KeyStats = memo(() => (
@@ -74,6 +75,7 @@ const Box1KeyStats = memo(() => (
     <StatRow label="Franchises" value="24" color={COLORS.warning} />
   </div>
 ));
+Box1KeyStats.displayName = 'Box1KeyStats';
 
 // ===== BOX 2: SYSTEM HEALTH =====
 const Box2SystemHealth = memo(() => (
@@ -97,31 +99,36 @@ const Box2SystemHealth = memo(() => (
     <StatRow label="RAM Usage" value="58%" color={COLORS.purple} />
   </div>
 ));
+Box2SystemHealth.displayName = 'Box2SystemHealth';
 
-// ===== BOX 3: LIVE ACTIVITY (ONLY HERE) =====
+// ===== BOX 3: LIVE ACTIVITY (ONLY HERE - NO OTHER LOCATION) =====
 const Box3LiveActivity = memo(() => {
   const activities = [
     { text: 'Admin logged in', time: '2m' },
     { text: 'Deploy #4521 started', time: '5m' },
     { text: 'AI processed 45 tasks', time: '8m' },
-    { text: 'Server backup done', time: '12m' },
+    { text: 'Server backup completed', time: '12m' },
     { text: 'New franchise added', time: '18m' },
   ];
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
         {activities.map((a, i) => (
-          <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded bg-white/5">
-            <span className="text-sm text-white/80 truncate">{a.text}</span>
-            <span className="text-xs text-white/40 ml-2">{a.time}</span>
+          <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded bg-white/5 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-sm text-white/80 truncate">{a.text}</span>
+            </div>
+            <span className="text-xs text-white/40 ml-2 flex-shrink-0">{a.time}</span>
           </div>
         ))}
       </div>
     </div>
   );
 });
+Box3LiveActivity.displayName = 'Box3LiveActivity';
 
-// ===== BOX 4: APPROVALS (ONLY HERE) =====
+// ===== BOX 4: APPROVALS (ONLY HERE - NO OTHER LOCATION) =====
 const Box4Approvals = memo(() => {
   const approvals = [
     { type: 'Role Approvals', count: 3 },
@@ -135,7 +142,7 @@ const Box4Approvals = memo(() => {
     return (
       <div className="h-full flex flex-col items-center justify-center text-white/50">
         <CheckCircle className="w-10 h-10 mb-2 text-emerald-400" />
-        <span className="text-sm">No Pending Approvals</span>
+        <span className="text-sm font-medium">No Pending Approvals</span>
       </div>
     );
   }
@@ -154,6 +161,7 @@ const Box4Approvals = memo(() => {
     </div>
   );
 });
+Box4Approvals.displayName = 'Box4Approvals';
 
 // ===== BOX 5: CEO OVERVIEW =====
 const Box5CEOOverview = memo(() => (
@@ -165,6 +173,7 @@ const Box5CEOOverview = memo(() => (
     <StatRow label="Status" value="On Track" color={COLORS.success} />
   </div>
 ));
+Box5CEOOverview.displayName = 'Box5CEOOverview';
 
 // ===== BOX 6: VALA AI STATUS =====
 const Box6ValaAI = memo(() => (
@@ -176,6 +185,7 @@ const Box6ValaAI = memo(() => (
     <StatRow label="Deploy Status" value="Ready" color={COLORS.success} />
   </div>
 ));
+Box6ValaAI.displayName = 'Box6ValaAI';
 
 // ===== BOX 7: SERVER MANAGEMENT =====
 const Box7Server = memo(() => (
@@ -187,8 +197,9 @@ const Box7Server = memo(() => (
     <StatRow label="Alerts" value="0" color={COLORS.success} />
   </div>
 ));
+Box7Server.displayName = 'Box7Server';
 
-// ===== BOX 8: CONTINENT / COUNTRY =====
+// ===== BOX 8: CONTINENT / COUNTRY CONTROL =====
 const Box8ContinentCountry = memo(() => (
   <div className="h-full flex flex-col">
     <StatRow label="Active Continents" value="4" color={COLORS.info} />
@@ -198,6 +209,7 @@ const Box8ContinentCountry = memo(() => (
     <StatRow label="Compliance" value="100%" color={COLORS.success} />
   </div>
 ));
+Box8ContinentCountry.displayName = 'Box8ContinentCountry';
 
 // ===== BOX 9: FRANCHISE SUMMARY =====
 const Box9Franchise = memo(() => (
@@ -209,6 +221,7 @@ const Box9Franchise = memo(() => (
     <StatRow label="Growth" value="+15%" color={COLORS.success} />
   </div>
 ));
+Box9Franchise.displayName = 'Box9Franchise';
 
 // ===== BOX 10: SALES & SUPPORT =====
 const Box10SalesSupport = memo(() => (
@@ -220,6 +233,7 @@ const Box10SalesSupport = memo(() => (
     <StatRow label="CSAT Score" value="4.7/5" color={COLORS.success} />
   </div>
 ));
+Box10SalesSupport.displayName = 'Box10SalesSupport';
 
 // ===== BOX 11: PRODUCT MANAGER =====
 const Box11Product = memo(() => (
@@ -231,8 +245,9 @@ const Box11Product = memo(() => (
     <StatRow label="Pending Review" value="2" color={COLORS.warning} />
   </div>
 ));
+Box11Product.displayName = 'Box11Product';
 
-// ===== BOX 12: DEMO / LIVE SOFTWARE =====
+// ===== BOX 12: DEMO / LIVE SOFTWARE STATUS =====
 const Box12Demo = memo(() => (
   <div className="h-full flex flex-col">
     <StatRow label="Active Demos" value="8" color={COLORS.purple} />
@@ -242,6 +257,7 @@ const Box12Demo = memo(() => (
     <StatRow label="Scheduled" value="5" color={COLORS.cyan} />
   </div>
 ));
+Box12Demo.displayName = 'Box12Demo';
 
 // ===== BOX 13: FINANCE OVERVIEW =====
 const Box13Finance = memo(() => (
@@ -253,8 +269,9 @@ const Box13Finance = memo(() => (
     <StatRow label="Net Profit" value="+₹12.2L" color={COLORS.success} />
   </div>
 ));
+Box13Finance.displayName = 'Box13Finance';
 
-// ===== BOX 14: ALERT SUMMARY =====
+// ===== BOX 14: ALERT SUMMARY (CLICK → FULL ALERT PAGE) =====
 const Box14Alerts = memo(() => (
   <div className="h-full flex flex-col">
     <div className="flex items-center justify-between py-2 border-b border-white/5">
@@ -279,30 +296,40 @@ const Box14Alerts = memo(() => (
       <span className="text-lg font-bold text-blue-400">7</span>
     </div>
     <div className="mt-auto pt-2 text-center">
-      <span className="text-xs text-white/40 hover:text-white/60 cursor-pointer">View All Alerts →</span>
+      <button className="text-xs text-white/40 hover:text-white/80 transition-colors cursor-pointer">
+        View All Alerts →
+      </button>
     </div>
   </div>
 ));
+Box14Alerts.displayName = 'Box14Alerts';
 
-// ===== GRID BOX DEFINITIONS (LOCKED ORDER) =====
+// ===== GRID BOX DEFINITIONS (LOCKED ORDER - DO NOT CHANGE) =====
 const GRID_BOXES: { id: string; title: string; icon: React.ElementType; color: string; Component: React.FC }[] = [
+  // ROW 1
   { id: 'key-stats', title: 'Key Stats', icon: TrendingUp, color: COLORS.success, Component: Box1KeyStats },
   { id: 'system-health', title: 'System Health', icon: Server, color: COLORS.success, Component: Box2SystemHealth },
+  // ROW 2
   { id: 'live-activity', title: 'Live Activity', icon: Activity, color: COLORS.info, Component: Box3LiveActivity },
   { id: 'approvals', title: 'Approvals / Degree', icon: FileCheck, color: COLORS.warning, Component: Box4Approvals },
+  // ROW 3
   { id: 'ceo-overview', title: 'CEO Overview', icon: Eye, color: COLORS.purple, Component: Box5CEOOverview },
   { id: 'vala-ai', title: 'VALA AI Status', icon: Brain, color: COLORS.cyan, Component: Box6ValaAI },
+  // ROW 4
   { id: 'server-mgmt', title: 'Server Management', icon: Cpu, color: '#64748b', Component: Box7Server },
   { id: 'continent-country', title: 'Continent / Country', icon: Globe2, color: COLORS.info, Component: Box8ContinentCountry },
+  // ROW 5
   { id: 'franchise', title: 'Franchise Summary', icon: Building2, color: '#0ea5e9', Component: Box9Franchise },
   { id: 'sales-support', title: 'Sales & Support', icon: Headphones, color: COLORS.success, Component: Box10SalesSupport },
+  // ROW 6
   { id: 'product-mgr', title: 'Product Manager', icon: Box, color: COLORS.purple, Component: Box11Product },
   { id: 'demo-status', title: 'Demo / Live Software', icon: Terminal, color: '#6366f1', Component: Box12Demo },
+  // ROW 7
   { id: 'finance', title: 'Finance Overview', icon: DollarSign, color: COLORS.success, Component: Box13Finance },
   { id: 'alerts', title: 'Alert Summary', icon: AlertTriangle, color: COLORS.warning, Component: Box14Alerts },
 ];
 
-// ===== SINGLE UNIFORM BOX =====
+// ===== UNIFORM BOX COMPONENT =====
 const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ box, index }) => {
   const Icon = box.icon;
   const Content = box.Component;
@@ -314,7 +341,7 @@ const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ bo
       transition={{ delay: index * 0.02, duration: 0.15 }}
       className={cn(
         BOX_HEIGHT,
-        "rounded-xl p-4 flex flex-col transition-all duration-150 hover:scale-[1.005]"
+        "rounded-xl p-4 flex flex-col transition-all duration-150"
       )}
       style={{
         background: COLORS.cardBg,
@@ -323,7 +350,7 @@ const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ bo
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = COLORS.cardBorderHover; }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = COLORS.cardBorder; }}
     >
-      {/* Header - Fixed Height */}
+      {/* Header */}
       <div className="flex items-center gap-2.5 pb-3 mb-2 border-b border-white/10 flex-shrink-0">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${box.color}20` }}>
           <Icon className="w-4 h-4" style={{ color: box.color }} />
@@ -331,7 +358,7 @@ const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ bo
         <h3 className="text-sm font-semibold text-white">{box.title}</h3>
       </div>
       
-      {/* Content - Fills Remaining Space */}
+      {/* Content */}
       <div className="flex-1 overflow-hidden">
         <Content />
       </div>
@@ -340,25 +367,25 @@ const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ bo
 });
 UniformBox.displayName = 'UniformBox';
 
-// ===== MAIN DASHBOARD - 2×7 GRID =====
+// ===== MAIN DASHBOARD - EXACT 2×7 GRID STRUCTURE =====
 export const ControlPanelDashboard = memo(() => {
   return (
-    <div className="flex-1 overflow-auto" style={{ background: COLORS.bg }}>
+    <div className="flex-1 h-full overflow-auto" style={{ background: COLORS.bg }}>
       {/* Header */}
-      <div className="p-5 pb-3 flex items-center justify-between">
+      <div className="p-5 pb-3 flex items-center justify-between sticky top-0 z-10" style={{ background: COLORS.bg }}>
         <div>
-          <h1 className="text-lg font-bold text-white">Master Control Panel</h1>
+          <h1 className="text-xl font-bold text-white">Master Control Panel</h1>
           <p className="text-xs text-white/50 mt-0.5">Boss / Owner • 2×7 Grid Dashboard</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-medium text-emerald-400">LIVE</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-semibold text-emerald-400">LIVE</span>
           </div>
         </div>
       </div>
 
-      {/* 2×7 GRID - EXACT STRUCTURE */}
+      {/* 2×7 GRID - EXACT STRUCTURE - 14 UNIFORM BOXES */}
       <div className="px-5 pb-5">
         <div className="grid grid-cols-2 gap-4">
           {GRID_BOXES.map((box, index) => (
