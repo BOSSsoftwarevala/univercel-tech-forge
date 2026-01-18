@@ -1,28 +1,36 @@
 /**
- * DEVELOPER MANAGER SIDEBAR
- * ==========================
- * INTERNAL HUMAN TEAM MANAGEMENT ONLY
- * ❌ NO AI CONTENT - That belongs to VALA AI module
+ * VALA AI SIDEBAR
+ * ================
+ * LOVABLE-STYLE AI PRODUCT ENGINE SIDEBAR
+ * CLIENT-FACING • PRODUCT-FACING ONLY
+ * ❌ NO DEVELOPER/HUMAN TEAM CONTENT
  */
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
-  Users,
-  Bug,
+  Brain,
+  Sparkles,
+  Layers,
+  FileCode,
+  Workflow,
+  Database,
   Rocket,
-  Box,
-  CheckSquare,
   Activity,
+  FileText,
+  History,
+  Copy,
+  Play,
+  CheckSquare,
+  AlertTriangle,
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  Code2,
+  Cpu,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-interface DeveloperManagerSidebarProps {
+interface ValaAISidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
   collapsed: boolean;
@@ -30,25 +38,34 @@ interface DeveloperManagerSidebarProps {
   onBackToControlPanel: () => void;
 }
 
-// Developer Manager Module Sidebar - INTERNAL HUMAN TEAM ONLY
-// ❌ NO AI CONTENT - That belongs to VALA AI module
+// VALA AI - Lovable-Style AI Product Engine Features ONLY
 const menuItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "developers", label: "Developers", icon: Users },
-  { id: "bugs", label: "Bugs / Issues", icon: Bug },
-  { id: "releases", label: "Releases", icon: Rocket },
-  { id: "products", label: "Products", icon: Box },
-  { id: "approvals", label: "Approvals", icon: CheckSquare },
-  { id: "activity-logs", label: "Activity Logs", icon: Activity },
+  { id: "ai-workspace", label: "AI Workspace", icon: Brain },
+  { id: "prompt-input", label: "Prompt Input", icon: Sparkles },
+  { id: "requirement-understanding", label: "Requirements", icon: FileText },
+  { id: "ai-plan-generation", label: "AI Plan Generation", icon: Layers },
+  { id: "feature-mapping", label: "Feature Mapping", icon: Workflow },
+  { id: "screen-generation", label: "Screen Generation", icon: FileCode },
+  { id: "flow-generation", label: "Flow Generation", icon: Workflow },
+  { id: "api-planning", label: "API Planning", icon: Database },
+  { id: "db-schema-planning", label: "DB Schema", icon: Database },
+  { id: "deployment-steps", label: "Deployment", icon: Rocket },
+  { id: "ai-logs", label: "AI Logs", icon: Activity },
+  { id: "ai-errors", label: "AI Errors & Fixes", icon: AlertTriangle },
+  { id: "ai-status", label: "AI Status", icon: Cpu },
+  { id: "ai-approval-queue", label: "Approval Queue", icon: CheckSquare },
+  { id: "ai-demo-generator", label: "Demo Generator", icon: Play },
+  { id: "ai-clone-project", label: "Clone Project", icon: Copy },
+  { id: "ai-version-history", label: "Version History", icon: History },
 ];
 
-const DeveloperManagerSidebar = ({
+const ValaAISidebar = ({
   activeSection,
   onSectionChange,
   collapsed,
   onCollapsedChange,
   onBackToControlPanel,
-}: DeveloperManagerSidebarProps) => {
+}: ValaAISidebarProps) => {
   return (
     <motion.aside
       initial={false}
@@ -92,11 +109,11 @@ const DeveloperManagerSidebar = ({
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <Code2 className="w-5 h-5 text-white" />
+              <Brain className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Developer Manager</p>
-              <p className="text-[11px] text-white/50">Human Operations</p>
+              <p className="text-sm font-semibold text-white">VALA AI</p>
+              <p className="text-[11px] text-white/50">AI Product Engine</p>
             </div>
           </div>
         </div>
@@ -114,7 +131,7 @@ const DeveloperManagerSidebar = ({
                 key={item.id}
                 onClick={() => onSectionChange(item.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left",
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left",
                   active
                     ? "bg-violet-500/20 text-violet-300 border border-violet-400/40 shadow-[0_0_15px_rgba(139,92,246,0.15)]"
                     : "text-white/60 hover:text-white hover:bg-white/5"
@@ -124,12 +141,12 @@ const DeveloperManagerSidebar = ({
               >
                 <Icon
                   className={cn(
-                    "w-5 h-5 flex-shrink-0",
+                    "w-4 h-4 flex-shrink-0",
                     active ? "text-violet-400" : "text-violet-500/50"
                   )}
                 />
                 {!collapsed && (
-                  <span className="text-sm font-medium truncate">{item.label}</span>
+                  <span className="text-xs font-medium truncate">{item.label}</span>
                 )}
               </motion.button>
             );
@@ -153,4 +170,4 @@ const DeveloperManagerSidebar = ({
   );
 };
 
-export default DeveloperManagerSidebar;
+export default ValaAISidebar;
