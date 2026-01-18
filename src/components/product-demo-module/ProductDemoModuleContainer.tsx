@@ -42,9 +42,9 @@ export const ProductDemoModuleContainer: React.FC<ProductDemoModuleContainerProp
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex min-h-screen w-full" style={{ background: '#0B0F1A' }}>
       <ProductDemoModuleSidebar activeSection={activeSection} onSectionChange={setActiveSection} onBack={onBack} />
-      <div className="flex-1 p-6 overflow-auto">{renderContent()}</div>
+      <div className="flex-1 p-6 overflow-auto" style={{ color: '#FFFFFF' }}>{renderContent()}</div>
     </div>
   );
 };

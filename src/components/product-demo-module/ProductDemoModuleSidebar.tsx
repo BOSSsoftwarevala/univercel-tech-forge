@@ -16,7 +16,7 @@ import {
   FileText, Zap, Shield, Target
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useSidebarStore, useShouldRenderSidebar } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 export type ProductDemoSection = 
   | 'dashboard'
@@ -110,21 +110,21 @@ export const ProductDemoModuleSidebar: React.FC<ProductDemoModuleSidebarProps> =
   mode = 'combined',
 }) => {
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use dedicated hook for strict visibility check
-  const shouldRender = useShouldRenderSidebar('category', 'product-demo');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('product-demo');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - triggers FULL context switch to Boss
   const handleBack = () => {
     exitToGlobal();
     onBack?.();
   };
-  
-  // STRICT ISOLATION: Only render when in Module context with matching category
-  if (!shouldRender) {
-    return null;
-  }
 
   // Select menu items based on mode
   const menuItems = mode === 'product' ? productMenuItems : 

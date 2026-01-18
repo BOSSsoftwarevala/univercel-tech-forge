@@ -29,7 +29,7 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSidebarStore, useShouldRenderSidebar } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 export type ValaAISection = 
   | 'home' 
@@ -82,21 +82,21 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
   onBack,
 }) => {
   // SINGLE SIDEBAR ENFORCEMENT: Use store for navigation
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use the standardized hook for visibility check
-  const shouldRender = useShouldRenderSidebar('category', 'vala-ai');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('vala-ai');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - updates store AND calls prop callback
   const handleBack = () => {
     exitToGlobal();
     onBack?.();
   };
-  
-  // SINGLE SIDEBAR ENFORCEMENT: Only render when this module is active
-  if (!shouldRender) {
-    return null;
-  }
   
   // ===== LOCKED COLORS: Dark Navy Blue Sidebar (matches Control Panel) =====
   const SIDEBAR_COLORS = {

@@ -6,6 +6,7 @@
  * - Only renders when activeContext === 'module' AND category === 'marketing'
  * - Back button triggers full context switch to Boss
  */
+import React from "react";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -21,7 +22,7 @@ import {
   Target,
   ArrowLeft
 } from "lucide-react";
-import { useSidebarStore, useShouldRenderSidebar } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 interface MarketingModuleSidebarProps {
   activeSection: string;
@@ -44,21 +45,21 @@ const sidebarItems = [
 
 export const MarketingModuleSidebar = ({ activeSection, setActiveSection, onBack }: MarketingModuleSidebarProps) => {
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use dedicated hook for strict visibility check
-  const shouldRender = useShouldRenderSidebar('category', 'marketing');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('marketing');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - triggers FULL context switch to Boss
   const handleBack = () => {
     exitToGlobal();
     onBack?.();
   };
-  
-  // STRICT ISOLATION: Only render when in Module context with matching category
-  if (!shouldRender) {
-    return null;
-  }
 
   // ===== LOCKED COLORS: Dark Navy Blue Sidebar (matches Control Panel) =====
   const SIDEBAR_COLORS = {

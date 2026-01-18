@@ -15,7 +15,7 @@ import {
   Database, FileText, Brain, Settings, ArrowLeft 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSidebarStore, useShouldRenderSidebar } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 export type ServerModuleSection = 
   | 'overview'
@@ -52,10 +52,15 @@ export const ServerModuleSidebar: React.FC<ServerModuleSidebarProps> = ({
   onBack,
 }) => {
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
-  const { exitToGlobal } = useSidebarStore();
+  const { exitToGlobal, enterCategory } = useSidebarStore();
   
-  // Use the dedicated hook to check if this sidebar should render
-  const shouldRender = useShouldRenderSidebar('category', 'server-manager');
+  // ALWAYS VISIBLE: When this component mounts, enter this category context
+  React.useEffect(() => {
+    enterCategory('server-manager');
+    return () => {
+      // Cleanup handled by exitToGlobal on back button
+    };
+  }, [enterCategory]);
   
   // Handle back navigation - triggers FULL context switch to Boss
   const handleBack = () => {
@@ -64,12 +69,6 @@ export const ServerModuleSidebar: React.FC<ServerModuleSidebarProps> = ({
     // 2. Call parent callback to update navigation state
     onBack?.();
   };
-  
-  // STRICT ISOLATION: Only render when in Module context with matching category
-  // This prevents double sidebars completely
-  if (!shouldRender) {
-    return null;
-  }
   
   // ===== LOCKED COLORS: Dark Navy Blue Sidebar (matches Control Panel) =====
   const SIDEBAR_COLORS = {
