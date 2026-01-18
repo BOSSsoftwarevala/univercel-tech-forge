@@ -912,40 +912,62 @@ const RoleSwitchSidebar = ({
 
   const Icon = currentConfig.icon;
 
+  // ===== LOCKED COLORS: Dark Navy Blue Sidebar =====
+  // DO NOT CHANGE - Final approved color scheme
+  const SIDEBAR_COLORS = {
+    bg: '#0a1628',           // Dark Navy background
+    bgGradient: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)',
+    border: '#1e3a5f',       // Navy border
+    activeHighlight: '#2563eb', // Bright Blue active state
+    hoverBg: 'rgba(37, 99, 235, 0.15)',
+    text: '#ffffff',
+    textMuted: 'rgba(255, 255, 255, 0.7)',
+    iconColor: '#60a5fa',    // Soft blue icons
+  };
+
   return (
     <aside
-      className={cn(
-        "flex flex-col border-r transition-all duration-150",
-        "border-border/50 bg-card/50 backdrop-blur-xl"
-      )}
+      className="flex flex-col border-r transition-all duration-150"
       style={{
         width: collapsed ? 60 : 240,
+        background: SIDEBAR_COLORS.bgGradient,
+        borderColor: SIDEBAR_COLORS.border,
       }}
     >
       {/* ================================================== */}
       {/* SECTION 1: ROLE AUTHORITY - STICKY AT TOP */}
       {/* ================================================== */}
-      <div className="sticky top-0 z-20 bg-card/80 backdrop-blur-xl">
+      <div className="sticky top-0 z-20" style={{ background: SIDEBAR_COLORS.bg }}>
         {/* Active Role Card */}
-        <div className="p-3 border-b border-border/50">
+        <div className="p-3" style={{ borderBottom: `1px solid ${SIDEBAR_COLORS.border}` }}>
           <div className="flex items-center gap-2">
             <div
-              className={cn(
-                "flex-shrink-0 rounded-lg flex items-center justify-center shadow-sm border",
-                "w-11 h-11 bg-muted/50 border-border"
-              )}
+              className="flex-shrink-0 rounded-lg flex items-center justify-center shadow-sm"
+              style={{
+                width: 44,
+                height: 44,
+                background: SIDEBAR_COLORS.activeHighlight,
+                border: `1px solid ${SIDEBAR_COLORS.border}`,
+              }}
             >
-              <Icon className="w-5 h-5 text-foreground" />
+              <Icon className="w-5 h-5" style={{ color: SIDEBAR_COLORS.text }} />
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0 transition-opacity duration-150">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-foreground tracking-tight">{currentConfig.label}</h2>
-                  <Badge className="text-[9px] px-1.5 py-0 bg-muted text-foreground/80 border border-border">
+                  <h2 className="text-sm font-bold tracking-tight" style={{ color: SIDEBAR_COLORS.text }}>{currentConfig.label}</h2>
+                  <Badge 
+                    className="text-[9px] px-1.5 py-0" 
+                    style={{ 
+                      background: 'rgba(37, 99, 235, 0.3)', 
+                      color: SIDEBAR_COLORS.text,
+                      border: `1px solid ${SIDEBAR_COLORS.border}` 
+                    }}
+                  >
                     {activeRole === 'boss_owner' ? 'FINAL AUTHORITY' : 'ROLE VIEW'}
                   </Badge>
                 </div>
-                <p className="text-[10px] text-muted-foreground font-medium">{currentConfig.description}</p>
+                <p className="text-[10px] font-medium" style={{ color: SIDEBAR_COLORS.textMuted }}>{currentConfig.description}</p>
               </div>
             )}
           </div>
@@ -1024,7 +1046,7 @@ const RoleSwitchSidebar = ({
       {/* SECTION 2: SYSTEM STATUS - Below Role Authority */}
       {/* Compact status indicators */}
       {/* ================================================== */}
-      <div className="px-3 py-2 border-b border-blue-500/30 bg-blue-500/20">
+      <div className="px-3 py-2" style={{ borderBottom: '1px solid #1e3a5f', background: 'rgba(37, 99, 235, 0.25)' }}>
         <div className="flex items-center gap-2">
           {!collapsed ? (
             <>
@@ -1115,20 +1137,23 @@ const RoleSwitchSidebar = ({
                             }}
                             className={cn(
                               "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 relative",
-                              isModuleExpanded || isModuleActive
-                                ? "text-white font-semibold bg-white/20"
-                                : "text-white/90 hover:text-white hover:bg-white/10",
                               collapsed ? "justify-center" : ""
                             )}
+                            style={{
+                              background: isModuleExpanded || isModuleActive ? '#2563eb' : 'transparent',
+                              color: '#ffffff',
+                              fontWeight: isModuleExpanded || isModuleActive ? 600 : 500,
+                            }}
                           >
                             {/* Left indicator for active module */}
                             {isModuleActive && (
                               <motion.div 
                                 layoutId="module-active-indicator"
-                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-amber-400 rounded-r-full"
+                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full"
+                                style={{ background: '#60a5fa' }}
                               />
                             )}
-                            <ModuleIcon className={cn("w-5 h-5 flex-shrink-0", isModuleActive ? "text-amber-300" : "text-white/80")} />
+                            <ModuleIcon className="w-5 h-5 flex-shrink-0" style={{ color: isModuleActive ? '#93c5fd' : '#60a5fa' }} />
                             <AnimatePresence>
                               {!collapsed && (
                                 <motion.span
@@ -1167,7 +1192,8 @@ const RoleSwitchSidebar = ({
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="mt-1 ml-4 border-l border-white/20 space-y-0.5"
+                            className="mt-1 ml-4 space-y-0.5"
+                            style={{ borderLeft: '1px solid #1e3a5f' }}
                           >
                             {module.categories.map((category, catIdx) => {
                               const CategoryIcon = category.icon;
@@ -1191,19 +1217,19 @@ const RoleSwitchSidebar = ({
                                       e.preventDefault();
                                       toggleCategoryExpansion(category.id);
                                     }}
-                                    className={cn(
-                                      "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all relative ml-1",
-                                      isCategoryExpanded || isCategoryActive
-                                        ? "text-white font-medium bg-white/15"
-                                        : "text-white/80 hover:text-white hover:bg-white/10"
-                                    )}
+                                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all relative ml-1"
+                                    style={{
+                                      background: isCategoryExpanded || isCategoryActive ? 'rgba(37, 99, 235, 0.4)' : 'transparent',
+                                      color: '#ffffff',
+                                      fontWeight: isCategoryActive ? 600 : 500,
+                                    }}
                                   >
                                     {/* Left indicator for active category */}
                                     {isCategoryActive && (
-                                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-emerald-400 rounded-r-full" />
+                                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r-full" style={{ background: '#60a5fa' }} />
                                     )}
-                                    <CategoryIcon className={cn("w-4 h-4 flex-shrink-0", isCategoryActive ? "text-emerald-300" : "text-white/70")} />
-                                    <span className={cn("text-xs truncate flex-1 text-left", isCategoryActive ? "font-semibold" : "font-medium")}>
+                                    <CategoryIcon className="w-4 h-4 flex-shrink-0" style={{ color: isCategoryActive ? '#93c5fd' : '#60a5fa' }} />
+                                    <span className="text-xs truncate flex-1 text-left" style={{ fontWeight: isCategoryActive ? 600 : 500 }}>
                                       {category.label}
                                     </span>
                                     {/* Chevron for categories with subcategories */}
@@ -1225,7 +1251,8 @@ const RoleSwitchSidebar = ({
                                         animate={{ opacity: 1, height: "auto" }}
                                         exit={{ opacity: 0, height: 0 }}
                                         transition={{ duration: 0.15 }}
-                                        className="mt-0.5 ml-4 border-l border-white/15 space-y-0.5"
+                                        className="mt-0.5 ml-4 space-y-0.5"
+                                        style={{ borderLeft: '1px solid #1e3a5f' }}
                                       >
                                         {category.subCategories!.map((subCategory, subIdx) => {
                                           const isSubCategoryActive = activeSubCategory === subCategory.id;
@@ -1246,14 +1273,13 @@ const RoleSwitchSidebar = ({
                                                 }
                                               }}
                                               disabled={isLocked}
-                                              className={cn(
-                                                "w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-all relative ml-1 group",
-                                                isSubCategoryActive
-                                                  ? "bg-white/25 text-white font-semibold"
-                                                  : isLocked
-                                                    ? "text-white/40 cursor-not-allowed"
-                                                    : "text-white/70 hover:text-white hover:bg-white/10"
-                                              )}
+                                              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-all relative ml-1 group"
+                                              style={{
+                                                background: isSubCategoryActive ? '#2563eb' : 'transparent',
+                                                color: isLocked ? 'rgba(255,255,255,0.4)' : '#ffffff',
+                                                fontWeight: isSubCategoryActive ? 600 : 400,
+                                                cursor: isLocked ? 'not-allowed' : 'pointer',
+                                              }}
                                             >
                                               {/* Active indicator */}
                                               {isSubCategoryActive && (

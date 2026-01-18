@@ -44,8 +44,19 @@ const menuItems: { id: BossPanelSection; label: string; icon: React.ElementType 
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-// BRAND THEME: Dark sidebar with blue accent
-// Uses CSS variables for consistency
+// ===== LOCKED COLORS: Dark Navy Blue Sidebar =====
+// DO NOT CHANGE - Final approved color scheme
+const SIDEBAR_COLORS = {
+  bg: '#0a1628',           // Dark Navy background
+  bgGradient: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)',
+  border: '#1e3a5f',       // Navy border
+  activeHighlight: '#2563eb', // Bright Blue active state
+  hoverBg: 'rgba(37, 99, 235, 0.15)',
+  text: '#ffffff',
+  textMuted: 'rgba(255, 255, 255, 0.7)',
+  iconColor: '#60a5fa',    // Soft blue icons
+};
+
 export function BossPanelSidebar({ 
   activeSection, 
   onSectionChange, 
@@ -56,8 +67,11 @@ export function BossPanelSidebar({
     <motion.aside
       initial={false}
       animate={{ width: collapsed ? 80 : 260 }}
-      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col border-r border-blue-400/30"
-      style={{ background: 'linear-gradient(180deg, hsl(217 91% 50%) 0%, hsl(226 71% 45%) 100%)' }}
+      className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col"
+      style={{ 
+        background: SIDEBAR_COLORS.bgGradient,
+        borderRight: `1px solid ${SIDEBAR_COLORS.border}`,
+      }}
     >
       {/* Collapse Toggle */}
       <button
@@ -66,7 +80,7 @@ export function BossPanelSidebar({
         style={{
           width: '24px',
           height: '24px',
-          background: 'hsl(217 91% 45%)',
+          background: SIDEBAR_COLORS.activeHighlight,
           border: '2px solid white',
           color: 'white'
         }}
@@ -93,15 +107,15 @@ export function BossPanelSidebar({
                 collapsed && "justify-center"
               )}
               style={{
-                background: isActive ? 'rgba(255,255,255,0.2)' : 'transparent',
-                color: 'white',
-                borderLeft: isActive ? '3px solid white' : '3px solid transparent'
+                background: isActive ? SIDEBAR_COLORS.activeHighlight : 'transparent',
+                color: SIDEBAR_COLORS.text,
+                borderLeft: isActive ? '3px solid #60a5fa' : '3px solid transparent'
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <Icon className="w-5 h-5 flex-shrink-0 text-white" />
+              <Icon className="w-5 h-5 flex-shrink-0" style={{ color: isActive ? '#ffffff' : SIDEBAR_COLORS.iconColor }} />
               {!collapsed && (
-                <span className="truncate text-sm font-medium text-white">
+                <span className="truncate text-sm font-medium" style={{ color: SIDEBAR_COLORS.text }}>
                   {item.label}
                 </span>
               )}
@@ -112,11 +126,11 @@ export function BossPanelSidebar({
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-white/20">
-          <div className="text-center uppercase tracking-widest text-[10px] text-white/70">
+        <div className="p-4" style={{ borderTop: `1px solid ${SIDEBAR_COLORS.border}` }}>
+          <div className="text-center uppercase tracking-widest text-[10px]" style={{ color: SIDEBAR_COLORS.textMuted }}>
             Boss Role Principle
           </div>
-          <div className="text-center mt-1 text-[9px] text-white">
+          <div className="text-center mt-1 text-[9px]" style={{ color: SIDEBAR_COLORS.text }}>
             See Everything • Change Nothing Casually
           </div>
         </div>
