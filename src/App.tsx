@@ -66,6 +66,7 @@ import SchoolERPDemo from "./pages/demos/SchoolERPDemo";
 import SchoolSmallDemo from "./pages/demos/school/SchoolSmallDemo";
 import SchoolMediumDemo from "./pages/demos/school/SchoolMediumDemo";
 import SchoolLargeDemo from "./pages/demos/school/SchoolLargeDemo";
+import EducationDemoHub from "./pages/demos/education/EducationDemoHub";
 import HospitalHMSDemo from "./pages/demos/HospitalHMSDemo";
 import EcommerceStoreDemo from "./pages/demos/EcommerceStoreDemo";
 import HotelBookingDemo from "./pages/demos/HotelBookingDemo";
@@ -366,6 +367,8 @@ const App = () => (
               <Route path="/demo/school-small" element={<SchoolSmallDemo />} />
               <Route path="/demo/school-medium" element={<SchoolMediumDemo />} />
               <Route path="/demo/school-large" element={<SchoolLargeDemo />} />
+              <Route path="/demo/education" element={<EducationDemoHub />} />
+              <Route path="/demos/education" element={<EducationDemoHub />} />
               <Route path="/demo/hospital-hms" element={<HospitalHMSDemo />} />
               <Route path="/demo/ecommerce-store" element={<EcommerceStoreDemo />} />
               <Route path="/demo/hotel-booking" element={<HotelBookingDemo />} />
