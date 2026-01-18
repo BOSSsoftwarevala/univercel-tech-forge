@@ -65,11 +65,11 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
     onBack?.();
   };
   
-  // Only render if this is the active category sidebar
-  const isActive = activeSidebar === 'category' && activeCategorySidebar === 'vala-ai';
-  const shouldRender = isActive || activeSidebar === 'global';
+  // SINGLE SIDEBAR ENFORCEMENT: Only render when this module is active
+  // No fallback - strict isolation to prevent double sidebar
+  const isThisModuleActive = activeSidebar === 'category' && activeCategorySidebar === 'vala-ai';
   
-  if (!shouldRender && activeSidebar === 'category' && activeCategorySidebar !== 'vala-ai') {
+  if (!isThisModuleActive) {
     return null;
   }
   

@@ -57,12 +57,13 @@ export const ServerModuleSidebar: React.FC<ServerModuleSidebarProps> = ({
     onBack?.();
   };
   
-  // Only render if this is the active category sidebar (or if store not initialized)
-  // This prevents double sidebars
-  const isActive = activeSidebar === 'category' && activeCategorySidebar === 'server-manager';
-  const shouldRender = isActive || activeSidebar === 'global'; // Fallback for backwards compatibility
+  // SINGLE SIDEBAR ENFORCEMENT: Only render when this module is active
+  // No fallback - strict isolation to prevent double sidebar
+  const isThisModuleActive = activeSidebar === 'category' && activeCategorySidebar === 'server-manager';
   
-  if (!shouldRender && activeSidebar === 'category' && activeCategorySidebar !== 'server-manager') {
+  // When in module view, the global sidebar is hidden and we should render
+  // When NOT in module view, don't render the module sidebar at all
+  if (!isThisModuleActive) {
     return null;
   }
   

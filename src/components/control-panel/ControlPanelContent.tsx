@@ -13,7 +13,7 @@ import { LiveRunningTasks } from './LiveRunningTasks';
 import { LiveCommitments } from './LiveCommitments';
 import { QuickActions } from './QuickActions';
 import { AlertsPreview } from './AlertsPreview';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 
 interface ControlPanelContentProps {
   collapsed?: boolean;
@@ -79,38 +79,36 @@ export const ControlPanelContent: React.FC<ControlPanelContentProps> = ({ collap
   }
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-2 space-y-4">
-        {/* Section 1: Live Status */}
-        <Section icon={Activity} title="Live Status" collapsed={collapsed}>
-          <LiveStatusIndicators />
-        </Section>
+    <div className="p-2 space-y-3 max-h-[280px] overflow-y-auto">
+      {/* Section 1: Live Status */}
+      <Section icon={Activity} title="Live Status" collapsed={collapsed}>
+        <LiveStatusIndicators />
+      </Section>
 
-        {/* Section 2: Live Chat */}
-        <Section icon={MessageCircle} title="Support" collapsed={collapsed}>
-          <LiveChatBlock />
-        </Section>
+      {/* Section 2: Live Chat */}
+      <Section icon={MessageCircle} title="Support" collapsed={collapsed}>
+        <LiveChatBlock />
+      </Section>
 
-        {/* Section 3: Running Tasks */}
-        <Section icon={ListTodo} title="Running Tasks" collapsed={collapsed}>
-          <LiveRunningTasks />
-        </Section>
+      {/* Section 3: Running Tasks */}
+      <Section icon={ListTodo} title="Running Tasks" collapsed={collapsed}>
+        <LiveRunningTasks />
+      </Section>
 
-        {/* Section 4: Commitments */}
-        <Section icon={Clock} title="Commitments" collapsed={collapsed}>
-          <LiveCommitments />
-        </Section>
+      {/* Section 4: Commitments */}
+      <Section icon={Clock} title="Commitments" collapsed={collapsed}>
+        <LiveCommitments />
+      </Section>
 
-        {/* Section 5: Quick Actions */}
-        <Section icon={Zap} title="Quick Actions" collapsed={collapsed}>
-          <QuickActions />
-        </Section>
+      {/* Section 5: Quick Actions */}
+      <Section icon={Zap} title="Quick Actions" collapsed={collapsed}>
+        <QuickActions />
+      </Section>
 
-        {/* Section 6: Alerts Preview */}
-        <Section icon={Bell} title="Alerts" collapsed={collapsed}>
-          <AlertsPreview />
-        </Section>
-      </div>
-    </ScrollArea>
+      {/* Section 6: Alerts Preview */}
+      <Section icon={Bell} title="Alerts" collapsed={collapsed}>
+        <AlertsPreview />
+      </Section>
+    </div>
   );
 };
