@@ -470,7 +470,7 @@ const RoleSwitchDashboard = () => {
 
   return (
     <div className={cn(
-      "min-h-screen flex flex-col transition-colors duration-300",
+      "dark min-h-screen flex flex-col transition-colors duration-300",
       // ALL dashboards use the same dark background for consistency
       "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     )}>
