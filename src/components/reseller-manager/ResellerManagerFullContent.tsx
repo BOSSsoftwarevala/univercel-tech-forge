@@ -2,7 +2,7 @@
  * RESELLER MANAGER FULL CONTENT
  * Dynamic content renderer for all 12 sections
  */
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,36 +54,72 @@ const sectionConfig: Record<string, { title: string; subtitle: string; icon: Rea
 };
 
 const mockStats = [
-  { label: 'Total Resellers', value: 247, icon: Users, color: 'from-amber-500 to-orange-600' },
-  { label: 'Active', value: 198, icon: UserCheck, color: 'from-emerald-500 to-green-600' },
-  { label: 'Pending', value: 32, icon: Clock, color: 'from-yellow-500 to-amber-600' },
-  { label: 'Suspended', value: 12, icon: UserX, color: 'from-red-500 to-rose-600' },
-  { label: 'Total Revenue', value: '₹45.2L', icon: DollarSign, color: 'from-blue-500 to-indigo-600' },
-];
+  { key: 'total', label: 'Total Resellers', icon: Users, color: 'from-amber-500 to-orange-600' },
+  { key: 'active', label: 'Active', icon: UserCheck, color: 'from-emerald-500 to-green-600' },
+  { key: 'pending', label: 'Pending', icon: Clock, color: 'from-yellow-500 to-amber-600' },
+  { key: 'suspended', label: 'Suspended', icon: UserX, color: 'from-red-500 to-rose-600' },
+  { key: 'revenue', label: 'Total Revenue', icon: DollarSign, color: 'from-blue-500 to-indigo-600' },
+] as const;
 
-const mockItems = [
-  { id: '1', name: 'TechDistro India', owner: 'Vikram Singh', status: 'active', country: 'India', revenue: '$125,000' },
-  { id: '2', name: 'Digital Partners UK', owner: 'Charlotte Brown', status: 'active', country: 'UK', revenue: '$210,000' },
-  { id: '3', name: 'CloudNet Nigeria', owner: 'Chinedu Okafor', status: 'pending', country: 'Nigeria', revenue: '$67,000' },
-  { id: '4', name: 'TechBridge UAE', owner: 'Omar Al-Rashid', status: 'suspended', country: 'UAE', revenue: '$95,000' },
-  { id: '5', name: 'Pacific Solutions', owner: 'David Wong', status: 'active', country: 'Australia', revenue: '$285,000' },
+const initialMockItems = [
+  { id: '1', name: 'TechDistro India', owner: 'Vikram Singh', status: 'active' as const, country: 'India', revenue: '$125,000' },
+  { id: '2', name: 'Digital Partners UK', owner: 'Charlotte Brown', status: 'active' as const, country: 'UK', revenue: '$210,000' },
+  { id: '3', name: 'CloudNet Nigeria', owner: 'Chinedu Okafor', status: 'pending' as const, country: 'Nigeria', revenue: '$67,000' },
+  { id: '4', name: 'TechBridge UAE', owner: 'Omar Al-Rashid', status: 'suspended' as const, country: 'UAE', revenue: '$95,000' },
+  { id: '5', name: 'Pacific Solutions', owner: 'David Wong', status: 'active' as const, country: 'Australia', revenue: '$285,000' },
 ];
 
 export function ResellerManagerFullContent({ activeSection }: ResellerManagerFullContentProps) {
+  const [items, setItems] = useState(() => initialMockItems);
+
   const config = sectionConfig[activeSection] || {
     title: 'Dashboard',
     subtitle: 'Reseller Manager Control Panel',
     icon: Store,
   };
 
-  const handleAction = (action: string, item?: string) => {
-    const target = item ? ` for ${item}` : '';
-    toast.success(`${action} action executed${target}`, { duration: 2000 });
-  };
+  const stats = useMemo(() => {
+    const total = items.length;
+    const active = items.filter(i => i.status === 'active').length;
+    const pending = items.filter(i => i.status === 'pending').length;
+    const suspended = items.filter(i => i.status === 'suspended').length;
+
+    // demo total revenue sum (parse simple numbers)
+    const revenue = items
+      .map(i => Number(String(i.revenue).replace(/[^0-9.]/g, '')) || 0)
+      .reduce((a, b) => a + b, 0);
+
+    return { total, active, pending, suspended, revenue };
+  }, [items]);
 
   const logAction = (action: string, target: string) => {
     console.log(`[AUDIT] ${new Date().toISOString()} - ${action}: ${target}`);
-    handleAction(action, target);
+    toast.success(`${action} executed`, {
+      description: target,
+      duration: 2000,
+    });
+  };
+
+  const updateStatus = (id: string, nextStatus: (typeof items)[number]['status']) => {
+    setItems(prev => prev.map(i => (i.id === id ? { ...i, status: nextStatus } : i)));
+  };
+
+  const confirmDelete = (id: string, name: string) => {
+    toast(`Delete ${name}?`, {
+      description: 'This action cannot be undone.',
+      action: {
+        label: 'Delete',
+        onClick: () => {
+          setItems(prev => prev.filter(i => i.id !== id));
+          logAction('Delete', name);
+        },
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => logAction('Delete Cancelled', name),
+      },
+      duration: 6000,
+    });
   };
 
   return (
@@ -109,29 +145,46 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
 
         {/* Stats Grid */}
         <div className="grid grid-cols-5 gap-4">
-          {mockStats.map((stat, idx) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <Card className="bg-card/50 border-border/50 hover:border-amber-500/30 transition-all cursor-pointer"
-                onClick={() => handleAction('View', stat.label)}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground">{stat.label}</p>
-                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+          {mockStats.map((stat, idx) => {
+            const value =
+              stat.key === 'total'
+                ? stats.total
+                : stat.key === 'active'
+                  ? stats.active
+                  : stat.key === 'pending'
+                    ? stats.pending
+                    : stat.key === 'suspended'
+                      ? stats.suspended
+                      : `₹${(stats.revenue / 1000).toFixed(1)}K`;
+
+            return (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Card
+                  className="bg-card/50 border-border/50 hover:border-amber-500/30 transition-all cursor-pointer"
+                  onClick={() => logAction('View', stat.label)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                        <p className="text-2xl font-bold text-foreground">{value}</p>
+                      </div>
+                      <div
+                        className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}
+                      >
+                        <stat.icon className="w-5 h-5 text-white" />
+                      </div>
                     </div>
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Data Table */}
@@ -143,7 +196,7 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {mockItems.map((item, idx) => (
+              {items.map((item, idx) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -181,8 +234,15 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
                       </Button>
                       {item.status === 'pending' && (
                         <>
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300"
-                            onClick={() => logAction('Approve', item.name)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300"
+                            onClick={() => {
+                              updateStatus(item.id, 'active');
+                              logAction('Approve', item.name);
+                            }}
+                          >
                             <CheckCircle className="w-4 h-4" />
                           </Button>
                           <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
@@ -203,12 +263,12 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
                           <Play className="w-4 h-4" />
                         </Button>
                       )}
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
-                        onClick={() => {
-                          if (confirm(`Delete ${item.name}? This action cannot be undone.`)) {
-                            logAction('Delete', item.name);
-                          }
-                        }}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
+                        onClick={() => confirmDelete(item.id, item.name)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                       <Button size="sm" variant="ghost" className="h-8 w-8 p-0"
@@ -226,7 +286,8 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
         {/* Quick Actions */}
         <div className="grid grid-cols-3 gap-4">
           <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20 cursor-pointer hover:border-amber-500/40 transition-all"
-            onClick={() => handleAction('Add New Reseller')}>
+            onClick={() => logAction('View', 'Add New Reseller')}
+          >
             <CardContent className="p-4 flex items-center gap-3">
               <Users className="w-8 h-8 text-amber-400" />
               <div>
@@ -236,7 +297,8 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-emerald-500/20 cursor-pointer hover:border-emerald-500/40 transition-all"
-            onClick={() => handleAction('Approve Pending')}>
+            onClick={() => logAction('Approve', 'Bulk Pending Approvals')}
+          >
             <CardContent className="p-4 flex items-center gap-3">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
               <div>
@@ -246,7 +308,8 @@ export function ResellerManagerFullContent({ activeSection }: ResellerManagerFul
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/20 cursor-pointer hover:border-blue-500/40 transition-all"
-            onClick={() => handleAction('Process Payouts')}>
+            onClick={() => logAction('Approve', 'Process Payouts')}
+          >
             <CardContent className="p-4 flex items-center gap-3">
               <DollarSign className="w-8 h-8 text-blue-400" />
               <div>
