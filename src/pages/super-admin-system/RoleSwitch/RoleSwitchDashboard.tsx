@@ -481,16 +481,15 @@ const RoleSwitchDashboard = () => {
           </Badge>
         </div>
 
-        {/* Center - Status Icons (Icon-Only) */}
+        {/* Center - Status Icons (Icon-Only) - FIX: All have real navigation */}
         <div className="flex items-center gap-3">
-          {/* System Status */}
+          {/* System Status - FIX: Navigate to system health page */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              toast.success('System Status: Healthy', {
-                description: 'All services operational. Last check: 1 minute ago',
-              });
+              setActiveNav('system-health');
+              toast.success('Opening System Health Monitor');
             }}
             className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center cursor-pointer group"
             title="System Healthy"
@@ -499,22 +498,17 @@ const RoleSwitchDashboard = () => {
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
             {/* Tooltip */}
             <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              System Healthy
+              System Health - Click to view
             </div>
           </motion.button>
 
-          {/* Risk Level */}
+          {/* Risk Level - FIX: Navigate to risk dashboard */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              toast.info(`Risk Level: ${riskLevel.toUpperCase()}`, {
-                description: riskLevel === 'low' 
-                  ? 'No immediate threats detected' 
-                  : riskLevel === 'medium' 
-                    ? 'Some activities require attention' 
-                    : 'Critical issues need immediate attention',
-              });
+              setActiveNav('risk-assessment');
+              toast.info('Opening Risk Assessment Dashboard');
             }}
             className={cn(
               "relative w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer group border",
@@ -532,7 +526,7 @@ const RoleSwitchDashboard = () => {
             )} />
             {/* Tooltip */}
             <div className="absolute top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-              Risk: {riskLevel.toUpperCase()}
+              Risk: {riskLevel.toUpperCase()} - Click to view
             </div>
           </motion.button>
 
