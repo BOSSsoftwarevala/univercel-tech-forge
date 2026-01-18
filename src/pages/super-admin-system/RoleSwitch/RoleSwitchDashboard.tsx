@@ -282,10 +282,18 @@ const RoleSwitchDashboard = () => {
     if (loading) return;
 
     // 1) If URL requests a role, always sync to it (if access allows)
+    // OVERRIDE (BOSS RULE): boss_owner & ceo should land on the Control Panel grid by default.
+    // They can still open their role dashboard by clicking from the Control Panel sidebar.
     if (requestedRole && requestedRole !== prevRequestedRoleRef.current) {
       prevRequestedRoleRef.current = requestedRole;
 
-      if (canAccessView(requestedRole)) {
+      const shouldStartInControlPanel = requestedRole === 'boss_owner' || requestedRole === 'ceo';
+
+      if (shouldStartInControlPanel) {
+        setActiveRole(null);
+        setActiveNav("dashboard");
+        setSelectedSubItem(undefined);
+      } else if (canAccessView(requestedRole)) {
         setActiveRole(requestedRole);
         setActiveNav("dashboard");
         setSelectedSubItem(undefined);
