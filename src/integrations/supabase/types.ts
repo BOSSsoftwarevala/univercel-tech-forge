@@ -21140,6 +21140,566 @@ export type Database = {
         }
         Relationships: []
       }
+      sv_ai_models: {
+        Row: {
+          api_endpoint: string | null
+          cost_per_unit: number | null
+          created_at: string
+          id: string
+          name: string
+          provider: string
+          region: string | null
+          status: string
+          type: string
+          unit_type: string | null
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          api_endpoint?: string | null
+          cost_per_unit?: number | null
+          created_at?: string
+          id?: string
+          name: string
+          provider: string
+          region?: string | null
+          status?: string
+          type: string
+          unit_type?: string | null
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          api_endpoint?: string | null
+          cost_per_unit?: number | null
+          created_at?: string
+          id?: string
+          name?: string
+          provider?: string
+          region?: string | null
+          status?: string
+          type?: string
+          unit_type?: string | null
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      sv_android_apks: {
+        Row: {
+          channel: string
+          created_at: string
+          download_url: string | null
+          file_size_mb: number | null
+          id: string
+          min_sdk_version: number | null
+          release_notes: string | null
+          released_at: string | null
+          released_by: string | null
+          status: string
+          target_sdk_version: number | null
+          updated_at: string
+          version: string
+          version_code: number
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          download_url?: string | null
+          file_size_mb?: number | null
+          id?: string
+          min_sdk_version?: number | null
+          release_notes?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          status?: string
+          target_sdk_version?: number | null
+          updated_at?: string
+          version: string
+          version_code: number
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          download_url?: string | null
+          file_size_mb?: number | null
+          id?: string
+          min_sdk_version?: number | null
+          release_notes?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          status?: string
+          target_sdk_version?: number | null
+          updated_at?: string
+          version?: string
+          version_code?: number
+        }
+        Relationships: []
+      }
+      sv_apk_configs: {
+        Row: {
+          ai_enabled: boolean | null
+          allowed_models: string[] | null
+          analytics_enabled: boolean | null
+          apk_id: string
+          crash_reporting: boolean | null
+          created_at: string
+          debug_mode: boolean | null
+          feature_flags: Json | null
+          id: string
+          logging_enabled: boolean | null
+          max_offline_cache_mb: number | null
+          offline_mode: boolean | null
+          sync_interval_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          ai_enabled?: boolean | null
+          allowed_models?: string[] | null
+          analytics_enabled?: boolean | null
+          apk_id: string
+          crash_reporting?: boolean | null
+          created_at?: string
+          debug_mode?: boolean | null
+          feature_flags?: Json | null
+          id?: string
+          logging_enabled?: boolean | null
+          max_offline_cache_mb?: number | null
+          offline_mode?: boolean | null
+          sync_interval_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          ai_enabled?: boolean | null
+          allowed_models?: string[] | null
+          analytics_enabled?: boolean | null
+          apk_id?: string
+          crash_reporting?: boolean | null
+          created_at?: string
+          debug_mode?: boolean | null
+          feature_flags?: Json | null
+          id?: string
+          logging_enabled?: boolean | null
+          max_offline_cache_mb?: number | null
+          offline_mode?: boolean | null
+          sync_interval_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_apk_configs_apk_id_fkey"
+            columns: ["apk_id"]
+            isOneToOne: false
+            referencedRelation: "sv_android_apks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_demo_attendance: {
+        Row: {
+          attended: boolean | null
+          converted: boolean | null
+          country: string | null
+          created_at: string
+          demo_id: string
+          feedback_score: number | null
+          feedback_text: string | null
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          join_time: string | null
+          leave_time: string | null
+          schedule_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attended?: boolean | null
+          converted?: boolean | null
+          country?: string | null
+          created_at?: string
+          demo_id: string
+          feedback_score?: number | null
+          feedback_text?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          join_time?: string | null
+          leave_time?: string | null
+          schedule_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attended?: boolean | null
+          converted?: boolean | null
+          country?: string | null
+          created_at?: string
+          demo_id?: string
+          feedback_score?: number | null
+          feedback_text?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          join_time?: string | null
+          leave_time?: string | null
+          schedule_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_demo_attendance_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "sv_demos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sv_demo_attendance_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "sv_demo_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_demo_schedules: {
+        Row: {
+          created_at: string
+          demo_id: string
+          host_user_id: string | null
+          id: string
+          max_attendees: number | null
+          reminder_sent: boolean | null
+          scheduled_date: string
+          scheduled_time: string
+          status: string | null
+          timezone: string
+        }
+        Insert: {
+          created_at?: string
+          demo_id: string
+          host_user_id?: string | null
+          id?: string
+          max_attendees?: number | null
+          reminder_sent?: boolean | null
+          scheduled_date: string
+          scheduled_time: string
+          status?: string | null
+          timezone?: string
+        }
+        Update: {
+          created_at?: string
+          demo_id?: string
+          host_user_id?: string | null
+          id?: string
+          max_attendees?: number | null
+          reminder_sent?: boolean | null
+          scheduled_date?: string
+          scheduled_time?: string
+          status?: string | null
+          timezone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_demo_schedules_demo_id_fkey"
+            columns: ["demo_id"]
+            isOneToOne: false
+            referencedRelation: "sv_demos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_demos: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          demo_type: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          join_url: string | null
+          name: string
+          product: string
+          recording_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          demo_type?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          join_url?: string | null
+          name: string
+          product: string
+          recording_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          demo_type?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          join_url?: string | null
+          name?: string
+          product?: string
+          recording_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sv_model_configs: {
+        Row: {
+          created_at: string
+          enabled: boolean | null
+          id: string
+          max_tokens: number | null
+          model_id: string
+          priority: number | null
+          quota: number | null
+          quota_period: string | null
+          rate_limit: number | null
+          rate_limit_window: string | null
+          temperature: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean | null
+          id?: string
+          max_tokens?: number | null
+          model_id: string
+          priority?: number | null
+          quota?: number | null
+          quota_period?: string | null
+          rate_limit?: number | null
+          rate_limit_window?: string | null
+          temperature?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean | null
+          id?: string
+          max_tokens?: number | null
+          model_id?: string
+          priority?: number | null
+          quota?: number | null
+          quota_period?: string | null
+          rate_limit?: number | null
+          rate_limit_window?: string | null
+          temperature?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_model_configs_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "sv_ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_model_routing: {
+        Row: {
+          conditions: Json | null
+          created_at: string
+          fallback_model_id: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          primary_model_id: string
+          priority: number | null
+          request_type: string
+          updated_at: string
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string
+          fallback_model_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          primary_model_id: string
+          priority?: number | null
+          request_type: string
+          updated_at?: string
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string
+          fallback_model_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          primary_model_id?: string
+          priority?: number | null
+          request_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_model_routing_fallback_model_id_fkey"
+            columns: ["fallback_model_id"]
+            isOneToOne: false
+            referencedRelation: "sv_ai_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sv_model_routing_primary_model_id_fkey"
+            columns: ["primary_model_id"]
+            isOneToOne: false
+            referencedRelation: "sv_ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_permissions: {
+        Row: {
+          action: string
+          created_at: string
+          description: string | null
+          id: string
+          module: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          module: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          module?: string
+        }
+        Relationships: []
+      }
+      sv_prompts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          environment: string
+          id: string
+          is_active: boolean | null
+          model_id: string | null
+          name: string
+          system_prompt: string | null
+          updated_at: string
+          user_prompt_template: string | null
+          variables: Json | null
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean | null
+          model_id?: string | null
+          name: string
+          system_prompt?: string | null
+          updated_at?: string
+          user_prompt_template?: string | null
+          variables?: Json | null
+          version?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean | null
+          model_id?: string | null
+          name?: string
+          system_prompt?: string | null
+          updated_at?: string
+          user_prompt_template?: string | null
+          variables?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_prompts_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "sv_ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_role_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sv_role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "sv_permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sv_role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "sv_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sv_roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_system_role: boolean | null
+          role_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system_role?: boolean | null
+          role_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system_role?: boolean | null
+          role_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_activity_log: {
         Row: {
           action_type: string
