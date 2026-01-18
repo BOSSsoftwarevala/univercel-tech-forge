@@ -354,19 +354,11 @@ const RoleSwitchDashboard = () => {
       toast.error("Access denied to this view");
       return;
     }
-    // Full state reset on role switch to prevent data bleed
-    setActiveRole(role);
-    setActiveNav("dashboard");
-    setSelectedSubItem(undefined);
-    
-    // Clear URL nav param if any
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('nav')) {
-      url.searchParams.delete('nav');
-      window.history.replaceState({}, '', url.toString());
-    }
-    
-    toast.success(`Switched to ${roleConfigs[role].label} view`);
+
+    // CRITICAL NAV RULE: Switching module = FULL UI reload.
+    // This also guarantees we are in the correct role context (fixes "buttons not working" caused by staying on ?role=boss_owner).
+    const nextUrl = `/super-admin-system/role-switch?role=${encodeURIComponent(role)}`;
+    window.location.assign(nextUrl);
   }, [canAccessView]);
 
   const handleNavChange = useCallback((navId: string) => {
