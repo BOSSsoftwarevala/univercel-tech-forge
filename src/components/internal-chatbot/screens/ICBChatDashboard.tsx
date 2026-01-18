@@ -74,7 +74,7 @@ export const ICBChatDashboard: React.FC<ICBChatDashboardProps> = ({ onNavigate }
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Chat Dashboard</h1>
+        <h1 className="text-2xl font-bold text-foreground">Chat Dashboard</h1>
         <p className="text-muted-foreground">Internal secure chat overview</p>
       </div>
 
@@ -95,7 +95,7 @@ export const ICBChatDashboard: React.FC<ICBChatDashboardProps> = ({ onNavigate }
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{card.value}</div>
+              <div className="text-3xl font-bold text-foreground">{card.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -104,7 +104,7 @@ export const ICBChatDashboard: React.FC<ICBChatDashboardProps> = ({ onNavigate }
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Recent Activity</CardTitle>
+          <CardTitle className="text-lg text-foreground">Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -116,8 +116,8 @@ export const ICBChatDashboard: React.FC<ICBChatDashboardProps> = ({ onNavigate }
             ].map((item, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-sm">{item.id}</span>
-                  <span className="text-xs bg-secondary px-2 py-1 rounded">{item.type}</span>
+                  <span className="font-mono text-sm text-foreground">{item.id}</span>
+                  <span className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded">{item.type}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`text-xs px-2 py-1 rounded ${
