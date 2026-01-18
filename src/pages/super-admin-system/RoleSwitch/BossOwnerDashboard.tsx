@@ -165,6 +165,71 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     fetchApprovals();
   }, []);
 
+  // === REALTIME NOTIFICATIONS FOR NEW APPLICATIONS ===
+  useEffect(() => {
+    console.log('Setting up realtime subscriptions for new applications...');
+    
+    const channel = supabase
+      .channel('boss-approval-notifications')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'reseller_applications' },
+        (payload) => {
+          console.log('New reseller application:', payload);
+          const newApp = payload.new as any;
+          toast.success(`🆕 New Reseller Application!`, {
+            description: `${newApp.full_name || newApp.business_name || 'New Reseller'} - ${newApp.email}`,
+            duration: 10000,
+          });
+          // Refresh approvals list
+          setApprovals(prev => ({
+            ...prev,
+            resellers: [{ ...newApp, auto_approve_eligible: newApp.payment_status === 'paid' }, ...prev.resellers]
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'franchise_accounts' },
+        (payload) => {
+          console.log('New franchise application:', payload);
+          const newApp = payload.new as any;
+          toast.success(`🆕 New Franchise Application!`, {
+            description: `${newApp.company_name || newApp.franchise_name || 'New Franchise'} - ${newApp.country || 'Unknown'}`,
+            duration: 10000,
+          });
+          setApprovals(prev => ({
+            ...prev,
+            franchises: [{ ...newApp, auto_approve_eligible: newApp.payment_status === 'paid' }, ...prev.franchises]
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'influencer_accounts' },
+        (payload) => {
+          console.log('New influencer application:', payload);
+          const newApp = payload.new as any;
+          toast.success(`🆕 New Influencer Application!`, {
+            description: `${newApp.name || newApp.influencer_name || 'New Influencer'} - ${newApp.platform || 'Unknown'}`,
+            duration: 10000,
+          });
+          setApprovals(prev => ({
+            ...prev,
+            influencers: [{ ...newApp, auto_approve_eligible: newApp.payment_status === 'paid' }, ...prev.influencers]
+          }));
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up realtime subscriptions...');
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   // Module routing
   const modules: Record<string, 'server' | 'vala-ai' | 'product-demo' | 'leads' | 'marketing'> = {
     'server-control': 'server', 'vala-ai': 'vala-ai', 'product-demo': 'product-demo', 'leads': 'leads', 'marketing': 'marketing'
