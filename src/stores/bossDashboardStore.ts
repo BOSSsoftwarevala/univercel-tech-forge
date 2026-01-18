@@ -9,7 +9,7 @@ import { persist } from 'zustand/middleware';
 export type BossModule = 
   | 'dashboard'
   | 'server'
-  | 'development'
+  | 'vala-ai'
   | 'franchise'
   | 'reseller'
   | 'leads'
