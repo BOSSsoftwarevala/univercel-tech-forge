@@ -186,8 +186,9 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
       </div>
 
       {/* SECTION 2 - CORE ROLES (CARD-STYLE BUTTONS) */}
-      <ScrollArea className="flex-1">
-        <nav className="space-y-2 px-4 py-4">
+      {/* IMPORTANT: min-h-0 ensures the scroll area can actually scroll inside a flex column */}
+      <ScrollArea className="flex-1 min-h-0">
+        <nav className="space-y-2 px-4 py-4 pb-8">
           {ROLE_CATEGORIES.map((role, index) => (
             <RoleButton
               key={role.id}
