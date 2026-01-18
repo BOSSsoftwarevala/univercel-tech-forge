@@ -155,14 +155,54 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
         </div>
       </div>
 
-      {/* Cards Grid - 2 Columns */}
-      <div className="grid grid-cols-2 gap-5">
-        <DataCard title="REVENUE" icon={<DollarSign size={14} />}><Chart type="bar" /><StatRow l1="THIS MONTH" v1="$847K" l2="LAST MONTH" v2="$692K" /></DataCard>
-        <DataCard title="USERS" icon={<Users size={14} />}><Chart type="line" /><StatRow l1="NEW USERS" v1="+2,847" l2="ACTIVE TODAY" v2="8,421" /></DataCard>
-        <DataCard title="FRANCHISES" icon={<Building2 size={14} />}><Chart type="bar" /><StatRow l1="TOP" v1="Mumbai" l2="AVG REV" v2="$18.7K" /></DataCard>
-        <DataCard title="SYSTEM" icon={<Server size={14} />}><Chart type="line" /><StatRow l1="LOAD" v1="42%" l2="RESPONSE" v2="124ms" c1={T.green} /></DataCard>
-        <DataCard title="SECURITY" icon={<ShieldAlert size={14} />}><Chart type="bar" /><StatRow l1="CRITICAL" v1="3" l2="RESOLVED" v2="47" c1={T.accent} c2={T.green} /></DataCard>
-        <DataCard title="TRANSACTIONS" icon={<CreditCard size={14} />}><Chart type="line" /><StatRow l1="TODAY" v1="$1.2M" l2="PENDING" v2="$89K" c2={T.primary} /></DataCard>
+      {/* MAIN LAYOUT: KEY STATS Sidebar + 2-Column Cards Grid */}
+      <div className="flex gap-5">
+        {/* KEY STATS Sidebar */}
+        <div className="w-56 flex-shrink-0">
+          <div style={{ background: T.primary, borderRadius: 8, overflow: 'hidden' }}>
+            <div className="px-4 py-3 text-center font-bold text-sm tracking-wider" style={{ background: T.primary, color: T.text }}>KEY STATS</div>
+            <div className="p-4 space-y-4" style={{ background: T.primary }}>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="flex items-center gap-2"><BarChart3 size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>TOTAL REVENUE</span></div>
+                <span className="font-bold" style={{ color: T.text }}>$2.4M</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="flex items-center gap-2"><TrendingUp size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>GROWTH</span></div>
+                <span className="font-bold" style={{ color: T.green }}>+24%</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="flex items-center gap-2"><Users size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>ACTIVE USERS</span></div>
+                <span className="font-bold" style={{ color: T.text }}>12.5K</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="flex items-center gap-2"><Globe2 size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>COUNTRIES</span></div>
+                <span className="font-bold" style={{ color: T.text }}>45</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="flex items-center gap-2"><Building2 size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>FRANCHISES</span></div>
+                <span className="font-bold" style={{ color: T.text }}>128</span>
+              </div>
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+                <div className="flex items-center gap-2"><Wallet size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>WALLET</span></div>
+                <span className="font-bold" style={{ color: T.text }}>$456K</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-2"><Activity size={14} style={{ color: 'rgba(255,255,255,0.7)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>UPTIME</span></div>
+                <span className="font-bold" style={{ color: T.green }}>99.9%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Cards Grid - 2 Columns */}
+        <div className="flex-1 grid grid-cols-2 gap-5">
+          <DataCard title="REVENUE" icon={<DollarSign size={14} />}><Chart type="bar" /><StatRow l1="THIS MONTH" v1="$847K" l2="LAST MONTH" v2="$692K" /></DataCard>
+          <DataCard title="USERS" icon={<Users size={14} />}><Chart type="line" /><StatRow l1="NEW USERS" v1="+2,847" l2="ACTIVE TODAY" v2="8,421" /></DataCard>
+          <DataCard title="FRANCHISES" icon={<Building2 size={14} />}><Chart type="bar" /><StatRow l1="TOP" v1="Mumbai" l2="AVG REV" v2="$18.7K" /></DataCard>
+          <DataCard title="SYSTEM" icon={<Server size={14} />}><Chart type="line" /><StatRow l1="LOAD" v1="42%" l2="RESPONSE" v2="124ms" c1={T.green} /></DataCard>
+          <DataCard title="SECURITY" icon={<ShieldAlert size={14} />}><Chart type="bar" /><StatRow l1="CRITICAL" v1="3" l2="RESOLVED" v2="47" c1={T.accent} c2={T.green} /></DataCard>
+          <DataCard title="TRANSACTIONS" icon={<CreditCard size={14} />}><Chart type="line" /><StatRow l1="TODAY" v1="$1.2M" l2="PENDING" v2="$89K" c2={T.primary} /></DataCard>
+        </div>
       </div>
     </div>
   );
