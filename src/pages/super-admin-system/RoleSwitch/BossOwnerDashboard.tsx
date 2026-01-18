@@ -17,7 +17,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ServerModuleContainer } from "@/components/server-module/ServerModuleContainer";
-import ValaAIDashboard from "./ValaAIDashboard";
 import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
@@ -308,8 +307,11 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
       case 'server':
         return <ServerModuleContainer onBack={goBack} />;
       case 'vala-ai':
-        // CRITICAL: VALA AI is its own AI-only screen (no developer widgets)
-        return <ValaAIDashboard />;
+        // CRITICAL NAV RULE:
+        // VALA AI must be its own isolated module with a full UI reload and its OWN sidebar.
+        // So when Boss selects VALA AI from the Boss dashboard, we hard-navigate to the VALA AI role route.
+        window.location.assign('/super-admin-system/role-switch?role=vala_ai_management');
+        return null;
       case 'product-demo':
         return <ProductDemoModuleContainer onBack={goBack} />;
       case 'leads':
