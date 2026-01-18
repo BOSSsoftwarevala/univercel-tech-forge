@@ -1,6 +1,7 @@
 /**
  * VALA AI MODULE CONTAINER
  * Main container that combines sidebar + content
+ * STEP 05: Added AI Support Bot & History panels
  */
 
 import React, { useState } from 'react';
@@ -16,6 +17,8 @@ import { AIAPIPanel } from './AIAPIPanel';
 import { AIAutomationPanel } from './AIAutomationPanel';
 import { AIClientDeployPanel } from './AIClientDeployPanel';
 import { AIDeploymentHistoryPanel } from './AIDeploymentHistoryPanel';
+import { AIClientSupportBot } from './AIClientSupportBot';
+import { AISupportHistoryPanel } from './AISupportHistoryPanel';
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
@@ -52,6 +55,10 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
         return <AIClientDeployPanel />;
       case 'ai-deploy-history':
         return <AIDeploymentHistoryPanel />;
+      case 'ai-support-bot':
+        return <AIClientSupportBot />;
+      case 'ai-support-history':
+        return <AISupportHistoryPanel />;
       default:
         return <ValaAIOverview />;
     }
