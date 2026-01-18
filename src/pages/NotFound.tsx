@@ -44,6 +44,14 @@ const NotFound = () => {
   const [countdown, setCountdown] = useState(15);
 
   const isSuperAdminLikePath = location.pathname.startsWith('/super-admin-system');
+  const hasEncodedQueryInPath = location.pathname.includes('%3F');
+
+  // Fix broken links like /role-switch%3Frole=boss_owner ("?" encoded into the pathname)
+  useEffect(() => {
+    if (!hasEncodedQueryInPath) return;
+    const decodedPath = decodeURIComponent(location.pathname);
+    navigate(decodedPath, { replace: true });
+  }, [hasEncodedQueryInPath, location.pathname, navigate]);
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
