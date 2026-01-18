@@ -66,7 +66,7 @@ const SessionTimerDisplay = ({ accentColor }: { accentColor: string }) => {
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20">
       <Timer className={cn("w-4 h-4", accentColor)} />
       <span className="text-sm font-mono text-foreground">{formatTime(seconds)}</span>
     </div>

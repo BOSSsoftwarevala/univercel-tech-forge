@@ -45,10 +45,11 @@ export const roleConfigs = {
     label: "Boss / Owner",
     shortLabel: "BOSS",
     icon: Crown,
-    themeColor: "from-amber-500 via-yellow-500 to-orange-600",
-    accentColor: "text-amber-400",
-    bgAccent: "bg-amber-500/10",
-    borderAccent: "border-amber-500/50",
+    // switched to the same BLUE tone used across the Boss dashboard cards
+    themeColor: "from-blue-600 via-blue-500 to-cyan-500",
+    accentColor: "text-blue-300",
+    bgAccent: "bg-blue-500/10",
+    borderAccent: "border-blue-500/50",
     description: "Final Authority • System Owner",
   },
   ceo: {
