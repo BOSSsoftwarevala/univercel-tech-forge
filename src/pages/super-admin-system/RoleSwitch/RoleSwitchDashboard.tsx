@@ -478,7 +478,10 @@ const RoleSwitchDashboard = () => {
             "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
             currentConfig.themeColor
           )}>
-            <currentConfig.icon className="w-5 h-5 text-white" />
+            {(() => {
+              const Icon = currentConfig.icon;
+              return <Icon className="w-5 h-5 text-white" />;
+            })()}
           </div>
           
           {/* Breadcrumb Trail - STEP 9: Shows navigation path */}

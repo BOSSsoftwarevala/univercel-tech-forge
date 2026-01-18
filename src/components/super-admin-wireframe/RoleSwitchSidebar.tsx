@@ -795,9 +795,8 @@ const RoleSwitchSidebar = ({
   onSubItemClick,
 }: RoleSwitchSidebarProps) => {
   const currentConfig = roleConfigs[activeRole] ?? roleConfigs.boss_owner;
-  // SIDEBAR CONSISTENCY: All roles share the Boss/Owner navigation tree
-  // This ensures every dashboard sees the same sidebar items.
-  const currentNavStructure = roleNavStructure.boss_owner ?? [];
+  // NAV STRUCTURE: each role uses its own sidebar tree
+  const currentNavStructure = roleNavStructure[activeRole] ?? [];
   const [internalActiveNav, setInternalActiveNav] = useState("overview");
   
   // STEP 2 FIX: Auto drill-down when a role is active (Boss should start drilled in)
@@ -886,9 +885,9 @@ const RoleSwitchSidebar = ({
   const handleRoleSelect = useCallback((roleId: ActiveRole) => {
     onRoleChange(roleId);
     setIsDrilledDown(true);
-    
-    // Reset to first module/category (shared Boss/Owner structure)
-    const firstModule = roleNavStructure.boss_owner?.[0];
+
+    // Reset to first module/category for the selected role
+    const firstModule = roleNavStructure[roleId]?.[0];
     if (firstModule) {
       setExpandedModules(new Set([firstModule.id]));
       const firstCategory = firstModule.categories[0];
@@ -911,12 +910,13 @@ const RoleSwitchSidebar = ({
     setIsDrilledDown(false);
   }, []);
 
+  const Icon = currentConfig.icon;
+
   return (
     <aside
       className={cn(
         "flex flex-col border-r transition-all duration-150",
-        // COLOR: Match Boss "KEY STATS" blue (no royal-blue gradient)
-        "border-blue-500/30 bg-gradient-to-b from-blue-600 via-blue-600 to-blue-600"
+        "border-border/50 bg-card/50 backdrop-blur-xl"
       )}
       style={{
         width: collapsed ? 60 : 240,
@@ -924,50 +924,51 @@ const RoleSwitchSidebar = ({
     >
       {/* ================================================== */}
       {/* SECTION 1: ROLE AUTHORITY - STICKY AT TOP */}
-      {/* Boss/Owner card always pinned, visually dominant */}
       {/* ================================================== */}
-      <div className="sticky top-0 z-20 bg-blue-600/95 backdrop-blur-sm">
-        {/* Boss/Owner Primary Role Card - Always Visible */}
-        <div className="p-3 border-b border-white/20">
+      <div className="sticky top-0 z-20 bg-card/80 backdrop-blur-xl">
+        {/* Active Role Card */}
+        <div className="p-3 border-b border-border/50">
           <div className="flex items-center gap-2">
-            {/* Crown Icon - Visually Dominant */}
-            <div className={cn(
-              "flex-shrink-0 rounded-lg flex items-center justify-center shadow-lg border-2",
-              "w-11 h-11 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 border-white/30"
-            )}>
-              <Crown className="w-5 h-5 text-white drop-shadow-md" />
+            <div
+              className={cn(
+                "flex-shrink-0 rounded-lg flex items-center justify-center shadow-sm border",
+                "w-11 h-11 bg-muted/50 border-border"
+              )}
+            >
+              <Icon className="w-5 h-5 text-foreground" />
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0 transition-opacity duration-150">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-white tracking-tight">Boss / Owner</h2>
-                  <Badge className="text-[9px] px-1.5 py-0 bg-white/15 text-white border-white/25">
-                    FINAL AUTHORITY
+                  <h2 className="text-sm font-bold text-foreground tracking-tight">{currentConfig.label}</h2>
+                  <Badge className="text-[9px] px-1.5 py-0 bg-muted text-foreground/80 border border-border">
+                    {activeRole === 'boss_owner' ? 'FINAL AUTHORITY' : 'ROLE VIEW'}
                   </Badge>
                 </div>
-                <p className="text-[10px] text-white/70 font-medium">System Owner • Full Control</p>
+                <p className="text-[10px] text-muted-foreground font-medium">{currentConfig.description}</p>
               </div>
             )}
           </div>
-          
-          {/* Boss Authority Actions - Lock / Archive / Override */}
-          {!collapsed && (
+
+          {/* Boss Authority Actions - shown only for Boss/Owner */}
+          {!collapsed && activeRole === 'boss_owner' && (
             <div className="flex items-center gap-1.5 mt-2">
-              <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 text-[10px] font-medium transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-destructive/10 hover:bg-destructive/15 border border-destructive/20 text-destructive text-[10px] font-medium transition-colors">
                 <Lock className="w-3 h-3" />
                 Lock
               </button>
-              <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-white/15 hover:bg-white/20 border border-white/20 text-white text-[10px] font-medium transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-muted hover:bg-muted/80 border border-border text-foreground text-[10px] font-medium transition-colors">
                 <Archive className="w-3 h-3" />
                 Archive
               </button>
-              <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-white/15 hover:bg-white/20 border border-white/20 text-white text-[10px] font-medium transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-muted hover:bg-muted/80 border border-border text-foreground text-[10px] font-medium transition-colors">
                 <Zap className="w-3 h-3" />
                 Override
               </button>
             </div>
           )}
         </div>
+
         
         {/* Role Switcher - Below Boss Card */}
         <div className="p-2 border-b border-white/15">
