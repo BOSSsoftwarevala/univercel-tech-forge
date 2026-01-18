@@ -4,15 +4,12 @@
  * Note: Legacy RoleSidebar removed - use /super-admin-system/role-switch for admin navigation
  */
 
-import { ReactNode, useState, memo, useCallback } from 'react';
+import { ReactNode, memo } from 'react';
 import { Loader2 } from 'lucide-react';
 import CommandHeader from './CommandHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { AppRole } from '@/types/roles';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import BottomNavigation from '@/components/layout/BottomNavigation';
-import MobileOptimizedSidebar from '@/components/layout/MobileOptimizedSidebar';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -27,13 +24,8 @@ const DashboardLayout = memo(({
   showBottomNav = true 
 }: DashboardLayoutProps) => {
   const { userRole, loading } = useAuth();
-  const isMobile = useIsMobile();
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   const activeRole = roleOverride || (userRole as AppRole) || 'client';
-
-  const handleOpenSidebar = useCallback(() => setMobileSidebarOpen(true), []);
-  const handleCloseSidebar = useCallback(() => setMobileSidebarOpen(false), []);
 
   // Fast loading state - no animations
   if (loading) {
@@ -51,31 +43,13 @@ const DashboardLayout = memo(({
       
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Mobile Sidebar */}
-        {isMobile && (
-          <MobileOptimizedSidebar
-            isOpen={mobileSidebarOpen}
-            onOpen={handleOpenSidebar}
-            onClose={handleCloseSidebar}
-            userRole={userRole}
-          />
-        )}
-        
         {/* Content */}
-        <main className={cn(
-          "flex-1 overflow-auto",
-          isMobile && showBottomNav && "pb-20" // Space for bottom nav
-        )}>
+        <main className={cn("flex-1 overflow-auto")}>
           <div className="p-4 sm:p-6">
             {children}
           </div>
         </main>
       </div>
-      
-      {/* Bottom Navigation - Mobile only */}
-      {isMobile && showBottomNav && (
-        <BottomNavigation onMenuClick={handleOpenSidebar} />
-      )}
     </div>
   );
 });
