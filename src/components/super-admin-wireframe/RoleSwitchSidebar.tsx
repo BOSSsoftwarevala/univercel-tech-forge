@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { ControlPanelContent } from "@/components/control-panel";
 
 
-export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "vala_ai_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager" | "developer_management";
+export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "product_manager" | "demo_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "vala_ai_management" | "developer_management" | "marketing_management" | "customer_support_management" | "role_manager";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -238,6 +238,18 @@ export const roleConfigs = {
     bgAccent: "bg-indigo-500/10",
     borderAccent: "border-indigo-500/50",
     description: "Product catalog & demo management",
+  },
+  demo_manager: {
+    id: "demo_manager",
+    label: "Demo Manager",
+    shortLabel: "DEMO",
+    icon: Terminal,
+    // keep existing theme system (no new colors introduced)
+    themeColor: "from-blue-600 via-blue-500 to-cyan-500",
+    accentColor: "text-blue-300",
+    bgAccent: "bg-blue-500/10",
+    borderAccent: "border-blue-500/50",
+    description: "Manage demos, trials & previews",
   },
   developer_management: {
     id: "developer_management",
@@ -659,6 +671,19 @@ const roleNavStructure: Record<ActiveRole, Module[]> = {
         { id: "products", label: "All Products", icon: Box, subCategories: [{ id: "product-list", label: "Product Catalog", status: "active" }] },
         { id: "demos", label: "Demos", icon: Play, subCategories: [{ id: "demo-manager", label: "Demo Manager", status: "active" }] },
         { id: "pricing", label: "Pricing", icon: CreditCard, subCategories: [{ id: "pricing-plans", label: "Pricing & Plans", status: "active" }] },
+      ]
+    },
+  ],
+  demo_manager: [
+    {
+      id: "demos",
+      label: "Demos",
+      icon: Terminal,
+      categories: [
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, subCategories: [{ id: "demo-dash", label: "Demo Dashboard", status: "active" }] },
+        { id: "instances", label: "Instances", icon: Monitor, subCategories: [{ id: "demo-instances", label: "All Instances", status: "active" }] },
+        { id: "requests", label: "Requests", icon: Clock, subCategories: [{ id: "demo-requests", label: "Pending Requests", status: "active" }] },
+        { id: "activity", label: "Activity", icon: Activity, subCategories: [{ id: "demo-activity", label: "Activity Logs", status: "active" }] },
       ]
     },
   ],
