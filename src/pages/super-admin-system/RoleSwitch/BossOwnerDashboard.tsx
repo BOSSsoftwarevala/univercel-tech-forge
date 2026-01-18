@@ -5,7 +5,7 @@ import {
   DollarSign, Wallet, BarChart3, ShieldAlert, FileText,
   Scale, Cpu, Clock, ArrowLeft, Eye, Edit3, RefreshCw,
   Play, StopCircle, Pause, CheckCircle, XCircle, UserPlus,
-  Megaphone, Store, Loader2
+  Megaphone, Store, Loader2, Bell
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -343,6 +343,140 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           </Dialog>
         </div>
       </div>
+
+      {/* ===== CRITICAL: PENDING APPROVALS - MOST VISIBLE SECTION ===== */}
+      {totalPendingApprovals > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }} 
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-6 rounded-xl overflow-hidden"
+          style={{ 
+            background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)', 
+            border: '2px solid #ef4444',
+            boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)'
+          }}
+        >
+          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center animate-pulse" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                <Bell size={20} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white tracking-wide">⚠️ PENDING APPROVALS — ACTION REQUIRED</h2>
+                <p className="text-xs text-red-200">These applications are waiting for your decision</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge className="bg-white text-red-600 font-bold text-sm px-3 py-1">
+                {totalPendingApprovals} WAITING
+              </Badge>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="h-8 text-xs border-white/50 text-white hover:bg-white/10"
+                onClick={() => window.location.reload()}
+              >
+                <RefreshCw size={12} className="mr-1" /> Refresh
+              </Button>
+            </div>
+          </div>
+          
+          <div className="p-4 grid grid-cols-3 gap-4">
+            {/* RESELLER PENDING */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <Store size={14} className="text-white" />
+                <span className="text-xs font-semibold text-white">RESELLER</span>
+                <Badge className="ml-auto text-[10px] bg-white/20 text-white">{approvals.resellers.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.resellers.length === 0 ? (
+                  <p className="text-xs text-center py-4 text-red-200">No resellers waiting</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.resellers.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <p className="text-sm font-semibold text-white">{item.full_name || item.business_name || 'Reseller'}</p>
+                        <p className="text-[10px] text-red-200">{item.country} • {new Date(item.created_at).toLocaleDateString()}</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('reseller', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Approve'}
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('reseller', item.id, 'reject')} disabled={processingId === item.id}>
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* FRANCHISE PENDING */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <Building2 size={14} className="text-white" />
+                <span className="text-xs font-semibold text-white">FRANCHISE</span>
+                <Badge className="ml-auto text-[10px] bg-white/20 text-white">{approvals.franchises.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.franchises.length === 0 ? (
+                  <p className="text-xs text-center py-4 text-red-200">No franchises waiting</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.franchises.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <p className="text-sm font-semibold text-white">{item.company_name || item.franchise_name || 'Franchise'}</p>
+                        <p className="text-[10px] text-red-200">{item.country || item.region} • {new Date(item.created_at).toLocaleDateString()}</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('franchise', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Approve'}
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('franchise', item.id, 'reject')} disabled={processingId === item.id}>
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* INFLUENCER PENDING */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <Megaphone size={14} className="text-white" />
+                <span className="text-xs font-semibold text-white">INFLUENCER</span>
+                <Badge className="ml-auto text-[10px] bg-white/20 text-white">{approvals.influencers.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.influencers.length === 0 ? (
+                  <p className="text-xs text-center py-4 text-red-200">No influencers waiting</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.influencers.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <p className="text-sm font-semibold text-white">{item.name || item.influencer_name || 'Influencer'}</p>
+                        <p className="text-[10px] text-red-200">{item.platform} • {new Date(item.created_at).toLocaleDateString()}</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('influencer', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Approve'}
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('influencer', item.id, 'reject')} disabled={processingId === item.id}>
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* ===== ROW 2: KEY STATS — 4 EQUAL LARGE CARDS WITH ACTIONS ===== */}
       <div className="grid grid-cols-4 gap-4 mb-6">
