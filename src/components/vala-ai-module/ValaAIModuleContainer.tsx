@@ -29,10 +29,14 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState<ValaAISection>(initialSection);
 
+  const handleNavigate = (section: ValaAISection) => {
+    setActiveSection(section);
+  };
+
   const renderContent = () => {
     switch (activeSection) {
       case 'home':
-        return <ValaAIHome />;
+        return <ValaAIHome onNavigate={handleNavigate} />;
       case 'new-project':
         return <ValaAINewProject />;
       case 'live-builds':
@@ -52,7 +56,7 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
       case 'settings':
         return <DevSettings />;
       default:
-        return <ValaAIHome />;
+        return <ValaAIHome onNavigate={handleNavigate} />;
     }
   };
 

@@ -19,6 +19,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
+import type { ValaAISection } from './ValaAISidebar';
+
 interface DashboardCard {
   id: string;
   label: string;
@@ -27,15 +29,16 @@ interface DashboardCard {
   color: string;
   bgColor: string;
   trend?: string;
+  navigateTo: ValaAISection;
 }
 
 const dashboardCards: DashboardCard[] = [
-  { id: 'new-requests', label: 'New Build Requests', value: 8, icon: Plus, color: 'text-blue-500', bgColor: 'bg-blue-500/10', trend: '+3' },
-  { id: 'running-builds', label: 'Running Builds', value: 4, icon: PlayCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  { id: 'failed-blocked', label: 'Failed / Blocked', value: 2, icon: XCircle, color: 'text-rose-500', bgColor: 'bg-rose-500/10' },
-  { id: 'waiting-approval', label: 'Waiting Approval', value: 5, icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
-  { id: 'deployed-today', label: 'Deployed Today', value: 12, icon: Rocket, color: 'text-purple-500', bgColor: 'bg-purple-500/10', trend: '+4' },
-  { id: 'auto-fixed', label: 'Auto-Fixed Issues', value: 23, icon: Wrench, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', trend: '+7' },
+  { id: 'new-requests', label: 'New Build Requests', value: 8, icon: Plus, color: 'text-blue-500', bgColor: 'bg-blue-500/10', trend: '+3', navigateTo: 'new-project' },
+  { id: 'running-builds', label: 'Running Builds', value: 4, icon: PlayCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', navigateTo: 'live-builds' },
+  { id: 'failed-blocked', label: 'Failed / Blocked', value: 2, icon: XCircle, color: 'text-rose-500', bgColor: 'bg-rose-500/10', navigateTo: 'live-builds' },
+  { id: 'waiting-approval', label: 'Waiting Approval', value: 5, icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', navigateTo: 'issue-inbox' },
+  { id: 'deployed-today', label: 'Deployed Today', value: 12, icon: Rocket, color: 'text-purple-500', bgColor: 'bg-purple-500/10', trend: '+4', navigateTo: 'deployment' },
+  { id: 'auto-fixed', label: 'Auto-Fixed Issues', value: 23, icon: Wrench, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', trend: '+7', navigateTo: 'auto-fix-queue' },
 ];
 
 // Mock live builds for real-time progress display
@@ -55,7 +58,11 @@ const getStageFromProgress = (progress: number): string => {
   return 'Ready';
 };
 
-export const ValaAIHome: React.FC = () => {
+interface ValaAIHomeProps {
+  onNavigate?: (section: ValaAISection) => void;
+}
+
+export const ValaAIHome: React.FC<ValaAIHomeProps> = ({ onNavigate }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [projectPrompt, setProjectPrompt] = useState('');
 
@@ -67,11 +74,12 @@ export const ValaAIHome: React.FC = () => {
     toast.success('Project queued for AI processing');
     setProjectPrompt('');
     setIsDialogOpen(false);
+    // Navigate to live builds to show the new project
+    onNavigate?.('live-builds');
   };
 
-  const handleCardClick = (cardId: string) => {
-    toast.info(`Opening ${cardId.replace('-', ' ')} view...`);
-    // In real implementation, this would navigate to the corresponding section
+  const handleCardClick = (card: DashboardCard) => {
+    onNavigate?.(card.navigateTo);
   };
 
   return (
@@ -157,9 +165,9 @@ export const ValaAIHome: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
             >
-              <Card 
-                className="bg-card/50 border-border/50 hover:bg-card/80 transition-all cursor-pointer group"
-                onClick={() => handleCardClick(card.id)}
+                <Card 
+                  className="bg-card/50 border-border/50 hover:bg-card/80 transition-all cursor-pointer group relative"
+                  onClick={() => handleCardClick(card)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
