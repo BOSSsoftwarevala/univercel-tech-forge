@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { ControlPanelContent } from "@/components/control-panel";
 
 
-export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "vala_ai_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
+export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "vala_ai_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager" | "developer_management";
 
 interface RoleSwitchSidebarProps {
   activeRole: ActiveRole;
@@ -238,6 +238,17 @@ export const roleConfigs = {
     bgAccent: "bg-indigo-500/10",
     borderAccent: "border-indigo-500/50",
     description: "Product catalog & demo management",
+  },
+  developer_management: {
+    id: "developer_management",
+    label: "Developer Management",
+    shortLabel: "DEV",
+    icon: Code2,
+    themeColor: "from-slate-600 to-zinc-800",
+    accentColor: "text-emerald-400",
+    bgAccent: "bg-emerald-500/10",
+    borderAccent: "border-emerald-500/50",
+    description: "Development & engineering operations",
   },
 } as const;
 
@@ -648,6 +659,19 @@ const roleNavStructure: Record<ActiveRole, Module[]> = {
         { id: "products", label: "All Products", icon: Box, subCategories: [{ id: "product-list", label: "Product Catalog", status: "active" }] },
         { id: "demos", label: "Demos", icon: Play, subCategories: [{ id: "demo-manager", label: "Demo Manager", status: "active" }] },
         { id: "pricing", label: "Pricing", icon: CreditCard, subCategories: [{ id: "pricing-plans", label: "Pricing & Plans", status: "active" }] },
+      ]
+    },
+  ],
+  developer_management: [
+    {
+      id: "development",
+      label: "Development",
+      icon: Code2,
+      categories: [
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, subCategories: [{ id: "dev-dash", label: "Dev Dashboard", status: "active" }] },
+        { id: "projects", label: "Projects", icon: Briefcase, subCategories: [{ id: "project-list", label: "All Projects", status: "active" }] },
+        { id: "sprints", label: "Sprints", icon: Rocket, subCategories: [{ id: "sprint-board", label: "Sprint Board", status: "active" }] },
+        { id: "code-review", label: "Code Review", icon: GitBranch, subCategories: [{ id: "review-queue", label: "Review Queue", status: "active" }] },
       ]
     },
   ],

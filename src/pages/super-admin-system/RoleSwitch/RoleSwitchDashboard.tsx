@@ -445,6 +445,27 @@ const RoleSwitchDashboard = () => {
         return <RoleManagerDashboard />;
       case "product_manager":
         return <ProductManagerDashboard />;
+      case "developer_management":
+        // Developer Management uses the same layout as other managers
+        return (
+          <div className="p-8">
+            <h1 className="text-3xl font-bold text-white mb-6">Developer Management</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+                <h2 className="text-lg font-semibold text-white mb-2">Active Projects</h2>
+                <p className="text-3xl font-bold text-emerald-400">12</p>
+              </div>
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+                <h2 className="text-lg font-semibold text-white mb-2">Open PRs</h2>
+                <p className="text-3xl font-bold text-amber-400">24</p>
+              </div>
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+                <h2 className="text-lg font-semibold text-white mb-2">Deployments Today</h2>
+                <p className="text-3xl font-bold text-blue-400">8</p>
+              </div>
+            </div>
+          </div>
+        );
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
@@ -616,48 +637,49 @@ const RoleSwitchDashboard = () => {
       
       {/* STEP 9: SINGLE-CONTEXT LAYOUT - Only ONE active view at a time */}
       {/* GOLDEN RULE: Control Panel OR Role Dashboard, NEVER both */}
+      {/* CLICK BEHAVIOR: When clicking role button, sidebar COMPLETELY REMOVED, module takes full width */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* CONTEXT A: Control Panel Sidebar - ONLY visible when no role selected */}
+        {/* Full height (100vh), fixed left, premium card-style buttons */}
         {isInControlPanelView && (
-          <ControlPanelSidebar
-            activeRole={undefined}
-            onRoleSelect={(roleId) => {
-              // Map RoleId to ActiveRole
-              const roleMap: Record<RoleId, ActiveRole> = {
-                'boss_owner': 'boss_owner',
-                'ceo': 'ceo',
-                'vala_ai': 'vala_ai_management',
-                'server_manager': 'server_manager',
-                'continent_super_admin': 'continent_super_admin',
-                'country_head': 'country_head',
-                'franchise_manager': 'franchise_manager',
-                'sales_support_manager': 'sales_support_manager',
-                'reseller_manager': 'reseller_manager',
-                'lead_manager': 'lead_manager',
-                'product_manager': 'product_manager',
-                'demo_manager': 'product_manager', // Demo manager uses product manager dashboard
-              };
-              handleRoleChange(roleMap[roleId]);
-            }}
-            collapsed={collapsed}
-            onToggleCollapse={() => setCollapsed(!collapsed)}
-            onLogout={handleLogout}
-          />
+          <>
+            <ControlPanelSidebar
+              activeRole={undefined}
+              onRoleSelect={(roleId) => {
+                // Map RoleId to ActiveRole (extended for 20 roles)
+                const roleMap: Record<RoleId, ActiveRole> = {
+                  'boss_owner': 'boss_owner',
+                  'ceo': 'ceo',
+                  'vala_ai': 'vala_ai_management',
+                  'server_manager': 'server_manager',
+                  'continent_super_admin': 'continent_super_admin',
+                  'country_head': 'country_head',
+                  'franchise_manager': 'franchise_manager',
+                  'sales_support_manager': 'sales_support_manager',
+                  'reseller_manager': 'reseller_manager',
+                  'lead_manager': 'lead_manager',
+                  'product_manager': 'product_manager',
+                  'demo_manager': 'product_manager',
+                  'pro_manager': 'pro_manager',
+                  'legal_manager': 'legal_manager',
+                  'task_management': 'task_management',
+                  'finance_manager': 'finance_manager',
+                  'developer_management': 'developer_management' as ActiveRole,
+                  'marketing_management': 'marketing_management',
+                  'customer_support_management': 'customer_support_management',
+                  'role_manager': 'role_manager',
+                };
+                handleRoleChange(roleMap[roleId] || 'boss_owner');
+              }}
+              onLogout={handleLogout}
+            />
+            {/* Spacer to offset fixed sidebar */}
+            <div className="w-[320px] flex-shrink-0" />
+          </>
         )}
         
-        {/* CONTEXT B: Role Sidebar - ONLY visible when a role is selected */}
-        {!isInControlPanelView && shouldShowGlobalSidebar && activeRole && (
-          <RoleSwitchSidebar
-            activeRole={activeRole}
-            onRoleChange={handleRoleChange}
-            collapsed={collapsed}
-            onToggleCollapse={() => setCollapsed(!collapsed)}
-            onLogout={handleLogout}
-            activeNav={activeNav}
-            onNavChange={handleNavChange}
-            onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
-          />
-        )}
+        {/* CONTEXT B: NO SIDEBAR when role is selected */}
+        {/* Module dashboard takes FULL WIDTH - no sidebar, no left panel, no right panel */}
 
         {/* CONTEXT B: Module Content - Takes full width when in module view */}
         {/* Module sidebar is rendered INSIDE the module container, not here */}
