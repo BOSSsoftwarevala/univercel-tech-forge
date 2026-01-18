@@ -17,7 +17,7 @@ import { SystemAuditPopup } from '@/components/system/SystemAuditPopup';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import RoleSwitchSidebar, { type ActiveRole, roleConfigs } from '@/components/super-admin-wireframe/RoleSwitchSidebar';
+import RoleSwitchSidebarNew, { type ActiveRole, roleConfigs } from '@/components/super-admin-wireframe/RoleSwitchSidebarNew';
 import CommandHeader from '@/components/layouts/CommandHeader';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -761,7 +761,7 @@ const SuperAdminCommandCenter = () => {
         {/* Main Content Area with Sidebar */}
         <div className="flex-1 flex overflow-hidden">
           {/* New Role Switch Sidebar */}
-          <RoleSwitchSidebar
+          <RoleSwitchSidebarNew
             activeRole={activeRole}
             onRoleChange={handleRoleChange}
             collapsed={sidebarCollapsed}

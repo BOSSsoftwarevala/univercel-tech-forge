@@ -122,7 +122,7 @@ interface RoleSwitchSidebarProps {
 // ==============================================
 // ROLE CONFIGURATIONS
 // ==============================================
-const roleConfigs: Record<ActiveRole, RoleConfig> = {
+export const roleConfigs: Record<ActiveRole, RoleConfig> = {
   boss_owner: {
     id: "boss_owner",
     label: "Boss / Owner",

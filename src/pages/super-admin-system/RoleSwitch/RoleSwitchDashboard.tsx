@@ -15,8 +15,7 @@ import ModuleBreadcrumb from "@/components/shared/ModuleBreadcrumb";
 // Sidebar visibility store for single-sidebar enforcement
 import { useSidebarStore } from "@/stores/sidebarStore";
 
-import RoleSwitchSidebarNew, { ActiveRole } from "@/components/super-admin-wireframe/RoleSwitchSidebarNew";
-import { roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
+import RoleSwitchSidebarNew, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebarNew";
 import { ControlPanelSidebar } from "@/components/super-admin-wireframe/ControlPanelSidebar";
 import { ControlPanelDashboard } from "@/components/super-admin-wireframe/ControlPanelDashboard";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
@@ -655,7 +654,7 @@ const RoleSwitchDashboard = () => {
       )}>
         <div className="flex items-center gap-4">
           <span className="text-xs text-muted-foreground font-mono">
-            View: <span className={currentConfig.accentColor}>{currentConfig.label}</span>
+            View: <span className="text-primary">{currentConfig.label}</span>
           </span>
           <span className="text-xs text-muted-foreground">|</span>
           <span className="text-xs text-muted-foreground font-mono">
