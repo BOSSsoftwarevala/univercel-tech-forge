@@ -212,6 +212,52 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
       </ScrollArea>
 
       {/* ========================================== */}
+      {/* STATUS STRIP - System Health Indicators */}
+      {/* ========================================== */}
+      <div 
+        className="px-3 py-3"
+        style={{ borderTop: `1px solid ${SIDEBAR_COLORS.border}` }}
+      >
+        {!collapsed ? (
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-medium text-emerald-400">RUNNING</span>
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-xs font-medium text-cyan-400">AI: ACTIVE</span>
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <span className="w-2 h-2 rounded-full bg-blue-400" />
+              <span className="text-xs font-medium text-blue-400">HEALTHY</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger>
+                <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+              </TooltipTrigger>
+              <TooltipContent side="right">System Running</TooltipContent>
+            </Tooltip>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger>
+                <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
+              </TooltipTrigger>
+              <TooltipContent side="right">AI Active</TooltipContent>
+            </Tooltip>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger>
+                <span className="w-3 h-3 rounded-full bg-blue-400" />
+              </TooltipTrigger>
+              <TooltipContent side="right">System Healthy</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
+      </div>
+
+      {/* ========================================== */}
       {/* FOOTER - Collapse & Logout */}
       {/* ========================================== */}
       <div 
