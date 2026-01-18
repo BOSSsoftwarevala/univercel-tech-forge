@@ -304,11 +304,9 @@ const ButtonAuditOverlayInner: React.FC<ButtonAuditOverlayProps> = ({
   );
 };
 
-// Wrapped export with forwardRef to fix AnimatePresence warning
-export const ButtonAuditOverlay = React.forwardRef<HTMLDivElement, ButtonAuditOverlayProps>((props, ref) => {
+// Export the component directly - no forwardRef needed since AnimatePresence doesn't accept refs
+export const ButtonAuditOverlay: React.FC<ButtonAuditOverlayProps> = (props) => {
   return <ButtonAuditOverlayInner {...props} />;
-});
-
-ButtonAuditOverlay.displayName = 'ButtonAuditOverlay';
+};
 
 export default ButtonAuditOverlay;
