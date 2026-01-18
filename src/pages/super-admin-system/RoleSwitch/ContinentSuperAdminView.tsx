@@ -43,6 +43,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContinentDashboard from "@/components/super-admin-wireframe/ContinentDashboard";
 import { ContinentSuperAdminDashboard, getContinentConfig, CONTINENT_CONFIGS } from "@/components/continent-dashboard";
+import GlobalContinentDashboard from "@/components/continent-dashboard/GlobalContinentDashboard";
 
 // Country data for each continent
 const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
@@ -799,134 +800,17 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     return renderRegistryView();
   }
 
-  // Default dashboard view - show only the detail panel when a CSA is selected
+  // Default: Show the Global Continent Dashboard with world map, sidebar, and boxes
   return (
-    <div className="h-full flex overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Main Content - Show selected CSA details or welcome message */}
-      <div className="flex-1 flex items-center justify-center">
-        {selectedCSA ? (
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-2xl bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden"
-            >
-              {/* Panel Header */}
-              <div 
-                className="p-5 border-b border-slate-700/50"
-                style={{ background: `linear-gradient(135deg, ${selectedCSA.color}15, transparent)` }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl"
-                      style={{ backgroundColor: `${selectedCSA.color}25` }}
-                    >
-                      {selectedCSA.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white">{selectedCSA.name}</h3>
-                      <p className="text-sm text-slate-400">{selectedCSA.continent} Super Admin</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => setSelectedCSA(null)}>
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
-                {getStatusBadge(selectedCSA.status)}
-              </div>
-
-              {/* Tabs */}
-              <Tabs value={detailTab} onValueChange={setDetailTab} className="flex-1 flex flex-col">
-                <TabsList className="mx-4 mt-4 bg-slate-800/50">
-                  <TabsTrigger value="profile">Profile</TabsTrigger>
-                  <TabsTrigger value="permissions">Permissions</TabsTrigger>
-                  <TabsTrigger value="countries">Countries</TabsTrigger>
-                  <TabsTrigger value="activity">Activity</TabsTrigger>
-                </TabsList>
-
-                <ScrollArea className="flex-1 max-h-[400px]">
-                  <div className="p-4">
-                    {/* Profile Tab */}
-                    <TabsContent value="profile" className="mt-0 space-y-4">
-                      <Card className="bg-slate-800/50 border-slate-700/50">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm text-slate-400">Basic Information</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">CSA ID</span>
-                            <code className="text-blue-400 text-sm">{selectedCSA.id}</code>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">Email</span>
-                            <span className="text-white">{selectedCSA.email}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">Username</span>
-                            <span className="text-white">{selectedCSA.username}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">Continent</span>
-                            <span className="text-white">{selectedCSA.continent}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-
-                    {/* Other tabs content - simplified */}
-                    <TabsContent value="permissions" className="mt-0">
-                      <Card className="bg-slate-800/50 border-slate-700/50">
-                        <CardContent className="pt-4 space-y-3">
-                          {Object.entries(selectedCSA.permissions).map(([key, value]) => (
-                            <div key={key} className="flex items-center justify-between p-2 bg-slate-700/30 rounded-lg">
-                              <span className="text-white text-sm capitalize">
-                                {key.replace(/([A-Z])/g, ' $1').trim()}
-                              </span>
-                              <Badge className={value ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"}>
-                                {value ? "Enabled" : "Disabled"}
-                              </Badge>
-                            </div>
-                          ))}
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-
-                    <TabsContent value="countries" className="mt-0">
-                      <Card className="bg-slate-800/50 border-slate-700/50">
-                        <CardContent className="pt-4 text-center py-8 text-slate-400">
-                          {selectedCSA.countriesCount} countries assigned to {selectedCSA.continent}
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-
-                    <TabsContent value="activity" className="mt-0">
-                      <Card className="bg-slate-800/50 border-slate-700/50">
-                        <CardContent className="pt-4 space-y-2">
-                          {selectedCSA.recentActions.map((action, idx) => (
-                            <div key={idx} className="p-2 bg-slate-700/30 rounded-lg">
-                              <p className="text-white text-sm">{action.action}</p>
-                              <p className="text-xs text-slate-500">{action.time}</p>
-                            </div>
-                          ))}
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                  </div>
-                </ScrollArea>
-              </Tabs>
-            </motion.div>
-          </AnimatePresence>
-        ) : (
-          <div className="text-center">
-            <Globe2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-white mb-2">Select a Continent Super Admin</h2>
-            <p className="text-slate-400">Click on a CSA from the sidebar to view details</p>
-          </div>
-        )}
-      </div>
-    </div>
+    <GlobalContinentDashboard
+      onBack={() => {
+        // Return to control panel - this should be handled by parent
+      }}
+      onContinentClick={(continentId) => {
+        // When clicking a continent on the map, show that continent's dashboard
+        setShowContinentDashboard(continentId);
+      }}
+    />
   );
 };
 
