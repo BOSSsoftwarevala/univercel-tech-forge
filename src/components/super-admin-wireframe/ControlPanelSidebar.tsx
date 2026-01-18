@@ -35,7 +35,7 @@ import {
   Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
   Headphones, Handshake, Target, Box, Terminal, 
   Star, Scale, ListTodo, DollarSign, Code2, 
-  Megaphone, HeartHandshake, Users, LogOut
+  Megaphone, HeartHandshake, Users, LogOut, Zap
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -53,7 +53,7 @@ const COLORS = {
   iconColor: '#60a5fa',
 };
 
-// ===== 20 ROLE CATEGORIES (EXACT ORDER - LOCKED) =====
+// ===== 21 ROLE CATEGORIES (EXACT ORDER - LOCKED) =====
 // IDs MUST match ActiveRole type in RoleSwitchSidebar.tsx
 const ROLE_CATEGORIES = [
   { id: 'boss_owner', label: 'Boss / Owner', icon: Crown },
@@ -76,6 +76,7 @@ const ROLE_CATEGORIES = [
   { id: 'marketing_management', label: 'Marketing Management', icon: Megaphone },
   { id: 'customer_support_management', label: 'Customer Support Management', icon: HeartHandshake },
   { id: 'role_manager', label: 'Role Manager', icon: Users },
+  { id: 'api_ai_manager', label: 'API & AI Manager', icon: Zap },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
