@@ -33,6 +33,7 @@ import DMFullLayout from "@/components/developer-management/DMFullLayout";
 import PROFullLayout from "@/components/pro-manager/PROFullLayout";
 import LegalManagerView from "./LegalManagerView";
 import TMFullLayout from "@/components/task-manager/TMFullLayout";
+import IMFullLayout from "@/components/influencer-manager/IMFullLayout";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
@@ -477,6 +478,8 @@ const RoleSwitchDashboard = () => {
         return <AMFullLayout />;
       case "internal_chatbot":
         return <ICBFullLayout />;
+      case "influencer_manager":
+        return <IMFullLayout />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
