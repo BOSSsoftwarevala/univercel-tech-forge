@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "react-router-dom";
 import { 
   Users, BookOpen, Calendar, Bell, 
   ClipboardList, DollarSign, FileText, 
@@ -26,9 +27,43 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useDemoTestMode } from "@/contexts/DemoTestModeContext";
+
+// Demo role configurations - URL-based auto-access
+const DEMO_ROLES = {
+  principal: { name: "Dr. Rajesh Kumar", designation: "Principal & Super Admin", avatar: "DR" },
+  vice_principal: { name: "Mrs. Sunita Sharma", designation: "Vice Principal", avatar: "SS" },
+  teacher: { name: "Mr. Amit Verma", designation: "Class Teacher - 10A", avatar: "AV" },
+  student: { name: "Rahul Singh", designation: "Student - Class 10A", avatar: "RS" },
+  parent: { name: "Mr. Suresh Singh", designation: "Parent - Rahul's Father", avatar: "SS" },
+  accountant: { name: "Mr. Prakash Jain", designation: "Chief Accountant", avatar: "PJ" },
+  librarian: { name: "Mrs. Kavita Gupta", designation: "Head Librarian", avatar: "KG" },
+  transport: { name: "Mr. Ramesh Yadav", designation: "Transport Manager", avatar: "RY" },
+  hostel: { name: "Mrs. Meena Devi", designation: "Hostel Warden", avatar: "MD" },
+  admin: { name: "Mr. Sanjay Patel", designation: "Admin Officer", avatar: "SP" },
+  hr: { name: "Mrs. Anita Roy", designation: "HR Manager", avatar: "AR" },
+  exam: { name: "Mr. Vijay Kumar", designation: "Exam Controller", avatar: "VK" },
+};
 
 const SchoolLargeDemo = () => {
+  const [searchParams] = useSearchParams();
+  const { isTestMode, skipLogin } = useDemoTestMode();
+  
+  // Get role from URL - auto-login without password
+  const roleFromUrl = searchParams.get('role') as keyof typeof DEMO_ROLES | null;
+  const currentRole = roleFromUrl && DEMO_ROLES[roleFromUrl] ? DEMO_ROLES[roleFromUrl] : DEMO_ROLES.principal;
+  
   const [activeModule, setActiveModule] = useState("dashboard");
+  const [isAutoLoggedIn, setIsAutoLoggedIn] = useState(false);
+
+  // Auto-login on URL access - no password needed for demo
+  useEffect(() => {
+    if (isTestMode || skipLogin) {
+      // Instant demo access - no authentication friction
+      setIsAutoLoggedIn(true);
+      console.log(`[DEMO] Auto-logged in as: ${currentRole.name} (${currentRole.designation})`);
+    }
+  }, [isTestMode, skipLogin, currentRole]);
   const [selectedBranch, setSelectedBranch] = useState("all");
 
   const branches = [
@@ -178,15 +213,24 @@ const SchoolLargeDemo = () => {
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">12</span>
             </Button>
 
+            {/* Dynamic Role Display - Based on URL Parameter */}
             <div className="flex items-center gap-3 pl-4 border-l border-slate-700">
-              <Avatar>
-                <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" />
-                <AvatarFallback className="bg-amber-500 text-white">DR</AvatarFallback>
-              </Avatar>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-white">Dr. Rajesh Kumar</p>
-                <p className="text-xs text-slate-400">Principal & Super Admin</p>
+              <div className="relative">
+                <Avatar>
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" />
+                  <AvatarFallback className="bg-amber-500 text-white">{currentRole.avatar}</AvatarFallback>
+                </Avatar>
+                {isAutoLoggedIn && (
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800" />
+                )}
               </div>
+              <div className="hidden md:block">
+                <p className="text-sm font-medium text-white">{currentRole.name}</p>
+                <p className="text-xs text-slate-400">{currentRole.designation}</p>
+              </div>
+              {isAutoLoggedIn && (
+                <Badge className="bg-green-500/20 text-green-400 text-xs">Auto-Login</Badge>
+              )}
             </div>
           </div>
         </div>
