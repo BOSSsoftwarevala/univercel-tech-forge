@@ -35,7 +35,7 @@ import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashb
 import RoleManagerDashboard from "./RoleManagerDashboard";
 // CRITICAL: Use the full-featured CountryHeadDashboard with built-in sidebar + interactive map
 import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDashboard";
-import ProductManagerDashboard from "./ProductManagerDashboard";
+import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
 import DemoManagerDashboard from "./DemoManagerDashboard";
 import CEODashboard from "./CEODashboard";
 import CEOSidebar from "@/components/ceo/CEOSidebar";
@@ -456,7 +456,7 @@ const RoleSwitchDashboard = () => {
       case "role_manager":
         return <RoleManagerDashboard />;
       case "product_manager":
-        return <ProductManagerDashboard />;
+        return <PMEnterpriseLayout />;
       case "demo_manager":
         return <DemoManagerDashboard />;
       case "developer_management":
