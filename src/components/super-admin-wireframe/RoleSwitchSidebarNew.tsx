@@ -78,7 +78,8 @@ export type ActiveRole =
   | "developer_management"
   | "marketing_management"
   | "customer_support_management"
-  | "role_manager";
+  | "role_manager"
+  | "api_ai_manager";
 
 interface SubCategory {
   id: string;
@@ -262,6 +263,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "DEV",
     icon: Code2,
     description: "Development & engineering",
+  },
+  api_ai_manager: {
+    id: "api_ai_manager",
+    label: "API & AI Manager",
+    shortLabel: "AAM",
+    icon: Zap,
+    description: "API & AI Cost Control",
   },
 };
 

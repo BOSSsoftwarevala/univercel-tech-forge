@@ -37,6 +37,7 @@ import RoleManagerDashboard from "./RoleManagerDashboard";
 import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDashboard";
 import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
 import LMEnterpriseLayout from "@/components/legal-manager/LMEnterpriseLayout";
+import AAMEnterpriseLayout from "@/components/api-ai-manager/AAMEnterpriseLayout";
 import DemoManagerDashboard from "./DemoManagerDashboard";
 import CEODashboard from "./CEODashboard";
 import CEOSidebar from "@/components/ceo/CEOSidebar";
@@ -462,6 +463,8 @@ const RoleSwitchDashboard = () => {
         return <DemoManagerDashboard />;
       case "developer_management":
         return <DeveloperManagementDashboard />;
+      case "api_ai_manager":
+        return <AAMEnterpriseLayout />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
