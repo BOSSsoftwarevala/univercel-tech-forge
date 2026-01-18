@@ -486,13 +486,13 @@ const RoleSwitchDashboard = () => {
       <header className={cn(
         "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
         "bg-gradient-to-r from-[#0a1628] via-[#0d1b2a] to-[#0a1628] border-[#1e3a5f]",
-        // When in Control Panel view, offset header for fixed sidebar
-        isInControlPanelView && "ml-[320px]"
+        // Offset only when the Control Panel sidebar is actually visible (NOT during module view)
+        isInControlPanelView && !isInModuleView && "ml-[320px]"
       )}>
         {/* LEFT: Back Button (when in module) OR Logo + Brand */}
         <div className="flex items-center gap-4">
-          {/* Back Button - Only visible in module view */}
-          {!isInControlPanelView && (
+          {/* Back Button - Visible in module view OR role dashboard view */}
+          {(!isInControlPanelView || isInModuleView) && (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -518,8 +518,8 @@ const RoleSwitchDashboard = () => {
           </div>
         </div>
 
-        {/* CENTER: Module Name (only in module view) */}
-        {!isInControlPanelView && (
+        {/* CENTER: Module Name (only in module / role dashboard view) */}
+        {(!isInControlPanelView || isInModuleView) && (
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <span className="text-lg font-semibold text-white">{currentConfig.label}</span>
           </div>
@@ -578,8 +578,8 @@ const RoleSwitchDashboard = () => {
       
       {/* STEP 9: SINGLE-CONTEXT LAYOUT - Exactly ONE sidebar visible at all times */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* CONTEXT A: Control Panel Sidebar - visible when no role selected */}
-        {isInControlPanelView && (
+        {/* CONTEXT A: Control Panel Sidebar - visible only when in Control Panel AND not inside a module */}
+        {isInControlPanelView && !isInModuleView && (
           <>
             <ControlPanelSidebar
               activeRole={undefined}
