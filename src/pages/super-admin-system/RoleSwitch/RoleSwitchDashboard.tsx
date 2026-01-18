@@ -36,6 +36,7 @@ import RoleManagerDashboard from "./RoleManagerDashboard";
 // CRITICAL: Use the full-featured CountryHeadDashboard with built-in sidebar + interactive map
 import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDashboard";
 import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
+import LMEnterpriseLayout from "@/components/legal-manager/LMEnterpriseLayout";
 import DemoManagerDashboard from "./DemoManagerDashboard";
 import CEODashboard from "./CEODashboard";
 import CEOSidebar from "@/components/ceo/CEOSidebar";
