@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useDashboardContext } from "@/hooks/useDashboardContext";
 import { toast } from "sonner";
+import { ControlPanelContent } from "@/components/control-panel";
 
 
 export type ActiveRole = "boss_owner" | "ceo" | "continent_super_admin" | "country_head" | "server_manager" | "franchise_manager" | "sales_support_manager" | "reseller_manager" | "lead_manager" | "pro_manager" | "legal_manager" | "task_management" | "finance_manager" | "vala_ai_management" | "marketing_management" | "customer_support_management" | "role_manager" | "product_manager";
@@ -934,11 +935,16 @@ const RoleSwitchSidebar = ({
                 className="flex-1 min-w-0"
               >
                 <h2 className="text-sm font-bold text-white tracking-tight truncate">Control Panel</h2>
-                <p className="text-[10px] text-white/70 font-medium">Super Admin</p>
+                <p className="text-[10px] text-white/70 font-medium">Live Operations</p>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+      </div>
+
+      {/* Control Panel Live Content - Always visible at top */}
+      <div className="border-b border-white/10">
+        <ControlPanelContent collapsed={collapsed} />
       </div>
 
       <AnimatePresence mode="wait">
