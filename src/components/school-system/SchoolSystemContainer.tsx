@@ -41,6 +41,12 @@ import { ExaminationModule } from "./modules/ExaminationModule";
 import { TransportModule } from "./modules/TransportModule";
 import { LibraryModule } from "./modules/LibraryModule";
 import { CommunicationModule } from "./modules/CommunicationModule";
+import { AcademicModule } from "./modules/AcademicModule";
+import { HostelModule } from "./modules/HostelModule";
+import { LabsModule } from "./modules/LabsModule";
+import { OnlineClassesModule } from "./modules/OnlineClassesModule";
+import { AnalyticsModule } from "./modules/AnalyticsModule";
+import { SecurityModule } from "./modules/SecurityModule";
 
 interface SchoolSystemContainerProps {
   onBack?: () => void;
@@ -140,6 +146,18 @@ export const SchoolSystemContainer = ({ onBack }: SchoolSystemContainerProps) =>
         return <LibraryModule />;
       case 'communication':
         return <CommunicationModule />;
+      case 'academic':
+        return <AcademicModule />;
+      case 'hostel':
+        return <HostelModule />;
+      case 'labs':
+        return <LabsModule />;
+      case 'online':
+        return <OnlineClassesModule />;
+      case 'analytics':
+        return <AnalyticsModule />;
+      case 'security':
+        return <SecurityModule />;
       default:
         return null;
     }
