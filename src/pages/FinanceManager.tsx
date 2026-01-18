@@ -1,6 +1,5 @@
 import { useState } from "react";
 import FinanceSidebar from "@/components/finance/FinanceSidebar";
-import FinanceTopBar from "@/components/finance/FinanceTopBar";
 import RevenueDashboard from "@/components/finance/RevenueDashboard";
 import PayoutManager from "@/components/finance/PayoutManager";
 import WalletSystem from "@/components/finance/WalletSystem";
@@ -53,9 +52,7 @@ const FinanceManager = () => {
       <FinanceSidebar activeView={activeView} onViewChange={setActiveView} />
       
       <div className="flex-1 flex flex-col">
-        <FinanceTopBar onNotificationsClick={() => setShowNotifications(true)} />
-        
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto pt-20">
           {renderContent()}
         </main>
       </div>

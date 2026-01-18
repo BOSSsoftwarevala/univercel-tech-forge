@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import LegalSidebar from "@/components/legal/LegalSidebar";
-import LegalTopBar from "@/components/legal/LegalTopBar";
 import LegalDashboard from "@/components/legal/LegalDashboard";
 import ContractTemplates from "@/components/legal/ContractTemplates";
 import ClientContracts from "@/components/legal/ClientContracts";
@@ -83,9 +82,7 @@ const LegalComplianceManager = () => {
       <LegalSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
       
       <div className="flex-1 flex flex-col">
-        <LegalTopBar />
-        
-        <div className="flex-1 flex">
+        <div className="flex-1 flex pt-16">
           <main className="flex-1 p-6 overflow-auto">
             <motion.div
               key={activeSection}
