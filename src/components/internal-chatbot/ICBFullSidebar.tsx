@@ -117,10 +117,10 @@ export const ICBFullSidebar: React.FC<ICBFullSidebarProps> = ({
               )}
               onClick={() => onScreenChange(item.id)}
             >
-              <item.icon className="h-4 w-4 shrink-0" />
+              <item.icon className="h-4 w-4 shrink-0 text-foreground" />
               {!collapsed && (
                 <>
-                  <span className="text-sm truncate">{item.label}</span>
+                  <span className="text-sm truncate text-foreground">{item.label}</span>
                   {item.badge && (
                     <span className="ml-auto bg-destructive text-destructive-foreground text-xs px-1.5 py-0.5 rounded-full">
                       {item.badge}
