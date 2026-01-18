@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import FranchiseManagerSidebar, { FranchiseManagerSection } from "@/components/franchise/FranchiseManagerSidebar";
 import FranchiseManagerDashboardContent from "@/components/franchise/FranchiseManagerDashboardContent";
@@ -7,7 +6,6 @@ import FranchiseManagerDashboardContent from "@/components/franchise/FranchiseMa
 const FranchiseManagerView = () => {
   const [activeSection, setActiveSection] = useState<FranchiseManagerSection>("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
 
   const handleSectionChange = useCallback((section: FranchiseManagerSection) => {
     setActiveSection(section);

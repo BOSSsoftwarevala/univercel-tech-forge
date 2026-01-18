@@ -1,10 +1,20 @@
-import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
-  Building2, Store, Users, DollarSign, Target, Activity,
-  CheckCircle, AlertTriangle, TrendingUp, Eye, BarChart3,
-  RefreshCw, MapPin, List, FileText, History, Clock
+  Building2,
+  Store,
+  Users,
+  DollarSign,
+  Target,
+  Activity,
+  CheckCircle,
+  AlertTriangle,
+  Eye,
+  MapPin,
+  List,
+  FileText,
+  History,
+  Clock,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { FranchiseManagerSection } from "./FranchiseManagerSidebar";
+
 
 interface FranchiseManagerDashboardContentProps {
   activeSection: FranchiseManagerSection;
@@ -142,9 +153,9 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
                 <Store className="w-5 h-5 text-indigo-400" />
                 Franchise Overview
               </h3>
-              <Button variant="outline" size="sm" onClick={() => handleAction("Viewing all franchises")}>
+              <Button variant="outline" size="sm" onClick={() => handleAction("View", "All Franchises")}>
                 <Eye className="w-4 h-4 mr-2" />
-                View All
+                View
               </Button>
             </div>
             <div className="space-y-2">
@@ -160,11 +171,11 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
+                    <Badge
                       variant="secondary"
                       className={cn(
                         "text-xs",
-                        franchise.status === "active" 
+                        franchise.status === "active"
                           ? "bg-emerald-500/20 text-emerald-400"
                           : "bg-orange-500/20 text-orange-400"
                       )}
@@ -187,9 +198,6 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
                 <Activity className="w-5 h-5 text-purple-400" />
                 Recent Activity
               </h3>
-              <Button variant="outline" size="sm" onClick={() => handleAction("Refreshing activity")}>
-                <RefreshCw className="w-4 h-4" />
-              </Button>
             </div>
             <div className="space-y-2">
               {recentActivity.map((activity) => (
@@ -247,7 +255,7 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
                   <Button 
                     size="sm" 
                     className="flex-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                    onClick={() => handleAction("Approved", approval.title)}
+                    onClick={() => handleAction("Approve", approval.title)}
                   >
                     Approve
                   </Button>
@@ -255,7 +263,7 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
                     size="sm" 
                     variant="outline"
                     className="flex-1"
-                    onClick={() => handleAction("Viewing details", approval.title)}
+                    onClick={() => handleAction("View", approval.title)}
                   >
                     View
                   </Button>
@@ -349,28 +357,237 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
     </div>
   );
 
-  const renderSection = (title: string, icon: React.ReactNode, description: string) => (
+  const renderFranchiseStaff = () => (
     <div className="space-y-6">
       <Card className="bg-card/50 backdrop-blur border-border/50">
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-6">
-            {icon}
+            <Users className="w-6 h-6 text-blue-400" />
             <div>
-              <h2 className="text-xl font-bold text-foreground">{title}</h2>
-              <p className="text-sm text-muted-foreground">{description}</p>
+              <h2 className="text-xl font-bold text-foreground">Franchise Staff</h2>
+              <p className="text-sm text-muted-foreground">Manage staff across assigned franchises</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-background/50 rounded-xl border border-border/50">
-                <div className="h-24 flex items-center justify-center">
-                  <p className="text-slate-400 text-sm">Content placeholder {i}</p>
+          <div className="space-y-3">
+            {franchiseList.map((franchise) => (
+              <div key={franchise.id} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50">
+                <div>
+                  <p className="font-semibold text-foreground">{franchise.name}</p>
+                  <p className="text-sm text-muted-foreground">Total Staff: {franchise.staff}</p>
                 </div>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => handleAction("View", `Item ${i}`)}>
+                <Button size="sm" variant="outline" onClick={() => handleAction("View", `${franchise.name} Staff`)}>
+                  View
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderSalesRevenue = () => (
+    <div className="space-y-6">
+      <Card className="bg-card/50 backdrop-blur border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <DollarSign className="w-6 h-6 text-cyan-400" />
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Sales & Revenue</h2>
+              <p className="text-sm text-muted-foreground">Revenue per franchise</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {franchiseList.map((franchise) => (
+              <div key={franchise.id} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50">
+                <div>
+                  <p className="font-semibold text-foreground">{franchise.name}</p>
+                  <p className="text-sm text-muted-foreground">Revenue: {franchise.revenue}</p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => handleAction("View", `${franchise.name} Revenue`)}>
+                  View
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderLeadsManagement = () => (
+    <div className="space-y-6">
+      <Card className="bg-card/50 backdrop-blur border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Target className="w-6 h-6 text-purple-400" />
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Leads Management</h2>
+              <p className="text-sm text-muted-foreground">Leads per franchise</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {franchiseList.map((franchise) => (
+              <div key={franchise.id} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50">
+                <div>
+                  <p className="font-semibold text-foreground">{franchise.name}</p>
+                  <p className="text-sm text-muted-foreground">Total Leads: {franchise.leads}</p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => handleAction("View", `${franchise.name} Leads`)}>
+                  View
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderCustomerActivity = () => (
+    <div className="space-y-6">
+      <Card className="bg-card/50 backdrop-blur border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Activity className="w-6 h-6 text-amber-400" />
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Customer Activity</h2>
+              <p className="text-sm text-muted-foreground">Recent customer-related events</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {recentActivity
+              .filter((a) => a.type === "customer")
+              .map((a) => (
+                <div key={a.id} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50">
+                  <div>
+                    <p className="font-semibold text-foreground">{a.action}</p>
+                    <p className="text-sm text-muted-foreground">{a.target}</p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => handleAction("View", a.target)}>
                     View
                   </Button>
                 </div>
+              ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderApprovals = () => (
+    <div className="space-y-6">
+      <Card className="bg-card/50 backdrop-blur border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <CheckCircle className="w-6 h-6 text-emerald-400" />
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Approvals</h2>
+              <p className="text-sm text-muted-foreground">Review and approve requests</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {pendingApprovals.map((approval) => (
+              <div key={approval.id} className="p-4 bg-background/50 rounded-lg border border-border/50">
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="text-sm font-medium text-foreground">{approval.title}</h4>
+                  <Badge
+                    variant="secondary"
+                    className={cn(
+                      "text-xs",
+                      approval.priority === "high"
+                        ? "bg-red-500/20 text-red-400"
+                        : approval.priority === "medium"
+                        ? "bg-amber-500/20 text-amber-400"
+                        : "bg-slate-500/20 text-slate-400"
+                    )}
+                  >
+                    {approval.priority}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">{approval.franchise}</p>
+                {approval.amount && (
+                  <p className="text-sm font-semibold text-cyan-400 mb-3">{approval.amount}</p>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                    onClick={() => handleAction("Approve", approval.title)}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => handleAction("View", approval.title)}
+                  >
+                    View
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderReports = () => (
+    <div className="space-y-6">
+      <Card className="bg-card/50 backdrop-blur border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <FileText className="w-6 h-6 text-indigo-400" />
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Reports</h2>
+              <p className="text-sm text-muted-foreground">Franchise performance reports</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {["Weekly Summary", "Monthly Revenue", "Leads Report"].map((report) => (
+              <div key={report} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50">
+                <div>
+                  <p className="font-semibold text-foreground">{report}</p>
+                  <p className="text-sm text-muted-foreground">Assigned Franchise(s)</p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => handleAction("View", report)}>
+                  View
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderActivityLog = () => (
+    <div className="space-y-6">
+      <Card className="bg-card/50 backdrop-blur border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <History className="w-6 h-6 text-slate-400" />
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Activity Log</h2>
+              <p className="text-sm text-muted-foreground">Recent actions</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {recentActivity.map((a) => (
+              <div key={a.id} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-slate-500/10 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{a.action}</p>
+                    <p className="text-sm text-muted-foreground">{a.target}</p>
+                  </div>
+                </div>
+                <span className="text-xs text-muted-foreground">{a.time}</span>
               </div>
             ))}
           </div>
@@ -388,19 +605,19 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
       case "franchise_list":
         return renderFranchiseList();
       case "franchise_staff":
-        return renderSection("Franchise Staff", <Users className="w-6 h-6 text-blue-400" />, "Manage staff across all franchises");
+        return renderFranchiseStaff();
       case "sales_revenue":
-        return renderSection("Sales & Revenue", <DollarSign className="w-6 h-6 text-cyan-400" />, "Track sales and revenue metrics");
+        return renderSalesRevenue();
       case "leads_management":
-        return renderSection("Leads Management", <Target className="w-6 h-6 text-purple-400" />, "Manage and assign leads");
+        return renderLeadsManagement();
       case "customer_activity":
-        return renderSection("Customer Activity", <Activity className="w-6 h-6 text-amber-400" />, "Monitor customer interactions");
+        return renderCustomerActivity();
       case "approvals":
-        return renderSection("Approvals", <CheckCircle className="w-6 h-6 text-emerald-400" />, "Review and approve requests");
+        return renderApprovals();
       case "reports":
-        return renderSection("Reports", <FileText className="w-6 h-6 text-indigo-400" />, "Generate and view reports");
+        return renderReports();
       case "activity_log":
-        return renderSection("Activity Log", <History className="w-6 h-6 text-slate-400" />, "View all activity history");
+        return renderActivityLog();
       default:
         return renderOverview();
     }
