@@ -16,6 +16,7 @@ import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
 import GlobalOfferPopup from "@/components/offers/GlobalOfferPopup";
 import AdminQuickAccess from "@/components/admin/AdminQuickAccess";
+import ButtonAuditOverlay from "@/components/shared/ButtonAuditOverlay";
 import Homepage from "./pages/Homepage";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -717,6 +718,8 @@ const App = () => (
                         </Routes>
                         <AdminQuickAccess />
                         <QuickSupport />
+                        {/* Button Audit Overlay - DEV MODE ONLY */}
+                        <ButtonAuditOverlay enabled={import.meta.env.DEV} />
                         </GlobalRealtimeProvider>
                       </TranslationProvider>
                     </NotificationProvider>

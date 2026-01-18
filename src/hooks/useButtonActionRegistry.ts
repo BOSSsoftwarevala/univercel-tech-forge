@@ -41,25 +41,31 @@ export interface ActionDefinition {
   moduleId?: string;
 }
 
-// Comprehensive Action Map
+// Comprehensive Action Map - ALL buttons must be registered here
 export const ACTION_MAP: Record<string, ActionDefinition> = {
   // ================= HEADER ACTIONS =================
   'btn_header_chat': { type: 'ROUTE', target: '/internal-chat', successMessage: 'Opening chat...' },
   'btn_header_tasks': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=task_management', sidebarAction: 'enterModule', moduleId: 'tasks' },
   'btn_header_alerts': { type: 'STATE', stateKey: 'showAlerts', stateValue: true },
-  'btn_header_promise': { type: 'MODAL', modalId: 'promise-panel' },
-  'btn_header_profile': { type: 'ROUTE', target: '/settings' },
+  'btn_header_promise': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=promise-tracker' },
+  'btn_header_profile': { type: 'ROUTE', target: '/profile' },
   'btn_header_settings': { type: 'ROUTE', target: '/settings' },
-  'btn_header_logout': { type: 'API', apiEndpoint: '/auth/logout', apiMethod: 'POST' },
+  'btn_header_logout': { type: 'API', apiEndpoint: '/auth/logout', apiMethod: 'POST', successMessage: 'Logged out successfully' },
   'btn_header_ai': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=vala_ai_management', sidebarAction: 'enterModule', moduleId: 'vala-ai' },
+  'btn_header_sound_toggle': { type: 'STATE', stateKey: 'soundEnabled', stateValue: 'toggle', successMessage: 'Sound toggled' },
+  'btn_header_language': { type: 'MODAL', modalId: 'language-selector' },
+  'btn_header_currency': { type: 'MODAL', modalId: 'currency-selector' },
   
   // ================= DASHBOARD CARDS =================
   'btn_card_server_status': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=server-control', sidebarAction: 'enterModule', moduleId: 'server-manager' },
-  'btn_card_risk_level': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=risk-dashboard' },
+  'btn_card_risk_level': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=risk-assessment' },
   'btn_card_users_online': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=users-online' },
   'btn_card_revenue': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=finance_manager' },
   'btn_card_tasks_pending': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=task_management' },
   'btn_card_leads': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=lead_manager', sidebarAction: 'enterModule', moduleId: 'lead-manager' },
+  'btn_card_system_health': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=system-health' },
+  'btn_card_active_sessions': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=sessions' },
+  'btn_card_alerts': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=alerts' },
   
   // ================= SIDEBAR NAVIGATION =================
   'btn_sidebar_dashboard': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner', sidebarAction: 'show' },
@@ -74,6 +80,10 @@ export const ACTION_MAP: Record<string, ActionDefinition> = {
   'btn_sidebar_support': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=customer_support_management' },
   'btn_sidebar_legal': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=legal_manager' },
   'btn_sidebar_back': { type: 'STATE', stateKey: 'sidebar', stateValue: 'parent', sidebarAction: 'exitModule' },
+  'btn_sidebar_home': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner', sidebarAction: 'show', successMessage: 'Returned to dashboard' },
+  'btn_sidebar_settings': { type: 'ROUTE', target: '/settings' },
+  'btn_sidebar_security': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=security' },
+  'btn_sidebar_audit': { type: 'ROUTE', target: '/super-admin-system/role-switch?role=boss_owner&nav=audit-logs' },
   
   // ================= CTA BUTTONS =================
   'btn_cta_create': { type: 'MODAL', modalId: 'create-modal', successMessage: 'Opening create form...' },
@@ -86,15 +96,28 @@ export const ACTION_MAP: Record<string, ActionDefinition> = {
   'btn_cta_edit': { type: 'MODAL', modalId: 'edit-modal' },
   'btn_cta_view': { type: 'MODAL', modalId: 'view-modal' },
   'btn_cta_close': { type: 'STATE', stateKey: 'modalOpen', stateValue: false },
+  'btn_cta_export': { type: 'API', apiEndpoint: '/export', apiMethod: 'GET', successMessage: 'Export started' },
+  'btn_cta_import': { type: 'MODAL', modalId: 'import-modal' },
+  'btn_cta_refresh': { type: 'STATE', stateKey: 'refresh', stateValue: true, successMessage: 'Refreshing...' },
+  'btn_cta_add': { type: 'MODAL', modalId: 'add-modal' },
+  'btn_cta_remove': { type: 'API', apiEndpoint: '/remove', apiMethod: 'DELETE', requiresConfirmation: true },
+  'btn_cta_start': { type: 'API', apiEndpoint: '/start', apiMethod: 'POST', successMessage: 'Started' },
+  'btn_cta_stop': { type: 'API', apiEndpoint: '/stop', apiMethod: 'POST', successMessage: 'Stopped', requiresConfirmation: true },
+  'btn_cta_pause': { type: 'API', apiEndpoint: '/pause', apiMethod: 'POST', successMessage: 'Paused' },
+  'btn_cta_resume': { type: 'API', apiEndpoint: '/resume', apiMethod: 'POST', successMessage: 'Resumed' },
+  'btn_cta_restart': { type: 'API', apiEndpoint: '/restart', apiMethod: 'POST', successMessage: 'Restarting...', requiresConfirmation: true },
   
   // ================= TABLE/ROW ACTIONS =================
   'btn_row_view': { type: 'MODAL', modalId: 'detail-view' },
   'btn_row_edit': { type: 'MODAL', modalId: 'edit-modal' },
-  'btn_row_delete': { type: 'API', apiEndpoint: '/delete', apiMethod: 'DELETE', requiresConfirmation: true },
-  'btn_row_approve': { type: 'API', apiEndpoint: '/approve', apiMethod: 'POST' },
-  'btn_row_reject': { type: 'API', apiEndpoint: '/reject', apiMethod: 'POST' },
-  'btn_row_pause': { type: 'API', apiEndpoint: '/pause', apiMethod: 'POST' },
-  'btn_row_resume': { type: 'API', apiEndpoint: '/resume', apiMethod: 'POST' },
+  'btn_row_delete': { type: 'API', apiEndpoint: '/delete', apiMethod: 'DELETE', requiresConfirmation: true, successMessage: 'Deleted' },
+  'btn_row_approve': { type: 'API', apiEndpoint: '/approve', apiMethod: 'POST', successMessage: 'Approved' },
+  'btn_row_reject': { type: 'API', apiEndpoint: '/reject', apiMethod: 'POST', successMessage: 'Rejected' },
+  'btn_row_pause': { type: 'API', apiEndpoint: '/pause', apiMethod: 'POST', successMessage: 'Paused' },
+  'btn_row_resume': { type: 'API', apiEndpoint: '/resume', apiMethod: 'POST', successMessage: 'Resumed' },
+  'btn_row_expand': { type: 'STATE', stateKey: 'expandedRow', stateValue: null },
+  'btn_row_select': { type: 'STATE', stateKey: 'selectedRow', stateValue: null },
+  'btn_row_details': { type: 'MODAL', modalId: 'row-details' },
   
   // ================= ICON BUTTONS =================
   'btn_icon_refresh': { type: 'STATE', stateKey: 'refresh', stateValue: true, successMessage: 'Refreshing...' },
@@ -105,11 +128,19 @@ export const ACTION_MAP: Record<string, ActionDefinition> = {
   'btn_icon_settings': { type: 'MODAL', modalId: 'settings-modal' },
   'btn_icon_help': { type: 'MODAL', modalId: 'help-modal' },
   'btn_icon_notifications': { type: 'STATE', stateKey: 'showNotifications', stateValue: true },
+  'btn_icon_menu': { type: 'STATE', stateKey: 'menuOpen', stateValue: 'toggle' },
+  'btn_icon_close': { type: 'STATE', stateKey: 'isOpen', stateValue: false },
+  'btn_icon_fullscreen': { type: 'STATE', stateKey: 'fullscreen', stateValue: 'toggle' },
+  'btn_icon_minimize': { type: 'STATE', stateKey: 'minimized', stateValue: true },
+  'btn_icon_maximize': { type: 'STATE', stateKey: 'maximized', stateValue: true },
   
   // ================= TOGGLE BUTTONS =================
   'btn_toggle_status': { type: 'STATE', stateKey: 'status', stateValue: 'toggle' },
   'btn_toggle_visibility': { type: 'STATE', stateKey: 'visible', stateValue: 'toggle' },
   'btn_toggle_active': { type: 'STATE', stateKey: 'active', stateValue: 'toggle' },
+  'btn_toggle_enabled': { type: 'STATE', stateKey: 'enabled', stateValue: 'toggle' },
+  'btn_toggle_theme': { type: 'STATE', stateKey: 'theme', stateValue: 'toggle' },
+  'btn_toggle_sidebar': { type: 'STATE', stateKey: 'sidebarCollapsed', stateValue: 'toggle' },
   
   // ================= NAVIGATION BUTTONS =================
   'btn_nav_back': { type: 'STATE', stateKey: 'navigation', stateValue: 'back', sidebarAction: 'exitModule' },
