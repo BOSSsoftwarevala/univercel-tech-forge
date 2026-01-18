@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Globe2, Timer, AlertCircle, Shield, Home, ArrowLeft, ChevronRight } from "lucide-react";
+import { Globe2, Timer, AlertCircle, Shield, Home, ArrowLeft, ChevronRight, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ import ModuleBreadcrumb from "@/components/shared/ModuleBreadcrumb";
 import { useSidebarStore } from "@/stores/sidebarStore";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
+import { ControlPanelSidebar, RoleId } from "@/components/super-admin-wireframe/ControlPanelSidebar";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
 // AreaManagerView removed - merged into CountryHeadDashboard
 import ServerManagerView from "./ServerManagerView";
@@ -104,7 +105,7 @@ const RoleSwitchDashboard = () => {
     return allowedViews.includes(viewRole);
   }, [userRole, isBossOwner]);
 
-  const [activeRole, setActiveRole] = useState<ActiveRole>("continent_super_admin");
+  const [activeRole, setActiveRole] = useState<ActiveRole | null>(null);
   const [activeNav, setActiveNav] = useState("dashboard");
   const [selectedSubItem, setSelectedSubItem] = useState<string | undefined>(undefined);
   const [collapsed, setCollapsed] = useState(false);
@@ -112,6 +113,9 @@ const RoleSwitchDashboard = () => {
   const [liveAlerts] = useState(3);
   const [initialized, setInitialized] = useState(false);
   const [navHistory, setNavHistory] = useState<string[]>(['dashboard']);
+  
+  // NEW: Track if we're in Control Panel view (no role selected) vs Role Dashboard view
+  const isInControlPanelView = activeRole === null;
 
   // STEP 8: Derive user role for header actions
   const getHeaderRole = useCallback((): 'boss' | 'employee' | 'client' | 'super_admin' | 'manager' => {
@@ -252,16 +256,22 @@ const RoleSwitchDashboard = () => {
     }
   }, [selectedSubItem, activeNav]);
 
-  // STEP 9: Handle home navigation - always returns to Boss Dashboard
+  // STEP 9: Handle home navigation - returns to Control Panel
   const handleHome = useCallback(() => {
-    if (activeRole !== 'boss_owner') {
-      setActiveRole('boss_owner');
-    }
+    setActiveRole(null);
     setActiveNav('dashboard');
     setSelectedSubItem(undefined);
     setNavHistory(['dashboard']);
-    toast.success('Returned to Boss Dashboard');
-  }, [activeRole]);
+    toast.success('Returned to Control Panel');
+  }, []);
+  
+  // Handle back to Control Panel from role dashboard
+  const handleBackToControlPanel = useCallback(() => {
+    setActiveRole(null);
+    setActiveNav('dashboard');
+    setSelectedSubItem(undefined);
+    toast.info('Returned to Control Panel');
+  }, []);
 
   // Initialize role based on URL or user's actual role
   const didInitRef = useRef(false);
@@ -293,9 +303,9 @@ const RoleSwitchDashboard = () => {
       return;
     }
 
-    // 2) First mount with no requested role -> set default once
+    // 2) First mount with no requested role -> start at Control Panel (null)
     if (!didInitRef.current && !requestedRole) {
-      setActiveRole(getDefaultRole());
+      setActiveRole(null); // Start at Control Panel
       didInitRef.current = true;
       setInitialized(true);
     }
@@ -359,7 +369,18 @@ const RoleSwitchDashboard = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const currentConfig = roleConfigs[activeRole];
+  // Get config for current role (null-safe for Control Panel view)
+  const currentConfig = activeRole ? roleConfigs[activeRole] : {
+    id: 'control_panel',
+    label: 'Control Panel',
+    shortLabel: 'CP',
+    icon: Crown,
+    themeColor: 'from-blue-600 via-blue-500 to-cyan-500',
+    accentColor: 'text-blue-300',
+    bgAccent: 'bg-blue-500/10',
+    borderAccent: 'border-blue-500/50',
+    description: 'System Control Center',
+  };
 
   // STEP 6: Show loading screen while initializing to prevent blank page
   if (loading || !initialized) {
@@ -415,13 +436,40 @@ const RoleSwitchDashboard = () => {
         return <RoleManagerDashboard />;
       case "product_manager":
         return <ProductManagerDashboard />;
+      case null:
+        // Control Panel view - render welcome content
+        return (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center max-w-2xl">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg">
+                <Crown className="w-12 h-12 text-white" />
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-3">Welcome to Control Panel</h1>
+              <p className="text-lg text-white/70 mb-8">Select a role from the sidebar to access its dashboard</p>
+              <div className="grid grid-cols-3 gap-4 text-sm text-white/60">
+                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold text-emerald-400">12</div>
+                  <div>Role Categories</div>
+                </div>
+                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold text-blue-400">Active</div>
+                  <div>System Status</div>
+                </div>
+                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold text-amber-400">3</div>
+                  <div>Pending Alerts</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
       default:
         // STEP 6: Use shared fallback component to prevent blank screens
         return (
           <RouteNotFoundScreen 
             attemptedRoute={`Role: ${activeRole}`}
             onGoBack={() => {
-              setActiveRole('boss_owner');
+              setActiveRole(null);
               setActiveNav('dashboard');
             }}
           />
@@ -442,21 +490,21 @@ const RoleSwitchDashboard = () => {
       )}>
         {/* Left - Role Identity + Breadcrumb */}
         <div className="flex items-center gap-4">
-          {/* Home Button - STEP 9: Always returns to Boss Dashboard */}
-          {(activeNav !== 'dashboard' || activeRole !== 'boss_owner') && (
+          {/* Home Button - Returns to Control Panel */}
+          {!isInControlPanelView && (
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              onClick={handleHome}
+              onClick={handleBackToControlPanel}
               className="w-9 h-9 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all group"
-              title="Return to Boss Dashboard"
+              title="Return to Control Panel"
             >
-              <Home className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+              <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
             </motion.button>
           )}
           
-          {/* Back Button - STEP 9: Returns to previous view */}
-          {(activeNav !== 'dashboard' || selectedSubItem) && (
+          {/* Back Button - Returns to previous view within role */}
+          {!isInControlPanelView && (activeNav !== 'dashboard' || selectedSubItem) && (
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -464,7 +512,7 @@ const RoleSwitchDashboard = () => {
               className="w-9 h-9 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all group"
               title="Go Back"
             >
-              <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+              <Home className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
             </motion.button>
           )}
           
@@ -582,11 +630,38 @@ const RoleSwitchDashboard = () => {
       </header>
       
       {/* STEP 9: SINGLE-CONTEXT LAYOUT - Only ONE active view at a time */}
-      {/* GOLDEN RULE: Boss context OR Module context, NEVER both */}
+      {/* GOLDEN RULE: Control Panel OR Role Dashboard, NEVER both */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* CONTEXT A: Boss Sidebar - ONLY visible in Boss context */}
-        {/* Completely unmounted in Module context to prevent overlap */}
-        {shouldShowGlobalSidebar && (
+        {/* CONTEXT A: Control Panel Sidebar - ONLY visible when no role selected */}
+        {isInControlPanelView && (
+          <ControlPanelSidebar
+            activeRole={undefined}
+            onRoleSelect={(roleId) => {
+              // Map RoleId to ActiveRole
+              const roleMap: Record<RoleId, ActiveRole> = {
+                'boss_owner': 'boss_owner',
+                'ceo': 'ceo',
+                'vala_ai': 'vala_ai_management',
+                'server_manager': 'server_manager',
+                'continent_super_admin': 'continent_super_admin',
+                'country_head': 'country_head',
+                'franchise_manager': 'franchise_manager',
+                'sales_support_manager': 'sales_support_manager',
+                'reseller_manager': 'reseller_manager',
+                'lead_manager': 'lead_manager',
+                'product_manager': 'product_manager',
+                'demo_manager': 'product_manager', // Demo manager uses product manager dashboard
+              };
+              handleRoleChange(roleMap[roleId]);
+            }}
+            collapsed={collapsed}
+            onToggleCollapse={() => setCollapsed(!collapsed)}
+            onLogout={handleLogout}
+          />
+        )}
+        
+        {/* CONTEXT B: Role Sidebar - ONLY visible when a role is selected */}
+        {!isInControlPanelView && shouldShowGlobalSidebar && activeRole && (
           <RoleSwitchSidebar
             activeRole={activeRole}
             onRoleChange={handleRoleChange}
