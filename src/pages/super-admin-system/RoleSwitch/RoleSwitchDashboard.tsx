@@ -28,6 +28,7 @@ import LeadManagerView from "./LeadManagerView";
 import LMFullLayout from "@/components/lead-manager/LMFullLayout";
 import PTFullLayout from "@/components/promise-tracker/PTFullLayout";
 import AMFullLayout from "@/components/assist-manager/AMFullLayout";
+import ICBFullLayout from "@/components/internal-chatbot/ICBFullLayout";
 import ProManagerView from "./ProManagerView";
 import LegalManagerView from "./LegalManagerView";
 import TaskManagementView from "./TaskManagementView";
