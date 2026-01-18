@@ -16,6 +16,7 @@ export type BossPanelSection =
   | 'security'
   | 'codepilot'
   | 'server-hosting'
+  | 'vala-ai'
   | 'settings';
 
 interface BossPanelLayoutProps {

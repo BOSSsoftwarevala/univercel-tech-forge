@@ -14,6 +14,7 @@ import { SecurityLegal } from './sections/SecurityLegal';
 import { BossSettings } from './sections/BossSettings';
 import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
+import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
 
 interface BossPanelContext {
   activeSection: BossPanelSection;
@@ -49,6 +50,8 @@ export function BossPanelContent() {
         return <CodePilot />;
       case 'server-hosting':
         return <ServerHosting />;
+      case 'vala-ai':
+        return <ValaAIModuleContainer />;
       case 'settings':
         return <BossSettings />;
       default:
