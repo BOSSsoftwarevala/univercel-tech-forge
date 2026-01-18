@@ -174,10 +174,10 @@ const RoleSwitchDashboard = () => {
     }
   }, [isInModuleView, activeNav, showGlobalSidebar, enterCategory, categoryMap, canTransition]);
   
-  // VISIBILITY RULE: Global sidebar visible ONLY in Boss context AND boss_owner role
-  // Uses activeContext from store AND role check for strict enforcement
-  // CRITICAL: Non-boss roles (continent_super_admin, country_head, etc.) have their OWN sidebars
-  const shouldShowGlobalSidebar = activeRole === 'boss_owner' && activeContext === 'boss' && activeSidebar === 'global' && !isInModuleView;
+  // VISIBILITY RULE: Global sidebar visible for ALL roles
+  // UPDATED: Sidebar is always shown regardless of role for consistent UX
+  // Sidebar is hidden only when in module view
+  const shouldShowGlobalSidebar = !isInModuleView;
 
   // STEP 9: Navigation labels for breadcrumb
   const navLabels: Record<string, string> = useMemo(() => ({
@@ -432,14 +432,8 @@ const RoleSwitchDashboard = () => {
   return (
     <div className={cn(
       "min-h-screen flex flex-col transition-colors duration-300",
-      activeRole === "boss_owner" ? "bg-gradient-to-br from-amber-950/30 via-zinc-950 to-orange-950/20" :
-      activeRole === "ceo" ? "bg-gradient-to-br from-emerald-950/20 via-background to-teal-950/20" :
-      activeRole === "country_head" ? "bg-gradient-to-br from-orange-950/20 via-background to-amber-950/20" :
-      activeRole === "server_manager" || activeRole === "vala_ai_management" ? "bg-zinc-950" : 
-      activeRole === "marketing_management" ? "bg-gradient-to-br from-pink-950/20 via-background to-rose-950/20" :
-      activeRole === "customer_support_management" ? "bg-gradient-to-br from-blue-950/20 via-background to-indigo-950/20" :
-      activeRole === "role_manager" ? "bg-gradient-to-br from-violet-950/20 via-background to-purple-950/20" :
-      activeRole === "product_manager" ? "bg-gradient-to-br from-indigo-950/20 via-background to-violet-950/20" : "bg-background"
+      // ALL dashboards use the same dark background for consistency
+      "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     )}>
       {/* TOP BAR - Icon-Only Enterprise Header */}
       <header className={cn(
