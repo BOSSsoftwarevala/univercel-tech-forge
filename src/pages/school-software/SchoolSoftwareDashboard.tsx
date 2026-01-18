@@ -1,7 +1,7 @@
 /**
  * School Management Software - Main Dashboard
- * LIVE OPERATING SOFTWARE with Visitor Mode
- * Complete Enterprise-Grade School ERP
+ * FULL USER TRIAL SYSTEM - 100% Features Available
+ * Direct Buy & Go Live Flow
  */
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,7 +25,7 @@ import {
   Lock, Key, Fingerprint, Eye, RefreshCw,
   ArrowLeft, Copy, ExternalLink, Check,
   UserCircle, School, Briefcase, Car,
-  BookOpenCheck, X, Info
+  BookOpenCheck, X, Info, ShoppingCart, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -40,6 +40,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useSchoolData } from "@/hooks/useSchoolData";
+import TrialPurchaseModal from "@/components/school-software/TrialPurchaseModal";
 
 // Import all working modules
 import { StudentManagementModule } from "@/components/school-system/modules/StudentManagementModule";
@@ -57,7 +58,18 @@ import { OnlineClassesModule } from "@/components/school-system/modules/OnlineCl
 import { AnalyticsModule } from "@/components/school-system/modules/AnalyticsModule";
 import { SecurityModule } from "@/components/school-system/modules/SecurityModule";
 
-// Role configurations with full access control
+// Trial Mode Config - FULL ACCESS, all features enabled
+const TRIAL_CONFIG = {
+  isTrialMode: true,
+  trialName: "USER TRIAL (FULL SYSTEM)",
+  allFeaturesEnabled: true,
+  dataCreationAllowed: true,
+  workflowsEnabled: true,
+  exportsEnabled: true,
+  watermarkText: "TRIAL MODE",
+};
+
+// Role configurations with FULL access in trial mode
 const ROLE_CONFIGS = {
   principal: { 
     name: "Dr. Rajesh Kumar", 
@@ -66,7 +78,7 @@ const ROLE_CONFIGS = {
     accessLevel: "full",
     color: "from-amber-500 to-orange-500",
     modules: ["all"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   vice_principal: { 
     name: "Mrs. Sunita Sharma", 
@@ -75,7 +87,7 @@ const ROLE_CONFIGS = {
     accessLevel: "admin",
     color: "from-purple-500 to-indigo-500",
     modules: ["dashboard", "students", "staff", "academic", "attendance", "exams", "communication"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   teacher: { 
     name: "Mr. Amit Verma", 
@@ -84,7 +96,7 @@ const ROLE_CONFIGS = {
     accessLevel: "teacher",
     color: "from-blue-500 to-cyan-500",
     modules: ["dashboard", "attendance", "exams", "communication", "library"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   student: { 
     name: "Rahul Singh", 
@@ -93,7 +105,7 @@ const ROLE_CONFIGS = {
     accessLevel: "student",
     color: "from-green-500 to-emerald-500",
     modules: ["dashboard", "fees", "exams", "library", "communication"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   parent: { 
     name: "Mr. Suresh Singh", 
@@ -102,7 +114,7 @@ const ROLE_CONFIGS = {
     accessLevel: "parent",
     color: "from-teal-500 to-green-500",
     modules: ["dashboard", "fees", "attendance", "exams", "communication", "transport"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   accountant: { 
     name: "Mr. Prakash Jain", 
@@ -111,7 +123,7 @@ const ROLE_CONFIGS = {
     accessLevel: "finance",
     color: "from-emerald-500 to-green-500",
     modules: ["dashboard", "fees", "finance"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   librarian: { 
     name: "Mrs. Kavita Gupta", 
@@ -120,7 +132,7 @@ const ROLE_CONFIGS = {
     accessLevel: "staff",
     color: "from-violet-500 to-purple-500",
     modules: ["dashboard", "library"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   transport: { 
     name: "Mr. Ramesh Yadav", 
@@ -129,7 +141,7 @@ const ROLE_CONFIGS = {
     accessLevel: "staff",
     color: "from-orange-500 to-red-500",
     modules: ["dashboard", "transport"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   hostel: { 
     name: "Mrs. Meena Devi", 
@@ -138,7 +150,7 @@ const ROLE_CONFIGS = {
     accessLevel: "staff",
     color: "from-pink-500 to-rose-500",
     modules: ["dashboard", "hostel"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   admin: { 
     name: "Mr. Sanjay Patel", 
@@ -147,7 +159,7 @@ const ROLE_CONFIGS = {
     accessLevel: "admin",
     color: "from-slate-500 to-gray-600",
     modules: ["dashboard", "students", "staff", "communication"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   hr: { 
     name: "Mrs. Anita Roy", 
@@ -156,7 +168,7 @@ const ROLE_CONFIGS = {
     accessLevel: "hr",
     color: "from-cyan-500 to-blue-500",
     modules: ["dashboard", "staff"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
   exam: { 
     name: "Mr. Vijay Kumar", 
@@ -165,7 +177,7 @@ const ROLE_CONFIGS = {
     accessLevel: "exam",
     color: "from-red-500 to-orange-500",
     modules: ["dashboard", "exams", "students"],
-    permissions: { view: true, edit: false, delete: false, export: false }
+    permissions: { view: true, edit: true, delete: true, export: true }
   },
 };
 
@@ -173,9 +185,9 @@ const SchoolSoftwareDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  // Get role and mode from URL
+  // Get role and mode from URL - Trial mode is the default
   const roleFromUrl = searchParams.get('role') as keyof typeof ROLE_CONFIGS | null;
-  const isVisitorMode = searchParams.get('mode') === 'visitor';
+  const isTrialMode = searchParams.get('mode') !== 'live'; // Default to trial mode
   const currentRole = roleFromUrl && ROLE_CONFIGS[roleFromUrl] ? ROLE_CONFIGS[roleFromUrl] : ROLE_CONFIGS.principal;
   const currentRoleKey = roleFromUrl || 'principal';
   
@@ -183,7 +195,8 @@ const SchoolSoftwareDashboard = () => {
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showVisitorNotice, setShowVisitorNotice] = useState(true);
+  const [showTrialBanner, setShowTrialBanner] = useState(true);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   
   // Real data from database
   const { 
@@ -203,18 +216,20 @@ const SchoolSoftwareDashboard = () => {
   // Show welcome toast on mount
   useEffect(() => {
     toast.success(`Welcome, ${currentRole.name}`, {
-      description: `${currentRole.designation} • View-Only Mode Active`,
+      description: `${currentRole.designation} • ${isTrialMode ? 'FULL TRIAL ACCESS' : 'LIVE SYSTEM'}`,
       duration: 4000,
     });
   }, [currentRoleKey]);
 
-  // Block any modification attempts
-  const handleModificationAttempt = (action: string) => {
-    toast.error('Modification Not Allowed', {
-      description: `${action} is disabled in visitor mode. This is a view-only demonstration.`,
-      duration: 3000,
+  // Handle purchase completion - convert to live mode
+  const handlePurchaseComplete = () => {
+    setSearchParams({ role: currentRoleKey, mode: 'live' });
+    toast.success('🎉 System Activated!', {
+      description: 'Your School Management System is now LIVE!',
+      duration: 5000,
     });
   };
+
 
   // Check if current role has access to a module
   const hasAccess = (moduleValue: string) => {
@@ -354,30 +369,40 @@ const SchoolSoftwareDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 flex">
-      {/* Visitor Mode Banner */}
-      {showVisitorNotice && (
+      {/* Trial Mode Banner with Buy Button */}
+      {showTrialBanner && isTrialMode && (
         <div className="fixed top-0 left-0 right-0 z-[100] bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Eye className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
               <span className="text-sm font-medium">
-                VISITOR MODE ACTIVE — You can view all modules but cannot make changes. This is a fully operational school management system.
+                USER TRIAL (FULL SYSTEM) — All features enabled. Test everything. Create data. Run workflows.
               </span>
             </div>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="text-white hover:bg-white/20 h-6 w-6 p-0"
-              onClick={() => setShowVisitorNotice(false)}
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                onClick={() => setShowPurchaseModal(true)}
+                className="bg-white text-amber-600 hover:bg-amber-50 font-semibold gap-1"
+              >
+                <ShoppingCart className="w-3 h-3" />
+                BUY & GO LIVE
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="text-white hover:bg-white/20 h-6 w-6 p-0"
+                onClick={() => setShowTrialBanner(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Left Sidebar */}
-      <aside className={`${sidebarCollapsed ? 'w-20' : 'w-72'} bg-slate-800 border-r border-slate-700 flex flex-col transition-all duration-300 ${showVisitorNotice ? 'pt-10' : ''}`}>
+      <aside className={`${sidebarCollapsed ? 'w-20' : 'w-72'} bg-slate-800 border-r border-slate-700 flex flex-col transition-all duration-300 ${showTrialBanner && isTrialMode ? 'pt-10' : ''}`}>
         {/* School Logo & Name */}
         <div className="p-4 border-b border-slate-700">
           <div className="flex items-center gap-3">
@@ -490,7 +515,7 @@ const SchoolSoftwareDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 flex flex-col ${showVisitorNotice ? 'pt-10' : ''}`}>
+      <main className={`flex-1 flex flex-col ${showTrialBanner && isTrialMode ? 'pt-10' : ''}`}>
         {/* Top Bar */}
         <header className="bg-slate-800/90 backdrop-blur-xl border-b border-slate-700 px-6 py-3 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center gap-4">
@@ -542,10 +567,21 @@ const SchoolSoftwareDashboard = () => {
               </span>
             </Button>
 
-            <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
-              <Eye className="w-3 h-3 mr-1" />
-              Visitor Mode
-            </Badge>
+            {isTrialMode ? (
+              <Button 
+                onClick={() => setShowPurchaseModal(true)}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white gap-1"
+                size="sm"
+              >
+                <ShoppingCart className="w-3 h-3" />
+                BUY & GO LIVE
+              </Button>
+            ) : (
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                LIVE SYSTEM
+              </Badge>
+            )}
           </div>
         </header>
 
@@ -745,6 +781,14 @@ const SchoolSoftwareDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Purchase Modal */}
+      <TrialPurchaseModal 
+        isOpen={showPurchaseModal}
+        onClose={() => setShowPurchaseModal(false)}
+        productName="School Management System"
+        onPurchaseComplete={handlePurchaseComplete}
+      />
     </div>
   );
 };
