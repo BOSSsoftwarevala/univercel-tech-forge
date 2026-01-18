@@ -1,10 +1,11 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback, memo, useEffect } from "react";
 import { 
   Crown, Shield, Lock, Users, Globe2, Activity, Server,
   Database, CreditCard, Brain, TrendingUp, Building2,
   DollarSign, Wallet, BarChart3, ShieldAlert, FileText,
   Scale, Cpu, Clock, ArrowLeft, Eye, Edit3, RefreshCw,
-  Play, StopCircle, Pause
+  Play, StopCircle, Pause, CheckCircle, XCircle, UserPlus,
+  Megaphone, Store, Loader2
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +23,7 @@ import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContaine
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // ===== BOX TYPES =====
 type BoxType = 'data' | 'process' | 'ai' | 'approval' | 'live';
@@ -92,6 +94,39 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
   const [reason, setReason] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const { user } = useAuth();
+  
+  // === APPROVAL QUEUE STATE ===
+  const [approvals, setApprovals] = useState<{
+    resellers: any[];
+    franchises: any[];
+    influencers: any[];
+  }>({ resellers: [], franchises: [], influencers: [] });
+  const [loadingApprovals, setLoadingApprovals] = useState(true);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
+  // === FETCH ALL PENDING APPROVALS ===
+  useEffect(() => {
+    const fetchApprovals = async () => {
+      setLoadingApprovals(true);
+      try {
+        const [resellerRes, franchiseRes, influencerRes] = await Promise.all([
+          supabase.from('reseller_applications').select('*').eq('status', 'pending').order('created_at', { ascending: false }).limit(10),
+          supabase.from('franchise_accounts').select('*').eq('status', 'pending').order('created_at', { ascending: false }).limit(10),
+          supabase.from('influencer_accounts').select('*').eq('status', 'pending').order('created_at', { ascending: false }).limit(10),
+        ]);
+        setApprovals({
+          resellers: resellerRes.data || [],
+          franchises: franchiseRes.data || [],
+          influencers: influencerRes.data || [],
+        });
+      } catch (e) {
+        console.error('Error fetching approvals:', e);
+      } finally {
+        setLoadingApprovals(false);
+      }
+    };
+    fetchApprovals();
+  }, []);
 
   // Module routing
   const modules: Record<string, 'server' | 'vala-ai' | 'product-demo' | 'leads' | 'marketing'> = {
@@ -105,6 +140,54 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, []);
 
+  const logAction = async (action: string, target: string, meta?: Record<string, any>) => {
+    try {
+      await supabase.from('audit_logs').insert({ user_id: user?.id, role: 'boss_owner' as any, module: 'boss-dashboard', action, meta_json: { target, timestamp: new Date().toISOString(), ...meta } });
+    } catch (e) { console.error(e); }
+  };
+
+  // === APPROVAL ACTIONS ===
+  const handleApproval = async (type: 'reseller' | 'franchise' | 'influencer', id: string, action: 'approve' | 'reject') => {
+    setProcessingId(id);
+    try {
+      const table = type === 'reseller' ? 'reseller_applications' : type === 'franchise' ? 'franchise_accounts' : 'influencer_accounts';
+      const newStatus = action === 'approve' ? 'approved' : 'rejected';
+      
+      const { error } = await supabase.from(table).update({ status: newStatus }).eq('id', id);
+      if (error) throw error;
+      
+      await logAction(`${action}_${type}`, id, { status: newStatus });
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} ${action}d successfully`);
+      
+      // Remove from local state
+      setApprovals(prev => ({
+        ...prev,
+        [type + 's']: prev[type + 's' as keyof typeof prev].filter((item: any) => item.id !== id)
+      }));
+    } catch (e) {
+      console.error(e);
+      toast.error(`Failed to ${action} ${type}`);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  // === BOX ACTION HANDLER ===
+  const handleBoxAction = useCallback(async (actionType: string, entityId: string) => {
+    await logAction(actionType, entityId);
+    toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)} action executed for ${entityId}`);
+  }, [user]);
+
+  const lockdown = async () => {
+    if (!confirmed) return toast.error("2FA required");
+    if (reason.length < 20) return toast.error("Reason: min 20 chars");
+    await logAction('emergency_lockdown', 'SYSTEM', { reason });
+    toast.success("🔒 LOCKDOWN ACTIVATED");
+    setShowLock(false); setReason(""); setConfirmed(false);
+  };
+
+  const totalPendingApprovals = approvals.resellers.length + approvals.franchises.length + approvals.influencers.length;
+
   // If module is selected, show module container with back button
   if (activeNav && activeNav in modules) {
     switch (modules[activeNav]) {
@@ -115,27 +198,6 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
       case 'marketing': return <MarketingModuleContainer onBack={goBack} />;
     }
   }
-
-  const logAction = async (action: string, target: string, meta?: Record<string, any>) => {
-    try {
-      await supabase.from('audit_logs').insert({ user_id: user?.id, role: 'boss_owner' as any, module: 'boss-dashboard', action, meta_json: { target, timestamp: new Date().toISOString(), ...meta } });
-    } catch (e) { console.error(e); }
-  };
-
-  // === BOX ACTION HANDLER ===
-  const handleBoxAction = useCallback(async (actionType: string, entityId: string) => {
-    await logAction(actionType, entityId);
-    toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)} action executed for ${entityId}`);
-    // Add real action logic here based on actionType
-  }, [user]);
-
-  const lockdown = async () => {
-    if (!confirmed) return toast.error("2FA required");
-    if (reason.length < 20) return toast.error("Reason: min 20 chars");
-    await logAction('emergency_lockdown', 'SYSTEM', { reason });
-    toast.success("🔒 LOCKDOWN ACTIVATED");
-    setShowLock(false); setReason(""); setConfirmed(false);
-  };
 
   return (
     <div className="min-h-screen p-6" style={{ fontFamily: "'Outfit', sans-serif", background: T.bg }}>
@@ -455,6 +517,136 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
             </div>
           </motion.div>
         </div>
+      </motion.div>
+
+      {/* ===== ROW 5: APPROVAL QUEUE — RESELLER / FRANCHISE / INFLUENCER ===== */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-6"
+        style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}
+      >
+        <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.15)' }}>
+          <div className="flex items-center gap-2">
+            <Shield size={16} style={{ color: '#60a5fa' }} />
+            <span className="text-sm font-semibold tracking-wider" style={{ color: '#60a5fa' }}>APPROVAL QUEUE</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge className={totalPendingApprovals > 0 ? STATUS_COLORS['pending'] : STATUS_COLORS['active']}>
+              {totalPendingApprovals} Pending
+            </Badge>
+            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => window.location.reload()}>
+              <RefreshCw size={12} className="mr-1" /> Refresh
+            </Button>
+          </div>
+        </div>
+
+        {loadingApprovals ? (
+          <div className="p-8 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
+          </div>
+        ) : totalPendingApprovals === 0 ? (
+          <div className="p-8 text-center">
+            <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-400" />
+            <p className="text-sm font-medium" style={{ color: T.text }}>All approvals cleared</p>
+            <p className="text-xs" style={{ color: T.muted }}>No pending reseller, franchise, or influencer applications</p>
+          </div>
+        ) : (
+          <div className="p-4 grid grid-cols-3 gap-4">
+            {/* RESELLER APPROVALS */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <Store size={14} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold" style={{ color: '#60a5fa' }}>RESELLER APPLICATIONS</span>
+                <Badge className="ml-auto text-[10px]" variant="secondary">{approvals.resellers.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.resellers.length === 0 ? (
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No pending resellers</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.resellers.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <p className="text-sm font-medium truncate" style={{ color: T.text }}>{item.business_name || item.name || 'Reseller'}</p>
+                        <p className="text-[10px]" style={{ color: T.muted }}>{item.email || 'No email'}</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApproval('reseller', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('reseller', item.id, 'reject')} disabled={processingId === item.id}>
+                            <XCircle className="w-3 h-3 mr-1" /> Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* FRANCHISE APPROVALS */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <Building2 size={14} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold" style={{ color: '#60a5fa' }}>FRANCHISE APPLICATIONS</span>
+                <Badge className="ml-auto text-[10px]" variant="secondary">{approvals.franchises.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.franchises.length === 0 ? (
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No pending franchises</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.franchises.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <p className="text-sm font-medium truncate" style={{ color: T.text }}>{item.company_name || item.franchise_name || 'Franchise'}</p>
+                        <p className="text-[10px]" style={{ color: T.muted }}>{item.country || item.region || 'Unknown location'}</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApproval('franchise', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('franchise', item.id, 'reject')} disabled={processingId === item.id}>
+                            <XCircle className="w-3 h-3 mr-1" /> Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* INFLUENCER APPROVALS */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <Megaphone size={14} style={{ color: '#60a5fa' }} />
+                <span className="text-xs font-semibold" style={{ color: '#60a5fa' }}>INFLUENCER APPLICATIONS</span>
+                <Badge className="ml-auto text-[10px]" variant="secondary">{approvals.influencers.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.influencers.length === 0 ? (
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No pending influencers</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.influencers.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <p className="text-sm font-medium truncate" style={{ color: T.text }}>{item.name || item.influencer_name || 'Influencer'}</p>
+                        <p className="text-[10px]" style={{ color: T.muted }}>{item.platform || 'Unknown platform'} • {item.followers || '0'} followers</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApproval('influencer', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('influencer', item.id, 'reject')} disabled={processingId === item.id}>
+                            <XCircle className="w-3 h-3 mr-1" /> Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          </div>
+        )}
       </motion.div>
     </div>
   );
