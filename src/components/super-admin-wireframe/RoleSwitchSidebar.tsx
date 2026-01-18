@@ -182,16 +182,16 @@ export const roleConfigs = {
     borderAccent: "border-emerald-600/50",
     description: "Financial operations & accounting",
   },
-  developer_management: {
-    id: "developer_management",
-    label: "Developer Management",
-    shortLabel: "DEV",
+  vala_ai_management: {
+    id: "vala_ai_management",
+    label: "VALA AI",
+    shortLabel: "AI",
     icon: Terminal,
     themeColor: "from-slate-700 to-zinc-900",
     accentColor: "text-cyan-400",
     bgAccent: "bg-cyan-500/10",
     borderAccent: "border-cyan-500/50",
-    description: "Tech & engineering operations",
+    description: "AI Operations & Automation",
   },
   marketing_management: {
     id: "marketing_management",
@@ -312,14 +312,14 @@ const roleNavStructure: Record<ActiveRole, Module[]> = {
           ]
         },
         { 
-          id: "dev-control", 
-          label: "Development", 
+          id: "vala-ai", 
+          label: "VALA AI", 
           icon: Code2,
           subCategories: [
-            { id: "dev-overview", label: "Overview", status: "active" },
-            { id: "dev-tasks", label: "Tasks", status: "active" },
-            { id: "dev-bugs", label: "Bug Tracker", status: "active" },
-            { id: "dev-releases", label: "Releases", status: "active" },
+            { id: "ai-overview", label: "Overview", status: "active" },
+            { id: "ai-requests", label: "AI Requests", status: "active" },
+            { id: "ai-models", label: "AI Models", status: "active" },
+            { id: "ai-automation", label: "Automation", status: "active" },
           ]
         },
       ]

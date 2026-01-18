@@ -155,7 +155,7 @@ const BossOwnerDashboard = ({ activeNav }: BossOwnerDashboardProps) => {
   const implementedNavItems = [
     'dashboard', 'approvals', 'security', 'settings',
     // Module views (handled separately)
-    'server-control', 'dev-control', 'product-demo', 'leads', 'marketing',
+    'server-control', 'vala-ai', 'product-demo', 'leads', 'marketing',
     // Tab-based views
     'franchise-control', 'reseller-control', 'finance', 'support-overview',
     'super-admins', 'franchise-intel', 'roles', 'modules', 'audit'

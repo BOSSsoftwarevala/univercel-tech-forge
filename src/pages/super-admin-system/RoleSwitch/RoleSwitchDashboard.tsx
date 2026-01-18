@@ -97,7 +97,7 @@ const RoleSwitchDashboard = () => {
   }, [isBossOwner, activeRole]);
 
   // STEP 9: Module view detection - determines if we're inside a full-screen module
-  const moduleViewIds = useMemo(() => ['server-control', 'dev-control', 'product-demo', 'leads', 'marketing'], []);
+  const moduleViewIds = useMemo(() => ['server-control', 'vala-ai', 'product-demo', 'leads', 'marketing'], []);
   const isInModuleView = activeRole === 'boss_owner' && moduleViewIds.includes(activeNav);
   
   // SINGLE SIDEBAR ENFORCEMENT: Use sidebar store for visibility control
@@ -107,9 +107,9 @@ const RoleSwitchDashboard = () => {
   useEffect(() => {
     if (isInModuleView) {
       // Map activeNav to category sidebar ID
-      const categoryMap: Record<string, 'server-manager' | 'dev-control' | 'product-demo' | 'lead-manager' | 'marketing'> = {
+      const categoryMap: Record<string, 'server-manager' | 'vala-ai' | 'product-demo' | 'lead-manager' | 'marketing'> = {
         'server-control': 'server-manager',
-        'dev-control': 'dev-control',
+        'vala-ai': 'vala-ai',
         'product-demo': 'product-demo',
         'leads': 'lead-manager',
         'marketing': 'marketing',
@@ -130,7 +130,7 @@ const RoleSwitchDashboard = () => {
   const navLabels: Record<string, string> = useMemo(() => ({
     'dashboard': 'Dashboard',
     'server-control': 'Server Control',
-    'dev-control': 'Development',
+    'vala-ai': 'VALA AI',
     'product-demo': 'Product Demo',
     'leads': 'Lead Management',
     'marketing': 'Marketing',

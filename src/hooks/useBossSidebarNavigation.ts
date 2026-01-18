@@ -21,7 +21,7 @@ export interface SidebarRoute {
 const SIDEBAR_ROUTES: SidebarRoute[] = [
   { id: 'dashboard', module: 'dashboard', path: '/boss/dashboard', label: 'Dashboard', isImplemented: true },
   { id: 'server-control', module: 'server', path: '/boss/server', label: 'Server Control', isImplemented: true },
-  { id: 'dev-control', module: 'development', path: '/boss/development', label: 'Development', isImplemented: true },
+  { id: 'vala-ai', module: 'vala-ai', path: '/boss/vala-ai', label: 'VALA AI', isImplemented: true },
   { id: 'franchise-control', module: 'franchise', path: '/boss/franchise', label: 'Franchise Control', isImplemented: true },
   { id: 'reseller-control', module: 'reseller', path: '/boss/reseller', label: 'Reseller Control', isImplemented: true },
   { id: 'marketing', module: 'marketing', path: '/boss/marketing', label: 'Marketing', isImplemented: true },
