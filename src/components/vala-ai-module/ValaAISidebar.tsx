@@ -17,7 +17,9 @@ import {
   Wallet,
   Webhook,
   Cog,
-  ArrowLeft
+  ArrowLeft,
+  Rocket,
+  History
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
@@ -31,7 +33,9 @@ export type ValaAISection =
   | 'ai-usage' 
   | 'ai-credits' 
   | 'ai-api' 
-  | 'ai-automation';
+  | 'ai-automation'
+  | 'ai-deploy'
+  | 'ai-deploy-history';
 
 interface ValaAISidebarProps {
   activeSection: ValaAISection;
@@ -49,6 +53,8 @@ const sidebarItems: { id: ValaAISection; label: string; icon: React.ElementType 
   { id: 'ai-credits', label: 'AI Credits Balance', icon: Wallet },
   { id: 'ai-api', label: 'AI API Calls', icon: Webhook },
   { id: 'ai-automation', label: 'AI Automation Jobs', icon: Cog },
+  { id: 'ai-deploy', label: 'Client Auto-Deploy', icon: Rocket },
+  { id: 'ai-deploy-history', label: 'Deployment History', icon: History },
 ];
 
 export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({

@@ -14,6 +14,8 @@ import { AIUsagePanel } from './AIUsagePanel';
 import { AICreditsPanel } from './AICreditsPanel';
 import { AIAPIPanel } from './AIAPIPanel';
 import { AIAutomationPanel } from './AIAutomationPanel';
+import { AIClientDeployPanel } from './AIClientDeployPanel';
+import { AIDeploymentHistoryPanel } from './AIDeploymentHistoryPanel';
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
@@ -46,6 +48,10 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
         return <AIAPIPanel />;
       case 'ai-automation':
         return <AIAutomationPanel />;
+      case 'ai-deploy':
+        return <AIClientDeployPanel />;
+      case 'ai-deploy-history':
+        return <AIDeploymentHistoryPanel />;
       default:
         return <ValaAIOverview />;
     }
