@@ -117,7 +117,7 @@ const RoleSwitchDashboard = () => {
   const [initialized, setInitialized] = useState(false);
   const [navHistory, setNavHistory] = useState<string[]>(['dashboard']);
   
-  // NEW: Track if we're in Control Panel view (no role selected) vs Role Dashboard view
+  // Track if we're in Control Panel view (no role selected)
   const isInControlPanelView = activeRole === null;
 
   // STEP 8: Derive user role for header actions
@@ -129,23 +129,21 @@ const RoleSwitchDashboard = () => {
   }, [isBossOwner, activeRole]);
 
   // STEP 9: Module view detection - determines if we're inside a full-screen module
-  // GOLDEN RULE: Only ONE context active at a time (Boss OR Module, never both)
-  // Extended module list for complete single-context enforcement
+  // GOLDEN RULE: Only ONE context active at a time (Control Panel OR Module)
   const moduleViewIds = useMemo(() => [
     'server-control', 'vala-ai', 'product-demo', 'leads', 'marketing',
     'finance', 'franchise-control', 'reseller-control', 'sales-support',
     'legal', 'task-management', 'hr-manager'
   ], []);
-  
-  // SINGLE-CONTEXT ENFORCEMENT: Role dashboards should NOT show role switcher
-  // When user is in any specific role dashboard (not boss_owner), they see only that role's sidebar
-  // Role switching ONLY happens in Control Panel
-  // FIXED: Hide RoleSwitchSidebarNew in ALL cases except when boss_owner is on main dashboard
+
+  /**
+   * STRICT RULE: If activeNav is a module id, we are in module view (even if activeRole === null).
+   * This prevents the Control Panel role list / switcher from showing alongside a module sidebar.
+   */
   const isInModuleView = useMemo(() => {
-    // Boss viewing a module (server-control, vala-ai, etc.)
-    if (activeRole === 'boss_owner' && moduleViewIds.includes(activeNav)) return true;
-    // Any role that is NOT boss_owner (they have their own sidebar)
-    if (activeRole !== 'boss_owner' && activeRole !== null) return true;
+    if (moduleViewIds.includes(activeNav)) return true;
+    // Any non-boss role dashboard is treated as its own isolated context (no role switcher)
+    if (activeRole !== null && activeRole !== 'boss_owner') return true;
     return false;
   }, [activeRole, activeNav, moduleViewIds]);
   
