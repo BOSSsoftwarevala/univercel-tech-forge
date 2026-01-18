@@ -1,22 +1,38 @@
 /**
- * CONTROL PANEL SIDEBAR - STRUCTURAL REBUILD
+ * CONTROL PANEL SIDEBAR - FORCE STRUCTURE REBUILD
+ * ================================================
  * ONLY NAVIGATION - NO DATA, NO STATS, NO ACTIVITY
- * 12 ROLE BUTTONS + STATUS STRIP
- * LOCKED STRUCTURE - BOSS APPROVAL REQUIRED
+ * 12 ROLE BUTTONS + STATUS STRIP AT BOTTOM
+ * LOCKED STRUCTURE - BOSS APPROVAL REQUIRED FOR CHANGES
+ * 
+ * EXACT ORDER (LOCKED):
+ * 1. Boss / Owner
+ * 2. CEO
+ * 3. Vala AI
+ * 4. Server Manager
+ * 5. Continent Admin
+ * 6. Country Head
+ * 7. Franchise Manager
+ * 8. Sales & Support Manager
+ * 9. Reseller Manager
+ * 10. Lead Manager
+ * 11. Product Manager
+ * 12. Demo Manager
  */
 
 import { memo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
-  Crown, Eye, Globe2, Flag, Server, Building2, Headphones, 
-  Handshake, Target, Box, Terminal, ChevronLeft, ChevronRight, LogOut, Brain
+  Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
+  Headphones, Handshake, Target, Box, Terminal, 
+  ChevronLeft, ChevronRight, LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// ===== LOCKED COLORS =====
+// ===== LOCKED COLORS (DO NOT CHANGE) =====
 const COLORS = {
   bg: '#0a1628',
   bgGradient: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)',
@@ -54,7 +70,7 @@ interface ControlPanelSidebarProps {
   onLogout: () => void;
 }
 
-// ===== ROLE BUTTON (UNIFORM SIZE) =====
+// ===== ROLE BUTTON (UNIFORM SIZE - LARGE, READABLE) =====
 const RoleButton = memo<{
   role: typeof ROLE_CATEGORIES[number];
   isActive: boolean;
@@ -74,7 +90,7 @@ const RoleButton = memo<{
           onClick={onClick}
           className={cn(
             "w-full flex items-center gap-3 rounded-lg transition-all duration-100",
-            collapsed ? "justify-center px-2 py-3" : "px-3 py-3",
+            collapsed ? "justify-center px-2 py-3.5" : "px-4 py-3.5",
             isActive ? "text-white font-semibold" : "text-white/80 hover:text-white"
           )}
           style={{
@@ -85,7 +101,7 @@ const RoleButton = memo<{
           onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
         >
           <div className={cn(
-            "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0",
+            "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
             isActive ? "bg-white/20" : "bg-white/10"
           )}>
             <Icon className="w-5 h-5" style={{ color: isActive ? COLORS.text : COLORS.iconColor }} />
@@ -99,7 +115,9 @@ const RoleButton = memo<{
         </motion.button>
       </TooltipTrigger>
       {collapsed && (
-        <TooltipContent side="right" sideOffset={10} className="text-sm">{role.label}</TooltipContent>
+        <TooltipContent side="right" sideOffset={10} className="text-sm font-medium">
+          {role.label}
+        </TooltipContent>
       )}
     </Tooltip>
   );
@@ -122,28 +140,28 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
     <aside
       className="flex flex-col border-r transition-all duration-150 h-screen flex-shrink-0"
       style={{
-        width: collapsed ? 72 : 280,
+        width: collapsed ? 80 : 300,
         background: COLORS.bgGradient,
         borderColor: COLORS.border,
       }}
     >
-      {/* HEADER - Title Only */}
-      <div className="px-4 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+      {/* HEADER - Title Only (No Data, No Stats) */}
+      <div className="px-4 py-5 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
         {!collapsed ? (
           <div>
-            <h1 className="text-lg font-bold text-white">Control Panel</h1>
-            <p className="text-xs text-white/60 mt-0.5">Super Admin</p>
+            <h1 className="text-xl font-bold text-white">Control Panel</h1>
+            <p className="text-sm text-white/60 mt-0.5">Super Admin</p>
           </div>
         ) : (
           <div className="flex justify-center">
-            <Crown className="w-6 h-6" style={{ color: COLORS.iconColor }} />
+            <Crown className="w-7 h-7" style={{ color: COLORS.iconColor }} />
           </div>
         )}
       </div>
 
-      {/* NAVIGATION - ONLY ROLES, NO DATA */}
-      <ScrollArea className="flex-1 py-2">
-        <nav className="space-y-0.5 px-2">
+      {/* NAVIGATION - ONLY ROLES (NO DATA, NO STATS, NO ACTIVITY) */}
+      <ScrollArea className="flex-1 py-3">
+        <nav className="space-y-1 px-3">
           {ROLE_CATEGORIES.map((role, index) => (
             <RoleButton
               key={role.id}
@@ -158,55 +176,62 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
       </ScrollArea>
 
       {/* STATUS STRIP - RUNNING | AI: ACTIVE | SYSTEM: HEALTHY */}
-      <div className="px-2 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
+      <div className="px-3 py-3 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
         {!collapsed ? (
-          <div className="flex items-center justify-between gap-1">
-            <div className="flex items-center gap-1.5 px-2 py-1.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-semibold text-emerald-400">RUNNING</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wide">Running</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 rounded bg-cyan-500/10 border border-cyan-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-[10px] font-semibold text-cyan-400">AI: ACTIVE</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-[11px] font-semibold text-cyan-400 uppercase tracking-wide">AI: Active</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 rounded bg-blue-500/10 border border-blue-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-              <span className="text-[10px] font-semibold text-blue-400">HEALTHY</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <span className="w-2 h-2 rounded-full bg-blue-400" />
+              <span className="text-[11px] font-semibold text-blue-400 uppercase tracking-wide">Healthy</span>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" title="Running" />
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" title="AI Active" />
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" title="Healthy" />
+          <div className="flex flex-col items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" title="Running" />
+            <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" title="AI Active" />
+            <span className="w-3 h-3 rounded-full bg-blue-400" title="Healthy" />
           </div>
         )}
       </div>
 
       {/* FOOTER - Collapse & Logout */}
-      <div className="p-2 space-y-1 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
+      <div className="p-3 space-y-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
         <Button
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
           className={cn(
-            "w-full text-white hover:bg-white/10 h-9",
+            "w-full text-white hover:bg-white/10 h-10",
             collapsed ? "justify-center px-0" : "justify-start"
           )}
         >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <><ChevronLeft className="w-4 h-4 mr-2" /><span className="text-sm">Collapse</span></>}
+          {collapsed ? (
+            <ChevronRight className="w-5 h-5" />
+          ) : (
+            <>
+              <ChevronLeft className="w-5 h-5 mr-2" />
+              <span className="text-sm font-medium">Collapse</span>
+            </>
+          )}
         </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={onLogout}
           className={cn(
-            "w-full text-white/70 hover:text-white hover:bg-red-500/20 h-9",
+            "w-full text-white/70 hover:text-white hover:bg-red-500/20 h-10",
             collapsed ? "justify-center px-0" : "justify-start"
           )}
         >
-          <LogOut className="w-4 h-4" />
-          {!collapsed && <span className="text-sm ml-2">Logout</span>}
+          <LogOut className="w-5 h-5" />
+          {!collapsed && <span className="text-sm font-medium ml-2">Logout</span>}
         </Button>
       </div>
     </aside>
