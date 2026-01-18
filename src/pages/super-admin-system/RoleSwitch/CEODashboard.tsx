@@ -105,10 +105,14 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
     const navToTabMap: Record<string, string> = {
       'dashboard': 'overview',
       'overview': 'overview',
+      'global-overview': 'overview',
       'revenue': 'overview', // Regional data in overview
-      'analytics': 'ai-insights',
-      'reports': 'approvals',
-      'settings': 'notes',
+      'active-users': 'overview',
+      'retention': 'overview',
+      'ai-insights': 'ai-insights',
+      'approvals': 'approvals',
+      'risks': 'risks',
+      'notes': 'notes',
     };
     return navToTabMap[nav || 'dashboard'] || 'overview';
   };
