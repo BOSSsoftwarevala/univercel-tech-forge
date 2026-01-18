@@ -28,6 +28,7 @@ export type DashboardSection =
   | 'prompt-studio'
   | 'support-bot'
   | 'product-demo'
+  | 'role-permissions'
   | 'languages'
   | 'countries'
   | 'android-apk'
@@ -49,6 +50,7 @@ const sidebarItems: SidebarItem[] = [
   { id: 'prompt-studio', label: 'Prompt Studio', icon: Sparkles, badge: 'New' },
   { id: 'support-bot', label: 'Support Bot', icon: Languages },
   { id: 'product-demo', label: 'Product Demo', icon: Globe2 },
+  { id: 'role-permissions', label: 'Role Permissions', icon: Settings },
   { id: 'languages', label: 'Languages', icon: Languages },
   { id: 'countries', label: 'Countries', icon: Globe2 },
   { id: 'android-apk', label: 'Android APK', icon: Smartphone },

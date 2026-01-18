@@ -10,6 +10,7 @@ import { SVAIModels } from './screens/SVAIModels';
 import { SVPromptStudio } from './screens/SVPromptStudio';
 import { SVSupportBot } from './screens/SVSupportBot';
 import { SVProductDemo } from './screens/SVProductDemo';
+import { SVRolePermissions } from './screens/SVRolePermissions';
 import { SVLanguages } from './screens/SVLanguages';
 import { SVCountries } from './screens/SVCountries';
 import { SVAndroidAPK } from './screens/SVAndroidAPK';
@@ -35,6 +36,8 @@ export const SoftwareValaDashboard: React.FC = () => {
         return <SVSupportBot />;
       case 'product-demo':
         return <SVProductDemo />;
+      case 'role-permissions':
+        return <SVRolePermissions />;
       case 'languages':
         return <SVLanguages />;
       case 'countries':
@@ -50,7 +53,7 @@ export const SoftwareValaDashboard: React.FC = () => {
       case 'settings':
         return <SVSettings />;
       default:
-        return <SVDashboardHome />;
+        return <SVDashboardHome />
     }
   };
 
