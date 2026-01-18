@@ -15,7 +15,8 @@ import ModuleBreadcrumb from "@/components/shared/ModuleBreadcrumb";
 // Sidebar visibility store for single-sidebar enforcement
 import { useSidebarStore } from "@/stores/sidebarStore";
 
-import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
+import RoleSwitchSidebarNew, { ActiveRole } from "@/components/super-admin-wireframe/RoleSwitchSidebarNew";
+import { roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
 import { ControlPanelSidebar } from "@/components/super-admin-wireframe/ControlPanelSidebar";
 import { ControlPanelDashboard } from "@/components/super-admin-wireframe/ControlPanelDashboard";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
@@ -587,7 +588,7 @@ const RoleSwitchDashboard = () => {
         {/* CONTEXT B: Role Sidebar (for ALL role dashboards except full-screen modules) */}
         {!isInControlPanelView && !isInModuleView && activeRole && (
           <>
-            <RoleSwitchSidebar
+            <RoleSwitchSidebarNew
               activeRole={activeRole}
               onRoleChange={handleRoleChange}
               collapsed={collapsed}
@@ -597,8 +598,8 @@ const RoleSwitchDashboard = () => {
               onNavChange={handleNavChange}
               onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
             />
-            {/* Spacer to offset fixed RoleSwitchSidebar (matches its internal widths) */}
-            <div className="flex-shrink-0" style={{ width: collapsed ? 70 : 280 }} />
+            {/* Spacer to offset RoleSwitchSidebar (matches its internal widths) */}
+            <div className="flex-shrink-0" style={{ width: collapsed ? 60 : 260 }} />
           </>
         )}
 
