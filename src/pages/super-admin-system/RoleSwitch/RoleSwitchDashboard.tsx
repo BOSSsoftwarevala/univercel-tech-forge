@@ -611,11 +611,7 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT C: Module Sidebar (rendered inside module containers). */}
-        {/* Spacer ensures module sidebar never overlaps content even when fixed. */}
-        {isInModuleView && (
-          <div className="flex-shrink-0" style={{ width: categoryCollapsed ? 80 : 260 }} />
-        )}
+        {/* CONTEXT C: Module containers render their OWN sidebar, so NO extra spacer needed */}
 
         <main
           className="flex-1 overflow-auto"
