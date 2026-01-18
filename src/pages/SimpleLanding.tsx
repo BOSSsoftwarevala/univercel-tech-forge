@@ -692,9 +692,9 @@ const SimpleLanding = () => {
               <a href="mailto:info@softwarevala.com" className="hover:text-cyan-400 transition-colors">
                 <Mail className="w-5 h-5" />
               </a>
-              <a href="#" className="hover:text-cyan-400 transition-colors">
+              <Link to="/support" className="hover:text-cyan-400 transition-colors">
                 <MessageCircle className="w-5 h-5" />
-              </a>
+              </Link>
             </div>
           </div>
           <div className="text-center mt-8 text-xs text-slate-600">

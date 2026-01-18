@@ -120,13 +120,19 @@ const MAFullAuditLedger = ({ onDeleteAttempt }: MAFullAuditLedgerProps) => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <button
-            onClick={handleDeleteAttempt}
-            className="px-4 py-2 rounded border border-red-500/30 text-red-400/50 cursor-not-allowed flex items-center gap-2"
-          >
-            <Ban className="w-4 h-4" />
-            Delete (Blocked)
-          </button>
+          <div className="relative group">
+            <button
+              onClick={handleDeleteAttempt}
+              className="px-4 py-2 rounded border border-red-500/30 text-red-400/50 cursor-not-allowed flex items-center gap-2"
+              disabled
+            >
+              <Ban className="w-4 h-4" />
+              Delete (Blocked)
+            </button>
+            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 border border-slate-700">
+              Audit logs cannot be deleted for compliance
+            </span>
+          </div>
         </div>
 
         <ScrollArea className="h-[400px]">
