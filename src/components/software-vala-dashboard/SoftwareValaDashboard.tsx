@@ -7,6 +7,9 @@ import React, { useState } from 'react';
 import { SoftwareValaSidebar, DashboardSection } from './SoftwareValaSidebar';
 import { SVDashboardHome } from './screens/SVDashboardHome';
 import { SVAIModels } from './screens/SVAIModels';
+import { SVPromptStudio } from './screens/SVPromptStudio';
+import { SVSupportBot } from './screens/SVSupportBot';
+import { SVProductDemo } from './screens/SVProductDemo';
 import { SVLanguages } from './screens/SVLanguages';
 import { SVCountries } from './screens/SVCountries';
 import { SVAndroidAPK } from './screens/SVAndroidAPK';
@@ -26,6 +29,12 @@ export const SoftwareValaDashboard: React.FC = () => {
         return <SVDashboardHome />;
       case 'ai-models':
         return <SVAIModels />;
+      case 'prompt-studio':
+        return <SVPromptStudio />;
+      case 'support-bot':
+        return <SVSupportBot />;
+      case 'product-demo':
+        return <SVProductDemo />;
       case 'languages':
         return <SVLanguages />;
       case 'countries':

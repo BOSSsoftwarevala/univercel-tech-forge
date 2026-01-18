@@ -25,6 +25,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 export type DashboardSection = 
   | 'dashboard'
   | 'ai-models'
+  | 'prompt-studio'
+  | 'support-bot'
+  | 'product-demo'
   | 'languages'
   | 'countries'
   | 'android-apk'
@@ -37,11 +40,15 @@ interface SidebarItem {
   id: DashboardSection;
   label: string;
   icon: React.ElementType;
+  badge?: string;
 }
 
 const sidebarItems: SidebarItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'ai-models', label: 'AI Models', icon: Brain },
+  { id: 'prompt-studio', label: 'Prompt Studio', icon: Sparkles, badge: 'New' },
+  { id: 'support-bot', label: 'Support Bot', icon: Languages },
+  { id: 'product-demo', label: 'Product Demo', icon: Globe2 },
   { id: 'languages', label: 'Languages', icon: Languages },
   { id: 'countries', label: 'Countries', icon: Globe2 },
   { id: 'android-apk', label: 'Android APK', icon: Smartphone },
@@ -111,7 +118,16 @@ export const SoftwareValaSidebar: React.FC<SoftwareValaSidebarProps> = ({
                 )}
               >
                 <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && "text-blue-600")} />
-                {!collapsed && <span>{item.label}</span>}
+                {!collapsed && (
+                  <span className="flex items-center gap-2">
+                    {item.label}
+                    {item.badge && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-600 rounded">
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
+                )}
               </button>
             );
 
