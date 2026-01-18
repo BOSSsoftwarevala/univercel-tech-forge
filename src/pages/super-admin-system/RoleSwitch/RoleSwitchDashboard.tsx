@@ -17,6 +17,7 @@ import { useSidebarStore } from "@/stores/sidebarStore";
 
 import RoleSwitchSidebar, { ActiveRole, roleConfigs } from "@/components/super-admin-wireframe/RoleSwitchSidebar";
 import { ControlPanelSidebar, RoleId } from "@/components/super-admin-wireframe/ControlPanelSidebar";
+import { ControlPanelDashboard } from "@/components/super-admin-wireframe/ControlPanelDashboard";
 import ContinentSuperAdminView from "./ContinentSuperAdminView";
 // AreaManagerView removed - merged into CountryHeadDashboard
 import ServerManagerView from "./ServerManagerView";
@@ -437,32 +438,8 @@ const RoleSwitchDashboard = () => {
       case "product_manager":
         return <ProductManagerDashboard />;
       case null:
-        // Control Panel view - render welcome content
-        return (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center max-w-2xl">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg">
-                <Crown className="w-12 h-12 text-white" />
-              </div>
-              <h1 className="text-3xl font-bold text-white mb-3">Welcome to Control Panel</h1>
-              <p className="text-lg text-white/70 mb-8">Select a role from the sidebar to access its dashboard</p>
-              <div className="grid grid-cols-3 gap-4 text-sm text-white/60">
-                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                  <div className="text-2xl font-bold text-emerald-400">12</div>
-                  <div>Role Categories</div>
-                </div>
-                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                  <div className="text-2xl font-bold text-blue-400">Active</div>
-                  <div>System Status</div>
-                </div>
-                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                  <div className="text-2xl font-bold text-amber-400">3</div>
-                  <div>Pending Alerts</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        // Control Panel view - render 2×7 grid dashboard
+        return <ControlPanelDashboard />;
       default:
         // STEP 6: Use shared fallback component to prevent blank screens
         return (
