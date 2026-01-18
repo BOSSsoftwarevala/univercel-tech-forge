@@ -554,76 +554,58 @@ const RoleSwitchDashboard = () => {
         />
       </header>
       
-      {/* STEP 9: Main Content Area - Single Active View Only */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Role Switch Sidebar - SINGLE SIDEBAR ENFORCEMENT: Only show when not in module view */}
-        <AnimatePresence mode="wait">
-          {shouldShowGlobalSidebar && (
-            <motion.div
-              key="global-sidebar"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -20, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <RoleSwitchSidebar
-                activeRole={activeRole}
-                onRoleChange={handleRoleChange}
-                collapsed={collapsed}
-                onToggleCollapse={() => setCollapsed(!collapsed)}
-                onLogout={handleLogout}
-                activeNav={activeNav}
-                onNavChange={handleNavChange}
-                onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* STEP 9: Main Content Area - SINGLE LAYOUT RULE: Only one active view at a time */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Role Switch Sidebar - SINGLE SIDEBAR ENFORCEMENT: Completely unmount when in module view */}
+        {shouldShowGlobalSidebar && (
+          <RoleSwitchSidebar
+            activeRole={activeRole}
+            onRoleChange={handleRoleChange}
+            collapsed={collapsed}
+            onToggleCollapse={() => setCollapsed(!collapsed)}
+            onLogout={handleLogout}
+            activeNav={activeNav}
+            onNavChange={handleNavChange}
+            onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
+          />
+        )}
 
-        {/* Dynamic Role View - STEP 9: Content area = 100% width of active module */}
-        <main className={cn(
-          "flex-1 overflow-auto transition-all duration-300",
-          isInModuleView ? "w-full" : ""
-        )} style={{ minHeight: 0, height: '100%' }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${activeRole}-${activeNav}-${selectedSubItem || 'main'}`}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="h-full min-h-full"
-              style={{ height: '100%', minHeight: '100%' }}
-            >
-              <ErrorBoundary
-                onError={(error) => {
-                  console.error("Role dashboard crashed", { role: activeRole, error });
-                  toast.error("Dashboard failed to load", {
-                    description: "Something went wrong while opening this role.",
-                  });
-                }}
-                fallback={
-                  <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-center p-8 bg-card/50 rounded-xl border border-border/50 max-w-md">
-                      <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
-                      <p className="text-muted-foreground mb-6">This dashboard failed to render. You can retry or switch roles.</p>
-                      <div className="flex items-center justify-center gap-3">
-                        <Button variant="outline" onClick={() => window.location.reload()}>
-                          Reload dashboard
-                        </Button>
-                        <Button onClick={handleHome}>
-                          Back to Boss Dashboard
-                        </Button>
-                      </div>
-                    </div>
+        {/* Dynamic Role View - SINGLE VIEW RULE: No stacking, no overlays */}
+        <main 
+          className={cn(
+            "flex-1 overflow-auto",
+            isInModuleView ? "w-full" : ""
+          )} 
+          style={{ minHeight: 0, height: '100%' }}
+        >
+          <ErrorBoundary
+            onError={(error) => {
+              console.error("Role dashboard crashed", { role: activeRole, error });
+              toast.error("Dashboard failed to load", {
+                description: "Something went wrong while opening this role.",
+              });
+            }}
+            fallback={
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center p-8 bg-card/50 rounded-xl border border-border/50 max-w-md">
+                  <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
+                  <p className="text-muted-foreground mb-6">This dashboard failed to render. You can retry or switch roles.</p>
+                  <div className="flex items-center justify-center gap-3">
+                    <Button variant="outline" onClick={() => window.location.reload()}>
+                      Reload dashboard
+                    </Button>
+                    <Button onClick={handleHome}>
+                      Back to Boss Dashboard
+                    </Button>
                   </div>
-                }
-              >
-                {renderRoleView()}
-              </ErrorBoundary>
-            </motion.div>
-          </AnimatePresence>
+                </div>
+              </div>
+            }
+          >
+            {/* KEY FIX: No AnimatePresence wrapper - prevents ghost renders during transitions */}
+            {renderRoleView()}
+          </ErrorBoundary>
         </main>
       </div>
 
