@@ -37,6 +37,7 @@ import CountryHeadDashboard from "./CountryHeadDashboard";
 import ProductManagerDashboard from "./ProductManagerDashboard";
 import CEODashboard from "./CEODashboard";
 import BossOwnerDashboard from "./BossOwnerDashboard";
+import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
 // Admin role deprecated - functionality merged into Boss/Owner and Super Admin
 
 // Define which roles can switch to which views
@@ -446,26 +447,7 @@ const RoleSwitchDashboard = () => {
       case "product_manager":
         return <ProductManagerDashboard />;
       case "developer_management":
-        // Developer Management uses the same layout as other managers
-        return (
-          <div className="p-8">
-            <h1 className="text-3xl font-bold text-white mb-6">Developer Management</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
-                <h2 className="text-lg font-semibold text-white mb-2">Active Projects</h2>
-                <p className="text-3xl font-bold text-emerald-400">12</p>
-              </div>
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
-                <h2 className="text-lg font-semibold text-white mb-2">Open PRs</h2>
-                <p className="text-3xl font-bold text-amber-400">24</p>
-              </div>
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
-                <h2 className="text-lg font-semibold text-white mb-2">Deployments Today</h2>
-                <p className="text-3xl font-bold text-blue-400">8</p>
-              </div>
-            </div>
-          </div>
-        );
+        return <DeveloperManagementDashboard />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;

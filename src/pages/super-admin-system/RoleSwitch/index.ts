@@ -18,3 +18,5 @@ export { default as ProductManagerDashboard } from "./ProductManagerDashboard";
 export { default as CEODashboard } from "./CEODashboard";
 export { default as BossOwnerDashboard } from "./BossOwnerDashboard";
 export { default as AdminDashboard } from "./AdminDashboard";
+export { default as DeveloperManagementDashboard } from "./DeveloperManagementDashboard";
+export { default as DemoManagerDashboard } from "./DemoManagerDashboard";
