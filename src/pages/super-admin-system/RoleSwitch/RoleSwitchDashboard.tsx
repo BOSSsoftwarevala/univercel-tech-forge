@@ -474,6 +474,8 @@ const RoleSwitchDashboard = () => {
         return <PTFullLayout />;
       case "assist_manager":
         return <AMFullLayout />;
+      case "internal_chatbot":
+        return <ICBFullLayout />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
