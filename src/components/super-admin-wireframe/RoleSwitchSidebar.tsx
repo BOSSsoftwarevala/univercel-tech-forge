@@ -795,8 +795,9 @@ const RoleSwitchSidebar = ({
   onSubItemClick,
 }: RoleSwitchSidebarProps) => {
   const currentConfig = roleConfigs[activeRole] ?? roleConfigs.boss_owner;
-  // STEP 7: Use new 3-level navigation structure
-  const currentNavStructure = roleNavStructure[activeRole] ?? [];
+  // SIDEBAR CONSISTENCY: All roles share the Boss/Owner navigation tree
+  // This ensures every dashboard sees the same sidebar items.
+  const currentNavStructure = roleNavStructure.boss_owner ?? [];
   const [internalActiveNav, setInternalActiveNav] = useState("overview");
   
   // STEP 2 FIX: Auto drill-down when a role is active (Boss should start drilled in)
@@ -886,8 +887,8 @@ const RoleSwitchSidebar = ({
     onRoleChange(roleId);
     setIsDrilledDown(true);
     
-    // Reset to first module/category
-    const firstModule = roleNavStructure[roleId]?.[0];
+    // Reset to first module/category (shared Boss/Owner structure)
+    const firstModule = roleNavStructure.boss_owner?.[0];
     if (firstModule) {
       setExpandedModules(new Set([firstModule.id]));
       const firstCategory = firstModule.categories[0];
@@ -914,7 +915,8 @@ const RoleSwitchSidebar = ({
     <aside
       className={cn(
         "flex flex-col border-r transition-all duration-150",
-        "border-blue-500/30 bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800"
+        // COLOR: Match Boss "KEY STATS" blue (no royal-blue gradient)
+        "border-blue-500/30 bg-gradient-to-b from-blue-600 via-blue-600 to-blue-600"
       )}
       style={{
         width: collapsed ? 60 : 240,

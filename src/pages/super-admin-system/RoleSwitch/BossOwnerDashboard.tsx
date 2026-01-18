@@ -114,7 +114,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ background: T.bg, fontFamily: "'Outfit', sans-serif" }}>
+    <div className="min-h-screen p-6" style={{ fontFamily: "'Outfit', sans-serif" }}>
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6 pb-4" style={{ borderBottom: `1px solid ${T.border}` }}>
         <div className="flex items-center gap-4">
