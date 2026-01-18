@@ -13,7 +13,7 @@ import { SVProductDemo } from './screens/SVProductDemo';
 import { SVLanguages } from './screens/SVLanguages';
 import { SVCountries } from './screens/SVCountries';
 import { SVAndroidAPK } from './screens/SVAndroidAPK';
-import { SVApiSdk } from './screens/SVApiSdk';
+import { SVAPIStructure } from './screens/SVAPIStructure';
 import { SVUsageBilling } from './screens/SVUsageBilling';
 import { SVLogs } from './screens/SVLogs';
 import { SVSettings } from './screens/SVSettings';
@@ -42,7 +42,7 @@ export const SoftwareValaDashboard: React.FC = () => {
       case 'android-apk':
         return <SVAndroidAPK />;
       case 'api-sdk':
-        return <SVApiSdk />;
+        return <SVAPIStructure />;
       case 'usage-billing':
         return <SVUsageBilling />;
       case 'logs':
