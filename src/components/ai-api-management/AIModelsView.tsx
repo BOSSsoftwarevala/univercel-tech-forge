@@ -2,14 +2,32 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   Brain, MessageSquare, Image, Video, Mic, Sparkles, Settings,
-  Play, Square, Plus, Trash2, CreditCard, AlertTriangle, CheckCircle2
+  Play, Square, Plus, Trash2, CreditCard, AlertTriangle, CheckCircle2,
+  Target, FileText, Database, Shield, Boxes, Smartphone, Bell,
+  DollarSign, Calendar, Lock
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+// Import all new sections
+import {
+  ModelEvaluationSection,
+  PromptManagementSection,
+  FineTuningSection,
+  DataGovernanceSection,
+  ModelRegistrySection,
+  OnDeviceAISection,
+  IncidentAlertsSection,
+  BillingAllocationSection,
+  VersionLifecycleSection,
+  AISafetySection,
+} from "./sections";
 
 interface AIModel {
   id: string;
@@ -53,8 +71,23 @@ const TYPE_COLORS = {
   custom: 'cyan',
 };
 
+const TABS = [
+  { id: 'models', label: 'Models', icon: Brain },
+  { id: 'evaluation', label: 'Evaluation', icon: Target },
+  { id: 'prompts', label: 'Prompts', icon: FileText },
+  { id: 'fine-tuning', label: 'Fine-Tuning', icon: Database },
+  { id: 'governance', label: 'Governance', icon: Shield },
+  { id: 'registry', label: 'Registry', icon: Boxes },
+  { id: 'on-device', label: 'On-Device', icon: Smartphone },
+  { id: 'incidents', label: 'Incidents', icon: Bell },
+  { id: 'billing', label: 'Billing', icon: DollarSign },
+  { id: 'lifecycle', label: 'Lifecycle', icon: Calendar },
+  { id: 'safety', label: 'Safety', icon: Lock },
+];
+
 export const AIModelsView = () => {
   const [models, setModels] = useState(AI_MODELS);
+  const [activeTab, setActiveTab] = useState('models');
 
   const handleToggleStatus = (id: string) => {
     setModels(prev => prev.map(m => 
@@ -80,14 +113,11 @@ export const AIModelsView = () => {
 
   const categories = ['text', 'image', 'video', 'voice', 'multimodal', 'custom'] as const;
 
-  return (
+  const ModelsContent = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Brain className="w-6 h-6 text-violet-400" />
-            AI Models
-          </h1>
+          <h2 className="text-xl font-bold text-white">Active Models</h2>
           <p className="text-sm text-muted-foreground">Manage all AI model integrations</p>
         </div>
         <Button className="bg-orange-500 hover:bg-orange-600 text-white">
@@ -96,7 +126,6 @@ export const AIModelsView = () => {
         </Button>
       </div>
 
-      {/* Category Sections */}
       {categories.map((category) => {
         const categoryModels = models.filter(m => m.type === category);
         if (categoryModels.length === 0) return null;
@@ -202,6 +231,77 @@ export const AIModelsView = () => {
           </div>
         );
       })}
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Brain className="w-6 h-6 text-violet-400" />
+            AI Models
+          </h1>
+          <p className="text-sm text-muted-foreground">Complete AI model management & governance</p>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <ScrollArea className="w-full whitespace-nowrap">
+          <TabsList className="inline-flex h-10 bg-slate-900/50 p-1">
+            {TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium",
+                  "data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-400"
+                )}
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+
+        <div className="mt-6">
+          <TabsContent value="models" className="mt-0">
+            <ModelsContent />
+          </TabsContent>
+          <TabsContent value="evaluation" className="mt-0">
+            <ModelEvaluationSection />
+          </TabsContent>
+          <TabsContent value="prompts" className="mt-0">
+            <PromptManagementSection />
+          </TabsContent>
+          <TabsContent value="fine-tuning" className="mt-0">
+            <FineTuningSection />
+          </TabsContent>
+          <TabsContent value="governance" className="mt-0">
+            <DataGovernanceSection />
+          </TabsContent>
+          <TabsContent value="registry" className="mt-0">
+            <ModelRegistrySection />
+          </TabsContent>
+          <TabsContent value="on-device" className="mt-0">
+            <OnDeviceAISection />
+          </TabsContent>
+          <TabsContent value="incidents" className="mt-0">
+            <IncidentAlertsSection />
+          </TabsContent>
+          <TabsContent value="billing" className="mt-0">
+            <BillingAllocationSection />
+          </TabsContent>
+          <TabsContent value="lifecycle" className="mt-0">
+            <VersionLifecycleSection />
+          </TabsContent>
+          <TabsContent value="safety" className="mt-0">
+            <AISafetySection />
+          </TabsContent>
+        </div>
+      </Tabs>
     </div>
   );
 };
