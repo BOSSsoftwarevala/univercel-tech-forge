@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ArrowLeft,
   Code2,
+  Bot,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -23,13 +24,14 @@ interface DeveloperManagerSidebarProps {
   onBackToControlPanel: () => void;
 }
 
-// NO AI ELEMENTS - Pure Developer Operations
+// Developer Manager Module Sidebar (Human + AI Tasks scope only)
 const menuItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "developers", label: "Developers", icon: Users },
   { id: "bugs", label: "Bugs / Issues", icon: Bug },
   { id: "releases", label: "Releases", icon: Rocket },
   { id: "products", label: "Products", icon: Box },
+  { id: "ai-tasks", label: "AI Tasks", icon: Bot },
   { id: "approvals", label: "Approvals", icon: CheckSquare },
   { id: "activity-logs", label: "Activity Logs", icon: Activity },
 ];
