@@ -7,6 +7,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity, MessageCircle, ListTodo, Clock, Zap, Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { LiveStatusIndicators } from './LiveStatusIndicators';
 import { LiveChatBlock } from './LiveChatBlock';
 import { LiveRunningTasks } from './LiveRunningTasks';
@@ -41,39 +43,65 @@ const Section: React.FC<SectionProps> = ({ icon: Icon, title, collapsed, childre
 };
 
 export const ControlPanelContent: React.FC<ControlPanelContentProps> = ({ collapsed = false }) => {
+  const navigate = useNavigate();
+
+  const handleSystemStatus = () => {
+    toast.info('All systems operational');
+  };
+
+  const handleOpenChat = () => {
+    toast.success('Opening live chat...');
+  };
+
+  const handleOpenTasks = () => {
+    navigate('/boss/tasks');
+  };
+
+  const handleOpenAlerts = () => {
+    navigate('/boss/alerts');
+  };
+
   if (collapsed) {
-    // Collapsed view - show only icons
+    // Collapsed view - show only icons with click handlers
     return (
       <div className="flex flex-col items-center gap-3 py-3">
-        <motion.div 
+        <motion.button 
           className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center cursor-pointer"
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           title="System Online"
+          onClick={handleSystemStatus}
         >
           <Activity className="w-4 h-4 text-emerald-400" />
-        </motion.div>
-        <motion.div 
+        </motion.button>
+        <motion.button 
           className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center cursor-pointer"
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           title="Live Chat"
+          onClick={handleOpenChat}
         >
           <MessageCircle className="w-4 h-4 text-blue-400" />
-        </motion.div>
-        <motion.div 
+        </motion.button>
+        <motion.button 
           className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center cursor-pointer"
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           title="Tasks"
+          onClick={handleOpenTasks}
         >
           <ListTodo className="w-4 h-4 text-amber-400" />
-        </motion.div>
-        <motion.div 
+        </motion.button>
+        <motion.button 
           className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center cursor-pointer relative"
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           title="Alerts"
+          onClick={handleOpenAlerts}
         >
           <Bell className="w-4 h-4 text-red-400" />
           <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 text-[8px] text-white flex items-center justify-center">3</span>
-        </motion.div>
+        </motion.button>
       </div>
     );
   }

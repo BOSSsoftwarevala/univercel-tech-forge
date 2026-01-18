@@ -1,4 +1,5 @@
 import { Shield, Lock, FileCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function GlobalFooter() {
   return (
@@ -14,15 +15,15 @@ export function GlobalFooter() {
 
         {/* Center - Links */}
         <div className="flex items-center gap-6 text-sm">
-          <a href="#" className="text-[hsl(var(--sv-gray))] hover:text-white transition-colors">
+          <Link to="/terms" className="text-[hsl(var(--sv-gray))] hover:text-white transition-colors">
             Terms of Service
-          </a>
-          <a href="#" className="text-[hsl(var(--sv-gray))] hover:text-white transition-colors">
+          </Link>
+          <Link to="/privacy" className="text-[hsl(var(--sv-gray))] hover:text-white transition-colors">
             Privacy Policy
-          </a>
-          <a href="#" className="text-[hsl(var(--sv-gray))] hover:text-white transition-colors">
+          </Link>
+          <Link to="/compliance" className="text-[hsl(var(--sv-gray))] hover:text-white transition-colors">
             Compliance
-          </a>
+          </Link>
         </div>
 
         {/* Right - Compliance Badges */}

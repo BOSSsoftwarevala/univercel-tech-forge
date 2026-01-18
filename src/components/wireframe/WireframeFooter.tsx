@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface WireframeFooterProps {
   theme: 'dark' | 'light';
@@ -15,18 +16,18 @@ export function WireframeFooter({ theme }: WireframeFooterProps) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Links */}
         <div className="flex items-center gap-6">
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+          <Link to="/legal" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
             Legal <ExternalLink className="h-3 w-3" />
-          </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+          </Link>
+          <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
             Privacy <ExternalLink className="h-3 w-3" />
-          </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+          </Link>
+          <Link to="/support" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
             Support <ExternalLink className="h-3 w-3" />
-          </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+          </Link>
+          <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
             Terms <ExternalLink className="h-3 w-3" />
-          </a>
+          </Link>
         </div>
 
         {/* Status */}

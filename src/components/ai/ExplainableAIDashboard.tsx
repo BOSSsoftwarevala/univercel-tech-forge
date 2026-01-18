@@ -394,28 +394,48 @@ const ExplainableAIDashboard = () => {
                   <span>Context-Aware Response Rate</span>
                   <span className="text-green-400">94.5%</span>
                 </div>
-                <Slider defaultValue={[94.5]} max={100} step={0.1} disabled />
+                <div className="relative group">
+                  <Slider defaultValue={[94.5]} max={100} step={0.1} disabled />
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Read-only: System metric
+                  </span>
+                </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Self-Healing Success Rate</span>
                   <span className="text-blue-400">87.2%</span>
                 </div>
-                <Slider defaultValue={[87.2]} max={100} step={0.1} disabled />
+                <div className="relative group">
+                  <Slider defaultValue={[87.2]} max={100} step={0.1} disabled />
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Read-only: System metric
+                  </span>
+                </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Multi-Agent Coordination</span>
                   <span className="text-purple-400">91.8%</span>
                 </div>
-                <Slider defaultValue={[91.8]} max={100} step={0.1} disabled />
+                <div className="relative group">
+                  <Slider defaultValue={[91.8]} max={100} step={0.1} disabled />
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Read-only: System metric
+                  </span>
+                </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>API Failover Success</span>
                   <span className="text-orange-400">99.1%</span>
                 </div>
-                <Slider defaultValue={[99.1]} max={100} step={0.1} disabled />
+                <div className="relative group">
+                  <Slider defaultValue={[99.1]} max={100} step={0.1} disabled />
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Read-only: System metric
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
