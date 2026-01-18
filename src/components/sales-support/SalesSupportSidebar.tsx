@@ -1,16 +1,40 @@
+/**
+ * SALES SUPPORT SIDEBAR
+ * SINGLE-CONTEXT ENFORCEMENT: Uses sidebar store for strict isolation
+ */
+
 import { motion } from "framer-motion";
 import { 
   Headset, LayoutDashboard, Inbox, FileText, MessageCircle, Bot, Ticket,
   Shield, BarChart3, Phone, AlertCircle, Settings, Users, Mail, Activity,
-  TrendingUp, UserRound
+  TrendingUp, UserRound, ArrowLeft
 } from "lucide-react";
+import { useSidebarStore, useShouldRenderSidebar } from "@/stores/sidebarStore";
 
 interface SalesSupportSidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
+  onBack?: () => void;
 }
 
-const SalesSupportSidebar = ({ activeSection, setActiveSection }: SalesSupportSidebarProps) => {
+const SalesSupportSidebar = ({ activeSection, setActiveSection, onBack }: SalesSupportSidebarProps) => {
+  // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
+  const { exitToGlobal } = useSidebarStore();
+  
+  // Use dedicated hook for strict visibility check
+  const shouldRender = useShouldRenderSidebar('category', 'sales-support');
+  
+  // Handle back navigation - triggers FULL context switch to Boss
+  const handleBack = () => {
+    exitToGlobal();
+    onBack?.();
+  };
+  
+  // STRICT ISOLATION: Only render when in Module context with matching category
+  if (!shouldRender) {
+    return null;
+  }
+
   // Enterprise SSM Module Navigation - Final Locked List
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: LayoutDashboard },
@@ -33,37 +57,42 @@ const SalesSupportSidebar = ({ activeSection, setActiveSection }: SalesSupportSi
   ];
 
   return (
-    <motion.aside
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      className="w-72 bg-gradient-to-b from-slate-900/95 to-slate-950/95 backdrop-blur-xl border-r border-cyan-500/20 flex flex-col"
-    >
-      <div className="p-6 border-b border-cyan-500/20">
+    <aside className="w-64 bg-card/50 border-r border-border/50 flex flex-col h-full">
+      {/* Back Button */}
+      <div className="p-2 border-b border-border/50">
+        <motion.button
+          onClick={handleBack}
+          whileHover={{ x: -2 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Boss</span>
+        </motion.button>
+      </div>
+
+      <div className="p-4 border-b border-border/50">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-            <Headset className="w-7 h-7 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+            <Headset className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-200 to-blue-400 bg-clip-text text-transparent">Sales & Support</h1>
-            <p className="text-xs text-cyan-500/70">Executive Portal</p>
+            <h1 className="text-sm font-bold text-foreground">Sales & Support</h1>
+            <p className="text-xs text-muted-foreground">Executive Portal</p>
           </div>
         </div>
-        <motion.div 
-          className="mt-4 p-3 rounded-lg bg-gradient-to-r from-cyan-500/10 to-blue-600/5 border border-cyan-500/20"
-          animate={{ boxShadow: ["0 0 20px rgba(6,182,212,0.1)", "0 0 30px rgba(6,182,212,0.2)", "0 0 20px rgba(6,182,212,0.1)"] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        >
+        <div className="mt-3 p-2 rounded-lg bg-muted/50 border border-border/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-sm text-cyan-300 font-medium">Online</span>
+              <span className="text-sm text-foreground font-medium">Online</span>
             </div>
-            <span className="text-xs text-slate-400">12 leads waiting</span>
+            <span className="text-xs text-muted-foreground">12 leads waiting</span>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -71,35 +100,41 @@ const SalesSupportSidebar = ({ activeSection, setActiveSection }: SalesSupportSi
             <motion.button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
-              whileHover={{ x: 4 }}
+              whileHover={{ x: 2 }}
               whileTap={{ scale: 0.98 }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
                 isActive
-                  ? "bg-gradient-to-r from-cyan-500/20 to-blue-600/10 text-cyan-300 border border-cyan-500/30"
-                  : "text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/5"
+                  ? "bg-primary/20 text-primary border border-primary/30"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? "text-cyan-400" : ""}`} />
-              <span className="font-medium text-sm">{item.label}</span>
+              <Icon className="w-4 h-4" />
+              <span className="font-medium">{item.label}</span>
+              {isActive && (
+                <motion.div
+                  layoutId="sales-support-active"
+                  className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"
+                />
+              )}
             </motion.button>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-cyan-500/20">
-        <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+      <div className="p-4 border-t border-border/50">
+        <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span>Today's Target</span>
-          <span className="text-cyan-400">8/15 Conversions</span>
+          <span className="text-primary">8/15 Conversions</span>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: "53%" }}
-            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
+            className="h-full bg-primary"
           />
         </div>
       </div>
-    </motion.aside>
+    </aside>
   );
 };
 

@@ -27,9 +27,14 @@ export type CategorySidebarId =
   | 'product-demo'
   | 'marketing'
   | 'finance'
+  | 'finance-manager'
+  | 'sales-support'
   | 'security'
   | 'support'
   | 'settings'
+  | 'legal'
+  | 'task-management'
+  | 'hr-manager'
   | null;
 
 // Active context - either Boss Dashboard or a specific Module

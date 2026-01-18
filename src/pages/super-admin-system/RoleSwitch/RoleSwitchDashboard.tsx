@@ -98,7 +98,12 @@ const RoleSwitchDashboard = () => {
 
   // STEP 9: Module view detection - determines if we're inside a full-screen module
   // GOLDEN RULE: Only ONE context active at a time (Boss OR Module, never both)
-  const moduleViewIds = useMemo(() => ['server-control', 'vala-ai', 'product-demo', 'leads', 'marketing'], []);
+  // Extended module list for complete single-context enforcement
+  const moduleViewIds = useMemo(() => [
+    'server-control', 'vala-ai', 'product-demo', 'leads', 'marketing',
+    'finance', 'franchise-control', 'reseller-control', 'sales-support',
+    'legal', 'task-management', 'hr-manager'
+  ], []);
   const isInModuleView = activeRole === 'boss_owner' && moduleViewIds.includes(activeNav);
   
   // SINGLE-CONTEXT ENFORCEMENT: Use sidebar store for context control
@@ -111,13 +116,20 @@ const RoleSwitchDashboard = () => {
     canTransition
   } = useSidebarStore();
   
-  // Category mapping for module navigation
-  const categoryMap: Record<string, 'server-manager' | 'vala-ai' | 'product-demo' | 'lead-manager' | 'marketing'> = useMemo(() => ({
+  // Category mapping for module navigation - ALL modules must be mapped
+  const categoryMap: Record<string, 'server-manager' | 'vala-ai' | 'product-demo' | 'lead-manager' | 'marketing' | 'finance-manager' | 'franchise-manager' | 'reseller-manager' | 'sales-support' | 'legal' | 'task-management' | 'hr-manager'> = useMemo(() => ({
     'server-control': 'server-manager',
     'vala-ai': 'vala-ai',
     'product-demo': 'product-demo',
     'leads': 'lead-manager',
     'marketing': 'marketing',
+    'finance': 'finance-manager',
+    'franchise-control': 'franchise-manager',
+    'reseller-control': 'reseller-manager',
+    'sales-support': 'sales-support',
+    'legal': 'legal',
+    'task-management': 'task-management',
+    'hr-manager': 'hr-manager',
   }), []);
   
   // CONTEXT SYNCHRONIZATION: Sync store state with module view state
