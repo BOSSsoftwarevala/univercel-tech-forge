@@ -1,7 +1,7 @@
 /**
  * VALA AI MODULE SIDEBAR
  * Sidebar for VALA AI Management
- * 8 items with Back to Boss button
+ * STEP 05: Added AI Support Bot for Prime members
  * SINGLE SIDEBAR ENFORCEMENT: Uses sidebar store
  */
 
@@ -19,7 +19,9 @@ import {
   Cog,
   ArrowLeft,
   Rocket,
-  History
+  History,
+  MessageSquare,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
@@ -35,7 +37,9 @@ export type ValaAISection =
   | 'ai-api' 
   | 'ai-automation'
   | 'ai-deploy'
-  | 'ai-deploy-history';
+  | 'ai-deploy-history'
+  | 'ai-support-bot'
+  | 'ai-support-history';
 
 interface ValaAISidebarProps {
   activeSection: ValaAISection;
@@ -55,6 +59,8 @@ const sidebarItems: { id: ValaAISection; label: string; icon: React.ElementType 
   { id: 'ai-automation', label: 'AI Automation Jobs', icon: Cog },
   { id: 'ai-deploy', label: 'Client Auto-Deploy', icon: Rocket },
   { id: 'ai-deploy-history', label: 'Deployment History', icon: History },
+  { id: 'ai-support-bot', label: 'AI Support Bot', icon: MessageSquare },
+  { id: 'ai-support-history', label: 'Support History', icon: FileText },
 ];
 
 export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
