@@ -37,6 +37,7 @@ import CountryHeadDashboard from "./CountryHeadDashboard";
 import ProductManagerDashboard from "./ProductManagerDashboard";
 import DemoManagerDashboard from "./DemoManagerDashboard";
 import CEODashboard from "./CEODashboard";
+import CEOSidebar from "@/components/ceo/CEOSidebar";
 import BossOwnerDashboard from "./BossOwnerDashboard";
 import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
 // Admin role deprecated - functionality merged into Boss/Owner and Super Admin
@@ -593,8 +594,23 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT B: Role Sidebar (for ALL role dashboards except full-screen modules) */}
-        {!isInControlPanelView && !isInModuleView && activeRole && (
+        {/* CONTEXT B1: CEO Sidebar (CEO role gets its own dedicated sidebar) */}
+        {activeRole === "ceo" && (
+          <>
+            <CEOSidebar
+              activeSection={activeNav}
+              onSectionChange={handleNavChange}
+              collapsed={collapsed}
+              onCollapsedChange={setCollapsed}
+              onBackToControlPanel={handleBackToControlPanel}
+            />
+            {/* Spacer to offset CEO sidebar */}
+            <div className="flex-shrink-0" style={{ width: collapsed ? 80 : 260 }} />
+          </>
+        )}
+
+        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO and full-screen modules) */}
+        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && (
           <>
             <RoleSwitchSidebarNew
               activeRole={activeRole}
