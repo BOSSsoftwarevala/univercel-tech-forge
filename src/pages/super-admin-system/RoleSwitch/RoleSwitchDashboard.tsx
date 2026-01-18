@@ -47,6 +47,32 @@ const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
   country_head: ['country_head'],
 };
 
+const SessionTimerDisplay = ({ accentColor }: { accentColor: string }) => {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+      <Timer className={cn("w-4 h-4", accentColor)} />
+      <span className="text-sm font-mono text-foreground">{formatTime(seconds)}</span>
+    </div>
+  );
+};
+
 const RoleSwitchDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -82,7 +108,6 @@ const RoleSwitchDashboard = () => {
   const [activeNav, setActiveNav] = useState("dashboard");
   const [selectedSubItem, setSelectedSubItem] = useState<string | undefined>(undefined);
   const [collapsed, setCollapsed] = useState(false);
-  const [sessionTime, setSessionTime] = useState(0);
   const [riskLevel] = useState<"low" | "medium" | "high">("low");
   const [liveAlerts] = useState(3);
   const [initialized, setInitialized] = useState(false);
@@ -276,22 +301,8 @@ const RoleSwitchDashboard = () => {
     }
   }, [requestedRole, loading, canAccessView, getDefaultRole]);
 
-  // Session timer (must never trigger navigation)
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setSessionTime((prev) => prev + 1);
-    }, 1000);
-
-    return () => window.clearInterval(interval);
-  }, []);
 
 
-  const formatTime = (seconds: number) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
 
   const handleLogout = async () => {
     try {
@@ -559,10 +570,7 @@ const RoleSwitchDashboard = () => {
           </motion.button>
 
           {/* Session Timer */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <Timer className={cn("w-4 h-4", currentConfig.accentColor)} />
-            <span className="text-sm font-mono text-foreground">{formatTime(sessionTime)}</span>
-          </div>
+          <SessionTimerDisplay accentColor={currentConfig.accentColor} />
         </div>
 
         {/* Right - STEP 8: Global Header Actions with role-based visibility */}
