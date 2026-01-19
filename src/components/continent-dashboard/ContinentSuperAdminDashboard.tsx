@@ -99,22 +99,35 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
   }, []);
 
   const handleKpiClick = useCallback((kpi: ActionKPI) => {
-    const idToSection: Partial<Record<ActionKPI["id"], ContinentSidebarSection>> = {
+    // Map ALL 12 KPIs to sidebar sections
+    const idToSection: Record<string, ContinentSidebarSection> = {
+      system_health: "dashboard",
+      active_countries: "countries",
+      active_franchises: "franchises",
+      active_resellers: "resellers",
       pending_approvals: "approvals",
-      critical_issues: "issues",
-      payment_pending: "revenue",
-      compliance: "compliance",
+      open_issues: "issues",
+      lead_volume: "leads",
+      conversion_rate: "reports",
+      revenue_today: "revenue",
+      wallet_risk: "revenue",
+      compliance_alerts: "compliance",
+      ai_recommendation: "reports",
     };
 
     const targetSection = idToSection[kpi.id];
     if (targetSection) {
       setActiveSection(targetSection);
+      toast.success(kpi.title, {
+        description: `Navigating to ${targetSection.replace(/_/g, " ")} panel`,
+        duration: 1500,
+      });
+    } else {
+      toast.info(kpi.title, {
+        description: `${kpi.count} items • ${kpi.source} source`,
+        duration: 2000,
+      });
     }
-
-    toast.info(kpi.title, {
-      description: targetSection ? `Opening ${targetSection.replace(/_/g, " ")}…` : "No panel linked yet.",
-      duration: 2000,
-    });
   }, [setActiveSection]);
 
   const getMarkerColor = (type: string): string => {
