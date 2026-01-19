@@ -246,6 +246,7 @@ import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
 import DomainProtection from "./components/security/DomainProtection";
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
+import { GlobalSecurityProvider } from "./components/security/GlobalSecurityProvider";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import QuickSupport from "./components/support/QuickSupport";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
@@ -338,17 +339,18 @@ const App = () => (
           <TooltipProvider>
             <DomainProtection>
               <SourceCodeProtection enabled={!import.meta.env.DEV}>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <SecurityProvider>
-                    <NotificationProvider>
-                      <TranslationProvider>
-                        <GlobalRealtimeProvider>
-                          <BlockingClassCleanup />
-                          <SystemNotificationsInitializer />
-                          <GlobalOfferPopup />
-                          <FloatingAIChatbotWrapper />
+                <GlobalSecurityProvider userRole="user">
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <SecurityProvider>
+                      <NotificationProvider>
+                        <TranslationProvider>
+                          <GlobalRealtimeProvider>
+                            <BlockingClassCleanup />
+                            <SystemNotificationsInitializer />
+                            <GlobalOfferPopup />
+                            <FloatingAIChatbotWrapper />
                           <Routes>
                           {/* Public Routes - No login required */}
               <Route path="/" element={<Index />} />
@@ -746,7 +748,8 @@ const App = () => (
                     </NotificationProvider>
                   </SecurityProvider>
                 </BrowserRouter>
-              </SourceCodeProtection>
+              </GlobalSecurityProvider>
+            </SourceCodeProtection>
             </DomainProtection>
           </TooltipProvider>
         </AnimationProvider>
