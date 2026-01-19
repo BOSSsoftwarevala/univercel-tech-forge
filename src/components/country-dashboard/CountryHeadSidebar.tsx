@@ -12,13 +12,13 @@ export type CountryHeadSection =
   | "dashboard"
   | "country-map"
   | "regions"
-  | "area-managers"
-  | "country-users"
   | "franchises"
   | "resellers"
-  | "influencers"
-  | "analytics"
-  | "escalations"
+  | "leads"
+  | "revenue"
+  | "approvals"
+  | "operations"
+  | "compliance"
   | "reports"
   | "settings";
 
@@ -32,19 +32,20 @@ interface CountryHeadSidebarProps {
   themeGradient?: string;
 }
 
+// Sidebar items matching exact spec order
 const sidebarItems: { id: CountryHeadSection; label: string; icon: any }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "country-map", label: "Country Map (Live)", icon: Map },
+  { id: "country-map", label: "Live Country Map", icon: Map },
   { id: "regions", label: "Regions & Areas", icon: MapPin },
-  { id: "area-managers", label: "Area Managers", icon: Users },
-  { id: "country-users", label: "Country Users", icon: Globe },
-  { id: "franchises", label: "Franchise (Country)", icon: Building2 },
-  { id: "resellers", label: "Reseller (Country)", icon: Store },
-  { id: "influencers", label: "Influencers / Partners", icon: Target },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "escalations", label: "Escalations", icon: AlertTriangle },
-  { id: "reports", label: "Reports", icon: FileText },
-  { id: "settings", label: "Settings (Country)", icon: Settings },
+  { id: "franchises", label: "Franchise Management", icon: Building2 },
+  { id: "resellers", label: "Reseller Management", icon: Store },
+  { id: "leads", label: "Lead Management", icon: Target },
+  { id: "revenue", label: "Revenue & Wallet", icon: BarChart3 },
+  { id: "approvals", label: "Approvals Center", icon: FileText },
+  { id: "operations", label: "Operations & Support", icon: AlertTriangle },
+  { id: "compliance", label: "Compliance & Legal", icon: Globe },
+  { id: "reports", label: "Reports & Analytics", icon: FileText },
+  { id: "settings", label: "Settings (Limited)", icon: Settings },
 ];
 
 const CountryHeadSidebar = ({

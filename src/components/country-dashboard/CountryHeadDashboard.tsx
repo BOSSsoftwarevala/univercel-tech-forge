@@ -20,6 +20,9 @@ import {
 } from "./types";
 import CountryHeadSidebar, { CountryHeadSection } from "./CountryHeadSidebar";
 
+// Icons for DollarSign in KPIs
+import { Wallet } from "lucide-react";
+
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 // Activity item interface
@@ -73,7 +76,7 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
   
   const liveAlertCount = openIssues + Math.floor(Math.random() * 3);
 
-  // 12 KPI Boxes following strict spec
+  // 12 KPI Boxes matching exact spec
   const actionKPIs: CountryActionKPI[] = useMemo(() => [
     { 
       id: "total_regions", 
@@ -116,14 +119,44 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
       lastUpdate: "5 min ago" 
     },
     { 
-      id: "influencers", 
-      title: "Influencers", 
-      count: totalInfluencers, 
+      id: "leads_today", 
+      title: "Leads Today", 
+      count: Math.floor(Math.random() * 50) + 20, 
       icon: Target, 
       color: "from-orange-500 to-amber-500", 
       trend: "up",
       source: "system",
       lastUpdate: "10 min ago" 
+    },
+    { 
+      id: "conversion_rate", 
+      title: "Conversion Rate", 
+      count: Math.floor(Math.random() * 30) + 15, 
+      icon: TrendingUp, 
+      color: "from-teal-500 to-cyan-500", 
+      trend: "up",
+      source: "ai",
+      lastUpdate: "15 min ago" 
+    },
+    { 
+      id: "revenue_today", 
+      title: "Revenue Today", 
+      count: Math.floor(Math.random() * 50) + 10, 
+      icon: DollarSign, 
+      color: "from-green-500 to-emerald-500", 
+      trend: "up",
+      source: "system",
+      lastUpdate: "30 min ago" 
+    },
+    { 
+      id: "wallet_risk", 
+      title: "Wallet Risk", 
+      count: Math.floor(Math.random() * 5), 
+      icon: AlertTriangle, 
+      color: "from-yellow-500 to-amber-500", 
+      trend: "stable",
+      source: "ai",
+      lastUpdate: "1 hour ago" 
     },
     { 
       id: "pending_approvals", 
@@ -139,55 +172,25 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
       id: "open_issues", 
       title: "Open Issues", 
       count: openIssues, 
-      icon: AlertTriangle, 
+      icon: AlertCircle, 
       color: "from-red-500 to-rose-500", 
       trend: openIssues > 0 ? "up" : "down",
       source: "ai",
       lastUpdate: "3 min ago" 
     },
     { 
-      id: "payment_pending", 
-      title: "Payment Pending", 
-      count: Math.floor(Math.random() * 10) + 3, 
-      icon: DollarSign, 
-      color: "from-yellow-500 to-amber-500", 
-      trend: "up",
-      source: "system",
-      lastUpdate: "30 min ago" 
-    },
-    { 
-      id: "renewals_due", 
-      title: "Expiry/Renewal Due", 
-      count: Math.floor(Math.random() * 8) + 2, 
-      icon: Calendar, 
-      color: "from-teal-500 to-cyan-500", 
+      id: "compliance_alerts", 
+      title: "Compliance Alerts", 
+      count: Math.floor(Math.random() * 3), 
+      icon: Shield, 
+      color: "from-purple-500 to-violet-500", 
       trend: "stable",
       source: "system",
       lastUpdate: "1 hour ago" 
     },
     { 
-      id: "live_alerts", 
-      title: "Live Alerts", 
-      count: liveAlertCount, 
-      icon: Bell, 
-      color: "from-rose-600 to-red-500", 
-      trend: liveAlertCount > 3 ? "up" : "down",
-      source: "ai",
-      lastUpdate: "1 min ago" 
-    },
-    { 
-      id: "performance", 
-      title: "Performance %", 
-      count: avgPerformance, 
-      icon: TrendingUp, 
-      color: "from-emerald-600 to-green-500", 
-      trend: avgPerformance > 85 ? "up" : "stable",
-      source: "ai",
-      lastUpdate: "5 min ago" 
-    },
-    { 
-      id: "ai_risk_summary", 
-      title: "AI Risk Summary", 
+      id: "ai_recommendation", 
+      title: "AI Recommendation", 
       count: riskLevel === "high" ? 3 : riskLevel === "medium" ? 2 : 1, 
       icon: Brain, 
       color: riskLevel === "high" ? "from-red-600 to-rose-500" : 
@@ -197,7 +200,7 @@ const CountryHeadDashboard = ({ countryCode = "IN", onBack }: CountryHeadDashboa
       source: "ai",
       lastUpdate: "Real-time" 
     },
-  ], [totalRegions, totalAreas, totalFranchises, totalResellers, totalInfluencers, pendingApprovals, openIssues, avgPerformance, liveAlertCount, riskLevel]);
+  ], [totalRegions, totalAreas, totalFranchises, totalResellers, pendingApprovals, openIssues, riskLevel]);
 
   // Live activity items
   const activityItems: ActivityItem[] = useMemo(() => [
