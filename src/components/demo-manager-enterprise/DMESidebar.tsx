@@ -53,6 +53,12 @@ const menuItems: { id: DMESection; label: string; icon: any; badge?: string }[] 
   { id: 'settings', label: 'Demo Settings', icon: Settings },
 ];
 
+interface DMESidebarProps {
+  activeSection: DMESection;
+  onSectionChange: (section: DMESection) => void;
+  onBack?: () => void;
+}
+
 export const DMESidebar: React.FC<DMESidebarProps> = ({
   activeSection,
   onSectionChange,
