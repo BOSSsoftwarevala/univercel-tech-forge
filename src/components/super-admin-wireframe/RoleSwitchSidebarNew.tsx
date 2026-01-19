@@ -87,7 +87,9 @@ export type ActiveRole =
   | "assist_manager"
   | "internal_chatbot"
   | "influencer_manager"
-  | "marketplace_manager";
+  | "marketplace_manager"
+  | "franchise_user"
+  | "reseller_sales";
 
 interface SubCategory {
   id: string;
@@ -313,6 +315,20 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "MM",
     icon: Store,
     description: "Franchise Marketplace & Billing",
+  },
+  franchise_user: {
+    id: "franchise_user",
+    label: "Franchise Dashboard",
+    shortLabel: "FU",
+    icon: Building2,
+    description: "Franchise User Portal",
+  },
+  reseller_sales: {
+    id: "reseller_sales",
+    label: "Reseller Dashboard",
+    shortLabel: "RS",
+    icon: Handshake,
+    description: "Reseller Sales Portal",
   },
 };
 

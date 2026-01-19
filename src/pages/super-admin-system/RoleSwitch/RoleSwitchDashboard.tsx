@@ -35,6 +35,8 @@ import LegalManagerView from "./LegalManagerView";
 import TMFullLayout from "@/components/task-manager/TMFullLayout";
 import IMFullLayout from "@/components/influencer-manager/IMFullLayout";
 import { MMFullLayout } from "@/components/marketplace-manager/MMFullLayout";
+import { FUFullLayout } from "@/components/franchise-user/FUFullLayout";
+import { RSFullLayout } from "@/components/reseller-sales/RSFullLayout";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
@@ -483,6 +485,10 @@ const RoleSwitchDashboard = () => {
         return <IMFullLayout />;
       case "marketplace_manager":
         return <MMFullLayout />;
+      case "franchise_user":
+        return <FUFullLayout />;
+      case "reseller_sales":
+        return <RSFullLayout onBack={() => setActiveRole(null)} />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
