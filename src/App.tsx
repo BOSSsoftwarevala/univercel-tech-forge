@@ -245,7 +245,7 @@ import ApplyPortal from "./pages/ApplyPortal";
 import CareerPortal from "./pages/CareerPortal";
 import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
-import DomainProtection from "./components/security/DomainProtection";
+
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
 import { GlobalSecurityProvider } from "./components/security/GlobalSecurityProvider";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
@@ -338,7 +338,7 @@ const App = () => (
       <DemoTestModeProvider>
         <AnimationProvider>
           <TooltipProvider>
-            <DomainProtection>
+            
               <SourceCodeProtection enabled={!import.meta.env.DEV}>
                 <GlobalSecurityProvider userRole="user">
                   <Toaster />
@@ -752,7 +752,7 @@ const App = () => (
                 </BrowserRouter>
               </GlobalSecurityProvider>
             </SourceCodeProtection>
-            </DomainProtection>
+            
           </TooltipProvider>
         </AnimationProvider>
       </DemoTestModeProvider>
