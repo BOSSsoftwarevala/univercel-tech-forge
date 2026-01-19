@@ -119,9 +119,9 @@ export function useSilentErrorHandler() {
     // Reset retry count
     retryCountRef.current.delete(actionKey);
 
-    // Show soft notice (not error popup)
+    // Show soft notice with POSITIVE messaging (not error popup)
     if (showNotice) {
-      toast.info('Something went wrong. Please try again.', {
+      toast.info('Processing is taking a bit longer than expected. Please wait.', {
         duration: 3000,
         position: 'bottom-right'
       });
