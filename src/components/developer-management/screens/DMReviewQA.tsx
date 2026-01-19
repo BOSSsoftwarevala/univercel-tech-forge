@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle, XCircle, RotateCcw, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+import { CheckCircle, XCircle, RotateCcw, AlertTriangle, Loader2 } from 'lucide-react';
+import { useActionHandler } from '@/hooks/useActionHandler';
 
 const reviews = [
   { id: 'REV-001', submission: 'SUB-001', dev: 'DEV-001', task: 'TSK-001', status: 'pending', time: '30 min ago' },
@@ -19,10 +19,23 @@ const reviews = [
 
 export const DMReviewQA: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const { approve, reject, escalate, isActionLoading } = useActionHandler();
 
   const filteredReviews = reviews.filter(rev => 
     activeTab === 'all' || rev.status === activeTab
   );
+
+  const handleApprove = (reviewId: string) => {
+    approve('Review', reviewId, { action: 'approve_qa' });
+  };
+
+  const handleSendBack = (reviewId: string) => {
+    reject('Review', reviewId, { action: 'send_back_for_revision' });
+  };
+
+  const handleEscalate = (reviewId: string) => {
+    escalate('Review', reviewId, { action: 'escalate_to_lead' });
+  };
 
   return (
     <div className="space-y-6">
@@ -86,25 +99,40 @@ export const DMReviewQA: React.FC = () => {
                       <Button 
                         size="sm" 
                         className="bg-green-600 hover:bg-green-700"
-                        onClick={() => toast.success(`Review ${review.id} approved`)}
+                        onClick={() => handleApprove(review.id)}
+                        disabled={isActionLoading('approve', review.id)}
                       >
-                        <CheckCircle className="h-4 w-4 mr-1" />
+                        {isActionLoading('approve', review.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                        )}
                         Approve
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => toast.warning(`Review ${review.id} sent back`)}
+                        onClick={() => handleSendBack(review.id)}
+                        disabled={isActionLoading('reject', review.id)}
                       >
-                        <RotateCcw className="h-4 w-4 mr-1" />
+                        {isActionLoading('reject', review.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                        )}
                         Send Back
                       </Button>
                       <Button 
                         size="sm" 
                         variant="destructive"
-                        onClick={() => toast.error(`Review ${review.id} escalated`)}
+                        onClick={() => handleEscalate(review.id)}
+                        disabled={isActionLoading('escalate', review.id)}
                       >
-                        <AlertTriangle className="h-4 w-4 mr-1" />
+                        {isActionLoading('escalate', review.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <AlertTriangle className="h-4 w-4 mr-1" />
+                        )}
                         Escalate
                       </Button>
                     </div>

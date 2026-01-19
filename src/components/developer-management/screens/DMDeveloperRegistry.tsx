@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Eye, ListTodo, Ban, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+import { Users, Eye, ListTodo, Ban, AlertTriangle, Loader2 } from 'lucide-react';
+import { useActionHandler } from '@/hooks/useActionHandler';
 
 const developers = [
   { id: 'DEV-001', role: 'Full Stack', location: '***-IN', skills: ['React', 'Node.js'], level: 'Senior', status: 'active' },
@@ -32,10 +32,27 @@ const getStatusBadge = (status: string) => {
 
 export const DMDeveloperRegistry: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const { view, assign, suspend, escalate, isActionLoading } = useActionHandler();
 
   const filteredDevs = developers.filter(dev => 
     activeTab === 'all' || dev.status === activeTab
   );
+
+  const handleView = (devId: string) => {
+    view('Developer', devId, { action: 'view_profile' });
+  };
+
+  const handleAssign = (devId: string) => {
+    assign('Developer', devId, { action: 'assign_task' });
+  };
+
+  const handleSuspend = (devId: string) => {
+    suspend('Developer', devId, { action: 'suspend_access' });
+  };
+
+  const handleEscalate = (devId: string) => {
+    escalate('Developer Issue', devId, { action: 'escalate_to_manager' });
+  };
 
   return (
     <div className="space-y-6">
@@ -82,22 +99,58 @@ export const DMDeveloperRegistry: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" onClick={() => toast.info(`Viewing ${dev.id}`)}>
-                        <Eye className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleView(dev.id)}
+                        disabled={isActionLoading('view', dev.id)}
+                      >
+                        {isActionLoading('view', dev.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Eye className="h-4 w-4 mr-1" />
+                        )}
                         View
                       </Button>
                       {dev.status !== 'exited' && (
                         <>
-                          <Button size="sm" variant="outline" onClick={() => toast.success(`Task assigned to ${dev.id}`)}>
-                            <ListTodo className="h-4 w-4 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleAssign(dev.id)}
+                            disabled={isActionLoading('assign', dev.id)}
+                          >
+                            {isActionLoading('assign', dev.id) ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <ListTodo className="h-4 w-4 mr-1" />
+                            )}
                             Assign
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => toast.warning(`Access suspended for ${dev.id}`)}>
-                            <Ban className="h-4 w-4 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleSuspend(dev.id)}
+                            disabled={isActionLoading('suspend', dev.id)}
+                          >
+                            {isActionLoading('suspend', dev.id) ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <Ban className="h-4 w-4 mr-1" />
+                            )}
                             Suspend
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => toast.error(`Issue escalated for ${dev.id}`)}>
-                            <AlertTriangle className="h-4 w-4 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleEscalate(dev.id)}
+                            disabled={isActionLoading('escalate', dev.id)}
+                          >
+                            {isActionLoading('escalate', dev.id) ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <AlertTriangle className="h-4 w-4 mr-1" />
+                            )}
                             Escalate
                           </Button>
                         </>
