@@ -43,7 +43,7 @@ import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import { UnifiedGlobalHeader } from "@/components/shared/UnifiedGlobalHeader";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
-import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
+import CustomerSupportManagerView from "./CustomerSupportManagerView";
 import RoleManagerDashboard from "./RoleManagerDashboard";
 import RMEnterpriseLayout from "@/components/role-manager/RMEnterpriseLayout";
 // CRITICAL: Use the full-featured CountryHeadDashboard with built-in sidebar + interactive map
@@ -65,7 +65,7 @@ const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
   boss_owner: Object.keys(roleConfigs) as ActiveRole[], // Boss Owner can view everything
   master: Object.keys(roleConfigs) as ActiveRole[], // Legacy master role
   ceo: Object.keys(roleConfigs) as ActiveRole[], // CEO can view everything (read-only)
-  super_admin: ['continent_super_admin', 'country_head', 'franchise_manager', 'sales_support_manager', 'reseller_manager', 'lead_manager'],
+  super_admin: ['continent_super_admin', 'country_head', 'franchise_manager', 'sales_support_manager', 'reseller_manager', 'lead_manager', 'customer_support_management'],
   continent_super_admin: ['continent_super_admin', 'country_head'],
   country_head: ['country_head'],
 };
@@ -499,7 +499,7 @@ const RoleSwitchDashboard = () => {
       case "marketing_management":
         return <MarketingManagementDashboard />;
       case "customer_support_management":
-        return <CustomerSupportManagementDashboard />;
+        return <CustomerSupportManagerView />;
       case "role_manager":
         return <RMEnterpriseLayout />;
       case "product_manager":
