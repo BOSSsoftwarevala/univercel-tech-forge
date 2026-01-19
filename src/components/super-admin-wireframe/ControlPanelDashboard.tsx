@@ -15,7 +15,7 @@
  * [13] FINANCE          [14] ALERT SUMMARY
  */
 
-import { memo } from "react";
+import { memo, forwardRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -56,13 +56,19 @@ const COLORS = {
 // ===== UNIFORM BOX HEIGHT =====
 const BOX_HEIGHT = 'h-[200px]';
 
-// ===== STAT ROW COMPONENT =====
-const StatRow = memo(({ label, value, color = COLORS.text }: { label: string; value: string; color?: string }) => (
-  <div className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
+// ===== STAT ROW COMPONENT (Fixed forwardRef) =====
+interface StatRowProps {
+  label: string;
+  value: string;
+  color?: string;
+}
+
+const StatRow = memo(forwardRef<HTMLDivElement, StatRowProps>(({ label, value, color = COLORS.text }, ref) => (
+  <div ref={ref} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
     <span className="text-sm text-white/60">{label}</span>
     <span className="text-sm font-semibold" style={{ color }}>{value}</span>
   </div>
-));
+)));
 StatRow.displayName = 'StatRow';
 
 // ===== BOX 1: KEY STATS =====

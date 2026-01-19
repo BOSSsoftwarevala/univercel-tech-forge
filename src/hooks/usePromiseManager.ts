@@ -63,10 +63,19 @@ export function usePromiseManagerMetrics() {
       const { data, error } = await supabase
         .from('promise_manager_metrics')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as PromiseManagerMetrics;
+      // Return empty metrics if no data exists
+      return (data ?? {
+        total_promises: 0,
+        active_count: 0,
+        completed_count: 0,
+        overdue_count: 0,
+        completion_rate: 0,
+        on_time_rate: 0,
+        avg_completion_time_hours: 0
+      }) as PromiseManagerMetrics;
     },
     refetchInterval: 30000, // Auto-refresh every 30 seconds
   });

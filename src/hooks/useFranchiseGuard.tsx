@@ -121,12 +121,12 @@ export function useFranchiseGuard() {
       }
 
       try {
-        // Fetch franchise account
+        // Fetch franchise account - use maybeSingle for robustness
         const { data: accountData, error: accountError } = await supabase
           .from('franchise_accounts')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (accountError) throw accountError;
         

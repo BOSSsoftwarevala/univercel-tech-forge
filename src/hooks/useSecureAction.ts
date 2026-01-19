@@ -28,19 +28,19 @@ export function useSecureAction() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get user's 2FA settings
+      // Get user's 2FA settings - use maybeSingle to handle missing records
       const { data: settings } = await supabase
         .from('user_2fa_settings')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      // Get user's session security settings
+      // Get user's session security settings - use maybeSingle to handle missing records
       const { data: sessionSettings } = await supabase
         .from('session_security')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Determine requirements based on action type and settings
       const isDeleteAction = actionType.includes('delete') || actionType.includes('remove');

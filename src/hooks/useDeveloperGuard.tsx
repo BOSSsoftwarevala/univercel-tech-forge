@@ -100,13 +100,13 @@ export function useDeveloperGuard() {
           return;
         }
 
-        // Check if user has developer role
+        // Check if user has developer role - use maybeSingle for robustness
         const { data: roleData } = await supabase
           .from('user_roles')
           .select('role, approval_status')
           .eq('user_id', user.id)
           .eq('role', 'developer')
-          .single();
+          .maybeSingle();
 
         if (!roleData || roleData.approval_status !== 'approved') {
           toast.error('Developer access not approved');

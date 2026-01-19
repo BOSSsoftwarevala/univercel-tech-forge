@@ -85,12 +85,12 @@ export const useResellerGuard = () => {
     }
 
     try {
-      // Fetch reseller account
+      // Fetch reseller account - use maybeSingle for robustness
       const { data: accountData, error: accountError } = await supabase
         .from('reseller_accounts')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (accountError) throw accountError;
 
@@ -109,12 +109,12 @@ export const useResellerGuard = () => {
         };
         setResellerAccount(account);
 
-        // Fetch wallet data
+        // Fetch wallet data - use maybeSingle for robustness
         const { data: walletData } = await supabase
           .from('reseller_wallet')
           .select('*')
           .eq('reseller_id', accountData.id)
-          .single();
+          .maybeSingle();
 
         if (walletData) {
           setWallet({

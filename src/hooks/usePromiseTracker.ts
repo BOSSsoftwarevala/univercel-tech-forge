@@ -60,10 +60,18 @@ export function useTrackerMetrics() {
       const { data, error } = await supabase
         .from('promise_tracker_metrics')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as TrackerMetrics;
+      // Return empty metrics if no data exists
+      return (data ?? {
+        total_promises: 0,
+        active_promises: 0,
+        completed_promises: 0,
+        overdue_promises: 0,
+        completion_rate: 0,
+        average_completion_hours: 0
+      }) as TrackerMetrics;
     },
     refetchInterval: 5000, // Refresh every 5 seconds for near real-time
     staleTime: 3000,
