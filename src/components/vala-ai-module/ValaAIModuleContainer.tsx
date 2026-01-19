@@ -1,30 +1,18 @@
 /**
  * VALA AI MODULE CONTAINER
- * Main container that combines sidebar + content
- * RENAMED: From Development Manager to VALA AI
- * FULL FEATURES: Dashboard, Models, Tasks, API, Automation, Credits, Alerts, Dev Studio
+ * ================================================
+ * CORE AI ENGINE - TEXT-ONLY COMMAND SYSTEM
+ * ================================================
+ * LOCKED: DO NOT CHANGE COLORS/FONTS/THEME
  */
 
 import React, { useState } from 'react';
 import { ValaAISidebar, ValaAISection } from './ValaAISidebar';
-import { ValaAIHome } from './ValaAIHome';
-import { ValaAINewProject } from './ValaAINewProject';
-import { ValaAILiveBuilds } from './ValaAILiveBuilds';
-import { ValaAIIssueInbox } from './ValaAIIssueInbox';
-import { ValaAIAutoFixQueue } from './ValaAIAutoFixQueue';
-import { AIClientDeployPanel } from './AIClientDeployPanel';
-import { ValaAIFullDashboard } from './ValaAIFullDashboard';
+import ValaAICommandCenter from './ValaAICommandCenter';
 import { AIModelsPanel } from './AIModelsPanel';
-import { AITasksPanel } from './AITasksPanel';
-import { AIAPIPanel } from './AIAPIPanel';
-import { AIAutomationPanel } from './AIAutomationPanel';
 import { AICreditsPanel } from './AICreditsPanel';
-import { AIAlertsPanel } from './AIAlertsPanel';
-import { DevVersions } from './DevVersions';
-import { DevLogs } from './DevLogs';
 import { DevSettings } from './DevSettings';
-import { DemoFactory } from './DemoFactory';
-import ValaAIDevStudio from './ValaAIDevStudio';
+import { DevLogs } from './DevLogs';
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
@@ -32,55 +20,30 @@ interface ValaAIModuleContainerProps {
 }
 
 export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
-  initialSection = 'home',
+  initialSection = 'command-center',
   onBack
 }) => {
   const [activeSection, setActiveSection] = useState<ValaAISection>(initialSection);
 
-  const handleNavigate = (section: ValaAISection) => {
-    setActiveSection(section);
-  };
-
   const renderContent = () => {
     switch (activeSection) {
-      case 'home':
-        return <ValaAIHome onNavigate={handleNavigate} />;
-      case 'dashboard':
-        return <ValaAIFullDashboard />;
-      case 'dev-studio':
-        return <ValaAIDevStudio />;
-      case 'new-project':
-        return <ValaAINewProject />;
-      case 'live-builds':
-        return <ValaAILiveBuilds />;
-      case 'active-demos':
-        return <DemoFactory />;
-      case 'issue-inbox':
-        return <ValaAIIssueInbox />;
-      case 'auto-fix-queue':
-        return <ValaAIAutoFixQueue />;
-      case 'deployment':
-        return <AIClientDeployPanel />;
+      case 'command-center':
+      case 'active-project':
+      case 'prompt-history':
+      case 'execution-logs':
+      case 'error-detection':
+      case 'rollback':
+      case 'lock-status':
+        // All core functions route to Command Center
+        return <ValaAICommandCenter />;
       case 'models':
         return <AIModelsPanel />;
-      case 'tasks':
-        return <AITasksPanel />;
-      case 'api':
-        return <AIAPIPanel />;
-      case 'automation':
-        return <AIAutomationPanel />;
       case 'credits':
         return <AICreditsPanel />;
-      case 'alerts':
-        return <AIAlertsPanel />;
-      case 'versions':
-        return <DevVersions />;
-      case 'logs':
-        return <DevLogs />;
       case 'settings':
         return <DevSettings />;
       default:
-        return <ValaAIHome onNavigate={handleNavigate} />;
+        return <ValaAICommandCenter />;
     }
   };
 
@@ -91,7 +54,7 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
         onSectionChange={setActiveSection}
         onBack={onBack}
       />
-      <div className="flex-1 p-6 overflow-y-auto" style={{ color: '#FFFFFF' }}>
+      <div className="flex-1 overflow-hidden" style={{ color: '#FFFFFF' }}>
         {renderContent()}
       </div>
     </div>

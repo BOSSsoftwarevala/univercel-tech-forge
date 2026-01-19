@@ -12,22 +12,23 @@ interface ValaAIManagerViewProps {
   activeNav?: string;
 }
 
-const ValaAIManagerView: React.FC<ValaAIManagerViewProps> = ({ activeNav = 'home' }) => {
+const ValaAIManagerView: React.FC<ValaAIManagerViewProps> = ({ activeNav = 'command-center' }) => {
   const getSectionFromNav = (nav: string): ValaAISection => {
     const mapping: Record<string, ValaAISection> = {
-      'dashboard': 'home',
-      'home': 'home',
-      'new-project': 'new-project',
-      'live-builds': 'live-builds',
-      'active-demos': 'active-demos',
-      'issue-inbox': 'issue-inbox',
-      'auto-fix-queue': 'auto-fix-queue',
-      'deployment': 'deployment',
-      'versions': 'versions',
-      'logs': 'logs',
+      'dashboard': 'command-center',
+      'home': 'command-center',
+      'command-center': 'command-center',
+      'active-project': 'active-project',
+      'prompt-history': 'prompt-history',
+      'execution-logs': 'execution-logs',
+      'error-detection': 'error-detection',
+      'rollback': 'rollback',
+      'lock-status': 'lock-status',
+      'models': 'models',
+      'credits': 'credits',
       'settings': 'settings',
     };
-    return mapping[nav] || 'home';
+    return mapping[nav] || 'command-center';
   };
 
   return (

@@ -8,47 +8,32 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Home,
-  Plus,
-  PlayCircle,
-  Monitor,
-  Inbox,
-  Wrench,
-  Rocket,
-  GitBranch,
-  FileText,
-  Settings,
   ArrowLeft,
   Brain,
-  Cpu,
-  ListTodo,
-  Webhook,
-  Cog,
-  Wallet,
-  AlertTriangle,
-  LayoutDashboard
+  Terminal, 
+  FolderOpen, 
+  History, 
+  FileText as LogsIcon, 
+  Bug, 
+  RotateCcw, 
+  Lock, 
+  Cpu, 
+  Wallet, 
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
 
 export type ValaAISection = 
-  | 'home' 
-  | 'dashboard'
-  | 'dev-studio'
-  | 'new-project' 
-  | 'live-builds' 
-  | 'active-demos' 
-  | 'issue-inbox' 
-  | 'auto-fix-queue' 
-  | 'deployment' 
+  | 'command-center'
+  | 'active-project'
+  | 'prompt-history'
+  | 'execution-logs'
+  | 'error-detection'
+  | 'rollback'
+  | 'lock-status'
   | 'models'
-  | 'tasks'
-  | 'api'
-  | 'automation'
   | 'credits'
-  | 'alerts'
-  | 'versions'
-  | 'logs'
   | 'settings';
 
 interface ValaAISidebarProps {
@@ -57,27 +42,17 @@ interface ValaAISidebarProps {
   onBack?: () => void;
 }
 
-import { Code2 } from 'lucide-react';
-
 const sidebarItems: { id: ValaAISection; label: string; icon: React.ElementType; badge?: string }[] = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'dashboard', label: 'AI Dashboard', icon: LayoutDashboard, badge: 'Full' },
-  { id: 'dev-studio', label: 'Dev Studio', icon: Code2, badge: 'LIVE' },
-  { id: 'new-project', label: 'New Project', icon: Plus },
-  { id: 'live-builds', label: 'Live Builds', icon: PlayCircle },
-  { id: 'active-demos', label: 'Active Demos', icon: Monitor },
-  { id: 'issue-inbox', label: 'Issue Inbox', icon: Inbox },
-  { id: 'auto-fix-queue', label: 'Auto Fix Queue', icon: Wrench },
-  { id: 'deployment', label: 'Deployment', icon: Rocket },
+  { id: 'command-center', label: 'Command Center', icon: Terminal, badge: 'CORE' },
+  { id: 'active-project', label: 'Active Project', icon: FolderOpen },
+  { id: 'prompt-history', label: 'Prompt History', icon: History, badge: 'Read-Only' },
+  { id: 'execution-logs', label: 'Execution Logs', icon: LogsIcon },
+  { id: 'error-detection', label: 'Error Detection', icon: Bug },
+  { id: 'rollback', label: 'Rollback Trigger', icon: RotateCcw },
+  { id: 'lock-status', label: 'Lock Status', icon: Lock },
   { id: 'models', label: 'AI Models', icon: Cpu },
-  { id: 'tasks', label: 'AI Tasks', icon: ListTodo },
-  { id: 'api', label: 'API Calls', icon: Webhook },
-  { id: 'automation', label: 'Automation', icon: Cog },
   { id: 'credits', label: 'Credits', icon: Wallet },
-  { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
-  { id: 'versions', label: 'Versions', icon: GitBranch },
-  { id: 'logs', label: 'Logs', icon: FileText, badge: 'Read-only' },
-  { id: 'settings', label: 'Settings', icon: Settings, badge: 'Limited' },
+  { id: 'settings', label: 'Settings', icon: SettingsIcon, badge: 'Limited' },
 ];
 
 export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({

@@ -33,12 +33,12 @@ interface DashboardCard {
 }
 
 const dashboardCards: DashboardCard[] = [
-  { id: 'new-requests', label: 'New Build Requests', value: 8, icon: Plus, color: 'text-blue-500', bgColor: 'bg-blue-500/10', trend: '+3', navigateTo: 'new-project' },
-  { id: 'running-builds', label: 'Running Builds', value: 4, icon: PlayCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', navigateTo: 'live-builds' },
-  { id: 'failed-blocked', label: 'Failed / Blocked', value: 2, icon: XCircle, color: 'text-rose-500', bgColor: 'bg-rose-500/10', navigateTo: 'live-builds' },
-  { id: 'waiting-approval', label: 'Waiting Approval', value: 5, icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', navigateTo: 'issue-inbox' },
-  { id: 'deployed-today', label: 'Deployed Today', value: 12, icon: Rocket, color: 'text-purple-500', bgColor: 'bg-purple-500/10', trend: '+4', navigateTo: 'deployment' },
-  { id: 'auto-fixed', label: 'Auto-Fixed Issues', value: 23, icon: Wrench, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', trend: '+7', navigateTo: 'auto-fix-queue' },
+  { id: 'new-requests', label: 'New Build Requests', value: 8, icon: Plus, color: 'text-blue-500', bgColor: 'bg-blue-500/10', trend: '+3', navigateTo: 'command-center' },
+  { id: 'running-builds', label: 'Running Builds', value: 4, icon: PlayCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', navigateTo: 'execution-logs' },
+  { id: 'failed-blocked', label: 'Failed / Blocked', value: 2, icon: XCircle, color: 'text-rose-500', bgColor: 'bg-rose-500/10', navigateTo: 'error-detection' },
+  { id: 'waiting-approval', label: 'Waiting Approval', value: 5, icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', navigateTo: 'prompt-history' },
+  { id: 'deployed-today', label: 'Deployed Today', value: 12, icon: Rocket, color: 'text-purple-500', bgColor: 'bg-purple-500/10', trend: '+4', navigateTo: 'execution-logs' },
+  { id: 'auto-fixed', label: 'Auto-Fixed Issues', value: 23, icon: Wrench, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', trend: '+7', navigateTo: 'error-detection' },
 ];
 
 // Mock live builds for real-time progress display
@@ -72,10 +72,9 @@ export const ValaAIHome: React.FC<ValaAIHomeProps> = ({ onNavigate }) => {
       return;
     }
     toast.success('Project queued for AI processing');
-    setProjectPrompt('');
     setIsDialogOpen(false);
-    // Navigate to live builds to show the new project
-    onNavigate?.('live-builds');
+    // Navigate to command center
+    onNavigate?.('command-center');
   };
 
   const handleCardClick = (card: DashboardCard) => {
