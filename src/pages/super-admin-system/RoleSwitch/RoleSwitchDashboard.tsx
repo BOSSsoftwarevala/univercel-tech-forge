@@ -310,6 +310,14 @@ const RoleSwitchDashboard = () => {
   useEffect(() => {
     if (loading) return;
 
+    // Debug: why role switch sometimes appears "dead"
+    console.debug("[RoleSwitchDashboard] init", {
+      userRole,
+      isBossOwner,
+      requestedRole,
+      href: window.location.href,
+    });
+
     // 1) If URL requests a role, always sync to it (if access allows)
     // OVERRIDE (BOSS RULE): boss_owner & ceo should land on the Control Panel grid by default.
     // They can still open their role dashboard by clicking from the Control Panel sidebar.
@@ -347,7 +355,7 @@ const RoleSwitchDashboard = () => {
       didInitRef.current = true;
       setInitialized(true);
     }
-  }, [requestedRole, loading, canAccessView, getDefaultRole]);
+  }, [requestedRole, loading, canAccessView, getDefaultRole, userRole, isBossOwner]);
 
 
 
@@ -364,6 +372,14 @@ const RoleSwitchDashboard = () => {
 
   // STEP 6: Enhanced role change with full state reset
   const handleRoleChange = useCallback((role: ActiveRole) => {
+    console.debug("[RoleSwitchDashboard] handleRoleChange", {
+      from: window.location.href,
+      toRole: role,
+      userRole,
+      isBossOwner,
+      canAccess: canAccessView(role),
+    });
+
     // Check if user can access this view
     if (!canAccessView(role)) {
       toast.error("Access denied to this view");
@@ -374,7 +390,7 @@ const RoleSwitchDashboard = () => {
     // This also guarantees we are in the correct role context (fixes "buttons not working" caused by staying on ?role=boss_owner).
     const nextUrl = `/super-admin-system/role-switch?role=${encodeURIComponent(role)}`;
     window.location.assign(nextUrl);
-  }, [canAccessView]);
+  }, [canAccessView, userRole, isBossOwner]);
 
   const handleNavChange = useCallback((navId: string) => {
     setActiveNav(navId);
