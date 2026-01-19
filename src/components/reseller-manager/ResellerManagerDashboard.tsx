@@ -36,14 +36,14 @@ export function ResellerManagerDashboard({ onBack }: ResellerManagerDashboardPro
         return (
           <div className="text-white p-6">
             <h2 className="text-xl font-bold mb-4">Reseller Map</h2>
-            <CategoryHierarchyView onNavigateToSection={setActiveSection} />
+            <CategoryHierarchyView />
           </div>
         );
       case 'performance':
         return (
           <div className="text-white p-6">
             <h2 className="text-xl font-bold mb-4">Performance & Revenue</h2>
-            <CategoryHierarchyView onNavigateToSection={setActiveSection} />
+            <CategoryHierarchyView />
           </div>
         );
       case 'partner-activity':
