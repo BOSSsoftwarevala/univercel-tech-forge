@@ -13,6 +13,10 @@ import { RSCommissionScreen } from './screens/RSCommissionScreen';
 import { RSMarketingScreen } from './screens/RSMarketingScreen';
 import { RSSupportScreen } from './screens/RSSupportScreen';
 import { RSProfileScreen } from './screens/RSProfileScreen';
+import { PaymentGatewayScreen } from '@/components/wallet/PaymentGatewayScreen';
+import { AddMoneyScreen } from '@/components/wallet/AddMoneyScreen';
+import { WalletHistoryScreen } from '@/components/wallet/WalletHistoryScreen';
+import { WalletHeader } from '@/components/wallet/WalletHeader';
 import { useNavigate } from 'react-router-dom';
 
 interface RSFullLayoutProps {
@@ -22,6 +26,7 @@ interface RSFullLayoutProps {
 export function RSFullLayout({ onBack }: RSFullLayoutProps) {
   const [activeSection, setActiveSection] = useState<RSSection>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [walletBalance] = useState(850);
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -31,6 +36,8 @@ export function RSFullLayout({ onBack }: RSFullLayoutProps) {
       navigate('/super-admin-system/role-switch?role=boss_owner');
     }
   };
+
+  const handleAddMoney = () => setActiveSection('add_money');
 
   const renderContent = () => {
     switch (activeSection) {
@@ -44,6 +51,14 @@ export function RSFullLayout({ onBack }: RSFullLayoutProps) {
         return <RSSalesScreen />;
       case 'commission':
         return <RSCommissionScreen />;
+      case 'wallet':
+        return <WalletHistoryScreen />;
+      case 'payment_gateway':
+        return <PaymentGatewayScreen />;
+      case 'add_money':
+        return <AddMoneyScreen />;
+      case 'wallet_history':
+        return <WalletHistoryScreen />;
       case 'marketing':
         return <RSMarketingScreen />;
       case 'support':
@@ -65,8 +80,14 @@ export function RSFullLayout({ onBack }: RSFullLayoutProps) {
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           onBack={handleBack}
         />
-        <main className="flex-1 overflow-auto bg-gradient-to-br from-slate-950 via-emerald-950/20 to-slate-900">
-          {renderContent()}
+        <main className="flex-1 overflow-auto bg-gradient-to-br from-slate-950 via-emerald-950/20 to-slate-900 flex flex-col">
+          {/* Wallet Header - Always Visible */}
+          <div className="p-4 border-b border-emerald-500/20">
+            <WalletHeader balance={walletBalance} onAddMoney={handleAddMoney} />
+          </div>
+          <div className="flex-1 overflow-auto p-6">
+            {renderContent()}
+          </div>
         </main>
       </div>
     </TooltipProvider>
