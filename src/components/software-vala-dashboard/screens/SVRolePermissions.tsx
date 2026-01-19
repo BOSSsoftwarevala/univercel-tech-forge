@@ -582,11 +582,11 @@ export const SVRolePermissions = () => {
                   { user: 'dev@softwarevala.com', action: 'Accessed API Keys module', time: '5 minutes ago', type: 'access' },
                   { user: 'support@softwarevala.com', action: 'Updated chatbot settings', time: '10 minutes ago', type: 'update' },
                   { user: 'demo@softwarevala.com', action: 'Created new demo', time: '15 minutes ago', type: 'create' },
-                  { user: 'viewer@softwarevala.com', action: 'Permission denied: billing.read', time: '20 minutes ago', type: 'denied' },
+                  { user: 'viewer@softwarevala.com', action: 'Access being configured: billing.read', time: '20 minutes ago', type: 'config' },
                 ].map((log, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
                     <div className={`w-2 h-2 rounded-full ${
-                      log.type === 'denied' ? 'bg-red-500' :
+                      log.type === 'config' ? 'bg-primary' :
                       log.type === 'grant' ? 'bg-green-500' :
                       'bg-blue-500'
                     }`} />

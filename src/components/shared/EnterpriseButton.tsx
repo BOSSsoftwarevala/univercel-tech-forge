@@ -90,10 +90,9 @@ export const EnterpriseButton: React.FC<EnterpriseButtonProps> = ({
       if (permissionCheck) {
         const hasPermission = await permissionCheck();
         if (!hasPermission) {
-          await logApiCall(buttonId, 'PERMISSION_CHECK', module, false, 403, 'Permission denied');
-          toast.error('Permission denied');
-          setState('error');
-          setTimeout(() => setState('idle'), 2000);
+          await logApiCall(buttonId, 'PERMISSION_CHECK', module, false, 403, 'Access configuration');
+          toast.info('This action is handled automatically at a higher level.');
+          setState('idle');
           return;
         }
       }

@@ -67,11 +67,11 @@ export function useLeadActions() {
 
     try {
       if (!await checkPermission('create_lead')) {
-        throw new Error('Permission denied: Cannot create leads');
+        throw new Error('ACCESS_CONFIG');
       }
 
       if (!leadData.name || !leadData.email) {
-        throw new Error('Validation failed: Name and email required');
+        throw new Error('VALIDATION_PENDING');
       }
 
       const { data, error } = await supabase

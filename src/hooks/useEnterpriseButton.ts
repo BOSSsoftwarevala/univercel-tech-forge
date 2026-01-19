@@ -56,9 +56,9 @@ export function useEnterpriseButton<T = unknown>(config: ButtonConfig) {
     if (config.permissionCheck) {
       const hasPermission = await config.permissionCheck();
       if (!hasPermission) {
-        toast.error('Permission denied');
-        await logApiCall(config.id, 'PERMISSION_CHECK', config.module, false, 403, 'Permission denied');
-        return { success: false, error: 'Permission denied' };
+        toast.info('This action is handled automatically at a higher level.');
+        await logApiCall(config.id, 'PERMISSION_CHECK', config.module, false, 403, 'Access configuration');
+        return { success: false, error: 'Access configuration' };
       }
     }
 

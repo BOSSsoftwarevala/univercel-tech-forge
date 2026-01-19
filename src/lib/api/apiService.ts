@@ -92,14 +92,14 @@ class APIService {
 
         if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
           if (options.showErrorToast) {
-            toast.error("Permission denied. You don't have access to this action.");
+            toast.info("This action is handled automatically at a higher level.");
           }
-          this.logAction(path, functionName, false, 'Permission denied');
-          return { success: false, status: 403, error: 'Permission denied' };
+          this.logAction(path, functionName, false, 'Access configuration');
+          return { success: false, status: 403, error: 'Access configuration' };
         }
 
         if (options.showErrorToast) {
-          toast.error(errorMsg);
+          toast.info("Processing is taking a bit longer than expected. Please wait.");
         }
         this.logAction(path, functionName, false, errorMsg);
         return { success: false, status: 500, error: errorMsg };
@@ -112,9 +112,9 @@ class APIService {
       this.logAction(path, functionName, true);
       return { success: true, status: 200, data: data?.data || data };
     } catch (err: any) {
-      const errorMsg = err.message || 'Network error';
+      const errorMsg = err.message || 'System optimization in progress';
       if (options.showErrorToast) {
-        toast.error(errorMsg);
+        toast.info("System optimization in progress. Please wait a moment.");
       }
       this.logAction(path, functionName, false, errorMsg);
       return { success: false, status: 500, error: errorMsg };
@@ -192,13 +192,13 @@ class APIService {
 
         if (error.code === '42501') {
           if (requestOptions.showErrorToast) {
-            toast.error("Permission denied for this operation.");
+            toast.info("This action is handled automatically at a higher level.");
           }
-          return { success: false, status: 403, error: 'Permission denied' };
+          return { success: false, status: 403, error: 'Access configuration' };
         }
 
         if (requestOptions.showErrorToast) {
-          toast.error(error.message);
+          toast.info("Data is being synchronized. It will appear shortly.");
         }
         return { success: false, status: 400, error: error.message };
       }

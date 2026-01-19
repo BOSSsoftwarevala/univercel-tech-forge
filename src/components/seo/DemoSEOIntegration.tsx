@@ -68,8 +68,8 @@ const DemoSEOIntegration = () => {
   ];
 
   const brokenDemoWarnings = [
-    { demo: "Legacy POS Demo", url: "/demo/pos-v1", status: 404, lastWorking: "3 days ago" },
-    { demo: "Old School Demo", url: "/demo/school-old", status: 500, lastWorking: "1 week ago" },
+    { demo: "Legacy POS Demo", url: "/demo/pos-v1", status: "redirect", lastWorking: "3 days ago" },
+    { demo: "Old School Demo", url: "/demo/school-old", status: "maintenance", lastWorking: "1 week ago" },
   ];
 
   const getMetaStatusStyle = (status: string) => {

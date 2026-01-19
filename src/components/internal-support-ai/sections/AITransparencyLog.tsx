@@ -50,7 +50,7 @@ export const AITransparencyLog: React.FC<AITransparencyLogProps> = ({ activeView
       id: 'LOG-002',
       timestamp: '12:44:18',
       issueId: 'ISS-141',
-      issueDetected: 'Permission denied accessing /admin/settings',
+      issueDetected: 'Access configuration for /admin/settings',
       actionTaken: 'Re-synced role permissions from authorization service',
       reason: 'User role cache was stale after recent permission update',
       outcome: 'success',

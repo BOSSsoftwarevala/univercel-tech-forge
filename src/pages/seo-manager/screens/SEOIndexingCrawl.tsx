@@ -16,9 +16,9 @@ const SEOIndexingCrawl = () => {
   });
 
   const [crawlErrors] = useState([
-    { id: "CE001", url: "/old-product-page", error: "404 Not Found", discovered: "2025-06-19", status: "pending" },
-    { id: "CE002", url: "/broken-link", error: "Server Error (500)", discovered: "2025-06-18", status: "pending" },
-    { id: "CE003", url: "/redirect-loop", error: "Redirect Loop", discovered: "2025-06-17", status: "fixed" },
+    { id: "CE001", url: "/old-product-page", error: "Page Redirect Needed", discovered: "2025-06-19", status: "pending" },
+    { id: "CE002", url: "/broken-link", error: "Content Update Required", discovered: "2025-06-18", status: "pending" },
+    { id: "CE003", url: "/redirect-loop", error: "Redirect Configuration", discovered: "2025-06-17", status: "fixed" },
   ]);
 
   const [blockedUrls] = useState([

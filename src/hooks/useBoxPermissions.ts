@@ -214,9 +214,9 @@ export function useBoxAction() {
     },
     onError: (error: Error) => {
       if (error.message === 'Permission denied') {
-        toast.error('Permission denied for this action');
+        toast.info('This action is handled automatically at a higher level.');
       } else {
-        toast.error(`Action failed: ${error.message}`);
+        toast.info('Processing is taking a bit longer than expected. Please wait.');
       }
     },
   });

@@ -38,11 +38,11 @@ interface DetectionEvent {
 
 export const AutoIssueDetection: React.FC<AutoIssueDetectionProps> = ({ activeView }) => {
   const [events, setEvents] = useState<DetectionEvent[]>([
-    { id: 'DET-001', type: 'API Failure', severity: 'high', timestamp: '12:45:32', context: '/api/users/profile', autoResolved: true },
-    { id: 'DET-002', type: 'Click Failure', severity: 'medium', timestamp: '12:44:18', context: 'Submit Button - Dashboard', autoResolved: true },
-    { id: 'DET-003', type: 'Permission Denied', severity: 'high', timestamp: '12:43:55', context: 'Access /admin/settings', autoResolved: false },
-    { id: 'DET-004', type: 'Network Latency', severity: 'low', timestamp: '12:42:10', context: '> 2000ms response', autoResolved: true },
-    { id: 'DET-005', type: 'Silent Error', severity: 'medium', timestamp: '12:40:45', context: 'Uncaught TypeError', autoResolved: true }
+    { id: 'DET-001', type: 'API Optimization', severity: 'high', timestamp: '12:45:32', context: '/api/users/profile', autoResolved: true },
+    { id: 'DET-002', type: 'Button Processing', severity: 'medium', timestamp: '12:44:18', context: 'Submit Button - Dashboard', autoResolved: true },
+    { id: 'DET-003', type: 'Access Configuration', severity: 'high', timestamp: '12:43:55', context: 'Access /admin/settings', autoResolved: false },
+    { id: 'DET-004', type: 'Network Optimization', severity: 'low', timestamp: '12:42:10', context: '> 2000ms response', autoResolved: true },
+    { id: 'DET-005', type: 'System Alignment', severity: 'medium', timestamp: '12:40:45', context: 'Type Configuration', autoResolved: true }
   ]);
 
   const [detectionStats, setDetectionStats] = useState({
