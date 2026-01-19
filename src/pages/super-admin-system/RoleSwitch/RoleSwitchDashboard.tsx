@@ -190,8 +190,21 @@ const RoleSwitchDashboard = () => {
   
   // CONTEXT SYNCHRONIZATION: Sync store state with module view state
   // This ensures the sidebar store always reflects the current view
+  // EXCLUSION LIST: Roles with their own internal sidebars should NOT trigger store changes
+  const rolesWithInternalSidebars = useMemo(() => [
+    'ceo', 'vala_ai_management', 'developer_management', 'demo_manager',
+    'continent_super_admin', 'reseller_manager', 'finance_manager'
+  ], []);
+  
   useEffect(() => {
     if (!canTransition()) return; // Prevent race conditions
+    
+    // Skip store sync for roles with internal sidebars - they manage their own navigation
+    if (activeRole && rolesWithInternalSidebars.includes(activeRole)) {
+      // Force clear any category overlays to prevent click-blocking
+      showGlobalSidebar();
+      return;
+    }
 
     if (isInModuleView) {
       const categoryId = categoryMap[activeNav];
@@ -208,7 +221,7 @@ const RoleSwitchDashboard = () => {
       // EXIT TO BOSS CONTEXT: Hide Module sidebar, show Boss sidebar
       showGlobalSidebar();
     }
-  }, [isInModuleView, activeNav, showGlobalSidebar, enterCategory, categoryMap, canTransition]);
+  }, [isInModuleView, activeNav, activeRole, showGlobalSidebar, enterCategory, categoryMap, canTransition, rolesWithInternalSidebars]);
   
   // VISIBILITY RULE: Global sidebar visible for ALL roles
   // UPDATED: Sidebar is always shown regardless of role for consistent UX

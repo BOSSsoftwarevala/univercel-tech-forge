@@ -49,7 +49,7 @@ const CEOSidebar = ({
     <motion.aside
       initial={false}
       animate={{ width: collapsed ? 80 : 260 }}
-      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[#0d0d14] via-[#12121a] to-[#0a0a10] backdrop-blur-xl border-r border-violet-500/15 z-40 flex flex-col"
+      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[#0d0d14] via-[#12121a] to-[#0a0a10] backdrop-blur-xl border-r border-violet-500/15 z-50 flex flex-col"
     >
       {/* Collapse Toggle */}
       <button
