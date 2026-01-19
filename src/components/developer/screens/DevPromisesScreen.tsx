@@ -134,7 +134,7 @@ export const DevPromisesScreen: React.FC<DevPromisesScreenProps> = ({ view }) =>
                     {view === 'team' && 'assignee' in promise && (
                       <span className="flex items-center gap-1">
                         <User className="w-3 h-3" />
-                        {promise.assignee}
+                        {String((promise as { assignee: string }).assignee)}
                       </span>
                     )}
                     <span className="flex items-center gap-1">
