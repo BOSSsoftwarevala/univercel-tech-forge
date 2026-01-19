@@ -46,7 +46,7 @@ import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDash
 import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
 import LMEnterpriseLayout from "@/components/legal-manager/LMEnterpriseLayout";
 import AAMEnterpriseLayout from "@/components/api-ai-manager/AAMEnterpriseLayout";
-import DemoManagerDashboard from "./DemoManagerDashboard";
+import DemoManagerFullLayout from "@/components/demo-manager/DemoManagerFullLayout";
 import CEODashboard from "./CEODashboard";
 import CEOSidebar from "@/components/ceo/CEOSidebar";
 import DeveloperManagerSidebar from "@/components/vala-ai/DeveloperManagerSidebar";
@@ -468,7 +468,7 @@ const RoleSwitchDashboard = () => {
       case "product_manager":
         return <PMEnterpriseLayout />;
       case "demo_manager":
-        return <DemoManagerDashboard />;
+        return <DemoManagerFullLayout />;
       case "developer_management":
         return <DMFullLayout />;
       case "api_ai_manager":
@@ -649,8 +649,8 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO/Developer Manager/VALA AI and full-screen modules) */}
-        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && (
+        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO/Developer Manager/VALA AI/Demo Manager and full-screen modules) */}
+        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "demo_manager" && (
           <>
             <RoleSwitchSidebarNew
               activeRole={activeRole}
