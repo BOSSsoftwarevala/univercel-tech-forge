@@ -19,12 +19,15 @@ import {
   ArrowDownRight
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
 
 interface FinanceOverviewProps {
   activeView: FinanceView;
 }
 
 const FinanceOverview: React.FC<FinanceOverviewProps> = ({ activeView }) => {
+  const { refresh, export: exportData } = useGlobalActions();
+
   const getTitle = () => {
     switch (activeView) {
       case 'overview_total_balance': return 'Total Balance';
@@ -52,6 +55,14 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({ activeView }) => {
     { id: 'TXN005', type: 'Credit', amount: '₹12,000', from: 'User Subscription', time: '08:00 AM', status: 'Completed' },
   ];
 
+  const handleRefresh = () => {
+    refresh('report');
+  };
+
+  const handleExport = () => {
+    exportData('report', 'pdf', { view: activeView });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -61,11 +72,11 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({ activeView }) => {
           <p className="text-sm text-slate-500 dark:text-slate-400">Real-time financial overview</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleRefresh}>
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
             <Download className="w-4 h-4" />
             Export
           </Button>

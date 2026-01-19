@@ -3,7 +3,7 @@
  * Master/Franchise/Reseller/User Wallets, Top-up, Deduction, Low Balance
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,12 +22,20 @@ import {
   Eye
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface WalletManagementProps {
   activeView: FinanceView;
 }
 
 const WalletManagement: React.FC<WalletManagementProps> = ({ activeView }) => {
+  const { update, create } = useGlobalActions();
+  const [showTopupDialog, setShowTopupDialog] = useState(false);
+  const [showDeductDialog, setShowDeductDialog] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
+  const [amount, setAmount] = useState('');
+
   const getTitle = () => {
     switch (activeView) {
       case 'wallet_master': return 'Master Wallet';
@@ -55,6 +63,42 @@ const WalletManagement: React.FC<WalletManagementProps> = ({ activeView }) => {
     { id: 'LBA003', wallet: 'Hyderabad User', balance: '₹500', threshold: '₹1,000', daysRemaining: 0 },
   ];
 
+  const handleTopup = (walletId: string) => {
+    setSelectedWallet(walletId);
+    setShowTopupDialog(true);
+  };
+
+  const handleDeduct = (walletId: string) => {
+    setSelectedWallet(walletId);
+    setShowDeductDialog(true);
+  };
+
+  const handleViewWallet = (walletId: string) => {
+    update('user', walletId, { action: 'view_wallet' });
+  };
+
+  const confirmTopup = () => {
+    if (selectedWallet && amount) {
+      create('user', { walletId: selectedWallet, amount, type: 'topup' });
+      setShowTopupDialog(false);
+      setAmount('');
+      setSelectedWallet(null);
+    }
+  };
+
+  const confirmDeduct = () => {
+    if (selectedWallet && amount) {
+      create('user', { walletId: selectedWallet, amount, type: 'deduction' });
+      setShowDeductDialog(false);
+      setAmount('');
+      setSelectedWallet(null);
+    }
+  };
+
+  const handleLowBalanceTopup = (alertId: string) => {
+    create('alert', { alertId, action: 'topup_from_alert' });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -64,11 +108,11 @@ const WalletManagement: React.FC<WalletManagementProps> = ({ activeView }) => {
           <p className="text-sm text-slate-500 dark:text-slate-400">Manage all wallet operations</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowTopupDialog(true)}>
             <Plus className="w-4 h-4" />
             Top-up
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowDeductDialog(true)}>
             <Minus className="w-4 h-4" />
             Deduct
           </Button>
@@ -176,13 +220,13 @@ const WalletManagement: React.FC<WalletManagementProps> = ({ activeView }) => {
                     <td className="py-3 text-slate-500">{wallet.lastActivity}</td>
                     <td className="py-3">
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleViewWallet(wallet.id)}>
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleTopup(wallet.id)}>
                           <Plus className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleDeduct(wallet.id)}>
                           <Minus className="w-4 h-4" />
                         </Button>
                       </div>
@@ -218,7 +262,7 @@ const WalletManagement: React.FC<WalletManagementProps> = ({ activeView }) => {
                     <Badge variant={alert.daysRemaining === 0 ? 'destructive' : 'secondary'}>
                       {alert.daysRemaining === 0 ? 'Critical' : `${alert.daysRemaining} days left`}
                     </Badge>
-                    <Button size="sm" className="gap-1">
+                    <Button size="sm" className="gap-1" onClick={() => handleLowBalanceTopup(alert.id)}>
                       <Plus className="w-3 h-3" />
                       Top-up
                     </Button>
@@ -229,6 +273,54 @@ const WalletManagement: React.FC<WalletManagementProps> = ({ activeView }) => {
           </CardContent>
         </Card>
       )}
+
+      {/* Top-up Dialog */}
+      <Dialog open={showTopupDialog} onOpenChange={setShowTopupDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Wallet Top-up</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium">Amount</label>
+              <Input 
+                placeholder="Enter amount" 
+                type="number" 
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTopupDialog(false)}>Cancel</Button>
+            <Button onClick={confirmTopup}>Confirm Top-up</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Deduct Dialog */}
+      <Dialog open={showDeductDialog} onOpenChange={setShowDeductDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Wallet Deduction</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium">Amount</label>
+              <Input 
+                placeholder="Enter amount" 
+                type="number" 
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeductDialog(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDeduct}>Confirm Deduction</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -3,7 +3,7 @@
  * Generate, Auto, Franchise, Reseller, Tax, Credit/Debit Notes
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,12 +23,25 @@ import {
   Printer
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface InvoiceManagementProps {
   activeView: FinanceView;
 }
 
 const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => {
+  const { create, update, export: exportData } = useGlobalActions();
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    clientType: '',
+    clientName: '',
+    amount: '',
+    dueDate: '',
+    description: ''
+  });
+
   const getTitle = () => {
     switch (activeView) {
       case 'invoice_generate': return 'Generate Invoice';
@@ -57,6 +70,44 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
     { label: 'Overdue', value: '₹1.2L', color: 'red' },
   ];
 
+  const handleGenerateInvoice = () => {
+    create('customer', {
+      ...formData,
+      type: 'invoice'
+    });
+    setFormData({ clientType: '', clientName: '', amount: '', dueDate: '', description: '' });
+  };
+
+  const handleAutoGenerate = () => {
+    create('customer', { action: 'auto_generate_invoices' });
+  };
+
+  const handleNewInvoice = () => {
+    update('module', 'invoice', { action: 'new' });
+  };
+
+  const handleViewInvoice = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setShowViewDialog(true);
+    update('customer', invoice.id, { action: 'view' });
+  };
+
+  const handleDownloadInvoice = (invoiceId: string) => {
+    exportData('customer', 'pdf', { invoiceId });
+  };
+
+  const handleSendInvoice = (invoiceId: string) => {
+    update('customer', invoiceId, { action: 'send_email' });
+  };
+
+  const handlePrintInvoice = (invoiceId: string) => {
+    update('customer', invoiceId, { action: 'print' });
+  };
+
+  const handleExportAll = () => {
+    exportData('customer', 'excel', { view: activeView });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -66,11 +117,11 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
           <p className="text-sm text-slate-500 dark:text-slate-400">Create and manage invoices</p>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" className="gap-2">
+          <Button size="sm" className="gap-2" onClick={handleNewInvoice}>
             <FilePlus className="w-4 h-4" />
             New Invoice
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleAutoGenerate}>
             <RefreshCw className="w-4 h-4" />
             Auto Generate
           </Button>
@@ -95,7 +146,7 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input placeholder="Search invoices by ID, client, or amount..." className="pl-10" />
         </div>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={handleExportAll}>
           <Download className="w-4 h-4" />
           Export All
         </Button>
@@ -111,7 +162,11 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Client Type</label>
-                <select className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
+                <select 
+                  className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+                  value={formData.clientType}
+                  onChange={(e) => setFormData(prev => ({ ...prev, clientType: e.target.value }))}
+                >
                   <option>Select type</option>
                   <option>Franchise</option>
                   <option>Reseller</option>
@@ -120,27 +175,44 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Client Name</label>
-                <Input placeholder="Enter client name" />
+                <Input 
+                  placeholder="Enter client name" 
+                  value={formData.clientName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Amount</label>
-                <Input placeholder="₹0.00" type="number" />
+                <Input 
+                  placeholder="₹0.00" 
+                  type="number" 
+                  value={formData.amount}
+                  onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Due Date</label>
-                <Input type="date" />
+                <Input 
+                  type="date" 
+                  value={formData.dueDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                />
               </div>
               <div className="md:col-span-2">
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Description</label>
-                <Input placeholder="Invoice description..." />
+                <Input 
+                  placeholder="Invoice description..." 
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                />
               </div>
             </div>
             <div className="flex gap-2 mt-4">
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={handleGenerateInvoice}>
                 <FilePlus className="w-4 h-4" />
                 Generate Invoice
               </Button>
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={() => setShowViewDialog(true)}>
                 <Eye className="w-4 h-4" />
                 Preview
               </Button>
@@ -194,16 +266,16 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
                     </td>
                     <td className="py-3">
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleViewInvoice(invoice)}>
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleDownloadInvoice(invoice.id)}>
                           <Download className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleSendInvoice(invoice.id)}>
                           <Send className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handlePrintInvoice(invoice.id)}>
                           <Printer className="w-4 h-4" />
                         </Button>
                       </div>
@@ -215,6 +287,40 @@ const InvoiceManagement: React.FC<InvoiceManagementProps> = ({ activeView }) => 
           </div>
         </CardContent>
       </Card>
+
+      {/* View Invoice Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invoice Details</DialogTitle>
+          </DialogHeader>
+          {selectedInvoice && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-slate-500">Invoice ID</label>
+                  <p className="font-mono">{selectedInvoice.id}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Amount</label>
+                  <p className="font-semibold">{selectedInvoice.amount}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Client</label>
+                  <p>{selectedInvoice.client}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Status</label>
+                  <Badge>{selectedInvoice.status}</Badge>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowViewDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
