@@ -26,32 +26,30 @@ import { Badge } from '@/components/ui/badge';
 
 export type DMESection =
   | 'overview'
+  | 'add-demo'
+  | 'demo-list'
+  | 'demo-access'
+  | 'demo-content'
+  | 'demo-upgrade'
+  | 'demo-issues'
+  | 'marketplace-sync'
   | 'library'
-  | 'category'
   | 'health'
-  | 'completion'
-  | 'vala-ai'
-  | 'urls'
   | 'security'
-  | 'logs'
   | 'settings';
 
-interface DMESidebarProps {
-  activeSection: DMESection;
-  onSectionChange: (section: DMESection) => void;
-  onBack?: () => void;
-}
-
 const menuItems: { id: DMESection; label: string; icon: any; badge?: string }[] = [
-  { id: 'overview', label: 'Demo Overview', icon: LayoutDashboard, badge: 'LIVE' },
-  { id: 'library', label: 'Demo Library', icon: Library, badge: '5K+' },
-  { id: 'category', label: 'Category Control', icon: FolderTree },
-  { id: 'health', label: 'Demo Health', icon: HeartPulse, badge: '99.9%' },
-  { id: 'completion', label: 'Demo Completion', icon: CheckCircle2 },
-  { id: 'vala-ai', label: 'Vala AI Control', icon: Bot, badge: 'AI' },
-  { id: 'urls', label: 'Demo URLs', icon: Link },
+  { id: 'overview', label: 'Demo Dashboard', icon: LayoutDashboard, badge: 'LIVE' },
+  { id: 'add-demo', label: 'Add New Demo', icon: Monitor },
+  { id: 'demo-list', label: 'Demo List', icon: Library },
+  { id: 'demo-access', label: 'Demo Access', icon: ShieldCheck },
+  { id: 'demo-content', label: 'Demo Content', icon: FileText },
+  { id: 'demo-upgrade', label: 'Demo Upgrade (Vala AI)', icon: Bot, badge: 'AI' },
+  { id: 'demo-issues', label: 'Demo Issues', icon: HeartPulse },
+  { id: 'marketplace-sync', label: 'Marketplace Sync', icon: Link },
+  { id: 'library', label: 'Demo Library', icon: FolderTree, badge: '5K+' },
+  { id: 'health', label: 'Demo Health', icon: CheckCircle2, badge: '99.9%' },
   { id: 'security', label: 'Demo Security', icon: ShieldCheck },
-  { id: 'logs', label: 'Demo Logs', icon: FileText },
   { id: 'settings', label: 'Demo Settings', icon: Settings },
 ];
 
