@@ -2,13 +2,61 @@ import React, { useState, useEffect } from 'react';
 import { 
   Target, Phone, MessageCircle, CheckCircle, Shield, Brain, 
   Eye, EyeOff, AlertTriangle, Clock, MapPin, Zap, Flag,
-  TrendingUp, UserCheck, Globe, Bell, Lock, Calendar
+  TrendingUp, UserCheck, Globe, Bell, Lock, Calendar, Users, UserPlus, Handshake
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { maskData } from '@/utils/dataMasking';
 import { Progress } from '@/components/ui/progress';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { toast } from 'sonner';
+
+// Team Members Data
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  activeLeads: number;
+  status: 'online' | 'offline' | 'busy';
+}
+
+const teamMembers: TeamMember[] = [
+  { id: 't1', name: 'Vikram Singh', role: 'Sales Executive', activeLeads: 8, status: 'online' },
+  { id: 't2', name: 'Neha Patel', role: 'Sales Executive', activeLeads: 5, status: 'online' },
+  { id: 't3', name: 'Rahul Sharma', role: 'Junior Executive', activeLeads: 3, status: 'busy' },
+  { id: 't4', name: 'Priya Verma', role: 'Senior Executive', activeLeads: 12, status: 'online' },
+];
+
+// Resellers Data
+interface Reseller {
+  id: string;
+  name: string;
+  company: string;
+  territory: string;
+  activeLeads: number;
+  rating: number;
+}
+
+const resellers: Reseller[] = [
+  { id: 'r1', name: 'Tech Solutions', company: 'Tech Solutions Pvt Ltd', territory: 'Mumbai West', activeLeads: 15, rating: 4.8 },
+  { id: 'r2', name: 'Digital Partners', company: 'Digital Partners India', territory: 'Mumbai Central', activeLeads: 10, rating: 4.5 },
+  { id: 'r3', name: 'Growth Hub', company: 'Growth Hub Services', territory: 'Mumbai East', activeLeads: 8, rating: 4.2 },
+];
 
 interface SmartLead {
   id: string;
@@ -31,6 +79,9 @@ interface SmartLead {
   // Territory
   isInTerritory: boolean;
   paymentVerified: boolean;
+  // Assignment
+  assignedTo?: string;
+  assignedType?: 'team' | 'reseller';
 }
 
 const smartLeads: SmartLead[] = [
@@ -113,6 +164,36 @@ const getRiskConfig = (risk: string) => {
 export function FULeadsScreen() {
   const [isWindowActive, setIsWindowActive] = useState(true);
   const [selectedLead, setSelectedLead] = useState<string | null>(null);
+  const [leads, setLeads] = useState(smartLeads);
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [assignType, setAssignType] = useState<'team' | 'reseller'>('team');
+  const [leadToAssign, setLeadToAssign] = useState<string | null>(null);
+
+  const handleAssignLead = (leadId: string, assigneeId: string, type: 'team' | 'reseller') => {
+    const assigneeName = type === 'team' 
+      ? teamMembers.find(m => m.id === assigneeId)?.name 
+      : resellers.find(r => r.id === assigneeId)?.name;
+    
+    setLeads(prev => prev.map(lead => 
+      lead.id === leadId 
+        ? { ...lead, assignedTo: assigneeId, assignedType: type }
+        : lead
+    ));
+    
+    toast.success(`Lead assigned to ${assigneeName}`, {
+      description: type === 'team' ? 'Team member notified' : 'Reseller notified'
+    });
+    setAssignDialogOpen(false);
+    setLeadToAssign(null);
+  };
+
+  const getAssigneeName = (lead: SmartLead) => {
+    if (!lead.assignedTo) return null;
+    if (lead.assignedType === 'team') {
+      return teamMembers.find(m => m.id === lead.assignedTo)?.name;
+    }
+    return resellers.find(r => r.id === lead.assignedTo)?.name;
+  };
 
   // Anti-leak: blur on inactive window
   useEffect(() => {
@@ -282,13 +363,14 @@ export function FULeadsScreen() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {smartLeads.map((lead) => {
+            {leads.map((lead) => {
               const statusConfig = getStatusConfig(lead.status);
               const probConfig = getProbabilityConfig(lead.purchaseProbability);
               const riskConfig = getRiskConfig(lead.riskLevel);
               const canView = canViewDetails(lead);
               const StatusIcon = statusConfig.icon;
               const RiskIcon = riskConfig.icon;
+              const assigneeName = getAssigneeName(lead);
 
               return (
                 <div 
@@ -312,6 +394,16 @@ export function FULeadsScreen() {
                             <Badge className="bg-red-500/20 text-red-500 text-xs">
                               <AlertTriangle className="h-3 w-3 mr-1" />
                               Fake Risk
+                            </Badge>
+                          )}
+                          {/* Assignment Badge */}
+                          {assigneeName && (
+                            <Badge 
+                              variant="outline" 
+                              className={lead.assignedType === 'team' ? 'border-blue-500 text-blue-500' : 'border-purple-500 text-purple-500'}
+                            >
+                              {lead.assignedType === 'team' ? <Users className="h-3 w-3 mr-1" /> : <Handshake className="h-3 w-3 mr-1" />}
+                              {assigneeName}
                             </Badge>
                           )}
                         </div>
@@ -385,7 +477,7 @@ export function FULeadsScreen() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button 
                         size="sm" 
                         className="bg-emerald-500 hover:bg-emerald-600"
@@ -411,6 +503,118 @@ export function FULeadsScreen() {
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Convert
                       </Button>
+                      
+                      {/* Assign Button with Dialog */}
+                      <Dialog open={assignDialogOpen && leadToAssign === lead.id} onOpenChange={(open) => {
+                        setAssignDialogOpen(open);
+                        if (!open) setLeadToAssign(null);
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-blue-500 text-blue-500"
+                            disabled={lead.riskLevel === 'risk'}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLeadToAssign(lead.id);
+                              setAssignDialogOpen(true);
+                            }}
+                          >
+                            <UserPlus className="h-4 w-4 mr-1" />
+                            Assign
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <UserPlus className="h-5 w-5 text-primary" />
+                              Assign Lead
+                            </DialogTitle>
+                            <DialogDescription>
+                              Assign this lead to a team member or reseller
+                            </DialogDescription>
+                          </DialogHeader>
+                          
+                          <div className="space-y-4 py-4">
+                            {/* Assignment Type Toggle */}
+                            <div className="flex gap-2">
+                              <Button
+                                variant={assignType === 'team' ? 'default' : 'outline'}
+                                className="flex-1"
+                                onClick={() => setAssignType('team')}
+                              >
+                                <Users className="h-4 w-4 mr-2" />
+                                My Team
+                              </Button>
+                              <Button
+                                variant={assignType === 'reseller' ? 'default' : 'outline'}
+                                className="flex-1"
+                                onClick={() => setAssignType('reseller')}
+                              >
+                                <Handshake className="h-4 w-4 mr-2" />
+                                Reseller
+                              </Button>
+                            </div>
+
+                            {/* Team Members List */}
+                            {assignType === 'team' && (
+                              <div className="space-y-2">
+                                <p className="text-sm font-medium text-muted-foreground">Select Team Member</p>
+                                {teamMembers.map((member) => (
+                                  <div
+                                    key={member.id}
+                                    className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors flex items-center justify-between"
+                                    onClick={() => handleAssignLead(lead.id, member.id, 'team')}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className={`w-2 h-2 rounded-full ${
+                                        member.status === 'online' ? 'bg-emerald-500' : 
+                                        member.status === 'busy' ? 'bg-amber-500' : 'bg-gray-400'
+                                      }`} />
+                                      <div>
+                                        <p className="font-medium">{member.name}</p>
+                                        <p className="text-xs text-muted-foreground">{member.role}</p>
+                                      </div>
+                                    </div>
+                                    <Badge variant="outline" className="text-xs">
+                                      {member.activeLeads} leads
+                                    </Badge>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Resellers List */}
+                            {assignType === 'reseller' && (
+                              <div className="space-y-2">
+                                <p className="text-sm font-medium text-muted-foreground">Select Reseller</p>
+                                {resellers.map((reseller) => (
+                                  <div
+                                    key={reseller.id}
+                                    className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors flex items-center justify-between"
+                                    onClick={() => handleAssignLead(lead.id, reseller.id, 'reseller')}
+                                  >
+                                    <div>
+                                      <p className="font-medium">{reseller.name}</p>
+                                      <p className="text-xs text-muted-foreground">{reseller.territory}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant="outline" className="text-xs">
+                                        ⭐ {reseller.rating}
+                                      </Badge>
+                                      <Badge variant="outline" className="text-xs">
+                                        {reseller.activeLeads} leads
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
                       <Button 
                         size="sm" 
                         variant="outline" 
