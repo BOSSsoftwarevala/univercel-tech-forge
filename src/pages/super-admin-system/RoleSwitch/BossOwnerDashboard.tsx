@@ -5,7 +5,7 @@ import {
   DollarSign, Wallet, BarChart3, ShieldAlert, FileText,
   Scale, Cpu, Clock, ArrowLeft, Eye, Edit3, RefreshCw,
   Play, StopCircle, Pause, CheckCircle, XCircle, UserPlus,
-  Megaphone, Store, Loader2, Bell
+  Megaphone, Store, Loader2, Bell, Bot, Sparkles
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -336,6 +336,28 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* TEST VALA AI BUTTON */}
+          <button 
+            onClick={() => {
+              // Find and click the floating chatbot button
+              const chatBtn = document.querySelector('[class*="fixed bottom-6 right-6"]') as HTMLElement;
+              if (chatBtn) {
+                chatBtn.click();
+              } else {
+                toast.info('Opening VALA AI Chat...', { description: 'Look for the green bot button at bottom-right' });
+              }
+            }}
+            className="px-4 py-2 rounded-lg flex items-center gap-2 font-semibold cursor-pointer transition-all hover:scale-105 text-sm animate-pulse"
+            style={{ 
+              background: 'linear-gradient(135deg, #10b981, #059669)', 
+              color: '#fff',
+              boxShadow: '0 4px 20px rgba(16,185,129,0.4)'
+            }}
+          >
+            <Sparkles size={14} /> 
+            Test VALA AI
+          </button>
+          
           <div className="px-3 py-1.5 rounded-lg flex items-center gap-2" style={{ background: 'rgba(37,99,235,0.15)', border: `1px solid ${T.primary}` }}>
             <Crown size={12} style={{ color: T.primary }} />
             <span className="text-xs font-semibold" style={{ color: T.primary }}>SUPREME AUTHORITY</span>
