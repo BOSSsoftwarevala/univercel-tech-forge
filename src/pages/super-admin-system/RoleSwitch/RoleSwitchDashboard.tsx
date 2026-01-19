@@ -311,7 +311,8 @@ const RoleSwitchDashboard = () => {
     if (requestedRole && requestedRole !== prevRequestedRoleRef.current) {
       prevRequestedRoleRef.current = requestedRole;
 
-      const shouldStartInControlPanel = requestedRole === 'boss_owner' || requestedRole === 'ceo';
+      // BOSS RULE: Only boss_owner starts at Control Panel - CEO should open its dashboard directly
+      const shouldStartInControlPanel = requestedRole === 'boss_owner';
 
       if (shouldStartInControlPanel) {
         setActiveRole(null);
