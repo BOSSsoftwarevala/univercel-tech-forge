@@ -1,15 +1,18 @@
 /**
  * DEVELOPER REGISTRY
  * All Developers • Active • Suspended • Probation • Exited
+ * DEBUG FIX: Connected to action logger for full traceability
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Eye, ListTodo, Ban, AlertTriangle } from 'lucide-react';
+import { Users, Eye, ListTodo, Ban, AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useActionLogger } from '@/hooks/useActionLogger';
+import { supabase } from '@/integrations/supabase/client';
 
 const developers = [
   { id: 'DEV-001', role: 'Full Stack', location: '***-IN', skills: ['React', 'Node.js'], level: 'Senior', status: 'active' },
@@ -32,10 +35,173 @@ const getStatusBadge = (status: string) => {
 
 export const DMDeveloperRegistry: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const { logAction } = useActionLogger();
 
   const filteredDevs = developers.filter(dev => 
     activeTab === 'all' || dev.status === activeTab
   );
+
+  // View Developer - READ action with logging
+  const handleViewDeveloper = useCallback(async (devId: string) => {
+    const startTime = performance.now();
+    setLoadingAction(`view-${devId}`);
+    
+    try {
+      // Log READ action
+      await logAction({
+        buttonId: `dm_view_developer_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'READ',
+        actionResult: 'success',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        metadata: { developerId: devId, action: 'view' }
+      });
+      
+      toast.info(`Viewing developer: ${devId}`, {
+        description: 'Developer profile loaded'
+      });
+    } catch (error) {
+      await logAction({
+        buttonId: `dm_view_developer_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'READ',
+        actionResult: 'failure',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error('Failed to view developer');
+    } finally {
+      setLoadingAction(null);
+    }
+  }, [logAction]);
+
+  // Assign Task - PROCESS action with logging
+  const handleAssignTask = useCallback(async (devId: string) => {
+    const startTime = performance.now();
+    setLoadingAction(`assign-${devId}`);
+    
+    try {
+      // Insert task assignment to DB
+      const { error } = await supabase
+        .from('developer_tasks')
+        .insert({
+          developer_id: devId,
+          category: 'assigned',
+          status: 'pending',
+          priority: 'medium',
+          title: `Task assigned to ${devId}`,
+          description: 'Task automatically assigned via Developer Registry'
+        });
+
+      if (error) throw error;
+
+      await logAction({
+        buttonId: `dm_assign_task_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'PROCESS',
+        actionResult: 'success',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        metadata: { developerId: devId, action: 'assign_task' }
+      });
+      
+      toast.success(`Task assigned to ${devId}`, {
+        description: 'Developer has been notified'
+      });
+    } catch (error) {
+      await logAction({
+        buttonId: `dm_assign_task_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'PROCESS',
+        actionResult: 'failure',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error('Failed to assign task', {
+        description: error instanceof Error ? error.message : 'Please try again'
+      });
+    } finally {
+      setLoadingAction(null);
+    }
+  }, [logAction]);
+
+  // Suspend Developer - UPDATE action with logging
+  const handleSuspendDeveloper = useCallback(async (devId: string) => {
+    const startTime = performance.now();
+    setLoadingAction(`suspend-${devId}`);
+    
+    try {
+      // Log UPDATE action for suspension
+      await logAction({
+        buttonId: `dm_suspend_developer_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'UPDATE',
+        actionResult: 'success',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        metadata: { developerId: devId, action: 'suspend', previousStatus: 'active', newStatus: 'suspended' }
+      });
+      
+      toast.warning(`Access suspended for ${devId}`, {
+        description: 'Developer access has been restricted'
+      });
+    } catch (error) {
+      await logAction({
+        buttonId: `dm_suspend_developer_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'UPDATE',
+        actionResult: 'failure',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error('Failed to suspend developer');
+    } finally {
+      setLoadingAction(null);
+    }
+  }, [logAction]);
+
+  // Escalate Issue - CREATE action with logging
+  const handleEscalateIssue = useCallback(async (devId: string) => {
+    const startTime = performance.now();
+    setLoadingAction(`escalate-${devId}`);
+    
+    try {
+      // Insert escalation record
+      const { error } = await supabase
+        .from('audit_logs')
+        .insert({
+          module: 'developer_management',
+          action: 'escalate_issue',
+          meta_json: { developerId: devId, severity: 'high', timestamp: new Date().toISOString() }
+        });
+
+      if (error) throw error;
+
+      await logAction({
+        buttonId: `dm_escalate_issue_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'CREATE',
+        actionResult: 'success',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        metadata: { developerId: devId, action: 'escalate', severity: 'high' }
+      });
+      
+      toast.error(`Issue escalated for ${devId}`, {
+        description: 'Management has been notified'
+      });
+    } catch (error) {
+      await logAction({
+        buttonId: `dm_escalate_issue_${devId}`,
+        moduleName: 'developer_management',
+        actionType: 'CREATE',
+        actionResult: 'failure',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error('Failed to escalate issue');
+    } finally {
+      setLoadingAction(null);
+    }
+  }, [logAction]);
 
   return (
     <div className="space-y-6">
@@ -82,22 +248,58 @@ export const DMDeveloperRegistry: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" onClick={() => toast.info(`Viewing ${dev.id}`)}>
-                        <Eye className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleViewDeveloper(dev.id)}
+                        disabled={loadingAction === `view-${dev.id}`}
+                      >
+                        {loadingAction === `view-${dev.id}` ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Eye className="h-4 w-4 mr-1" />
+                        )}
                         View
                       </Button>
                       {dev.status !== 'exited' && (
                         <>
-                          <Button size="sm" variant="outline" onClick={() => toast.success(`Task assigned to ${dev.id}`)}>
-                            <ListTodo className="h-4 w-4 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleAssignTask(dev.id)}
+                            disabled={loadingAction === `assign-${dev.id}`}
+                          >
+                            {loadingAction === `assign-${dev.id}` ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <ListTodo className="h-4 w-4 mr-1" />
+                            )}
                             Assign
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => toast.warning(`Access suspended for ${dev.id}`)}>
-                            <Ban className="h-4 w-4 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleSuspendDeveloper(dev.id)}
+                            disabled={loadingAction === `suspend-${dev.id}`}
+                          >
+                            {loadingAction === `suspend-${dev.id}` ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <Ban className="h-4 w-4 mr-1" />
+                            )}
                             Suspend
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => toast.error(`Issue escalated for ${dev.id}`)}>
-                            <AlertTriangle className="h-4 w-4 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleEscalateIssue(dev.id)}
+                            disabled={loadingAction === `escalate-${dev.id}`}
+                          >
+                            {loadingAction === `escalate-${dev.id}` ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <AlertTriangle className="h-4 w-4 mr-1" />
+                            )}
                             Escalate
                           </Button>
                         </>

@@ -2,6 +2,8 @@
  * ACTION LOGGER HOOK
  * Universal button action logging for Software Vala Enterprise Platform
  * Every button click = 1 DB action minimum
+ * 
+ * DEBUG FIX: Enhanced with retry logic, fail-safe, and complete traceability
  */
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,27 +32,43 @@ interface UseActionLoggerReturn {
 
 export function useActionLogger(): UseActionLoggerReturn {
   const logAction = useCallback(async (params: LogActionParams) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // Use raw SQL insert to avoid type issues with new tables
-      const insertData = {
-        user_id: user?.id || null,
-        button_id: params.buttonId,
-        module_name: params.moduleName,
-        action_type: params.actionType,
-        action_result: params.actionResult,
-        response_time_ms: params.responseTimeMs || null,
-        error_message: params.errorMessage || null,
-        metadata: (params.metadata || null) as Json,
-        user_agent: navigator.userAgent,
-      };
+    const maxRetries = 2;
+    let retryCount = 0;
+    
+    const attemptLog = async (): Promise<void> => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const insertData = {
+          user_id: user?.id || null,
+          button_id: params.buttonId,
+          module_name: params.moduleName,
+          action_type: params.actionType,
+          action_result: params.actionResult,
+          response_time_ms: params.responseTimeMs || null,
+          error_message: params.errorMessage || null,
+          metadata: (params.metadata || null) as Json,
+          user_agent: navigator.userAgent,
+        };
 
-      await supabase.from('action_logs' as 'action_logs').insert(insertData as never);
-    } catch (error) {
-      // Silent fail - logging should never break the app
-      console.error('[ActionLogger] Failed to log action:', error);
-    }
+        const { error } = await supabase.from('action_logs').insert(insertData);
+        
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        retryCount++;
+        if (retryCount < maxRetries) {
+          // Retry with exponential backoff
+          await new Promise(resolve => setTimeout(resolve, retryCount * 100));
+          return attemptLog();
+        }
+        // Silent fail after retries - logging should never break the app
+        console.error('[ActionLogger] Failed to log action after retries:', error);
+      }
+    };
+    
+    await attemptLog();
   }, []);
 
   const logButtonClick = useCallback((buttonId: string, moduleName: string, actionType: ActionType) => {
@@ -79,6 +97,7 @@ export function useActionLogger(): UseActionLoggerReturn {
 
 /**
  * Higher-order function to wrap any button action with logging
+ * DEBUG FIX: Added proper error handling and retry logic
  */
 export function withActionLogging<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
@@ -101,20 +120,36 @@ export function withActionLogging<T extends (...args: unknown[]) => Promise<unkn
     } finally {
       const responseTimeMs = Math.round(performance.now() - startTime);
       
-      // Log asynchronously without blocking
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        const insertData = {
-          user_id: user?.id || null,
-          button_id: buttonId,
-          module_name: moduleName,
-          action_type: actionType,
-          action_result: result,
-          response_time_ms: responseTimeMs,
-          error_message: errorMessage || null,
-          user_agent: navigator.userAgent,
-        };
-        supabase.from('action_logs' as 'action_logs').insert(insertData as never);
-      });
+      // Log asynchronously without blocking - with retry
+      const logWithRetry = async (retries = 2) => {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          const insertData = {
+            user_id: user?.id || null,
+            button_id: buttonId,
+            module_name: moduleName,
+            action_type: actionType,
+            action_result: result,
+            response_time_ms: responseTimeMs,
+            error_message: errorMessage || null,
+            user_agent: navigator.userAgent,
+          };
+          
+          const { error } = await supabase.from('action_logs').insert(insertData);
+          if (error && retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return logWithRetry(retries - 1);
+          }
+        } catch (err) {
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return logWithRetry(retries - 1);
+          }
+          console.error('[ActionLogger] HOF logging failed:', err);
+        }
+      };
+      
+      logWithRetry();
     }
   };
 }

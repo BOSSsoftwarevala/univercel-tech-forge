@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+/**
+ * CATEGORY CARD
+ * DEBUG FIX: Removed mock delay, added action logging
+ */
+
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { 
   ChevronRight, Loader2, TrendingUp, Headphones, CreditCard, 
   Shield, BarChart3, Brain, Users, ShoppingCart, DollarSign,
@@ -11,6 +15,7 @@ import {
   AlertTriangle, CheckCircle, Layers, Clock, Wallet, FileWarning,
   PieChart, Medal, Lightbulb, Target
 } from 'lucide-react';
+import { useActionLogger } from '@/hooks/useActionLogger';
 
 interface CategoryCardProps {
   id: string;
@@ -70,14 +75,39 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { logAction } = useActionLogger();
 
-  const handleClick = async () => {
+  // DEBUG FIX: Removed mock 150ms delay, direct execution with logging
+  const handleClick = useCallback(async () => {
+    const startTime = performance.now();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 150));
-    setIsLoading(false);
-    onClick();
-  };
+    
+    try {
+      // Log navigation action
+      await logAction({
+        buttonId: `category_card_${id}`,
+        moduleName: 'reseller_manager',
+        actionType: 'NAVIGATE',
+        actionResult: 'success',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        metadata: { categoryId: id, categoryName: name, variant }
+      });
+      
+      // Execute callback immediately (no mock delay)
+      onClick();
+    } catch (error) {
+      await logAction({
+        buttonId: `category_card_${id}`,
+        moduleName: 'reseller_manager',
+        actionType: 'NAVIGATE',
+        actionResult: 'failure',
+        responseTimeMs: Math.round(performance.now() - startTime),
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, name, variant, onClick, logAction]);
 
   const getStatusColor = () => {
     switch (status) {
