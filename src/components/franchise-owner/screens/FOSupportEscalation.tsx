@@ -77,7 +77,7 @@ export function FOSupportEscalation() {
 
   const handleCreateTicket = () => {
     if (!ticketSubject || !ticketDescription || !ticketPriority) {
-      toast({ title: "Error", description: "Please fill all fields", variant: "destructive" });
+      toast({ title: "Fields Required", description: "Please complete all fields to continue" });
       return;
     }
     toast({

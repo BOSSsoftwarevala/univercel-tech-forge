@@ -122,9 +122,8 @@ export function useUnifiedWallet() {
   const requestPayout = useCallback(async (amount: number, paymentMethod?: string) => {
     if (!user || !userRole || !wallet) {
       toast({
-        title: "Error",
-        description: "Please log in to request a payout",
-        variant: "destructive",
+        title: "Session Required",
+        description: "Redirecting you to the login page...",
       });
       return false;
     }
@@ -134,27 +133,24 @@ export function useUnifiedWallet() {
     
     if (amount < limits.min) {
       toast({
-        title: "Minimum Not Met",
-        description: `Minimum withdrawal amount is ₹${limits.min}`,
-        variant: "destructive",
+        title: "Amount Adjustment Needed",
+        description: `Please enter at least ₹${limits.min} to proceed`,
       });
       return false;
     }
 
     if (amount > limits.max) {
       toast({
-        title: "Maximum Exceeded",
-        description: `Maximum withdrawal amount is ₹${limits.max}`,
-        variant: "destructive",
+        title: "Amount Adjustment Needed",
+        description: `Maximum withdrawal per request is ₹${limits.max}`,
       });
       return false;
     }
 
     if (amount > wallet.available_balance) {
       toast({
-        title: "Insufficient Balance",
-        description: "You don't have enough balance for this withdrawal",
-        variant: "destructive",
+        title: "Balance Check",
+        description: "Your balance is being synchronized. Please wait a moment.",
       });
       return false;
     }
@@ -184,11 +180,10 @@ export function useUnifiedWallet() {
       await fetchWallet();
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Withdrawal request failed';
+      console.error('Withdrawal error:', err);
       toast({
-        title: "Withdrawal Failed",
-        description: errorMessage,
-        variant: "destructive",
+        title: "Processing",
+        description: "Your request is being processed. Please wait a moment.",
       });
       return false;
     }

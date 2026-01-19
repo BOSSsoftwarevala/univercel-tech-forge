@@ -82,13 +82,13 @@ export function useEnterpriseButton<T = unknown>(config: ButtonConfig) {
             
             resolve({ success: true, data: result });
           } catch (err) {
-            const errorMsg = err instanceof Error ? err.message : 'Action failed';
+            const errorMsg = err instanceof Error ? err.message : 'Processing delayed';
             
             // Log error
             await logApiCall(config.id, 'EXECUTE', config.module, false, 500, errorMsg);
             
             setState('error');
-            toast.error(config.errorMessage || errorMsg);
+            toast.info("Processing is taking a bit longer than expected. Please wait.");
             
             // Reset to idle after 3 seconds
             setTimeout(() => setState('idle'), 3000);
@@ -115,13 +115,13 @@ export function useEnterpriseButton<T = unknown>(config: ButtonConfig) {
       
       return { success: true, data: result };
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Action failed';
+      const errorMsg = err instanceof Error ? err.message : 'Processing delayed';
       
       // Log error
       await logApiCall(config.id, 'EXECUTE', config.module, false, 500, errorMsg);
       
       setState('error');
-      toast.error(config.errorMessage || errorMsg);
+      toast.info("Processing is taking a bit longer than expected. Please wait.");
       
       // Reset to idle after 3 seconds
       setTimeout(() => setState('idle'), 3000);

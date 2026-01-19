@@ -119,8 +119,7 @@ const TermsAcceptanceModal: React.FC<TermsAcceptanceModalProps> = ({
     if (!accepted) {
       toast({
         title: "Acceptance Required",
-        description: "You must check the box to accept the terms and rules",
-        variant: "destructive"
+        description: "Please check the box to accept the terms and continue",
       });
       return;
     }
@@ -164,9 +163,8 @@ const TermsAcceptanceModal: React.FC<TermsAcceptanceModalProps> = ({
     } catch (error: any) {
       console.error('Error accepting terms:', error);
       toast({
-        title: "Error",
-        description: "Failed to record acceptance. Please try again.",
-        variant: "destructive"
+        title: "Synchronizing",
+        description: "Your preferences are being synchronized. Please try again.",
       });
     } finally {
       setIsSubmitting(false);

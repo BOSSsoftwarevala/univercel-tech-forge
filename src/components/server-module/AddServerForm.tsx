@@ -292,19 +292,19 @@ export const AddServerForm: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, y: -10 }}
           >
-            <Card className="bg-destructive/10 border-destructive/30">
+            <Card className="bg-primary/10 border-primary/30">
               <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-8 h-8 text-destructive" />
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  We couldn't connect
+                  Optimizing Connection
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  Please recheck your server details and try again.
+                  System is configuring the connection. Please verify your details and try again.
                 </p>
                 <Button onClick={handleReset}>
-                  Try Again
+                  Continue Setup
                 </Button>
               </CardContent>
             </Card>

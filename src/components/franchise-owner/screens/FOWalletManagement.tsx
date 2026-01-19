@@ -50,7 +50,7 @@ export function FOWalletManagement() {
 
   const handleAddMoney = () => {
     if (!addAmount || parseInt(addAmount) <= 0) {
-      toast({ title: "Error", description: "Please enter a valid amount", variant: "destructive" });
+      toast({ title: "Input Required", description: "Please enter a valid amount to continue" });
       return;
     }
     toast({

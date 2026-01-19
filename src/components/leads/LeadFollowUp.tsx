@@ -80,9 +80,8 @@ const LeadFollowUp = () => {
   const handleSchedule = () => {
     if (!formData.type || !formData.date) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
+        title: "Fields Required",
+        description: "Please complete all required fields to continue",
       });
       return;
     }

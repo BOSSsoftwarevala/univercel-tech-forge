@@ -44,7 +44,7 @@ const OperationWorkspace = () => {
 
   const handleSubmit = async () => {
     if (!actionType.trim()) {
-      toast({ title: "Error", description: "Action type is required.", variant: "destructive" });
+      toast({ title: "Input Required", description: "Please specify an action type to continue." });
       return;
     }
 

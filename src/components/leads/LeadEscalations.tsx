@@ -64,9 +64,8 @@ const LeadEscalations = () => {
   const submitResolution = () => {
     if (!resolutionNote.trim()) {
       toast({
-        title: "Error",
-        description: "Please provide resolution notes",
-        variant: "destructive",
+        title: "Notes Required",
+        description: "Please provide resolution notes to continue",
       });
       return;
     }
