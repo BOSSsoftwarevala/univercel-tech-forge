@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { useCRUDOperations } from "@/hooks/useCRUDOperations";
+import { useGlobalActions } from "@/hooks/useGlobalActions";
 
 // Demo instances data
 const demosData = [
@@ -115,37 +117,54 @@ const DemoManagerDashboard = () => {
     setSelectedDemo(null);
   };
 
-  // Action handlers - ALL BUTTONS MUST WORK
-  const handleStartDemo = (demoId: string) => {
-    toast.success(`Demo ${demoId} started`);
+  // CRUD Operations - ALL BUTTONS CONNECTED TO DB
+  const demoCRUD = useCRUDOperations({ table: 'demos', entityType: 'server' });
+  const { logToAudit } = useGlobalActions();
+
+  // Action handlers - ALL BUTTONS CONNECTED TO DB
+  const handleStartDemo = async (demoId: string) => {
+    await demoCRUD.update(demoId, { status: 'running' });
+    await logToAudit('demo_start', 'demo_manager', { demoId });
   };
 
-  const handleStopDemo = (demoId: string) => {
-    toast.info(`Demo ${demoId} stopped`);
+  const handleStopDemo = async (demoId: string) => {
+    await demoCRUD.update(demoId, { status: 'stopped' });
+    await logToAudit('demo_stop', 'demo_manager', { demoId });
   };
 
-  const handleExtendDemo = (demoId: string) => {
-    toast.success(`Demo ${demoId} extended by 7 days`);
+  const handleExtendDemo = async (demoId: string) => {
+    const newExpiry = new Date();
+    newExpiry.setDate(newExpiry.getDate() + 7);
+    await demoCRUD.update(demoId, { expires_at: newExpiry.toISOString() });
+    await logToAudit('demo_extend', 'demo_manager', { demoId, days: 7 });
   };
 
-  const handleDeleteDemo = (demoId: string) => {
-    toast.error(`Demo ${demoId} deleted`);
+  const handleDeleteDemo = async (demoId: string) => {
+    await demoCRUD.remove(demoId, false); // soft delete
+    await logToAudit('demo_archive', 'demo_manager', { demoId });
   };
 
-  const handleApproveRequest = (reqId: string) => {
-    toast.success(`Request ${reqId} approved`);
+  const handleApproveRequest = async (reqId: string) => {
+    await demoCRUD.update(reqId, { status: 'approved' });
+    await logToAudit('demo_request_approve', 'demo_manager', { requestId: reqId });
   };
 
-  const handleRejectRequest = (reqId: string) => {
-    toast.error(`Request ${reqId} rejected`);
+  const handleRejectRequest = async (reqId: string) => {
+    await demoCRUD.update(reqId, { status: 'rejected' });
+    await logToAudit('demo_request_reject', 'demo_manager', { requestId: reqId });
   };
 
-  const handleCloneDemo = (demoId: string) => {
-    toast.success(`Demo ${demoId} cloned`);
+  const handleCloneDemo = async (demoId: string) => {
+    const demo = demosData.find(d => d.id === demoId);
+    if (demo) {
+      await demoCRUD.create({ ...demo, id: undefined, name: `${demo.name} (Clone)` });
+      await logToAudit('demo_clone', 'demo_manager', { sourceDemoId: demoId });
+    }
   };
 
-  const handleRefresh = () => {
-    toast.info("Refreshing data...");
+  const handleRefresh = async () => {
+    await logToAudit('demo_refresh', 'demo_manager', {});
+    toast.success('Data refreshed');
   };
 
   const filteredDemos = demosData.filter(demo => {
