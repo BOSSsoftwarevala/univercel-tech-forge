@@ -21,7 +21,7 @@ import PMApprovalFlow from './screens/PMApprovalFlow';
 import PMSecurityLicense from './screens/PMSecurityLicense';
 import PMReports from './screens/PMReports';
 import PMSoftwareProfile from './screens/PMSoftwareProfile';
-import ValaAIDevStudio from '@/components/vala-ai-module/ValaAIDevStudio';
+import ValaAICommandCenter from '@/components/vala-ai-module/ValaAICommandCenter';
 
 type PMSection = 
   | 'dashboard' 
@@ -224,7 +224,7 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
 
     // Dev Studio
     if (activeSection === 'dev-studio') {
-      return <ValaAIDevStudio />;
+      return <ValaAICommandCenter />;
     }
 
     // Legacy sections
