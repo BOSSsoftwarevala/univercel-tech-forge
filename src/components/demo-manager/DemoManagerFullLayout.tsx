@@ -14,7 +14,6 @@ const DemoManagerFullLayout = () => {
 
   // Memoized handler to ensure state updates properly
   const handleViewChange = useCallback((view: string) => {
-    console.log("[DemoManager] View changed to:", view);
     setActiveView(view);
   }, []);
 

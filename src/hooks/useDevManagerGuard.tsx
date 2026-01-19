@@ -41,7 +41,6 @@ export function useDevManagerGuard() {
     );
 
     if (isBlocked) {
-      console.warn(`[DEV_MANAGER_GUARD] Blocked access attempt: ${location.pathname}`);
       navigate('/dev-manager', { replace: true });
       return;
     }
@@ -56,14 +55,7 @@ export function useDevManagerGuard() {
     }
   }, [location.pathname, navigate]);
 
-  // Log all navigation attempts
-  useEffect(() => {
-    const logNavigation = async () => {
-      // In production, this would log to audit_logs table
-      console.log(`[DEV_MANAGER_AUDIT] Navigation: ${location.pathname} at ${new Date().toISOString()}`);
-    };
-    logNavigation();
-  }, [location.pathname]);
+  // Navigation logging handled by action_logs table
 
   return {
     isBlocked: BLOCKED_ROUTES.some(route => location.pathname.startsWith(route)),

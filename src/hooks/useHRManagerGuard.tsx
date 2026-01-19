@@ -32,7 +32,6 @@ export function useHRManagerGuard() {
     );
 
     if (isBlocked) {
-      console.warn(`[HR_MANAGER_GUARD] Blocked access attempt: ${location.pathname}`);
       navigate('/hr-manager', { replace: true });
       return;
     }
@@ -46,10 +45,7 @@ export function useHRManagerGuard() {
     }
   }, [location.pathname, navigate]);
 
-  // Audit log all navigation
-  useEffect(() => {
-    console.log(`[HR_MANAGER_AUDIT] Navigation: ${location.pathname} at ${new Date().toISOString()}`);
-  }, [location.pathname]);
+  // Navigation logging handled by action_logs table
 
   return {
     isBlocked: BLOCKED_ROUTES.some(route => location.pathname.startsWith(route)),
