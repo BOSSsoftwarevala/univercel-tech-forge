@@ -112,45 +112,63 @@ export const UnderConfigurationScreen = ({
   </div>
 );
 
-// Route Not Found - for completely invalid routes
+// Route Redirect - Positive messaging for navigation
 export const RouteNotFoundScreen = ({ 
   attemptedRoute,
   onGoBack
 }: { 
   attemptedRoute?: string;
   onGoBack?: () => void;
-}) => (
-  <div className="min-h-full w-full flex items-center justify-center bg-background">
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="text-center p-12 max-w-md"
-    >
-      <div className="w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center bg-gradient-to-br from-destructive/20 to-destructive/5 border border-destructive/30">
-        <AlertCircle className="w-12 h-12 text-destructive" />
-      </div>
-      <h2 className="text-2xl font-bold mb-2 text-foreground">
-        Route Not Found
-      </h2>
-      {attemptedRoute && (
-        <p className="text-sm text-muted-foreground mb-4">
-          Attempted: <code className="px-2 py-0.5 bg-muted rounded text-xs">{attemptedRoute}</code>
+}) => {
+  const [isRedirecting, setIsRedirecting] = React.useState(true);
+
+  // Auto-redirect after 2 seconds
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onGoBack) {
+        onGoBack();
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [onGoBack]);
+
+  return (
+    <div className="min-h-full w-full flex items-center justify-center bg-background">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center p-12 max-w-md"
+      >
+        <div className="w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 relative">
+          <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        </div>
+        <h2 className="text-2xl font-bold mb-2 text-foreground">
+          Redirecting to Your Workspace
+        </h2>
+        <p className="text-base mb-4 text-muted-foreground">
+          We're navigating you to the correct section.
         </p>
-      )}
-      <p className="text-base mb-6 text-muted-foreground">
-        The requested page doesn't exist or has been moved.
-      </p>
-      {onGoBack && (
-        <button
-          onClick={onGoBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/20 transition-colors"
-        >
-          Go Back to Dashboard
-        </button>
-      )}
-    </motion.div>
-  </div>
-);
+        <p className="text-sm text-muted-foreground/70 mb-6">
+          Please wait a moment while we align your path.
+        </p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/15 border border-primary/30">
+          <Activity className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium text-primary">
+            Auto-navigation in progress
+          </span>
+        </div>
+        {onGoBack && (
+          <button
+            onClick={onGoBack}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 border border-border text-muted-foreground hover:bg-muted transition-colors text-sm"
+          >
+            Go to Dashboard Now
+          </button>
+        )}
+      </motion.div>
+    </div>
+  );
+};
 
 // Content area skeleton while loading
 export const ContentSkeleton = () => (

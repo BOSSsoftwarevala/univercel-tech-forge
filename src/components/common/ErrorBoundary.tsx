@@ -28,7 +28,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       return (
         this.props.fallback ?? (
           <SystemErrorUI 
-            customMessage="The app encountered an unexpected error. Try reloading the dashboard."
+            customMessage="System optimization in progress. We're aligning things in the background."
           />
         )
       );
