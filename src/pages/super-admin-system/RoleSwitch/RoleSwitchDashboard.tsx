@@ -39,6 +39,7 @@ import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import MarketingManager from "@/pages/MarketingManager";
+import FinanceManager from "@/pages/FinanceManager";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
 import RoleManagerDashboard from "./RoleManagerDashboard";
 import RMEnterpriseLayout from "@/components/role-manager/RMEnterpriseLayout";
@@ -463,7 +464,7 @@ const RoleSwitchDashboard = () => {
       case "task_management":
         return <TMFullLayout />;
       case "finance_manager":
-        return <FinanceManagerDashboard />;
+        return <FinanceManager />;
       case "vala_ai_management":
         return <ValaAIDashboard />;
       case "marketing_management":
@@ -657,7 +658,7 @@ const RoleSwitchDashboard = () => {
         )}
 
         {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except roles with built-in sidebars) */}
-        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "demo_manager" && activeRole !== "continent_super_admin" && activeRole !== "reseller_manager" && (
+        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "demo_manager" && activeRole !== "continent_super_admin" && activeRole !== "reseller_manager" && activeRole !== "finance_manager" && (
           <>
             <RoleSwitchSidebarNew
               activeRole={activeRole}
