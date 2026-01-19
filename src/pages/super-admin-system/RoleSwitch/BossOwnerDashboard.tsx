@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useActionLogger } from "@/hooks/useActionLogger";
 import { ServerModuleContainer } from "@/components/server-module/ServerModuleContainer";
 import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
@@ -285,11 +286,41 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     }
   };
 
-  // === BOX ACTION HANDLER ===
+  // === BOX ACTION HANDLER - CONNECTED TO action_logs ===
+  const { logAction: logToActionLogs } = useActionLogger();
+  
   const handleBoxAction = useCallback(async (actionType: string, entityId: string) => {
-    await logAction(actionType, entityId);
-    toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)} action executed for ${entityId}`);
-  }, [user]);
+    const startTime = performance.now();
+    
+    try {
+      // Log to audit_logs (existing behavior)
+      await logAction(actionType, entityId);
+      
+      // Log to action_logs with response time
+      const responseTimeMs = Math.round(performance.now() - startTime);
+      await logToActionLogs({
+        buttonId: `boss-${entityId}-${actionType}`,
+        moduleName: 'boss-dashboard',
+        actionType: actionType.toUpperCase() as 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'PROCESS' | 'NAVIGATE',
+        actionResult: 'success',
+        responseTimeMs,
+        metadata: { entityId, actionType }
+      });
+      
+      toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)} action executed for ${entityId}`);
+    } catch (error) {
+      const responseTimeMs = Math.round(performance.now() - startTime);
+      await logToActionLogs({
+        buttonId: `boss-${entityId}-${actionType}`,
+        moduleName: 'boss-dashboard',
+        actionType: actionType.toUpperCase() as 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'PROCESS' | 'NAVIGATE',
+        actionResult: 'failure',
+        responseTimeMs,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error(`Failed to execute ${actionType} for ${entityId}`);
+    }
+  }, [user, logToActionLogs]);
 
   const lockdown = async () => {
     if (!confirmed) return toast.error("2FA required");

@@ -20,6 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { useActionLogger } from "@/hooks/useActionLogger";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
@@ -93,37 +94,74 @@ const GlobalContinentDashboard = ({ onBack, onContinentClick }: GlobalContinentD
     }
   };
 
-  // Button action handlers
-  const handleBoxAction = useCallback((action: string, boxId: string, boxTitle: string) => {
-    switch (action) {
-      case "View":
-        toast.info(`Viewing ${boxTitle}`, {
-          description: `Opening ${boxTitle.toLowerCase()} management panel...`,
-          duration: 2000
-        });
-        break;
-      case "Approve":
-        toast.success(`Approve ${boxTitle}`, {
-          description: `Opening approval queue for ${boxTitle.toLowerCase()}...`,
-          duration: 2000
-        });
-        break;
-      case "Reject":
-        toast.warning(`Reject ${boxTitle}`, {
-          description: `Opening rejection panel for ${boxTitle.toLowerCase()}...`,
-          duration: 2000
-        });
-        break;
-      case "Suspend":
-        toast.warning(`Suspend ${boxTitle}`, {
-          description: `Opening suspension controls for ${boxTitle.toLowerCase()}...`,
-          duration: 2000
-        });
-        break;
-      default:
-        toast.info(`${action} ${boxTitle}`, { duration: 2000 });
+  // Button action handlers - CONNECTED TO action_logs
+  const { logAction } = useActionLogger();
+  
+  const handleBoxAction = useCallback(async (action: string, boxId: string, boxTitle: string) => {
+    const startTime = performance.now();
+    
+    // Map action to ActionType
+    const actionTypeMap: Record<string, 'READ' | 'UPDATE' | 'DELETE' | 'PROCESS'> = {
+      'View': 'READ',
+      'Approve': 'UPDATE',
+      'Reject': 'UPDATE',
+      'Suspend': 'UPDATE'
+    };
+    
+    try {
+      // Log to action_logs with response time
+      const responseTimeMs = Math.round(performance.now() - startTime);
+      await logAction({
+        buttonId: `continent-${boxId}-${action.toLowerCase()}`,
+        moduleName: 'continent-dashboard',
+        actionType: actionTypeMap[action] || 'PROCESS',
+        actionResult: 'success',
+        responseTimeMs,
+        metadata: { boxId, boxTitle, action }
+      });
+      
+      // Show toast feedback
+      switch (action) {
+        case "View":
+          toast.info(`Viewing ${boxTitle}`, {
+            description: `Opening ${boxTitle.toLowerCase()} management panel...`,
+            duration: 2000
+          });
+          break;
+        case "Approve":
+          toast.success(`Approve ${boxTitle}`, {
+            description: `Opening approval queue for ${boxTitle.toLowerCase()}...`,
+            duration: 2000
+          });
+          break;
+        case "Reject":
+          toast.warning(`Reject ${boxTitle}`, {
+            description: `Opening rejection panel for ${boxTitle.toLowerCase()}...`,
+            duration: 2000
+          });
+          break;
+        case "Suspend":
+          toast.warning(`Suspend ${boxTitle}`, {
+            description: `Opening suspension controls for ${boxTitle.toLowerCase()}...`,
+            duration: 2000
+          });
+          break;
+        default:
+          toast.info(`${action} ${boxTitle}`, { duration: 2000 });
+      }
+    } catch (error) {
+      const responseTimeMs = Math.round(performance.now() - startTime);
+      await logAction({
+        buttonId: `continent-${boxId}-${action.toLowerCase()}`,
+        moduleName: 'continent-dashboard',
+        actionType: actionTypeMap[action] || 'PROCESS',
+        actionResult: 'failure',
+        responseTimeMs,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error(`Failed to ${action.toLowerCase()} ${boxTitle}`);
     }
-  }, []);
+  }, [logAction]);
 
   return (
     <div className="h-full flex bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
