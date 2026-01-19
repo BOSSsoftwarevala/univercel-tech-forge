@@ -87,7 +87,15 @@ export type ActiveRole =
   | "assist_manager"
   | "internal_chatbot"
   | "influencer_manager"
-  | "marketplace_manager";
+  | "marketplace_manager"
+  | "seo_manager"
+  | "influencer_dashboard"
+  | "developer_dashboard"
+  | "pro_user_dashboard"
+  | "basic_user_dashboard"
+  | "home"
+  | "security"
+  | "settings";
 
 interface SubCategory {
   id: string;
@@ -313,6 +321,62 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "MM",
     icon: Store,
     description: "Franchise Marketplace & Billing",
+  },
+  seo_manager: {
+    id: "seo_manager",
+    label: "SEO Manager",
+    shortLabel: "SEO",
+    icon: TrendingUp,
+    description: "Search Engine Optimization",
+  },
+  influencer_dashboard: {
+    id: "influencer_dashboard",
+    label: "Influencer Dashboard",
+    shortLabel: "ID",
+    icon: Users,
+    description: "Influencer Activity & Earnings",
+  },
+  developer_dashboard: {
+    id: "developer_dashboard",
+    label: "Developer Dashboard",
+    shortLabel: "DD",
+    icon: Code2,
+    description: "Developer Tasks & Projects",
+  },
+  pro_user_dashboard: {
+    id: "pro_user_dashboard",
+    label: "Pro User Dashboard",
+    shortLabel: "PRO",
+    icon: Crown,
+    description: "Pro User Features & Analytics",
+  },
+  basic_user_dashboard: {
+    id: "basic_user_dashboard",
+    label: "Basic User Dashboard",
+    shortLabel: "BU",
+    icon: Users,
+    description: "Basic User Features",
+  },
+  home: {
+    id: "home",
+    label: "Home",
+    shortLabel: "HM",
+    icon: LayoutDashboard,
+    description: "System Home",
+  },
+  security: {
+    id: "security",
+    label: "Security",
+    shortLabel: "SEC",
+    icon: Shield,
+    description: "Security & Access Control",
+  },
+  settings: {
+    id: "settings",
+    label: "Settings",
+    shortLabel: "SET",
+    icon: Settings,
+    description: "System Settings",
   },
 };
 

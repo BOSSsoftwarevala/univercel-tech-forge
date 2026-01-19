@@ -502,6 +502,30 @@ const RoleSwitchDashboard = () => {
         return <IMFullLayout />;
       case "marketplace_manager":
         return <MMFullLayout />;
+      case "seo_manager":
+        // SEO Manager - placeholder (shares Marketing features)
+        return <MarketingManager />;
+      case "influencer_dashboard":
+        // Influencer Dashboard - placeholder
+        return <IMFullLayout />;
+      case "developer_dashboard":
+        // Developer Dashboard - placeholder
+        return <DMFullLayout />;
+      case "pro_user_dashboard":
+        // Pro User Dashboard - placeholder
+        return <PROFullLayout />;
+      case "basic_user_dashboard":
+        // Basic User Dashboard - placeholder
+        return <ControlPanelDashboard />;
+      case "home":
+        // Home - returns to Control Panel
+        return <ControlPanelDashboard />;
+      case "security":
+        // Security view - placeholder
+        return <ControlPanelDashboard />;
+      case "settings":
+        // Settings view - placeholder
+        return <ControlPanelDashboard />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;

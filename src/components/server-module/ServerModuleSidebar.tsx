@@ -5,10 +5,10 @@
  * 
  * SINGLE-CONTEXT ENFORCEMENT:
  * - Only renders when activeContext === 'module' AND category matches
- * - Back button triggers full context switch to Boss
+ * - Back button triggers FULL context switch to Boss
  */
 
-import React from 'react';
+import React, { forwardRef, memo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Plus, Server, Activity, Shield, 
@@ -46,11 +46,11 @@ const sidebarItems: { id: ServerModuleSection; label: string; icon: React.Elemen
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export const ServerModuleSidebar: React.FC<ServerModuleSidebarProps> = ({
+export const ServerModuleSidebar = memo(forwardRef<HTMLDivElement, ServerModuleSidebarProps>(({
   activeSection,
   onSectionChange,
   onBack,
-}) => {
+}, ref) => {
   // SINGLE-CONTEXT ENFORCEMENT: Use store for clean context transitions
   const { exitToGlobal, enterCategory } = useSidebarStore();
   
@@ -84,6 +84,7 @@ export const ServerModuleSidebar: React.FC<ServerModuleSidebarProps> = ({
   
   return (
     <div 
+      ref={ref}
       className="w-56 flex flex-col shrink-0"
       style={{ 
         background: SIDEBAR_COLORS.bgGradient, 
@@ -154,6 +155,7 @@ export const ServerModuleSidebar: React.FC<ServerModuleSidebarProps> = ({
       </div>
     </div>
   );
-};
+}));
 
+ServerModuleSidebar.displayName = 'ServerModuleSidebar';
 export default ServerModuleSidebar;
