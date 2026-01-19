@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import SalesSupportSidebar from "@/components/sales-support/SalesSupportSidebarLegacy";
+import SalesSupportSidebar from "@/components/sales-support/SalesSupportSidebar";
 import SalesSupportTopBar from "@/components/sales-support/SalesSupportTopBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Inbox, TrendingUp, DollarSign, Clock, AlertTriangle, Ticket, Phone, Mail } from "lucide-react";
@@ -25,7 +25,8 @@ import SalesPerformanceDashboard from "@/components/sales-support/SalesPerforman
 import LeadInbox from "@/components/sales-support/LeadInbox";
 
 const SalesSupportDashboard = () => {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState<string>("overview");
+  const [collapsed, setCollapsed] = useState(false);
 
   // Clickable KPI cards that navigate to filtered views
   const handleKPIClick = (section: string) => {
@@ -125,7 +126,7 @@ const SalesSupportDashboard = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950/20 flex"
     >
-      <SalesSupportSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+      <SalesSupportSidebar activeSection={activeSection as any} onSectionChange={(s) => setActiveSection(s)} collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
       <div className="flex-1 flex flex-col">
         <SalesSupportTopBar />
         <main className="flex-1 p-6 overflow-auto">

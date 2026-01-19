@@ -51,8 +51,6 @@ import AAMEnterpriseLayout from "@/components/api-ai-manager/AAMEnterpriseLayout
 import DemoManagerFullLayout from "@/components/demo-manager/DemoManagerFullLayout";
 import CEODashboard from "./CEODashboard";
 import CEOSidebar from "@/components/ceo/CEOSidebar";
-import DeveloperManagerSidebar from "@/components/vala-ai/DeveloperManagerSidebar";
-import ValaAISidebar from "@/components/vala-ai/ValaAISidebar";
 import BossOwnerDashboard from "./BossOwnerDashboard";
 import DeveloperManagementDashboard from "./DeveloperManagementDashboard";
 // Admin role deprecated - functionality merged into Boss/Owner and Super Admin
@@ -655,20 +653,7 @@ const RoleSwitchDashboard = () => {
 
         {/* CONTEXT B1.1: Developer Management uses DMFullLayout with built-in sidebar */}
 
-        {/* CONTEXT B1.2: VALA AI Sidebar (dedicated sidebar for AI Product Engine) */}
-        {activeRole === "vala_ai_management" && (
-          <>
-            <ValaAISidebar
-              activeSection={activeNav}
-              onSectionChange={handleNavChange}
-              collapsed={collapsed}
-              onCollapsedChange={setCollapsed}
-              onBackToControlPanel={handleBackToControlPanel}
-            />
-            {/* Spacer to offset VALA AI sidebar */}
-            <div className="flex-shrink-0" style={{ width: collapsed ? 80 : 260 }} />
-          </>
-        )}
+        {/* CONTEXT B1.2: VALA AI uses ValaAIModuleContainer with built-in sidebar */}
 
         {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except roles with built-in sidebars) */}
         {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "demo_manager" && activeRole !== "continent_super_admin" && activeRole !== "reseller_manager" && activeRole !== "finance_manager" && (
