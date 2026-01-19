@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, X, Send, Sparkles, Lock, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Bot, X, Send, Sparkles, Lock, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import softwareValaLogo from '@/assets/software-vala-logo.png';
 
 type RequestStatus = 'none' | 'pending' | 'approved' | 'rejected';
@@ -39,9 +40,17 @@ const FloatingAIChatbot = ({
   const [requestPriority, setRequestPriority] = useState<'normal' | 'urgent' | 'critical'>('normal');
   const [requestStatus, setRequestStatus] = useState<RequestStatus>('none');
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([
-    { role: 'ai', content: 'Hello! I\'m your AI assistant. How can I help you today?' }
+    { role: 'ai', content: 'Hello! I\'m VALA AI, your intelligent assistant. How can I help you today?' }
   ]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-chat`;
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Mock pending requests for super admin view
   const [pendingRequests, setPendingRequests] = useState<ChatRequest[]>([
@@ -70,19 +79,108 @@ const FloatingAIChatbot = ({
   const isBossOwner = userRole === 'boss_owner' || userRole === 'ceo';
   const canChatDirectly = isBossOwner || requestStatus === 'approved';
 
+  // Stream AI response
+  const streamChat = async (userMessage: string) => {
+    setIsLoading(true);
+    let assistantContent = '';
+
+    // Add empty assistant message to start streaming
+    setMessages(prev => [...prev, { role: 'ai', content: '' }]);
+
+    try {
+      const chatMessages = messages
+        .filter(m => m.content.trim())
+        .map(m => ({
+          role: m.role === 'ai' ? 'assistant' : 'user',
+          content: m.content
+        }));
+      
+      chatMessages.push({ role: 'user', content: userMessage });
+
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          messages: chatMessages,
+          userRole,
+          context: `User: ${userName}`
+        }),
+      });
+
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        throw new Error(errorData.error || `Request failed with status ${resp.status}`);
+      }
+
+      if (!resp.body) throw new Error("No response body");
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1] = { role: 'ai', content: assistantContent };
+                return newMessages;
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get response';
+      toast.error(errorMessage);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = { 
+          role: 'ai', 
+          content: `Sorry, I encountered an error: ${errorMessage}. Please try again.`
+        };
+        return newMessages;
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSend = () => {
-    if (!message.trim()) return;
+    if (!message.trim() || isLoading) return;
     
-    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    const userMessage = message.trim();
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setMessage('');
     
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        content: 'I understand your request. Let me help you with that...' 
-      }]);
-    }, 1000);
+    streamChat(userMessage);
   };
 
   const handleRequestAccess = () => {
@@ -361,10 +459,16 @@ const FloatingAIChatbot = ({
                           ? 'bg-emerald-500/20 text-emerald-100 rounded-br-md'
                           : 'bg-slate-800 text-slate-200 rounded-bl-md'
                       }`}>
-                        {msg.content}
+                        {msg.content || (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Thinking...
+                          </span>
+                        )}
                       </div>
                     </motion.div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
@@ -373,16 +477,18 @@ const FloatingAIChatbot = ({
                     <Input
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                      onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                       placeholder="Ask me anything..."
+                      disabled={isLoading}
                       className="flex-1 bg-slate-800/50 border-slate-700/50 text-white placeholder:text-slate-500"
                     />
                     <Button
                       onClick={handleSend}
                       size="sm"
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                      disabled={isLoading || !message.trim()}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
                     >
-                      <Send className="w-4 h-4" />
+                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
