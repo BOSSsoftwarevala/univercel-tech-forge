@@ -404,7 +404,7 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
   };
 
   return (
-    <aside className="w-72 flex flex-col h-full" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)', borderRight: '1px solid #1e3a5f' }}>
+    <aside className="w-72 flex flex-col h-screen sticky top-0 left-0 z-40" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)', borderRight: '1px solid #1e3a5f' }}>
       {/* Back Button */}
       <div className="p-2 flex-shrink-0" style={{ borderBottom: '1px solid #1e3a5f' }}>
         <motion.button
