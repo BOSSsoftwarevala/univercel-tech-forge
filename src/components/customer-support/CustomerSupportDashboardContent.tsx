@@ -2,22 +2,21 @@
  * CUSTOMER SUPPORT DASHBOARD CONTENT
  * Main content area with clickable KPI cards and section views
  */
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
-  Headphones, Ticket, Clock, AlertTriangle, Bot, Users,
-  CheckCircle, TrendingUp, ArrowUpCircle, ClipboardCheck,
+  Headphones, Ticket, AlertTriangle, Bot, Users,
+  CheckCircle, ArrowUpCircle, ClipboardCheck,
   Smile, Timer, Activity, Gauge, Eye, Send, RefreshCw,
   XCircle, Shield, Zap, BarChart3, Bell, Settings,
-  MessageSquare, User, FileText, Loader2
+  User, FileText
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { useEnterpriseAudit } from '@/hooks/useEnterpriseAudit';
+import { CustomerSupportActionButton } from './CustomerSupportActionButton';
 
 interface CustomerSupportDashboardContentProps {
   activeSection: string;
@@ -64,7 +63,7 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const { logButtonClick } = useEnterpriseAudit();
 
-  const handleAction = async (action: string, target?: string, data?: any) => {
+  const handleAction = useCallback(async (action: string, target?: string, data?: any) => {
     const actionKey = `${action}-${target || 'general'}`;
     setLoadingAction(actionKey);
     
@@ -117,45 +116,11 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [logButtonClick]);
 
-  const ActionButton = ({ 
-    action, 
-    target, 
-    variant = 'outline', 
-    size = 'sm',
-    icon: Icon,
-    className,
-    children 
-  }: { 
-    action: string; 
-    target?: string; 
-    variant?: 'outline' | 'default' | 'ghost' | 'destructive';
-    size?: 'sm' | 'default' | 'lg';
-    icon?: React.ElementType;
-    className?: string;
-    children: React.ReactNode;
-  }) => {
-    const actionKey = `${action}-${target || 'general'}`;
-    const isLoading = loadingAction === actionKey;
-    
-    return (
-      <Button
-        variant={variant}
-        size={size}
-        onClick={() => handleAction(action, target)}
-        disabled={isLoading}
-        className={className}
-      >
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-        ) : Icon ? (
-          <Icon className="w-4 h-4 mr-2" />
-        ) : null}
-        {children}
-      </Button>
-    );
-  };
+  const isActionLoading = useCallback((action: string, target?: string) => {
+    return loadingAction === `${action}-${target || 'general'}`;
+  }, [loadingAction]);
 
   const renderDashboardOverview = () => (
     <div className="space-y-6">
@@ -331,12 +296,24 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
                   <p className="text-xs text-muted-foreground truncate mt-1">{ticket.subject}</p>
                 </div>
                 <div className="flex items-center gap-2 ml-2">
-                  <ActionButton action="View" target={ticket.id} icon={Eye}>
+                  <CustomerSupportActionButton 
+                    action="View" 
+                    target={ticket.id} 
+                    icon={Eye}
+                    onClick={handleAction}
+                    isLoading={isActionLoading('View', ticket.id)}
+                  >
                     View
-                  </ActionButton>
-                  <ActionButton action="Assign" target={ticket.id} icon={Users}>
+                  </CustomerSupportActionButton>
+                  <CustomerSupportActionButton 
+                    action="Assign" 
+                    target={ticket.id} 
+                    icon={Users}
+                    onClick={handleAction}
+                    isLoading={isActionLoading('Assign', ticket.id)}
+                  >
                     Assign
-                  </ActionButton>
+                  </CustomerSupportActionButton>
                 </div>
               </div>
             ))}
@@ -378,9 +355,15 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
                   >
                     {agent.status}
                   </Badge>
-                  <ActionButton action="View" target={agent.name} icon={Eye}>
+                  <CustomerSupportActionButton 
+                    action="View" 
+                    target={agent.name} 
+                    icon={Eye}
+                    onClick={handleAction}
+                    isLoading={isActionLoading('View', agent.name)}
+                  >
                     View
-                  </ActionButton>
+                  </CustomerSupportActionButton>
                 </div>
               </div>
             ))}
@@ -412,12 +395,25 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ActionButton action="View" target={esc.id} icon={Eye}>
+                  <CustomerSupportActionButton 
+                    action="View" 
+                    target={esc.id} 
+                    icon={Eye}
+                    onClick={handleAction}
+                    isLoading={isActionLoading('View', esc.id)}
+                  >
                     View
-                  </ActionButton>
-                  <ActionButton action="Resolve" target={esc.id} icon={CheckCircle} className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">
+                  </CustomerSupportActionButton>
+                  <CustomerSupportActionButton 
+                    action="Resolve" 
+                    target={esc.id} 
+                    icon={CheckCircle} 
+                    className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                    onClick={handleAction}
+                    isLoading={isActionLoading('Resolve', esc.id)}
+                  >
                     Resolve
-                  </ActionButton>
+                  </CustomerSupportActionButton>
                 </div>
               </div>
             ))}
@@ -450,9 +446,16 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
         <CardContent>
           <div className="flex items-center gap-3 mb-6">
             {actions.map((act) => (
-              <ActionButton key={act.action} action={act.action} target={title} icon={act.icon}>
+              <CustomerSupportActionButton 
+                key={act.action} 
+                action={act.action} 
+                target={title} 
+                icon={act.icon}
+                onClick={handleAction}
+                isLoading={isActionLoading(act.action, title)}
+              >
                 {act.label}
-              </ActionButton>
+              </CustomerSupportActionButton>
             ))}
           </div>
           
@@ -470,18 +473,44 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
                   Content placeholder
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <ActionButton action="View" target={`${title}-${i}`} className="flex-1" icon={Eye}>
+                  <CustomerSupportActionButton 
+                    action="View" 
+                    target={`${title}-${i}`} 
+                    className="flex-1" 
+                    icon={Eye}
+                    onClick={handleAction}
+                    isLoading={isActionLoading('View', `${title}-${i}`)}
+                  >
                     View
-                  </ActionButton>
-                  <ActionButton action="Edit" target={`${title}-${i}`} className="flex-1">
+                  </CustomerSupportActionButton>
+                  <CustomerSupportActionButton 
+                    action="Edit" 
+                    target={`${title}-${i}`} 
+                    className="flex-1"
+                    onClick={handleAction}
+                    isLoading={isActionLoading('Edit', `${title}-${i}`)}
+                  >
                     Edit
-                  </ActionButton>
-                  <ActionButton action="Assign" target={`${title}-${i}`} icon={Users}>
+                  </CustomerSupportActionButton>
+                  <CustomerSupportActionButton 
+                    action="Assign" 
+                    target={`${title}-${i}`} 
+                    icon={Users}
+                    onClick={handleAction}
+                    isLoading={isActionLoading('Assign', `${title}-${i}`)}
+                  >
                     Assign
-                  </ActionButton>
-                  <ActionButton action="Escalate" target={`${title}-${i}`} icon={ArrowUpCircle} variant="destructive">
+                  </CustomerSupportActionButton>
+                  <CustomerSupportActionButton 
+                    action="Escalate" 
+                    target={`${title}-${i}`} 
+                    icon={ArrowUpCircle} 
+                    variant="destructive"
+                    onClick={handleAction}
+                    isLoading={isActionLoading('Escalate', `${title}-${i}`)}
+                  >
                     Escalate
-                  </ActionButton>
+                  </CustomerSupportActionButton>
                 </div>
               </div>
             ))}
