@@ -1,6 +1,6 @@
 /**
- * VALA AI DEV STUDIO - Ultra Simple Lovable-style Interface
- * Clean split view: Project Selector + Chat | Preview
+ * VALA AI DEV STUDIO - Lovable-style Interface with Live AI
+ * Clean split view: Project Selector + AI Chat | Preview
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -22,6 +22,9 @@ interface Project {
 }
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
+type Message = { role: 'user' | 'assistant'; content: string };
+
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-chat`;
 
 const ValaAIDevStudio: React.FC = () => {
   // Project state
@@ -37,11 +40,12 @@ const ValaAIDevStudio: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   // Chat state
-  const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([
-    { role: 'assistant', content: 'Hi! 👋 Select a project to start. I\'ll help you customize and clone it.' }
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: 'Hi! 👋 Select a project and ask me anything. I can help with themes, features, and customization.' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isCloning, setIsCloning] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom
@@ -82,7 +86,7 @@ const ValaAIDevStudio: React.FC = () => {
     setShowDropdown(false);
     setMessages(prev => [...prev, {
       role: 'assistant',
-      content: `✅ **${project.title}** loaded!\n\nWhat would you like to do?\n• Clone this project\n• Change theme colors\n• Add a feature`
+      content: `✅ **${project.title}** loaded!\n\nAsk me anything about this project - themes, features, modifications, or clone it with one click.`
     }]);
   };
 
@@ -99,21 +103,105 @@ const ValaAIDevStudio: React.FC = () => {
     setIsCloning(false);
   };
 
-  // Send message
-  const handleSend = () => {
-    if (!inputMessage.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', content: inputMessage }]);
+  // Stream AI response
+  const streamChat = async (userMessage: string) => {
+    const context = selectedProject 
+      ? `Working on project: "${selectedProject.title}" (${selectedProject.category || 'General'}). URL: ${selectedProject.url}`
+      : 'No project selected yet.';
+
+    const chatMessages = [...messages, { role: 'user' as const, content: userMessage }];
     
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: selectedProject 
-          ? `I'll help with that for ${selectedProject.title}. This feature is coming soon!`
-          : 'Please select a project first.'
+    try {
+      const resp = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: chatMessages.map(m => ({ role: m.role, content: m.content })),
+          userRole: 'developer',
+          context,
+        }),
+      });
+
+      if (!resp.ok) {
+        if (resp.status === 429) {
+          toast.error('Rate limit exceeded. Please wait a moment.');
+          return;
+        }
+        if (resp.status === 402) {
+          toast.error('AI credits exhausted. Please add credits.');
+          return;
+        }
+        throw new Error('AI request failed');
+      }
+
+      if (!resp.body) throw new Error('No response body');
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let assistantContent = '';
+
+      // Add empty assistant message
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        
+        let newlineIdx: number;
+        while ((newlineIdx = buffer.indexOf('\n')) !== -1) {
+          let line = buffer.slice(0, newlineIdx);
+          buffer = buffer.slice(newlineIdx + 1);
+          
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+          
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') break;
+          
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
+                return updated;
+              });
+            }
+          } catch {
+            // Incomplete JSON, wait for more
+          }
+        }
+      }
+    } catch (error) {
+      console.error('AI chat error:', error);
+      toast.error('Failed to get AI response');
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error. Please try again.' 
       }]);
-    }, 500);
+    }
+  };
+
+  // Send message
+  const handleSend = async () => {
+    if (!inputMessage.trim() || isStreaming) return;
     
+    const userMsg = inputMessage.trim();
     setInputMessage('');
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setIsStreaming(true);
+    
+    await streamChat(userMsg);
+    setIsStreaming(false);
   };
 
   // Copy URL
@@ -247,8 +335,13 @@ const ValaAIDevStudio: React.FC = () => {
               placeholder="💬 Ask anything..."
               className="flex-1 h-12 text-base bg-background/80 border-emerald-500/30 text-white placeholder:text-pink-300/50"
             />
-            <Button size="icon" onClick={handleSend} className="shrink-0 h-12 w-12 bg-gradient-to-r from-pink-500 to-emerald-500 hover:from-pink-400 hover:to-emerald-400">
-              <Send className="h-5 w-5" />
+            <Button 
+              size="icon" 
+              onClick={handleSend} 
+              disabled={isStreaming || !inputMessage.trim()}
+              className="shrink-0 h-12 w-12 bg-gradient-to-r from-pink-500 to-emerald-500 hover:from-pink-400 hover:to-emerald-400 disabled:opacity-50"
+            >
+              {isStreaming ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             </Button>
           </div>
         </div>
