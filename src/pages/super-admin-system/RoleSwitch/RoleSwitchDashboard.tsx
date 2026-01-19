@@ -634,7 +634,7 @@ const RoleSwitchDashboard = () => {
               onLogout={handleLogout}
             />
             {/* Spacer to offset fixed Control Panel sidebar */}
-            <div className="w-[280px] flex-shrink-0" />
+            <div className="w-[260px] flex-shrink-0" />
           </>
         )}
 

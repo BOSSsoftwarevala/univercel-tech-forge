@@ -96,7 +96,7 @@ interface ControlPanelSidebarProps {
   onLogout: () => void;
 }
 
-// ===== COMPACT ROLE BUTTON (NO SCROLL - ALL FIT ON SCREEN) =====
+// ===== COMPACT ROLE BUTTON (ALL FIT ON SCREEN - CLICKABLE) =====
 const RoleButton = memo<{
   role: typeof ROLE_CATEGORIES[number];
   isActive: boolean;
@@ -107,11 +107,12 @@ const RoleButton = memo<{
   return (
     <button
       onClick={onClick}
+      type="button"
       className={cn(
-        "w-full flex items-center gap-2 rounded-lg transition-all duration-150",
-        "px-2 py-1.5 text-left group relative",
+        "w-full flex items-center gap-2 rounded transition-all duration-100 cursor-pointer",
+        "px-2 py-[5px] text-left min-h-[26px]",
         isActive 
-          ? "bg-blue-600 ring-1 ring-blue-400/50" 
+          ? "bg-blue-600" 
           : "hover:bg-white/10"
       )}
       style={{
@@ -120,22 +121,22 @@ const RoleButton = memo<{
           : undefined,
       }}
     >
-      {/* Compact Icon */}
+      {/* Icon */}
       <div className={cn(
-        "w-6 h-6 rounded flex items-center justify-center flex-shrink-0",
+        "w-5 h-5 rounded flex items-center justify-center flex-shrink-0",
         isActive ? "bg-white/20" : "bg-white/10"
       )}>
         <Icon 
-          className="w-3.5 h-3.5" 
+          className="w-3 h-3" 
           style={{ color: isActive ? '#ffffff' : COLORS.iconColor }} 
         />
       </div>
       
-      {/* Text - compact */}
+      {/* Text */}
       <span 
         className={cn(
-          "text-xs font-medium truncate",
-          isActive ? "text-white" : "text-white/80"
+          "text-[11px] font-medium truncate leading-tight",
+          isActive ? "text-white" : "text-white/85"
         )}
       >
         {role.label}
@@ -157,22 +158,23 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 fixed left-0 top-0 z-40 overflow-hidden"
+      className="flex flex-col flex-shrink-0 fixed left-0 top-0 z-40"
       style={{
-        width: 280,
+        width: 260,
         height: '100vh',
         background: COLORS.bgGradient,
         borderRight: `1px solid ${COLORS.border}`,
+        overflow: 'hidden',
       }}
     >
-      {/* SECTION 1 - SYSTEM NAME (Compact) */}
-      <div className="px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-        <h1 className="text-lg font-bold text-white tracking-tight">Control Panel</h1>
-        <p className="text-xs text-white/60 font-medium">Super Admin</p>
+      {/* HEADER (Compact) */}
+      <div className="px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+        <h1 className="text-base font-bold text-white tracking-tight">Control Panel</h1>
+        <p className="text-[10px] text-white/60 font-medium">Super Admin</p>
       </div>
 
-      {/* SECTION 2 - ALL MODULES (NO SCROLL - FIXED HEIGHT) */}
-      <nav className="flex-1 flex flex-col gap-0.5 px-2 py-1 overflow-hidden">
+      {/* ALL MODULES - FIXED HEIGHT - NO SCROLL */}
+      <nav className="flex-1 flex flex-col px-2 py-1" style={{ gap: '2px', overflow: 'hidden' }}>
         {ROLE_CATEGORIES.map((role) => (
           <RoleButton
             key={role.id}
@@ -183,30 +185,31 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
         ))}
       </nav>
 
-      {/* SECTION 3 - STATUS + LOGOUT (Compact) */}
-      <div className="px-2 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-bold text-emerald-400 uppercase">Live</span>
+      {/* STATUS + LOGOUT (Minimal) */}
+      <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
+        <div className="flex items-center gap-1 mb-1.5">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="text-[9px] font-bold text-emerald-400 uppercase">Live</span>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-[10px] font-bold text-cyan-400 uppercase">AI</span>
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            <span className="text-[9px] font-bold text-cyan-400 uppercase">AI</span>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span className="text-[10px] font-bold text-blue-400 uppercase">OK</span>
+            <span className="text-[9px] font-bold text-blue-400 uppercase">OK</span>
           </div>
         </div>
         
-        {/* Logout Button */}
+        {/* Logout */}
         <button
           onClick={onLogout}
-          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+          type="button"
+          className="w-full flex items-center justify-center gap-1.5 px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
         >
-          <LogOut className="w-3.5 h-3.5" />
-          <span className="text-xs font-semibold">Logout</span>
+          <LogOut className="w-3 h-3" />
+          <span className="text-[10px] font-semibold">Logout</span>
         </button>
       </div>
     </aside>
