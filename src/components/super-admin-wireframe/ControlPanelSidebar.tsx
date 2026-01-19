@@ -109,8 +109,8 @@ const RoleButton = memo<{
       onClick={onClick}
       type="button"
       className={cn(
-        "w-full flex items-center gap-2 rounded transition-all duration-100 cursor-pointer",
-        "px-2 py-[5px] text-left min-h-[26px]",
+        "w-full flex items-center gap-3 rounded-lg transition-all duration-100 cursor-pointer",
+        "px-3 py-2 text-left min-h-[36px]",
         isActive 
           ? "bg-blue-600" 
           : "hover:bg-white/10"
@@ -123,11 +123,11 @@ const RoleButton = memo<{
     >
       {/* Icon */}
       <div className={cn(
-        "w-5 h-5 rounded flex items-center justify-center flex-shrink-0",
+        "w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0",
         isActive ? "bg-white/20" : "bg-white/10"
       )}>
         <Icon 
-          className="w-3 h-3" 
+          className="w-4 h-4" 
           style={{ color: isActive ? '#ffffff' : COLORS.iconColor }} 
         />
       </div>
@@ -135,8 +135,8 @@ const RoleButton = memo<{
       {/* Text */}
       <span 
         className={cn(
-          "text-[11px] font-medium truncate leading-tight",
-          isActive ? "text-white" : "text-white/85"
+          "text-sm font-semibold truncate leading-tight",
+          isActive ? "text-white" : "text-white/90"
         )}
       >
         {role.label}
@@ -160,21 +160,22 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
     <aside
       className="flex flex-col flex-shrink-0 fixed left-0 top-0 z-40"
       style={{
-        width: 260,
+        width: 320,
         height: '100vh',
         background: COLORS.bgGradient,
         borderRight: `1px solid ${COLORS.border}`,
-        overflow: 'hidden',
+        overflowY: 'auto',
+        overflowX: 'hidden',
       }}
     >
-      {/* HEADER (Compact) */}
-      <div className="px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-        <h1 className="text-base font-bold text-white tracking-tight">Control Panel</h1>
-        <p className="text-[10px] text-white/60 font-medium">Super Admin</p>
+      {/* HEADER */}
+      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+        <h1 className="text-xl font-bold text-white tracking-tight">Control Panel</h1>
+        <p className="text-xs text-white/60 font-medium">Super Admin</p>
       </div>
 
-      {/* ALL MODULES - FIXED HEIGHT - NO SCROLL */}
-      <nav className="flex-1 flex flex-col px-2 py-1" style={{ gap: '2px', overflow: 'hidden' }}>
+      {/* ALL MODULES - SCROLLABLE */}
+      <nav className="flex-1 flex flex-col px-3 py-2" style={{ gap: '4px' }}>
         {ROLE_CATEGORIES.map((role) => (
           <RoleButton
             key={role.id}
@@ -185,20 +186,20 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
         ))}
       </nav>
 
-      {/* STATUS + LOGOUT (Minimal) */}
-      <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-        <div className="flex items-center gap-1 mb-1.5">
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-[9px] font-bold text-emerald-400 uppercase">Live</span>
+      {/* STATUS + LOGOUT */}
+      <div className="px-3 py-3 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-bold text-emerald-400 uppercase">Live</span>
           </div>
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-            <span className="text-[9px] font-bold text-cyan-400 uppercase">AI</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/20">
+            <span className="w-2 h-2 rounded-full bg-cyan-400" />
+            <span className="text-xs font-bold text-cyan-400 uppercase">AI</span>
           </div>
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span className="text-[9px] font-bold text-blue-400 uppercase">OK</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20">
+            <span className="w-2 h-2 rounded-full bg-blue-400" />
+            <span className="text-xs font-bold text-blue-400 uppercase">OK</span>
           </div>
         </div>
         
@@ -206,10 +207,10 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
         <button
           onClick={onLogout}
           type="button"
-          className="w-full flex items-center justify-center gap-1.5 px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
         >
-          <LogOut className="w-3 h-3" />
-          <span className="text-[10px] font-semibold">Logout</span>
+          <LogOut className="w-4 h-4" />
+          <span className="text-sm font-semibold">Logout</span>
         </button>
       </div>
     </aside>
