@@ -24,7 +24,7 @@ import { DevVersions } from './DevVersions';
 import { DevLogs } from './DevLogs';
 import { DevSettings } from './DevSettings';
 import { DemoFactory } from './DemoFactory';
-import { ValaAIDevStudio } from './ValaAIDevStudio';
+import ValaAIDevStudio from './ValaAIDevStudio';
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
