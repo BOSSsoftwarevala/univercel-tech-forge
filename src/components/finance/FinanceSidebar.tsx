@@ -420,18 +420,12 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
       </div>
       
       {/* Logo */}
-      <div className="p-4 flex-shrink-0" style={{ borderBottom: '1px solid #1e3a5f' }}>
-        <div className="flex items-center gap-3">
-          <img 
-            src={softwareValaLogo} 
-            alt="Software Vala Logo" 
-            className="w-10 h-10 rounded-full object-contain"
-          />
-          <div>
-            <h2 className="text-sm font-semibold" style={{ color: '#ffffff' }}>Finance Manager</h2>
-            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Master Financial Control</p>
-          </div>
-        </div>
+      <div className="p-4 flex-shrink-0 flex justify-center" style={{ borderBottom: '1px solid #1e3a5f' }}>
+        <img 
+          src={softwareValaLogo} 
+          alt="Software Vala Logo" 
+          className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30"
+        />
       </div>
 
       {/* User Info */}

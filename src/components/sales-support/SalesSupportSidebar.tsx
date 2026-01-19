@@ -55,18 +55,9 @@ const SalesSupportSidebar = ({
     >
       {/* Header */}
       <div className="p-3 border-b border-slate-700/50 flex items-center justify-between">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <img src={softwareValaLogo} alt="Software Vala Logo" className="w-10 h-10 rounded-full object-contain" />
-            <div className="truncate">
-              <p className="text-sm font-medium text-white truncate">Sales & Support</p>
-              <p className="text-[10px] text-slate-400 truncate">Global Team Management</p>
-            </div>
-          </div>
-        )}
-        {collapsed && (
-          <img src={softwareValaLogo} alt="Software Vala Logo" className="w-10 h-10 rounded-full object-contain mx-auto" />
-        )}
+        <div className={cn("flex justify-center", collapsed ? "w-full" : "flex-1")}>
+          <img src={softwareValaLogo} alt="Software Vala Logo" className="w-12 h-12 rounded-full object-contain border-2 border-cyan-500/30" />
+        </div>
         {!collapsed && (
           <Button
             variant="ghost"

@@ -36,14 +36,8 @@ const LMEnterpriseSidebar = ({ activeSection, onSectionChange }: LMEnterpriseSid
       className="fixed left-0 top-0 h-screen w-64 bg-card border-r border-border flex flex-col z-50"
     >
       {/* Logo Section */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <img src={softwareValaLogo} alt="Software Vala Logo" className="w-10 h-10 rounded-full object-contain" />
-          <div>
-            <h1 className="text-lg font-bold text-foreground">Lead Manager</h1>
-            <p className="text-xs text-muted-foreground">Enterprise Edition</p>
-          </div>
-        </div>
+      <div className="p-4 border-b border-border flex justify-center">
+        <img src={softwareValaLogo} alt="Software Vala Logo" className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30" />
       </div>
 
       {/* Quick Stats */}

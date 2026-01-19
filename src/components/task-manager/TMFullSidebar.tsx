@@ -94,21 +94,29 @@ export const TMFullSidebar: React.FC<TMFullSidebarProps> = ({
     )}>
       {/* Header */}
       <div className="p-4 border-b border-border flex items-center justify-between">
+        <div className={cn("flex justify-center", collapsed ? "w-full" : "flex-1")}>
+          <img src={softwareValaLogo} alt="Software Vala Logo" className="w-10 h-10 rounded-full object-contain border-2 border-cyan-500/30" />
+        </div>
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <img src={softwareValaLogo} alt="Software Vala Logo" className="w-8 h-8 rounded-full object-contain" />
-            <span className="font-semibold text-sm text-foreground">Task Manager</span>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={onToggleCollapse}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
         )}
-        {collapsed && <img src={softwareValaLogo} alt="Software Vala Logo" className="w-8 h-8 rounded-full object-contain mx-auto" />}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={onToggleCollapse}
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </Button>
+        {collapsed && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 absolute right-1"
+            onClick={onToggleCollapse}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Navigation */}

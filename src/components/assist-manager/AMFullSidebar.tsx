@@ -70,18 +70,12 @@ export function AMFullSidebar({ activeSection, onSectionChange }: AMFullSidebarP
   return (
     <aside className="w-64 bg-card border-r border-border h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <img 
-            src={assistManagerLogo} 
-            alt="Assist Manager Logo" 
-            className="w-10 h-10 rounded-lg object-contain"
-          />
-          <div>
-            <h2 className="font-semibold text-sm">Assist Manager</h2>
-            <p className="text-xs text-muted-foreground">VALA Connect</p>
-          </div>
-        </div>
+      <div className="p-4 border-b border-border flex justify-center">
+        <img 
+          src={assistManagerLogo} 
+          alt="Assist Manager Logo" 
+          className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30"
+        />
       </div>
 
       {/* Navigation */}

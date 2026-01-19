@@ -54,14 +54,8 @@ export const PerformanceSidebar = () => {
   return (
     <aside className="w-64 min-h-screen bg-slate-900/90 backdrop-blur-xl border-r border-cyan-500/20 flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-cyan-500/20">
-        <div className="flex items-center gap-3">
-          <img src={softwareValaLogo} alt="Software Vala Logo" className="w-10 h-10 rounded-full object-contain" />
-          <div>
-            <p className="font-bold text-white text-sm">SOFTWARE VALA</p>
-            <p className="text-xs text-cyan-400">Performance Hub</p>
-          </div>
-        </div>
+      <div className="p-4 border-b border-cyan-500/20 flex justify-center">
+        <img src={softwareValaLogo} alt="Software Vala Logo" className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30" />
       </div>
 
       {/* Menu Items */}

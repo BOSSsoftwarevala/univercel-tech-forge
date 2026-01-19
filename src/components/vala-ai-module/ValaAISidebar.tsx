@@ -111,18 +111,12 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
         </motion.button>
       </div>
       
-      <div className="p-4" style={{ borderBottom: `1px solid ${SIDEBAR_COLORS.border}` }}>
-        <div className="flex items-center gap-3">
-          <img 
-            src={softwareValaLogo} 
-            alt="Software Vala Logo" 
-            className="w-10 h-10 rounded-full object-contain"
-          />
-          <div>
-            <h2 className="text-sm font-semibold" style={{ color: SIDEBAR_COLORS.text }}>VALA AI</h2>
-            <p className="text-xs" style={{ color: SIDEBAR_COLORS.textMuted }}>AI Command Center</p>
-          </div>
-        </div>
+      <div className="p-4 flex justify-center" style={{ borderBottom: `1px solid ${SIDEBAR_COLORS.border}` }}>
+        <img 
+          src={softwareValaLogo} 
+          alt="Software Vala Logo" 
+          className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30"
+        />
       </div>
       
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">

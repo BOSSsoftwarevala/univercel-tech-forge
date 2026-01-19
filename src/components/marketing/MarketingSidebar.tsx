@@ -275,27 +275,12 @@ const MarketingSidebar = ({ activeSection, setActiveSection }: MarketingSidebarP
       className="w-64 bg-gradient-to-b from-slate-900/95 to-slate-950/95 backdrop-blur-xl border-r border-teal-500/20 flex flex-col h-screen"
     >
       {/* Compact Header */}
-      <div className="px-3 py-2 border-b border-teal-500/20 shrink-0">
-        <div className="flex items-center gap-2">
-          <img 
-            src={softwareValaLogo} 
-            alt="Software Vala Logo" 
-            className="w-8 h-8 rounded-full object-contain"
-          />
-          <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-bold bg-gradient-to-r from-teal-200 to-cyan-400 bg-clip-text text-transparent">
-              Marketing Manager
-            </h1>
-            <div className="flex items-center gap-1">
-              <Badge className="bg-teal-500/20 text-teal-300 text-[8px] px-1 py-0 h-4">
-                {maskedId}
-              </Badge>
-              <span className="text-[9px] text-teal-400 flex items-center gap-0.5">
-                <Sparkles className="w-2.5 h-2.5" /> AI Active
-              </span>
-            </div>
-          </div>
-        </div>
+      <div className="px-3 py-3 border-b border-teal-500/20 shrink-0 flex justify-center">
+        <img 
+          src={softwareValaLogo} 
+          alt="Software Vala Logo" 
+          className="w-12 h-12 rounded-full object-contain border-2 border-cyan-500/30"
+        />
       </div>
 
       {/* Navigation - Compact Scrollable */}

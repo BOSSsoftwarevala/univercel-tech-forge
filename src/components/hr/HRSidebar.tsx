@@ -51,16 +51,8 @@ const HRSidebar = ({ activeSection, setActiveSection }: HRSidebarProps) => {
       className="fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-950 via-violet-950/20 to-slate-950 border-r border-violet-500/20 z-40 flex flex-col"
     >
       {/* Header */}
-      <div className="h-16 flex items-center px-4 border-b border-violet-500/20">
-        <div className="flex items-center gap-3">
-          <img src={softwareValaLogo} alt="Software Vala Logo" className="w-10 h-10 rounded-full object-contain" />
-          {!collapsed && (
-            <div>
-              <h1 className="font-bold text-white">HR & Training</h1>
-              <p className="text-xs text-violet-400">People Operations</p>
-            </div>
-          )}
-        </div>
+      <div className="h-16 flex items-center justify-center px-4 border-b border-violet-500/20">
+        <img src={softwareValaLogo} alt="Software Vala Logo" className="w-12 h-12 rounded-full object-contain border-2 border-cyan-500/30" />
       </div>
 
       {/* User Info & Role Badge */}

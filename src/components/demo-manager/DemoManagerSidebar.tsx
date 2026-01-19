@@ -299,21 +299,12 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
       animate={{ x: 0, opacity: 1 }}
       className="h-screen w-64 bg-card border-r border-border/30 flex flex-col sticky top-0"
     >
-      <div className="p-4 border-b border-border/30">
-        <div className="flex items-center gap-3">
-          <img 
-            src={softwareValaLogo} 
-            alt="Software Vala Logo" 
-            className="w-12 h-12 rounded-full object-contain"
-          />
-          <div>
-            <div className="font-mono font-bold text-sm text-foreground">SOFTWARE VALA</div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
-              <span className="text-[10px] text-neon-green uppercase tracking-widest font-mono">Demo Manager</span>
-            </div>
-          </div>
-        </div>
+      <div className="p-4 border-b border-border/30 flex justify-center">
+        <img 
+          src={softwareValaLogo} 
+          alt="Software Vala Logo" 
+          className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30"
+        />
       </div>
 
       {/* Quick Stats */}
