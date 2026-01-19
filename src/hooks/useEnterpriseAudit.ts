@@ -20,7 +20,10 @@ export type AuditModule =
   | 'system'
   | 'vala_builder'
   | 'server_orchestration'
-  | 'validation';
+  | 'validation'
+  | 'source_protection'
+  | 'boss_dashboard'
+  | 'continent_dashboard';
 
 export interface AuditEntry {
   action: string;
