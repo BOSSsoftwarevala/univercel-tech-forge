@@ -48,6 +48,9 @@ import CountryHeadDashboard from "@/components/country-dashboard/CountryHeadDash
 import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
 import LMEnterpriseLayout from "@/components/legal-manager/LMEnterpriseLayout";
 import AAMEnterpriseLayout from "@/components/api-ai-manager/AAMEnterpriseLayout";
+import SecurityDashboard from "@/components/control-panel/SecurityDashboard";
+import SettingsDashboard from "@/components/control-panel/SettingsDashboard";
+import HomeDashboard from "@/components/control-panel/HomeDashboard";
 import DemoManagerFullLayout from "@/components/demo-manager/DemoManagerFullLayout";
 import CEODashboard from "./CEODashboard";
 import CEOSidebar from "@/components/ceo/CEOSidebar";
@@ -518,14 +521,14 @@ const RoleSwitchDashboard = () => {
         // Basic User Dashboard - placeholder
         return <ControlPanelDashboard />;
       case "home":
-        // Home - returns to Control Panel
-        return <ControlPanelDashboard />;
+        // Home Dashboard with welcome & quick actions
+        return <HomeDashboard />;
       case "security":
-        // Security view - placeholder
-        return <ControlPanelDashboard />;
+        // Security Dashboard - 2FA, sessions, audit logs
+        return <SecurityDashboard />;
       case "settings":
-        // Settings view - placeholder
-        return <ControlPanelDashboard />;
+        // Settings Dashboard - profile, notifications, logout
+        return <SettingsDashboard />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
