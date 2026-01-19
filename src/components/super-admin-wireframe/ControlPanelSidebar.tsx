@@ -85,6 +85,7 @@ const ROLE_CATEGORIES = [
   { id: 'franchise_user', label: 'Franchise Dashboard', icon: Building2 },
   { id: 'demo_manager_enterprise', label: 'Demo Manager', icon: Monitor },
   { id: 'reseller_sales', label: 'Reseller Dashboard', icon: Handshake },
+  { id: 'developer', label: 'Developer Dashboard', icon: Code2 },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
