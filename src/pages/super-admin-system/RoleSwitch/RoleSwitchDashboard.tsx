@@ -190,12 +190,17 @@ const RoleSwitchDashboard = () => {
   // This ensures the sidebar store always reflects the current view
   useEffect(() => {
     if (!canTransition()) return; // Prevent race conditions
-    
+
     if (isInModuleView) {
       const categoryId = categoryMap[activeNav];
       if (categoryId) {
         // ENTER MODULE CONTEXT: Hide Boss sidebar, show Module sidebar
         enterCategory(categoryId);
+      } else {
+        // IMPORTANT: Role dashboards (e.g., reseller_manager) are "module view" for layout isolation,
+        // but they do NOT use CategorySidebarWrapper. Ensure any previously-open module sidebar
+        // is fully cleared so it cannot block clicks.
+        showGlobalSidebar();
       }
     } else {
       // EXIT TO BOSS CONTEXT: Hide Module sidebar, show Boss sidebar
