@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Globe2, User, Shield, Calendar, Clock, Activity,
   Eye, MapPin, Ban, Lock, ChevronRight, X,
@@ -342,7 +343,14 @@ interface ContinentSuperAdminViewProps {
 const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: ContinentSuperAdminViewProps) => {
   const navigate = useNavigate();
 
-  const [selectedCSA, setSelectedCSA] = useState<typeof continentSuperAdmins[0] | null>(null);
+  type ContinentCSA = Omit<(typeof continentSuperAdmins)[number], "status"> & {
+    status: "active" | "suspended" | "locked";
+  };
+
+  const [csaList, setCsaList] = useState<ContinentCSA[]>(() => [...continentSuperAdmins]);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+
+  const [selectedCSA, setSelectedCSA] = useState<ContinentCSA | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [continentFilter, setContinentFilter] = useState("all");
@@ -387,13 +395,13 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
   }
 
   // Stats calculations
-  const totalCSAs = continentSuperAdmins.length;
-  const activeCSAs = continentSuperAdmins.filter(c => c.status === "active").length;
-  const lockedCSAs = continentSuperAdmins.filter(c => c.status === "locked").length;
-  const liveActionsToday = continentSuperAdmins.reduce((sum, c) => sum + c.actionsToday, 0);
+  const totalCSAs = csaList.length;
+  const activeCSAs = csaList.filter(c => c.status === "active").length;
+  const lockedCSAs = csaList.filter(c => c.status === "locked").length;
+  const liveActionsToday = csaList.reduce((sum, c) => sum + c.actionsToday, 0);
 
   // Filtered CSAs
-  const filteredCSAs = continentSuperAdmins.filter(csa => {
+  const filteredCSAs = csaList.filter(csa => {
     const matchesSearch = csa.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           csa.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           csa.continent.toLowerCase().includes(searchQuery.toLowerCase());
@@ -402,10 +410,79 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     return matchesSearch && matchesStatus && matchesContinent;
   });
 
+  const updateCSAStatus = useCallback(async (csaId: string, nextStatus: "active" | "suspended") => {
+    const csa = csaList.find(c => c.id === csaId);
+    if (!csa) return;
+    if (csa.status === "locked") {
+      toast.error("System locked", { description: "This account cannot be changed." });
+      return;
+    }
+
+    setStatusUpdatingId(csaId);
+
+    // Update UI immediately (so the button always feels responsive)
+    const actionLabel = nextStatus === "active" ? "Activate" : "Suspend";
+    const actionType = nextStatus === "active" ? "activation" : "suspension";
+
+    setCsaList(prev => prev.map(item => {
+      if (item.id !== csaId) return item;
+      const updated = {
+        ...item,
+        status: nextStatus as any,
+        lastActivity: "Just now",
+        recentActions: [
+          { action: `${actionLabel}d CSA`, time: "Just now", type: actionType },
+          ...item.recentActions,
+        ].slice(0, 8),
+      };
+      return updated;
+    }));
+
+    setSelectedCSA(prev => {
+      if (!prev || prev.id !== csaId) return prev;
+      return {
+        ...prev,
+        status: nextStatus as any,
+        lastActivity: "Just now",
+        recentActions: [
+          { action: `${actionLabel}d CSA`, time: "Just now", type: actionType },
+          ...prev.recentActions,
+        ].slice(0, 8),
+      };
+    });
+
+    // Best-effort backend audit log (do not block UI)
+    try {
+      await supabase.from("audit_logs").insert([
+        {
+          action: `continent_csa_${nextStatus}`,
+          module: "continent_super_admin",
+          meta_json: {
+            csa_id: csaId,
+            continent: csa.continent,
+            next_status: nextStatus,
+            timestamp: new Date().toISOString(),
+          },
+          // Keep role/user_id null here; this is a demo/admin UI action.
+          role: null,
+          user_id: null,
+        },
+      ]);
+    } catch {
+      // ignore (UI already updated)
+    } finally {
+      setStatusUpdatingId(null);
+    }
+
+    toast.success(`${actionLabel}d`, { description: `${csa.continent} CSA is now ${nextStatus}.` });
+  }, [csaList]);
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
         return <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">Active</Badge>;
+      case "suspended":
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">Suspended</Badge>;
       case "locked":
         return <Badge className="bg-slate-500/20 text-slate-400 border-slate-500/50">System Locked</Badge>;
       default:
@@ -440,7 +517,7 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
         {/* The 7 CSA List - Simple & Clean */}
         <ScrollArea className="flex-1">
           <div className="p-3 space-y-2">
-            {continentSuperAdmins.map((csa, index) => (
+            {filteredCSAs.map((csa, index) => (
               <motion.div
                 key={csa.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -486,6 +563,7 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
                       <div className={cn(
                         "w-4 h-4 rounded-full shadow-lg",
                         csa.status === "active" && "bg-emerald-500 shadow-emerald-500/50",
+                        csa.status === "suspended" && "bg-yellow-500 shadow-yellow-500/50",
                         csa.status === "locked" && "bg-slate-500 shadow-slate-500/50"
                       )} />
                       {csa.status === "active" && (
@@ -788,7 +866,8 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
                   <Button
                     variant="outline"
                     className="w-full gap-2 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
-                    onClick={() => toast.warning("Suspend CSA", { description: "Suspension flow not wired to backend yet.", duration: 2500 })}
+                    disabled={statusUpdatingId === selectedCSA.id}
+                    onClick={() => updateCSAStatus(selectedCSA.id, "suspended")}
                   >
                     <Pause className="w-4 h-4" /> Suspend CSA
                   </Button>
@@ -796,7 +875,8 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
                   <Button
                     variant="outline"
                     className="w-full gap-2 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10"
-                    onClick={() => toast.success("Activate CSA", { description: "Activation flow not wired to backend yet.", duration: 2500 })}
+                    disabled={statusUpdatingId === selectedCSA.id || selectedCSA.status === "locked"}
+                    onClick={() => updateCSAStatus(selectedCSA.id, "active")}
                   >
                     <Play className="w-4 h-4" /> Activate CSA
                   </Button>
