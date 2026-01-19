@@ -2,30 +2,18 @@
  * CONTROL PANEL SIDEBAR - FINAL STRUCTURE
  * ========================================
  * FULL HEIGHT (100vh) • ONE SIDEBAR ONLY • PREMIUM CARD-STYLE BUTTONS
- * 20 ROLE BUTTONS + STATUS STRIP AT BOTTOM
  * LOCKED STRUCTURE - BOSS APPROVAL REQUIRED FOR CHANGES
  * 
- * EXACT ORDER (LOCKED - 20 ROLES):
- * 1. Boss / Owner
- * 2. CEO
- * 3. Vala AI
- * 4. Server Manager
- * 5. Continent Admin
- * 6. Country Head
- * 7. Franchise Manager
- * 8. Sales & Support Manager
- * 9. Reseller Manager
- * 10. Lead Manager
- * 11. Product Manager
- * 12. Demo Manager
- * 13. Pro Manager
- * 14. Legal Manager
- * 15. Task Management
- * 16. Finance Manager
- * 17. Developer Management
- * 18. Marketing Management
- * 19. Customer Support Management
- * 20. Role Manager
+ * MASTER MODULE ORDER (LOCKED - 8 GRADES):
+ * 
+ * GRADE 1: Boss Dashboard, CEO Dashboard, Vala AI, Server Manager, AI API Manager
+ * GRADE 2: Development Manager, Product Manager, Demo Manager, Task Manager, Promise Tracker, Assist Manager
+ * GRADE 3: Marketing Manager, SEO Manager, Lead Manager, Sales & Support, Customer Support
+ * GRADE 4: Franchise Owner, Reseller Manager, Influencer Manager, Influencer Dashboard
+ * GRADE 5: Continent Admin, Country Admin
+ * GRADE 6: Finance Manager, Legal Manager, Developer Dashboard, Pro Manager
+ * GRADE 7: Pro User Dashboard, Basic User Dashboard
+ * GRADE 8: Home, Security, Settings
  */
 
 import { memo, useCallback } from "react";
@@ -35,7 +23,8 @@ import {
   Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
   Headphones, Handshake, Target, Box, Terminal, 
   Star, Scale, ListTodo, DollarSign, Code2, 
-  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, MessageSquare, Store
+  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, 
+  Home, Shield, Settings, Search, User, UserCircle
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -53,35 +42,48 @@ const COLORS = {
   iconColor: '#60a5fa',
 };
 
-// ===== ROLE CATEGORIES (EXACT ORDER - LOCKED) =====
+// ===== ROLE CATEGORIES (EXACT ORDER - LOCKED BY GRADE) =====
 // IDs MUST match ActiveRole type in RoleSwitchSidebarNew.tsx
 const ROLE_CATEGORIES = [
-  { id: 'boss_owner', label: 'Boss / Owner', icon: Crown },
-  { id: 'ceo', label: 'CEO', icon: Eye },
+  // GRADE 1
+  { id: 'boss_owner', label: 'Boss Dashboard', icon: Crown },
+  { id: 'ceo', label: 'CEO Dashboard', icon: Eye },
   { id: 'vala_ai_management', label: 'Vala AI', icon: Brain },
   { id: 'server_manager', label: 'Server Manager', icon: Server },
-  { id: 'continent_super_admin', label: 'Continent Admin', icon: Globe2 },
-  { id: 'country_head', label: 'Country Head', icon: Flag },
-  { id: 'franchise_manager', label: 'Franchise Manager', icon: Building2 },
-  { id: 'sales_support_manager', label: 'Sales & Support Manager', icon: Headphones },
-  { id: 'reseller_manager', label: 'Reseller Manager', icon: Handshake },
-  { id: 'lead_manager', label: 'Lead Manager', icon: Target },
+  { id: 'api_ai_manager', label: 'AI API Manager', icon: Zap },
+  // GRADE 2
+  { id: 'developer_management', label: 'Development Manager', icon: Code2 },
   { id: 'product_manager', label: 'Product Manager', icon: Box },
   { id: 'demo_manager', label: 'Demo Manager', icon: Terminal },
-  { id: 'pro_manager', label: 'Pro Manager', icon: Star },
-  { id: 'legal_manager', label: 'Legal Manager', icon: Scale },
-  { id: 'task_management', label: 'Task Management', icon: ListTodo },
-  { id: 'finance_manager', label: 'Finance Manager', icon: DollarSign },
-  { id: 'developer_management', label: 'Developer Management', icon: Code2 },
-  { id: 'marketing_management', label: 'Marketing Management', icon: Megaphone },
-  { id: 'customer_support_management', label: 'Customer Support Management', icon: HeartHandshake },
-  { id: 'role_manager', label: 'Role Manager', icon: Users },
-  { id: 'api_ai_manager', label: 'API & AI Manager', icon: Zap },
+  { id: 'task_management', label: 'Task Manager', icon: ListTodo },
   { id: 'promise_tracker_manager', label: 'Promise Tracker', icon: Timer },
   { id: 'assist_manager', label: 'Assist Manager', icon: MonitorPlay },
-  { id: 'internal_chatbot', label: 'Internal Chat Bot', icon: MessageSquare },
+  // GRADE 3
+  { id: 'marketing_management', label: 'Marketing Manager', icon: Megaphone },
+  { id: 'seo_manager', label: 'SEO Manager', icon: Search },
+  { id: 'lead_manager', label: 'Lead Manager', icon: Target },
+  { id: 'sales_support_manager', label: 'Sales & Support', icon: Headphones },
+  { id: 'customer_support_management', label: 'Customer Support', icon: HeartHandshake },
+  // GRADE 4
+  { id: 'franchise_manager', label: 'Franchise Owner', icon: Building2 },
+  { id: 'reseller_manager', label: 'Reseller Manager', icon: Handshake },
   { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
-  { id: 'marketplace_manager', label: 'Marketplace Manager', icon: Store },
+  { id: 'influencer_dashboard', label: 'Influencer Dashboard', icon: User },
+  // GRADE 5
+  { id: 'continent_super_admin', label: 'Continent Admin', icon: Globe2 },
+  { id: 'country_head', label: 'Country Admin', icon: Flag },
+  // GRADE 6
+  { id: 'finance_manager', label: 'Finance Manager', icon: DollarSign },
+  { id: 'legal_manager', label: 'Legal Manager', icon: Scale },
+  { id: 'developer_dashboard', label: 'Developer Dashboard', icon: Code2 },
+  { id: 'pro_manager', label: 'Pro Manager', icon: Star },
+  // GRADE 7
+  { id: 'pro_user_dashboard', label: 'Pro User Dashboard', icon: UserCircle },
+  { id: 'basic_user_dashboard', label: 'Basic User Dashboard', icon: User },
+  // GRADE 8 (LAST)
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
