@@ -12,7 +12,6 @@ import ValaAICommandCenter from './ValaAICommandCenter';
 import { AIModelsPanel } from './AIModelsPanel';
 import { AICreditsPanel } from './AICreditsPanel';
 import { DevSettings } from './DevSettings';
-import { DevLogs } from './DevLogs';
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
