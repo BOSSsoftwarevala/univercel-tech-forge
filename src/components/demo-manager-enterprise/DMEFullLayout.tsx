@@ -8,14 +8,16 @@ import React, { useState } from 'react';
 import { DMESidebar, DMESection } from './DMESidebar';
 import { DMEOverviewScreen } from './screens/DMEOverviewScreen';
 import { DMELibraryScreen } from './screens/DMELibraryScreen';
-import { DMECategoryScreen } from './screens/DMECategoryScreen';
 import { DMEHealthScreen } from './screens/DMEHealthScreen';
-import { DMECompletionScreen } from './screens/DMECompletionScreen';
-import { DMEValaAIScreen } from './screens/DMEValaAIScreen';
-import { DMEUrlsScreen } from './screens/DMEUrlsScreen';
 import { DMESecurityScreen } from './screens/DMESecurityScreen';
-import { DMELogsScreen } from './screens/DMELogsScreen';
 import { DMESettingsScreen } from './screens/DMESettingsScreen';
+import { DMEAddDemoScreen } from './screens/DMEAddDemoScreen';
+import { DMEDemoListScreen } from './screens/DMEDemoListScreen';
+import { DMEDemoAccessScreen } from './screens/DMEDemoAccessScreen';
+import { DMEDemoContentScreen } from './screens/DMEDemoContentScreen';
+import { DMEDemoUpgradeScreen } from './screens/DMEDemoUpgradeScreen';
+import { DMEDemoIssuesScreen } from './screens/DMEDemoIssuesScreen';
+import { DMEMarketplaceSyncScreen } from './screens/DMEMarketplaceSyncScreen';
 
 interface DMEFullLayoutProps {
   initialSection?: DMESection;
@@ -32,22 +34,26 @@ export const DMEFullLayout: React.FC<DMEFullLayoutProps> = ({
     switch (activeSection) {
       case 'overview':
         return <DMEOverviewScreen />;
+      case 'add-demo':
+        return <DMEAddDemoScreen />;
+      case 'demo-list':
+        return <DMEDemoListScreen />;
+      case 'demo-access':
+        return <DMEDemoAccessScreen />;
+      case 'demo-content':
+        return <DMEDemoContentScreen />;
+      case 'demo-upgrade':
+        return <DMEDemoUpgradeScreen />;
+      case 'demo-issues':
+        return <DMEDemoIssuesScreen />;
+      case 'marketplace-sync':
+        return <DMEMarketplaceSyncScreen />;
       case 'library':
         return <DMELibraryScreen />;
-      case 'category':
-        return <DMECategoryScreen />;
       case 'health':
         return <DMEHealthScreen />;
-      case 'completion':
-        return <DMECompletionScreen />;
-      case 'vala-ai':
-        return <DMEValaAIScreen />;
-      case 'urls':
-        return <DMEUrlsScreen />;
       case 'security':
         return <DMESecurityScreen />;
-      case 'logs':
-        return <DMELogsScreen />;
       case 'settings':
         return <DMESettingsScreen />;
       default:
