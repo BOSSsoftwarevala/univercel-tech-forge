@@ -40,6 +40,7 @@ import { RSFullLayout } from "@/components/reseller-sales/RSFullLayout";
 import { DMEFullLayout } from "@/components/demo-manager-enterprise/DMEFullLayout";
 import { DevFullLayout } from "@/components/developer/DevFullLayout";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
+import { UnifiedGlobalHeader } from "@/components/shared/UnifiedGlobalHeader";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
 import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
@@ -518,96 +519,125 @@ const RoleSwitchDashboard = () => {
       // ALL dashboards use the same dark background for consistency
       "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     )}>
-      {/* TOP HEADER - Software Vala Enterprise Header */}
+      {/* TOP HEADER - Unified Global Header (Icon-only, 3D Premium) */}
       <header className={cn(
-        "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
-        "bg-gradient-to-r from-[#0a1628] via-[#0d1b2a] to-[#0a1628] border-[#1e3a5f]",
+        "h-14 backdrop-blur-xl border-b flex items-center justify-between px-4 z-50 transition-colors duration-300",
+        "bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-slate-800/50",
         // Offset only when the Control Panel sidebar is actually visible (NOT during module view)
         isInControlPanelView && !isInModuleView && "ml-[320px]"
       )}>
-        {/* LEFT: Back Button (when in module) OR Logo + Brand */}
-        <div className="flex items-center gap-4">
+        {/* LEFT: Back Button (when in module) + Logo */}
+        <div className="flex items-center gap-3">
           {/* Back Button - Visible in module view OR role dashboard view */}
           {(!isInControlPanelView || isInModuleView) && (
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleBackToControlPanel}
-              className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center transition-all group"
+              className="w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-cyan-500/30 transition-all group"
               title="← Back to Control Panel"
             >
-              <ArrowLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+              <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400" />
             </motion.button>
           )}
           
-          {/* SV Logo + Brand Text */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-lg">SV</span>
+          {/* 1️⃣ SV Logo (Home / Control Panel) */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleBackToControlPanel}
+            className="flex items-center gap-2 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow">
+              <span className="text-white font-bold text-sm">SV</span>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-white tracking-tight">Software Vala</h1>
-              <p className="text-xs text-white/60 font-medium">
-                {isInControlPanelView ? 'Super Admin' : (currentConfig.label || 'Module')}
-              </p>
+            <div className="hidden sm:block">
+              <p className="text-sm font-semibold text-white leading-none">Software Vala</p>
+              <p className="text-[10px] text-slate-500">{isInControlPanelView ? 'Control Panel' : currentConfig.label}</p>
             </div>
-          </div>
+          </motion.button>
         </div>
 
-        {/* CENTER: Module Name (only in module / role dashboard view) */}
-        {(!isInControlPanelView || isInModuleView) && (
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <span className="text-lg font-semibold text-white">{currentConfig.label}</span>
+        {/* RIGHT: Global Action Icons (Icon-only, 3D Premium) */}
+        <div className="flex items-center gap-2">
+          {/* 2️⃣ AI API Manager */}
+          <motion.button
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleRoleChange("api_ai_manager")}
+            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-cyan-500/30 transition-all group"
+            title="AI / API Manager"
+          >
+            <Globe2 className="w-4 h-4 text-slate-400 group-hover:text-cyan-400" />
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500" />
+          </motion.button>
+
+          {/* 3️⃣ Promise Tracker */}
+          <motion.button
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleRoleChange("promise_tracker_manager")}
+            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-amber-500/30 transition-all group"
+            title="Promise Tracker"
+          >
+            <Timer className="w-4 h-4 text-slate-400 group-hover:text-amber-400" />
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-[10px] font-bold text-white flex items-center justify-center">3</span>
+          </motion.button>
+
+          {/* 4️⃣ Assist Manager (UltraViewer-style with pulse) */}
+          <motion.button
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleRoleChange("assist_manager")}
+            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-violet-900/50 to-slate-900 border border-violet-500/30 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-violet-400/50 transition-all group"
+            title="Assist Manager"
+          >
+            <Shield className="w-4 h-4 text-violet-400 group-hover:text-violet-300" />
+            <motion.span
+              className="absolute inset-0 rounded-xl border-2 border-violet-500/40"
+              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </motion.button>
+
+          {/* 5️⃣ Internal Chat Bot */}
+          <motion.button
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleRoleChange("internal_chatbot")}
+            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-emerald-500/30 transition-all group"
+            title="Internal Chat"
+          >
+            <Home className="w-4 h-4 text-slate-400 group-hover:text-emerald-400" />
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-emerald-500 text-[10px] font-bold text-white flex items-center justify-center">5</span>
+          </motion.button>
+
+          {/* 6️⃣ Notification / Alert Bell */}
+          <div className="relative">
+            <motion.button
+              whileHover={{ y: -2, scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-red-500/30 transition-all group ring-2 ring-red-500/30"
+              title="Notifications"
+            >
+              <AlertCircle className="w-4 h-4 text-slate-400 group-hover:text-red-400" />
+              {liveAlerts > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+                  {liveAlerts}
+                </span>
+              )}
+            </motion.button>
           </div>
-        )}
-
-        {/* RIGHT: Status Icons + Notifications + Profile */}
-        <div className="flex items-center gap-3">
-          {/* System Status Icon */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
-            title="System Healthy"
-          >
-            <Shield className="w-5 h-5 text-emerald-400" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
-          </motion.button>
-
-          {/* Risk Level Icon */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
-            title="Low Risk"
-          >
-            <AlertCircle className="w-5 h-5 text-emerald-400" />
-          </motion.button>
-
-          {/* Notification Badge */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center"
-            title="Notifications"
-          >
-            <AlertCircle className="w-5 h-5 text-amber-400" />
-            {liveAlerts > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                {liveAlerts}
-              </span>
-            )}
-          </motion.button>
 
           {/* Profile Icon */}
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ y: -2, scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleLogout}
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg"
+            className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-shadow"
             title="Profile"
           >
-            <Crown className="w-5 h-5 text-white" />
+            <Crown className="w-4 h-4 text-white" />
           </motion.button>
         </div>
       </header>
