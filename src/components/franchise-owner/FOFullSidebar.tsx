@@ -1,7 +1,6 @@
 /**
  * FRANCHISE OWNER FULL SIDEBAR
- * 12 Sections - All-in-One Business Control
- * Style: Same as Core Theme
+ * 12 Sections - Enterprise Operations Panel
  */
 
 import React from 'react';
@@ -9,32 +8,32 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   LayoutDashboard,
-  Users,
-  UserCheck,
-  Target,
-  Search,
-  Megaphone,
+  Store,
+  ShoppingCart,
+  Package,
   Wallet,
-  TrendingUp,
-  Star,
-  HeadphonesIcon,
+  Users,
+  Search,
+  Headphones,
+  ShieldCheck,
   BarChart3,
+  FileText,
   Settings,
 } from 'lucide-react';
 
 export type FOSection =
-  | 'franchise_overview'
-  | 'hrm_management'
-  | 'crm_management'
-  | 'lead_management'
+  | 'franchise_home'
+  | 'marketplace'
+  | 'place_order'
+  | 'orders_delivery'
+  | 'invoices_wallet'
+  | 'leads_customers'
   | 'seo_marketing'
-  | 'ads_manager'
-  | 'wallet_billing'
-  | 'sales_performance'
-  | 'influencer_leads'
-  | 'customer_support'
-  | 'reports_analytics'
-  | 'franchise_settings';
+  | 'support_issues'
+  | 'promises_sla'
+  | 'performance_reports'
+  | 'agreement_legal'
+  | 'settings';
 
 interface FOFullSidebarProps {
   activeSection: FOSection;
@@ -42,24 +41,23 @@ interface FOFullSidebarProps {
 }
 
 const SIDEBAR_ITEMS: { id: FOSection; label: string; icon: React.ElementType }[] = [
-  { id: 'franchise_overview', label: 'Franchise Overview', icon: LayoutDashboard },
-  { id: 'hrm_management', label: 'HRM Management', icon: Users },
-  { id: 'crm_management', label: 'CRM Management', icon: UserCheck },
-  { id: 'lead_management', label: 'Lead Management', icon: Target },
+  { id: 'franchise_home', label: 'Franchise Home', icon: LayoutDashboard },
+  { id: 'marketplace', label: 'Marketplace', icon: Store },
+  { id: 'place_order', label: 'Place Order', icon: ShoppingCart },
+  { id: 'orders_delivery', label: 'Orders & Delivery', icon: Package },
+  { id: 'invoices_wallet', label: 'Invoices & Wallet', icon: Wallet },
+  { id: 'leads_customers', label: 'Leads & Customers', icon: Users },
   { id: 'seo_marketing', label: 'SEO & Marketing', icon: Search },
-  { id: 'ads_manager', label: 'Ads Manager (AI)', icon: Megaphone },
-  { id: 'wallet_billing', label: 'Wallet & Billing', icon: Wallet },
-  { id: 'sales_performance', label: 'Sales Performance', icon: TrendingUp },
-  { id: 'influencer_leads', label: 'Influencer Leads', icon: Star },
-  { id: 'customer_support', label: 'Customer Support', icon: HeadphonesIcon },
-  { id: 'reports_analytics', label: 'Reports & Analytics', icon: BarChart3 },
-  { id: 'franchise_settings', label: 'Franchise Settings', icon: Settings },
+  { id: 'support_issues', label: 'Support & Issues', icon: Headphones },
+  { id: 'promises_sla', label: 'Promises & SLA', icon: ShieldCheck },
+  { id: 'performance_reports', label: 'Performance & Reports', icon: BarChart3 },
+  { id: 'agreement_legal', label: 'Agreement & Legal', icon: FileText },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export function FOFullSidebar({ activeSection, onSectionChange }: FOFullSidebarProps) {
   return (
     <aside className="w-64 bg-card border-r border-border h-full flex flex-col">
-      {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -67,12 +65,11 @@ export function FOFullSidebar({ activeSection, onSectionChange }: FOFullSidebarP
           </div>
           <div>
             <h2 className="font-semibold text-sm">Franchise Owner</h2>
-            <p className="text-xs text-muted-foreground">Business Control</p>
+            <p className="text-xs text-muted-foreground">Enterprise Operations</p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
       <ScrollArea className="flex-1">
         <nav className="p-2 space-y-1">
           {SIDEBAR_ITEMS.map((item) => {
@@ -98,7 +95,6 @@ export function FOFullSidebar({ activeSection, onSectionChange }: FOFullSidebarP
         </nav>
       </ScrollArea>
 
-      {/* Footer Status */}
       <div className="p-3 border-t border-border">
         <div className="flex items-center gap-2 text-xs">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
