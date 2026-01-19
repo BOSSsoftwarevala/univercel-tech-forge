@@ -33,23 +33,33 @@ const DomainProtection: React.FC<DomainProtectionProps> = ({ children }) => {
         hostname.endsWith('.lovableproject.com')
       );
 
-      // Check if user is franchise
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: roles } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
+      // If domain is allowed, grant access immediately
+      if (isDomainAllowed) {
+        setIsAllowed(true);
+        return;
+      }
+
+      // Only check franchise role if domain is not allowed
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
         
-        const hasFranchiseRole = roles?.some(r => r.role === 'franchise');
-        setIsFranchise(hasFranchiseRole || false);
-        
-        // Franchise users bypass domain restriction
-        if (hasFranchiseRole) {
-          setIsAllowed(true);
-          return;
+        if (user) {
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+          
+          const hasFranchiseRole = roles?.some(r => r.role === 'franchise');
+          setIsFranchise(hasFranchiseRole || false);
+          
+          // Franchise users bypass domain restriction
+          if (hasFranchiseRole) {
+            setIsAllowed(true);
+            return;
+          }
         }
+      } catch (error) {
+        console.error('Error checking user role:', error);
       }
 
       setIsAllowed(isDomainAllowed);
