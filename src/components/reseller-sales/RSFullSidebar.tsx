@@ -17,6 +17,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
+  Wallet,
+  CreditCard,
+  Plus,
+  History,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -27,6 +31,10 @@ export type RSSection =
   | 'leads'
   | 'sales'
   | 'commission'
+  | 'wallet'
+  | 'payment_gateway'
+  | 'add_money'
+  | 'wallet_history'
   | 'marketing'
   | 'support'
   | 'profile';
@@ -39,12 +47,23 @@ interface RSFullSidebarProps {
   onBack?: () => void;
 }
 
-const menuItems: { id: RSSection; label: string; icon: any }[] = [
+interface MenuItem {
+  id: RSSection;
+  label: string;
+  icon: any;
+  indent?: boolean;
+}
+
+const menuItems: MenuItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'products', label: 'Products', icon: Package },
   { id: 'leads', label: 'Leads', icon: Users },
   { id: 'sales', label: 'Sales', icon: ShoppingCart },
   { id: 'commission', label: 'Commission', icon: Percent },
+  { id: 'wallet', label: 'Invoices & Wallet', icon: Wallet },
+  { id: 'payment_gateway', label: 'Payment Gateway', icon: CreditCard, indent: true },
+  { id: 'add_money', label: 'Add Money', icon: Plus, indent: true },
+  { id: 'wallet_history', label: 'Wallet History', icon: History, indent: true },
   { id: 'marketing', label: 'Marketing Tools', icon: Megaphone },
   { id: 'support', label: 'Support', icon: MessageSquare },
   { id: 'profile', label: 'Profile & Security', icon: User },
@@ -111,6 +130,7 @@ export function RSFullSidebar({
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
+          const isWalletSection = ['payment_gateway', 'add_money', 'wallet_history'].includes(item.id);
 
           return (
             <motion.button
@@ -118,14 +138,17 @@ export function RSFullSidebar({
               onClick={() => onSectionChange(item.id)}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
+                item.indent && !collapsed && 'ml-4 w-[calc(100%-1rem)]',
                 isActive
                   ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400 border border-emerald-500/30'
+                  : isWalletSection
+                  ? 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
               )}
-              whileHover={{ x: 4 }}
+              whileHover={{ x: collapsed ? 0 : 4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Icon className={cn('h-5 w-5 flex-shrink-0', isActive && 'text-emerald-400')} />
+              <Icon className={cn('h-5 w-5 flex-shrink-0', item.indent && 'h-4 w-4', isActive && 'text-emerald-400')} />
               {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
             </motion.button>
           );
