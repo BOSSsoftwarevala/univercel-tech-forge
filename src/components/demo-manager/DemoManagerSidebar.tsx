@@ -289,7 +289,7 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="fixed left-0 top-0 bottom-0 w-64 glass-panel border-r border-border/30 z-50 flex flex-col"
+      className="h-screen w-64 bg-card border-r border-border/30 flex flex-col sticky top-0"
     >
       {/* Logo Section */}
       <div className="p-4 border-b border-border/30">

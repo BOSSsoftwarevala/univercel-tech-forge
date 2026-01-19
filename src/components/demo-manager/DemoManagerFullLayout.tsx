@@ -5,23 +5,31 @@
  * LOCKED STRUCTURE - NO CHANGES WITHOUT APPROVAL
  */
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import DemoManagerSidebar from "./DemoManagerSidebar";
 import DemoManagerMainContent from "./DemoManagerMainContent";
 
 const DemoManagerFullLayout = () => {
   const [activeView, setActiveView] = useState("live-demo-count");
 
+  // Memoized handler to ensure state updates properly
+  const handleViewChange = useCallback((view: string) => {
+    console.log("[DemoManager] View changed to:", view);
+    setActiveView(view);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <DemoManagerSidebar 
-        activeView={activeView} 
-        onViewChange={setActiveView} 
-      />
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar - Fixed width, not position:fixed to avoid z-index issues */}
+      <div className="w-64 flex-shrink-0">
+        <DemoManagerSidebar 
+          activeView={activeView} 
+          onViewChange={handleViewChange} 
+        />
+      </div>
       
-      {/* Main Content - offset for sidebar */}
-      <div className="ml-64">
+      {/* Main Content - Flex grow to fill remaining space */}
+      <div className="flex-1 min-w-0">
         <DemoManagerMainContent activeView={activeView} />
       </div>
     </div>
