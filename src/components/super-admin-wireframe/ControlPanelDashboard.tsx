@@ -336,7 +336,12 @@ const GRID_BOXES: { id: string; title: string; icon: React.ElementType; color: s
 ];
 
 // ===== UNIFORM BOX COMPONENT =====
-const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ box, index }) => {
+interface UniformBoxProps {
+  box: typeof GRID_BOXES[number];
+  index: number;
+}
+
+const UniformBoxComponent: React.FC<UniformBoxProps> = ({ box, index }) => {
   const Icon = box.icon;
   const Content = box.Component;
   
@@ -370,8 +375,8 @@ const UniformBox = memo<{ box: typeof GRID_BOXES[number]; index: number }>(({ bo
       </div>
     </motion.div>
   );
-});
-UniformBox.displayName = 'UniformBox';
+};
+const UniformBox = UniformBoxComponent;
 
 // ===== MAIN DASHBOARD - EXACT 2×7 GRID STRUCTURE =====
 export const ControlPanelDashboard = memo(() => {
