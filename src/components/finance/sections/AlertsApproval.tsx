@@ -21,12 +21,15 @@ import {
   DollarSign
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
 
 interface AlertsApprovalProps {
   activeView: FinanceView;
 }
 
 const AlertsApproval: React.FC<AlertsApprovalProps> = ({ activeView }) => {
+  const { approve, reject, update } = useGlobalActions();
+
   const getTitle = () => {
     switch (activeView) {
       case 'alert_high_amount': return 'High Amount Approvals';
@@ -61,6 +64,30 @@ const AlertsApproval: React.FC<AlertsApprovalProps> = ({ activeView }) => {
     { label: 'Rejected Today', value: '5', icon: XCircle, color: 'slate' },
   ];
 
+  const handleApproveRequest = (requestId: string) => {
+    approve('deal', requestId, { action: 'approve' });
+  };
+
+  const handleRejectRequest = (requestId: string, reason: string = 'Rejected by Finance Manager') => {
+    reject('deal', requestId, reason);
+  };
+
+  const handleAlertSettings = () => {
+    update('setting', 'alerts', { action: 'open_settings' });
+  };
+
+  const handleReviewTransaction = (txnId: string) => {
+    update('deal', txnId, { action: 'review' });
+  };
+
+  const handleBlockTransaction = (txnId: string) => {
+    reject('deal', txnId, 'Blocked due to risk assessment');
+  };
+
+  const handleAllowTransaction = (txnId: string) => {
+    approve('deal', txnId, { action: 'allow' });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -74,7 +101,7 @@ const AlertsApproval: React.FC<AlertsApprovalProps> = ({ activeView }) => {
             <p className="text-sm text-slate-500 dark:text-slate-400">Review and approve financial requests</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={handleAlertSettings}>
           <Settings className="w-4 h-4" />
           Alert Settings
         </Button>
@@ -140,11 +167,11 @@ const AlertsApproval: React.FC<AlertsApprovalProps> = ({ activeView }) => {
                       'default'
                     }>{request.riskLevel} Risk</Badge>
                     <div className="flex gap-1">
-                      <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700">
+                      <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApproveRequest(request.id)}>
                         <ThumbsUp className="w-3 h-3" />
                         Approve
                       </Button>
-                      <Button variant="destructive" size="sm" className="gap-1">
+                      <Button variant="destructive" size="sm" className="gap-1" onClick={() => handleRejectRequest(request.id)}>
                         <ThumbsDown className="w-3 h-3" />
                         Reject
                       </Button>
@@ -181,11 +208,11 @@ const AlertsApproval: React.FC<AlertsApprovalProps> = ({ activeView }) => {
                     <Badge variant={override.status === 'Approved' ? 'default' : 'secondary'}>{override.status}</Badge>
                     {override.status === 'Pending' && (
                       <div className="flex gap-1">
-                        <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700">
+                        <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApproveRequest(override.id)}>
                           <CheckCircle className="w-3 h-3" />
                           Approve
                         </Button>
-                        <Button variant="destructive" size="sm" className="gap-1">
+                        <Button variant="destructive" size="sm" className="gap-1" onClick={() => handleRejectRequest(override.id)}>
                           <XCircle className="w-3 h-3" />
                           Reject
                         </Button>
@@ -242,15 +269,15 @@ const AlertsApproval: React.FC<AlertsApprovalProps> = ({ activeView }) => {
                       ))}
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="gap-1">
+                      <Button variant="outline" size="sm" className="gap-1" onClick={() => handleReviewTransaction(txn.id)}>
                         <Eye className="w-3 h-3" />
                         Review
                       </Button>
-                      <Button variant="destructive" size="sm" className="gap-1">
+                      <Button variant="destructive" size="sm" className="gap-1" onClick={() => handleBlockTransaction(txn.id)}>
                         <XCircle className="w-3 h-3" />
                         Block
                       </Button>
-                      <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700">
+                      <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => handleAllowTransaction(txn.id)}>
                         <CheckCircle className="w-3 h-3" />
                         Allow
                       </Button>

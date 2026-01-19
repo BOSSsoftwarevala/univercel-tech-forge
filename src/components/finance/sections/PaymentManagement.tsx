@@ -3,7 +3,7 @@
  * Incoming, Outgoing, Failed, Pending, Partial Payments
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,12 +22,18 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface PaymentManagementProps {
   activeView: FinanceView;
 }
 
 const PaymentManagement: React.FC<PaymentManagementProps> = ({ activeView }) => {
+  const { update, approve, export: exportData } = useGlobalActions();
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+
   const getTitle = () => {
     switch (activeView) {
       case 'payment_incoming': return 'Incoming Payments';
@@ -60,6 +66,28 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ activeView }) => 
 
   const Icon = getIcon();
 
+  const handleViewPayment = (payment: any) => {
+    setSelectedPayment(payment);
+    setShowViewDialog(true);
+    update('deal', payment.id, { action: 'view' });
+  };
+
+  const handleRetryPayment = (paymentId: string) => {
+    update('deal', paymentId, { action: 'retry' });
+  };
+
+  const handleApprovePayment = (paymentId: string) => {
+    approve('deal', paymentId, { action: 'approve' });
+  };
+
+  const handleFilter = () => {
+    update('report', 'filter', { view: activeView });
+  };
+
+  const handleExport = () => {
+    exportData('report', 'excel', { view: activeView });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -74,11 +102,11 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ activeView }) => 
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleFilter}>
             <Filter className="w-4 h-4" />
             Filter
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
             <Download className="w-4 h-4" />
             Export
           </Button>
@@ -193,16 +221,16 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ activeView }) => 
                     </td>
                     <td className="py-3">
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleViewPayment(payment)}>
                           <Eye className="w-4 h-4" />
                         </Button>
                         {payment.status === 'Failed' && (
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleRetryPayment(payment.id)}>
                             <RefreshCw className="w-4 h-4" />
                           </Button>
                         )}
                         {payment.status === 'Pending' && (
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleApprovePayment(payment.id)}>
                             <CheckCircle className="w-4 h-4" />
                           </Button>
                         )}
@@ -215,6 +243,40 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ activeView }) => 
           </div>
         </CardContent>
       </Card>
+
+      {/* View Payment Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Payment Details</DialogTitle>
+          </DialogHeader>
+          {selectedPayment && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-slate-500">Payment ID</label>
+                  <p className="font-mono">{selectedPayment.id}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Amount</label>
+                  <p className="font-semibold">{selectedPayment.amount}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Source</label>
+                  <p>{selectedPayment.from}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Gateway</label>
+                  <p>{selectedPayment.gateway}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowViewDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

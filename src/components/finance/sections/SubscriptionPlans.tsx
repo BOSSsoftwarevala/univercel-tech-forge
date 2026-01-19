@@ -22,12 +22,15 @@ import {
   Zap
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
 
 interface SubscriptionPlansProps {
   activeView: FinanceView;
 }
 
 const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ activeView }) => {
+  const { update, create } = useGlobalActions();
+
   const getTitle = () => {
     switch (activeView) {
       case 'plan_active': return 'Active Plans';
@@ -60,6 +63,22 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ activeView }) => 
     { name: 'Enterprise', price: '₹99,999/yr', features: ['Unlimited Users', '24/7 Support', '1TB Storage'], color: 'purple' },
   ];
 
+  const handleSendRenewalReminders = () => {
+    create('customer', { action: 'send_renewal_reminders' });
+  };
+
+  const handleUpgrade = (subId: string) => {
+    update('customer', subId, { action: 'upgrade' });
+  };
+
+  const handleRenew = (subId: string) => {
+    update('customer', subId, { action: 'renew' });
+  };
+
+  const handleSelectPlan = (planName: string) => {
+    create('customer', { action: 'select_plan', plan: planName });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -68,7 +87,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ activeView }) => 
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{getTitle()}</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">Manage subscription plans and renewals</p>
         </div>
-        <Button size="sm" className="gap-2">
+        <Button size="sm" className="gap-2" onClick={handleSendRenewalReminders}>
           <Zap className="w-4 h-4" />
           Send Renewal Reminders
         </Button>
@@ -116,7 +135,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ activeView }) => 
                     </li>
                   ))}
                 </ul>
-                <Button variant="outline" className="w-full">Select Plan</Button>
+                <Button variant="outline" className="w-full" onClick={() => handleSelectPlan(plan.name)}>Select Plan</Button>
               </CardContent>
             </Card>
           ))}
@@ -179,11 +198,11 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ activeView }) => 
                     </td>
                     <td className="py-3">
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => handleUpgrade(sub.id)}>
                           <TrendingUp className="w-3 h-3 mr-1" />
                           Upgrade
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => handleRenew(sub.id)}>
                           <RefreshCw className="w-3 h-3 mr-1" />
                           Renew
                         </Button>

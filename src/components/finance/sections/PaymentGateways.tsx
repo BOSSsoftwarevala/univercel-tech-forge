@@ -3,7 +3,7 @@
  * UPI, Bank Transfer, PayU, Stripe, PayPal, Crypto
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,12 +21,27 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useGlobalActions } from '@/hooks/useGlobalActions';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface PaymentGatewaysProps {
   activeView: FinanceView;
 }
 
 const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
+  const { toggle, update } = useGlobalActions();
+  const [gatewayStatus, setGatewayStatus] = useState<Record<string, boolean>>({
+    upi: true,
+    bank: true,
+    payu: true,
+    stripe: true,
+    paypal: false,
+    crypto: true,
+  });
+  const [showLogsDialog, setShowLogsDialog] = useState(false);
+  const [showConfigDialog, setShowConfigDialog] = useState(false);
+  const [selectedGateway, setSelectedGateway] = useState<string | null>(null);
+
   const getTitle = () => {
     switch (activeView) {
       case 'gateway_upi': return 'UPI Gateway';
@@ -102,7 +117,28 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
     },
   ];
 
-  const selectedGateway = gateways.find(g => `gateway_${g.id}` === activeView);
+  const selectedGatewayData = gateways.find(g => `gateway_${g.id}` === activeView);
+
+  const handleToggleGateway = (gatewayId: string, currentStatus: boolean) => {
+    toggle('setting', gatewayId, 'status', currentStatus);
+    setGatewayStatus(prev => ({ ...prev, [gatewayId]: !currentStatus }));
+  };
+
+  const handleViewLogs = (gatewayId: string) => {
+    setSelectedGateway(gatewayId);
+    setShowLogsDialog(true);
+    update('log', gatewayId, { action: 'view_logs' });
+  };
+
+  const handleConfig = (gatewayId: string) => {
+    setSelectedGateway(gatewayId);
+    setShowConfigDialog(true);
+    update('setting', gatewayId, { action: 'view_config' });
+  };
+
+  const handleGatewaySettings = () => {
+    update('setting', 'gateways', { action: 'open_settings' });
+  };
 
   return (
     <div className="space-y-6">
@@ -112,7 +148,7 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{getTitle()}</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">Configure and monitor payment gateways</p>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={handleGatewaySettings}>
           <Settings className="w-4 h-4" />
           Gateway Settings
         </Button>
@@ -123,6 +159,7 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
         {gateways.map((gateway) => {
           const Icon = gateway.icon;
           const isSelected = `gateway_${gateway.id}` === activeView;
+          const isActive = gatewayStatus[gateway.id];
           
           return (
             <Card 
@@ -133,23 +170,26 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      gateway.status === 'Active' ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-amber-100 dark:bg-amber-900/30'
+                      isActive ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-amber-100 dark:bg-amber-900/30'
                     }`}>
                       <Icon className={`w-5 h-5 ${
-                        gateway.status === 'Active' ? 'text-emerald-600' : 'text-amber-600'
+                        isActive ? 'text-emerald-600' : 'text-amber-600'
                       }`} />
                     </div>
                     <div>
                       <p className="font-medium text-slate-900 dark:text-white">{gateway.name}</p>
                       <Badge 
-                        variant={gateway.status === 'Active' ? 'default' : 'secondary'}
+                        variant={isActive ? 'default' : 'secondary'}
                         className="text-[10px] mt-1"
                       >
-                        {gateway.status}
+                        {isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
                   </div>
-                  <Switch checked={gateway.status === 'Active'} />
+                  <Switch 
+                    checked={isActive} 
+                    onCheckedChange={() => handleToggleGateway(gateway.id, isActive)}
+                  />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 text-sm">
@@ -172,11 +212,11 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => handleViewLogs(gateway.id)}>
                     <Activity className="w-3 h-3 mr-1" />
                     Logs
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 text-xs">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => handleConfig(gateway.id)}>
                     <Settings className="w-3 h-3 mr-1" />
                     Config
                   </Button>
@@ -188,12 +228,12 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
       </div>
 
       {/* Selected Gateway Details */}
-      {selectedGateway && (
+      {selectedGatewayData && (
         <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <selectedGateway.icon className="w-5 h-5 text-blue-500" />
-              {selectedGateway.name} - Detailed View
+              <selectedGatewayData.icon className="w-5 h-5 text-blue-500" />
+              {selectedGatewayData.name} - Detailed View
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -255,6 +295,37 @@ const PaymentGateways: React.FC<PaymentGatewaysProps> = ({ activeView }) => {
           </CardContent>
         </Card>
       )}
+
+      {/* Logs Dialog */}
+      <Dialog open={showLogsDialog} onOpenChange={setShowLogsDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Gateway Logs - {selectedGateway?.toUpperCase()}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-sm text-slate-500">
+            Recent transaction logs will be displayed here.
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLogsDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Config Dialog */}
+      <Dialog open={showConfigDialog} onOpenChange={setShowConfigDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Gateway Configuration - {selectedGateway?.toUpperCase()}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-sm text-slate-500">
+            Gateway configuration options will be displayed here.
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfigDialog(false)}>Cancel</Button>
+            <Button>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
