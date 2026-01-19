@@ -650,8 +650,8 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO/Developer Manager/VALA AI/Demo Manager and full-screen modules) */}
-        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "demo_manager" && (
+        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except roles with built-in sidebars) */}
+        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "demo_manager" && activeRole !== "continent_super_admin" && (
           <>
             <RoleSwitchSidebarNew
               activeRole={activeRole}
