@@ -306,7 +306,7 @@ const ValaAIDevStudio: React.FC = () => {
           {selectedProject?.url ? (
             <div
               className={cn(
-                "bg-background rounded-xl shadow-2xl overflow-hidden transition-all duration-300 border-2 border-emerald-500/30",
+                "bg-background rounded-xl shadow-2xl overflow-hidden transition-all duration-300 border-2 border-emerald-500/30 relative",
                 device === 'desktop' && "w-full h-full"
               )}
               style={device !== 'desktop' ? deviceStyles[device] : undefined}
@@ -316,7 +316,16 @@ const ValaAIDevStudio: React.FC = () => {
                 src={selectedProject.url}
                 className="w-full h-full border-0"
                 title="Preview"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                loading="lazy"
+                onError={() => console.log('Iframe blocked by target site')}
               />
+              {/* Fallback overlay for blocked iframes */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/95 opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
+                <ExternalLink className="h-10 w-10 text-emerald-400 mb-3" />
+                <p className="text-lg font-semibold text-white">Preview may be blocked</p>
+                <p className="text-sm text-emerald-300 mt-1">Click external link icon to open in new tab</p>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center">
