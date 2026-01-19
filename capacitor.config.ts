@@ -1,12 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.softwarevala.app',
-  appName: 'Software Vala',
+  appId: 'app.lovable.60a74dfa5c5348bdb711c4f1a1cc9bf5',
+  appName: 'softwarewalanet',
   webDir: 'dist',
   
   // Live URL - APK always loads latest version from web
-  // When you update the website, APK users automatically get updates!
   server: {
     url: 'https://60a74dfa-5c53-48bd-b711-c4f1a1cc9bf5.lovableproject.com?forceHideBadge=true',
     cleartext: true,
@@ -22,19 +21,27 @@ const config: CapacitorConfig = {
     buildOptions: {
       releaseType: 'APK'
     },
-    // Enable hardware acceleration for smooth performance
-    useLegacyBridge: false
+    useLegacyBridge: false,
+    // Security: Disable screenshots in sensitive areas
+    appendUserAgent: 'SoftwareVala-Mobile/1.0'
+  },
+  
+  ios: {
+    backgroundColor: '#1a1a2e',
+    contentInset: 'automatic',
+    scheme: 'SoftwareVala'
   },
   
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 1500,
       backgroundColor: '#1a1a2e',
       showSpinner: true,
       spinnerColor: '#8b5cf6',
       androidSpinnerStyle: 'large',
       splashFullScreen: true,
-      splashImmersive: true
+      splashImmersive: true,
+      launchAutoHide: true
     },
     Keyboard: {
       resize: 'body',
@@ -44,6 +51,10 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: 'dark',
       backgroundColor: '#1a1a2e'
+    },
+    // Haptics for button feedback
+    Haptics: {
+      impactStyle: 'light'
     }
   }
 };
