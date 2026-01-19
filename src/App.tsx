@@ -514,8 +514,8 @@ const App = () => (
               </Route>
 
               {/* Continent Super Admin Routes */}
-              <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
-              <Route path="/continent-super-admin/*" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
+              <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner", "continent_super_admin"]}><ContinentSuperAdminDashboard /></RequireRole>} />
+              <Route path="/continent-super-admin/*" element={<RequireRole allowed={["boss_owner", "continent_super_admin"]}><ContinentSuperAdminDashboard /></RequireRole>} />
 
               {/* Super Admin Routes - Redirect to unified RoleSwitchDashboard to prevent duplicate layouts */}
               <Route path="/admin" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
