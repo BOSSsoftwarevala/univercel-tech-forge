@@ -38,6 +38,7 @@ import { MMFullLayout } from "@/components/marketplace-manager/MMFullLayout";
 import { FUFullLayout } from "@/components/franchise-user/FUFullLayout";
 import { RSFullLayout } from "@/components/reseller-sales/RSFullLayout";
 import { DMEFullLayout } from "@/components/demo-manager-enterprise/DMEFullLayout";
+import { DevFullLayout } from "@/components/developer/DevFullLayout";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
@@ -492,6 +493,8 @@ const RoleSwitchDashboard = () => {
         return <RSFullLayout onBack={() => setActiveRole(null)} />;
       case "demo_manager_enterprise":
         return <DMEFullLayout onBack={() => setActiveRole(null)} />;
+      case "developer":
+        return <DevFullLayout onBack={() => setActiveRole(null)} />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;

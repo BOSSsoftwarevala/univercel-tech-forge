@@ -80,6 +80,7 @@ export type ActiveRole =
   | "finance_manager"
   | "vala_ai_management"
   | "developer_management"
+  | "developer"
   | "marketing_management"
   | "customer_support_management"
   | "role_manager"
@@ -338,6 +339,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "DM",
     icon: Monitor,
     description: "Enterprise Demo Management",
+  },
+  developer: {
+    id: "developer",
+    label: "Developer Dashboard",
+    shortLabel: "DEV",
+    icon: Code2,
+    description: "Developer Portal & Projects",
   },
 };
 
