@@ -481,7 +481,7 @@ const RoleSwitchDashboard = () => {
       case "franchise_manager":
         return <FranchiseManagerView />;
       case "sales_support_manager":
-        return <SalesSupportManagerView />;
+        return <CustomerSupportManagerView />;
       case "reseller_manager":
         return <ResellerManagerFullView onBack={() => setActiveRole("boss_owner")} />;
       case "lead_manager":
