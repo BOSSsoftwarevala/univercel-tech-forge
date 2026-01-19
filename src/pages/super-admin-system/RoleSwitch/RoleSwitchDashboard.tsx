@@ -160,11 +160,11 @@ const RoleSwitchDashboard = () => {
    * This prevents the Control Panel role list / switcher from showing alongside a module sidebar.
    */
   const isInModuleView = useMemo(() => {
-    if (moduleViewIds.includes(activeNav)) return true;
-    // Any non-boss role dashboard is treated as its own isolated context (no role switcher)
-    if (activeRole !== null && activeRole !== 'boss_owner') return true;
-    return false;
-  }, [activeRole, activeNav, moduleViewIds]);
+    // A "module view" is only when activeNav is a dedicated full-screen module.
+    // Role dashboards (e.g. Continent Admin) are NOT treated as module views, otherwise
+    // their navigation/sidebar can get disabled.
+    return moduleViewIds.includes(activeNav);
+  }, [activeNav, moduleViewIds]);
   
   // SINGLE-CONTEXT ENFORCEMENT: Use sidebar store for context control
   const {
