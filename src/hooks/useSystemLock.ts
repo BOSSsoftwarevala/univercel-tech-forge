@@ -11,7 +11,10 @@ export type LockableArea =
   | 'routes'
   | 'ui_refactor'
   | 'permissions'
-  | 'design_system';
+  | 'design_system'
+  | 'api_endpoints'
+  | 'role_matrix'
+  | 'production_mode';
 
 export interface SystemLockState {
   isLocked: boolean;
@@ -46,7 +49,7 @@ export function useSystemLock() {
   }, [lockState]);
 
   /**
-   * Lock the entire system
+   * Lock the entire system for production
    */
   const lockSystem = useCallback(async (lockedBy: string): Promise<boolean> => {
     const timestamp = new Date().toISOString();
@@ -55,7 +58,16 @@ export function useSystemLock() {
       isLocked: true,
       lockTimestamp: timestamp,
       lockedBy,
-      lockedAreas: ['schema', 'routes', 'ui_refactor', 'permissions', 'design_system'],
+      lockedAreas: [
+        'schema', 
+        'routes', 
+        'ui_refactor', 
+        'permissions', 
+        'design_system',
+        'api_endpoints',
+        'role_matrix',
+        'production_mode'
+      ],
       version: CURRENT_VERSION,
       allowedChangeTypes: ['hotfix', 'security_patch', 'new_version']
     });
@@ -67,6 +79,45 @@ export function useSystemLock() {
       metadata: {
         locked_by: lockedBy,
         lock_timestamp: timestamp,
+        version: CURRENT_VERSION,
+        mode: 'production'
+      }
+    });
+
+    return true;
+  }, [logAction]);
+
+  /**
+   * Enable production mode lock
+   */
+  const enableProductionMode = useCallback(async (enabledBy: string): Promise<boolean> => {
+    const timestamp = new Date().toISOString();
+
+    setLockState(prev => ({
+      ...prev,
+      isLocked: true,
+      lockTimestamp: timestamp,
+      lockedBy: enabledBy,
+      lockedAreas: [
+        'schema', 
+        'routes', 
+        'ui_refactor', 
+        'permissions', 
+        'design_system',
+        'api_endpoints',
+        'role_matrix',
+        'production_mode'
+      ],
+      allowedChangeTypes: ['hotfix', 'security_patch']
+    }));
+
+    await logAction({
+      action: 'production_mode_enabled',
+      module: 'system',
+      severity: 'critical',
+      metadata: {
+        enabled_by: enabledBy,
+        timestamp,
         version: CURRENT_VERSION
       }
     });
@@ -132,6 +183,7 @@ export function useSystemLock() {
   return {
     lockState,
     lockSystem,
+    enableProductionMode,
     isAreaLocked,
     isChangeAllowed,
     requestUnlock,
