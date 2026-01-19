@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ListTodo, UserPlus, RefreshCw, Pause, AlertTriangle, CheckCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { ListTodo, UserPlus, RefreshCw, Pause, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { useActionHandler } from '@/hooks/useActionHandler';
 
 const tasks = [
   { id: 'TSK-001', project: 'Project Alpha', module: 'Auth', priority: 'high', deadline: '2024-01-20', dependency: 'None', status: 'new', assignee: null },
@@ -42,10 +42,31 @@ const getStatusBadge = (status: string) => {
 
 export const DMTaskManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const { assign, reassign, pause, escalate, close, isActionLoading } = useActionHandler();
 
   const filteredTasks = tasks.filter(task => 
     activeTab === 'all' || task.status === activeTab
   );
+
+  const handleAssign = (taskId: string) => {
+    assign('Task', taskId, { action: 'assign_developer' });
+  };
+
+  const handleReassign = (taskId: string) => {
+    reassign('Task', taskId, { action: 'reassign_developer' });
+  };
+
+  const handlePause = (taskId: string) => {
+    pause('Task', taskId, { action: 'pause_task' });
+  };
+
+  const handleEscalate = (taskId: string) => {
+    escalate('Task', taskId, { action: 'escalate_to_lead' });
+  };
+
+  const handleClose = (taskId: string) => {
+    close('Task', taskId, { action: 'close_task' });
+  };
 
   return (
     <div className="space-y-6">
@@ -103,24 +124,69 @@ export const DMTaskManagement: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" onClick={() => toast.success(`Task ${task.id} assigned`)}>
-                        <UserPlus className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleAssign(task.id)}
+                        disabled={isActionLoading('assign', task.id)}
+                      >
+                        {isActionLoading('assign', task.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <UserPlus className="h-4 w-4 mr-1" />
+                        )}
                         Assign
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.info(`Task ${task.id} reassigned`)}>
-                        <RefreshCw className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleReassign(task.id)}
+                        disabled={isActionLoading('reassign', task.id)}
+                      >
+                        {isActionLoading('reassign', task.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-4 w-4 mr-1" />
+                        )}
                         Reassign
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.warning(`Task ${task.id} paused`)}>
-                        <Pause className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handlePause(task.id)}
+                        disabled={isActionLoading('pause', task.id)}
+                      >
+                        {isActionLoading('pause', task.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Pause className="h-4 w-4 mr-1" />
+                        )}
                         Pause
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.error(`Task ${task.id} escalated`)}>
-                        <AlertTriangle className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleEscalate(task.id)}
+                        disabled={isActionLoading('escalate', task.id)}
+                      >
+                        {isActionLoading('escalate', task.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <AlertTriangle className="h-4 w-4 mr-1" />
+                        )}
                         Escalate
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.success(`Task ${task.id} closed`)}>
-                        <CheckCircle className="h-4 w-4 mr-1" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleClose(task.id)}
+                        disabled={isActionLoading('close', task.id)}
+                      >
+                        {isActionLoading('close', task.id) ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                        )}
                         Close
                       </Button>
                     </div>
