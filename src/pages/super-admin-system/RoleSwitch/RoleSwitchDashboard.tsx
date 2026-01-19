@@ -536,6 +536,8 @@ const RoleSwitchDashboard = () => {
       "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     )}>
       {/* TOP HEADER - Unified Global Header (Icon-only, 3D Premium) */}
+      {/* NOTE: Hide top header when in continent_super_admin since that view has its own header */}
+      {activeRole !== "continent_super_admin" && (
       <header className={cn(
         "h-14 backdrop-blur-xl border-b flex items-center justify-between px-4 z-50 transition-colors duration-300",
         "bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-slate-800/50",
@@ -657,6 +659,7 @@ const RoleSwitchDashboard = () => {
           </motion.button>
         </div>
       </header>
+      )}
       
       {/* STEP 9: SINGLE-CONTEXT LAYOUT - Exactly ONE sidebar visible at all times */}
       <div className="flex-1 flex overflow-hidden relative">
@@ -707,8 +710,9 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO/Developer Manager/VALA AI and full-screen modules) */}
-        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && (
+        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO/Developer Manager/VALA AI/Continent Admin and full-screen modules) */}
+        {/* NOTE: continent_super_admin has its OWN sidebar inside ContinentSuperAdminView/GlobalContinentDashboard - do NOT render a second one here */}
+        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && activeRole !== "continent_super_admin" && (
           <>
             <RoleSwitchSidebarNew
               activeRole={activeRole}
@@ -764,31 +768,33 @@ const RoleSwitchDashboard = () => {
         </main>
       </div>
 
-      {/* FOOTER */}
-      <footer className={cn(
-        "h-12 backdrop-blur-xl border-t flex items-center justify-between px-6 transition-colors duration-300",
-        activeRole === "server_manager" 
-          ? "bg-zinc-900/80 border-zinc-700" 
-          : "bg-card/80 border-border/50"
-      )}>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-muted-foreground font-mono">
-            View: <span className="text-primary">{currentConfig.label}</span>
-          </span>
-          <span className="text-xs text-muted-foreground">|</span>
-          <span className="text-xs text-muted-foreground font-mono">
-            Scope: Global
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-muted-foreground">
-            Session ID: <span className="font-mono text-foreground">SES-{Date.now().toString(36).toUpperCase()}</span>
-          </span>
-          <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 text-xs">
-            Secure Connection
-          </Badge>
-        </div>
-      </footer>
+      {/* FOOTER - Hide for continent_super_admin which has its own layout */}
+      {activeRole !== "continent_super_admin" && (
+        <footer className={cn(
+          "h-12 backdrop-blur-xl border-t flex items-center justify-between px-6 transition-colors duration-300",
+          activeRole === "server_manager" 
+            ? "bg-zinc-900/80 border-zinc-700" 
+            : "bg-card/80 border-border/50"
+        )}>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-muted-foreground font-mono">
+              View: <span className="text-primary">{currentConfig.label}</span>
+            </span>
+            <span className="text-xs text-muted-foreground">|</span>
+            <span className="text-xs text-muted-foreground font-mono">
+              Scope: Global
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-muted-foreground">
+              Session ID: <span className="font-mono text-foreground">SES-{Date.now().toString(36).toUpperCase()}</span>
+            </span>
+            <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 text-xs">
+              Secure Connection
+            </Badge>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
