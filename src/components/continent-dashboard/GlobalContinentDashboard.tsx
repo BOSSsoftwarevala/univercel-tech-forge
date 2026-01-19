@@ -53,13 +53,14 @@ const sidebarItems: { id: SidebarSection; label: string; icon: any; readOnly?: b
   { id: "activity_log", label: "Activity Log", icon: FileText },
 ];
 
-// Continent data with markers
+// Continent data with markers - 7 regions
 const continentMarkers = [
   { id: "asia", name: "Asia", coordinates: [100, 35] as [number, number], color: "#ef4444", countries: 48, admins: 45, franchises: 1250, resellers: 3400, icon: "🌏" },
   { id: "africa", name: "Africa", coordinates: [20, 0] as [number, number], color: "#f59e0b", countries: 54, admins: 48, franchises: 890, resellers: 2100, icon: "🌍" },
   { id: "europe", name: "Europe", coordinates: [15, 50] as [number, number], color: "#3b82f6", countries: 44, admins: 42, franchises: 1100, resellers: 2800, icon: "🌍" },
   { id: "north_america", name: "North America", coordinates: [-100, 45] as [number, number], color: "#10b981", countries: 23, admins: 21, franchises: 950, resellers: 2200, icon: "🌎" },
   { id: "south_america", name: "South America", coordinates: [-60, -15] as [number, number], color: "#84cc16", countries: 12, admins: 10, franchises: 420, resellers: 980, icon: "🌎" },
+  { id: "middle_east", name: "Middle East", coordinates: [50, 28] as [number, number], color: "#06b6d4", countries: 18, admins: 16, franchises: 380, resellers: 920, icon: "🌍" },
   { id: "oceania", name: "Oceania", coordinates: [135, -25] as [number, number], color: "#8b5cf6", countries: 14, admins: 12, franchises: 280, resellers: 650, icon: "🌏" },
 ];
 

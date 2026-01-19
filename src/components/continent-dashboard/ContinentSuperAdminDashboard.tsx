@@ -48,20 +48,20 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
     issues: config.countries.reduce((sum, c) => sum + c.issues, 0),
   }), [config.countries]);
   
-  // 12 Action KPI Boxes - Continent-scoped only
+  // 12 Action KPI Boxes - Continent-scoped only (matching required specs)
   const actionKPIs: ActionKPI[] = useMemo(() => [
+    { id: "system_health", title: "System Health", count: 94, icon: Server, color: "from-emerald-500 to-green-500", trend: "stable", source: "System", lastUpdate: "1 min ago", actions: ["details", "restart"] },
+    { id: "active_countries", title: "Active Countries", count: totals.countries, icon: Target, color: "from-blue-500 to-cyan-500", trend: "stable", source: "System", lastUpdate: "5 min ago", actions: ["view"] },
+    { id: "active_franchises", title: "Active Franchise", count: totals.franchises, icon: Clock, color: "from-purple-500 to-violet-500", trend: "up", source: "Human", lastUpdate: "2 min ago", actions: ["approve", "review"] },
+    { id: "active_resellers", title: "Active Reseller", count: totals.resellers, icon: Clock, color: "from-orange-500 to-amber-500", trend: "up", source: "Human", lastUpdate: "3 min ago", actions: ["approve", "review"] },
     { id: "pending_approvals", title: "Pending Approvals", count: totals.pendingApprovals, icon: Clock, color: "from-amber-500 to-orange-500", trend: "up", source: "Human", lastUpdate: "2 min ago", actions: ["approve", "reject", "review"] },
-    { id: "critical_issues", title: "Critical Issues", count: totals.issues, icon: AlertTriangle, color: "from-red-500 to-rose-500", trend: "up", source: "System", lastUpdate: "5 min ago", actions: ["review", "escalate", "resolve"] },
-    { id: "system_health", title: `System Health (${config.name})`, count: 94, icon: Server, color: "from-emerald-500 to-green-500", trend: "stable", source: "System", lastUpdate: "1 min ago", actions: ["details", "restart"] },
-    { id: "server_risk", title: "Server Load / Risk", count: 2, icon: Zap, color: "from-yellow-500 to-amber-500", trend: "down", source: "AI", lastUpdate: "3 min ago", actions: ["review", "scale"] },
-    { id: "failed_builds", title: "Failed Builds", count: 0, icon: FileWarning, color: "from-slate-500 to-gray-500", trend: "stable", source: "System", lastUpdate: "Just now", actions: ["retry", "review"] },
-    { id: "deployment", title: "Deployment Waiting", count: 3, icon: Clock, color: "from-blue-500 to-cyan-500", trend: "up", source: "Human", lastUpdate: "10 min ago", actions: ["approve", "reject"] },
-    { id: "payment_pending", title: "Payment Pending", count: 8, icon: DollarSign, color: "from-purple-500 to-violet-500", trend: "up", source: "System", lastUpdate: "15 min ago", actions: ["approve", "hold", "review"] },
-    { id: "expiry_renewal", title: "Expiry / Renewal Due", count: 12, icon: Calendar, color: "from-orange-500 to-red-500", trend: "up", source: "System", lastUpdate: "1 hour ago", actions: ["renew", "notify", "suspend"] },
-    { id: "ai_cost", title: "AI / API Cost Spike", count: 1, icon: Zap, color: "from-pink-500 to-rose-500", trend: "up", source: "AI", lastUpdate: "30 min ago", actions: ["review", "limit", "optimize"] },
-    { id: "open_issues", title: "Open Issues (Unresolved)", count: 15, icon: Target, color: "from-indigo-500 to-purple-500", trend: "down", source: "Human", lastUpdate: "5 min ago", actions: ["assign", "escalate", "close"] },
-    { id: "security", title: "Security Warnings", count: 2, icon: Lock, color: "from-red-600 to-red-500", trend: "stable", source: "AI", lastUpdate: "2 hours ago", actions: ["investigate", "block", "whitelist"] },
-    { id: "compliance", title: "Compliance / SLA Breach", count: 1, icon: Shield, color: "from-rose-500 to-red-500", trend: "down", source: "System", lastUpdate: "45 min ago", actions: ["review", "notify", "resolve"] },
+    { id: "open_issues", title: "Open Issues", count: totals.issues, icon: AlertTriangle, color: "from-red-500 to-rose-500", trend: "up", source: "System", lastUpdate: "5 min ago", actions: ["review", "escalate", "resolve"] },
+    { id: "lead_volume", title: "Lead Volume", count: totals.leads, icon: Target, color: "from-pink-500 to-rose-500", trend: "up", source: "System", lastUpdate: "10 min ago", actions: ["view"] },
+    { id: "conversion_rate", title: "Conversion Rate", count: 42, icon: Zap, color: "from-indigo-500 to-purple-500", trend: "up", source: "AI", lastUpdate: "15 min ago", actions: ["view"] },
+    { id: "revenue_today", title: "Revenue Today", count: Math.round(totals.revenue / 1000), icon: DollarSign, color: "from-emerald-500 to-teal-500", trend: "up", source: "System", lastUpdate: "1 min ago", actions: ["view", "export"] },
+    { id: "wallet_risk", title: "Wallet Risk", count: 3, icon: Lock, color: "from-yellow-500 to-amber-500", trend: "down", source: "AI", lastUpdate: "30 min ago", actions: ["review", "alert"] },
+    { id: "compliance_alerts", title: "Compliance Alerts", count: 2, icon: Shield, color: "from-red-600 to-red-500", trend: "stable", source: "System", lastUpdate: "45 min ago", actions: ["review", "resolve"] },
+    { id: "ai_recommendation", title: "AI Recommendation", count: 5, icon: Zap, color: "from-cyan-500 to-blue-500", trend: "stable", source: "AI", lastUpdate: "10 min ago", actions: ["view", "apply"] },
   ], [totals, config.name]);
 
   const handleRefresh = useCallback(async () => {
@@ -100,9 +100,9 @@ const ContinentSuperAdminDashboard = ({ config, onBack }: ContinentSuperAdminDas
 
   const handleKpiClick = useCallback((kpi: ActionKPI) => {
     const idToSection: Partial<Record<ActionKPI["id"], ContinentSidebarSection>> = {
-      pending_approvals: "pending_approvals",
-      critical_issues: "critical_issues",
-      payment_pending: "payments",
+      pending_approvals: "approvals",
+      critical_issues: "issues",
+      payment_pending: "revenue",
       compliance: "compliance",
     };
 

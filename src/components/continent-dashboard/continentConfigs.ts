@@ -124,6 +124,23 @@ export const CONTINENT_CONFIGS: Record<string, ContinentConfig> = {
     themeGradient: "from-purple-500 to-violet-600",
     accentColor: "purple",
   },
+  middle_east: {
+    id: "middle_east",
+    name: "Middle East",
+    icon: "🌍",
+    mapCenter: [50, 28],
+    mapScale: 600,
+    countries: [
+      { id: "AE", name: "UAE", admin: "Ahmed Al-Rashid", status: "healthy", franchises: 22, resellers: 55, leads: 145, revenue: 1800000, lat: 23.4241, lng: 53.8478, pendingApprovals: 2, issues: 1, compliance: "compliant" },
+      { id: "SA", name: "Saudi Arabia", admin: "Mohammed Al-Saud", status: "healthy", franchises: 18, resellers: 42, leads: 98, revenue: 1500000, lat: 23.8859, lng: 45.0792, pendingApprovals: 3, issues: 2, compliance: "compliant" },
+      { id: "QA", name: "Qatar", admin: "Hamad Al-Thani", status: "healthy", franchises: 8, resellers: 18, leads: 42, revenue: 680000, lat: 25.2867, lng: 51.5333, pendingApprovals: 1, issues: 0, compliance: "compliant" },
+      { id: "KW", name: "Kuwait", admin: "Fahad Al-Sabah", status: "healthy", franchises: 6, resellers: 15, leads: 35, revenue: 450000, lat: 29.3759, lng: 47.9774, pendingApprovals: 0, issues: 0, compliance: "compliant" },
+      { id: "BH", name: "Bahrain", admin: "Ali Al-Khalifa", status: "warning", franchises: 4, resellers: 10, leads: 22, revenue: 280000, lat: 26.0275, lng: 50.5500, pendingApprovals: 2, issues: 1, compliance: "review" },
+      { id: "OM", name: "Oman", admin: "Said Al-Busaidi", status: "healthy", franchises: 5, resellers: 12, leads: 28, revenue: 320000, lat: 21.5126, lng: 55.9233, pendingApprovals: 1, issues: 0, compliance: "compliant" },
+    ],
+    themeGradient: "from-cyan-500 to-teal-600",
+    accentColor: "cyan",
+  },
 };
 
 export const getContinentConfig = (continentId: string): ContinentConfig => {
