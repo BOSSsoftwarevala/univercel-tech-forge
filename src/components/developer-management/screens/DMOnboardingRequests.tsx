@@ -7,8 +7,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, FileCheck, Shield, Award, Crown, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
-import { useActionHandler } from '@/hooks/useActionHandler';
+import { UserPlus, FileCheck, Shield, Award, Crown, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { toast } from 'sonner';
 
 const onboardingRequests = [
   { 
@@ -43,20 +43,6 @@ const stepIcons = {
 };
 
 export const DMOnboardingRequests: React.FC = () => {
-  const { approve, reject, hold, isActionLoading } = useActionHandler();
-
-  const handleApprove = (requestId: string) => {
-    approve('Onboarding Request', requestId, { action: 'approve_step' });
-  };
-
-  const handleReject = (requestId: string) => {
-    reject('Onboarding Request', requestId, { action: 'reject_application' });
-  };
-
-  const handleHold = (requestId: string) => {
-    hold('Onboarding Request', requestId, { action: 'put_on_hold' });
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -135,40 +121,25 @@ export const DMOnboardingRequests: React.FC = () => {
                   <Button 
                     size="sm" 
                     className="bg-green-600 hover:bg-green-700"
-                    onClick={() => handleApprove(request.id)}
-                    disabled={isActionLoading('approve', request.id)}
+                    onClick={() => toast.success(`${request.id} approved`)}
                   >
-                    {isActionLoading('approve', request.id) ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                    )}
+                    <CheckCircle className="h-4 w-4 mr-1" />
                     Approve
                   </Button>
                   <Button 
                     size="sm" 
                     variant="destructive"
-                    onClick={() => handleReject(request.id)}
-                    disabled={isActionLoading('reject', request.id)}
+                    onClick={() => toast.error(`${request.id} rejected`)}
                   >
-                    {isActionLoading('reject', request.id) ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <XCircle className="h-4 w-4 mr-1" />
-                    )}
+                    <XCircle className="h-4 w-4 mr-1" />
                     Reject
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => handleHold(request.id)}
-                    disabled={isActionLoading('hold', request.id)}
+                    onClick={() => toast.info(`${request.id} on hold`)}
                   >
-                    {isActionLoading('hold', request.id) ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <Clock className="h-4 w-4 mr-1" />
-                    )}
+                    <Clock className="h-4 w-4 mr-1" />
                     Hold
                   </Button>
                 </div>

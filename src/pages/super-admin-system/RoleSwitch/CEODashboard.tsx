@@ -35,8 +35,8 @@ const regionalPerformance = [
   { region: "Africa", revenue: 180000, growth: 25.4, status: "excellent" },
 ];
 
-// AI suggestions - initial state
-const initialAiSuggestions = [
+// AI suggestions
+const aiSuggestions = [
   {
     id: 1,
     type: "growth",
@@ -75,15 +75,15 @@ const initialAiSuggestions = [
   },
 ];
 
-// Strategic approval queue - initial state
-const initialApprovalQueue = [
-  { id: 1, title: "New Franchise Agreement - Dubai", submittedBy: "Super Admin", amount: "$500K", priority: "high", daysAgo: 2, status: "pending" },
-  { id: 2, title: "Marketing Campaign Budget", submittedBy: "Marketing Head", amount: "$120K", priority: "medium", daysAgo: 1, status: "pending" },
-  { id: 3, title: "Technology Infrastructure Upgrade", submittedBy: "Server Manager", amount: "$350K", priority: "high", daysAgo: 3, status: "pending" },
-  { id: 4, title: "Legal Compliance Update", submittedBy: "Legal Manager", amount: "$45K", priority: "low", daysAgo: 5, status: "pending" },
+// Strategic approval queue
+const approvalQueue = [
+  { id: 1, title: "New Franchise Agreement - Dubai", submittedBy: "Super Admin", amount: "$500K", priority: "high", daysAgo: 2 },
+  { id: 2, title: "Marketing Campaign Budget", submittedBy: "Marketing Head", amount: "$120K", priority: "medium", daysAgo: 1 },
+  { id: 3, title: "Technology Infrastructure Upgrade", submittedBy: "Server Manager", amount: "$350K", priority: "high", daysAgo: 3 },
+  { id: 4, title: "Legal Compliance Update", submittedBy: "Legal Manager", amount: "$45K", priority: "low", daysAgo: 5 },
 ];
 
-// Risk alerts - static read-only data
+// Risk alerts
 const riskAlerts = [
   { id: 1, level: "high", title: "Regulatory Change in EU", description: "New data protection requirements effective Q2", deadline: "45 days" },
   { id: 2, level: "medium", title: "Competitor Product Launch", description: "Major competitor announcing new features", deadline: "30 days" },
@@ -95,12 +95,9 @@ interface CEODashboardProps {
 }
 
 const CEODashboard = ({ activeNav }: CEODashboardProps) => {
-  const [suggestions, setSuggestions] = useState(initialAiSuggestions);
-  const [approvals, setApprovals] = useState(initialApprovalQueue);
-  const [selectedSuggestion, setSelectedSuggestion] = useState<typeof initialAiSuggestions[0] | null>(null);
+  const [selectedSuggestion, setSelectedSuggestion] = useState<typeof aiSuggestions[0] | null>(null);
   const [noteText, setNoteText] = useState("");
   const [showNoteDialog, setShowNoteDialog] = useState(false);
-  const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set());
   const { user } = useAuth();
   
   // Map sidebar navigation to internal tabs
@@ -146,93 +143,23 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   }, [user?.id]);
 
   const handleApprove = async (id: number) => {
-    setLoadingIds(prev => new Set(prev).add(id));
-    try {
-      const suggestion = suggestions.find(s => s.id === id);
-      await logAction('suggestion_approve', suggestion?.title || `suggestion_${id}`, { 
-        suggestionId: id, 
-        type: suggestion?.type,
-        confidence: suggestion?.confidence 
-      });
-      // Update state to reflect approval
-      setSuggestions(prev => prev.map(s => 
-        s.id === id ? { ...s, status: "approved" } : s
-      ));
-      toast.success("Suggestion approved and sent to Super Admin for implementation");
-    } finally {
-      setLoadingIds(prev => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-    }
+    const suggestion = aiSuggestions.find(s => s.id === id);
+    await logAction('suggestion_approve', suggestion?.title || `suggestion_${id}`, { 
+      suggestionId: id, 
+      type: suggestion?.type,
+      confidence: suggestion?.confidence 
+    });
+    toast.success("Suggestion approved and sent to Super Admin for implementation");
   };
 
   const handleReject = async (id: number, reason: string) => {
-    setLoadingIds(prev => new Set(prev).add(id));
-    try {
-      const suggestion = suggestions.find(s => s.id === id);
-      await logAction('suggestion_reject', suggestion?.title || `suggestion_${id}`, { 
-        suggestionId: id, 
-        reason,
-        type: suggestion?.type 
-      });
-      // Update state to reflect rejection
-      setSuggestions(prev => prev.map(s => 
-        s.id === id ? { ...s, status: "rejected" } : s
-      ));
-      toast.info("Suggestion rejected with feedback");
-    } finally {
-      setLoadingIds(prev => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-    }
-  };
-
-  const handleApprovalApprove = async (id: number) => {
-    setLoadingIds(prev => new Set(prev).add(id + 1000)); // Offset to avoid collision
-    try {
-      const item = approvals.find(a => a.id === id);
-      await logAction('strategic_approval_approve', item?.title || `approval_${id}`, { 
-        amount: item?.amount, 
-        submittedBy: item?.submittedBy 
-      });
-      // Update state
-      setApprovals(prev => prev.map(a => 
-        a.id === id ? { ...a, status: "approved" } : a
-      ));
-      toast.success(`${item?.title} approved!`);
-    } finally {
-      setLoadingIds(prev => {
-        const next = new Set(prev);
-        next.delete(id + 1000);
-        return next;
-      });
-    }
-  };
-
-  const handleApprovalReject = async (id: number) => {
-    setLoadingIds(prev => new Set(prev).add(id + 1000));
-    try {
-      const item = approvals.find(a => a.id === id);
-      await logAction('strategic_approval_reject', item?.title || `approval_${id}`, { 
-        amount: item?.amount, 
-        submittedBy: item?.submittedBy 
-      });
-      // Update state
-      setApprovals(prev => prev.map(a => 
-        a.id === id ? { ...a, status: "rejected" } : a
-      ));
-      toast.info(`${item?.title} rejected`);
-    } finally {
-      setLoadingIds(prev => {
-        const next = new Set(prev);
-        next.delete(id + 1000);
-        return next;
-      });
-    }
+    const suggestion = aiSuggestions.find(s => s.id === id);
+    await logAction('suggestion_reject', suggestion?.title || `suggestion_${id}`, { 
+      suggestionId: id, 
+      reason,
+      type: suggestion?.type 
+    });
+    toast.info("Suggestion rejected with feedback");
   };
 
   const handleAddNote = async () => {
@@ -459,7 +386,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
             <CardContent>
               <ScrollArea className="h-[500px]">
                 <div className="space-y-4">
-                  {suggestions.map((suggestion) => (
+                  {aiSuggestions.map((suggestion) => (
                     <motion.div
                       key={suggestion.id}
                       initial={{ opacity: 0, y: 10 }}
@@ -530,7 +457,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
             <CardContent>
               <ScrollArea className="h-[400px]">
                 <div className="space-y-3">
-                  {approvals.filter(a => a.status === "pending").map((item) => (
+                  {approvalQueue.map((item) => (
                     <div key={item.id} className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/30 flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

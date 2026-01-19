@@ -11,15 +11,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 export type ContinentSidebarSection = 
   | "dashboard"
   | "live_map"
-  | "countries"
+  | "country_admins"
   | "franchises"
   | "resellers"
-  | "leads"
-  | "revenue"
-  | "approvals"
-  | "issues"
-  | "reports"
+  | "influencers"
+  | "pending_approvals"
+  | "critical_issues"
+  | "payments"
   | "compliance"
+  | "audit_logs"
+  | "reports"
   | "settings";
 
 interface ContinentSidebarProps {
@@ -34,16 +35,17 @@ interface ContinentSidebarProps {
 
 const sidebarItems: { id: ContinentSidebarSection; label: string; icon: any }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "live_map", label: "Live Continent Map", icon: Map },
-  { id: "countries", label: "Countries Management", icon: Users },
+  { id: "live_map", label: "Live Map", icon: Map },
+  { id: "country_admins", label: "Country Admins", icon: Users },
   { id: "franchises", label: "Franchise Management", icon: Building2 },
   { id: "resellers", label: "Reseller Management", icon: Store },
-  { id: "leads", label: "Lead Oversight", icon: Target },
-  { id: "revenue", label: "Revenue & Wallet", icon: DollarSign },
-  { id: "approvals", label: "Approvals Center", icon: Clock },
-  { id: "issues", label: "Issues & Alerts", icon: AlertTriangle },
-  { id: "reports", label: "Reports & Analytics", icon: FileText },
-  { id: "compliance", label: "Compliance / Legal", icon: Shield },
+  { id: "influencers", label: "Influencer / Partner", icon: Target },
+  { id: "pending_approvals", label: "Pending Approvals", icon: Clock },
+  { id: "critical_issues", label: "Critical Issues", icon: AlertTriangle },
+  { id: "payments", label: "Payments & Renewals", icon: DollarSign },
+  { id: "compliance", label: "Compliance & Legal", icon: Shield },
+  { id: "audit_logs", label: "Audit Logs", icon: FileText },
+  { id: "reports", label: "Reports & Export", icon: FileText },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 

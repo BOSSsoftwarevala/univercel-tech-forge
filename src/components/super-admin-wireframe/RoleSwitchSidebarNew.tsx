@@ -42,7 +42,6 @@ import {
   Timer,
   MessageSquare,
   Store,
-  Monitor,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -80,7 +79,6 @@ export type ActiveRole =
   | "finance_manager"
   | "vala_ai_management"
   | "developer_management"
-  | "developer"
   | "marketing_management"
   | "customer_support_management"
   | "role_manager"
@@ -89,10 +87,7 @@ export type ActiveRole =
   | "assist_manager"
   | "internal_chatbot"
   | "influencer_manager"
-  | "marketplace_manager"
-  | "franchise_user"
-  | "reseller_sales"
-  | "demo_manager_enterprise";
+  | "marketplace_manager";
 
 interface SubCategory {
   id: string;
@@ -318,34 +313,6 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "MM",
     icon: Store,
     description: "Franchise Marketplace & Billing",
-  },
-  franchise_user: {
-    id: "franchise_user",
-    label: "Franchise Dashboard",
-    shortLabel: "FU",
-    icon: Building2,
-    description: "Franchise User Portal",
-  },
-  reseller_sales: {
-    id: "reseller_sales",
-    label: "Reseller Dashboard",
-    shortLabel: "RS",
-    icon: Handshake,
-    description: "Reseller Sales Portal",
-  },
-  demo_manager_enterprise: {
-    id: "demo_manager_enterprise",
-    label: "Demo Manager",
-    shortLabel: "DM",
-    icon: Monitor,
-    description: "Enterprise Demo Management",
-  },
-  developer: {
-    id: "developer",
-    label: "Developer Dashboard",
-    shortLabel: "DEV",
-    icon: Code2,
-    description: "Developer Portal & Projects",
   },
 };
 

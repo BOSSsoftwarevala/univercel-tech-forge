@@ -10,7 +10,13 @@ import {
 } from './types/categoryTypes';
 import { toast } from 'sonner';
 
-export const CategoryHierarchyView: React.FC = () => {
+interface CategoryHierarchyViewProps {
+  onNavigateToSection?: (section: unknown) => void;
+}
+
+export const CategoryHierarchyView: React.FC<CategoryHierarchyViewProps> = ({ 
+  onNavigateToSection 
+}) => {
   const [currentLevel, setCurrentLevel] = useState<CategoryLevel>('category');
   const [path, setPath] = useState<CategoryPath>({});
   const [categories] = useState<Category[]>(resellerCategories);

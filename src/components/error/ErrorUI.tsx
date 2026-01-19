@@ -1,4 +1,3 @@
-import React, { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +7,7 @@ import { motion } from "framer-motion";
 export type ErrorType = 
   | "access-denied" 
   | "page-not-found" 
-  | "permission-blocked"
+  | "permission-blocked" 
   | "data-load-failed" 
   | "system-error" 
   | "session-expired";
@@ -85,7 +84,7 @@ interface ErrorUIProps {
   dashboardPath?: string;
 }
 
-export const ErrorUI = forwardRef<HTMLDivElement, ErrorUIProps>(({
+export const ErrorUI = ({
   type,
   customMessage,
   showBackButton = true,
@@ -95,7 +94,7 @@ export const ErrorUI = forwardRef<HTMLDivElement, ErrorUIProps>(({
   showSupportButton = false,
   onRetry,
   dashboardPath = "/dashboard",
-}, ref) => {
+}: ErrorUIProps) => {
   const navigate = useNavigate();
   const config = errorConfigs[type];
 
@@ -108,7 +107,7 @@ export const ErrorUI = forwardRef<HTMLDivElement, ErrorUIProps>(({
   };
 
   return (
-    <div ref={ref} className="min-h-[60vh] flex items-center justify-center p-6">
+    <div className="min-h-[60vh] flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -180,33 +179,31 @@ export const ErrorUI = forwardRef<HTMLDivElement, ErrorUIProps>(({
       </motion.div>
     </div>
   );
-});
+};
 
-ErrorUI.displayName = "ErrorUI";
+// Convenience exports for specific error types
+export const AccessDeniedUI = (props: Omit<ErrorUIProps, "type">) => (
+  <ErrorUI type="access-denied" showSupportButton {...props} />
+);
 
-// Convenience exports for specific error types - simple function components
-export function AccessDeniedUI(props: Omit<ErrorUIProps, "type">) {
-  return <ErrorUI type="access-denied" showSupportButton {...props} />;
-}
+export const PageNotFoundUI = (props: Omit<ErrorUIProps, "type">) => (
+  <ErrorUI type="page-not-found" {...props} />
+);
 
-export function PageNotFoundUI(props: Omit<ErrorUIProps, "type">) {
-  return <ErrorUI type="page-not-found" {...props} />;
-}
+export const PermissionBlockedUI = (props: Omit<ErrorUIProps, "type">) => (
+  <ErrorUI type="permission-blocked" showSupportButton {...props} />
+);
 
-export function PermissionBlockedUI(props: Omit<ErrorUIProps, "type">) {
-  return <ErrorUI type="permission-blocked" showSupportButton {...props} />;
-}
+export const DataLoadFailedUI = (props: Omit<ErrorUIProps, "type">) => (
+  <ErrorUI type="data-load-failed" showRetryButton {...props} />
+);
 
-export function DataLoadFailedUI(props: Omit<ErrorUIProps, "type">) {
-  return <ErrorUI type="data-load-failed" showRetryButton {...props} />;
-}
+export const SystemErrorUI = (props: Omit<ErrorUIProps, "type">) => (
+  <ErrorUI type="system-error" showRetryButton {...props} />
+);
 
-export function SystemErrorUI(props: Omit<ErrorUIProps, "type">) {
-  return <ErrorUI type="system-error" showRetryButton {...props} />;
-}
-
-export function SessionExpiredUI(props: Omit<ErrorUIProps, "type">) {
-  return <ErrorUI type="session-expired" showLoginButton showHomeButton={false} showBackButton={false} {...props} />;
-}
+export const SessionExpiredUI = (props: Omit<ErrorUIProps, "type">) => (
+  <ErrorUI type="session-expired" showLoginButton showHomeButton={false} showBackButton={false} {...props} />
+);
 
 export default ErrorUI;

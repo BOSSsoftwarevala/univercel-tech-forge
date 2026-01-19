@@ -7,8 +7,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Hammer, Play, Square, Send, Loader2 } from 'lucide-react';
-import { useActionHandler } from '@/hooks/useActionHandler';
+import { Hammer, Play, Square, Send } from 'lucide-react';
+import { toast } from 'sonner';
 
 const builds = [
   { id: 'BLD-001', module: 'Auth Module', assignee: 'DEV-001', status: 'in_progress', started: '2024-01-18 10:00' },
@@ -28,20 +28,6 @@ const getStatusBadge = (status: string) => {
 };
 
 export const DMBuildAssignment: React.FC = () => {
-  const { start, stop, send, isActionLoading } = useActionHandler();
-
-  const handleStartBuild = (buildId: string) => {
-    start('Build', buildId, { action: 'start_build_process' });
-  };
-
-  const handleStopBuild = (buildId: string) => {
-    stop('Build', buildId, { action: 'stop_build_process' });
-  };
-
-  const handleSendToQA = (buildId: string) => {
-    send('Build', buildId, 'QA', { action: 'send_to_qa_queue' });
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -84,40 +70,28 @@ export const DMBuildAssignment: React.FC = () => {
                   <Button 
                     size="sm" 
                     className="bg-green-600 hover:bg-green-700"
-                    onClick={() => handleStartBuild(build.id)}
-                    disabled={build.status === 'in_progress' || isActionLoading('start', build.id)}
+                    onClick={() => toast.success(`Build ${build.id} started`)}
+                    disabled={build.status === 'in_progress'}
                   >
-                    {isActionLoading('start', build.id) ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <Play className="h-4 w-4 mr-1" />
-                    )}
+                    <Play className="h-4 w-4 mr-1" />
                     Start Build
                   </Button>
                   <Button 
                     size="sm" 
                     variant="destructive"
-                    onClick={() => handleStopBuild(build.id)}
-                    disabled={build.status !== 'in_progress' || isActionLoading('stop', build.id)}
+                    onClick={() => toast.warning(`Build ${build.id} stopped`)}
+                    disabled={build.status !== 'in_progress'}
                   >
-                    {isActionLoading('stop', build.id) ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <Square className="h-4 w-4 mr-1" />
-                    )}
+                    <Square className="h-4 w-4 mr-1" />
                     Stop Build
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => handleSendToQA(build.id)}
-                    disabled={build.status !== 'completed' || isActionLoading('send', build.id)}
+                    onClick={() => toast.info(`Build ${build.id} sent to QA`)}
+                    disabled={build.status !== 'completed'}
                   >
-                    {isActionLoading('send', build.id) ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4 mr-1" />
-                    )}
+                    <Send className="h-4 w-4 mr-1" />
                     Send to QA
                   </Button>
                 </div>

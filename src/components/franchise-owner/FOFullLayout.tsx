@@ -1,56 +1,55 @@
 /**
  * FRANCHISE OWNER FULL LAYOUT
- * Header + Sidebar + Content Area
+ * Combines Sidebar + Content Area
  */
 
 import React, { useState } from 'react';
 import { FOFullSidebar, FOSection } from './FOFullSidebar';
-import { FOHeader } from './FOHeader';
-import { FOHomeScreen } from './screens/FOHomeScreen';
-import { FOMarketplaceScreen } from './screens/FOMarketplaceScreen';
-import { FOPlaceOrderScreen } from './screens/FOPlaceOrderScreen';
-import { FOOrdersScreen } from './screens/FOOrdersScreen';
-import { FOInvoicesWalletScreen } from './screens/FOInvoicesWalletScreen';
-import { FOLeadsCustomersScreen } from './screens/FOLeadsCustomersScreen';
-import { FOSEOMarketingScreen } from './screens/FOSEOMarketingScreen';
-import { FOSupportIssuesScreen } from './screens/FOSupportIssuesScreen';
-import { FOPromisesSLAScreen } from './screens/FOPromisesSLAScreen';
-import { FOPerformanceReportsScreen } from './screens/FOPerformanceReportsScreen';
-import { FOAgreementLegalScreen } from './screens/FOAgreementLegalScreen';
-import { FOFranchiseSettingsScreen } from './screens/FOFranchiseSettingsScreen';
+import { FOOverviewScreen } from './screens/FOOverviewScreen';
+import { FOHRMScreen } from './screens/FOHRMScreen';
+import { FOCRMScreen } from './screens/FOCRMScreen';
+import { FOLeadScreen } from './screens/FOLeadScreen';
+import { FOSEOScreen } from './screens/FOSEOScreen';
+import { FOAdsScreen } from './screens/FOAdsScreen';
+import { FOWalletScreen } from './screens/FOWalletScreen';
+import { FOSalesScreen } from './screens/FOSalesScreen';
+import { FOInfluencerScreen } from './screens/FOInfluencerScreen';
+import { FOSupportScreen } from './screens/FOSupportScreen';
+import { FOReportsScreen } from './screens/FOReportsScreen';
+import { FOSettingsScreen } from './screens/FOSettingsScreen';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function FOFullLayout() {
-  const [activeSection, setActiveSection] = useState<FOSection>('franchise_home');
+  const [activeSection, setActiveSection] = useState<FOSection>('franchise_overview');
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'franchise_home':
-        return <FOHomeScreen />;
-      case 'marketplace':
-        return <FOMarketplaceScreen />;
-      case 'place_order':
-        return <FOPlaceOrderScreen />;
-      case 'orders_delivery':
-        return <FOOrdersScreen />;
-      case 'invoices_wallet':
-        return <FOInvoicesWalletScreen />;
-      case 'leads_customers':
-        return <FOLeadsCustomersScreen />;
+      case 'franchise_overview':
+        return <FOOverviewScreen />;
+      case 'hrm_management':
+        return <FOHRMScreen />;
+      case 'crm_management':
+        return <FOCRMScreen />;
+      case 'lead_management':
+        return <FOLeadScreen />;
       case 'seo_marketing':
-        return <FOSEOMarketingScreen />;
-      case 'support_issues':
-        return <FOSupportIssuesScreen />;
-      case 'promises_sla':
-        return <FOPromisesSLAScreen />;
-      case 'performance_reports':
-        return <FOPerformanceReportsScreen />;
-      case 'agreement_legal':
-        return <FOAgreementLegalScreen />;
-      case 'settings':
-        return <FOFranchiseSettingsScreen />;
+        return <FOSEOScreen />;
+      case 'ads_manager':
+        return <FOAdsScreen />;
+      case 'wallet_billing':
+        return <FOWalletScreen />;
+      case 'sales_performance':
+        return <FOSalesScreen />;
+      case 'influencer_leads':
+        return <FOInfluencerScreen />;
+      case 'customer_support':
+        return <FOSupportScreen />;
+      case 'reports_analytics':
+        return <FOReportsScreen />;
+      case 'franchise_settings':
+        return <FOSettingsScreen />;
       default:
-        return <FOHomeScreen />;
+        return <FOOverviewScreen />;
     }
   };
 
@@ -60,18 +59,8 @@ export function FOFullLayout() {
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
-      <main className="flex-1 overflow-hidden flex flex-col">
-        <FOHeader
-          walletBalance={45200}
-          orderAlerts={3}
-          promiseStatus="healthy"
-          unreadMessages={2}
-          notifications={5}
-          franchiseCode="FO-2024-001"
-          territory="North Region"
-          onAddMoney={() => setActiveSection('invoices_wallet')}
-        />
-        <ScrollArea className="flex-1">
+      <main className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
           <div className="p-6">
             {renderContent()}
           </div>

@@ -35,7 +35,7 @@ import {
   Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
   Headphones, Handshake, Target, Box, Terminal, 
   Star, Scale, ListTodo, DollarSign, Code2, 
-  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, MessageSquare, Store, Monitor
+  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, MessageSquare, Store
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -82,10 +82,6 @@ const ROLE_CATEGORIES = [
   { id: 'internal_chatbot', label: 'Internal Chat Bot', icon: MessageSquare },
   { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
   { id: 'marketplace_manager', label: 'Marketplace Manager', icon: Store },
-  { id: 'franchise_user', label: 'Franchise Dashboard', icon: Building2 },
-  { id: 'demo_manager_enterprise', label: 'Demo Manager', icon: Monitor },
-  { id: 'reseller_sales', label: 'Reseller Dashboard', icon: Handshake },
-  { id: 'developer', label: 'Developer Dashboard', icon: Code2 },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
@@ -176,7 +172,6 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
   onLogout,
 }) => {
   const handleRoleClick = useCallback((roleId: RoleId) => {
-    console.debug("[ControlPanelSidebar] role click", { roleId });
     onRoleSelect(roleId);
   }, [onRoleSelect]);
 

@@ -8,9 +8,7 @@ import { IssuesEscalationsView } from './IssuesEscalationsView';
 import { AIInsightsView } from './AIInsightsView';
 import { RMComplianceStatus } from './RMComplianceStatus';
 import { RMAIFraudFlags } from './RMAIFraudFlags';
-import RMResellerMapView from './RMResellerMapView';
-import RMPerformanceRevenueView from './RMPerformanceRevenueView';
-import RMSettingsView from './RMSettingsView';
+import { CategoryHierarchyView } from './CategoryHierarchyView';
 
 interface ResellerManagerDashboardProps {
   onBack?: () => void;
@@ -35,13 +33,28 @@ export function ResellerManagerDashboard({ onBack }: ResellerManagerDashboardPro
       case 'ai-insights':
         return <AIInsightsView />;
       case 'reseller-map':
-        return <RMResellerMapView />;
+        return (
+          <div className="text-white p-6">
+            <h2 className="text-xl font-bold mb-4">Reseller Map</h2>
+            <CategoryHierarchyView onNavigateToSection={setActiveSection} />
+          </div>
+        );
       case 'performance':
-        return <RMPerformanceRevenueView />;
+        return (
+          <div className="text-white p-6">
+            <h2 className="text-xl font-bold mb-4">Performance & Revenue</h2>
+            <CategoryHierarchyView onNavigateToSection={setActiveSection} />
+          </div>
+        );
       case 'partner-activity':
         return <RMAIFraudFlags />;
       case 'settings':
-        return <RMSettingsView />;
+        return (
+          <div className="text-white p-6">
+            <h2 className="text-xl font-bold mb-4">Settings</h2>
+            <p className="text-slate-400">Reseller manager settings</p>
+          </div>
+        );
       default:
         return <ResellerDashboardOverview onNavigate={setActiveSection} />;
     }

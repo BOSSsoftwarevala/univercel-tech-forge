@@ -35,15 +35,10 @@ import LegalManagerView from "./LegalManagerView";
 import TMFullLayout from "@/components/task-manager/TMFullLayout";
 import IMFullLayout from "@/components/influencer-manager/IMFullLayout";
 import { MMFullLayout } from "@/components/marketplace-manager/MMFullLayout";
-import { FUFullLayout } from "@/components/franchise-user/FUFullLayout";
-import { RSFullLayout } from "@/components/reseller-sales/RSFullLayout";
-import { DMEFullLayout } from "@/components/demo-manager-enterprise/DMEFullLayout";
-import { DevFullLayout } from "@/components/developer/DevFullLayout";
 import FinanceManagerDashboard from "./FinanceManagerDashboard";
-import { UnifiedGlobalHeader } from "@/components/shared/UnifiedGlobalHeader";
 import ValaAIDashboard from "./ValaAIDashboard";
 import MarketingManagementDashboard from "./MarketingManagementDashboard";
-import CustomerSupportManagerView from "./CustomerSupportManagerView";
+import CustomerSupportManagementDashboard from "./CustomerSupportManagementDashboard";
 import RoleManagerDashboard from "./RoleManagerDashboard";
 import RMEnterpriseLayout from "@/components/role-manager/RMEnterpriseLayout";
 // CRITICAL: Use the full-featured CountryHeadDashboard with built-in sidebar + interactive map
@@ -65,7 +60,7 @@ const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
   boss_owner: Object.keys(roleConfigs) as ActiveRole[], // Boss Owner can view everything
   master: Object.keys(roleConfigs) as ActiveRole[], // Legacy master role
   ceo: Object.keys(roleConfigs) as ActiveRole[], // CEO can view everything (read-only)
-  super_admin: ['continent_super_admin', 'country_head', 'franchise_manager', 'sales_support_manager', 'reseller_manager', 'lead_manager', 'customer_support_management'],
+  super_admin: ['continent_super_admin', 'country_head', 'franchise_manager', 'sales_support_manager', 'reseller_manager', 'lead_manager'],
   continent_super_admin: ['continent_super_admin', 'country_head'],
   country_head: ['country_head'],
 };
@@ -160,11 +155,11 @@ const RoleSwitchDashboard = () => {
    * This prevents the Control Panel role list / switcher from showing alongside a module sidebar.
    */
   const isInModuleView = useMemo(() => {
-    // A "module view" is only when activeNav is a dedicated full-screen module.
-    // Role dashboards (e.g. Continent Admin) are NOT treated as module views, otherwise
-    // their navigation/sidebar can get disabled.
-    return moduleViewIds.includes(activeNav);
-  }, [activeNav, moduleViewIds]);
+    if (moduleViewIds.includes(activeNav)) return true;
+    // Any non-boss role dashboard is treated as its own isolated context (no role switcher)
+    if (activeRole !== null && activeRole !== 'boss_owner') return true;
+    return false;
+  }, [activeRole, activeNav, moduleViewIds]);
   
   // SINGLE-CONTEXT ENFORCEMENT: Use sidebar store for context control
   const {
@@ -310,14 +305,6 @@ const RoleSwitchDashboard = () => {
   useEffect(() => {
     if (loading) return;
 
-    // Debug: why role switch sometimes appears "dead"
-    console.debug("[RoleSwitchDashboard] init", {
-      userRole,
-      isBossOwner,
-      requestedRole,
-      href: window.location.href,
-    });
-
     // 1) If URL requests a role, always sync to it (if access allows)
     // OVERRIDE (BOSS RULE): boss_owner & ceo should land on the Control Panel grid by default.
     // They can still open their role dashboard by clicking from the Control Panel sidebar.
@@ -355,7 +342,7 @@ const RoleSwitchDashboard = () => {
       didInitRef.current = true;
       setInitialized(true);
     }
-  }, [requestedRole, loading, canAccessView, getDefaultRole, userRole, isBossOwner]);
+  }, [requestedRole, loading, canAccessView, getDefaultRole]);
 
 
 
@@ -372,41 +359,17 @@ const RoleSwitchDashboard = () => {
 
   // STEP 6: Enhanced role change with full state reset
   const handleRoleChange = useCallback((role: ActiveRole) => {
-    console.debug("[RoleSwitchDashboard] handleRoleChange", {
-      from: window.location.href,
-      toRole: role,
-      userRole,
-      isBossOwner,
-      canAccess: canAccessView(role),
-    });
-
     // Check if user can access this view
     if (!canAccessView(role)) {
       toast.error("Access denied to this view");
       return;
     }
 
-    // IMPORTANT: Use SPA navigation (iframe-safe) and sync state immediately.
+    // CRITICAL NAV RULE: Switching module = FULL UI reload.
+    // This also guarantees we are in the correct role context (fixes "buttons not working" caused by staying on ?role=boss_owner).
     const nextUrl = `/super-admin-system/role-switch?role=${encodeURIComponent(role)}`;
-
-    // Boss/CEO should always land on the Control Panel grid by default.
-    const shouldStartInControlPanel = role === "boss_owner" || role === "ceo";
-    if (shouldStartInControlPanel) {
-      setActiveRole(null);
-    } else {
-      setActiveRole(role);
-    }
-
-    setActiveNav("dashboard");
-    setSelectedSubItem(undefined);
-    setNavHistory(["dashboard"]);
-
-    // Push (not replace) so browser history reflects the navigation.
-    navigate(nextUrl);
-
-    // Diagnostic (no UI change): confirm role switch fired.
-    console.debug("[RoleSwitchDashboard] navigated", { nextUrl });
-  }, [canAccessView, userRole, isBossOwner, navigate]);
+    window.location.assign(nextUrl);
+  }, [canAccessView]);
 
   const handleNavChange = useCallback((navId: string) => {
     setActiveNav(navId);
@@ -481,7 +444,7 @@ const RoleSwitchDashboard = () => {
       case "franchise_manager":
         return <FranchiseManagerView />;
       case "sales_support_manager":
-        return <CustomerSupportManagerView />;
+        return <SalesSupportManagerView />;
       case "reseller_manager":
         return <ResellerManagerFullView onBack={() => setActiveRole("boss_owner")} />;
       case "lead_manager":
@@ -499,7 +462,7 @@ const RoleSwitchDashboard = () => {
       case "marketing_management":
         return <MarketingManagementDashboard />;
       case "customer_support_management":
-        return <CustomerSupportManagerView />;
+        return <CustomerSupportManagementDashboard />;
       case "role_manager":
         return <RMEnterpriseLayout />;
       case "product_manager":
@@ -520,14 +483,6 @@ const RoleSwitchDashboard = () => {
         return <IMFullLayout />;
       case "marketplace_manager":
         return <MMFullLayout />;
-      case "franchise_user":
-        return <FUFullLayout />;
-      case "reseller_sales":
-        return <RSFullLayout onBack={() => setActiveRole(null)} />;
-      case "demo_manager_enterprise":
-        return <DMEFullLayout onBack={() => setActiveRole(null)} />;
-      case "developer":
-        return <DevFullLayout onBack={() => setActiveRole(null)} />;
       case null:
         // Control Panel view - render 2×7 grid dashboard
         return <ControlPanelDashboard />;
@@ -551,131 +506,99 @@ const RoleSwitchDashboard = () => {
       // ALL dashboards use the same dark background for consistency
       "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     )}>
-      {/* TOP HEADER - Unified Global Header (Icon-only, 3D Premium) */}
-      {/* NOTE: Hide top header when in continent_super_admin since that view has its own header */}
-      {activeRole !== "continent_super_admin" && (
+      {/* TOP HEADER - Software Vala Enterprise Header */}
       <header className={cn(
-        "h-14 backdrop-blur-xl border-b flex items-center justify-between px-4 z-50 transition-colors duration-300",
-        "bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-slate-800/50",
+        "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
+        "bg-gradient-to-r from-[#0a1628] via-[#0d1b2a] to-[#0a1628] border-[#1e3a5f]",
         // Offset only when the Control Panel sidebar is actually visible (NOT during module view)
         isInControlPanelView && !isInModuleView && "ml-[320px]"
       )}>
-        {/* LEFT: Back Button (when in module) + Logo */}
-        <div className="flex items-center gap-3">
+        {/* LEFT: Back Button (when in module) OR Logo + Brand */}
+        <div className="flex items-center gap-4">
           {/* Back Button - Visible in module view OR role dashboard view */}
           {(!isInControlPanelView || isInModuleView) && (
             <motion.button
-              whileHover={{ scale: 1.05, y: -1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleBackToControlPanel}
-              className="w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-cyan-500/30 transition-all group"
+              className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center transition-all group"
               title="← Back to Control Panel"
             >
-              <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400" />
+              <ArrowLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
             </motion.button>
           )}
           
-          {/* 1️⃣ SV Logo (Home / Control Panel) */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleBackToControlPanel}
-            className="flex items-center gap-2 group"
-          >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow">
-              <span className="text-white font-bold text-sm">SV</span>
+          {/* SV Logo + Brand Text */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <span className="text-white font-bold text-lg">SV</span>
             </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-white leading-none">Software Vala</p>
-              <p className="text-[10px] text-slate-500">{isInControlPanelView ? 'Control Panel' : currentConfig.label}</p>
+            <div>
+              <h1 className="text-lg font-bold text-white tracking-tight">Software Vala</h1>
+              <p className="text-xs text-white/60 font-medium">
+                {isInControlPanelView ? 'Super Admin' : (currentConfig.label || 'Module')}
+              </p>
             </div>
-          </motion.button>
+          </div>
         </div>
 
-        {/* RIGHT: Global Action Icons (Icon-only, 3D Premium) */}
-        <div className="flex items-center gap-2">
-          {/* 2️⃣ AI API Manager */}
-          <motion.button
-            whileHover={{ y: -2, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleRoleChange("api_ai_manager")}
-            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-cyan-500/30 transition-all group"
-            title="AI / API Manager"
-          >
-            <Globe2 className="w-4 h-4 text-slate-400 group-hover:text-cyan-400" />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500" />
-          </motion.button>
-
-          {/* 3️⃣ Promise Tracker */}
-          <motion.button
-            whileHover={{ y: -2, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleRoleChange("promise_tracker_manager")}
-            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-amber-500/30 transition-all group"
-            title="Promise Tracker"
-          >
-            <Timer className="w-4 h-4 text-slate-400 group-hover:text-amber-400" />
-            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-[10px] font-bold text-white flex items-center justify-center">3</span>
-          </motion.button>
-
-          {/* 4️⃣ Assist Manager (UltraViewer-style with pulse) */}
-          <motion.button
-            whileHover={{ y: -2, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleRoleChange("assist_manager")}
-            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-violet-900/50 to-slate-900 border border-violet-500/30 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-violet-400/50 transition-all group"
-            title="Assist Manager"
-          >
-            <Shield className="w-4 h-4 text-violet-400 group-hover:text-violet-300" />
-            <motion.span
-              className="absolute inset-0 rounded-xl border-2 border-violet-500/40"
-              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </motion.button>
-
-          {/* 5️⃣ Internal Chat Bot */}
-          <motion.button
-            whileHover={{ y: -2, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleRoleChange("internal_chatbot")}
-            className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-emerald-500/30 transition-all group"
-            title="Internal Chat"
-          >
-            <Home className="w-4 h-4 text-slate-400 group-hover:text-emerald-400" />
-            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-emerald-500 text-[10px] font-bold text-white flex items-center justify-center">5</span>
-          </motion.button>
-
-          {/* 6️⃣ Notification / Alert Bell */}
-          <div className="relative">
-            <motion.button
-              whileHover={{ y: -2, scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-9 h-9 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:border-red-500/30 transition-all group ring-2 ring-red-500/30"
-              title="Notifications"
-            >
-              <AlertCircle className="w-4 h-4 text-slate-400 group-hover:text-red-400" />
-              {liveAlerts > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
-                  {liveAlerts}
-                </span>
-              )}
-            </motion.button>
+        {/* CENTER: Module Name (only in module / role dashboard view) */}
+        {(!isInControlPanelView || isInModuleView) && (
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <span className="text-lg font-semibold text-white">{currentConfig.label}</span>
           </div>
+        )}
+
+        {/* RIGHT: Status Icons + Notifications + Profile */}
+        <div className="flex items-center gap-3">
+          {/* System Status Icon */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
+            title="System Healthy"
+          >
+            <Shield className="w-5 h-5 text-emerald-400" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
+          </motion.button>
+
+          {/* Risk Level Icon */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
+            title="Low Risk"
+          >
+            <AlertCircle className="w-5 h-5 text-emerald-400" />
+          </motion.button>
+
+          {/* Notification Badge */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center"
+            title="Notifications"
+          >
+            <AlertCircle className="w-5 h-5 text-amber-400" />
+            {liveAlerts > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                {liveAlerts}
+              </span>
+            )}
+          </motion.button>
 
           {/* Profile Icon */}
           <motion.button
-            whileHover={{ y: -2, scale: 1.05 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleLogout}
-            className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-shadow"
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg"
             title="Profile"
           >
-            <Crown className="w-4 h-4 text-white" />
+            <Crown className="w-5 h-5 text-white" />
           </motion.button>
         </div>
       </header>
-      )}
       
       {/* STEP 9: SINGLE-CONTEXT LAYOUT - Exactly ONE sidebar visible at all times */}
       <div className="flex-1 flex overflow-hidden relative">
@@ -726,32 +649,23 @@ const RoleSwitchDashboard = () => {
           </>
         )}
 
-        {/* CONTEXT B2: Role Sidebar (for dashboards that DON'T render their own internal sidebar) */}
-        {/* NOTE: These roles render their OWN sidebar inside their view, so do NOT render RoleSwitchSidebarNew here */}
-        {!isInControlPanelView &&
-          !isInModuleView &&
-          activeRole &&
-          activeRole !== "ceo" &&
-          activeRole !== "developer_management" &&
-          activeRole !== "vala_ai_management" &&
-          activeRole !== "continent_super_admin" &&
-          activeRole !== "sales_support_manager" &&
-          activeRole !== "customer_support_management" && (
-            <>
-              <RoleSwitchSidebarNew
-                activeRole={activeRole}
-                onRoleChange={handleRoleChange}
-                collapsed={collapsed}
-                onToggleCollapse={() => setCollapsed((prev) => !prev)}
-                onLogout={handleLogout}
-                activeNav={activeNav}
-                onNavChange={handleNavChange}
-                onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
-              />
-              {/* Spacer to offset RoleSwitchSidebar (matches its internal widths) */}
-              <div className="flex-shrink-0" style={{ width: collapsed ? 60 : 260 }} />
-            </>
-          )}
+        {/* CONTEXT B2: Role Sidebar (for ALL other role dashboards except CEO/Developer Manager/VALA AI and full-screen modules) */}
+        {!isInControlPanelView && !isInModuleView && activeRole && activeRole !== "ceo" && activeRole !== "developer_management" && activeRole !== "vala_ai_management" && (
+          <>
+            <RoleSwitchSidebarNew
+              activeRole={activeRole}
+              onRoleChange={handleRoleChange}
+              collapsed={collapsed}
+              onToggleCollapse={() => setCollapsed((prev) => !prev)}
+              onLogout={handleLogout}
+              activeNav={activeNav}
+              onNavChange={handleNavChange}
+              onSubItemClick={(subItemId) => setSelectedSubItem(subItemId)}
+            />
+            {/* Spacer to offset RoleSwitchSidebar (matches its internal widths) */}
+            <div className="flex-shrink-0" style={{ width: collapsed ? 60 : 260 }} />
+          </>
+        )}
 
         {/* CONTEXT C: Module containers render their OWN sidebar, so NO extra spacer needed */}
 
@@ -792,33 +706,31 @@ const RoleSwitchDashboard = () => {
         </main>
       </div>
 
-      {/* FOOTER - Hide for continent_super_admin which has its own layout */}
-      {activeRole !== "continent_super_admin" && (
-        <footer className={cn(
-          "h-12 backdrop-blur-xl border-t flex items-center justify-between px-6 transition-colors duration-300",
-          activeRole === "server_manager" 
-            ? "bg-zinc-900/80 border-zinc-700" 
-            : "bg-card/80 border-border/50"
-        )}>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground font-mono">
-              View: <span className="text-primary">{currentConfig.label}</span>
-            </span>
-            <span className="text-xs text-muted-foreground">|</span>
-            <span className="text-xs text-muted-foreground font-mono">
-              Scope: Global
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground">
-              Session ID: <span className="font-mono text-foreground">SES-{Date.now().toString(36).toUpperCase()}</span>
-            </span>
-            <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 text-xs">
-              Secure Connection
-            </Badge>
-          </div>
-        </footer>
-      )}
+      {/* FOOTER */}
+      <footer className={cn(
+        "h-12 backdrop-blur-xl border-t flex items-center justify-between px-6 transition-colors duration-300",
+        activeRole === "server_manager" 
+          ? "bg-zinc-900/80 border-zinc-700" 
+          : "bg-card/80 border-border/50"
+      )}>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-muted-foreground font-mono">
+            View: <span className="text-primary">{currentConfig.label}</span>
+          </span>
+          <span className="text-xs text-muted-foreground">|</span>
+          <span className="text-xs text-muted-foreground font-mono">
+            Scope: Global
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-muted-foreground">
+            Session ID: <span className="font-mono text-foreground">SES-{Date.now().toString(36).toUpperCase()}</span>
+          </span>
+          <Badge variant="outline" className="text-emerald-400 border-emerald-500/50 text-xs">
+            Secure Connection
+          </Badge>
+        </div>
+      </footer>
     </div>
   );
 };

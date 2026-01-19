@@ -208,7 +208,6 @@ import FranchiseTeamManagement from "./pages/franchise/TeamManagement";
 import FranchiseCRM from "./pages/franchise/CRM";
 import FranchiseHRM from "./pages/franchise/HRM";
 import FranchiseLeadActivity from "./pages/franchise/LeadActivity";
-import FranchiseManagerView from "./pages/super-admin-system/RoleSwitch/FranchiseManagerView";
 
 // Existing Pages
 import FranchiseManagement from "./pages/FranchiseManagement";
@@ -245,9 +244,8 @@ import ApplyPortal from "./pages/ApplyPortal";
 import CareerPortal from "./pages/CareerPortal";
 import InternalChat from "./pages/InternalChat";
 import PersonalChat from "./pages/PersonalChat";
-
+import DomainProtection from "./components/security/DomainProtection";
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
-import { GlobalSecurityProvider } from "./components/security/GlobalSecurityProvider";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import QuickSupport from "./components/support/QuickSupport";
 import AIOptimizationConsole from "./pages/ai-console/AIOptimizationConsole";
@@ -338,20 +336,19 @@ const App = () => (
       <DemoTestModeProvider>
         <AnimationProvider>
           <TooltipProvider>
-            
+            <DomainProtection>
               <SourceCodeProtection enabled={!import.meta.env.DEV}>
-                <GlobalSecurityProvider userRole="user">
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
-                    <SecurityProvider>
-                      <NotificationProvider>
-                        <TranslationProvider>
-                          <GlobalRealtimeProvider>
-                            <BlockingClassCleanup />
-                            <SystemNotificationsInitializer />
-                            <GlobalOfferPopup />
-                            <FloatingAIChatbotWrapper />
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <SecurityProvider>
+                    <NotificationProvider>
+                      <TranslationProvider>
+                        <GlobalRealtimeProvider>
+                          <BlockingClassCleanup />
+                          <SystemNotificationsInitializer />
+                          <GlobalOfferPopup />
+                          <FloatingAIChatbotWrapper />
                           <Routes>
                           {/* Public Routes - No login required */}
               <Route path="/" element={<Index />} />
@@ -514,8 +511,8 @@ const App = () => (
               </Route>
 
               {/* Continent Super Admin Routes */}
-              <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner", "continent_super_admin"]}><ContinentSuperAdminDashboard /></RequireRole>} />
-              <Route path="/continent-super-admin/*" element={<RequireRole allowed={["boss_owner", "continent_super_admin"]}><ContinentSuperAdminDashboard /></RequireRole>} />
+              <Route path="/continent-super-admin" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
+              <Route path="/continent-super-admin/*" element={<RequireRole allowed={["boss_owner"]}><ContinentSuperAdminDashboard /></RequireRole>} />
 
               {/* Super Admin Routes - Redirect to unified RoleSwitchDashboard to prevent duplicate layouts */}
               <Route path="/admin" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
@@ -563,7 +560,6 @@ const App = () => (
               <Route path="/franchise-program" element={<FranchiseLanding />} />
               <Route path="/franchise-landing" element={<FranchiseLanding />} />
               <Route path="/franchise-dashboard" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseDashboard /></RequireRole>} />
-              <Route path="/franchise-manager" element={<RequireRole allowed={["franchise_manager", "boss_owner", "super_admin"]}><FranchiseManagerView /></RequireRole>} />
 
               {/* Reseller Routes */}
               <Route path="/reseller" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
@@ -750,9 +746,8 @@ const App = () => (
                     </NotificationProvider>
                   </SecurityProvider>
                 </BrowserRouter>
-              </GlobalSecurityProvider>
-            </SourceCodeProtection>
-            
+              </SourceCodeProtection>
+            </DomainProtection>
           </TooltipProvider>
         </AnimationProvider>
       </DemoTestModeProvider>
