@@ -208,6 +208,7 @@ import FranchiseTeamManagement from "./pages/franchise/TeamManagement";
 import FranchiseCRM from "./pages/franchise/CRM";
 import FranchiseHRM from "./pages/franchise/HRM";
 import FranchiseLeadActivity from "./pages/franchise/LeadActivity";
+import FranchiseManagerView from "./pages/super-admin-system/RoleSwitch/FranchiseManagerView";
 
 // Existing Pages
 import FranchiseManagement from "./pages/FranchiseManagement";
@@ -562,6 +563,7 @@ const App = () => (
               <Route path="/franchise-program" element={<FranchiseLanding />} />
               <Route path="/franchise-landing" element={<FranchiseLanding />} />
               <Route path="/franchise-dashboard" element={<RequireRole allowed={["franchise", "super_admin"]}><FranchiseDashboard /></RequireRole>} />
+              <Route path="/franchise-manager" element={<RequireRole allowed={["franchise_manager", "boss_owner", "super_admin"]}><FranchiseManagerView /></RequireRole>} />
 
               {/* Reseller Routes */}
               <Route path="/reseller" element={<RequireRole allowed={["reseller", "super_admin"]}><ResellerDashboard /></RequireRole>} />
