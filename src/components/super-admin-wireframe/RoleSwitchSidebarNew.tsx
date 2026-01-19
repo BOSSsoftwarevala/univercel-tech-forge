@@ -41,6 +41,7 @@ import {
   Map,
   Timer,
   MessageSquare,
+  Store,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -85,7 +86,8 @@ export type ActiveRole =
   | "promise_tracker_manager"
   | "assist_manager"
   | "internal_chatbot"
-  | "influencer_manager";
+  | "influencer_manager"
+  | "marketplace_manager";
 
 interface SubCategory {
   id: string;
@@ -304,6 +306,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "IM",
     icon: Users,
     description: "Influencer & Campaign Management",
+  },
+  marketplace_manager: {
+    id: "marketplace_manager",
+    label: "Marketplace Manager",
+    shortLabel: "MM",
+    icon: Store,
+    description: "Franchise Marketplace & Billing",
   },
 };
 

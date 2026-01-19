@@ -35,7 +35,7 @@ import {
   Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
   Headphones, Handshake, Target, Box, Terminal, 
   Star, Scale, ListTodo, DollarSign, Code2, 
-  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, MessageSquare
+  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, MessageSquare, Store
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -81,6 +81,7 @@ const ROLE_CATEGORIES = [
   { id: 'assist_manager', label: 'Assist Manager', icon: MonitorPlay },
   { id: 'internal_chatbot', label: 'Internal Chat Bot', icon: MessageSquare },
   { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
+  { id: 'marketplace_manager', label: 'Marketplace Manager', icon: Store },
 ] as const;
 
 type RoleId = typeof ROLE_CATEGORIES[number]['id'];
