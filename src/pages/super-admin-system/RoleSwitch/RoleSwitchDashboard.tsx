@@ -430,10 +430,14 @@ const RoleSwitchDashboard = () => {
   };
 
   // STEP 6: Show loading screen while initializing to prevent blank page
+  // IMPORTANT: keep "dark" class here so background never flashes white.
   if (loading || !initialized) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingSkeleton message="Initializing dashboard..." />
+      <div className={cn(
+        "dark min-h-screen flex items-center justify-center",
+        "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+      )}>
+        <LoadingSkeleton message="System is preparing this section" />
       </div>
     );
   }
