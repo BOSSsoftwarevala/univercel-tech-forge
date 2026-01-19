@@ -89,7 +89,8 @@ export type ActiveRole =
   | "influencer_manager"
   | "marketplace_manager"
   | "franchise_user"
-  | "reseller_sales";
+  | "reseller_sales"
+  | "demo_manager_enterprise";
 
 interface SubCategory {
   id: string;
@@ -329,6 +330,13 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "RS",
     icon: Handshake,
     description: "Reseller Sales Portal",
+  },
+  demo_manager_enterprise: {
+    id: "demo_manager_enterprise",
+    label: "Demo Manager",
+    shortLabel: "DM",
+    icon: Monitor,
+    description: "Enterprise Demo Management",
   },
 };
 

@@ -83,6 +83,7 @@ const ROLE_CATEGORIES = [
   { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
   { id: 'marketplace_manager', label: 'Marketplace Manager', icon: Store },
   { id: 'franchise_user', label: 'Franchise Dashboard', icon: Building2 },
+  { id: 'demo_manager_enterprise', label: 'Demo Manager', icon: Monitor },
   { id: 'reseller_sales', label: 'Reseller Dashboard', icon: Handshake },
 ] as const;
 
