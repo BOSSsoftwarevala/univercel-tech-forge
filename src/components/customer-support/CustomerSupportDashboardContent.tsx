@@ -80,12 +80,39 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      toast.success(`${action} completed`, {
-        description: target ? `Action performed on ${target}` : 'Action completed successfully',
-      });
+      // Different success messages based on action type
+      const successMessages: Record<string, { title: string; desc: string }> = {
+        'View': { title: 'Loaded', desc: `Viewing ${target || 'details'}` },
+        'View All': { title: 'List Loaded', desc: `Showing all ${target || 'items'}` },
+        'Assign': { title: 'Assignment Sent', desc: `Assignment request for ${target}` },
+        'Reassign': { title: 'Reassignment Queued', desc: `Reassigning ${target}` },
+        'Escalate': { title: 'Escalated', desc: `${target} escalated to next level` },
+        'Approve': { title: 'Approved', desc: `${target} has been approved` },
+        'Reject': { title: 'Rejected', desc: `${target} has been rejected` },
+        'Close': { title: 'Closed', desc: `${target} has been closed` },
+        'Reopen': { title: 'Reopened', desc: `${target} has been reopened` },
+        'Lock': { title: 'Locked', desc: `${target} is now locked` },
+        'Unlock': { title: 'Unlocked', desc: `${target} is now unlocked` },
+        'Retry': { title: 'Retrying', desc: `Retrying ${target}` },
+        'Restart': { title: 'Restarted', desc: `${target} has been restarted` },
+        'Refresh': { title: 'Refreshed', desc: `${target} data updated` },
+        'Resolve': { title: 'Resolved', desc: `${target} marked as resolved` },
+        'Edit': { title: 'Edit Mode', desc: `Editing ${target}` },
+        'Navigate': { title: 'Navigating', desc: `Opening ${target}` },
+        'Reply': { title: 'Reply Sent', desc: `Reply sent for ${target}` },
+      };
+      
+      const msg = successMessages[action] || { title: `${action} completed`, desc: target ? `Action on ${target}` : 'Success' };
+      toast.success(msg.title, { description: msg.desc });
+      
     } catch (error) {
+      console.error(`Action ${action} failed:`, error);
       toast.error(`${action} failed`, {
         description: 'Please try again or contact support',
+        action: {
+          label: 'Retry',
+          onClick: () => handleAction(action, target, data),
+        },
       });
     } finally {
       setLoadingAction(null);
@@ -448,6 +475,12 @@ const CustomerSupportDashboardContent = ({ activeSection }: CustomerSupportDashb
                   </ActionButton>
                   <ActionButton action="Edit" target={`${title}-${i}`} className="flex-1">
                     Edit
+                  </ActionButton>
+                  <ActionButton action="Assign" target={`${title}-${i}`} icon={Users}>
+                    Assign
+                  </ActionButton>
+                  <ActionButton action="Escalate" target={`${title}-${i}`} icon={ArrowUpCircle} variant="destructive">
+                    Escalate
                   </ActionButton>
                 </div>
               </div>
