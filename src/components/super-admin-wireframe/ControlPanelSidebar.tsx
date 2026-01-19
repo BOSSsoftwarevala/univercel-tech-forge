@@ -26,7 +26,7 @@ import {
   Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, 
   Home, Shield, Settings, Search, User, UserCircle
 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+// ScrollArea removed - NO SCROLLING in Control Panel
 
 // ===== LOCKED COLORS (SOFTWARE VALA BLUE GRADIENT - DO NOT CHANGE) =====
 const COLORS = {
@@ -96,73 +96,51 @@ interface ControlPanelSidebarProps {
   onLogout: () => void;
 }
 
-// ===== PREMIUM CARD-STYLE ROLE BUTTON =====
-// Rounded rectangle, large height, soft glow, icon in circular badge
+// ===== COMPACT ROLE BUTTON (NO SCROLL - ALL FIT ON SCREEN) =====
 const RoleButton = memo<{
   role: typeof ROLE_CATEGORIES[number];
   isActive: boolean;
   onClick: () => void;
-  index: number;
-}>(({ role, isActive, onClick, index }) => {
+}>(({ role, isActive, onClick }) => {
   const Icon = role.icon;
   
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.02, duration: 0.2 }}
+    <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-4 rounded-2xl transition-all duration-200",
-        "px-4 py-4 text-left group relative overflow-hidden",
-        isActive && "ring-2 ring-blue-400/50"
+        "w-full flex items-center gap-2 rounded-lg transition-all duration-150",
+        "px-2 py-1.5 text-left group relative",
+        isActive 
+          ? "bg-blue-600 ring-1 ring-blue-400/50" 
+          : "hover:bg-white/10"
       )}
       style={{
         background: isActive 
           ? `linear-gradient(135deg, ${COLORS.activeHighlight} 0%, #1d4ed8 100%)`
-          : COLORS.cardBg,
-        boxShadow: isActive 
-          ? `0 8px 32px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)`
-          : `0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.05)`,
+          : undefined,
       }}
-      whileHover={{ 
-        scale: 1.02,
-        boxShadow: `0 8px 32px ${COLORS.cardGlow}, inset 0 1px 0 rgba(255,255,255,0.1)`
-      }}
-      whileTap={{ scale: 0.98 }}
     >
-      {/* Soft glow effect on hover */}
-      <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at 30% 50%, ${COLORS.cardGlow} 0%, transparent 70%)`
-        }}
-      />
-      
-      {/* Icon in circular badge */}
+      {/* Compact Icon */}
       <div className={cn(
-        "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 relative z-10",
-        "transition-all duration-200",
-        isActive 
-          ? "bg-white/20 shadow-lg shadow-blue-500/30" 
-          : "bg-white/10 group-hover:bg-white/15"
+        "w-6 h-6 rounded flex items-center justify-center flex-shrink-0",
+        isActive ? "bg-white/20" : "bg-white/10"
       )}>
         <Icon 
-          className="w-6 h-6 transition-colors" 
+          className="w-3.5 h-3.5" 
           style={{ color: isActive ? '#ffffff' : COLORS.iconColor }} 
         />
       </div>
       
-      {/* Text - clearly readable, no tiny fonts */}
+      {/* Text - compact */}
       <span 
         className={cn(
-          "text-base font-semibold truncate relative z-10 transition-colors",
-          isActive ? "text-white" : "text-white/90 group-hover:text-white"
+          "text-xs font-medium truncate",
+          isActive ? "text-white" : "text-white/80"
         )}
       >
         {role.label}
       </span>
-    </motion.button>
+    </button>
   );
 });
 RoleButton.displayName = 'RoleButton';
@@ -179,65 +157,57 @@ export const ControlPanelSidebar = memo<ControlPanelSidebarProps>(({
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 fixed left-0 top-0 z-40"
+      className="flex flex-col flex-shrink-0 fixed left-0 top-0 z-40 overflow-hidden"
       style={{
-        width: 320,
+        width: 280,
         height: '100vh',
         background: COLORS.bgGradient,
         borderRight: `1px solid ${COLORS.border}`,
       }}
     >
-      {/* SECTION 1 - SYSTEM NAME */}
-      <div className="px-6 py-6 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Control Panel</h1>
-        <p className="text-sm text-white/60 mt-1 font-medium">Super Admin</p>
+      {/* SECTION 1 - SYSTEM NAME (Compact) */}
+      <div className="px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+        <h1 className="text-lg font-bold text-white tracking-tight">Control Panel</h1>
+        <p className="text-xs text-white/60 font-medium">Super Admin</p>
       </div>
 
-      {/* SECTION 2 - CORE ROLES (CARD-STYLE BUTTONS) */}
-      {/* FORCE: guarantee scroll height by giving ScrollArea an explicit parent height */}
-      <div className="flex-1 min-h-0">
-        <ScrollArea className="h-full">
-          <nav className="space-y-2 px-4 py-4 pb-24">
-            {ROLE_CATEGORIES.map((role, index) => (
-              <RoleButton
-                key={role.id}
-                role={role}
-                isActive={activeRole === role.id}
-                onClick={() => handleRoleClick(role.id)}
-                index={index}
-              />
-            ))}
-          </nav>
-        </ScrollArea>
-      </div>
+      {/* SECTION 2 - ALL MODULES (NO SCROLL - FIXED HEIGHT) */}
+      <nav className="flex-1 flex flex-col gap-0.5 px-2 py-1 overflow-hidden">
+        {ROLE_CATEGORIES.map((role) => (
+          <RoleButton
+            key={role.id}
+            role={role}
+            isActive={activeRole === role.id}
+            onClick={() => handleRoleClick(role.id)}
+          />
+        ))}
+      </nav>
 
-      {/* SECTION 3 - SYSTEM STATUS (BOTTOM FIXED) */}
-      <div className="px-4 py-4 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Running</span>
+      {/* SECTION 3 - STATUS + LOGOUT (Compact) */}
+      <div className="px-2 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${COLORS.border}` }}>
+        <div className="flex items-center gap-1 mb-2">
+          <div className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-bold text-emerald-400 uppercase">Live</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-xs font-bold text-cyan-400 uppercase tracking-wide">AI Active</span>
+          <div className="flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="text-[10px] font-bold text-cyan-400 uppercase">AI</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-            <span className="text-xs font-bold text-blue-400 uppercase tracking-wide">Healthy</span>
+          <div className="flex items-center gap-1 px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span className="text-[10px] font-bold text-blue-400 uppercase">OK</span>
           </div>
         </div>
         
         {/* Logout Button */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
         >
-          <LogOut className="w-5 h-5" />
-          <span className="text-sm font-semibold">Logout</span>
-        </motion.button>
+          <LogOut className="w-3.5 h-3.5" />
+          <span className="text-xs font-semibold">Logout</span>
+        </button>
       </div>
     </aside>
   );
