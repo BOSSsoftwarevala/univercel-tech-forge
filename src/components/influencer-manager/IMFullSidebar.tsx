@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, UserPlus, Users, CheckCircle, Megaphone,
   FileText, MousePointer, BarChart3, ShieldAlert, Wallet,
   UserCheck, MessageSquare, History, FileSearch, Settings,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,12 +34,42 @@ const menuItems = [
 
 const IMFullSidebar = ({ activeScreen, onScreenChange }: IMFullSidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (activeScreen !== 'dashboard') {
+      onScreenChange('dashboard');
+    } else {
+      navigate('/super-admin-system/role-switch?role=boss_owner');
+    }
+  };
 
   return (
     <div className={cn(
       "h-full bg-slate-900 border-r border-pink-500/20 flex flex-col transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
+      {/* Back Button */}
+      <div className="p-2 border-b border-slate-700/50">
+        <motion.button
+          whileHover={{ scale: 1.02, x: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleBack}
+          className={cn(
+            "flex items-center gap-2 px-3 py-2 rounded-lg bg-pink-500/10 border border-pink-500/20 hover:bg-pink-500/20 hover:border-pink-500/40 transition-all group w-full",
+            isCollapsed && "justify-center"
+          )}
+          title={activeScreen === 'dashboard' ? "Back to Control Panel" : "Back to Dashboard"}
+        >
+          <ArrowLeft className="w-4 h-4 text-pink-400 group-hover:text-pink-300" />
+          {!isCollapsed && (
+            <span className="text-sm font-medium text-pink-400 group-hover:text-pink-300">
+              {activeScreen === 'dashboard' ? 'Control Panel' : 'Back'}
+            </span>
+          )}
+        </motion.button>
+      </div>
+
       {/* Header */}
       <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
         {!isCollapsed && (

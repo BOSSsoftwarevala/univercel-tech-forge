@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Target, TrendingUp, Globe, FileText, MessageSquare,
@@ -6,7 +7,8 @@ import {
   Brain, AlertTriangle, Copy, Layers, Eye, Edit, Phone, Mail,
   MessageCircle, Calendar, UserCheck, XCircle, Bot, Clock, Lightbulb,
   UserCog, Activity, Bell, AlertCircle, FileBarChart, BarChart3,
-  Plug, Link, Shield, Lock, FileSearch, Settings, ChevronDown, ChevronRight
+  Plug, Link, Shield, Lock, FileSearch, Settings, ChevronDown, ChevronRight,
+  ArrowLeft
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -223,6 +225,15 @@ const sidebarSections = [
 const LMFullSidebar = ({ activeSection, onSectionChange }: LMFullSidebarProps) => {
   const [expandedSections, setExpandedSections] = useState<string[]>(['overview', 'sources']);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (activeSection !== 'dashboard') {
+      onSectionChange('dashboard');
+    } else {
+      navigate('/super-admin-system/role-switch?role=boss_owner');
+    }
+  };
 
   const toggleSection = (id: string) => {
     setExpandedSections(prev => 
@@ -242,6 +253,22 @@ const LMFullSidebar = ({ activeSection, onSectionChange }: LMFullSidebarProps) =
       animate={{ x: 0, opacity: 1 }}
       className="fixed left-0 top-0 h-screen w-64 bg-card border-r border-border flex flex-col z-50"
     >
+      {/* Back Button */}
+      <div className="p-2 border-b border-border">
+        <motion.button
+          whileHover={{ scale: 1.02, x: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleBack}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all group w-full"
+          title={activeSection === 'dashboard' ? "Back to Control Panel" : "Back to Dashboard"}
+        >
+          <ArrowLeft className="w-4 h-4 text-primary group-hover:text-primary" />
+          <span className="text-sm font-medium text-primary">
+            {activeSection === 'dashboard' ? 'Control Panel' : 'Back'}
+          </span>
+        </motion.button>
+      </div>
+
       {/* Logo Section */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center gap-3">

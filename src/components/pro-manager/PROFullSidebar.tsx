@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -26,7 +27,8 @@ import {
   FileText,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -92,11 +94,41 @@ export const PROFullSidebar: React.FC<PROFullSidebarProps> = ({
   collapsed = false,
   onToggleCollapse
 }) => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (activeScreen !== 'pro_dashboard') {
+      onScreenChange('pro_dashboard');
+    } else {
+      navigate('/super-admin-system/role-switch?role=boss_owner');
+    }
+  };
+
   return (
     <div className={cn(
       "h-full bg-card border-r border-border flex flex-col transition-all duration-300",
       collapsed ? "w-16" : "w-64"
     )}>
+      {/* Back Button */}
+      <div className="p-2 border-b border-border">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleBack}
+          className={cn(
+            "w-full flex items-center gap-2 bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary",
+            collapsed && "justify-center px-2"
+          )}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {!collapsed && (
+            <span className="text-sm">
+              {activeScreen === 'pro_dashboard' ? 'Control Panel' : 'Back'}
+            </span>
+          )}
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="p-4 border-b border-border flex items-center justify-between">
         {!collapsed && (
