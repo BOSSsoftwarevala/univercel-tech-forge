@@ -4,7 +4,7 @@
  * NOT for Control Panel
  */
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { FUFullSidebar, FUSection } from './FUFullSidebar';
 import { FUDashboardScreen } from './screens/FUDashboardScreen';
 import { FULeadsScreen } from './screens/FULeadsScreen';
@@ -16,9 +16,19 @@ import { FUWalletScreen } from './screens/FUWalletScreen';
 import { FUSupportScreen } from './screens/FUSupportScreen';
 import { FUProfileScreen } from './screens/FUProfileScreen';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { GlobalBackButton } from '@/components/shared/GlobalBackButton';
+import { toast } from 'sonner';
 
 export function FUFullLayout() {
   const [activeSection, setActiveSection] = useState<FUSection>('dashboard');
+
+  const handleBackToModuleHome = useCallback(() => {
+    if (activeSection === 'dashboard') {
+      toast.info('You are already on your dashboard');
+      return;
+    }
+    setActiveSection('dashboard');
+  }, [activeSection]);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -47,15 +57,23 @@ export function FUFullLayout() {
 
   return (
     <div className="flex h-full w-full bg-background">
-      <FUFullSidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
+      <FUFullSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+
       <main className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="p-6">
-            {renderContent()}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-border bg-background">
+          <GlobalBackButton
+            onBack={handleBackToModuleHome}
+            activeScreen={activeSection}
+            homeScreen="dashboard"
+            showHome={false}
+          />
+          <div className="text-sm text-muted-foreground">
+            Franchise Dashboard
           </div>
+        </div>
+
+        <ScrollArea className="h-[calc(100%-4rem)]">
+          <div className="p-6">{renderContent()}</div>
         </ScrollArea>
       </main>
     </div>
