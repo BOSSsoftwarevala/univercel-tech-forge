@@ -653,6 +653,104 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_job_steps: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          duration_ms: number | null
+          id: string
+          input_data: Json | null
+          job_id: string | null
+          output_data: Json | null
+          status: string
+          step_number: number
+          step_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          id?: string
+          input_data?: Json | null
+          job_id?: string | null
+          output_data?: Json | null
+          status?: string
+          step_number: number
+          step_type: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          id?: string
+          input_data?: Json | null
+          job_id?: string | null
+          output_data?: Json | null
+          status?: string
+          step_number?: number
+          step_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_job_steps_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "ai_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_jobs: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          completed_at: string | null
+          confidence_score: number | null
+          created_at: string | null
+          error_message: string | null
+          human_approved: boolean | null
+          id: string
+          input_data: Json | null
+          job_type: string
+          output_data: Json | null
+          source_button_id: string | null
+          source_module: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          human_approved?: boolean | null
+          id?: string
+          input_data?: Json | null
+          job_type: string
+          output_data?: Json | null
+          source_button_id?: string | null
+          source_module: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          human_approved?: boolean | null
+          id?: string
+          input_data?: Json | null
+          job_type?: string
+          output_data?: Json | null
+          source_button_id?: string | null
+          source_module?: string
+          status?: string
+        }
+        Relationships: []
+      }
       ai_observation_logs: {
         Row: {
           action_id: string | null
@@ -950,6 +1048,50 @@ export type Database = {
           super_admin_id?: string
         }
         Relationships: []
+      }
+      approval_steps: {
+        Row: {
+          approval_id: string | null
+          approver_id: string | null
+          approver_role: string
+          created_at: string | null
+          decided_at: string | null
+          decision_notes: string | null
+          id: string
+          status: string
+          step_number: number
+        }
+        Insert: {
+          approval_id?: string | null
+          approver_id?: string | null
+          approver_role: string
+          created_at?: string | null
+          decided_at?: string | null
+          decision_notes?: string | null
+          id?: string
+          status?: string
+          step_number?: number
+        }
+        Update: {
+          approval_id?: string | null
+          approver_id?: string | null
+          approver_role?: string
+          created_at?: string | null
+          decided_at?: string | null
+          decision_notes?: string | null
+          id?: string
+          status?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_steps_approval_id_fkey"
+            columns: ["approval_id"]
+            isOneToOne: false
+            referencedRelation: "approvals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       approvals: {
         Row: {
@@ -2001,6 +2143,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      button_executions: {
+        Row: {
+          button_id: string
+          completed_at: string | null
+          created_at: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          ip_address: string | null
+          latency_ms: number | null
+          metadata: Json | null
+          role_id: string | null
+          status: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          button_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: string | null
+          latency_ms?: number | null
+          metadata?: Json | null
+          role_id?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          button_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: string | null
+          latency_ms?: number | null
+          metadata?: Json | null
+          role_id?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       button_registry: {
         Row: {
