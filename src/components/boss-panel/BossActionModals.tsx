@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Bell, Headphones, ListChecks, MessageSquare, Globe, Banknote,
   CheckCircle2, Clock, AlertTriangle, Users, Send, Search,
-  FileText, Shield, Lock, Scale
+  FileText, Shield, Lock, Scale, Check, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useBossPendingActions } from '@/hooks/boss-panel/useBossPendingActions';
 
 // Modal Base Component
 interface ModalProps {
@@ -66,72 +67,180 @@ interface NotificationsModalProps {
 }
 
 export const NotificationsModal = ({ open, onClose }: NotificationsModalProps) => {
-  const notifications = [
-    { id: 1, type: 'critical', title: 'Emergency Lock Request', message: 'Finance module lock requested by SA-002', time: '2 min ago', read: false },
-    { id: 2, type: 'warning', title: 'Super Admin Escalation', message: 'Pending approval for role elevation', time: '15 min ago', read: false },
-    { id: 3, type: 'critical', title: 'Security Alert', message: 'Multiple failed login attempts detected', time: '1 hour ago', read: false },
-    { id: 4, type: 'info', title: 'System Update', message: 'Database backup completed successfully', time: '2 hours ago', read: true },
-    { id: 5, type: 'info', title: 'New Super Admin', message: 'SA-005 has been created and activated', time: '1 day ago', read: true },
-  ];
+  const { 
+    pendingApprovals, 
+    securityAlerts, 
+    counts, 
+    isLoading, 
+    approveRequest, 
+    rejectRequest, 
+    resolveAlert 
+  } = useBossPendingActions();
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
-  const handleMarkAllRead = async () => {
-    await supabase.from('audit_logs').insert({
-      action: 'mark_all_notifications_read',
-      module: 'boss-panel',
-      meta_json: { count: notifications.filter(n => !n.read).length }
-    });
-    toast.success('All notifications marked as read');
+  const handleApprove = async (id: string) => {
+    setProcessingId(id);
+    try {
+      await approveRequest(id);
+      toast.success('Request approved');
+    } catch (e) {
+      toast.error('Failed to approve');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    setProcessingId(id);
+    try {
+      await rejectRequest(id, 'Rejected by Boss');
+      toast.success('Request rejected');
+    } catch (e) {
+      toast.error('Failed to reject');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleResolveAlert = async (id: string) => {
+    setProcessingId(id);
+    try {
+      await resolveAlert(id, 'Resolved by Boss');
+      toast.success('Alert resolved');
+    } catch (e) {
+      toast.error('Failed to resolve');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const formatTime = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const diff = Date.now() - d.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins} min ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} hr ago`;
+    return d.toLocaleDateString();
   };
 
   return (
     <Modal 
       open={open} 
       onClose={onClose} 
-      title="Notifications" 
+      title="Notifications & Pending Actions" 
       icon={<Bell className="w-5 h-5 text-blue-400" />}
     >
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Badge className="bg-red-500/20 text-red-400">
-            {notifications.filter(n => !n.read).length} unread
-          </Badge>
-          <Button variant="ghost" size="sm" onClick={handleMarkAllRead}>
-            Mark all read
-          </Button>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex gap-2">
+            <Badge className="bg-red-500/20 text-red-400">
+              {counts.pendingApprovals} approvals
+            </Badge>
+            <Badge className="bg-amber-500/20 text-amber-400">
+              {counts.criticalAlerts} alerts
+            </Badge>
+          </div>
         </div>
-        <div className="space-y-2">
-          {notifications.map((notif) => (
-            <div 
-              key={notif.id}
-              className={cn(
-                "p-3 rounded-lg border transition-all cursor-pointer hover:border-blue-500/50",
-                notif.read 
-                  ? "bg-slate-800/50 border-slate-700" 
-                  : "bg-slate-800 border-slate-600"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className={cn(
-                  "w-2 h-2 rounded-full mt-2 flex-shrink-0",
-                  notif.type === 'critical' ? "bg-red-500" :
-                  notif.type === 'warning' ? "bg-amber-500" : "bg-blue-500"
-                )} />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className={cn(
-                      "text-sm font-medium",
-                      notif.read ? "text-slate-300" : "text-white"
-                    )}>
-                      {notif.title}
-                    </p>
-                    <span className="text-xs text-slate-500">{notif.time}</span>
+
+        {isLoading ? (
+          <div className="text-center py-8 text-slate-400">Loading...</div>
+        ) : (
+          <div className="space-y-4">
+            {/* Pending Approvals */}
+            {pendingApprovals.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs uppercase text-slate-500 font-semibold">Pending Approvals</h4>
+                {pendingApprovals.map((approval) => (
+                  <div 
+                    key={approval.id}
+                    className="p-3 rounded-lg border bg-amber-500/5 border-amber-500/30"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-white">{approval.request_type}</p>
+                        <p className="text-xs text-slate-400 mt-1">{formatTime(approval.created_at)}</p>
+                        {approval.risk_score && approval.risk_score > 70 && (
+                          <Badge className="mt-1 bg-red-500/20 text-red-400 text-[10px]">HIGH RISK</Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 text-green-400 hover:bg-green-500/20"
+                          onClick={() => handleApprove(approval.id)}
+                          disabled={processingId === approval.id}
+                        >
+                          <Check className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/20"
+                          onClick={() => handleReject(approval.id)}
+                          disabled={processingId === approval.id}
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-slate-400 mt-1">{notif.message}</p>
-                </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
+            )}
+
+            {/* Security Alerts */}
+            {securityAlerts.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs uppercase text-slate-500 font-semibold">Security Alerts</h4>
+                {securityAlerts.map((alert) => (
+                  <div 
+                    key={alert.id}
+                    className={cn(
+                      "p-3 rounded-lg border",
+                      alert.severity === 'critical' 
+                        ? "bg-red-500/5 border-red-500/30" 
+                        : "bg-slate-800 border-slate-600"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <div className={cn(
+                            "w-2 h-2 rounded-full flex-shrink-0",
+                            alert.severity === 'critical' ? "bg-red-500" : "bg-amber-500"
+                          )} />
+                          <p className="text-sm font-medium text-white">{alert.alert_type}</p>
+                        </div>
+                        {alert.description && (
+                          <p className="text-xs text-slate-400 mt-1">{alert.description}</p>
+                        )}
+                        <p className="text-xs text-slate-500 mt-1">{formatTime(alert.created_at)}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-2 text-green-400 hover:bg-green-500/20"
+                        onClick={() => handleResolveAlert(alert.id)}
+                        disabled={processingId === alert.id}
+                      >
+                        Resolve
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {pendingApprovals.length === 0 && securityAlerts.length === 0 && (
+              <div className="text-center py-8 text-slate-400">
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>No pending actions</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Modal>
   );

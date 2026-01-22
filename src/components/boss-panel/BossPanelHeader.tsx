@@ -11,7 +11,8 @@ import {
   MessageSquare,
   ListChecks,
   Globe,
-  Banknote
+  Banknote,
+  CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +36,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { useBossPendingActions } from '@/hooks/boss-panel/useBossPendingActions';
 import {
   NotificationsModal,
   AssistModal,
@@ -61,6 +63,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const [showCurrency, setShowCurrency] = useState(false);
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const { counts } = useBossPendingActions();
 
   const handleEmergencyLock = async () => {
     setIsLocking(true);
@@ -163,17 +166,19 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           <MessageSquare className="w-5 h-5 text-white" />
         </Button>
 
-        {/* Notifications / Buzzer */}
+        {/* Notifications / Buzzer - LIVE COUNT */}
         <Button 
           variant="ghost" 
           size="icon"
           onClick={() => setShowNotifications(true)}
           className="relative hover:bg-white/20 w-10 h-10"
         >
-          <Bell className="w-5 h-5 text-white" />
-          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold bg-red-500 text-white rounded-full">
-            3
-          </span>
+          <Bell className={`w-5 h-5 text-white ${counts.total > 0 ? 'animate-pulse' : ''}`} />
+          {counts.total > 0 && (
+            <span className="absolute top-1 right-1 flex items-center justify-center min-w-4 h-4 px-1 text-[10px] font-semibold bg-destructive text-destructive-foreground rounded-full">
+              {counts.total > 99 ? '99+' : counts.total}
+            </span>
+          )}
         </Button>
 
         {/* Language */}
