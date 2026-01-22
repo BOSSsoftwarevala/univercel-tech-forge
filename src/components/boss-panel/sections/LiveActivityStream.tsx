@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Activity, 
-  User, 
-  DollarSign, 
-  Package, 
-  Shield, 
-  AlertTriangle,
   Filter,
   Radio,
   Clock
@@ -21,84 +16,115 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { useBossActivityStream } from '@/hooks/boss-panel/useBossActivityStream';
 
-interface ActivityEvent {
-  id: string;
-  timestamp: Date;
-  actor: string;
-  actorRole: string;
-  action: string;
-  module: string;
-  region: string;
-  riskLevel: 'low' | 'medium' | 'high';
-  icon: React.ElementType;
-}
+type PriorityFlag = 'HIGH' | 'NORMAL';
 
-const mockEvents: Omit<ActivityEvent, 'id' | 'timestamp'>[] = [
-  { actor: 'John Smith', actorRole: 'Franchise', action: 'Lead created', module: 'Leads', region: 'North America', riskLevel: 'low', icon: User },
-  { actor: 'Sarah Chen', actorRole: 'Reseller', action: 'Deal closed - $15,000', module: 'Sales', region: 'Asia Pacific', riskLevel: 'low', icon: DollarSign },
-  { actor: 'Mike Johnson', actorRole: 'Super Admin', action: 'Role permissions updated', module: 'Security', region: 'Europe', riskLevel: 'medium', icon: Shield },
-  { actor: 'Emily Davis', actorRole: 'Lead Manager', action: 'Demo converted', module: 'Demos', region: 'North America', riskLevel: 'low', icon: Package },
-  { actor: 'System', actorRole: 'AI Engine', action: 'Security alert triggered', module: 'Security', region: 'Global', riskLevel: 'high', icon: AlertTriangle },
-  { actor: 'David Wilson', actorRole: 'Country Admin', action: 'New product added', module: 'Products', region: 'Europe', riskLevel: 'low', icon: Package },
-];
-
-const riskColors = {
+const riskColors: Record<string, string> = {
   low: 'bg-green-500/20 text-green-400 border-green-500/30',
   medium: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   high: 'bg-red-500/20 text-red-400 border-red-500/30',
+  critical: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
+function toPriority(riskLevel?: string | null): PriorityFlag {
+  const r = (riskLevel || '').toLowerCase();
+  return r === 'high' || r === 'critical' ? 'HIGH' : 'NORMAL';
+}
+
+function extractStatus(metadata: unknown): string {
+  if (!metadata || typeof metadata !== 'object') return 'logged';
+  const m = metadata as Record<string, unknown>;
+  return (
+    (typeof m.status === 'string' && m.status) ||
+    (typeof m.approval_status === 'string' && m.approval_status) ||
+    (typeof m.action_result === 'string' && m.action_result) ||
+    'logged'
+  );
+}
+
+function startOfDayISO(date: Date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function endOfDayISO(date: Date) {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
 export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boolean }) {
-  const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterModule, setFilterModule] = useState<string>('all');
-  const [filterRisk, setFilterRisk] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [filterStart, setFilterStart] = useState<string>('');
+  const [filterEnd, setFilterEnd] = useState<string>('');
 
-  // Simulate live events
-  useEffect(() => {
-    if (!streamingOn) return;
+  const { activities, isLoading, error, isStreaming } = useBossActivityStream(streamingOn);
 
-    const interval = setInterval(() => {
-      const randomEvent = mockEvents[Math.floor(Math.random() * mockEvents.length)];
-      const newEvent: ActivityEvent = {
-        ...randomEvent,
-        id: Math.random().toString(36).substr(2, 9),
-        timestamp: new Date(),
-      };
-      
-      setEvents(prev => [newEvent, ...prev].slice(0, 50));
-    }, 3000);
+  const derived = useMemo(() => {
+    const roles = new Set<string>();
+    const modules = new Set<string>();
+    const statuses = new Set<string>();
 
-    return () => clearInterval(interval);
-  }, [streamingOn]);
+    activities.forEach((a) => {
+      if (a.actor_role) roles.add(a.actor_role);
+      if (a.target) modules.add(a.target);
+      statuses.add(extractStatus(a.metadata));
+    });
 
-  const filteredEvents = events.filter(event => {
-    if (filterRole !== 'all' && event.actorRole !== filterRole) return false;
-    if (filterModule !== 'all' && event.module !== filterModule) return false;
-    if (filterRisk !== 'all' && event.riskLevel !== filterRisk) return false;
-    return true;
-  });
+    return {
+      roles: Array.from(roles).sort(),
+      modules: Array.from(modules).sort(),
+      statuses: Array.from(statuses).sort(),
+    };
+  }, [activities]);
+
+  const filteredActivities = useMemo(() => {
+    const startDate = filterStart ? startOfDayISO(new Date(filterStart)) : null;
+    const endDate = filterEnd ? endOfDayISO(new Date(filterEnd)) : null;
+
+    return activities.filter((a) => {
+      if (filterRole !== 'all' && a.actor_role !== filterRole) return false;
+      if (filterModule !== 'all' && a.target !== filterModule) return false;
+
+      const status = extractStatus(a.metadata);
+      if (filterStatus !== 'all' && status !== filterStatus) return false;
+
+      const priority = toPriority(a.risk_level);
+      if (filterPriority !== 'all' && priority !== filterPriority) return false;
+
+      const ts = a.timestamp ? new Date(a.timestamp) : null;
+      if (startDate && ts && ts < startDate) return false;
+      if (endDate && ts && ts > endDate) return false;
+
+      return true;
+    });
+  }, [activities, filterEnd, filterModule, filterPriority, filterRole, filterStart, filterStatus]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-white">Live Activity Stream</h1>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${streamingOn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${isStreaming ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
             <Radio className={`w-3 h-3 ${streamingOn ? 'animate-pulse' : ''}`} />
-            <span className="text-xs font-medium">{streamingOn ? 'LIVE' : 'PAUSED'}</span>
+            <span className="text-xs font-medium">{isStreaming ? 'LIVE' : 'PAUSED'}</span>
           </div>
         </div>
         <div className="text-xs text-white/40">
-          {events.length} events captured
+          {activities.length} events captured
         </div>
       </div>
 
       {/* Filters */}
       <Card className="bg-[#12121a] border-white/10">
         <CardContent className="p-4">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Filter className="w-4 h-4 text-white/40" />
             <Select value={filterRole} onValueChange={setFilterRole}>
               <SelectTrigger className="w-40 bg-white/5 border-white/10">
@@ -106,10 +132,9 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
               </SelectTrigger>
               <SelectContent className="bg-[#1a1a2e] border-white/10">
                 <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="Super Admin">Super Admin</SelectItem>
-                <SelectItem value="Franchise">Franchise</SelectItem>
-                <SelectItem value="Reseller">Reseller</SelectItem>
-                <SelectItem value="Lead Manager">Lead Manager</SelectItem>
+                {derived.roles.map((r) => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -119,25 +144,49 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
               </SelectTrigger>
               <SelectContent className="bg-[#1a1a2e] border-white/10">
                 <SelectItem value="all">All Modules</SelectItem>
-                <SelectItem value="Leads">Leads</SelectItem>
-                <SelectItem value="Sales">Sales</SelectItem>
-                <SelectItem value="Products">Products</SelectItem>
-                <SelectItem value="Demos">Demos</SelectItem>
-                <SelectItem value="Security">Security</SelectItem>
+                {derived.modules.map((m) => (
+                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
-            <Select value={filterRisk} onValueChange={setFilterRisk}>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-40 bg-white/5 border-white/10">
-                <SelectValue placeholder="Risk" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent className="bg-[#1a1a2e] border-white/10">
-                <SelectItem value="all">All Risk</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
+                {derived.statuses.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
+
+            <Select value={filterPriority} onValueChange={setFilterPriority}>
+              <SelectTrigger className="w-40 bg-white/5 border-white/10">
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a2e] border-white/10">
+                <SelectItem value="all">All Priority</SelectItem>
+                <SelectItem value="HIGH">HIGH</SelectItem>
+                <SelectItem value="NORMAL">NORMAL</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                value={filterStart}
+                onChange={(e) => setFilterStart(e.target.value)}
+                className="w-[150px] bg-white/5 border-white/10 text-white"
+              />
+              <Input
+                type="date"
+                value={filterEnd}
+                onChange={(e) => setFilterEnd(e.target.value)}
+                className="w-[150px] bg-white/5 border-white/10 text-white"
+              />
+            </div>
 
             <Button 
               variant="ghost" 
@@ -145,7 +194,10 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
               onClick={() => {
                 setFilterRole('all');
                 setFilterModule('all');
-                setFilterRisk('all');
+                setFilterStatus('all');
+                setFilterPriority('all');
+                setFilterStart('');
+                setFilterEnd('');
               }}
               className="text-white/50 hover:text-white"
             >
@@ -166,46 +218,78 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
         <CardContent>
           <div className="space-y-2 max-h-[600px] overflow-y-auto">
             <AnimatePresence mode="popLayout">
-              {filteredEvents.length === 0 ? (
+              {error ? (
                 <div className="text-center py-12 text-white/40">
                   <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Waiting for activity...</p>
-                  {!streamingOn && <p className="text-xs mt-2">Streaming is paused</p>}
+                  <p>Failed to load activity feed</p>
+                </div>
+              ) : isLoading ? (
+                <div className="text-center py-12 text-white/40">
+                  <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Loading activity…</p>
+                </div>
+              ) : filteredActivities.length === 0 ? (
+                <div className="text-center py-12 text-white/40">
+                  <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No activity matches current filters</p>
                 </div>
               ) : (
-                filteredEvents.map((event) => {
-                  const Icon = event.icon;
+                filteredActivities.map((a) => {
+                  const risk = (a.risk_level || 'low').toLowerCase();
+                  const status = extractStatus(a.metadata);
+                  const priority = toPriority(a.risk_level);
+
                   return (
                     <motion.div
-                      key={event.id}
+                      key={a.log_id}
                       initial={{ opacity: 0, x: -20, height: 0 }}
                       animate={{ opacity: 1, x: 0, height: 'auto' }}
                       exit={{ opacity: 0, x: 20, height: 0 }}
-                      className="flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                      className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${priority === 'HIGH' ? 'bg-amber-500/10 hover:bg-amber-500/15' : 'bg-white/5 hover:bg-white/10'}`}
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${riskColors[event.riskLevel]}`}>
-                        <Icon className="w-5 h-5" />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${riskColors[risk] || riskColors.low}`}>
+                        <Activity className="w-5 h-5" />
                       </div>
+
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-medium">{event.actor}</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-white font-medium truncate">
+                            {a.actor_id ? a.actor_id : 'System'}
+                          </span>
                           <Badge variant="outline" className="text-[10px] border-white/20 text-white/60">
-                            {event.actorRole}
+                            {a.actor_role}
                           </Badge>
+                          <Badge variant="outline" className="text-[10px] border-white/20 text-white/60">
+                            {status}
+                          </Badge>
+                          {priority === 'HIGH' && (
+                            <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]">
+                              PRIORITY: HIGH
+                            </Badge>
+                          )}
                         </div>
-                        <p className="text-sm text-white/60 truncate">{event.action}</p>
+                        <p className="text-sm text-white/70 truncate">
+                          {a.action_type}
+                        </p>
+                        {(a.target || a.target_id) && (
+                          <p className="text-[11px] text-white/45 truncate">
+                            {a.target ? `${a.target}` : ''}{a.target_id ? ` • ${a.target_id}` : ''}
+                          </p>
+                        )}
                       </div>
+
                       <div className="text-right">
                         <Badge variant="outline" className="text-[10px] border-white/20 text-white/50 mb-1">
-                          {event.module}
+                          {a.target || 'system'}
                         </Badge>
-                        <div className="flex items-center gap-1 text-[10px] text-white/40">
+                        <div className="flex items-center justify-end gap-1 text-[10px] text-white/40">
                           <Clock className="w-3 h-3" />
-                          {event.timestamp.toLocaleTimeString()}
+                          {a.timestamp ? new Date(a.timestamp).toLocaleString() : ''}
                         </div>
                       </div>
-                      <Badge className={`${riskColors[event.riskLevel]} border text-[10px]`}>
-                        {event.riskLevel.toUpperCase()}
+
+                      <Badge className={`${riskColors[risk] || riskColors.low} border text-[10px]`}>
+                        {(a.risk_level || 'low').toString().toUpperCase()}
                       </Badge>
                     </motion.div>
                   );
