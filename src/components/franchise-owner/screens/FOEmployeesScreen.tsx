@@ -1,6 +1,7 @@
 /**
  * FRANCHISE OWNER EMPLOYEES SCREEN
  * Team management with role assignment
+ * ALL ACTIONS LOGGED TO BOSS PANEL
  */
 
 import React, { useState } from 'react';
@@ -17,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
+import { useFranchiseActionLogger } from '@/hooks/useFranchiseActionLogger';
 
 interface Employee {
   id: string;
@@ -42,12 +44,17 @@ export function FOEmployeesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', role: '' });
+  const { logAddEmployee } = useFranchiseActionLogger();
 
-  const handleAddEmployee = () => {
+  const handleAddEmployee = async () => {
     if (!newEmployee.name || !newEmployee.email || !newEmployee.role) {
       toast.error('Please fill all fields');
       return;
     }
+    
+    // Log action - THIS WILL APPEAR ON BOSS PANEL
+    await logAddEmployee(newEmployee.name, newEmployee.role);
+    
     toast.success(`Employee ${newEmployee.name} added successfully`);
     setShowAddDialog(false);
     setNewEmployee({ name: '', email: '', role: '' });

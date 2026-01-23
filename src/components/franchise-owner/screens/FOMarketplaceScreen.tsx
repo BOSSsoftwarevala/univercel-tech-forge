@@ -2,6 +2,7 @@
  * FRANCHISE OWNER MARKETPLACE SCREEN
  * Product listing with buy/order functionality
  * 30% franchise discount auto-applied
+ * ALL ACTIONS LOGGED TO BOSS PANEL
  */
 
 import React, { useState } from 'react';
@@ -17,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { useFranchiseActionLogger } from '@/hooks/useFranchiseActionLogger';
 
 interface Product {
   id: string;
@@ -90,14 +92,24 @@ export function FOMarketplaceScreen() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [legalAccepted, setLegalAccepted] = useState(false);
+  const { logPlaceOrder, logAction, logLegalAcceptance } = useFranchiseActionLogger();
 
   const filteredProducts = MOCK_PRODUCTS.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleViewDetails = (product: Product) => {
+  const handleViewDetails = async (product: Product) => {
     setSelectedProduct(product);
+    // Log view action
+    await logAction({
+      action: 'view_product',
+      module: 'fo_marketplace',
+      targetId: product.id,
+      targetName: product.name,
+      riskLevel: 'low',
+      details: { category: product.category }
+    });
   };
 
   const handlePlaceOrder = (product: Product) => {
@@ -105,12 +117,26 @@ export function FOMarketplaceScreen() {
     setShowOrderDialog(true);
   };
 
-  const handleSubmitOrder = () => {
+  const handleSubmitOrder = async () => {
     if (!legalAccepted) {
       toast.error('Please accept the legal terms to proceed');
       return;
     }
-    toast.success(`Order placed for ${selectedProduct?.name}. Pending approval.`);
+    
+    if (selectedProduct) {
+      // Log legal acceptance first
+      await logLegalAcceptance('Order Terms & Conditions');
+      
+      // Log order placement - THIS WILL APPEAR ON BOSS PANEL
+      await logPlaceOrder(
+        selectedProduct.name, 
+        selectedProduct.id, 
+        getDiscountedPrice(selectedProduct.price)
+      );
+      
+      toast.success(`Order placed for ${selectedProduct.name}. Pending approval.`);
+    }
+    
     setShowOrderDialog(false);
     setSelectedProduct(null);
     setLegalAccepted(false);

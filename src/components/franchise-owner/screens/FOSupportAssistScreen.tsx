@@ -1,6 +1,7 @@
 /**
  * FRANCHISE OWNER SUPPORT & ASSIST SCREEN
  * Assist requests + Promise tracker
+ * ALL ACTIONS LOGGED TO BOSS PANEL
  */
 
 import React, { useState } from 'react';
@@ -17,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { useFranchiseActionLogger } from '@/hooks/useFranchiseActionLogger';
 
 interface AssistRequest {
   id: string;
@@ -53,6 +55,8 @@ const MOCK_PROMISES: Promise[] = [
 export function FOSupportAssistScreen() {
   const [activeTab, setActiveTab] = useState('assist');
   const [showNewRequest, setShowNewRequest] = useState(false);
+  const [requestSubject, setRequestSubject] = useState('');
+  const { logRaiseSupport } = useFranchiseActionLogger();
 
   const getStatusBadge = (status: AssistRequest['status']) => {
     switch (status) {
@@ -80,9 +84,13 @@ export function FOSupportAssistScreen() {
     }
   };
 
-  const handleSubmitRequest = () => {
+  const handleSubmitRequest = async () => {
+    // Log action - THIS WILL APPEAR ON BOSS PANEL
+    await logRaiseSupport(requestSubject || 'New Support Request', `AST-${Date.now()}`);
+    
     toast.success('Assist request submitted. AI will analyze first.');
     setShowNewRequest(false);
+    setRequestSubject('');
   };
 
   return (
@@ -110,7 +118,11 @@ export function FOSupportAssistScreen() {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label>Subject</Label>
-                <Input placeholder="Brief description of issue" />
+                <Input 
+                  placeholder="Brief description of issue" 
+                  value={requestSubject}
+                  onChange={(e) => setRequestSubject(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Description</Label>

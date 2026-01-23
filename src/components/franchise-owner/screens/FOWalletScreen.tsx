@@ -1,8 +1,14 @@
+/**
+ * FRANCHISE OWNER WALLET SCREEN
+ * ALL ACTIONS LOGGED TO BOSS PANEL
+ */
 import React from 'react';
 import { Wallet, Coins, History, RefreshCw, Plus, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { useFranchiseActionLogger } from '@/hooks/useFranchiseActionLogger';
 
 const usageHistory = [
   { id: 1, service: 'AI Lead Assignment', coins: 50, date: 'Today, 10:30 AM' },
