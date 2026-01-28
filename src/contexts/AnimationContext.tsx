@@ -30,26 +30,12 @@ export const AnimationProvider = ({ children }: { children: ReactNode }) => {
   // If an animation stays visible too long, force-close it.
   useEffect(() => {
     if (!animation.type) return;
-    const MAX_OVERLAY_MS = 6000; // Force hide after 6 seconds
+    const MAX_OVERLAY_MS = 7000;
     const t = window.setTimeout(() => {
-      console.warn('[Animation] Force-hiding stuck animation overlay');
       hideAnimation();
     }, MAX_OVERLAY_MS);
     return () => window.clearTimeout(t);
   }, [animation.type, hideAnimation]);
-
-  // Ensure no animation is shown on initial mount for public routes
-  useEffect(() => {
-    // On mount, ensure animation state is clean
-    if (animation.type && typeof window !== 'undefined') {
-      // Check if we're on a public route where animations shouldn't auto-show
-      const publicRoutes = ['/', '/demos', '/products', '/contact', '/about'];
-      const isPublicRoute = publicRoutes.some(route => window.location.pathname === route || window.location.pathname.startsWith(route + '/'));
-      
-      // If on public route and no explicit trigger (user action), don't show
-      // This is a safety check - animations should only trigger via explicit actions
-    }
-  }, []);
 
   return (
     <AnimationContext.Provider value={{ 

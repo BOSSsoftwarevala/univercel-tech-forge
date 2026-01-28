@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEnterpriseAudit } from '@/hooks/useEnterpriseAudit';
 
 interface EnhancedDemoCardProps {
   id: string;
@@ -51,7 +50,6 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
   className
 }) => {
   const navigate = useNavigate();
-  const { logAction } = useEnterpriseAudit();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
@@ -68,40 +66,11 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
     return sessionId;
   };
 
-  const handleBuyNow = async () => {
-    // Log public action for Boss Panel visibility
-    await logAction({
-      action: 'public_buy_now_clicked',
-      module: 'lead_manager',
-      severity: 'medium',
-      target_id: id,
-      target_type: 'demo',
-      metadata: {
-        demo_title: title,
-        demo_category: category,
-        price: price,
-        page_url: window.location.pathname,
-        source: 'public_demo_card'
-      }
-    });
+  const handleBuyNow = () => {
     navigate(`/checkout/${id}`);
   };
 
-  const handleStartDemo = async () => {
-    // Log public action for Boss Panel visibility
-    await logAction({
-      action: 'public_try_demo_clicked',
-      module: 'lead_manager',
-      severity: 'low',
-      target_id: id,
-      target_type: 'demo',
-      metadata: {
-        demo_title: title,
-        demo_category: category,
-        page_url: window.location.pathname,
-        source: 'public_demo_card'
-      }
-    });
+  const handleStartDemo = () => {
     navigate(`/demo/${id}`);
   };
 
@@ -123,22 +92,6 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
         });
 
       if (error) throw error;
-      
-      // Log public action for Boss Panel visibility
-      await logAction({
-        action: 'public_add_to_cart',
-        module: 'lead_manager',
-        severity: 'low',
-        target_id: id,
-        target_type: 'demo',
-        metadata: {
-          demo_title: title,
-          demo_category: category,
-          price: price,
-          page_url: window.location.pathname,
-          source: 'public_demo_card'
-        }
-      });
       
       setIsInCart(true);
       toast.success('Added to cart!', {

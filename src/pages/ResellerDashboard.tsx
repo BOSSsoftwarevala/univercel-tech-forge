@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
+import { 
   LayoutDashboard, Users, Wallet, BarChart3, Target, Settings, LogOut,
   Radar, Brain, Sparkles, Coins, ShoppingCart, Briefcase, Percent,
-  Banknote, FileText, Bell, Lock, ChevronLeft, ChevronRight
+  Banknote, FileText, Bell, Lock, ArrowLeft, ChevronLeft, ChevronRight
 } from 'lucide-react';
-import { GlobalBackButton } from '@/components/shared/GlobalBackButton';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import softwareValaLogo from '@/assets/software-vala-logo.png';
@@ -93,22 +92,9 @@ const ResellerDashboard = () => {
       {/* Top Bar */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900/90 backdrop-blur-xl border-b border-emerald-500/20 z-50 flex items-center justify-between px-6">
         <div className="flex items-center gap-3">
-          <GlobalBackButton
-            onBack={() => {
-              if (activeSection === 'dashboard') {
-                toast.info('You are already on your dashboard');
-                return;
-              }
-              setActiveSection('dashboard');
-            }}
-            activeScreen={activeSection}
-            homeScreen="dashboard"
-            showHome={false}
-            variant="compact"
-          />
-          <div
+          <div 
             className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center cursor-pointer shadow-lg shadow-emerald-500/30"
-            onClick={() => setActiveSection('dashboard')}
+            onClick={() => navigate('/')}
           >
             <span className="text-white font-bold text-lg">SV</span>
           </div>

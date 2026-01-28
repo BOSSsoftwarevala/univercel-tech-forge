@@ -387,20 +387,11 @@ const RoleSwitchDashboard = () => {
       return;
     }
 
-    // IMPORTANT: Avoid hard page reload (window.location.assign) because it causes
-    // intermittent blank/white flashes while the browser reloads the JS bundle.
-    // We keep the same URL contract (?role=...) but transition via SPA navigation
-    // and force the local loading screen for a stable, non-white state.
+    // CRITICAL NAV RULE: Switching module = FULL UI reload.
+    // This also guarantees we are in the correct role context (fixes "buttons not working" caused by staying on ?role=boss_owner).
     const nextUrl = `/super-admin-system/role-switch?role=${encodeURIComponent(role)}`;
-
-    // Force loading overlay immediately (prevents any flash)
-    setInitialized(false);
-    setActiveRole(null);
-    setActiveNav("dashboard");
-    setSelectedSubItem(undefined);
-
-    navigate(nextUrl, { replace: true });
-  }, [canAccessView, navigate]);
+    window.location.assign(nextUrl);
+  }, [canAccessView]);
 
   const handleNavChange = useCallback((navId: string) => {
     setActiveNav(navId);

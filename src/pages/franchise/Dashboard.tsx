@@ -1,7 +1,7 @@
-import FONewLayout from '@/components/franchise-owner/FONewLayout';
+import FranchiseDash from '@/components/franchise/FranchiseDash';
 
 const FranchiseDashboardPage = () => {
-  return <FONewLayout />;
+  return <FranchiseDash />;
 };
 
 export default FranchiseDashboardPage;
