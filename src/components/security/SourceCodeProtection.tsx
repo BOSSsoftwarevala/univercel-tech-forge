@@ -69,37 +69,44 @@ export function useSourceCodeProtection() {
   const violationCountRef = useRef(0);
   const MAX_VIOLATIONS = 5;
 
-  // Log violation and show warning
+  // Log violation and show warning - ONLY IN PRODUCTION
   const handleViolation = useCallback((type: string, event?: Event) => {
+    // CRITICAL FIX: Skip all blocking in dev mode to allow normal button operation
+    if (import.meta.env.DEV) {
+      return true; // Allow action in dev
+    }
+    
     event?.preventDefault();
     event?.stopPropagation();
     
     violationCountRef.current++;
     
+    // Only log to DB in production, silently
     logProtectionViolation(user?.id || null, type, {
       violationCount: violationCountRef.current,
       deviceFingerprint: getDeviceFingerprint(),
     });
 
+    // Show toast only for actual security violations, not every action
     if (violationCountRef.current >= MAX_VIOLATIONS) {
-      toast.error('Security Alert: Multiple violations detected. This incident has been logged.', {
-        duration: 10000,
-      });
-    } else {
-      toast.warning('This action is blocked for security reasons.', {
-        duration: 3000,
+      toast.error('Security Alert: Multiple violations detected.', {
+        duration: 5000,
       });
     }
+    // REMOVED: The generic "This action is blocked" toast was blocking legitimate clicks
 
     return false;
   }, [user?.id]);
 
   useEffect(() => {
-    // Skip in development for debugging
+    // Skip ALL protection in development mode - allows normal button clicks
     if (import.meta.env.DEV) {
       console.log(LICENSE_NOTICE);
+      // Do NOT attach any event listeners in dev mode
       return;
     }
+    
+    // PRODUCTION MODE: Enable protection
 
     // ========================================
     // 1. PREVENT COPYING & SCREENSHOTS
@@ -253,31 +260,35 @@ export function useSourceCodeProtection() {
     const style = document.createElement('style');
     style.id = 'source-protection-styles';
     style.textContent = `
-      /* Disable text selection on protected content */
-      .protected-content,
-      body:not(input):not(textarea) {
+      /* Disable text selection ONLY on explicitly protected content */
+      .protected-content {
         -webkit-user-select: none !important;
         -moz-user-select: none !important;
         -ms-user-select: none !important;
         user-select: none !important;
       }
       
-      /* Allow selection in input fields */
-      input, textarea, [contenteditable="true"] {
+      /* Allow selection in input fields and text content */
+      input, textarea, [contenteditable="true"], p, span, h1, h2, h3, h4, h5, h6 {
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
         -ms-user-select: text !important;
         user-select: text !important;
       }
       
-      /* Disable image dragging */
+      /* CRITICAL FIX: Images MUST be clickable - removed pointer-events: none */
       img {
         -webkit-user-drag: none !important;
         -khtml-user-drag: none !important;
         -moz-user-drag: none !important;
         -o-user-drag: none !important;
         user-drag: none !important;
-        pointer-events: none;
+        /* pointer-events: none; -- REMOVED: This was blocking image buttons */
+      }
+      
+      /* CRITICAL FIX: Ensure buttons and interactive elements are always clickable */
+      button, a, [role="button"], [onclick], input[type="submit"], input[type="button"] {
+        pointer-events: auto !important;
       }
       
       /* Add protection overlay on print */

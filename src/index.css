@@ -777,3 +777,69 @@ html {
   transform: translateZ(0);
   will-change: transform;
 }
+
+/* ========================================
+   CRITICAL CLICK-BLOCKING FIX
+   ======================================== */
+
+/* Ensure all interactive elements are ALWAYS clickable */
+button,
+a,
+[role="button"],
+[onclick],
+input[type="submit"],
+input[type="button"],
+.btn,
+.clickable {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fixed overlays for decoration MUST NOT block clicks */
+.fixed.inset-0.pointer-events-none,
+[class*="fixed"][class*="inset-0"][class*="pointer-events-none"] {
+  pointer-events: none !important;
+}
+
+/* Ensure main content area is always interactive */
+main,
+.main-content,
+[role="main"],
+.content-area {
+  pointer-events: auto !important;
+}
+
+/* Sidebar should only occupy its width, not block content */
+aside,
+.sidebar,
+[role="navigation"] {
+  /* Sidebar clicks work, but doesn't block content area */
+  pointer-events: auto;
+}
+
+/* Modal/Dialog should be on top but with proper z-index */
+[role="dialog"],
+[role="alertdialog"],
+.modal,
+.dialog {
+  z-index: 100 !important;
+  pointer-events: auto !important;
+}
+
+/* Toast notifications should be clickable for dismiss */
+[data-sonner-toaster],
+.sonner-toast,
+[data-toast] {
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+
+/* Dropdown menus need proper z-index */
+[data-radix-popper-content-wrapper],
+[data-radix-menu-content],
+[role="menu"],
+[role="listbox"] {
+  z-index: 100 !important;
+  pointer-events: auto !important;
+}

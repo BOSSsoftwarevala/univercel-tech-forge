@@ -33,20 +33,35 @@ const DomainProtection: React.FC<DomainProtectionProps> = ({ children }) => {
         hostname.endsWith('.lovableproject.com')
       );
 
-      // Check if user is franchise
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: roles } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
+      // FAST PATH: If domain is allowed, immediately allow without auth check
+      // This prevents the loading screen from blocking legitimate access
+      if (isDomainAllowed) {
+        setIsAllowed(true);
+        return;
+      }
+
+      // Only check franchise role if domain is not directly allowed
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
         
-        const hasFranchiseRole = roles?.some(r => r.role === 'franchise');
-        setIsFranchise(hasFranchiseRole || false);
-        
-        // Franchise users bypass domain restriction
-        if (hasFranchiseRole) {
+        if (user) {
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+          
+          const hasFranchiseRole = roles?.some(r => r.role === 'franchise');
+          setIsFranchise(hasFranchiseRole || false);
+          
+          // Franchise users bypass domain restriction
+          if (hasFranchiseRole) {
+            setIsAllowed(true);
+            return;
+          }
+        }
+      } catch {
+        // If auth check fails, still allow on valid domains
+        if (isDomainAllowed) {
           setIsAllowed(true);
           return;
         }

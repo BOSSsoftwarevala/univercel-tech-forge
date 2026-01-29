@@ -54,10 +54,17 @@ export function CategorySidebarWrapper({
       exit={{ x: -20, opacity: 0 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        // CRITICAL: Sidebar must be full-height, fixed, and never overlapped by content
-        "fixed left-0 top-0 h-screen flex flex-col border-r border-border/50 bg-card/95 text-card-foreground backdrop-blur-xl z-50",
+        // CRITICAL FIX: Sidebar is fixed left, NOT full-screen
+        // Use explicit width, NOT inset-0, to prevent blocking content area
+        "fixed left-0 top-0 h-screen flex flex-col border-r border-border/50 bg-card/95 text-card-foreground backdrop-blur-xl",
+        // z-40 is enough - z-50 was fighting with modals
+        "z-40",
         className
       )}
+      style={{
+        // Ensure sidebar never expands beyond its width
+        maxWidth: categoryCollapsed ? '80px' : '260px',
+      }}
     >
       {/* Header with Back Button */}
       <div className="p-4 border-b border-border/50">
