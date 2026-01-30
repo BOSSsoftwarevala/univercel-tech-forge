@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { 
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import softwareValaLogo from "@/assets/software-vala-logo.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Demo {
   id: string;
@@ -2672,6 +2673,30 @@ const Index = () => {
   );
 };
 
+// AUDIT LOGGING: Log public actions to audit_logs for Boss Panel visibility
+const logPublicAction = async (action: string, metadata?: Record<string, unknown>) => {
+  try {
+    const sessionId = localStorage.getItem('demo_session_id') || 
+      (() => {
+        const id = 'session_' + Math.random().toString(36).substring(2, 15);
+        localStorage.setItem('demo_session_id', id);
+        return id;
+      })();
+    
+    await supabase.from('audit_logs').insert({
+      action,
+      module: 'public_site',
+      meta_json: {
+        session_id: sessionId,
+        timestamp: new Date().toISOString(),
+        ...metadata,
+      },
+    });
+  } catch (err) {
+    console.error('[AUDIT] Public action log failed:', err);
+  }
+};
+
 // Demo Card Component - Enhanced with interactions
 const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: { 
   demo: Demo; 
@@ -2680,9 +2705,42 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
   onToggleFavorite: () => void;
 }) => {
   const Icon = demo.icon;
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [activeTab, setActiveTab] = useState<'features' | 'tech'>('features');
   const [showQuickView, setShowQuickView] = useState(false);
+
+  // FIXED: Buy Now handler - logs action + navigates to checkout
+  const handleBuyNow = async () => {
+    await logPublicAction('buy_now_click', {
+      demo_id: demo.id,
+      demo_name: demo.name,
+      price: demo.discountPrice,
+      category: demo.category,
+    });
+    toast.success("🎉 Redirecting to checkout...", { description: `${demo.name} - ${demo.discountPrice}` });
+    navigate(`/checkout/${demo.id}`);
+  };
+
+  // FIXED: Live Demo handler - logs action + navigates to demo
+  const handleLiveDemo = async () => {
+    await logPublicAction('live_demo_click', {
+      demo_id: demo.id,
+      demo_name: demo.name,
+      category: demo.category,
+    });
+    navigate(demo.url);
+  };
+
+  // FIXED: Notify Me handler - logs action + shows toast
+  const handleNotifyMe = async () => {
+    await logPublicAction('notify_me_click', {
+      demo_id: demo.id,
+      demo_name: demo.name,
+      category: demo.category,
+    });
+    toast.info("📧 We'll notify you when this is available!", { description: demo.name });
+  };
   
   return (
     <motion.div
@@ -2842,18 +2900,19 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
               </Badge>
             </div>
 
-            {/* Enhanced Actions */}
+            {/* Enhanced Actions - FIXED: Now triggers API + navigation */}
             <div className="flex gap-2 mt-auto">
               {demo.status === "ACTIVE" ? (
                 <>
-                  <Link to={demo.url} className="flex-1">
-                    <Button className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all">
-                      <Play className="h-4 w-4 mr-2" /> Live Demo
-                    </Button>
-                  </Link>
+                  <Button 
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all"
+                    onClick={handleLiveDemo}
+                  >
+                    <Play className="h-4 w-4 mr-2" /> Live Demo
+                  </Button>
                   <Button 
                     className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
-                    onClick={() => toast.success("🎉 Redirecting to purchase...", { description: `${demo.name} - ${demo.discountPrice}` })}
+                    onClick={handleBuyNow}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" /> Buy Now
                   </Button>
@@ -2868,7 +2927,7 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                   </Button>
                   <Button 
                     className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-lg shadow-yellow-500/25 hover:shadow-yellow-500/40 transition-all"
-                    onClick={() => toast.info("📧 We'll notify you when this is available!", { description: demo.name })}
+                    onClick={handleNotifyMe}
                   >
                     <Bell className="h-4 w-4 mr-2" /> Notify Me
                   </Button>
