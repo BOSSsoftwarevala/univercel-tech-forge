@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { 
@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import softwareValaLogo from "@/assets/software-vala-logo.jpg";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Demo {
   id: string;
@@ -2565,45 +2564,33 @@ const Index = () => {
       </section>
 
       {/* Category Filter - Master Categories */}
-      {/* MOBILE FIX: Horizontal scroll only, no full-screen grid */}
-      <div className="bg-[#0d1e36]/80 backdrop-blur-sm border-b border-cyan-500/20 py-3 md:py-4 px-4 sticky top-0 z-30">
+      <div className="bg-[#0d1e36]/80 backdrop-blur-sm border-b border-cyan-500/20 py-4 px-4 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto">
-          {/* Search Row */}
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-4 mb-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <Input 
                 placeholder="Search software..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 md:pl-10 h-10 bg-[#1a2d4a] border-cyan-500/30 text-white placeholder:text-gray-400 text-sm"
+                className="pl-10 bg-[#1a2d4a] border-cyan-500/30 text-white placeholder:text-gray-400"
               />
             </div>
-            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 whitespace-nowrap text-xs md:text-sm shrink-0">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
               {filteredDemos.length} Products
             </Badge>
           </div>
-          
-          {/* CRITICAL MOBILE FIX: Horizontal scroll container, NOT flex-wrap */}
-          {/* On mobile: single horizontal scroll row. On desktop: wrap allowed */}
-          <div 
-            className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-transparent md:flex-wrap md:overflow-x-visible md:pb-0"
-            style={{ 
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'thin'
-            }}
-          >
+          <div className="flex gap-2 flex-wrap">
             {masterCategories.map(cat => (
               <Button
                 key={cat}
                 variant={activeCategory === cat ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveCategory(cat)}
-                className={`shrink-0 text-xs md:text-sm h-8 md:h-9 px-3 md:px-4 ${
-                  activeCategory === cat 
-                    ? "bg-cyan-500 text-white hover:bg-cyan-600" 
-                    : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 bg-[#1a2d4a]/50"
-                }`}
+                className={activeCategory === cat 
+                  ? "bg-cyan-500 text-white hover:bg-cyan-600" 
+                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200"
+                }
               >
                 {cat === "All" ? `All (${getCategoryCount(cat)})` : cat}
                 {cat !== "All" && (
@@ -2673,30 +2660,6 @@ const Index = () => {
   );
 };
 
-// AUDIT LOGGING: Log public actions to audit_logs for Boss Panel visibility
-const logPublicAction = async (action: string, metadata?: Record<string, unknown>) => {
-  try {
-    const sessionId = localStorage.getItem('demo_session_id') || 
-      (() => {
-        const id = 'session_' + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem('demo_session_id', id);
-        return id;
-      })();
-    
-    await supabase.from('audit_logs').insert({
-      action,
-      module: 'public_site',
-      meta_json: {
-        session_id: sessionId,
-        timestamp: new Date().toISOString(),
-        ...metadata,
-      },
-    });
-  } catch (err) {
-    console.error('[AUDIT] Public action log failed:', err);
-  }
-};
-
 // Demo Card Component - Enhanced with interactions
 const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: { 
   demo: Demo; 
@@ -2705,42 +2668,9 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
   onToggleFavorite: () => void;
 }) => {
   const Icon = demo.icon;
-  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [activeTab, setActiveTab] = useState<'features' | 'tech'>('features');
   const [showQuickView, setShowQuickView] = useState(false);
-
-  // FIXED: Buy Now handler - logs action + navigates to checkout
-  const handleBuyNow = async () => {
-    await logPublicAction('buy_now_click', {
-      demo_id: demo.id,
-      demo_name: demo.name,
-      price: demo.discountPrice,
-      category: demo.category,
-    });
-    toast.success("🎉 Redirecting to checkout...", { description: `${demo.name} - ${demo.discountPrice}` });
-    navigate(`/checkout/${demo.id}`);
-  };
-
-  // FIXED: Live Demo handler - logs action + navigates to demo
-  const handleLiveDemo = async () => {
-    await logPublicAction('live_demo_click', {
-      demo_id: demo.id,
-      demo_name: demo.name,
-      category: demo.category,
-    });
-    navigate(demo.url);
-  };
-
-  // FIXED: Notify Me handler - logs action + shows toast
-  const handleNotifyMe = async () => {
-    await logPublicAction('notify_me_click', {
-      demo_id: demo.id,
-      demo_name: demo.name,
-      category: demo.category,
-    });
-    toast.info("📧 We'll notify you when this is available!", { description: demo.name });
-  };
   
   return (
     <motion.div
@@ -2900,19 +2830,18 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
               </Badge>
             </div>
 
-            {/* Enhanced Actions - FIXED: Now triggers API + navigation */}
+            {/* Enhanced Actions */}
             <div className="flex gap-2 mt-auto">
               {demo.status === "ACTIVE" ? (
                 <>
-                  <Button 
-                    className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all"
-                    onClick={handleLiveDemo}
-                  >
-                    <Play className="h-4 w-4 mr-2" /> Live Demo
-                  </Button>
+                  <Link to={demo.url} className="flex-1">
+                    <Button className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all">
+                      <Play className="h-4 w-4 mr-2" /> Live Demo
+                    </Button>
+                  </Link>
                   <Button 
                     className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
-                    onClick={handleBuyNow}
+                    onClick={() => toast.success("🎉 Redirecting to purchase...", { description: `${demo.name} - ${demo.discountPrice}` })}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" /> Buy Now
                   </Button>
@@ -2927,7 +2856,7 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                   </Button>
                   <Button 
                     className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-lg shadow-yellow-500/25 hover:shadow-yellow-500/40 transition-all"
-                    onClick={handleNotifyMe}
+                    onClick={() => toast.info("📧 We'll notify you when this is available!", { description: demo.name })}
                   >
                     <Bell className="h-4 w-4 mr-2" /> Notify Me
                   </Button>

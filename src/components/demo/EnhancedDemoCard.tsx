@@ -66,33 +66,11 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
     return sessionId;
   };
 
-  // AUDIT LOGGING: Log public actions to audit_logs for Boss Panel visibility
-  const logPublicAction = async (action: string, metadata?: Record<string, unknown>) => {
-    try {
-      await supabase.from('audit_logs').insert({
-        action,
-        module: 'public_site',
-        meta_json: {
-          demo_id: id,
-          demo_title: title,
-          session_id: getSessionId(),
-          ...metadata,
-        },
-      });
-    } catch (err) {
-      // Silent fail - don't block user action
-      console.error('[AUDIT] Public action log failed:', err);
-    }
-  };
-
-  const handleBuyNow = async () => {
-    // Log action FIRST - Boss sees it immediately
-    await logPublicAction('buy_now_click', { price, category });
+  const handleBuyNow = () => {
     navigate(`/checkout/${id}`);
   };
 
-  const handleStartDemo = async () => {
-    await logPublicAction('start_demo_click', { category });
+  const handleStartDemo = () => {
     navigate(`/demo/${id}`);
   };
 
@@ -101,9 +79,6 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
     try {
       const { data: { user } } = await supabase.auth.getUser();
       const sessionId = getSessionId();
-
-      // Log action for Boss Panel visibility
-      await logPublicAction('add_to_cart_click', { price, category, userId: user?.id });
 
       const { error } = await supabase
         .from('demo_cart')
