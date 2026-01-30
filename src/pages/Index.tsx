@@ -2564,33 +2564,45 @@ const Index = () => {
       </section>
 
       {/* Category Filter - Master Categories */}
-      <div className="bg-[#0d1e36]/80 backdrop-blur-sm border-b border-cyan-500/20 py-4 px-4 sticky top-0 z-40">
+      {/* MOBILE FIX: Horizontal scroll only, no full-screen grid */}
+      <div className="bg-[#0d1e36]/80 backdrop-blur-sm border-b border-cyan-500/20 py-3 md:py-4 px-4 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
+          {/* Search Row */}
+          <div className="flex items-center gap-3 mb-3">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
               <Input 
                 placeholder="Search software..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-[#1a2d4a] border-cyan-500/30 text-white placeholder:text-gray-400"
+                className="pl-9 md:pl-10 h-10 bg-[#1a2d4a] border-cyan-500/30 text-white placeholder:text-gray-400 text-sm"
               />
             </div>
-            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 whitespace-nowrap text-xs md:text-sm shrink-0">
               {filteredDemos.length} Products
             </Badge>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          
+          {/* CRITICAL MOBILE FIX: Horizontal scroll container, NOT flex-wrap */}
+          {/* On mobile: single horizontal scroll row. On desktop: wrap allowed */}
+          <div 
+            className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-transparent md:flex-wrap md:overflow-x-visible md:pb-0"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'thin'
+            }}
+          >
             {masterCategories.map(cat => (
               <Button
                 key={cat}
                 variant={activeCategory === cat ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveCategory(cat)}
-                className={activeCategory === cat 
-                  ? "bg-cyan-500 text-white hover:bg-cyan-600" 
-                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200"
-                }
+                className={`shrink-0 text-xs md:text-sm h-8 md:h-9 px-3 md:px-4 ${
+                  activeCategory === cat 
+                    ? "bg-cyan-500 text-white hover:bg-cyan-600" 
+                    : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 bg-[#1a2d4a]/50"
+                }`}
               >
                 {cat === "All" ? `All (${getCategoryCount(cat)})` : cat}
                 {cat !== "All" && (
