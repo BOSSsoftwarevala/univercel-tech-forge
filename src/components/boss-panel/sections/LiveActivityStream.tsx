@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Activity, 
@@ -11,7 +11,9 @@ import {
   Radio,
   Clock,
   RefreshCw,
-  Database
+  Database,
+  Zap,
+  MousePointer
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,9 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useBossActivityStream } from '@/hooks/boss-panel/useBossActivityStream';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface ActivityEvent {
   id: string;
@@ -46,17 +47,24 @@ const riskColors = {
 };
 
 const getIconForAction = (action: string): React.ElementType => {
+  if (action.includes('button_click')) return MousePointer;
   if (action.includes('security') || action.includes('devtools') || action.includes('visibility')) return Shield;
-  if (action.includes('lead') || action.includes('user')) return User;
-  if (action.includes('payment') || action.includes('wallet')) return DollarSign;
+  if (action.includes('lead') || action.includes('user') || action.includes('login')) return User;
+  if (action.includes('payment') || action.includes('wallet') || action.includes('finance')) return DollarSign;
   if (action.includes('product') || action.includes('demo')) return Package;
   if (action.includes('alert') || action.includes('error')) return AlertTriangle;
+  if (action.includes('api') || action.includes('crud')) return Zap;
   return Activity;
 };
 
-const getRiskLevel = (riskLevel: string | null): 'low' | 'medium' | 'high' => {
-  if (riskLevel === 'high' || riskLevel === 'critical') return 'high';
-  if (riskLevel === 'medium') return 'medium';
+const getRiskLevel = (action: string, metaJson?: any): 'low' | 'medium' | 'high' => {
+  // Check meta_json for severity
+  if (metaJson?.severity === 'critical' || metaJson?.severity === 'high') return 'high';
+  if (metaJson?.severity === 'medium') return 'medium';
+  
+  // Infer from action type
+  if (action.includes('delete') || action.includes('devtools') || action.includes('permission_denied')) return 'high';
+  if (action.includes('update') || action.includes('visibility')) return 'medium';
   return 'low';
 };
 
@@ -64,13 +72,12 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterModule, setFilterModule] = useState<string>('all');
   const [filterRisk, setFilterRisk] = useState<string>('all');
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const queryClient = useQueryClient();
 
-  // Use the real hook for system_activity_log
-  const { activities: systemActivities, isLoading: systemLoading, isStreaming } = useBossActivityStream(streamingOn);
-
-  // Also fetch from audit_logs table for comprehensive view
-  const { data: auditLogs, isLoading: auditLoading, refetch } = useQuery({
-    queryKey: ['boss-audit-logs'],
+  // PRIMARY: Fetch directly from audit_logs table (source of truth)
+  const { data: auditLogs, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['boss-live-audit-logs'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('audit_logs')
@@ -78,53 +85,47 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
         .order('timestamp', { ascending: false })
         .limit(100);
       
-      if (error) throw error;
+      if (error) {
+        console.error('[LiveActivityStream] Fetch error:', error);
+        throw error;
+      }
+      
+      setLastRefresh(new Date());
       return data || [];
     },
-    refetchInterval: streamingOn ? 3000 : false // Poll every 3 seconds when streaming
+    refetchInterval: streamingOn ? 3000 : false, // Poll every 3 seconds when streaming
+    staleTime: 1000, // Consider data stale after 1 second
   });
 
-  // Combine and transform activities from both sources
+  // Manual refresh handler
+  const handleRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  // Transform audit logs to ActivityEvent format
   const events: ActivityEvent[] = React.useMemo(() => {
-    const combined: ActivityEvent[] = [];
+    if (!auditLogs) return [];
 
-    // Add system_activity_log entries
-    systemActivities.forEach(activity => {
-      combined.push({
-        id: activity.log_id,
-        timestamp: new Date(activity.timestamp),
-        actor: activity.actor_id?.slice(0, 8) || 'System',
-        actorRole: activity.actor_role || 'unknown',
-        action: activity.action_type,
-        module: activity.target || 'System',
-        region: 'Global',
-        riskLevel: getRiskLevel(activity.risk_level),
-        icon: getIconForAction(activity.action_type),
-      });
-    });
-
-    // Add audit_logs entries
-    auditLogs?.forEach(log => {
-      combined.push({
+    return auditLogs.map(log => {
+      const metaJson = (typeof log.meta_json === 'object' && log.meta_json !== null && !Array.isArray(log.meta_json)) 
+        ? log.meta_json as Record<string, unknown>
+        : {};
+      
+      const actorRole = (log.role as string) || (metaJson?.role as string) || 'unknown';
+      
+      return {
         id: log.id,
         timestamp: new Date(log.timestamp),
         actor: log.user_id?.slice(0, 8) || 'System',
-        actorRole: log.role || 'unknown',
+        actorRole,
         action: log.action,
         module: log.module,
         region: 'Global',
-        riskLevel: 'low',
+        riskLevel: getRiskLevel(log.action, metaJson),
         icon: getIconForAction(log.action),
-      });
+      };
     });
-
-    // Remove duplicates and sort by timestamp
-    const uniqueEvents = combined.filter((event, index, self) =>
-      index === self.findIndex(e => e.id === event.id)
-    ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-    return uniqueEvents.slice(0, 100);
-  }, [systemActivities, auditLogs]);
+  }, [auditLogs]);
 
   const filteredEvents = events.filter(event => {
     if (filterRole !== 'all' && event.actorRole !== filterRole) return false;
@@ -133,34 +134,45 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
     return true;
   });
 
-  const isLoading = systemLoading || auditLoading;
+  // Get unique modules from data for dynamic filter
+  const uniqueModules = React.useMemo(() => {
+    const modules = new Set(events.map(e => e.module));
+    return Array.from(modules);
+  }, [events]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold" style={{ color: '#1E293B' }}>Live Activity Stream</h1>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${streamingOn && isStreaming ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'}`}>
-            <Radio className={`w-3 h-3 ${streamingOn && isStreaming ? 'animate-pulse' : ''}`} />
-            <span className="text-xs font-medium">{streamingOn && isStreaming ? 'LIVE' : 'PAUSED'}</span>
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${streamingOn ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'}`}>
+            <Radio className={`w-3 h-3 ${streamingOn ? 'animate-pulse' : ''}`} />
+            <span className="text-xs font-medium">{streamingOn ? 'LIVE' : 'PAUSED'}</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-600">
             <Database className="w-3 h-3" />
-            <span className="text-xs font-medium">REAL DATA</span>
+            <span className="text-xs font-medium">REAL DB</span>
           </div>
+          {isFetching && (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-600">
+              <RefreshCw className="w-3 h-3 animate-spin" />
+              <span className="text-xs font-medium">SYNCING</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => refetch()}
+            onClick={handleRefresh}
+            disabled={isFetching}
             className="text-slate-600 hover:text-slate-900"
           >
-            <RefreshCw className="w-4 h-4 mr-1" />
+            <RefreshCw className={`w-4 h-4 mr-1 ${isFetching ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
           <div className="text-xs text-slate-500">
-            {events.length} events captured
+            {events.length} events • Last: {lastRefresh.toLocaleTimeString()}
           </div>
         </div>
       </div>
@@ -190,11 +202,9 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
               </SelectTrigger>
               <SelectContent className="bg-white border-slate-200">
                 <SelectItem value="all">All Modules</SelectItem>
-                <SelectItem value="source_protection">Security</SelectItem>
-                <SelectItem value="leads">Leads</SelectItem>
-                <SelectItem value="products">Products</SelectItem>
-                <SelectItem value="demos">Demos</SelectItem>
-                <SelectItem value="System">System</SelectItem>
+                {uniqueModules.map(mod => (
+                  <SelectItem key={mod} value={mod}>{mod}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -231,7 +241,10 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
             <Activity className="w-5 h-5 text-amber-500" />
-            Unified Timeline (Real-time from Database)
+            Live Timeline (Direct from audit_logs)
+            <Badge variant="outline" className="ml-2 text-xs">
+              {filteredEvents.length} / {events.length}
+            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -247,7 +260,7 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
                   <div className="text-center py-12 text-slate-500">
                     <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No activities yet - frontend actions will appear here</p>
-                    {!streamingOn && <p className="text-xs mt-2">Streaming is paused</p>}
+                    {!streamingOn && <p className="text-xs mt-2">Streaming is paused - enable to see live updates</p>}
                   </div>
                 ) : (
                   filteredEvents.map((event) => {
