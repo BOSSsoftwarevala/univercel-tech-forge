@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useEnterpriseAudit } from "@/hooks/useEnterpriseAudit";
 import { 
   Play, Heart, ShoppingCart, Filter, Search, Bell,
   GraduationCap, Stethoscope, Utensils, Hotel, Home, Car, Plane,
@@ -2668,6 +2669,7 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
   onToggleFavorite: () => void;
 }) => {
   const Icon = demo.icon;
+  const { logAction } = useEnterpriseAudit();
   const [isHovered, setIsHovered] = useState(false);
   const [activeTab, setActiveTab] = useState<'features' | 'tech'>('features');
   const [showQuickView, setShowQuickView] = useState(false);
@@ -2841,7 +2843,24 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                   </Link>
                   <Button 
                     className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
-                    onClick={() => toast.success("🎉 Redirecting to purchase...", { description: `${demo.name} - ${demo.discountPrice}` })}
+                     onClick={async () => {
+                       await logAction({
+                         action: 'public_buy_now_clicked',
+                         module: 'finance',
+                         severity: 'low',
+                         target_id: demo.id,
+                         target_type: 'product_demo',
+                         metadata: {
+                           status: 'pending',
+                           demo_name: demo.name,
+                           price: demo.price,
+                           discount_price: demo.discountPrice,
+                           source: 'index_buy_now',
+                           path: window.location.pathname,
+                         },
+                       });
+                       toast.success("🎉 Redirecting to purchase...", { description: `${demo.name} - ${demo.discountPrice}` });
+                     }}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" /> Buy Now
                   </Button>
