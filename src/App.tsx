@@ -40,9 +40,42 @@ const RouteLoader = memo(() => (
   </div>
 ));
 
-// Lazy load factory
+// Error fallback for failed module loads
+const ModuleErrorFallback = memo(() => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="text-center space-y-4">
+      <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+        <Loader2 className="w-8 h-8 text-destructive" />
+      </div>
+      <div>
+        <p className="text-lg font-medium">Failed to load page</p>
+        <p className="text-sm text-muted-foreground">Please refresh or try again</p>
+      </div>
+      <button 
+        onClick={() => window.location.reload()} 
+        className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium"
+      >
+        Refresh Page
+      </button>
+    </div>
+  </div>
+));
+
+// Lazy load factory with error handling and retry
 const lazyLoad = (importFn: () => Promise<any>) => {
-  const LazyComponent = lazy(importFn);
+  const LazyComponent = lazy(() => 
+    importFn().catch((error) => {
+      console.error("Dynamic import failed:", error);
+      // Retry once after short delay
+      return new Promise(resolve => setTimeout(resolve, 100))
+        .then(() => importFn())
+        .catch((retryError) => {
+          console.error("Retry also failed:", retryError);
+          // Return error fallback component
+          return { default: ModuleErrorFallback };
+        });
+    })
+  );
   return (props: any) => (
     <Suspense fallback={<RouteLoader />}>
       <LazyComponent {...props} />
