@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useEnterpriseAudit } from '@/hooks/useEnterpriseAudit';
 
 interface EnhancedDemoCardProps {
   id: string;
@@ -50,6 +51,7 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
   className
 }) => {
   const navigate = useNavigate();
+  const { logAction } = useEnterpriseAudit();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
@@ -66,11 +68,55 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
     return sessionId;
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
+    await logAction({
+      action: 'public_buy_now_clicked',
+      module: 'finance',
+      severity: 'low',
+      metadata: {
+        system_request: {
+          enabled: true,
+          action_type: 'order',
+          role_type: 'client',
+          status: 'NEW',
+          source: 'frontend',
+          payload_json: {
+            intent: 'buy_now',
+            demo_id: id,
+            demo_title: title,
+            category,
+          },
+        },
+        demo_id: id,
+        demo_title: title,
+      },
+    });
     navigate(`/checkout/${id}`);
   };
 
-  const handleStartDemo = () => {
+  const handleStartDemo = async () => {
+    await logAction({
+      action: 'public_try_demo_clicked',
+      module: 'vala_builder',
+      severity: 'low',
+      metadata: {
+        system_request: {
+          enabled: true,
+          action_type: 'demo',
+          role_type: 'client',
+          status: 'NEW',
+          source: 'frontend',
+          payload_json: {
+            intent: 'try_demo',
+            demo_id: id,
+            demo_title: title,
+            category,
+          },
+        },
+        demo_id: id,
+        demo_title: title,
+      },
+    });
     navigate(`/demo/${id}`);
   };
 
