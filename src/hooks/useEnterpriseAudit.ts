@@ -5,6 +5,7 @@
 
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { createSystemRequest, type SystemRequestStatus } from '@/hooks/useSystemRequestLogger';
 
 export type AuditSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type AuditModule = 
@@ -37,6 +38,15 @@ export interface AuditEntry {
   metadata?: Record<string, unknown>;
 }
 
+type SystemRequestMeta = {
+  enabled: true;
+  action_type: string;
+  role_type?: string;
+  status?: SystemRequestStatus;
+  source?: string;
+  payload_json?: Record<string, unknown>;
+};
+
 interface DeviceInfo {
   user_agent: string;
   screen: string;
@@ -64,6 +74,24 @@ export function useEnterpriseAudit() {
       // Log entry even without user for system events
       const userId = user?.id || null;
       const deviceInfo = getDeviceInfo();
+
+      // If this audit event represents a business-critical request, create a system_requests record.
+      // This is logic-only and does not change UI.
+      const systemRequest = (entry.metadata as any)?.system_request as SystemRequestMeta | undefined;
+      if (systemRequest?.enabled) {
+        await createSystemRequest({
+          action_type: systemRequest.action_type,
+          role_type: systemRequest.role_type ?? null,
+          status: (systemRequest.status as SystemRequestStatus | undefined) ?? 'NEW',
+          source: systemRequest.source ?? 'frontend',
+          payload_json: {
+            audit_action: entry.action,
+            audit_module: entry.module,
+            ...(systemRequest.payload_json ?? {}),
+          },
+          user_id: userId,
+        });
+      }
 
       // Primary audit log (immutable)
       const { error: auditError } = await supabase.from('audit_logs').insert([{

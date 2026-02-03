@@ -111,6 +111,18 @@ const FranchiseCTA = () => {
                       module: 'franchise_manager',
                       severity: 'low',
                       metadata: {
+                        system_request: {
+                          enabled: true,
+                          action_type: 'franchise',
+                          role_type: 'franchise',
+                          status: 'NEW',
+                          source: 'frontend',
+                          payload_json: {
+                            intent: 'apply',
+                            entry_point: 'franchise_cta',
+                            path: window.location.pathname,
+                          },
+                        },
                         status: 'pending',
                         source: 'franchise_cta',
                         path: window.location.pathname,

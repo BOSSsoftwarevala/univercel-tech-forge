@@ -111,6 +111,18 @@ const ResellerCTA = () => {
                       module: 'reseller_manager',
                       severity: 'low',
                       metadata: {
+                        system_request: {
+                          enabled: true,
+                          action_type: 'reseller',
+                          role_type: 'reseller',
+                          status: 'NEW',
+                          source: 'frontend',
+                          payload_json: {
+                            intent: 'apply',
+                            entry_point: 'reseller_cta',
+                            path: window.location.pathname,
+                          },
+                        },
                         status: 'pending',
                         source: 'reseller_cta',
                         path: window.location.pathname,

@@ -22370,6 +22370,42 @@ export type Database = {
         }
         Relationships: []
       }
+      system_requests: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          payload_json: Json
+          role_type: string | null
+          source: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          payload_json?: Json
+          role_type?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          payload_json?: Json
+          role_type?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string | null
