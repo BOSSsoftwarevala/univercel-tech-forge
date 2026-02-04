@@ -2851,6 +2851,22 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                          target_id: demo.id,
                          target_type: 'product_demo',
                          metadata: {
+                            system_request: {
+                              enabled: true,
+                              action_type: 'order',
+                              role_type: 'client',
+                              status: 'PENDING',
+                              source: 'frontend',
+                              payload_json: {
+                                intent: 'buy_now',
+                                demo_id: demo.id,
+                                demo_name: demo.name,
+                                price: demo.price,
+                                discount_price: demo.discountPrice,
+                                entry_point: 'index_buy_now',
+                                path: window.location.pathname,
+                              },
+                            },
                            status: 'pending',
                            demo_name: demo.name,
                            price: demo.price,
@@ -2875,7 +2891,36 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                   </Button>
                   <Button 
                     className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-lg shadow-yellow-500/25 hover:shadow-yellow-500/40 transition-all"
-                    onClick={() => toast.info("📧 We'll notify you when this is available!", { description: demo.name })}
+                    onClick={async () => {
+                      await logAction({
+                        action: 'public_notify_me_clicked',
+                        module: 'lead_manager',
+                        severity: 'low',
+                        target_id: demo.id,
+                        target_type: 'product_demo',
+                        metadata: {
+                          system_request: {
+                            enabled: true,
+                            action_type: 'request',
+                            role_type: 'client',
+                            status: 'PENDING',
+                            source: 'frontend',
+                            payload_json: {
+                              intent: 'notify_me',
+                              demo_id: demo.id,
+                              demo_name: demo.name,
+                              entry_point: 'index_notify_me',
+                              path: window.location.pathname,
+                            },
+                          },
+                          status: 'pending',
+                          demo_name: demo.name,
+                          source: 'index_notify_me',
+                          path: window.location.pathname,
+                        },
+                      });
+                      toast.info("📧 We'll notify you when this is available!", { description: demo.name });
+                    }}
                   >
                     <Bell className="h-4 w-4 mr-2" /> Notify Me
                   </Button>

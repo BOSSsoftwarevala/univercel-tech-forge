@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Activity, 
@@ -38,6 +38,7 @@ interface ActivityEvent {
   region: string;
   riskLevel: 'low' | 'medium' | 'high';
   icon: React.ElementType;
+  status: string;
 }
 
 const riskColors = {
@@ -75,14 +76,15 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const queryClient = useQueryClient();
 
-  // PRIMARY: Fetch directly from audit_logs table (source of truth)
-  const { data: auditLogs, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['boss-live-audit-logs'],
+  // PRIMARY: Fetch directly from system_events table (single source of truth)
+  const { data: systemEvents, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['boss-live-system-events'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('audit_logs')
+        .from('system_events')
         .select('*')
-        .order('timestamp', { ascending: false })
+        .eq('status', 'PENDING')
+        .order('created_at', { ascending: false })
         .limit(100);
       
       if (error) {
@@ -102,30 +104,58 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
     refetch();
   }, [refetch]);
 
-  // Transform audit logs to ActivityEvent format
+  // Transform system events to ActivityEvent format
   const events: ActivityEvent[] = React.useMemo(() => {
-    if (!auditLogs) return [];
+    if (!systemEvents) return [];
 
-    return auditLogs.map(log => {
-      const metaJson = (typeof log.meta_json === 'object' && log.meta_json !== null && !Array.isArray(log.meta_json)) 
-        ? log.meta_json as Record<string, unknown>
+    return systemEvents.map((ev: any) => {
+      const payload = (typeof ev.payload === 'object' && ev.payload !== null && !Array.isArray(ev.payload))
+        ? (ev.payload as Record<string, any>)
         : {};
-      
-      const actorRole = (log.role as string) || (metaJson?.role as string) || 'unknown';
-      
+
+      const module = String(payload.audit_module || payload.module || 'system');
+      const action = String(ev.event_type);
+
       return {
-        id: log.id,
-        timestamp: new Date(log.timestamp),
-        actor: log.user_id?.slice(0, 8) || 'System',
-        actorRole,
-        action: log.action,
-        module: log.module,
-        region: 'Global',
-        riskLevel: getRiskLevel(log.action, metaJson),
-        icon: getIconForAction(log.action),
+        id: ev.id,
+        timestamp: new Date(ev.created_at),
+        actor: (ev.source_user_id ? String(ev.source_user_id).slice(0, 8) : 'Public'),
+        actorRole: String(ev.source_role || 'unknown'),
+        action,
+        module,
+        region: String(payload.region || 'Global'),
+        riskLevel: getRiskLevel(action, payload),
+        icon: getIconForAction(action),
+        status: String(ev.status || 'PENDING'),
       };
     });
-  }, [auditLogs]);
+  }, [systemEvents]);
+
+  const updateEventStatus = useCallback(async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    try {
+      // Use fetch to support PATCH on /api-system-event/:id
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(`${baseUrl}/functions/v1/api-system-event/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+
+      // Refresh list
+      queryClient.invalidateQueries({ queryKey: ['boss-live-system-events'] });
+    } catch (e) {
+      console.error('[LiveActivityStream] Status update failed', e);
+    }
+  }, [queryClient]);
 
   const filteredEvents = events.filter(event => {
     if (filterRole !== 'all' && event.actorRole !== filterRole) return false;
@@ -241,7 +271,7 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
             <Activity className="w-5 h-5 text-amber-500" />
-            Live Timeline (Direct from audit_logs)
+             Live Timeline (Direct from system_events)
             <Badge variant="outline" className="ml-2 text-xs">
               {filteredEvents.length} / {events.length}
             </Badge>
@@ -285,10 +315,28 @@ export function LiveActivityStream({ streamingOn = true }: { streamingOn?: boole
                           </div>
                           <p className="text-sm text-slate-600 truncate">{event.action}</p>
                         </div>
-                        <div className="text-right">
+                     <div className="text-right">
                           <Badge variant="outline" className="text-[10px] border-slate-300 text-slate-500 mb-1">
                             {event.module}
                           </Badge>
+                       <div className="flex items-center justify-end gap-2 mb-1">
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => updateEventStatus(event.id, 'APPROVED')}
+                           className="h-6 px-2 text-[10px]"
+                         >
+                           Approve
+                         </Button>
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => updateEventStatus(event.id, 'REJECTED')}
+                           className="h-6 px-2 text-[10px]"
+                         >
+                           Reject
+                         </Button>
+                       </div>
                           <div className="flex items-center gap-1 text-[10px] text-slate-400">
                             <Clock className="w-3 h-3" />
                             {event.timestamp.toLocaleTimeString()}

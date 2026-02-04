@@ -20,31 +20,36 @@ export async function createSystemRequest(input: SystemRequestInput) {
     action_type,
     role_type = null,
     source = 'frontend',
-    status = 'NEW',
+    status = 'PENDING',
     payload_json = {},
     user_id,
   } = input;
 
   const finalUserId = typeof user_id === 'string' ? user_id : null;
 
-  console.log('[SYSTEM_REQUEST] Creating request:', { action_type, role_type, source, status, user_id: finalUserId });
-
-  const { data, error } = await supabase.from('system_requests').insert([
-    {
-      action_type,
-      role_type,
-      user_id: finalUserId,
+  const eventBody = {
+    event_type: action_type,
+    source_role: role_type ?? 'unknown',
+    source_user_id: finalUserId,
+    status,
+    payload: {
       source,
-      status,
-      payload_json: JSON.parse(JSON.stringify(payload_json)),
+      ...JSON.parse(JSON.stringify(payload_json)),
     },
-  ]).select();
+  };
+
+  console.log('[SYSTEM_EVENT] POST api-system-event', eventBody);
+
+  const { data, error } = await supabase.functions.invoke('api-system-event', {
+    body: eventBody,
+  });
 
   if (error) {
-    console.error('[SYSTEM_REQUEST] Insert FAILED:', error);
+    console.error('[SYSTEM_EVENT] Create FAILED:', error);
     return { data: null, error };
   }
 
-  console.log('[SYSTEM_REQUEST] Insert SUCCESS:', data);
+  console.log('[SYSTEM_EVENT] Create SUCCESS:', data);
   return { data, error: null };
 }
+
