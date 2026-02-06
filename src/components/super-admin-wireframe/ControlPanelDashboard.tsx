@@ -346,20 +346,17 @@ const UniformBoxComponent: React.FC<UniformBoxProps> = ({ box, index }) => {
   const Content = box.Component;
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.02, duration: 0.15 }}
+    <div
       className={cn(
         BOX_HEIGHT,
-        "rounded-xl p-4 flex flex-col transition-all duration-150"
+        "rounded-xl p-4 flex flex-col overflow-hidden"
       )}
       style={{
         background: COLORS.cardBg,
         border: `1px solid ${COLORS.cardBorder}`,
+        maxHeight: '200px',
+        minHeight: '200px',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = COLORS.cardBorderHover; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = COLORS.cardBorder; }}
     >
       {/* Header */}
       <div className="flex items-center gap-2.5 pb-3 mb-2 border-b border-white/10 flex-shrink-0">
@@ -373,7 +370,7 @@ const UniformBoxComponent: React.FC<UniformBoxProps> = ({ box, index }) => {
       <div className="flex-1 overflow-hidden">
         <Content />
       </div>
-    </motion.div>
+    </div>
   );
 };
 const UniformBox = UniformBoxComponent;
