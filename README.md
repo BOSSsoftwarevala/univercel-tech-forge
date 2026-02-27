@@ -2,6 +2,35 @@
 
 A full-featured software demo and showcase platform where businesses can explore, try, and purchase industry-specific software solutions across 500+ live demos.
 
+## What's Next
+
+The platform currently has **24 active live demos** and **126 demos coming soon** across these upcoming categories:
+
+| Category | Demos Coming |
+|---|---|
+| Accounting | 7 |
+| Marketing | 7 |
+| HR & Payroll | 7 |
+| Inventory, Warehouse & Supply Chain | 7 |
+| Customer Support & Helpdesk | 7 |
+| Government & e-Governance Systems | 7 |
+| Cyber Security & Data Protection | 7 |
+| Education (College ERP, LMS, Coaching, Exams, etc.) | 6 |
+| Retail & POS (Grocery, Multi-Store, Mobile POS, etc.) | 6 |
+| Healthcare (Clinic, Pharmacy, etc.) | 6 |
+| Logistics | 6 |
+| Real Estate | 6 |
+| Finance | 6 |
+| Sales & CRM | 6 |
+| E-commerce & Online Marketplaces | 6 |
+| Telecom, Call Center & VoIP | 6 |
+| Legal, Compliance & Documentation | 6 |
+| Security, Surveillance & Access Control | 6 |
+| Hospitality (Hotel, Restaurant, Travel) | 5 |
+| Enterprise Resource Planning (ERP) | 6 |
+
+These demos will be activated progressively. Each live demo includes full UI, sample data, and an in-app AI assistant.
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
