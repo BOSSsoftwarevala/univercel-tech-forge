@@ -1,31 +1,22 @@
-# Use the official Node.js 20 Alpine image for the build stage
+# Dockerfile
 
-FROM node:20-alpine AS build
+# Use the official Node.js image.
+FROM node:14
 
-# Set the working directory in the container
-WORKDIR /app
+# Set the working directory.
+WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json for npm ci
-COPY package.json package-lock.json ./
+# Install app dependencies.
+COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install production and development dependencies.
+RUN npm install
 
-# Copy the rest of the application files
+# Copy the rest of the application code.
 COPY . .
 
-# Build the application
+# Build the application.
 RUN npm run build
 
-
-# Use the official Nginx image for the serving stage
-FROM nginx:alpine
-
-# Copy built app from the build stage to Nginx's html folder
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Specify the command to run your app.
+CMD [ "npm", "start" ]
