@@ -2,17 +2,23 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: softwarewala-ingress
+  namespace: default
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
+  tls:
+  - hosts:
+    - softwarewala.net
+    secretName: softwarewala-tls
   rules:
-    - host: softwarewala.net
-      http:
-        paths:
-          - path: /?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: softwarewala-service
-                port:
-                  number: 80
+  - host: softwarewala.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: softwarewala-frontend
+            port:
+              number: 80
