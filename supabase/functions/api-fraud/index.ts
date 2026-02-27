@@ -6,13 +6,13 @@ import {
 } from "../_shared/utils.ts";
 import { withAuth, RequestContext } from "../_shared/middleware.ts";
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-const AI_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const AI_GATEWAY_URL = "https://api.openai.com/v1/chat/completions";
 
 // AI-powered fraud analysis
 async function analyzeWithAI(prompt: string): Promise<string> {
-  if (!LOVABLE_API_KEY) {
-    console.warn("LOVABLE_API_KEY not configured, using rule-based analysis");
+  if (!OPENAI_API_KEY) {
+    console.warn("OPENAI_API_KEY not configured, using rule-based analysis");
     return "rule_based";
   }
 
@@ -20,11 +20,11 @@ async function analyzeWithAI(prompt: string): Promise<string> {
     const response = await fetch(AI_GATEWAY_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",

@@ -113,14 +113,14 @@ If the issue matches a quick solution, provide those steps. If not, try to help 
     ];
 
     // Call Lovable AI (no API key needed)
-    const response = await fetch('https://api.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY') || ''}`
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY') || ''}`
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o-mini',
         messages,
         temperature: 0.7,
         max_tokens: 500

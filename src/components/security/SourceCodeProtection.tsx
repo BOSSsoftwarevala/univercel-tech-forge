@@ -95,13 +95,13 @@ export function useSourceCodeProtection() {
   }, [user?.id]);
 
   useEffect(() => {
-    // Skip in development or Lovable preview environment
+    // Skip in development or preview environment
     const isDevMode = import.meta.env.DEV;
-    const isLovablePreview = window.location.hostname.includes('lovable.app') || 
-                             window.location.hostname.includes('preview') ||
-                             window.location.hostname.includes('localhost');
+    const isPreview = window.location.hostname.includes('vercel.app') || 
+                      window.location.hostname.includes('preview') ||
+                      window.location.hostname.includes('localhost');
     
-    if (isDevMode || isLovablePreview) {
+    if (isDevMode || isPreview) {
       console.log(LICENSE_NOTICE);
       return;
     }
