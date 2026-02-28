@@ -29,7 +29,7 @@ function getClientIP(req: Request): string {
   );
 }
 
-// Generate a secure, unique license key
+// Generate a secure, unique license key (5 groups of 8 hex chars = 160 bits entropy)
 async function generateLicenseKey(
   orderId: string,
   applicationId: string,
@@ -43,13 +43,13 @@ async function generateLicenseKey(
     .join("")
     .toUpperCase();
 
-  // Format: XXXX-XXXX-XXXX-XXXX-XXXX (groups of 4, 5 groups = 20 chars)
+  // Format: XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX (5 groups of 8 = 40 chars, 160 bits)
   return [
-    hex.slice(0, 4),
-    hex.slice(4, 8),
-    hex.slice(8, 12),
-    hex.slice(12, 16),
-    hex.slice(16, 20),
+    hex.slice(0, 8),
+    hex.slice(8, 16),
+    hex.slice(16, 24),
+    hex.slice(24, 32),
+    hex.slice(32, 40),
   ].join("-");
 }
 

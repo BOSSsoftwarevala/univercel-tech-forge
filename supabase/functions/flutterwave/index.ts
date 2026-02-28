@@ -15,8 +15,10 @@ const corsHeaders = {
   "X-Frame-Options": "DENY",
 };
 
-const FLW_SECRET_KEY = Deno.env.get("FLUTTERWAVE_SECRET_KEY") || "";
-const FLW_API_BASE  = "https://api.flutterwave.com/v3";
+const FLW_SECRET_KEY  = Deno.env.get("FLUTTERWAVE_SECRET_KEY") || "";
+const FLW_API_BASE    = "https://api.flutterwave.com/v3";
+const FLW_BRAND_TITLE = Deno.env.get("MARKETPLACE_TITLE") || "Software Vala Marketplace";
+const FLW_BRAND_LOGO  = Deno.env.get("MARKETPLACE_LOGO_URL") || "";
 
 const FLW_RETRY_CONFIG = {
   maxRetries: 3,
@@ -68,9 +70,9 @@ async function createPaymentLink(params: {
         meta: params.meta || {},
         customer: params.customer,
         customizations: {
-          title: params.title || "Software Vala Marketplace",
+          title: params.title || FLW_BRAND_TITLE,
           description: params.description || "Software purchase",
-          logo: "https://softwarevala.net/logo.png",
+          logo: FLW_BRAND_LOGO,
         },
       }),
     },

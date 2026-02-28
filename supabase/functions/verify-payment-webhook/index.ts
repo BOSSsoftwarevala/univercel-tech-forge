@@ -274,7 +274,7 @@ serve(async (req: Request) => {
         return jsonResponse({ received: true }, 200);
       }
 
-      const pi = (event.object as Record<string, unknown>) ||
+      const pi = (event.object as Record<string, unknown>) ??
         ((event.data as Record<string, unknown>)?.object as Record<string, unknown>);
 
       const orderId = (pi?.metadata as Record<string, string>)?.order_id;
