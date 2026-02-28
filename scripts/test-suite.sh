@@ -173,6 +173,19 @@ echo ""
 
 # ── JSON report ───────────────────────────────────────────────────
 FINAL_REPORT="$REPORT_DIR/final-report.json"
+
+# Build JSON array for critical issues
+ISSUES_JSON='[]'
+if [ ${#CRITICAL_ISSUES[@]} -gt 0 ]; then
+  ISSUES_JSON='['
+  for i in "${!CRITICAL_ISSUES[@]}"; do
+    escaped="${CRITICAL_ISSUES[$i]//\"/\\\"}"
+    ISSUES_JSON+="\"$escaped\""
+    [ $i -lt $((${#CRITICAL_ISSUES[@]} - 1)) ] && ISSUES_JSON+=','
+  done
+  ISSUES_JSON+=']'
+fi
+
 node -e "
 const fs = require('fs');
 const report = {
@@ -183,7 +196,7 @@ const report = {
   failed: $TOTAL_FAIL,
   coverage: '$COVERAGE_PCT',
   safe_to_merge: $( [ $TOTAL_FAIL -eq 0 ] && echo 'true' || echo 'false' ),
-  critical_issues: $([ ${#CRITICAL_ISSUES[@]} -eq 0 ] && echo '[]' || printf '[\"%s\"]' "$(IFS='","'; echo "${CRITICAL_ISSUES[*]}")"),
+  critical_issues: ${ISSUES_JSON},
 };
 fs.writeFileSync('$FINAL_REPORT', JSON.stringify(report, null, 2));
 console.log('  Report saved: $FINAL_REPORT');
