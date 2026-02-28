@@ -12,12 +12,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { 
   Send, Terminal, Loader2, Lock, Unlock, AlertTriangle, 
   RotateCcw, History, CheckCircle2, XCircle, Clock, Zap,
-  Shield, FileText, Bug, Activity
+  Shield, FileText, Bug, Activity, Volume2, VolumeX
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAIRA, AIRAError } from '@/hooks/useAIRA';
 
 type Message = { 
   role: 'user' | 'assistant' | 'system'; 
@@ -34,8 +35,6 @@ type ExecutionLog = {
   duration: number;
 };
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-chat`;
-
 // ===== LOCKED COLORS (DO NOT CHANGE) =====
 const COLORS = {
   bg: '#0B0F1A',
@@ -50,10 +49,13 @@ const COLORS = {
 };
 
 const ValaAICommandCenter: React.FC = () => {
+  const { executeCommand, logCommandSuccess, logCommandError, validateCommand, systemHealthy, isBossOwner, user } = useAIRA();
+
   // System state
   const [isLocked, setIsLocked] = useState(true);
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [projects, setProjects] = useState<Array<{id: string; title: string}>>([]);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
 
   // Command state
   const [messages, setMessages] = useState<Message[]>([
@@ -105,40 +107,21 @@ const ValaAICommandCenter: React.FC = () => {
     return 'English';
   };
 
-  // Stream AI response
+  // Stream AI response via useAIRA hook
   const streamCommand = async (command: string) => {
     const startTime = Date.now();
     const context = `VALA AI CORE ENGINE | Project: ${activeProject || 'None'} | Mode: TEXT-ONLY COMMAND | Lock: ${isLocked ? 'ACTIVE' : 'UNLOCKED'}`;
+    const { riskLevel } = validateCommand(command);
 
     try {
-      const resp = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          messages: messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content })).concat([{ role: 'user', content: command }]),
-          userRole: 'system_admin',
-          context,
-        }),
-      });
+      const responseBody = await executeCommand(
+        command,
+        messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content })),
+        context,
+        { voiceEnabled },
+      );
 
-      if (!resp.ok) {
-        if (resp.status === 429) {
-          toast.error('Rate limit exceeded');
-          return;
-        }
-        if (resp.status === 402) {
-          toast.error('AI credits exhausted');
-          return;
-        }
-        throw new Error('Command execution failed');
-      }
-
-      if (!resp.body) throw new Error('No response');
-
-      const reader = resp.body.getReader();
+      const reader = responseBody.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
       let assistantContent = '';
@@ -175,7 +158,7 @@ const ValaAICommandCenter: React.FC = () => {
                 return updated;
               });
             }
-          } catch {}
+          } catch { /* ignore malformed SSE JSON chunks */ }
         }
       }
 
@@ -185,6 +168,9 @@ const ValaAICommandCenter: React.FC = () => {
         updated[updated.length - 1] = { ...updated[updated.length - 1], status: 'success' };
         return updated;
       });
+
+      // Log success to aira_logs
+      await logCommandSuccess(command, riskLevel as 'low' | 'medium');
 
       // Log execution
       const duration = Date.now() - startTime;
@@ -197,14 +183,37 @@ const ValaAICommandCenter: React.FC = () => {
       }, ...prev.slice(0, 49)]);
 
     } catch (error) {
-      console.error('Command error:', error);
-      toast.error('Command execution failed');
+      const isAIRAErr = error instanceof AIRAError;
+      const errMsg = error instanceof Error ? error.message : 'Command execution failed';
+      console.error('[AIRA] Command error:', error);
+
+      // Show specific error messages based on AIRAError code (type-safe)
+      if (isAIRAErr && error.code === 'UNAUTHORIZED') {
+        toast.error('Access denied: Only boss_owner can execute AIRA commands');
+      } else if (isAIRAErr && error.code === 'FAILSAFE') {
+        toast.error('System health check failed — execution halted');
+      } else if (isAIRAErr && error.code === 'VALIDATION_FAILED') {
+        toast.error(`Validation failed: ${errMsg}`);
+      } else if (isAIRAErr && error.code === 'RATE_LIMIT') {
+        toast.error('Rate limit exceeded');
+      } else if (isAIRAErr && error.code === 'CREDITS_EXHAUSTED') {
+        toast.error('AI credits exhausted');
+      } else {
+        toast.error('Command execution failed');
+      }
+
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: '❌ ERROR: Command execution failed. Please try again.',
+        content: `❌ ERROR: ${errMsg}`,
         timestamp: new Date(),
         status: 'error'
       }]);
+
+      // Log error to aira_logs (skip pre-execution rejections — already logged in hook)
+      const preExecution = isAIRAErr && ['UNAUTHORIZED', 'FAILSAFE', 'VALIDATION_FAILED'].includes(error.code);
+      if (!preExecution) {
+        await logCommandError(command, errMsg, riskLevel as 'low' | 'medium' | 'high');
+      }
 
       setExecutionLogs(prev => [{
         id: Date.now().toString(),
@@ -252,7 +261,24 @@ const ValaAICommandCenter: React.FC = () => {
 
   return (
     <div className="h-full flex" style={{ background: COLORS.bg }}>
-      {/* Main Command Panel */}
+      {/* Access Gate: only boss_owner can use AIRA */}
+      {!isBossOwner && (
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+          <Shield className="w-16 h-16" style={{ color: COLORS.error }} />
+          <div className="text-center">
+            <h2 className="text-xl font-bold mb-2" style={{ color: COLORS.text }}>Access Restricted</h2>
+            <p className="text-sm" style={{ color: COLORS.textMuted }}>
+              VALA AI Command Center is restricted to <strong style={{ color: COLORS.warning }}>boss_owner</strong> only.
+            </p>
+            <p className="text-xs mt-2" style={{ color: COLORS.textMuted }}>
+              All unauthorized access attempts are logged to the audit trail.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Main Command Panel — visible to boss_owner only */}
+      {isBossOwner && <>
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div 
@@ -265,8 +291,26 @@ const ValaAICommandCenter: React.FC = () => {
             <span className="text-xs px-2 py-0.5 rounded" style={{ background: COLORS.accent, color: COLORS.text }}>
               TEXT-ONLY
             </span>
+            {!systemHealthy && (
+              <span className="text-xs px-2 py-0.5 rounded flex items-center gap-1" style={{ background: 'rgba(239, 68, 68, 0.2)', color: COLORS.error }}>
+                <AlertTriangle className="w-3 h-3" /> FAILSAFE ACTIVE
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
+            {/* Voice Toggle (server-side synthesis, boss_owner only) */}
+            <button
+              onClick={() => setVoiceEnabled(!voiceEnabled)}
+              title={voiceEnabled ? 'Voice output ON (server-side)' : 'Voice output OFF'}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all"
+              style={{ 
+                background: voiceEnabled ? 'rgba(37, 99, 235, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                color: voiceEnabled ? COLORS.accent : COLORS.textMuted
+              }}
+            >
+              {voiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              Voice
+            </button>
             {/* Lock Status */}
             <button
               onClick={() => setIsLocked(!isLocked)}
@@ -480,9 +524,9 @@ const ValaAICommandCenter: React.FC = () => {
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between">
               <span style={{ color: COLORS.textMuted }}>AI Engine</span>
-              <span className="flex items-center gap-1" style={{ color: COLORS.success }}>
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                ONLINE
+              <span className="flex items-center gap-1" style={{ color: systemHealthy ? COLORS.success : COLORS.error }}>
+                <span className={`w-2 h-2 rounded-full ${systemHealthy ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                {systemHealthy ? 'ONLINE' : 'FAILSAFE'}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -499,9 +543,16 @@ const ValaAICommandCenter: React.FC = () => {
               <span style={{ color: COLORS.textMuted }}>Mode</span>
               <span style={{ color: COLORS.accent }}>TEXT-ONLY</span>
             </div>
+            <div className="flex items-center justify-between">
+              <span style={{ color: COLORS.textMuted }}>Voice</span>
+              <span style={{ color: voiceEnabled ? COLORS.accent : COLORS.textMuted }}>
+                {voiceEnabled ? 'ON' : 'OFF'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
+      </>}
     </div>
   );
 };
