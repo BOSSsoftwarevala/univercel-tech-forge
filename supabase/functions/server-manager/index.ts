@@ -812,6 +812,52 @@ serve(async (req) => {
       status = 200;
     }
 
+    // ==================== SYSTEM HEALTH CHECK ====================
+    else if (path === '/system/health-check' && method === 'POST') {
+      const { data: servers } = await supabase
+        .from('server_instances')
+        .select('id, name, status, health_score, region');
+
+      const serverList = servers || [];
+      const healthyCount = serverList.filter((s: any) => s.status === 'running' || s.health_score >= 80).length;
+      const degradedCount = serverList.filter((s: any) => s.health_score >= 50 && s.health_score < 80).length;
+      const criticalCount = serverList.filter((s: any) => s.status === 'error' || s.health_score < 50).length;
+
+      const overallStatus = criticalCount > 0 ? 'critical' : degradedCount > 0 ? 'degraded' : 'healthy';
+
+      // Persist health snapshot
+      await supabase.from('system_health').insert({
+        check_type: 'full_system',
+        overall_status: overallStatus,
+        total_servers: serverList.length,
+        healthy_servers: healthyCount,
+        degraded_servers: degradedCount,
+        critical_servers: criticalCount,
+        checked_by: user.id,
+        checked_at: new Date().toISOString(),
+      });
+
+      await supabase.from('server_audit_logs').insert({
+        action: 'system_health_check',
+        action_type: 'monitoring',
+        performed_by: user.id,
+        performed_by_role: userRoles[0] || 'unknown',
+        details: { overall_status: overallStatus, server_count: serverList.length }
+      });
+
+      response = {
+        overall_status: overallStatus,
+        checked_at: new Date().toISOString(),
+        summary: {
+          total: serverList.length,
+          healthy: healthyCount,
+          degraded: degradedCount,
+          critical: criticalCount,
+        },
+      };
+      status = 200;
+    }
+
     return new Response(JSON.stringify(response), {
       status,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
