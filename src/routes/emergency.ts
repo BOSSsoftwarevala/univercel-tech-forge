@@ -10,7 +10,7 @@ async function setSystemState(tenantId: string, key: string, value: string) {
 }
 
 async function logAudit(tenantId: string, userId: string, action: string, reason: string) {
-  return supabase.from('audit_logs').insert({ user_id: userId, action, module: 'emergency', meta_json: { tenant_id: tenantId, reason } });
+  return supabase.from('audit_logs').insert({ tenant_id: tenantId, user_id: userId, action, entity_type: 'emergency', details: { reason } });
 }
 
 export async function killAll(tenantId: string, userId: string, reason: string) {

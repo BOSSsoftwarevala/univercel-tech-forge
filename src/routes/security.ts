@@ -10,10 +10,11 @@ export async function getAbuseEvents(tenantId: string) {
 
 export async function blockUser(tenantId: string, userId: string, reason: string, adminId: string) {
   return supabase.from('audit_logs').insert({
+    tenant_id: tenantId,
     user_id: adminId,
     action: 'block_user',
-    module: 'security',
-    meta_json: { tenant_id: tenantId, blocked_user_id: userId, reason },
+    entity_type: 'security',
+    details: { blocked_user_id: userId, reason },
   });
 }
 

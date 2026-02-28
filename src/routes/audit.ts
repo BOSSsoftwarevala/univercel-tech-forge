@@ -10,8 +10,8 @@ export async function getAuditLogs(tenantId: string, limit = 200, filters: Audit
   let query = supabase.from('audit_logs').select('*');
   if (filters.action) query = query.eq('action', filters.action);
   if (filters.userId) query = query.eq('user_id', filters.userId);
-  if (filters.entityType) query = query.eq('module', filters.entityType);
-  return query.order('timestamp', { ascending: false }).limit(limit);
+  if (filters.entityType) query = query.eq('entity_type', filters.entityType);
+  return query.order('created_at', { ascending: false }).limit(limit);
 }
 
 export async function getAdminActionLogs(tenantId: string) {
@@ -19,7 +19,7 @@ export async function getAdminActionLogs(tenantId: string) {
     .from('audit_logs')
     .select('*')
     .in('action', ['block_user', 'kill_all', 'kill_ai', 'lock_wallet', 'resume', 'delete_service', 'rotate_key'])
-    .order('timestamp', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(200);
 }
 
@@ -27,7 +27,7 @@ export async function exportAuditLogs(tenantId: string, format: 'csv' | 'json') 
   const { data, error } = await supabase
     .from('audit_logs')
     .select('*')
-    .order('timestamp', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(5000);
 
   if (error) return { data: null, error };

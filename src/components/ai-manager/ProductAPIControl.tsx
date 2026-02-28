@@ -53,7 +53,7 @@ export default function ProductAPIControl({ tenantId }: Props) {
 
   const openAdd = () => {
     setEditTarget(null);
-    setForm({ product_id: '', service_id: '', is_enabled: true });
+    setForm({ product_id: '', service_id: '', is_active: true });
     setDialogOpen(true);
   };
 
