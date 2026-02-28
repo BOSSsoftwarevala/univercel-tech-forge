@@ -16,6 +16,7 @@ import { SecurityProvider } from "./contexts/SecurityContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { TranslationProvider } from "./contexts/TranslationContext";
 import { GlobalRealtimeProvider } from "./providers/GlobalRealtimeProvider";
+import { TenantProvider } from "./lib/multi-tenant/tenant-context";
 import SystemNotificationsInitializer from "./components/notifications/SystemNotificationsInitializer";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
@@ -399,7 +400,8 @@ const BlockingClassCleanup = memo(() => {
 const App = memo(() => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <DemoTestModeProvider>
+      <TenantProvider>
+        <DemoTestModeProvider>
         <AnimationProvider>
           <TooltipProvider>
             <DomainProtection>
@@ -741,6 +743,7 @@ const App = memo(() => (
           </TooltipProvider>
         </AnimationProvider>
       </DemoTestModeProvider>
+      </TenantProvider>
     </AuthProvider>
   </QueryClientProvider>
 ));
