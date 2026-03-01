@@ -29,7 +29,7 @@ const SIDEBAR_ROUTES: SidebarRoute[] = [
   { id: 'product-demo', module: 'product-demo', path: '/boss/product-demo', label: 'Product Demo', isImplemented: true },
   { id: 'finance', module: 'finance', path: '/boss/finance', label: 'Finance', isImplemented: true },
   { id: 'security', module: 'security', path: '/boss/security', label: 'Security', isImplemented: true },
-  { id: 'ai-ceo', module: 'ai-ceo', path: '/boss/ai-ceo', label: 'AIRA', isImplemented: false },
+  { id: 'ai-ceo', module: 'ai-ceo', path: '/boss/ai-ceo', label: 'AIRA', isImplemented: true },
   { id: 'support-overview', module: 'support', path: '/boss/support', label: 'Support', isImplemented: true },
   { id: 'settings', module: 'settings', path: '/boss/settings', label: 'Settings', isImplemented: true },
 ];

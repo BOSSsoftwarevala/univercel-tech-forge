@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,10 +13,12 @@ import {
   Sparkles,
   Tag,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { marketplaceService, type MarketplaceProduct } from '@/services/marketplaceService';
 
 interface Product {
   id: string;
@@ -42,98 +44,48 @@ const categories = [
   { id: 'marketing', label: 'Marketing Tools' },
 ];
 
-const products: Product[] = [
-  {
-    id: '1',
-    name: 'CRM Pro Suite',
-    category: 'crm',
-    subCategory: 'Sales CRM',
-    description: 'Complete customer relationship management solution with AI insights',
-    features: ['Lead Management', 'Sales Pipeline', 'Email Integration', 'AI Analytics'],
-    basePrice: 50000,
+function mapSupabaseProduct(p: MarketplaceProduct): Product {
+  const basePrice = p.lifetime_price ?? p.monthly_price ?? 0;
+  return {
+    id: p.product_id,
+    name: p.product_name,
+    category: (p.category ?? 'other').toLowerCase(),
+    subCategory: p.category ?? 'Software',
+    description: p.description ?? 'Enterprise software solution',
+    features: Array.isArray((p as any).features_json) ? (p as any).features_json : [],
+    basePrice,
     franchiseDiscount: 30,
-    franchisePrice: 35000,
-    rating: 4.8,
-    reviews: 124,
-    popular: true
-  },
-  {
-    id: '2',
-    name: 'HRM Enterprise',
-    category: 'hrm',
-    subCategory: 'Employee Management',
-    description: 'Full-featured human resource management system',
-    features: ['Attendance', 'Payroll', 'Performance', 'Recruitment'],
-    basePrice: 75000,
-    franchiseDiscount: 30,
-    franchisePrice: 52500,
-    rating: 4.6,
-    reviews: 89,
-    popular: true
-  },
-  {
-    id: '3',
-    name: 'E-Shop Builder',
-    category: 'ecommerce',
-    subCategory: 'Online Store',
-    description: 'Build stunning online stores with integrated payments',
-    features: ['Store Builder', 'Payment Gateway', 'Inventory', 'Shipping'],
-    basePrice: 40000,
-    franchiseDiscount: 30,
-    franchisePrice: 28000,
-    rating: 4.9,
-    reviews: 203,
-    popular: true
-  },
-  {
-    id: '4',
-    name: 'Marketing Autopilot',
-    category: 'marketing',
-    subCategory: 'Automation',
-    description: 'AI-powered marketing automation platform',
-    features: ['Email Campaigns', 'Social Media', 'SEO Tools', 'Analytics'],
-    basePrice: 35000,
-    franchiseDiscount: 30,
-    franchisePrice: 24500,
-    rating: 4.7,
-    reviews: 156,
-    popular: false
-  },
-  {
-    id: '5',
-    name: 'ERP Complete',
-    category: 'erp',
-    subCategory: 'Business Management',
-    description: 'End-to-end enterprise resource planning solution',
-    features: ['Finance', 'Inventory', 'Manufacturing', 'Supply Chain'],
-    basePrice: 120000,
-    franchiseDiscount: 30,
-    franchisePrice: 84000,
+    franchisePrice: Math.round(basePrice * 0.7),
     rating: 4.5,
-    reviews: 67,
-    popular: false
-  },
-  {
-    id: '6',
-    name: 'Lead Magnet Pro',
-    category: 'crm',
-    subCategory: 'Lead Generation',
-    description: 'Capture and convert leads with intelligent forms',
-    features: ['Smart Forms', 'Landing Pages', 'A/B Testing', 'Integrations'],
-    basePrice: 25000,
-    franchiseDiscount: 30,
-    franchisePrice: 17500,
-    rating: 4.8,
-    reviews: 178,
-    popular: true
-  },
-];
+    reviews: 0,
+    popular: p.status === 'active',
+  };
+}
 
 export function MMMarketplaceScreen() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    marketplaceService
+      .getProducts()
+      .then((data) => setProducts(data.map(mapSupabaseProduct)))
+      .catch((err) => console.error('Failed to load marketplace products:', err))
+      .finally(() => setLoading(false));
+
+    const channel = marketplaceService.subscribeToProductChanges(() => {
+      marketplaceService
+        .getProducts()
+        .then((data) => setProducts(data.map(mapSupabaseProduct)))
+        .catch((err) => console.error('Failed to refresh marketplace products:', err));
+    });
+
+    return () => { channel.unsubscribe(); };
+  }, []);
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
@@ -153,7 +105,10 @@ export function MMMarketplaceScreen() {
             <Store className="h-6 w-6 text-purple-400" />
             Software Marketplace
           </h1>
-          <p className="text-slate-400 mt-1">Browse and purchase software solutions</p>
+          <p className="text-slate-400 mt-1">
+            Browse and purchase software solutions
+            {!loading && <span className="ml-2 text-purple-400">({products.length} products)</span>}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
@@ -198,6 +153,12 @@ export function MMMarketplaceScreen() {
       </div>
 
       {/* Products Grid */}
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+          <span className="ml-3 text-slate-400">Loading products from database...</span>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map(product => (
           <Card key={product.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-all">
@@ -403,6 +364,7 @@ export function MMMarketplaceScreen() {
           </Card>
         ))}
       </div>
+      )}
     </div>
   );
 }

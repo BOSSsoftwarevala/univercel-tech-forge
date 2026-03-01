@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, 
@@ -15,7 +15,10 @@ import {
   Clock,
   Calendar,
   Mail,
-  Phone
+  Phone,
+  Package,
+  ShoppingCart,
+  Bell
 } from 'lucide-react';
 import { 
   AreaChart,
@@ -35,31 +38,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { GlobalNetworkMap } from './GlobalNetworkMap';
-
-// Summary cards with modern styling
-const summaryCards = [
-  { 
-    label: 'Total Consultations', 
-    value: '1,032', 
-    icon: Users, 
-    gradient: 'from-blue-500 to-cyan-400',
-    bgGradient: 'from-blue-500/20 to-cyan-400/10'
-  },
-  { 
-    label: 'In Progress', 
-    value: '132', 
-    icon: Clock, 
-    gradient: 'from-orange-500 to-amber-400',
-    bgGradient: 'from-orange-500/20 to-amber-400/10'
-  },
-  { 
-    label: 'In Review', 
-    value: '128', 
-    icon: CheckCircle2, 
-    gradient: 'from-purple-500 to-pink-400',
-    bgGradient: 'from-purple-500/20 to-pink-400/10'
-  },
-];
+import { marketplaceService, type MarketplaceStats } from '@/services/marketplaceService';
 
 const revenueData = [
   { month: 'Jan', revenue: 4500, trend: 3200 },
@@ -100,6 +79,48 @@ const scheduleData = [
 ];
 
 export function BossDashboard() {
+  const [marketplaceStats, setMarketplaceStats] = useState<MarketplaceStats | null>(null);
+
+  useEffect(() => {
+    marketplaceService.getStats().then(setMarketplaceStats).catch((err) => console.error('Failed to load marketplace stats:', err));
+
+    const ordersChannel = marketplaceService.subscribeToOrderChanges(() => {
+      marketplaceService.getStats().then(setMarketplaceStats).catch((err) => console.error('Failed to refresh marketplace stats:', err));
+    });
+    const productsChannel = marketplaceService.subscribeToProductChanges(() => {
+      marketplaceService.getStats().then(setMarketplaceStats).catch((err) => console.error('Failed to refresh marketplace stats:', err));
+    });
+
+    return () => {
+      ordersChannel.unsubscribe();
+      productsChannel.unsubscribe();
+    };
+  }, []);
+
+  const summaryCards = [
+    {
+      label: 'Total Products',
+      value: marketplaceStats ? marketplaceStats.totalProducts.toLocaleString() : '—',
+      icon: Package,
+      gradient: 'from-blue-500 to-cyan-400',
+      bgGradient: 'from-blue-500/20 to-cyan-400/10',
+    },
+    {
+      label: 'Total Orders',
+      value: marketplaceStats ? marketplaceStats.totalOrders.toLocaleString() : '—',
+      icon: ShoppingCart,
+      gradient: 'from-orange-500 to-amber-400',
+      bgGradient: 'from-orange-500/20 to-amber-400/10',
+    },
+    {
+      label: 'Pending Orders',
+      value: marketplaceStats ? marketplaceStats.pendingOrders.toLocaleString() : '—',
+      icon: Clock,
+      gradient: 'from-purple-500 to-pink-400',
+      bgGradient: 'from-purple-500/20 to-pink-400/10',
+    },
+  ];
+
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-full">
       {/* Header */}
