@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { BossPanelSection } from './BossPanelLayout';
 import { useBossPanelContext } from './BossPanelLayout';
@@ -16,6 +16,10 @@ import { BossSettings } from './sections/BossSettings';
 import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
 import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
+
+const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
+const FranchiseDashboardEmbed = lazy(() => import('@/pages/franchise/Dashboard'));
+const CEODashboardEmbed = lazy(() => import('@/pages/super-admin-system/RoleSwitch/CEODashboard'));
 
 interface BossPanelOutletContext {
   activeSection: BossPanelSection;
@@ -78,6 +82,12 @@ export function BossPanelContent() {
         return <ServerHosting />;
       case 'vala-ai':
         return <ValaAIModuleContainer />;
+      case 'reseller-dashboard':
+        return <Suspense fallback={<div className="p-6 text-center">Loading Reseller Dashboard...</div>}><ResellerDashboardEmbed /></Suspense>;
+      case 'franchise-dashboard':
+        return <Suspense fallback={<div className="p-6 text-center">Loading Franchise Dashboard...</div>}><FranchiseDashboardEmbed /></Suspense>;
+      case 'aira':
+        return <Suspense fallback={<div className="p-6 text-center">Loading AIRA...</div>}><CEODashboardEmbed /></Suspense>;
       case 'settings':
         return <BossSettings />;
       default:
