@@ -39,8 +39,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
-const randomUUID = () => crypto.randomUUID ? crypto.randomUUID() : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-const randomDate = (daysAgo: number) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); return d; };
+const randomUUID = () => (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `id-${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+const dateFromDaysAgo = (daysAgo: number) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); return d; };
 
 // ============ TYPES ============
 interface Role {
@@ -294,7 +294,7 @@ const mockApprovals: RoleApproval[] = [
     roleName: 'Regional Auditor',
     requestedBy: 'Ravi Kumar',
     requestedByEmail: 'auditor.request@company.com',
-    requestedAt: randomDate(5),
+    requestedAt: dateFromDaysAgo(5),
     reason: 'Need audit access for quarterly compliance review in APAC region',
     permissions: ['Audit.view', 'Compliance.view', 'Reports.view'],
     status: 'pending',
@@ -306,7 +306,7 @@ const mockApprovals: RoleApproval[] = [
     roleName: 'External Consultant',
     requestedBy: 'Alex Mueller',
     requestedByEmail: 'consultant@external.com',
-    requestedAt: randomDate(3),
+    requestedAt: dateFromDaysAgo(3),
     reason: 'External security consultant requires access for penetration testing',
     permissions: ['Security.view', 'Server.view'],
     status: 'pending',
@@ -325,7 +325,7 @@ const mockAuditLog: AuditLogEntry[] = [
     module: 'Users',
     permission: 'view',
     performedBy: 'Super Admin',
-    performedAt: randomDate(30),
+    performedAt: dateFromDaysAgo(30),
     reason: 'Initial role setup - User management access required',
     previousState: false,
     newState: true,
@@ -338,7 +338,7 @@ const mockAuditLog: AuditLogEntry[] = [
     module: 'Finance',
     permission: 'view',
     performedBy: 'Super Admin',
-    performedAt: randomDate(25),
+    performedAt: dateFromDaysAgo(25),
     reason: 'Workload delegation - Finance reporting access',
     previousState: false,
     newState: true,
@@ -351,7 +351,7 @@ const mockAuditLog: AuditLogEntry[] = [
     module: 'Database',
     permission: 'view',
     performedBy: 'Super Admin',
-    performedAt: randomDate(10),
+    performedAt: dateFromDaysAgo(10),
     reason: 'Security policy update - Restricted access',
     previousState: true,
     newState: false,
