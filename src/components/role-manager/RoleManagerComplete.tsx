@@ -38,7 +38,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { random, generatePerson } from '@/data/mockDataGenerator';
+
+const randomUUID = () => crypto.randomUUID ? crypto.randomUUID() : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const randomDate = (daysAgo: number) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); return d; };
 
 // ============ TYPES ============
 interface Role {
@@ -288,11 +290,11 @@ const generateDefaultLockMatrix = () => {
 // Mock approvals
 const mockApprovals: RoleApproval[] = [
   {
-    id: random.uuid(),
+    id: randomUUID(),
     roleName: 'Regional Auditor',
-    requestedBy: generatePerson('asia').fullName,
+    requestedBy: 'Ravi Kumar',
     requestedByEmail: 'auditor.request@company.com',
-    requestedAt: random.date(5),
+    requestedAt: randomDate(5),
     reason: 'Need audit access for quarterly compliance review in APAC region',
     permissions: ['Audit.view', 'Compliance.view', 'Reports.view'],
     status: 'pending',
@@ -300,11 +302,11 @@ const mockApprovals: RoleApproval[] = [
     riskScore: 25,
   },
   {
-    id: random.uuid(),
+    id: randomUUID(),
     roleName: 'External Consultant',
-    requestedBy: generatePerson('europe').fullName,
+    requestedBy: 'Alex Mueller',
     requestedByEmail: 'consultant@external.com',
-    requestedAt: random.date(3),
+    requestedAt: randomDate(3),
     reason: 'External security consultant requires access for penetration testing',
     permissions: ['Security.view', 'Server.view'],
     status: 'pending',
@@ -316,40 +318,40 @@ const mockApprovals: RoleApproval[] = [
 // Mock audit log for permission grants
 const mockAuditLog: AuditLogEntry[] = [
   {
-    id: random.uuid(),
+    id: randomUUID(),
     action: 'permission_granted',
     roleId: 'master_admin',
     roleName: 'Master Admin',
     module: 'Users',
     permission: 'view',
     performedBy: 'Super Admin',
-    performedAt: random.date(30),
+    performedAt: randomDate(30),
     reason: 'Initial role setup - User management access required',
     previousState: false,
     newState: true,
   },
   {
-    id: random.uuid(),
+    id: randomUUID(),
     action: 'permission_granted',
     roleId: 'finance_manager',
     roleName: 'Finance Manager',
     module: 'Finance',
     permission: 'view',
     performedBy: 'Super Admin',
-    performedAt: random.date(25),
+    performedAt: randomDate(25),
     reason: 'Workload delegation - Finance reporting access',
     previousState: false,
     newState: true,
   },
   {
-    id: random.uuid(),
+    id: randomUUID(),
     action: 'permission_revoked',
     roleId: 'developer',
     roleName: 'Developer',
     module: 'Database',
     permission: 'view',
     performedBy: 'Super Admin',
-    performedAt: random.date(10),
+    performedAt: randomDate(10),
     reason: 'Security policy update - Restricted access',
     previousState: true,
     newState: false,
@@ -444,7 +446,7 @@ const RoleManagerComplete = () => {
 
     // Add audit log
     setAuditLog([{
-      id: random.uuid(),
+      id: randomUUID(),
       action: 'role_created',
       roleId: role.id,
       roleName: role.displayName,
@@ -520,7 +522,7 @@ const RoleManagerComplete = () => {
 
     // Add audit log
     setAuditLog([{
-      id: random.uuid(),
+      id: randomUUID(),
       action: 'permission_granted',
       roleId,
       roleName: role?.displayName || roleId,
@@ -555,7 +557,7 @@ const RoleManagerComplete = () => {
 
     // Add audit log
     setAuditLog([{
-      id: random.uuid(),
+      id: randomUUID(),
       action: 'permission_revoked',
       roleId,
       roleName: role?.displayName || roleId,

@@ -26,8 +26,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { useDemoManagerAccess } from "@/hooks/useDemoManagerAccess";
-import { DemoReportCardsList } from "@/components/demo-manager/DemoReportCard";
-import { DemoAccessGate } from "@/components/demo-manager/DemoAccessGate";
 import { isDemoTestMode } from "@/contexts/DemoTestModeContext";
 
 interface Demo {
@@ -533,12 +531,9 @@ export default function DemoManagerPanel() {
         </TabsContent>
 
         <TabsContent value="report-cards" className="mt-4">
-          <DemoReportCardsList 
-            reportCards={reportCards} 
-            onUpdateStatus={updateWorkflowStatus}
-            title="Demo Report Cards"
-            maxHeight="500px"
-          />
+          <Card>
+            <CardContent className="p-4 text-sm text-muted-foreground">Report cards functionality has been removed.</CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

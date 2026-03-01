@@ -123,60 +123,13 @@ const EasyAuth = lazyLoad(() => import("./pages/auth/EasyAuth"));
 const RoleBasedLogin = lazyLoad(() => import("./pages/auth/RoleBasedLogin"));
 const SessionExpiredPage = lazyLoad(() => import("./pages/error/SessionExpiredPage"));
 
-// Demo Pages
-const PublicDemos = lazyLoad(() => import("./pages/demos/PublicDemos"));
-const SimpleDemoList = lazyLoad(() => import("./pages/SimpleDemoList"));
-const SimpleDemoView = lazyLoad(() => import("./pages/SimpleDemoView"));
+// Core Pages
 const SimpleCheckout = lazyLoad(() => import("./pages/SimpleCheckout"));
 const SimpleUserDashboard = lazyLoad(() => import("./pages/SimpleUserDashboard"));
 const UserDashboard = lazyLoad(() => import("./pages/user/UserDashboard"));
-const DemoAccess = lazyLoad(() => import("./pages/DemoAccess"));
-const DemoDirectory = lazyLoad(() => import("./pages/DemoDirectory"));
-const DemoLogin = lazyLoad(() => import("./pages/DemoLogin"));
-const DemoShowcase = lazyLoad(() => import("./pages/DemoShowcase"));
-const PremiumDemoShowcase = lazyLoad(() => import("./pages/PremiumDemoShowcase"));
-const PremiumDemoShowcaseNew = lazyLoad(() => import("./pages/showcase/PremiumDemoShowcase"));
+const SalesCRMAuthPage = lazyLoad(() => import("./pages/sales-crm/SalesCRMAuthPage"));
 const ServerManagementPortal = lazyLoad(() => import("./pages/server/ServerManagementPortal"));
 const ClientPortal = lazyLoad(() => import("./pages/ClientPortal"));
-
-// Demo Products
-const RestaurantPOSDemo = lazyLoad(() => import("./pages/demos/RestaurantPOSDemo"));
-const SaaSPOSDemo = lazyLoad(() => import("./pages/saas-pos/SaaSPOSDemo"));
-const RestaurantSmallDemo = lazyLoad(() => import("./pages/demos/restaurant/RestaurantSmallDemo"));
-const RestaurantMediumDemo = lazyLoad(() => import("./pages/demos/restaurant/RestaurantMediumDemo"));
-const RestaurantLargeDemo = lazyLoad(() => import("./pages/demos/restaurant/RestaurantLargeDemo"));
-const SchoolERPDemo = lazyLoad(() => import("./pages/demos/SchoolERPDemo"));
-const SchoolSmallDemo = lazyLoad(() => import("./pages/demos/school/SchoolSmallDemo"));
-const SchoolMediumDemo = lazyLoad(() => import("./pages/demos/school/SchoolMediumDemo"));
-const SchoolLargeDemo = lazyLoad(() => import("./pages/demos/school/SchoolLargeDemo"));
-const EducationDemoHub = lazyLoad(() => import("./pages/demos/education/EducationDemoHub"));
-const HospitalHMSDemo = lazyLoad(() => import("./pages/demos/HospitalHMSDemo"));
-const EcommerceStoreDemo = lazyLoad(() => import("./pages/demos/EcommerceStoreDemo"));
-const HotelBookingDemo = lazyLoad(() => import("./pages/demos/HotelBookingDemo"));
-const RealEstateDemo = lazyLoad(() => import("./pages/demos/RealEstateDemo"));
-const AutomotiveDemo = lazyLoad(() => import("./pages/demos/AutomotiveDemo"));
-const TravelDemo = lazyLoad(() => import("./pages/demos/TravelDemo"));
-const FinanceDemo = lazyLoad(() => import("./pages/demos/FinanceDemo"));
-const ManufacturingDemo = lazyLoad(() => import("./pages/demos/ManufacturingDemo"));
-const GymDemo = lazyLoad(() => import("./pages/demos/GymDemo"));
-const SalonDemo = lazyLoad(() => import("./pages/demos/SalonDemo"));
-const LegalDemo = lazyLoad(() => import("./pages/demos/LegalDemo"));
-const SecurityDemo = lazyLoad(() => import("./pages/demos/SecurityDemo"));
-const TelecomDemo = lazyLoad(() => import("./pages/demos/TelecomDemo"));
-const ChildcareDemo = lazyLoad(() => import("./pages/demos/ChildcareDemo"));
-const PetCareDemo = lazyLoad(() => import("./pages/demos/PetCareDemo"));
-const EventDemo = lazyLoad(() => import("./pages/demos/EventDemo"));
-const CRMDemo = lazyLoad(() => import("./pages/demos/CRMDemo"));
-const LogisticsDemo = lazyLoad(() => import("./pages/demos/LogisticsDemo"));
-const SalesCRMDemo = lazyLoad(() => import("./pages/sales-crm/SalesCRMDemo"));
-const SalesCRMAuthPage = lazyLoad(() => import("./pages/sales-crm/SalesCRMAuthPage"));
-const SimpleHRMDemo = lazyLoad(() => import("./pages/simple-hrm/SimpleHRMDemo"));
-const CorporateHRMDemo = lazyLoad(() => import("./pages/corporate-hrm/CorporateHRMDemo"));
-const SaasHRMDemo = lazyLoad(() => import("./pages/saas-hrm/SaasHRMDemo"));
-const RetailPOSDemo = lazyLoad(() => import("./pages/retail-pos/RetailPOSDemo"));
-const RestaurantPOSNewDemo = lazyLoad(() => import("./pages/restaurant-pos-new/RestaurantPOSNewDemo"));
-const AccountingDemo = lazyLoad(() => import("./pages/accounting/AccountingDemo"));
-const ProAccountingDemo = lazyLoad(() => import("./pages/pro-accounting/ProAccountingDemo"));
 const AutoDevEngine = lazyLoad(() => import("./pages/auto-dev/AutoDevEngine"));
 
 // School Software
@@ -242,9 +195,6 @@ const BulkUserCreation = lazyLoad(() => import("./pages/admin/BulkUserCreation")
 const BulkActionsReference = lazyLoad(() => import("./pages/admin/BulkActionsReference"));
 const ContinentSuperAdminDashboard = lazyLoad(() => import("./pages/continent-super-admin/ContinentSuperAdminDashboard"));
 
-// Product Demo Manager
-const ProductDemoManagerPage = lazyLoad(() => import("./pages/product-demo-manager"));
-
 // Franchise
 const FranchiseLayout = lazyLoad(() => import("./components/layouts/FranchiseLayout"));
 const FranchiseDashboardPage = lazyLoad(() => import("./pages/franchise/Dashboard"));
@@ -288,8 +238,6 @@ const ClientSuccessDashboard = lazyLoad(() => import("./pages/ClientSuccessDashb
 const IncidentCrisisDashboard = lazyLoad(() => import("./pages/IncidentCrisisDashboard"));
 const PerformanceManager = lazyLoad(() => import("./pages/PerformanceManager"));
 const FinanceManager = lazyLoad(() => import("./pages/FinanceManager"));
-const ProductDemoManager = lazyLoad(() => import("./pages/ProductDemoManager"));
-const DemoManagerDashboard = lazyLoad(() => import("./pages/DemoManagerDashboard"));
 const PrimeUserDashboard = lazyLoad(() => import("./pages/PrimeUserDashboard"));
 const LegalComplianceManager = lazyLoad(() => import("./pages/LegalComplianceManager"));
 const MarketingManager = lazyLoad(() => import("./pages/MarketingManager"));
@@ -317,10 +265,7 @@ const AICEOReports = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOReports
 const AICEOLearning = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOLearning"));
 const AICEOSettings = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOSettings"));
 
-const DemoCredentials = lazyLoad(() => import("./pages/DemoCredentials"));
-const DemoOrderSystem = lazyLoad(() => import("./pages/demo-system/DemoOrderSystem"));
 const SectorsBrowse = lazyLoad(() => import("./pages/SectorsBrowse"));
-const SubCategoryDemos = lazyLoad(() => import("./pages/SubCategoryDemos"));
 
 // Business Management
 const BusinessLayout = lazyLoad(() => import("./components/business/BusinessLayout").then(m => ({ default: m.BusinessLayout })));
@@ -419,11 +364,11 @@ const App = memo(() => (
                             {/* Public Routes */}
                             <Route path="/" element={<Index />} />
                             <Route path="/demos" element={<Index />} />
-                            <Route path="/explore" element={<Navigate to="/demos" replace />} />
+                            <Route path="/explore" element={<Navigate to="/" replace />} />
                             <Route path="/products" element={<Index />} />
-                            <Route path="/pricing" element={<SimpleDemoList />} />
-                            <Route path="/demos/public" element={<PublicDemos />} />
-                            <Route path="/showcase" element={<PremiumDemoShowcaseNew />} />
+                            <Route path="/pricing" element={<Navigate to="/" replace />} />
+                            <Route path="/demos/public" element={<Navigate to="/" replace />} />
+                            <Route path="/showcase" element={<Navigate to="/" replace />} />
                             <Route path="/server-portal" element={<RequireAuth><ServerManagementPortal /></RequireAuth>} />
                             <Route path="/auth" element={<Auth />} />
                             <Route path="/dashboard" element={<Dashboard />} />
@@ -432,59 +377,31 @@ const App = memo(() => (
                             <Route path="/change-password" element={<RequireAuth><ChangePassword /></RequireAuth>} />
                             <Route path="/onboard" element={<Homepage />} />
                             <Route path="/onboard/:category" element={<CategoryOnboarding />} />
-                            <Route path="/apply" element={<SimpleDemoList />} />
+                            <Route path="/apply" element={<Navigate to="/" replace />} />
                             <Route path="/careers" element={<CareerPortal />} />
                             <Route path="/join-developer" element={<CareerPortal />} />
                             <Route path="/join-influencer" element={<CareerPortal />} />
                             <Route path="/jobs" element={<CareerPortal />} />
                             <Route path="/bootstrap-admins" element={<RequireRole allowed={["master"]} masterOnly><BootstrapAdmins /></RequireRole>} />
                             <Route path="/sectors" element={<SectorsBrowse />} />
-                            <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
+                            <Route path="/sectors/:sectorId/:subCategoryId" element={<Navigate to="/sectors" replace />} />
                             <Route path="/auto-dev" element={<AutoDevEngine />} />
 
-                            {/* Demo Routes */}
-                            <Route path="/demo/restaurant-pos" element={<RestaurantPOSDemo />} />
-                            <Route path="/demo/restaurant-small" element={<RestaurantSmallDemo />} />
-                            <Route path="/demo/restaurant-medium" element={<RestaurantMediumDemo />} />
-                            <Route path="/demo/restaurant-large" element={<RestaurantLargeDemo />} />
-                            <Route path="/demo/school-erp" element={<SchoolERPDemo />} />
-                            <Route path="/demo/school-small" element={<SchoolSmallDemo />} />
-                            <Route path="/demo/school-medium" element={<SchoolMediumDemo />} />
-                            <Route path="/demo/school-large" element={<SchoolLargeDemo />} />
-                            <Route path="/demo/education" element={<EducationDemoHub />} />
-                            <Route path="/demos/education" element={<EducationDemoHub />} />
-                            <Route path="/school-software" element={<SchoolSoftwareHomepage />} />
-                            <Route path="/school-software/dashboard" element={<SchoolSoftwareDashboard />} />
-                            <Route path="/demo/hospital-hms" element={<HospitalHMSDemo />} />
-                            <Route path="/demo/ecommerce-store" element={<EcommerceStoreDemo />} />
-                            <Route path="/demo/hotel-booking" element={<HotelBookingDemo />} />
-                            <Route path="/demo/real-estate" element={<RealEstateDemo />} />
-                            <Route path="/demo/automotive" element={<AutomotiveDemo />} />
-                            <Route path="/demo/travel" element={<TravelDemo />} />
-                            <Route path="/demo/finance" element={<FinanceDemo />} />
-                            <Route path="/demo/manufacturing" element={<ManufacturingDemo />} />
-                            <Route path="/demo/gym" element={<GymDemo />} />
-                            <Route path="/demo/salon" element={<SalonDemo />} />
-                            <Route path="/demo/legal" element={<LegalDemo />} />
-                            <Route path="/demo/security" element={<SecurityDemo />} />
-                            <Route path="/demo/telecom" element={<TelecomDemo />} />
-                            <Route path="/demo/childcare" element={<ChildcareDemo />} />
-                            <Route path="/demo/petcare" element={<PetCareDemo />} />
-                            <Route path="/demo/event" element={<EventDemo />} />
-                            <Route path="/demo/crm" element={<CRMDemo />} />
-                            <Route path="/demo/logistics" element={<LogisticsDemo />} />
-                            <Route path="/sales-crm" element={<SalesCRMDemo />} />
-                            <Route path="/sales-crm/auth" element={<SalesCRMAuthPage />} />
-                            <Route path="/retail-pos" element={<RetailPOSDemo />} />
-                            <Route path="/demo-directory" element={<DemoDirectory />} />
-                            <Route path="/demo/:demoId" element={<SimpleDemoView />} />
+                            {/* Checkout & User Routes */}
                             <Route path="/checkout/:demoId" element={<SimpleCheckout />} />
                             <Route path="/user-dashboard" element={<SimpleUserDashboard />} />
                             <Route path="/user/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
-                            <Route path="/demo-login" element={<DemoLogin />} />
-                            <Route path="/premium-demos" element={<PremiumDemoShowcase />} />
                             <Route path="/client-portal" element={<ClientPortal />} />
                             <Route path="/get-started" element={<ClientPortal />} />
+                            <Route path="/sales-crm/auth" element={<SalesCRMAuthPage />} />
+
+                            {/* Demo routes removed - redirect to home */}
+                            <Route path="/demo/*" element={<Navigate to="/" replace />} />
+                            <Route path="/demo-directory" element={<Navigate to="/" replace />} />
+                            <Route path="/demo-login" element={<Navigate to="/auth" replace />} />
+                            <Route path="/premium-demos" element={<Navigate to="/" replace />} />
+                            <Route path="/school-software" element={<SchoolSoftwareHomepage />} />
+                            <Route path="/school-software/dashboard" element={<SchoolSoftwareDashboard />} />
 
                             {/* Auth Routes */}
                             <Route path="/login" element={<RoleBasedLogin />} />
@@ -562,7 +479,6 @@ const App = memo(() => (
                             <Route path="/super-admin/user-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><UserManager /></RequireRole>} />
                             <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><PermissionMatrix /></RequireRole>} />
                             <Route path="/super-admin/security-center" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SecurityCenter /></RequireRole>} />
-                            <Route path="/super-admin/demo-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><ProductDemoManager /></RequireRole>} />
                             <Route path="/super-admin/product-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><ProductManagerPage /></RequireRole>} />
                             <Route path="/super-admin/system-settings" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><SystemSettings /></RequireRole>} />
                             <Route path="/super-admin/system-audit" element={<RequireRole allowed={["boss_owner"]}><SystemAudit /></RequireRole>} />
@@ -632,7 +548,6 @@ const App = memo(() => (
                             <Route path="/incident-crisis" element={<RequireRole allowed={["incident_crisis", "super_admin"]}><IncidentCrisisDashboard /></RequireRole>} />
                             <Route path="/performance" element={<RequireRole allowed={["performance_manager", "super_admin"]}><PerformanceManager /></RequireRole>} />
                             <Route path="/finance" element={<RequireRole allowed={["finance_manager", "super_admin"]}><FinanceManager /></RequireRole>} />
-                            <Route path="/demo-manager" element={<RequireRole allowed={["demo_manager", "super_admin"]}><DemoManagerDashboard /></RequireRole>} />
                             <Route path="/prime" element={<RequireRole allowed={["prime", "super_admin"]}><PrimeUserDashboard /></RequireRole>} />
                             <Route path="/legal" element={<RequireRole allowed={["legal_compliance", "super_admin"]}><LegalComplianceManager /></RequireRole>} />
                             <Route path="/marketing" element={<RequireRole allowed={["marketing", "super_admin"]}><MarketingManager /></RequireRole>} />
@@ -693,15 +608,6 @@ const App = memo(() => (
                             <Route path="/super-admin-system/activity-log" element={<RequireRole allowed={["boss_owner"]}><SuperAdminActivityLog /></RequireRole>} />
                             <Route path="/super-admin-system/audit" element={<RequireRole allowed={["boss_owner"]}><SuperAdminAudit /></RequireRole>} />
 
-                            {/* HRM Demos */}
-                            <Route path="/simple-hrm" element={<SimpleHRMDemo />} />
-                            <Route path="/corporate-hrm" element={<CorporateHRMDemo />} />
-                            <Route path="/saas-hrm" element={<SaasHRMDemo />} />
-                            <Route path="/saas-pos" element={<SaaSPOSDemo />} />
-                            <Route path="/restaurant-pos-new" element={<RestaurantPOSNewDemo />} />
-                            <Route path="/accounting" element={<AccountingDemo />} />
-                            <Route path="/pro-accounting" element={<ProAccountingDemo />} />
-
                             {/* Business Management */}
                             <Route path="/business" element={<RequireAuth><Suspense fallback={<RouteLoader />}><BusinessLayout><BusinessDashboard /></BusinessLayout></Suspense></RequireAuth>} />
                             <Route path="/business/dashboard" element={<RequireAuth><Suspense fallback={<RouteLoader />}><BusinessLayout><BusinessDashboard /></BusinessLayout></Suspense></RequireAuth>} />
@@ -711,19 +617,11 @@ const App = memo(() => (
                             <Route path="/business/reports" element={<RequireAuth><Suspense fallback={<RouteLoader />}><BusinessLayout><ReportsPage /></BusinessLayout></Suspense></RequireAuth>} />
                             <Route path="/business/settings" element={<RequireAuth><Suspense fallback={<RouteLoader />}><BusinessLayout><BusinessSettings /></BusinessLayout></Suspense></RequireAuth>} />
 
-                            {/* Demo Order System */}
-                            <Route path="/demo-order" element={<DemoOrderSystem />} />
-                            <Route path="/demo-credentials" element={<DemoCredentials />} />
-
                             {/* Safe Assist & Promise */}
                             <Route path="/safe-assist" element={<RequireAuth><SafeAssistDashboard /></RequireAuth>} />
                             <Route path="/assist-manager" element={<RequireRole allowed={["assist_manager", "boss_owner"]}><AssistManagerDashboard /></RequireRole>} />
                             <Route path="/promise-tracker" element={<RequireAuth><PromiseTrackerDashboard /></RequireAuth>} />
                             <Route path="/promise-management" element={<RequireRole allowed={["boss_owner", "master"]}><PromiseManagementDashboard /></RequireRole>} />
-
-                            {/* Product Demo Manager */}
-                            <Route path="/product-demo-manager" element={<RequireRole allowed={["boss_owner", "demo_manager"]}><ProductDemoManagerPage /></RequireRole>} />
-                            <Route path="/product-demo-manager/*" element={<RequireRole allowed={["boss_owner", "demo_manager"]}><ProductDemoManagerPage /></RequireRole>} />
 
                             {/* Wireframe Routes */}
                             <Route path="/wireframe/*" element={<WireframeRoutes />} />

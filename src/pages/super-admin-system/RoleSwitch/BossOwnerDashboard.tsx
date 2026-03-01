@@ -18,7 +18,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useActionLogger } from "@/hooks/useActionLogger";
 import { ServerModuleContainer } from "@/components/server-module/ServerModuleContainer";
-import { ProductDemoModuleContainer } from "@/components/product-demo-module/ProductDemoModuleContainer";
 import { LeadModuleContainer } from "@/components/lead-module/LeadModuleContainer";
 import { MarketingModuleContainer } from "@/components/marketing-module/MarketingModuleContainer";
 import { cn } from "@/lib/utils";
@@ -344,7 +343,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
         window.location.assign('/super-admin-system/role-switch?role=vala_ai_management');
         return null;
       case 'product-demo':
-        return <ProductDemoModuleContainer onBack={goBack} />;
+        return <div className="p-8 text-center text-muted-foreground">Product Demo module has been removed.</div>;
       case 'leads':
         return <LeadModuleContainer onBack={goBack} />;
       case 'marketing':

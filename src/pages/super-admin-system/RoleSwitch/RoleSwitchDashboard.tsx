@@ -89,7 +89,6 @@ const AAMEnterpriseLayout = lazyWithRetry(() => import("@/components/api-ai-mana
 const SecurityDashboard = lazyWithRetry(() => import("@/components/control-panel/SecurityDashboard"));
 const SettingsDashboard = lazyWithRetry(() => import("@/components/control-panel/SettingsDashboard"));
 const HomeDashboard = lazyWithRetry(() => import("@/components/control-panel/HomeDashboard"));
-const DemoManagerFullLayout = lazyWithRetry(() => import("@/components/demo-manager/DemoManagerFullLayout"));
 const CEODashboard = lazyWithRetry(() => import("./CEODashboard"));
 const CEOSidebar = lazyWithRetry(() => import("@/components/ceo/CEOSidebar"));
 const BossOwnerDashboard = lazyWithRetry(() => import("./BossOwnerDashboard"));
@@ -493,7 +492,7 @@ const RoleSwitchDashboard = () => {
         case "product_manager":
           return <PMEnterpriseLayout />;
         case "demo_manager":
-          return <DemoManagerFullLayout />;
+          return <div className="p-8 text-center text-muted-foreground">Demo Manager has been removed.</div>;
         case "developer_management":
           return <DMFullLayout />;
         case "api_ai_manager":
