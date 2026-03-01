@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   CreditCard, Search, Filter, CheckCircle, XCircle, Clock,
@@ -12,75 +12,72 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
-const payments = [
-  {
-    id: 'PAY-2024-001',
-    invoiceId: 'INV-2024-155',
-    client: 'TechStart Inc',
-    amount: 2891,
-    method: 'card',
-    methodDetails: 'Visa ****4242',
-    status: 'success',
-    date: '2024-12-24 14:32',
-  },
-  {
-    id: 'PAY-2024-002',
-    invoiceId: 'INV-2024-152',
-    client: 'StartupXYZ',
-    amount: 1050.2,
-    method: 'upi',
-    methodDetails: 'UPI - success@upi',
-    status: 'success',
-    date: '2024-12-23 10:15',
-  },
-  {
-    id: 'PAY-2024-003',
-    invoiceId: 'INV-2024-148',
-    client: 'DataFlow Ltd',
-    amount: 5200,
-    method: 'bank',
-    methodDetails: 'NEFT Transfer',
-    status: 'pending',
-    date: '2024-12-22 16:45',
-  },
-  {
-    id: 'PAY-2024-004',
-    invoiceId: 'INV-2024-145',
-    client: 'CloudBase Pro',
-    amount: 890,
-    method: 'card',
-    methodDetails: 'Mastercard ****8888',
-    status: 'failed',
-    date: '2024-12-21 09:20',
-    failReason: 'Card declined',
-  },
-  {
-    id: 'PAY-2024-005',
-    invoiceId: 'INV-2024-140',
-    client: 'Acme Corp',
-    amount: 3500,
-    method: 'wallet',
-    methodDetails: 'Wallet Balance',
-    status: 'success',
-    date: '2024-12-20 11:55',
-  },
-  {
-    id: 'PAY-2024-006',
-    invoiceId: 'INV-2024-138',
-    client: 'MegaCorp Industries',
-    amount: 12500,
-    method: 'bank',
-    methodDetails: 'Wire Transfer',
-    status: 'success',
-    date: '2024-12-19 15:30',
-  },
-];
+interface Payment {
+  id: string;
+  invoiceId: string;
+  client: string;
+  amount: number;
+  method: string;
+  methodDetails: string;
+  status: string;
+  date: string;
+  failReason?: string;
+}
 
 const PaymentsScreen = () => {
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filterMethod, setFilterMethod] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+
+        const formattedPayments: Payment[] = (data ?? []).map((order) => ({
+          id: order.id,
+          invoiceId: order.order_number,
+          client: order.buyer_name,
+          amount: Number(order.amount),
+          method: order.payment_method || 'card',
+          methodDetails: `${order.payment_gateway ?? 'payu'} - ${order.payment_id ?? ''}`,
+          status: order.payment_status === 'verified' ? 'success' : (order.payment_status ?? 'pending'),
+          date: new Date(order.created_at).toLocaleString(),
+        }));
+
+        setPayments(formattedPayments);
+      } catch (error) {
+        console.error('Failed to fetch payments:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPayments();
+
+    const subscription = supabase
+      .channel('orders-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => fetchPayments()
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -111,7 +108,7 @@ const PaymentsScreen = () => {
     return matchesMethod && matchesStatus && matchesSearch;
   });
 
-  const handleAction = (action: string, payment: typeof payments[0]) => {
+  const handleAction = (action: string, payment: Payment) => {
     switch (action) {
       case 'verify':
         toast.success(`Payment ${payment.id} verified`);
@@ -131,6 +128,14 @@ const PaymentsScreen = () => {
     pending: payments.filter(p => p.status === 'pending').length,
     failed: payments.filter(p => p.status === 'failed').length,
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <div className="text-slate-400">Loading payments...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -14008,6 +14008,170 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          activation_date: string | null
+          amount: number
+          buyer_email: string
+          buyer_name: string
+          created_at: string
+          currency: string | null
+          id: string
+          is_lifetime: boolean | null
+          is_verified: boolean | null
+          license_id: string | null
+          license_type: string | null
+          order_number: string
+          payment_gateway: string | null
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          product_id: string
+          status: string | null
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          activation_date?: string | null
+          amount: number
+          buyer_email: string
+          buyer_name: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_verified?: boolean | null
+          license_id?: string | null
+          license_type?: string | null
+          order_number: string
+          payment_gateway?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          product_id: string
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          activation_date?: string | null
+          amount?: number
+          buyer_email?: string
+          buyer_name?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_verified?: boolean | null
+          license_id?: string | null
+          license_type?: string | null
+          order_number?: string
+          payment_gateway?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          product_id?: string
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          activation_date: string
+          active_devices: number | null
+          created_at: string
+          expiry_date: string | null
+          id: string
+          is_lifetime: boolean | null
+          is_revoked: boolean | null
+          license_key: string
+          license_type: string | null
+          max_devices: number | null
+          order_id: string
+          product_id: string
+          revoked_at: string | null
+          revoked_reason: string | null
+          status: string | null
+          updated_at: string
+          usage_stats: Json | null
+          user_id: string
+        }
+        Insert: {
+          activation_date?: string
+          active_devices?: number | null
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_revoked?: boolean | null
+          license_key: string
+          license_type?: string | null
+          max_devices?: number | null
+          order_id: string
+          product_id: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          status?: string | null
+          updated_at?: string
+          usage_stats?: Json | null
+          user_id: string
+        }
+        Update: {
+          activation_date?: string
+          active_devices?: number | null
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_revoked?: boolean | null
+          license_key?: string
+          license_type?: string | null
+          max_devices?: number | null
+          order_id?: string
+          product_id?: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          status?: string | null
+          updated_at?: string
+          usage_stats?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       products: {
         Row: {
           business_category_id: string | null
@@ -23314,6 +23478,7 @@ export type Database = {
       }
       user_notifications: {
         Row: {
+          action_id: string | null
           action_label: string | null
           action_url: string | null
           created_at: string
@@ -23326,10 +23491,12 @@ export type Database = {
           message: string
           read_at: string | null
           role_target: string[] | null
+          title: string | null
           type: string
           user_id: string
         }
         Insert: {
+          action_id?: string | null
           action_label?: string | null
           action_url?: string | null
           created_at?: string
@@ -23342,10 +23509,12 @@ export type Database = {
           message: string
           read_at?: string | null
           role_target?: string[] | null
+          title?: string | null
           type: string
           user_id: string
         }
         Update: {
+          action_id?: string | null
           action_label?: string | null
           action_url?: string | null
           created_at?: string
@@ -23358,6 +23527,7 @@ export type Database = {
           message?: string
           read_at?: string | null
           role_target?: string[] | null
+          title?: string | null
           type?: string
           user_id?: string
         }
