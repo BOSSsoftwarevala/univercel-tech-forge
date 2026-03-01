@@ -205,8 +205,8 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
               <Eye className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">CEO Dashboard</h1>
-              <p className="text-violet-400/80">Vision & Strategic Oversight • Read-Only Access</p>
+              <h1 className="text-3xl font-bold text-white">AIRA</h1>
+              <p className="text-violet-400/80">AI-Powered Strategic Oversight • Read-Only Access</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

@@ -35,7 +35,7 @@ const menuItems = [
   { id: "ai-insights", label: "AI Insights", icon: Sparkles },
   { id: "approvals", label: "Strategic Approvals", icon: CheckSquare },
   { id: "risks", label: "Risk & Compliance", icon: ShieldAlert },
-  { id: "notes", label: "CEO Notes", icon: FileText },
+  { id: "notes", label: "AIRA Notes", icon: FileText },
 ];
 
 const CEOSidebar = ({ 
@@ -128,7 +128,7 @@ const CEOSidebar = ({
           <div className="flex items-center gap-3 p-3 rounded-lg bg-violet-500/5 border border-violet-500/20">
             <Eye className="w-8 h-8 text-violet-400" />
             <div>
-              <p className="text-xs text-violet-400 font-medium">CEO Vision Mode</p>
+              <p className="text-xs text-violet-400 font-medium">AIRA Vision Mode</p>
               <p className="text-[10px] text-violet-500/60">Read • Suggest • Approve</p>
             </div>
           </div>

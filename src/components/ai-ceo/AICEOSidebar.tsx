@@ -110,7 +110,7 @@ const AICEOSidebar = ({ activeSection, collapsed, onCollapsedChange }: AICEOSide
           <div className="flex items-center gap-3 p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
             <Bot className="w-8 h-8 text-cyan-400" />
             <div>
-              <p className="text-xs text-cyan-400 font-medium">AI CEO v2.0</p>
+              <p className="text-xs text-cyan-400 font-medium">AIRA v2.0</p>
               <p className="text-[10px] text-cyan-500/60">Observer • Advisor</p>
             </div>
           </div>
