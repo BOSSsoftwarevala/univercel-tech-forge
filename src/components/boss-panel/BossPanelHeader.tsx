@@ -313,7 +313,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       </div>
 
       {/* Modals */}
-      <NotificationsModal open={showNotifications} onClose={() => { setShowNotifications(false); setUnreadCount(0); }} userId={user?.id} />
+      <NotificationsModal open={showNotifications} onClose={() => setShowNotifications(false)} userId={user?.id} onUnreadCountChange={setUnreadCount} />
       <AssistModal open={showAssist} onClose={() => setShowAssist(false)} />
       <PromiseTrackerModal open={showPromise} onClose={() => setShowPromise(false)} />
       <InternalChatModal open={showChat} onClose={() => setShowChat(false)} />

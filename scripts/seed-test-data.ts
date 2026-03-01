@@ -21,10 +21,15 @@ async function seedData() {
 
   const productId = products[0].product_id;
 
+  // Note: user_id must reference an actual auth.users entry
+  // Replace with a real user UUID before running this seed
+  const TEST_USER_ID = process.env.TEST_BOSS_USER_ID || "00000000-0000-0000-0000-000000000000";
+
   // Create test boss user role
   const { data: testBoss } = await supabase
     .from("user_roles")
     .insert({
+      user_id: TEST_USER_ID,
       role: "boss_owner",
       created_at: new Date().toISOString(),
     })

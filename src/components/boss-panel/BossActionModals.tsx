@@ -64,6 +64,7 @@ interface NotificationsModalProps {
   open: boolean;
   onClose: () => void;
   userId?: string;
+  onUnreadCountChange?: (count: number) => void;
 }
 
 interface UserNotification {
@@ -76,9 +77,14 @@ interface UserNotification {
   action_id: string | null;
 }
 
-export const NotificationsModal = ({ open, onClose, userId }: NotificationsModalProps) => {
+export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange }: NotificationsModalProps) => {
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const updateUnreadCount = (count: number) => {
+    setUnreadCount(count);
+    onUnreadCountChange?.(count);
+  };
 
   useEffect(() => {
     if (!open || !userId) return;
@@ -93,7 +99,7 @@ export const NotificationsModal = ({ open, onClose, userId }: NotificationsModal
 
       if (data) {
         setNotifications(data as UserNotification[]);
-        setUnreadCount(data.filter((n) => !n.is_read).length);
+        updateUnreadCount(data.filter((n) => !n.is_read).length);
       }
     };
 
@@ -111,7 +117,7 @@ export const NotificationsModal = ({ open, onClose, userId }: NotificationsModal
         },
         (payload) => {
           setNotifications((prev) => [payload.new as UserNotification, ...prev]);
-          setUnreadCount((prev) => prev + 1);
+          updateUnreadCount(unreadCount + 1);
         }
       )
       .subscribe();
@@ -129,7 +135,7 @@ export const NotificationsModal = ({ open, onClose, userId }: NotificationsModal
         .eq('user_id', userId)
         .eq('is_read', false);
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      setUnreadCount(0);
+      updateUnreadCount(0);
     }
     await supabase.from('audit_logs').insert({
       action: 'mark_all_notifications_read',

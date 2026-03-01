@@ -50,6 +50,7 @@ serve(async (req) => {
 
     // Verify PayU reverse hash
     // Formula: salt|status||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key
+    // The six consecutive pipes (||||||) are required by PayU's spec for empty udf fields
     const reverseHashString = `${PAYU_SALT}|${status}||||||${udf5}|${udf4}|${udf3}|${udf2}|${udf1}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${PAYU_MERCHANT_KEY}`;
     const expectedHash = await generateHash(reverseHashString);
 
