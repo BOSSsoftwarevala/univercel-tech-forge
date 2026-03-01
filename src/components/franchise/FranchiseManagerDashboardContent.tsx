@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -22,46 +23,97 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { FranchiseManagerSection } from "./FranchiseManagerSidebar";
+import { supabase } from "@/integrations/supabase/client";
 
 
 interface FranchiseManagerDashboardContentProps {
   activeSection: FranchiseManagerSection;
 }
 
-// Mock data
-const franchiseStats = {
-  totalFranchises: 12,
-  activeFranchises: 10,
-  onHold: 2,
-  totalStaff: 145,
-  totalLeads: 328,
-  totalRevenue: "₹42.5L",
-};
-
-const franchiseList = [
-  { id: 1, name: "Mumbai Central", status: "active", staff: 24, leads: 45, revenue: "₹8.5L" },
-  { id: 2, name: "Pune West", status: "active", staff: 18, leads: 32, revenue: "₹6.2L" },
-  { id: 3, name: "Ahmedabad Hub", status: "active", staff: 22, leads: 38, revenue: "₹7.1L" },
-  { id: 4, name: "Surat Branch", status: "hold", staff: 15, leads: 28, revenue: "₹4.8L" },
-  { id: 5, name: "Nashik Zone", status: "active", staff: 12, leads: 22, revenue: "₹3.9L" },
-];
-
-const recentActivity = [
-  { id: 1, action: "New lead assigned", target: "Mumbai Central", time: "5 min ago", type: "lead" },
-  { id: 2, action: "Staff onboarded", target: "Pune West", time: "1 hour ago", type: "staff" },
-  { id: 3, action: "Revenue report", target: "Weekly Summary", time: "2 hours ago", type: "report" },
-  { id: 4, action: "Approval pending", target: "Equipment Request", time: "3 hours ago", type: "approval" },
-  { id: 5, action: "Customer feedback", target: "Positive Review", time: "5 hours ago", type: "customer" },
-];
-
-const pendingApprovals = [
-  { id: 1, title: "New Equipment Purchase", franchise: "Mumbai Central", amount: "₹2.5L", priority: "high" },
-  { id: 2, title: "Staff Hiring Request", franchise: "Pune West", amount: null, priority: "medium" },
-  { id: 3, title: "Marketing Budget", franchise: "Ahmedabad Hub", amount: "₹50K", priority: "low" },
-];
-
 const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDashboardContentProps) => {
-  
+  const [franchiseStats, setFranchiseStats] = useState({
+    totalFranchises: 0,
+    activeFranchises: 0,
+    onHold: 0,
+    totalStaff: 0,
+    totalLeads: 0,
+    totalRevenue: 0,
+  });
+  const [franchiseList, setFranchiseList] = useState<Array<{ id: string | number; name: string; status: string; staff?: number; leads?: number; revenue?: number }>>([]);
+  const [recentActivity, setRecentActivity] = useState<Array<{ id: string | number; action: string; target: string; time: string; type: string }>>([]);
+  const [pendingApprovals, setPendingApprovals] = useState<Array<{ id: string | number; title: string; franchise?: string; amount?: string | null; priority: string }>>([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data: franchises, error: fError } = await supabase
+        .from('franchises')
+        .select('id, name, status');
+      if (!fError) {
+        const totalFranchises = franchises?.length || 0;
+        const activeFranchises = franchises?.filter((f: { status: string }) => f.status === 'active').length || 0;
+        const onHold = franchises?.filter((f: { status: string }) => f.status === 'on_hold').length || 0;
+        setFranchiseStats(prev => ({ ...prev, totalFranchises, activeFranchises, onHold }));
+        setFranchiseList(franchises?.map((f: { id: string; name: string; status: string }) => ({ id: f.id, name: f.name, status: f.status })) || []);
+      } else {
+        console.error('Failed to fetch franchises:', fError);
+      }
+
+      const { count: staffCount, error: staffError } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'franchise');
+      if (!staffError) {
+        setFranchiseStats(prev => ({ ...prev, totalStaff: staffCount || 0 }));
+      }
+
+      const { count: leadsCount, error: leadsError } = await supabase
+        .from('leads')
+        .select('*', { count: 'exact', head: true });
+      if (!leadsError) {
+        setFranchiseStats(prev => ({ ...prev, totalLeads: leadsCount || 0 }));
+      }
+
+      const { data: orders, error: ordersError } = await supabase
+        .from('orders')
+        .select('amount')
+        .eq('payment_status', 'success');
+      if (!ordersError) {
+        const totalRevenue = orders?.reduce((sum: number, o: { amount: number }) => sum + (o.amount || 0), 0) || 0;
+        setFranchiseStats(prev => ({ ...prev, totalRevenue }));
+      }
+
+      const { data: activity, error: activityError } = await supabase
+        .from('audit_logs')
+        .select('id, action, meta_json, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (!activityError) {
+        setRecentActivity(activity?.map((a: { id: string; action: string; meta_json?: { target?: string }; created_at: string }) => ({
+          id: a.id,
+          action: a.action,
+          target: a.meta_json?.target || '—',
+          time: new Date(a.created_at).toLocaleString(),
+          type: 'log',
+        })) || []);
+      }
+
+      const { data: approvals, error: approvalsError } = await supabase
+        .from('approvals')
+        .select('id, title, status, created_at')
+        .eq('status', 'pending')
+        .limit(5);
+      if (!approvalsError) {
+        setPendingApprovals(approvals?.map((a: { id: string; title: string }) => ({
+          id: a.id,
+          title: a.title,
+          priority: 'medium',
+        })) || []);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const handleAction = (action: string, target?: string) => {
     toast.success(`${action}${target ? ` for ${target}` : ''}`);
   };
@@ -135,7 +187,7 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold text-cyan-400">{franchiseStats.totalRevenue}</p>
+                <p className="text-2xl font-bold text-cyan-400">₹{(franchiseStats.totalRevenue / 100000).toFixed(1)}L</p>
               </div>
               <DollarSign className="w-8 h-8 text-cyan-400/30" />
             </div>

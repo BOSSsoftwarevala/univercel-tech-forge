@@ -18,23 +18,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-// Mock KPI data
-const kpiData = {
-  revenue: { value: "$4.2M", change: "+12.5%", trend: "up" },
-  users: { value: "156K", change: "+8.2%", trend: "up" },
-  retention: { value: "94.2%", change: "+2.1%", trend: "up" },
-  satisfaction: { value: "4.8/5", change: "+0.3", trend: "up" },
-};
-
-// Regional performance
-const regionalPerformance = [
-  { region: "Asia Pacific", revenue: 1250000, growth: 18.5, status: "excellent" },
-  { region: "Europe", revenue: 980000, growth: 12.3, status: "good" },
-  { region: "Americas", revenue: 1450000, growth: 8.7, status: "good" },
-  { region: "Middle East", revenue: 320000, growth: -2.1, status: "attention" },
-  { region: "Africa", revenue: 180000, growth: 25.4, status: "excellent" },
-];
-
 // AI suggestions
 const aiSuggestions = [
   {
@@ -99,6 +82,64 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const [noteText, setNoteText] = useState("");
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const { user } = useAuth();
+
+  const [revenue, setRevenue] = useState(0);
+  const [users, setUsers] = useState(0);
+  const [retention, setRetention] = useState<number | string>(0);
+  const [regionalPerformance, setRegionalPerformance] = useState<Array<{ region: string; revenue: number; growth: number; status: string }>>([]);
+
+  useEffect(() => {
+    const fetchRevenue = async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('amount')
+        .eq('payment_status', 'success');
+      if (error) { console.error('Failed to fetch revenue:', error); return; }
+      setRevenue(data?.reduce((sum: number, order: { amount: number }) => sum + (order.amount || 0), 0) || 0);
+    };
+
+    const fetchUsers = async () => {
+      const { count, error } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: true });
+      if (error) { console.error('Failed to fetch users:', error); return; }
+      const userCount = count || 0;
+      setUsers(userCount);
+
+      const { data: activityData, error: activityError } = await supabase
+        .from('user_activity')
+        .select('user_id')
+        .gt('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+      if (!activityError) {
+        const activeUsers = new Set(activityData?.map((a: { user_id: string }) => a.user_id)).size;
+        setRetention(userCount > 0 ? ((activeUsers / userCount) * 100).toFixed(1) : 0);
+      }
+    };
+
+    const fetchRegional = async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('region, amount')
+        .eq('payment_status', 'success');
+      if (error) { console.error('Failed to fetch regional data:', error); setRegionalPerformance([]); return; }
+      const grouped: Array<{ region: string; revenue: number; growth: number; status: string }> =
+        (data || []).reduce((acc: Array<{ region: string; revenue: number; growth: number; status: string }>, order: { region: string; amount: number }) => {
+          if (!order.region) return acc;
+          const existing = acc.find(r => r.region === order.region);
+          if (existing) {
+            existing.revenue += order.amount || 0;
+          } else {
+            acc.push({ region: order.region, revenue: order.amount || 0, growth: 0, status: 'good' });
+          }
+          return acc;
+        }, []);
+      setRegionalPerformance(grouped);
+    };
+
+    fetchRevenue();
+    fetchUsers();
+    fetchRegional();
+  }, []);
   
   // Map sidebar navigation to internal tabs
   const getTabFromNav = (nav?: string): string => {
@@ -249,10 +290,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Revenue", ...kpiData.revenue, icon: DollarSign, color: "emerald" },
-          { label: "Active Users", ...kpiData.users, icon: Users, color: "blue" },
-          { label: "Retention Rate", ...kpiData.retention, icon: Target, color: "violet" },
-          { label: "Satisfaction", ...kpiData.satisfaction, icon: Star, color: "amber" },
+          { label: "Total Revenue", value: `$${(revenue / 1000000).toFixed(2)}M`, trend: "up" as const, icon: DollarSign, color: "emerald" },
+          { label: "Active Users", value: users.toLocaleString(), trend: "up" as const, icon: Users, color: "blue" },
+          { label: "Retention Rate", value: `${retention}%`, trend: "up" as const, icon: Target, color: "violet" },
+          { label: "Satisfaction", value: "—", trend: "up" as const, icon: Star, color: "amber" },
         ].map((kpi, i) => (
           <Card key={i} className="bg-slate-900/50 border-slate-700/50 backdrop-blur-xl">
             <CardContent className="p-4">
@@ -260,9 +301,6 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 <div>
                   <p className="text-xs text-slate-400 uppercase tracking-wider">{kpi.label}</p>
                   <p className="text-2xl font-bold text-white mt-1">{kpi.value}</p>
-                  <p className={`text-sm mt-1 ${kpi.trend === "up" ? "text-emerald-400" : "text-red-400"}`}>
-                    {kpi.change}
-                  </p>
                 </div>
                 <div className={`w-12 h-12 rounded-xl bg-${kpi.color}-500/20 flex items-center justify-center`}>
                   <kpi.icon className={`w-6 h-6 text-${kpi.color}-400`} />
@@ -309,8 +347,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                   <div className="text-center">
                     <BarChart3 className="w-12 h-12 text-violet-400/50 mx-auto mb-2" />
                     <p className="text-slate-400">Revenue Chart</p>
-                    <p className="text-2xl font-bold text-white mt-2">$4.2M MTD</p>
-                    <p className="text-sm text-emerald-400">+12.5% vs last month</p>
+                    <p className="text-2xl font-bold text-white mt-2">${(revenue / 1000000).toFixed(2)}M MTD</p>
                   </div>
                 </div>
               </CardContent>
@@ -355,7 +392,9 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {regionalPerformance.map((region, i) => (
+                {regionalPerformance.length === 0 ? (
+                  <p className="text-slate-400 col-span-5 text-center py-4">No regional data available</p>
+                ) : regionalPerformance.map((region, i) => (
                   <div key={i} className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/30">
                     <h4 className="text-sm font-medium text-white">{region.region}</h4>
                     <p className="text-2xl font-bold text-white mt-2">
