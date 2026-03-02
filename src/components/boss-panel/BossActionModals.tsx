@@ -149,10 +149,10 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
     toast.success('All notifications marked as read');
   };
 
-  const getNotifType = (type: string | null) => {
-    if (type === 'order_created') return 'info';
-    if (type === 'critical') return 'critical';
-    if (type === 'warning') return 'warning';
+  const getNotifType = (notificationType: string | null) => {
+    if (notificationType === 'order_created') return 'info';
+    if (notificationType === 'critical') return 'critical';
+    if (notificationType === 'warning') return 'warning';
     return 'info';
   };
 
@@ -199,7 +199,7 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
                     )}>
                       {notif.title || notif.type}
                     </p>
-                    <span className="text-xs text-slate-500">{new Date(notif.created_at).toLocaleTimeString()}</span>
+                    <span className="text-xs text-slate-500">{new Date(notif.created_at).toLocaleString()}</span>
                   </div>
                   <p className="text-sm text-slate-400 mt-1">{notif.message}</p>
                 </div>

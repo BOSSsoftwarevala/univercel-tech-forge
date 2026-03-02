@@ -87,7 +87,11 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           table: 'user_notifications',
           filter: `user_id=eq.${user.id}`,
         },
-        () => setUnreadCount((prev) => prev + 1)
+        (payload) => {
+          if (payload.new && (payload.new as { is_read: boolean }).is_read === false) {
+            setUnreadCount((prev) => prev + 1);
+          }
+        }
       )
       .subscribe();
 
