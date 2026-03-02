@@ -186,6 +186,9 @@ const SchoolSoftwareDashboard = lazyLoad(() => import("./pages/school-software/S
 // Settings
 const SettingsPage = lazyLoad(() => import("./pages/Settings"));
 
+// What Is Happening
+const WhatIsHappening = lazyLoad(() => import("./pages/WhatIsHappening"));
+
 // Super Admin
 const SuperAdminCommandCenter = lazyLoad(() => import("./pages/super-admin/CommandCenter"));
 const LiveTracking = lazyLoad(() => import("./pages/super-admin/LiveTracking"));
@@ -558,6 +561,7 @@ const App = memo(() => (
                             <Route path="/super-admin/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
                             <Route path="/super-admin/command-center" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
                             <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><LiveTracking /></RequireRole>} />
+                            <Route path="/what-is-happening" element={<RequireRole allowed={["boss_owner", "master", "ceo", "super_admin", "admin"]}><WhatIsHappening /></RequireRole>} />
                             <Route path="/super-admin/role-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><RoleManager /></RequireRole>} />
                             <Route path="/super-admin/user-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><UserManager /></RequireRole>} />
                             <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><PermissionMatrix /></RequireRole>} />
