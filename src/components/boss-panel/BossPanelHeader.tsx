@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Bell, 
@@ -59,8 +59,46 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const [showChat, setShowChat] = useState(false);
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCurrency, setShowCurrency] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchUnreadCount = async () => {
+      const { count } = await supabase
+        .from('user_notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      setUnreadCount(count ?? 0);
+    };
+
+    fetchUnreadCount();
+
+    const channel = supabase
+      .channel(`header-notifications:${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'user_notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.new && (payload.new as { is_read: boolean }).is_read === false) {
+            setUnreadCount((prev) => prev + 1);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   const handleEmergencyLock = async () => {
     setIsLocking(true);
@@ -171,9 +209,11 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           className="relative hover:bg-white/20 w-10 h-10"
         >
           <Bell className="w-5 h-5 text-white" />
-          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold bg-red-500 text-white rounded-full">
-            3
-          </span>
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold bg-red-500 text-white rounded-full">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </Button>
 
         {/* Language */}
@@ -277,7 +317,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       </div>
 
       {/* Modals */}
-      <NotificationsModal open={showNotifications} onClose={() => setShowNotifications(false)} />
+      <NotificationsModal open={showNotifications} onClose={() => setShowNotifications(false)} userId={user?.id} onUnreadCountChange={setUnreadCount} />
       <AssistModal open={showAssist} onClose={() => setShowAssist(false)} />
       <PromiseTrackerModal open={showPromise} onClose={() => setShowPromise(false)} />
       <InternalChatModal open={showChat} onClose={() => setShowChat(false)} />
