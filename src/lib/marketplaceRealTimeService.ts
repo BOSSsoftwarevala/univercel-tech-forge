@@ -1,27 +1,29 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '@/integrations/supabase/client';
 
 // Subscribe to order notifications
 export const subscribeToOrders = () => {
-    return supabase
-        .from('orders')
-        .on('INSERT', payload => {
-            console.log('New order!', payload);
-            // Handle the new order
-        })
-        .subscribe();
+  return supabase
+    .channel('marketplace-orders')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'orders' },
+      (payload) => {
+        console.log('New order!', payload);
+      }
+    )
+    .subscribe();
 };
 
 // Subscribe to notifications
 export const subscribeToNotifications = () => {
-    return supabase
-        .from('notifications')
-        .on('INSERT', payload => {
-            console.log('New notification!', payload);
-            // Handle the new notification
-        })
-        .subscribe();
+  return supabase
+    .channel('marketplace-notifications')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'notifications' },
+      (payload) => {
+        console.log('New notification!', payload);
+      }
+    )
+    .subscribe();
 };
