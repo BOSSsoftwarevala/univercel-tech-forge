@@ -35,6 +35,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { GlobalNetworkMap } from './GlobalNetworkMap';
+import { useBossDashboard } from '@/hooks/boss-panel/useBossDashboard';
+import { useBossActivityStream } from '@/hooks/boss-panel/useBossActivityStream';
 
 // Summary cards with modern styling
 const summaryCards = [
@@ -85,14 +87,6 @@ const incomeData = [
   { name: 'Expense', value: 1000, color: '#F97316' },
 ];
 
-const appointments = [
-  { name: 'Ronda Rousy', time: '10 am', duration: '30 Mins', avatar: 'RR' },
-  { name: 'Redona Charles', time: '11:30 am', duration: '45 Mins', avatar: 'RC' },
-  { name: 'Jia Nick', time: '12:15 pm', duration: '15 Mins', avatar: 'JN' },
-  { name: 'Wales James', time: '12:40 pm', duration: '20 Mins', avatar: 'WJ' },
-  { name: 'Maria Lucy', time: '12:40 pm', duration: '20 Mins', avatar: 'ML' },
-];
-
 const scheduleData = [
   { title: 'Aspirus Hospital', time: '8:00am - 10:00am', color: 'bg-emerald-500' },
   { title: 'Ron sesame st', time: '2:00pm - 4:00pm', color: 'bg-orange-500' },
@@ -100,6 +94,9 @@ const scheduleData = [
 ];
 
 export function BossDashboard() {
+  const { summary, isLoading } = useBossDashboard();
+  const { activities, isLoading: activitiesLoading } = useBossActivityStream();
+
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-full">
       {/* Header */}
@@ -150,8 +147,10 @@ export function BossDashboard() {
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">560</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">New Users</p>
+                  <p className="text-xl font-bold text-slate-900 dark:text-white">
+                    {isLoading ? '—' : (summary?.totalSuperAdmins ?? 0)}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Super Admins</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-gradient-to-r from-orange-500/10 to-amber-400/5 dark:from-orange-500/20 dark:to-amber-400/10 px-4 py-3 rounded-2xl">
@@ -159,8 +158,10 @@ export function BossDashboard() {
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">300</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Active</p>
+                  <p className="text-xl font-bold text-slate-900 dark:text-white">
+                    {isLoading ? '—' : (summary?.activeContinents ?? 0)}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Active Continents</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-gradient-to-r from-purple-500/10 to-pink-400/5 dark:from-purple-500/20 dark:to-pink-400/10 px-4 py-3 rounded-2xl">
@@ -168,8 +169,10 @@ export function BossDashboard() {
                   <CheckCircle2 className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">200</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Completed</p>
+                  <p className="text-xl font-bold text-slate-900 dark:text-white">
+                    {isLoading ? '—' : (summary?.countriesLive ?? 0)}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Countries Live</p>
                 </div>
               </div>
             </div>
@@ -399,7 +402,6 @@ export function BossDashboard() {
             </div>
           </motion.div>
 
-          {/* Appointments */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -412,9 +414,11 @@ export function BossDashboard() {
             </div>
             
             <div className="space-y-3">
-              {appointments.map((apt, i) => (
+              {activitiesLoading ? (
+                <p className="text-sm text-slate-500 dark:text-slate-400">Loading activities...</p>
+              ) : activities.slice(0, 5).map((activity, i) => (
                 <motion.div
-                  key={i}
+                  key={activity.log_id}
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.05 }}
@@ -423,19 +427,28 @@ export function BossDashboard() {
                   <div className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                       <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xs">
-                        {apt.avatar}
+                        {(activity.actor_role?.slice(0, 2) || '??').toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">{apt.name}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{apt.time} · {apt.duration}</p>
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">{activity.action_type}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {activity.actor_role} · {activity.timestamp ? new Date(activity.timestamp).toLocaleTimeString() : 'Unknown time'}
+                      </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-violet-500 text-xs">
-                    History
-                  </Button>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    activity.risk_level === 'high' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                    activity.risk_level === 'medium' ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
+                    'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                  }`}>
+                    {activity.risk_level}
+                  </span>
                 </motion.div>
               ))}
+              {!activitiesLoading && activities.length === 0 && (
+                <p className="text-sm text-slate-500 dark:text-slate-400">No recent activity</p>
+              )}
             </div>
           </motion.div>
         </div>
