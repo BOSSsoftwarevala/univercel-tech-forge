@@ -1,3 +1,6 @@
+-- V135__create_notifications_table.sql
+-- Mirrors supabase/migrations/20260301000000_notifications_table.sql
+
 -- Create notifications table for real-time notification system
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

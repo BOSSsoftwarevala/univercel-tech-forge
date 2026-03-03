@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
 import { marketplaceService, type MarketplaceProduct } from '@/services/marketplaceService';
 
 interface Product {
@@ -69,6 +70,25 @@ export function MMMarketplaceScreen() {
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (error) {
+        console.error('Failed to load wallet balance:', error);
+        return;
+      }
+      if (data?.balance != null) setWalletBalance(data.balance);
+    };
+    fetchWallet();
+  }, []);
 
   useEffect(() => {
     marketplaceService
@@ -93,8 +113,6 @@ export function MMMarketplaceScreen() {
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  const walletBalance = 45230; // Would come from state/API
 
   return (
     <div className="p-6 space-y-6">
