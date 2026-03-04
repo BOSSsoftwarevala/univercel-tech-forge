@@ -94,6 +94,8 @@ const CEODashboard = lazyWithRetry(() => import("./CEODashboard"));
 const CEOSidebar = lazyWithRetry(() => import("@/components/ceo/CEOSidebar"));
 const BossOwnerDashboard = lazyWithRetry(() => import("./BossOwnerDashboard"));
 const DeveloperManagementDashboard = lazyWithRetry(() => import("./DeveloperManagementDashboard"));
+const FranchiseDashboardEmbed = lazyWithRetry(() => import("@/pages/franchise/Dashboard"));
+const ResellerDashboardEmbed = lazyWithRetry(() => import("@/pages/ResellerDashboard"));
 
 // Define which roles can switch to which views
 const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
@@ -468,10 +470,14 @@ const RoleSwitchDashboard = () => {
           return <ServerManagerView activeNav={activeNav} />;
         case "franchise_manager":
           return <FranchiseManagerView />;
+        case "franchise_dashboard":
+          return <FranchiseDashboardEmbed />;
         case "sales_support_manager":
           return <SalesSupportManagerView />;
         case "reseller_manager":
           return <ResellerManagerFullView onBack={() => setActiveRole("boss_owner")} />;
+        case "reseller_dashboard":
+          return <ResellerDashboardEmbed />;
         case "lead_manager":
           return <LMFullLayout />;
         case "pro_manager":
