@@ -1,10 +1,10 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
+import ProductManagerDashboard from "@/components/product-manager/ProductManagerDashboard";
 
 const ProductManagerPage = () => {
   return (
     <DashboardLayout roleOverride={"boss_owner" as any}>
-      <PMEnterpriseLayout viewOnly={false} />
+      <ProductManagerDashboard viewOnly={false} />
     </DashboardLayout>
   );
 };
