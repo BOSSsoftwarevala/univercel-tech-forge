@@ -93,6 +93,8 @@ export type ActiveRole =
   | "developer_dashboard"
   | "pro_user_dashboard"
   | "basic_user_dashboard"
+  | "reseller_dashboard"
+  | "franchise_dashboard"
   | "home"
   | "security"
   | "settings";
@@ -356,6 +358,20 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     shortLabel: "BU",
     icon: Users,
     description: "Basic User Features",
+  },
+  reseller_dashboard: {
+    id: "reseller_dashboard",
+    label: "Reseller Dashboard",
+    shortLabel: "RDSH",
+    icon: Handshake,
+    description: "Direct reseller dashboard access",
+  },
+  franchise_dashboard: {
+    id: "franchise_dashboard",
+    label: "Franchise Dashboard",
+    shortLabel: "FDSH",
+    icon: Building2,
+    description: "Direct franchise dashboard access",
   },
   home: {
     id: "home",
