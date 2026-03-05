@@ -125,8 +125,8 @@ export function BossMarketplaceAdmin() {
     if (!newProduct.product_name.trim()) { toast.error('Product name required'); return; }
     const monthlyVal = newProduct.monthly_price ? parseFloat(newProduct.monthly_price) : null;
     const lifetimeVal = newProduct.lifetime_price ? parseFloat(newProduct.lifetime_price) : null;
-    if (monthlyVal !== null && monthlyVal <= 0) { toast.error('Monthly price must be positive'); return; }
-    if (lifetimeVal !== null && lifetimeVal <= 0) { toast.error('Lifetime price must be positive'); return; }
+    if (monthlyVal !== null && (isNaN(monthlyVal) || monthlyVal <= 0)) { toast.error('Monthly price must be a positive number'); return; }
+    if (lifetimeVal !== null && (isNaN(lifetimeVal) || lifetimeVal <= 0)) { toast.error('Lifetime price must be a positive number'); return; }
     const features = newProduct.features_csv ? newProduct.features_csv.split(',').map(f => f.trim()).filter(Boolean) : [];
     const { error } = await supabase.from('products').insert({
       product_name: newProduct.product_name,
@@ -155,12 +155,12 @@ export function BossMarketplaceAdmin() {
   }
 
   async function deleteProduct(id: string) {
-    const { data: deps } = await (supabase as any)
+    const { data: existingOrders } = await (supabase as any)
       .from('marketplace_order_items')
       .select('order_item_id')
       .eq('product_id', id)
       .limit(1);
-    if (deps && deps.length > 0) {
+    if (existingOrders && existingOrders.length > 0) {
       toast.error('Cannot delete: product has existing orders');
       return;
     }

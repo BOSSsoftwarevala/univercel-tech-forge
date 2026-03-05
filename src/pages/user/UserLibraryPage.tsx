@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Package, ExternalLink, Calendar, Key, Loader2, Store } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface LibraryItem {
   order_item_id: string;
