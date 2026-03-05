@@ -93,12 +93,19 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "AI service temporarily unavailable" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
     }
     return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" }, });
-  } catch (error) {
+  } catch (error: unknown) {
     clearTimeout(timeoutId);
-    if (error.name === "AbortError") {
+
+    const isAbortError =
+      (error instanceof DOMException && error.name === "AbortError") ||
+      (error instanceof Error && error.name === "AbortError");
+
+    if (isAbortError) {
       return new Response(JSON.stringify({ error: "Request timeout: AI response took too long" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
     }
+
     console.error("Vala AI chat error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error occurred" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    return new Response(JSON.stringify({ error: errorMessage }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
   }
 });

@@ -1,18 +1,23 @@
-// Complete implementation for the marketplace screen
 import React from 'react';
-import { View, Text, Button } from 'react-native';
 
-const MMMarketplaceScreen = () => {
-    return (
-        <View>
-            <Text>Marketplace</Text>
-            {/* Product Cards will be rendered here */}
-            {/* Filters will be rendered here */}
-            <Button title="Demo" onPress={() => {/* Demo button action */}} />
-            <Button title="Buy Now" onPress={() => {/* Buy now button action */}} />
-            {/* Order dialog will be implemented here */}
-        </View>
-    );
-};
+export function MMMarketplaceScreen() {
+  return (
+    <section className="p-6 space-y-4">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold text-foreground">Marketplace</h1>
+        <p className="text-sm text-muted-foreground">Browse products, try demos, and place orders.</p>
+      </header>
+
+      <div className="flex flex-wrap gap-3">
+        <button type="button" className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground border border-border">
+          Demo
+        </button>
+        <button type="button" className="px-4 py-2 rounded-md bg-primary text-primary-foreground">
+          Buy Now
+        </button>
+      </div>
+    </section>
+  );
+}
 
 export default MMMarketplaceScreen;
