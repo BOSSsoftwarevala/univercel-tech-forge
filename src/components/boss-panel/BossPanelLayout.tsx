@@ -19,6 +19,7 @@ export type BossPanelSection =
   | 'vala-ai'
   | 'reseller-dashboard'
   | 'franchise-dashboard'
+  | 'marketplace-manager'
   | 'aira'
   | 'settings';
 
