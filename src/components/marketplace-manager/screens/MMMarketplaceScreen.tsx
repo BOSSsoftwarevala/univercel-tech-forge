@@ -1,83 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, ToastAndroid, StyleSheet } from 'react-native';
+import React from 'react';
+import { useState, useEffect } from 'react';
+import './MMMarketplaceScreen.css'; // Assuming you have some styles
 
-// Mock data for fallback
-const mockData = [
-    { id: '1', name: 'Product 1', price: 100 },
-    { id: '2', name: 'Product 2', price: 200 },
-    { id: '3', name: 'Product 3', price: 300 },
+const placeholderProducts = [
+    { id: 1, name: 'Demo Product 1', price: '$10', image: 'path/to/image1.jpg' },
+    { id: 2, name: 'Demo Product 2', price: '$15', image: 'path/to/image2.jpg' },
+    // Add more mock data as needed
 ];
 
-const MMMarketplaceScreen = () => {
+export const MMMarketplaceScreen = () => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        // Simulate fetching data from the database
-        const fetchData = async () => {
+        const fetchProducts = async () => {
             try {
-                // Replace with actual database call
-                const response = await fetch('https://api.example.com/products');
+                const response = await fetch('https://api.example.com/products'); // Replace with your API endpoint
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 setProducts(data);
             } catch (error) {
-                console.error(error); // Normally handle the error properly
-                // Fallback to mock data
-                setProducts(mockData);
+                console.error('Fetch error:', error);
+                // Fallback to the mock data
+                setProducts(placeholderProducts);
             }
         };
-
-        fetchData();
+        fetchProducts();
     }, []);
 
-    const handleDemoClick = (productName) => {
-        ToastAndroid.show(`Demo for ${productName} clicked!`, ToastAndroid.SHORT);
-    };
-
-    const handleBuyClick = (productName) => {
-        ToastAndroid.show(`Buying ${productName}!`, ToastAndroid.SHORT);
-    };
-
-    const renderItem = ({ item }) => {
-        const discountedPrice = (item.price * 0.7).toFixed(2); // 30% discount
-        return (
-            <View style={styles.productContainer}>
-                <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.productPrice}>Price: ${discountedPrice}</Text>
-                <Button title="Demo" onPress={() => handleDemoClick(item.name)} />
-                <Button title="Buy" onPress={() => handleBuyClick(item.name)} />
-            </View>
-        );
-    };
-
     return (
-        <FlatList
-            data={products}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.container}
-        />
+        <div className='marketplace'>
+            <h1>Marketplace</h1>
+            <div className='product-grid'>
+                {products.map(product => (
+                    <div key={product.id} className='product-card'>
+                        <img src={product.image} alt={product.name} />
+                        <h2>{product.name}</h2>
+                        <p>{product.price}</p>
+                        <button onClick={() => alert('Demo clicked for ' + product.name)}>Demo</button>
+                        <button onClick={() => alert('Buy clicked for ' + product.name)}>Buy</button>
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        padding: 20,
-    },
-    productContainer: {
-        marginBottom: 20,
-        padding: 15,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
-    },
-    productName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    productPrice: {
-        fontSize: 16,
-        color: '#555',
-    },
-});
-
-export default MMMarketplaceScreen;
