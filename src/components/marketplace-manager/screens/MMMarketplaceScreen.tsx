@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,10 +13,19 @@ import {
   Sparkles,
   Tag,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Heart,
+  Bell,
+  BellOff,
+  Play,
+  Loader2
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { marketplaceService } from '@/services/marketplaceService';
 
 interface Product {
   id: string;
@@ -31,6 +40,7 @@ interface Product {
   rating: number;
   reviews: number;
   popular: boolean;
+  demoUrl?: string;
 }
 
 const categories = [
@@ -55,7 +65,8 @@ const products: Product[] = [
     franchisePrice: 35000,
     rating: 4.8,
     reviews: 124,
-    popular: true
+    popular: true,
+    demoUrl: 'https://demo.softwarewala.net/crm-pro',
   },
   {
     id: '2',
@@ -69,7 +80,8 @@ const products: Product[] = [
     franchisePrice: 52500,
     rating: 4.6,
     reviews: 89,
-    popular: true
+    popular: true,
+    demoUrl: 'https://demo.softwarewala.net/hrm-enterprise',
   },
   {
     id: '3',
@@ -83,7 +95,8 @@ const products: Product[] = [
     franchisePrice: 28000,
     rating: 4.9,
     reviews: 203,
-    popular: true
+    popular: true,
+    demoUrl: 'https://demo.softwarewala.net/eshop-builder',
   },
   {
     id: '4',
@@ -97,7 +110,8 @@ const products: Product[] = [
     franchisePrice: 24500,
     rating: 4.7,
     reviews: 156,
-    popular: false
+    popular: false,
+    demoUrl: 'https://demo.softwarewala.net/marketing-autopilot',
   },
   {
     id: '5',
@@ -111,7 +125,8 @@ const products: Product[] = [
     franchisePrice: 84000,
     rating: 4.5,
     reviews: 67,
-    popular: false
+    popular: false,
+    demoUrl: 'https://demo.softwarewala.net/erp-complete',
   },
   {
     id: '6',
@@ -125,15 +140,147 @@ const products: Product[] = [
     franchisePrice: 17500,
     rating: 4.8,
     reviews: 178,
-    popular: true
+    popular: true,
+    demoUrl: 'https://demo.softwarewala.net/lead-magnet-pro',
   },
 ];
 
 export function MMMarketplaceScreen() {
+  const { user, userRole } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderRequirements, setOrderRequirements] = useState('');
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [notifications, setNotifications] = useState<Set<string>>(new Set());
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [franchiseId, setFranchiseId] = useState<string | null>(null);
+
+  const fetchWalletData = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data: franchise } = await supabase
+        .from('franchise_accounts')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (franchise) {
+        setFranchiseId(franchise.id);
+
+        const { data: ledger } = await supabase
+          .from('franchise_wallet_ledger')
+          .select('balance_after')
+          .eq('franchise_id', franchise.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (ledger) {
+          setWalletBalance(ledger.balance_after);
+        }
+      }
+    } catch {
+      // Keep default balance if fetch fails
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchWalletData();
+  }, [fetchWalletData]);
+
+  const handleConfirmOrder = async () => {
+    if (!user || !franchiseId) {
+      toast.error('Authentication required. Please log in again.');
+      return;
+    }
+    if (!selectedProduct) return;
+
+    if (walletBalance < selectedProduct.franchisePrice) {
+      const shortfall = selectedProduct.franchisePrice - walletBalance;
+      toast.error(`Insufficient balance. Please add ₹${shortfall.toLocaleString()} to proceed.`);
+      return;
+    }
+
+    setIsPlacingOrder(true);
+    try {
+      const result = await marketplaceService.placeOrder({
+        productId: selectedProduct.id,
+        productName: selectedProduct.name,
+        franchiseId,
+        userId: user.id,
+        userRole: userRole || 'franchise',
+        amount: selectedProduct.franchisePrice,
+        baseAmount: selectedProduct.basePrice,
+        discountPercent: selectedProduct.franchiseDiscount,
+        currentWalletBalance: walletBalance,
+        requirements: orderRequirements,
+      });
+
+      if (!result.success) {
+        toast.error(result.error || 'Failed to place order. Please try again.');
+        return;
+      }
+
+      setWalletBalance(prev => prev - selectedProduct.franchisePrice);
+      setShowOrderDialog(false);
+      setOrderRequirements('');
+      toast.success(
+        `Order placed successfully! ${result.orderNumber} — ₹${selectedProduct.franchisePrice.toLocaleString()} deducted from wallet.`
+      );
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to place order. Please try again.');
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  };
+
+  const handleToggleFavorite = (productId: string, productName: string) => {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      if (next.has(productId)) {
+        next.delete(productId);
+        toast.info(`${productName} removed from wishlist.`);
+      } else {
+        next.add(productId);
+        toast.success(`${productName} added to wishlist!`);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleNotify = (productId: string, productName: string) => {
+    setNotifications(prev => {
+      const next = new Set(prev);
+      if (next.has(productId)) {
+        next.delete(productId);
+        toast.info(`Unsubscribed from updates for ${productName}.`);
+      } else {
+        next.add(productId);
+        toast.success(`You'll be notified about updates for ${productName}!`);
+      }
+      return next;
+    });
+  };
+
+  const handleOpenDemo = (product: Product) => {
+    if (product.demoUrl) {
+      try {
+        const url = new URL(product.demoUrl);
+        if (url.protocol === 'https:' || url.protocol === 'http:') {
+          window.open(url.toString(), '_blank', 'noopener,noreferrer');
+        } else {
+          toast.error('Invalid demo URL.');
+        }
+      } catch {
+        toast.error('Invalid demo URL.');
+      }
+    } else {
+      toast.info(`Demo for ${product.name} is coming soon.`);
+    }
+  };
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
@@ -141,8 +288,6 @@ export function MMMarketplaceScreen() {
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  const walletBalance = 45230; // Would come from state/API
 
   return (
     <div className="p-6 space-y-6">
@@ -207,12 +352,14 @@ export function MMMarketplaceScreen() {
                   <CardTitle className="text-lg">{product.name}</CardTitle>
                   <p className="text-xs text-slate-400 mt-1">{product.subCategory}</p>
                 </div>
-                {product.popular && (
-                  <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    Popular
-                  </Badge>
-                )}
+                <div className="flex items-center gap-1">
+                  {product.popular && (
+                    <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Popular
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -258,6 +405,43 @@ export function MMMarketplaceScreen() {
 
               {/* Actions */}
               <div className="flex gap-2">
+                {/* Demo Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-slate-600 text-blue-400 hover:text-blue-300"
+                  onClick={() => handleOpenDemo(product)}
+                  title="Open Demo"
+                >
+                  <Play className="h-4 w-4" />
+                </Button>
+
+                {/* Favorites Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`border-slate-600 ${favorites.has(product.id) ? 'text-pink-400' : 'text-slate-400 hover:text-pink-400'}`}
+                  onClick={() => handleToggleFavorite(product.id, product.name)}
+                  title={favorites.has(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  <Heart className={`h-4 w-4 ${favorites.has(product.id) ? 'fill-pink-400' : ''}`} />
+                </Button>
+
+                {/* Notify Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`border-slate-600 ${notifications.has(product.id) ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`}
+                  onClick={() => handleToggleNotify(product.id, product.name)}
+                  title={notifications.has(product.id) ? 'Unsubscribe from Updates' : 'Subscribe to Updates'}
+                >
+                  {notifications.has(product.id) ? (
+                    <Bell className="h-4 w-4 fill-amber-400" />
+                  ) : (
+                    <BellOff className="h-4 w-4" />
+                  )}
+                </Button>
+
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button 
@@ -295,11 +479,22 @@ export function MMMarketplaceScreen() {
                           </span>
                         </div>
                       </div>
+                      <Button
+                        variant="outline"
+                        className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                        onClick={() => handleOpenDemo(product)}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Open Live Demo
+                      </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
                 
-                <Dialog open={showOrderDialog && selectedProduct?.id === product.id} onOpenChange={setShowOrderDialog}>
+                <Dialog open={showOrderDialog && selectedProduct?.id === product.id} onOpenChange={(open) => {
+                  setShowOrderDialog(open);
+                  if (!open) setOrderRequirements('');
+                }}>
                   <DialogTrigger asChild>
                     <Button 
                       size="sm" 
@@ -371,6 +566,8 @@ export function MMMarketplaceScreen() {
                         <Textarea 
                           placeholder="Any specific requirements or customizations..."
                           className="bg-slate-800 border-slate-700"
+                          value={orderRequirements}
+                          onChange={(e) => setOrderRequirements(e.target.value)}
                         />
                       </div>
 
@@ -384,10 +581,20 @@ export function MMMarketplaceScreen() {
 
                       <Button 
                         className="w-full bg-purple-500 hover:bg-purple-600"
-                        disabled={walletBalance < product.franchisePrice}
+                        disabled={walletBalance < product.franchisePrice || isPlacingOrder}
+                        onClick={handleConfirmOrder}
                       >
-                        Confirm Order
-                        <ArrowRight className="h-4 w-4 ml-2" />
+                        {isPlacingOrder ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Placing Order...
+                          </>
+                        ) : (
+                          <>
+                            Confirm Order
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </DialogContent>
