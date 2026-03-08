@@ -37,7 +37,19 @@ const CONTENT_IDEAS = [
   { title: "The Future of White-Label Software Markets", type: "Whitepaper", score: 82 },
 ];
 
-const AIRAMarketing = () => {
+const COMPETITORS = [
+  { name: "Envato Market", strength: "Large marketplace", weakness: "No AI integration", threat: "medium", share: 28 },
+  { name: "AppSumo", strength: "Deal-driven audience", weakness: "One-time deals only", threat: "low", share: 15 },
+  { name: "Gumroad", strength: "Creator-friendly", weakness: "No enterprise features", threat: "low", share: 12 },
+  { name: "FastSpring", strength: "Enterprise billing", weakness: "No marketplace", threat: "high", share: 22 },
+];
+
+const CAMPAIGNS = [
+  { id: "1", name: "Q1 Enterprise Push", status: "active", budget: "₹5,00,000", spent: 62, leads: 340, roi: "+180%" },
+  { id: "2", name: "Developer Outreach", status: "active", budget: "₹2,00,000", spent: 45, leads: 180, roi: "+120%" },
+  { id: "3", name: "Reseller Recruitment", status: "planned", budget: "₹3,50,000", spent: 0, leads: 0, roi: "—" },
+  { id: "4", name: "Product Launch — AI Suite", status: "completed", budget: "₹4,00,000", spent: 100, leads: 520, roi: "+240%" },
+];
   const impactStyle = (i: string) => {
     if (i === "high") return "bg-red-500/20 text-red-400 border-red-500/30";
     if (i === "medium") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
