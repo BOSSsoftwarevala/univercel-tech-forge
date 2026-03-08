@@ -11,7 +11,9 @@ import {
   MessageSquare,
   ListChecks,
   Globe,
-  Banknote
+  Banknote,
+  Search,
+  HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,12 +46,23 @@ import {
   CurrencyModal,
 } from './BossActionModals';
 
+// ─── SAP SHELL BAR COLOR TOKENS ───────────────────────────────
+const SHELL = {
+  bg: 'hsl(214, 32%, 20%)',        // SAP Shell dark
+  bgHover: 'hsl(214, 32%, 26%)',
+  text: 'hsl(0, 0%, 100%)',
+  textMuted: 'hsl(214, 20%, 70%)',
+  separator: 'hsl(214, 25%, 30%)',
+  brand: 'hsl(210, 100%, 46%)',    // SAP Blue
+  badge: 'hsl(0, 78%, 55%)',       // SAP Negative
+  positive: 'hsl(145, 63%, 42%)',
+};
+
 interface BossPanelHeaderProps {
   streamingOn: boolean;
   onStreamingToggle: () => void;
 }
 
-// BRAND THEME: Dark header with blue accent
 export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHeaderProps) {
   const [isLocking, setIsLocking] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -110,7 +123,6 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
         action: 'emergency_system_lock',
         meta_json: { timestamp: new Date().toISOString() }
       });
-      
       toast.success('🔒 EMERGENCY LOCK ACTIVATED', {
         description: 'All system operations have been frozen.',
         duration: 5000
@@ -142,110 +154,106 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
     }
   };
 
+  const ShellButton = ({ children, onClick, className = '' }: { children: React.ReactNode; onClick?: () => void; className?: string }) => (
+    <button
+      onClick={onClick}
+      className={`relative flex items-center justify-center w-10 h-10 rounded transition-colors ${className}`}
+      style={{ color: SHELL.text }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = SHELL.bgHover)}
+      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+    >
+      {children}
+    </button>
+  );
+
   return (
     <header 
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
-      style={{ background: 'hsl(217 91% 50%)' }}
+      className="fixed top-0 left-0 right-0 z-50 flex items-center h-11 px-3"
+      style={{ background: SHELL.bg, borderBottom: `1px solid ${SHELL.separator}` }}
     >
-      {/* LEFT: Logo Icon Only */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white">
-          <span className="font-bold text-lg" style={{ color: 'hsl(217 91% 50%)' }}>S</span>
+      {/* LEFT: SAP Logo + Product Title */}
+      <div className="flex items-center gap-3 mr-4">
+        <div className="flex items-center justify-center w-8 h-8 rounded" style={{ background: SHELL.brand }}>
+          <span className="font-bold text-sm" style={{ color: SHELL.text }}>SV</span>
+        </div>
+        <div className="h-5 w-px" style={{ background: SHELL.separator }} />
+        <span className="text-sm font-medium" style={{ color: SHELL.text }}>Boss Command Center</span>
+      </div>
+
+      {/* CENTER: Search (SAP Shell Search) */}
+      <div className="flex-1 flex justify-center max-w-md mx-auto">
+        <div 
+          className="flex items-center gap-2 px-3 h-8 rounded w-full"
+          style={{ background: 'hsl(214, 32%, 26%)', border: `1px solid ${SHELL.separator}` }}
+        >
+          <Search className="w-3.5 h-3.5" style={{ color: SHELL.textMuted }} />
+          <input 
+            type="text" 
+            placeholder="Search modules, reports, users..."
+            className="bg-transparent text-xs outline-none flex-1 placeholder:text-inherit"
+            style={{ color: SHELL.text }}
+          />
         </div>
       </div>
 
-      {/* CENTER: Live Status */}
-      <button
-        onClick={onStreamingToggle}
-        className={`flex items-center gap-2 px-4 py-2 h-9 rounded-full transition-all border ${
-          streamingOn 
-            ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-500' 
-            : 'bg-destructive/15 border-destructive/50 text-destructive'
-        }`}
-      >
-        <Radio className={`w-4 h-4 ${streamingOn ? 'animate-pulse' : ''}`} />
-        <span className="text-[13px] font-medium">
+      {/* RIGHT: Shell Actions */}
+      <div className="flex items-center gap-0.5 ml-4">
+        {/* Live Status Indicator */}
+        <button
+          onClick={onStreamingToggle}
+          className="flex items-center gap-1.5 px-3 h-7 rounded text-xs font-medium mr-1 transition-colors"
+          style={{
+            background: streamingOn ? 'hsl(145, 63%, 20%)' : 'hsl(0, 78%, 25%)',
+            color: streamingOn ? SHELL.positive : SHELL.badge,
+            border: `1px solid ${streamingOn ? 'hsl(145, 63%, 35%)' : 'hsl(0, 78%, 40%)'}`
+          }}
+        >
+          <Radio className={`w-3 h-3 ${streamingOn ? 'animate-pulse' : ''}`} />
           {streamingOn ? 'LIVE' : 'PAUSED'}
-        </span>
-      </button>
+        </button>
 
-      {/* RIGHT: Icon-only actions */}
-      <div className="flex items-center gap-1">
-        {/* Assist (UltraViewer) */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowAssist(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <Headphones className="w-5 h-5 text-white" />
-        </Button>
+        <div className="h-5 w-px mx-1" style={{ background: SHELL.separator }} />
 
-        {/* Promise Tracker */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowPromise(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <ListChecks className="w-5 h-5 text-white" />
-        </Button>
+        <ShellButton onClick={() => setShowAssist(true)}>
+          <Headphones className="w-4 h-4" />
+        </ShellButton>
 
-        {/* Internal Chat Bot */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowChat(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <MessageSquare className="w-5 h-5 text-white" />
-        </Button>
+        <ShellButton onClick={() => setShowPromise(true)}>
+          <ListChecks className="w-4 h-4" />
+        </ShellButton>
 
-        {/* Notifications / Buzzer */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowNotifications(true)}
-          className="relative hover:bg-white/20 w-10 h-10"
-        >
-          <Bell className="w-5 h-5 text-white" />
+        <ShellButton onClick={() => setShowChat(true)}>
+          <MessageSquare className="w-4 h-4" />
+        </ShellButton>
+
+        <ShellButton onClick={() => setShowNotifications(true)}>
+          <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold bg-red-500 text-white rounded-full">
+            <span 
+              className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[9px] font-bold rounded-full"
+              style={{ background: SHELL.badge, color: SHELL.text }}
+            >
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
-        </Button>
+        </ShellButton>
 
-        {/* Language */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowLanguage(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <Globe className="w-5 h-5 text-white" />
-        </Button>
+        <ShellButton onClick={() => setShowLanguage(true)}>
+          <Globe className="w-4 h-4" />
+        </ShellButton>
 
-        {/* Currency */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowCurrency(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <Banknote className="w-5 h-5 text-white" />
-        </Button>
+        <ShellButton onClick={() => setShowCurrency(true)}>
+          <Banknote className="w-4 h-4" />
+        </ShellButton>
+
+        <div className="h-5 w-px mx-1" style={{ background: SHELL.separator }} />
 
         {/* Emergency Lock */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="hover:bg-destructive/10 w-10 h-10"
-            >
-              <ShieldAlert className="w-5 h-5 text-destructive" />
-            </Button>
+            <ShellButton className="hover:!bg-red-900/30">
+              <ShieldAlert className="w-4 h-4" style={{ color: SHELL.badge }} />
+            </ShellButton>
           </AlertDialogTrigger>
           <AlertDialogContent className="bg-sidebar border-destructive/30">
             <AlertDialogHeader>
@@ -255,22 +263,13 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-sidebar-accent border-sidebar-border text-foreground">
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel className="bg-sidebar-accent border-sidebar-border text-foreground">Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleEmergencyLock}
                 disabled={isLocking}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {isLocking ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Locking...
-                  </>
-                ) : (
-                  'ACTIVATE LOCKDOWN'
-                )}
+                {isLocking ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Locking...</> : 'ACTIVATE LOCKDOWN'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -279,37 +278,24 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
         {/* Profile Avatar */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="hover:bg-white/20 w-10 h-10 p-0"
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-full ml-1 transition-colors"
+              style={{ background: SHELL.brand, color: SHELL.text }}
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white">
-                <User className="w-4 h-4" style={{ color: 'hsl(217 91% 50%)' }} />
-              </div>
-            </Button>
+              <User className="w-4 h-4" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end"
-            className="bg-sidebar border-sidebar-border"
-          >
-            <DropdownMenuItem 
-              onClick={() => navigate('/settings')}
-              className="text-muted-foreground hover:bg-white/5 focus:bg-white/5 cursor-pointer"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Profile
+          <DropdownMenuContent align="end" className="bg-sidebar border-sidebar-border">
+            <DropdownMenuItem onClick={() => navigate('/settings')} className="text-muted-foreground hover:bg-white/5 focus:bg-white/5 cursor-pointer">
+              <User className="w-4 h-4 mr-2" />Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-sidebar-border" />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={handleLogout}
               disabled={isLoggingOut}
               className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10 cursor-pointer"
             >
-              {isLoggingOut ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <LogOut className="w-4 h-4 mr-2" />
-              )}
+              {isLoggingOut ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <LogOut className="w-4 h-4 mr-2" />}
               {isLoggingOut ? 'Logging out...' : 'Logout'}
             </DropdownMenuItem>
           </DropdownMenuContent>
