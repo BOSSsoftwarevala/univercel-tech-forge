@@ -555,7 +555,10 @@ const ValaAIDashboard = () => {
     if (!lastUserMsg) return;
     // Remove last assistant message
     setMessages(prev => {
-      const lastAssistantIdx = prev.findLastIndex(m => m.role === 'assistant' && m.id !== '1');
+      let lastAssistantIdx = -1;
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (prev[i].role === 'assistant' && prev[i].id !== '1') { lastAssistantIdx = i; break; }
+      }
       if (lastAssistantIdx > 0) return prev.slice(0, lastAssistantIdx);
       return prev;
     });
