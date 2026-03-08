@@ -38,10 +38,10 @@ export function useAIRAMetrics() {
       const db = supabase as any;
       const usersRes = await db.from('profiles').select('id', { count: 'exact', head: true });
       const ordersRes = await db.from('marketplace_orders').select('id, final_amount, created_at');
-      const productsRes = await db.from('products').select('id, category', { count: 'exact' }).eq('is_active', true);
-      const serversRes = await db.from('server_instances').select('id', { count: 'exact' }).eq('status', 'running');
-      const approvalsRes = await db.from('approvals').select('id', { count: 'exact' }).eq('status', 'pending');
-      const alertsRes = await db.from('system_alerts').select('id', { count: 'exact' }).eq('is_resolved', false);
+      const productsRes = await db.from('marketplace_products').select('*', { count: 'exact', head: true });
+      const serversRes = await db.from('server_instances').select('*', { count: 'exact', head: true }).eq('status', 'running');
+      const approvalsRes = await db.from('approvals').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const alertsRes = await db.from('system_alerts').select('*', { count: 'exact', head: true });
       const auditRes = await db.from('audit_logs').select('id, module, action, role, timestamp').order('timestamp', { ascending: false }).limit(200);
       const activityRes = await db.from('activity_log').select('id, action_type, entity_type, role, severity_level, created_at').order('created_at', { ascending: false }).limit(100);
       const rolesRes = await db.from('user_roles').select('role');
