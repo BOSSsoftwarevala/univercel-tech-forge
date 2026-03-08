@@ -15,7 +15,7 @@ import { SecurityLegal } from './sections/SecurityLegal';
 import { BossSettings } from './sections/BossSettings';
 import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
-import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
+
 import { MMFullLayout } from '@/components/marketplace-manager/MMFullLayout';
 
 const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
@@ -82,7 +82,7 @@ export function BossPanelContent() {
       case 'server-hosting':
         return <ServerHosting />;
       case 'vala-ai':
-        return <ValaAIModuleContainer />;
+        return <Navigate to="/super-admin-system/role-switch?role=aira&nav=vala-ai" replace />;
       case 'marketplace-manager':
         return <MMFullLayout />;
       case 'reseller-dashboard':
