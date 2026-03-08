@@ -2815,13 +2815,13 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite, localPrice }: {
 
             {/* Price with animation */}
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-gray-500 line-through text-sm">{demo.price}</span>
+              <span className="text-gray-500 line-through text-sm">{localPrice ? localPrice(demo.price) : demo.price}</span>
               <motion.span 
                 className="text-emerald-400 font-bold text-xl"
                 animate={{ scale: isHovered ? [1, 1.05, 1] : 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {demo.discountPrice}
+                {localPrice ? localPrice(demo.discountPrice) : demo.discountPrice}
               </motion.span>
               <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xs animate-pulse">
                 40% OFF
