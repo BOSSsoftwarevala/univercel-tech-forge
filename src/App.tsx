@@ -178,6 +178,7 @@ const RestaurantPOSNewDemo = lazyLoad(() => import("./pages/restaurant-pos-new/R
 const AccountingDemo = lazyLoad(() => import("./pages/accounting/AccountingDemo"));
 const ProAccountingDemo = lazyLoad(() => import("./pages/pro-accounting/ProAccountingDemo"));
 const AutoDevEngine = lazyLoad(() => import("./pages/auto-dev/AutoDevEngine"));
+const GoogleClassroomDemo = lazyLoad(() => import("./pages/demos/GoogleClassroomDemo"));
 
 // School Software
 const SchoolSoftwareHomepage = lazyLoad(() => import("./pages/school-software/SchoolSoftwareHomepage"));
