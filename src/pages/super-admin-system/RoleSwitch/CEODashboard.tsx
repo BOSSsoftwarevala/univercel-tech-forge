@@ -28,6 +28,7 @@ import {
   CategoryTreemap,
 } from "@/components/aira/AIRACharts";
 import { AIRASystemScanner, ScanReport } from "@/components/aira/AIRASystemScanner";
+import AIRAChatInterface from "@/components/aira/AIRAChatInterface";
 
 interface CEODashboardProps {
   activeNav?: string;
