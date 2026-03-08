@@ -5,7 +5,7 @@ import {
   Lightbulb, ThumbsUp, ThumbsDown, MessageSquare, Shield, Clock,
   Target, DollarSign, Users, Activity, Brain, Zap, CheckCircle2,
   XCircle, FileText, Sparkles, RefreshCw, Server, Package,
-  ShoppingCart, AlertCircle, Layers, ScanLine, Bot
+  ShoppingCart, AlertCircle, Layers, ScanLine, Bot, MapPin
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useAIRAMetrics } from "@/hooks/useAIRAMetrics";
+import { useCEODashboard } from "@/hooks/useCEODashboard";
 import {
   RevenueAreaChart,
   ModuleBarChart,
@@ -30,6 +31,10 @@ import {
 import { AIRASystemScanner, ScanReport } from "@/components/aira/AIRASystemScanner";
 import AIRAChatInterface from "@/components/aira/AIRAChatInterface";
 import AIRAReports from "@/components/aira/AIRAReports";
+import CEOProductPerformance from "@/components/ceo/CEOProductPerformance";
+import CEORegionPerformance from "@/components/ceo/CEORegionPerformance";
+import CEOSystemHealthPanel from "@/components/ceo/CEOSystemHealthPanel";
+import CEOAlertsPanel from "@/components/ceo/CEOAlertsPanel";
 
 interface CEODashboardProps {
   activeNav?: string;
@@ -54,6 +59,15 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const { user } = useAuth();
   const { metrics, loading, lastRefresh, refresh } = useAIRAMetrics();
+  const {
+    productPerformance,
+    regionPerformance,
+    systemHealth,
+    scanResult,
+    loading: ceoLoading,
+    runScan,
+    fetchAll: refreshCEO,
+  } = useCEODashboard();
 
   useEffect(() => {
     if (activeNav) setActiveSection(NAV_MAP[activeNav] || "scanner");
@@ -89,21 +103,18 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
 
   // ─── Sections ────────────────────────────────────────────────
   const sections = [
-    { id: "scanner", label: "System Scanner", icon: ScanLine },
+    { id: "scanner", label: "Dashboard", icon: ScanLine },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "products", label: "Products", icon: Package },
+    { id: "regions", label: "Regions", icon: MapPin },
+    { id: "system", label: "System Health", icon: Activity },
+    { id: "alerts", label: "Alerts", icon: AlertCircle },
     { id: "reports", label: "Reports", icon: FileText },
     { id: "chat", label: "AIRA Chat", icon: Bot },
     { id: "insights", label: "AI Insights", icon: Brain },
     { id: "approvals", label: "Approvals", icon: FileText },
-    { id: "risks", label: "Risk Radar", icon: AlertTriangle },
     { id: "notes", label: "CEO Notes", icon: MessageSquare },
   ];
-
-  const severityColor = (s: string) => {
-    if (s === "critical" || s === "emergency") return "text-red-400 bg-red-500/20";
-    if (s === "warning") return "text-amber-400 bg-amber-500/20";
-    return "text-slate-400 bg-slate-700/50";
-  };
 
   if (loading) {
     return (
@@ -134,25 +145,25 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
             <div>
               <h1 className="text-xl font-bold text-white tracking-tight">AIRA</h1>
               <p className="text-[10px] text-violet-400/80 uppercase tracking-widest">
-                CEO System Scanner • Tableau View
+                CEO Strategic Intelligence • Full Dashboard
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Section tabs - Tableau style */}
-            <div className="flex bg-slate-800/60 rounded-lg p-0.5 border border-slate-700/50">
+            {/* Section tabs */}
+            <div className="flex bg-slate-800/60 rounded-lg p-0.5 border border-slate-700/50 overflow-x-auto max-w-[700px]">
               {sections.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setActiveSection(s.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all whitespace-nowrap ${
                     activeSection === s.id
                       ? "bg-violet-500/20 text-violet-300 shadow-sm"
                       : "text-slate-500 hover:text-slate-300"
                   }`}
                 >
-                  <s.icon className="w-3.5 h-3.5" />
+                  <s.icon className="w-3 h-3" />
                   {s.label}
                 </button>
               ))}
@@ -165,7 +176,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
             <Button
               size="sm"
               variant="ghost"
-              onClick={refresh}
+              onClick={() => { refresh(); refreshCEO(); }}
               className="text-slate-400 hover:text-white"
             >
               <RefreshCw className="w-3.5 h-3.5" />
@@ -181,11 +192,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
       <div className="px-6 pt-4 pb-0">
         <div className="flex flex-wrap gap-2">
           {[
-            { label: "System Scan", icon: ScanLine, action: () => { setActiveSection("scanner"); logAction("ceo_action", "system_scan"); toast.info("System scan initiated"); } },
+            { label: "System Scan", icon: ScanLine, action: () => { runScan(); setActiveSection("system"); logAction("ceo_action", "system_scan"); toast.info("System scan initiated"); } },
             { label: "Generate Report", icon: FileText, action: async () => {
               logAction("ceo_action", "generate_report");
               toast.info("Generating executive report...");
-              // Submit scan report to system_events
               try {
                 await (supabase as any).from("system_events").insert({
                   event_type: "aira_executive_report",
@@ -198,8 +208,8 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
               } catch { toast.error("Report generation failed"); }
             }},
             { label: "Open AI Chat", icon: Bot, action: () => { setActiveSection("chat"); logAction("ceo_action", "open_ai_chat"); } },
-            { label: "View Alerts", icon: AlertCircle, action: () => { setActiveSection("risks"); logAction("ceo_action", "view_alerts"); } },
-            { label: "View System Health", icon: Activity, action: () => { setActiveSection("scanner"); logAction("ceo_action", "view_system_health"); } },
+            { label: "View Alerts", icon: AlertCircle, action: () => { setActiveSection("alerts"); logAction("ceo_action", "view_alerts"); } },
+            { label: "View System Health", icon: Activity, action: () => { setActiveSection("system"); logAction("ceo_action", "view_system_health"); } },
             { label: "Submit to Boss Panel", icon: Zap, action: async () => {
               logAction("ceo_action", "submit_to_boss");
               try {
@@ -229,13 +239,9 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* ─── SCANNER ──────────────────────────────────────── */}
+        {/* ─── SCANNER / DASHBOARD ──────────────────────────── */}
         {activeSection === "scanner" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             {/* KPI Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
               {[
@@ -248,15 +254,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 { label: "Alerts", value: m.criticalAlerts.toLocaleString(), icon: AlertCircle, color: "red" },
                 { label: "Audit/24h", value: m.auditEvents24h.toLocaleString(), icon: Layers, color: "purple" },
               ].map((kpi, i) => (
-                <Card
-                  key={i}
-                  className="bg-slate-900/60 border-slate-700/40 backdrop-blur hover:border-violet-500/30 transition-all"
-                >
+                <Card key={i} className="bg-slate-900/60 border-slate-700/40 backdrop-blur hover:border-violet-500/30 transition-all">
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-slate-500 uppercase tracking-wider">
-                        {kpi.label}
-                      </span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider">{kpi.label}</span>
                       <kpi.icon className={`w-3.5 h-3.5 text-${kpi.color}-400`} />
                     </div>
                     <p className="text-lg font-bold text-white">{kpi.value}</p>
@@ -273,7 +274,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
               ))}
             </div>
 
-            {/* ─── AIRA 37-Module System Scanner ──────────────── */}
+            {/* AIRA 37-Module System Scanner */}
             <AIRASystemScanner />
 
             {/* Charts Row */}
@@ -309,11 +310,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
 
         {/* ─── ANALYTICS ────────────────────────────────────── */}
         {activeSection === "analytics" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
                 <CardHeader className="pb-2">
@@ -326,7 +323,6 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                   <RevenueAreaChart data={m.revenueByMonth} />
                 </CardContent>
               </Card>
-
               <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm text-white flex items-center gap-2">
@@ -339,7 +335,6 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 </CardContent>
               </Card>
             </div>
-
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-white flex items-center gap-2">
@@ -351,7 +346,6 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 <ModuleBarChart data={m.moduleActivity} />
               </CardContent>
             </Card>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
                 <CardHeader className="pb-2">
@@ -379,6 +373,30 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
+        {/* ─── PRODUCT PERFORMANCE ──────────────────────────── */}
+        {activeSection === "products" && (
+          <CEOProductPerformance products={productPerformance} />
+        )}
+
+        {/* ─── REGIONAL PERFORMANCE ─────────────────────────── */}
+        {activeSection === "regions" && (
+          <CEORegionPerformance regions={regionPerformance} />
+        )}
+
+        {/* ─── SYSTEM HEALTH ───────────────────────────────── */}
+        {activeSection === "system" && (
+          <CEOSystemHealthPanel
+            health={systemHealth.length > 0 ? systemHealth : m.systemHealth.map(h => ({ metric_name: h.metric, score: h.score, benchmark: h.benchmark, status: h.score >= 90 ? 'healthy' : 'warning' }))}
+            onRunScan={() => runScan()}
+            scanLoading={ceoLoading}
+          />
+        )}
+
+        {/* ─── ALERTS ──────────────────────────────────────── */}
+        {activeSection === "alerts" && (
+          <CEOAlertsPanel />
+        )}
+
         {/* ─── REPORTS ─────────────────────────────────────── */}
         {activeSection === "reports" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -395,11 +413,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
 
         {/* ─── AI INSIGHTS ──────────────────────────────────── */}
         {activeSection === "insights" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
               <CardHeader>
                 <CardTitle className="text-sm text-white flex items-center gap-2">
@@ -416,22 +430,13 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                       { id: 3, type: "product", title: "Enterprise Product Gap", desc: "Competitors gaining with enterprise solutions.", confidence: 78, impact: "high" },
                       { id: 4, type: "efficiency", title: "Support Cost Optimization", desc: "AI chatbot could reduce costs by 35%.", confidence: 94, impact: "medium" },
                     ].map((s) => (
-                      <div
-                        key={s.id}
-                        className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/30 hover:border-violet-500/30 transition"
-                      >
+                      <div key={s.id} className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/30 hover:border-violet-500/30 transition">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <Lightbulb className="w-4 h-4 text-violet-400" />
                               <h4 className="font-medium text-white text-sm">{s.title}</h4>
-                              <Badge
-                                className={
-                                  s.impact === "high"
-                                    ? "bg-red-500/20 text-red-400 border-red-500/50 text-[10px]"
-                                    : "bg-amber-500/20 text-amber-400 border-amber-500/50 text-[10px]"
-                                }
-                              >
+                              <Badge className={s.impact === "high" ? "bg-red-500/20 text-red-400 border-red-500/50 text-[10px]" : "bg-amber-500/20 text-amber-400 border-amber-500/50 text-[10px]"}>
                                 {s.impact}
                               </Badge>
                             </div>
@@ -444,26 +449,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                             </div>
                           </div>
                           <div className="flex gap-1 ml-3">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={async () => {
-                                await logAction("suggestion_approve", s.title);
-                                toast.success("Approved & sent to Super Admin");
-                              }}
-                              className="text-emerald-400 hover:bg-emerald-500/10 h-8 w-8 p-0"
-                            >
+                            <Button size="sm" variant="ghost" onClick={async () => { await logAction("suggestion_approve", s.title); toast.success("Approved & sent to Super Admin"); }} className="text-emerald-400 hover:bg-emerald-500/10 h-8 w-8 p-0">
                               <ThumbsUp className="w-3.5 h-3.5" />
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={async () => {
-                                await logAction("suggestion_reject", s.title);
-                                toast.info("Rejected");
-                              }}
-                              className="text-red-400 hover:bg-red-500/10 h-8 w-8 p-0"
-                            >
+                            <Button size="sm" variant="ghost" onClick={async () => { await logAction("suggestion_reject", s.title); toast.info("Rejected"); }} className="text-red-400 hover:bg-red-500/10 h-8 w-8 p-0">
                               <ThumbsDown className="w-3.5 h-3.5" />
                             </Button>
                           </div>
@@ -479,18 +468,13 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
 
         {/* ─── APPROVALS ────────────────────────────────────── */}
         {activeSection === "approvals" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
               <CardHeader>
                 <CardTitle className="text-sm text-white flex items-center gap-2">
                   <FileText className="w-4 h-4 text-violet-400" />
                   Strategic Approval Queue
-                  <Badge className="bg-amber-500/20 text-amber-400 text-[10px]">
-                    {m.pendingApprovals} Pending
-                  </Badge>
+                  <Badge className="bg-amber-500/20 text-amber-400 text-[10px]">{m.pendingApprovals} Pending</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -502,50 +486,22 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                       { id: 3, title: "Infrastructure Upgrade", by: "Server Manager", amount: "$350K", priority: "high", days: 3 },
                       { id: 4, title: "Legal Compliance Update", by: "Legal Manager", amount: "$45K", priority: "low", days: 5 },
                     ].map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/30 flex items-center justify-between"
-                      >
+                      <div key={item.id} className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/30 flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-0.5">
                             <h4 className="text-sm font-medium text-white">{item.title}</h4>
-                            <Badge
-                              className={`text-[9px] ${
-                                item.priority === "high"
-                                  ? "bg-red-500/20 text-red-400"
-                                  : item.priority === "medium"
-                                  ? "bg-amber-500/20 text-amber-400"
-                                  : "bg-blue-500/20 text-blue-400"
-                              }`}
-                            >
+                            <Badge className={`text-[9px] ${item.priority === "high" ? "bg-red-500/20 text-red-400" : item.priority === "medium" ? "bg-amber-500/20 text-amber-400" : "bg-blue-500/20 text-blue-400"}`}>
                               {item.priority}
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-slate-500">
-                            By {item.by} • {item.days}d ago
-                          </p>
+                          <p className="text-[11px] text-slate-500">By {item.by} • {item.days}d ago</p>
                         </div>
                         <p className="text-sm font-bold text-white mr-4">{item.amount}</p>
                         <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            className="bg-emerald-600 hover:bg-emerald-700 h-7 w-7 p-0"
-                            onClick={async () => {
-                              await logAction("approval_approve", item.title, { amount: item.amount });
-                              toast.success("Approved!");
-                            }}
-                          >
+                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 h-7 w-7 p-0" onClick={async () => { await logAction("approval_approve", item.title, { amount: item.amount }); toast.success("Approved!"); }}>
                             <CheckCircle2 className="w-3.5 h-3.5" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="h-7 w-7 p-0"
-                            onClick={async () => {
-                              await logAction("approval_reject", item.title);
-                              toast.info("Rejected");
-                            }}
-                          >
+                          <Button size="sm" variant="destructive" className="h-7 w-7 p-0" onClick={async () => { await logAction("approval_reject", item.title); toast.info("Rejected"); }}>
                             <XCircle className="w-3.5 h-3.5" />
                           </Button>
                         </div>
@@ -558,88 +514,9 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
-        {/* ─── RISKS ────────────────────────────────────────── */}
-        {activeSection === "risks" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-amber-400" />
-                    System Health Radar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <SystemHealthRadar data={m.systemHealth} />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-red-400" />
-                    Active Risk Alerts ({m.criticalAlerts})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { level: "high", title: "EU Regulatory Change", desc: "New data protection requirements Q2", deadline: "45 days" },
-                      { level: "medium", title: "Competitor Launch", desc: "Major features announced", deadline: "30 days" },
-                      { level: "low", title: "Currency Fluctuation", desc: "USD/EUR volatility", deadline: "Ongoing" },
-                    ].map((alert, i) => (
-                      <div
-                        key={i}
-                        className={`p-3 rounded-lg border ${
-                          alert.level === "high"
-                            ? "bg-red-500/10 border-red-500/30"
-                            : alert.level === "medium"
-                            ? "bg-amber-500/10 border-amber-500/30"
-                            : "bg-blue-500/10 border-blue-500/30"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <Badge
-                                className={`text-[9px] ${
-                                  alert.level === "high"
-                                    ? "bg-red-500/20 text-red-400"
-                                    : alert.level === "medium"
-                                    ? "bg-amber-500/20 text-amber-400"
-                                    : "bg-blue-500/20 text-blue-400"
-                                }`}
-                              >
-                                {alert.level.toUpperCase()}
-                              </Badge>
-                              <h4 className="text-sm font-medium text-white">{alert.title}</h4>
-                            </div>
-                            <p className="text-[11px] text-slate-400">{alert.desc}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[10px] text-slate-500">Deadline</p>
-                            <p className="text-xs font-medium text-white">{alert.deadline}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </motion.div>
-        )}
-
         {/* ─── NOTES ────────────────────────────────────────── */}
         {activeSection === "notes" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-sm text-white flex items-center gap-2">
@@ -664,9 +541,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                       className="bg-slate-800 border-slate-700 text-white min-h-[120px]"
                     />
                     <DialogFooter>
-                      <Button onClick={handleAddNote} className="bg-violet-600 hover:bg-violet-700">
-                        Submit
-                      </Button>
+                      <Button onClick={handleAddNote} className="bg-violet-600 hover:bg-violet-700">Submit</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -678,18 +553,14 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                       <Badge className="bg-violet-500/20 text-violet-400 text-[10px]">Strategic</Badge>
                       <span className="text-[10px] text-slate-500">Today</span>
                     </div>
-                    <p className="text-xs text-slate-300">
-                      Focus on Southeast Asia expansion. Prioritize quality partnerships over rapid scale.
-                    </p>
+                    <p className="text-xs text-slate-300">Focus on Southeast Asia expansion. Prioritize quality partnerships over rapid scale.</p>
                   </div>
                   <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/30">
                     <div className="flex items-center gap-2 mb-1.5">
                       <Badge className="bg-blue-500/20 text-blue-400 text-[10px]">Direction</Badge>
                       <span className="text-[10px] text-slate-500">2 days ago</span>
                     </div>
-                    <p className="text-xs text-slate-300">
-                      Review enterprise pricing strategy. We're leaving money on the table.
-                    </p>
+                    <p className="text-xs text-slate-300">Review enterprise pricing strategy. We're leaving money on the table.</p>
                   </div>
                 </div>
               </CardContent>
@@ -719,14 +590,8 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 { ok: false, label: "Operations" },
               ].map((p, i) => (
                 <div key={i} className="flex items-center gap-1">
-                  {p.ok ? (
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  ) : (
-                    <XCircle className="w-3 h-3 text-red-400/60" />
-                  )}
-                  <span className={`text-[10px] ${p.ok ? "text-slate-300" : "text-slate-500"}`}>
-                    {p.label}
-                  </span>
+                  {p.ok ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <XCircle className="w-3 h-3 text-red-400/60" />}
+                  <span className={`text-[10px] ${p.ok ? "text-slate-300" : "text-slate-500"}`}>{p.label}</span>
                 </div>
               ))}
             </div>
