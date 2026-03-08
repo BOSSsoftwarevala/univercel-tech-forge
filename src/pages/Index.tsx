@@ -2834,6 +2834,121 @@ const Index = () => {
   );
 };
 
+// ===== NETFLIX SCROLL ROW — Horizontal scroll with left/right arrows =====
+const NetflixScrollRow = ({ row, demos, isEmpty, favorites, toggleFavorite, localPrice: localPriceFn }: {
+  row: NetflixRow;
+  demos: Demo[];
+  isEmpty: boolean;
+  favorites: string[];
+  toggleFavorite: (id: string) => void;
+  localPrice: (inrStr: string) => string;
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, demos]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.75;
+    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="group/row relative">
+      <div className="flex items-center gap-3 mb-3">
+        <span className="text-xs text-slate-500 font-mono w-6">{String(row.id).padStart(2, '0')}</span>
+        <h3 className="text-lg font-bold text-white group-hover/row:text-cyan-400 transition-colors">
+          {row.title}
+        </h3>
+        <span className="text-xs text-slate-600 bg-slate-800/50 px-2 py-0.5 rounded-full">
+          {isEmpty ? 'Coming Soon' : `${demos.length}`}
+        </span>
+      </div>
+
+      {isEmpty ? (
+        /* Placeholder row for empty categories */
+        <div className="flex gap-3 overflow-hidden pb-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex-shrink-0 w-[200px] md:w-[220px]">
+              <div className="aspect-[3/4] rounded-lg bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-slate-700/30 flex flex-col items-center justify-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-slate-700/50 flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-slate-500" />
+                </div>
+                <span className="text-slate-500 text-xs font-medium">Coming Soon</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="relative">
+          {/* Left Arrow */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 top-0 bottom-3 w-12 z-30 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/90 to-transparent flex items-center justify-start pl-1 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200"
+            >
+              <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10">
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </div>
+            </button>
+          )}
+
+          {/* Scrollable Row */}
+          <div
+            ref={scrollRef}
+            className="flex gap-3 overflow-x-auto pb-3 scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {demos.map((demo, index) => (
+              <div key={demo.id} className="flex-shrink-0 w-[200px] md:w-[220px]">
+                <DemoCard
+                  demo={demo}
+                  index={index}
+                  isFavorite={favorites.includes(demo.id)}
+                  onToggleFavorite={() => toggleFavorite(demo.id)}
+                  localPrice={localPriceFn}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Right Arrow */}
+          {canScrollRight && (
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 top-0 bottom-3 w-12 z-30 bg-gradient-to-l from-[#0a1628] via-[#0a1628]/90 to-transparent flex items-center justify-end pr-1 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200"
+            >
+              <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10">
+                <ChevronRight className="w-5 h-5 text-white" />
+              </div>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ===== NETFLIX POSTER CARD — Image-focused, minimal text, hover reveal =====
 const DemoCard = ({ demo, index, isFavorite, onToggleFavorite, localPrice }: { 
   demo: Demo; 
