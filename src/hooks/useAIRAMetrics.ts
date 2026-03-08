@@ -34,16 +34,17 @@ export function useAIRAMetrics() {
 
   const fetchMetrics = useCallback(async () => {
     try {
-      // Parallel queries for all metrics
-      const usersRes: any = await supabase.from('profiles').select('id', { count: 'exact', head: true });
-      const ordersRes: any = await supabase.from('marketplace_orders').select('id, final_amount, created_at');
-      const productsRes: any = await supabase.from('products').select('id, category', { count: 'exact' }).eq('is_active', true);
-      const serversRes: any = await supabase.from('server_instances').select('id', { count: 'exact' }).eq('status', 'running');
-      const approvalsRes: any = await supabase.from('approvals').select('id', { count: 'exact' }).eq('status', 'pending');
-      const alertsRes: any = await supabase.from('system_alerts').select('id', { count: 'exact' }).eq('is_resolved', false);
-      const auditRes: any = await supabase.from('audit_logs').select('id, module, action, role, timestamp').order('timestamp', { ascending: false }).limit(200);
-      const activityRes: any = await supabase.from('activity_log').select('id, action_type, entity_type, role, severity_level, created_at').order('created_at', { ascending: false }).limit(100);
-      const rolesRes: any = await supabase.from('user_roles').select('role');
+      // Parallel queries for all metrics — cast to any to avoid deep type instantiation
+      const db = supabase as any;
+      const usersRes = await db.from('profiles').select('id', { count: 'exact', head: true });
+      const ordersRes = await db.from('marketplace_orders').select('id, final_amount, created_at');
+      const productsRes = await db.from('products').select('id, category', { count: 'exact' }).eq('is_active', true);
+      const serversRes = await db.from('server_instances').select('id', { count: 'exact' }).eq('status', 'running');
+      const approvalsRes = await db.from('approvals').select('id', { count: 'exact' }).eq('status', 'pending');
+      const alertsRes = await db.from('system_alerts').select('id', { count: 'exact' }).eq('is_resolved', false);
+      const auditRes = await db.from('audit_logs').select('id, module, action, role, timestamp').order('timestamp', { ascending: false }).limit(200);
+      const activityRes = await db.from('activity_log').select('id, action_type, entity_type, role, severity_level, created_at').order('created_at', { ascending: false }).limit(100);
+      const rolesRes = await db.from('user_roles').select('role');
 
       // Calculate revenue
       const orders = ordersRes.data || [];
