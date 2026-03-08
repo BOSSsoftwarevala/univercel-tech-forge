@@ -49,7 +49,7 @@ serve(async (req: Request) => {
           mime_type: file.type,
           storage_path: storagePath,
           upload_status: "completed",
-          created_by: user.id,
+          created_by: user.userId,
         }).select().single();
 
         if (dbError) return errorResponse(`Database error: ${dbError.message}`, 500);
