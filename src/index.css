@@ -204,6 +204,8 @@
     --glass-bg: 224 71% 11% / 0.8;
     --glass-border: 224 50% 30% / 0.3;
   }
+}
+
 @layer base {
   * {
     @apply border-border;
