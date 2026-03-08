@@ -35,12 +35,14 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aira-chat`;
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
 
 const QUICK_PROMPTS = [
-  "System health summary",
-  "Revenue report today",
-  "Any critical alerts?",
-  "Marketplace activity",
-  "Pending approvals",
-  "Security status",
+  "📊 Revenue report & finance split",
+  "💰 Pending payments follow-up",
+  "🛒 Recent orders status",
+  "🔧 Delegate task to VALA AI",
+  "📈 SEO status for products",
+  "⚡ System health summary",
+  "🔒 Security status",
+  "📋 Show my 40/28/20/12 split",
 ];
 
 // AIRA uses Sarah voice — warm, professional female
