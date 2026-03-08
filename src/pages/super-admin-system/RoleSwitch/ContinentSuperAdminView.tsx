@@ -46,6 +46,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContinentDashboard from "@/components/super-admin-wireframe/ContinentDashboard";
 import { ContinentSuperAdminDashboard, getContinentConfig, CONTINENT_CONFIGS } from "@/components/continent-dashboard";
 import GlobalContinentDashboard from "@/components/continent-dashboard/GlobalContinentDashboard";
+import MetaContinentDashboard from "@/pages/continent-super-admin/ContinentSuperAdminDashboard";
 
 // Country data for each continent
 const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
@@ -820,19 +821,8 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     return renderRegistryView();
   }
 
-  // Default: Show the Global Continent Dashboard with world map, sidebar, and boxes
-  return (
-    <GlobalContinentDashboard
-      onBack={() => {
-        // Exit Continent Admin -> return to Control Panel
-        navigate("/super-admin-system/role-switch?role=boss_owner");
-      }}
-      onContinentClick={(continentId) => {
-        // When clicking a continent on the map, show that continent's dashboard
-        setShowContinentDashboard(continentId);
-      }}
-    />
-  );
+  // Default: Show the Meta Business Manager clone dashboard
+  return <MetaContinentDashboard />;
 };
 
 export default ContinentSuperAdminView;
