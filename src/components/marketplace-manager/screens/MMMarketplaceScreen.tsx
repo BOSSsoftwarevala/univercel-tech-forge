@@ -425,6 +425,8 @@ export const MMMarketplaceScreen = () => {
     return groups;
   }, [products]);
 
+  const latestLaunches = useMemo(() => products.filter(p => p.listing_status === 'live' || p.demo_url), [products]);
+  const upcomingProducts = useMemo(() => products.filter(p => p.listing_status === 'upcoming' || p.listing_status === 'coming_soon').slice(0, 10), [products]);
   const featuredProducts = useMemo(() => products.slice(0, 5), [products]);
   const trendingProducts = useMemo(() => [...products].sort(() => 0.5 - Math.random()).slice(0, 8), [products]);
   const newReleases = useMemo(() => products.slice(0, 8), [products]);
