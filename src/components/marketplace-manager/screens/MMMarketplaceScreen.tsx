@@ -92,25 +92,34 @@ export const MMMarketplaceScreen = () => {
   const fetchProducts = async () => {
     try {
       // Try software_catalog first (primary product database), fallback to products
-      let result = await supabase
+      let data: any[] | null = null;
+      let fetchError: any = null;
+
+      const catalogResult = await supabase
         .from('software_catalog' as any)
         .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (result.error) {
+      if (!catalogResult.error && catalogResult.data) {
+        data = catalogResult.data as any[];
+      } else {
         // Fallback to products table
-        result = await supabase
+        const productsResult = await supabase
           .from('products')
           .select('*')
           .eq('is_active', true)
           .order('created_at', { ascending: false });
+
+        if (productsResult.error) {
+          fetchError = productsResult.error;
+        } else {
+          data = productsResult.data;
+        }
       }
 
-      const { data, error } = result;
-
-      if (error) throw error;
-      setProducts(data || []);
+      if (fetchError) throw fetchError;
+      setProducts((data as Product[]) || []);
     } catch (err) {
       console.error('Failed to fetch products:', err);
       setProducts([]);
