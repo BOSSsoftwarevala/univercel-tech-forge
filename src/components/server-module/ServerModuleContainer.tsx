@@ -27,6 +27,9 @@ import { DomainLockSystem } from './DomainLockSystem';
 import { CodeProtection } from './CodeProtection';
 import { DeploySecurity } from './DeploySecurity';
 import { SecurityDashboard } from './SecurityDashboard';
+import { CpanelManager } from './CpanelManager';
+import { WhoisDnsTools } from './WhoisDnsTools';
+import { HostingReseller } from './HostingReseller';
 
 interface ServerModuleContainerProps {
   initialSection?: ServerModuleSection;
