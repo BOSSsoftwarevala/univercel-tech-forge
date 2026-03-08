@@ -432,13 +432,18 @@ export const MMMarketplaceScreen = () => {
     return groups;
   }, [products]);
 
-  const latestLaunches = useMemo(() => products.filter(p => p.listing_status === 'live' || p.demo_url), [products]);
+  // Show products with live status or demo_url, OR show recent products if none available
+  const latestLaunches = useMemo(() => {
+    const live = products.filter(p => p.listing_status === 'live' || p.demo_url);
+    return live.length > 0 ? live : products.slice(0, 10);
+  }, [products]);
   const upcomingProducts = useMemo(() => products.filter(p => p.listing_status === 'upcoming' || p.listing_status === 'coming_soon').slice(0, 10), [products]);
   const featuredProducts = useMemo(() => products.slice(0, 5), [products]);
   const trendingProducts = useMemo(() => [...products].sort(() => 0.5 - Math.random()).slice(0, 8), [products]);
   const newReleases = useMemo(() => products.slice(0, 8), [products]);
 
-  const discountedPrice = (price: number | null) => (price ? (price * 0.7).toFixed(0) : '0');
+  // Format price for display
+  const formatPrice = (price: number | null) => price ? `$${price.toLocaleString()}` : '$249';
 
   if (loading) {
     return (
