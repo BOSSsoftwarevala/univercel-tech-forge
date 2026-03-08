@@ -63,6 +63,7 @@ interface ImportStats {
   total: number;
   imported: number;
   failed: number;
+  categories?: Record<string, number>;
 }
 
 const TYPES = ["All", "SaaS", "Desktop", "Mobile", "Offline", "Hybrid"];
@@ -71,7 +72,9 @@ const CATEGORIES = [
   "E-Commerce", "POS", "CRM", "HRM", "ERP", "Real Estate", "Logistics",
   "Inventory", "Project Management", "Fitness", "Events", "Lending",
   "Insurance", "Manufacturing", "Automotive", "Beauty/Salon", "Library",
-  "Subscription", "General"
+  "Subscription", "Social Media", "Security", "Agriculture", "Legal",
+  "NGO/Charity", "Telecom", "Media", "Jewellery", "Laundry", "Parking",
+  "Utility", "Gaming", "AI/ML", "DevOps", "Analytics", "Communication", "General"
 ];
 
 interface TypeStats {
@@ -94,9 +97,61 @@ const SoftwareCatalogManager = () => {
   
   // Import state
   const [isImporting, setIsImporting] = useState(false);
+  const [isGitHubImporting, setIsGitHubImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [importStats, setImportStats] = useState<ImportStats | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const importFromGitHub = async () => {
+    setIsGitHubImporting(true);
+    setImportProgress(10);
+    
+    try {
+      toast({
+        title: "GitHub Import Started",
+        description: "Fetching all repositories and categorizing...",
+      });
+
+      setImportProgress(30);
+
+      const { data, error } = await supabase.functions.invoke('import-github-repos');
+
+      setImportProgress(90);
+
+      if (error) throw error;
+
+      if (data.success) {
+        setImportStats({
+          total: data.total_repos,
+          imported: data.imported,
+          failed: data.failed,
+          categories: data.categories,
+        });
+        toast({
+          title: "GitHub Import Complete ✅",
+          description: `${data.imported} products imported from ${data.total_repos} repos (${data.skipped_duplicates} duplicates skipped)`,
+        });
+        fetchCatalog();
+        fetchTotalCount();
+        fetchTypeStats();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      console.error('GitHub import error:', error);
+      toast({
+        title: "GitHub Import Failed",
+        description: error.message || "Failed to import from GitHub",
+        variant: "destructive"
+      });
+    } finally {
+      setImportProgress(100);
+      setTimeout(() => {
+        setIsGitHubImporting(false);
+        setImportProgress(0);
+      }, 1500);
+    }
+  };
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -430,7 +485,20 @@ const SoftwareCatalogManager = () => {
             ) : (
               <Download className="w-4 h-4 mr-2" />
             )}
-            {totalCount > 0 ? 'Reload 5000+ Software' : 'Load 5000+ Software'}
+             {totalCount > 0 ? 'Reload 5000+ Software' : 'Load 5000+ Software'}
+          </Button>
+          <Button 
+            variant="default"
+            onClick={importFromGitHub}
+            disabled={isGitHubImporting || isImporting}
+            className="bg-gradient-to-r from-primary to-neon-purple text-white font-bold px-6 hover:opacity-90 shadow-lg shadow-primary/30"
+          >
+            {isGitHubImporting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Database className="w-4 h-4 mr-2" />
+            )}
+            {isGitHubImporting ? 'Importing Repos...' : 'Import from Repos'}
           </Button>
           <Button 
             variant="outline"
@@ -504,6 +572,18 @@ const SoftwareCatalogManager = () => {
                 Dismiss
               </Button>
             </div>
+            {importStats.categories && Object.keys(importStats.categories).length > 0 && (
+              <div className="mt-3 pt-3 border-t border-border/50">
+                <p className="text-xs text-muted-foreground mb-2">Category Breakdown:</p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(importStats.categories).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
+                    <Badge key={cat} variant="outline" className="text-xs">
+                      {cat}: {count}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
