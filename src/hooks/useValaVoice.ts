@@ -59,10 +59,10 @@ export function useValaVoice() {
           body: JSON.stringify({
             text: text.substring(0, 5000),
             voiceId: settings?.voiceId || VOICE_PRESETS.alice.id,
-            stability: settings?.stability ?? 0.7,
-            similarityBoost: settings?.similarityBoost ?? 0.85,
-            style: settings?.style ?? 0.3,
-            speed: settings?.speed ?? 0.85,
+            stability: settings?.stability ?? 0.4,
+            similarityBoost: settings?.similarityBoost ?? 0.75,
+            style: settings?.style ?? 0.5,
+            speed: settings?.speed ?? 0.95,
           }),
           signal: abortRef.current.signal,
         }
