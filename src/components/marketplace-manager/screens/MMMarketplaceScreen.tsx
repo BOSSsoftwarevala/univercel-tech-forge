@@ -597,6 +597,20 @@ export const MMMarketplaceScreen = () => {
               discountedPrice={discountedPrice}
             />
 
+            {upcomingProducts.length > 0 && (
+              <ProductRow
+                title="🔜 Upcoming Soon"
+                icon={<Monitor className="w-5 h-5 text-amber-400" />}
+                products={upcomingProducts}
+                favorites={favorites}
+                onView={handleProductView}
+                onDemo={handleDemo}
+                onBuy={handleBuy}
+                onFav={toggleFavorite}
+                discountedPrice={discountedPrice}
+              />
+            )}
+
             {Object.entries(groupedByCategory).slice(0, 6).map(([category, categoryProducts]) => (
               <ProductRow
                 key={category}
