@@ -77,9 +77,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+    // Track whether we already fetched role for this mount to avoid double-fetching
+    let roleFetchedForUser: string | null = null;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -89,31 +94,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        // Only fetch role on SIGNED_IN event or if not already checked
-        if (session?.user && (event === 'SIGNED_IN' || !roleChecked)) {
-          setTimeout(() => {
-            fetchUserRoleAndStatus(session.user.id);
-          }, 0);
-        } else if (!session) {
+        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          if (roleFetchedForUser !== session.user.id) {
+            roleFetchedForUser = session.user.id;
+            setTimeout(() => {
+              if (isMounted) fetchUserRoleAndStatus(session.user.id);
+            }, 0);
+          }
+        } else if (event === 'SIGNED_OUT' || !session) {
           setUserRole(null);
           setApprovalStatus(null);
           setRoleChecked(false);
+          roleFetchedForUser = null;
         }
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user && !roleChecked) {
+      if (session?.user && roleFetchedForUser !== session.user.id) {
+        roleFetchedForUser = session.user.id;
         fetchUserRoleAndStatus(session.user.id);
       }
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, [roleChecked]);
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Periodic force logout check for non-boss_owner users
   useEffect(() => {
