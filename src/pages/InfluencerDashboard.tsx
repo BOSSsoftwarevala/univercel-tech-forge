@@ -89,7 +89,8 @@ const InfluencerDashboard = () => {
       case 'click-tracker': return <LiveClickTracker />;
       case 'fraud-guard': return <AIFraudGuard />;
       case 'videos': return <VideoReelsManager />;
-      case 'promo': return <PromoGenerator />;
+      case 'rate-chart': return <InfluencerRateChart />;
+      case 'promo': return <AIBrandedPostGenerator />;
       case 'assets': return <VisualAssetLibrary />;
       case 'leaderboard': return <LeaderboardRewards />;
       case 'audience': return <AudienceInsights />;
