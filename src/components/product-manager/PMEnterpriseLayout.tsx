@@ -195,6 +195,9 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
     }
     
     // Deployment Control
+    if (activeSection === 'client-deploy') {
+      return <PMDeployScreen />;
+    }
     if (['server-assignment', 'environment-select', 'deploy', 'rollback', 'stop-deployment', 'deployment-logs'].includes(activeSection)) {
       return <PMDeploymentControl deploymentType={activeSection} />;
     }
