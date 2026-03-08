@@ -8437,6 +8437,263 @@ export type Database = {
         }
         Relationships: []
       }
+      gc_announcements: {
+        Row: {
+          attachments: Json | null
+          author_id: string
+          classroom_id: string
+          content: string
+          created_at: string | null
+          id: string
+          is_pinned: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          author_id: string
+          classroom_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          author_id?: string
+          classroom_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_announcements_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "gc_classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gc_assignments: {
+        Row: {
+          assignment_type: string | null
+          attachments: Json | null
+          classroom_id: string
+          created_at: string | null
+          created_by: string
+          description: string | null
+          due_date: string | null
+          id: string
+          max_points: number | null
+          status: string | null
+          title: string
+          topic: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_type?: string | null
+          attachments?: Json | null
+          classroom_id: string
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          max_points?: number | null
+          status?: string | null
+          title: string
+          topic?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_type?: string | null
+          attachments?: Json | null
+          classroom_id?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          max_points?: number | null
+          status?: string | null
+          title?: string
+          topic?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_assignments_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "gc_classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gc_class_members: {
+        Row: {
+          classroom_id: string
+          id: string
+          joined_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          classroom_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          classroom_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_class_members_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "gc_classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gc_classrooms: {
+        Row: {
+          class_code: string | null
+          cover_color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_archived: boolean | null
+          name: string
+          owner_id: string
+          room: string | null
+          section: string | null
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          class_code?: string | null
+          cover_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean | null
+          name: string
+          owner_id: string
+          room?: string | null
+          section?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          class_code?: string | null
+          cover_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean | null
+          name?: string
+          owner_id?: string
+          room?: string | null
+          section?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      gc_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          parent_id: string
+          parent_type: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          parent_id: string
+          parent_type: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string
+          parent_type?: string
+        }
+        Relationships: []
+      }
+      gc_submissions: {
+        Row: {
+          assignment_id: string
+          attachments: Json | null
+          created_at: string | null
+          feedback: string | null
+          grade: number | null
+          graded_at: string | null
+          graded_by: string | null
+          id: string
+          status: string | null
+          student_id: string
+          submission_text: string | null
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_id: string
+          attachments?: Json | null
+          created_at?: string | null
+          feedback?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          graded_by?: string | null
+          id?: string
+          status?: string | null
+          student_id: string
+          submission_text?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_id?: string
+          attachments?: Json | null
+          created_at?: string | null
+          feedback?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          graded_by?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string
+          submission_text?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "gc_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       global_offers: {
         Row: {
           banner_text: string | null
