@@ -48,10 +48,10 @@ const C = {
 
 // ─── ANIMATION VARIANTS ──────────────────────────────────────
 const pageIn = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
-const itemIn = { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 320, damping: 26 } } };
-const slideLeft = { hidden: { x: -20, opacity: 0 }, show: { x: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 25 } } };
-const slideRight = { hidden: { x: 20, opacity: 0 }, show: { x: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 25 } } };
-const scaleIn = { hidden: { scale: 0.96, opacity: 0 }, show: { scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 350, damping: 28 } } };
+const itemIn = { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 26 } } };
+const slideLeft = { hidden: { x: -20, opacity: 0 }, show: { x: 0, opacity: 1, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } } };
+const slideRight = { hidden: { x: 20, opacity: 0 }, show: { x: 0, opacity: 1, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } } };
+const scaleIn = { hidden: { scale: 0.96, opacity: 0 }, show: { scale: 1, opacity: 1, transition: { type: 'spring' as const, stiffness: 350, damping: 28 } } };
 
 // ─── MOCK DATA ───────────────────────────────────────────────
 const CATEGORIES = [
