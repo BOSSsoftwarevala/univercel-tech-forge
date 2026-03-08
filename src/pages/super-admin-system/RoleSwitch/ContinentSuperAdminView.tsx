@@ -397,12 +397,12 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
   // Directly compute continent from selectedSubItem for immediate response
   const currentContinentId = selectedSubItem ? continentIdMap[selectedSubItem] : showContinentDashboard;
 
-  // If any continent is selected (except Antarctica), render the unified continent dashboard
-  if (currentContinentId && currentContinentId !== "antarctica" && CONTINENT_CONFIGS[currentContinentId]) {
-    const config = getContinentConfig(currentContinentId);
+  // If any continent is selected, render the Meta Business Manager dashboard
+  if (currentContinentId && CONTINENT_CONFIGS[currentContinentId]) {
     return (
-      <ContinentSuperAdminDashboard 
-        config={config}
+      <MetaContinentDashboard 
+        continentId={currentContinentId}
+        continentName={continentNameMap[currentContinentId] || currentContinentId}
         onBack={() => {
           setShowContinentDashboard(null);
         }} 
