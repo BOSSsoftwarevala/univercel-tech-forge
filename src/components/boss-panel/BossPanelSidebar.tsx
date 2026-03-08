@@ -46,8 +46,6 @@ const menuGroups: MenuGroup[] = [
     label: 'Command Center',
     items: [
       { id: 'dashboard', label: 'Boss Panel', icon: LayoutDashboard, status: 'live' },
-      { id: 'ceo-dashboard', label: 'CEO Dashboard', icon: Monitor },
-      { id: 'vala-ai', label: 'Vala AI', icon: Brain, status: 'live' },
     ],
   },
   {

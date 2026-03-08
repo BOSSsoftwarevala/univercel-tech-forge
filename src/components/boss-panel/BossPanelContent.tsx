@@ -82,7 +82,7 @@ export function BossPanelContent() {
       case 'server-hosting':
         return <ServerHosting />;
       case 'vala-ai':
-        return <ValaAIModuleContainer />;
+        return <Navigate to="/super-admin-system/role-switch?role=aira&nav=vala-ai" replace />;
       case 'marketplace-manager':
         return <MMFullLayout />;
       case 'reseller-dashboard':
