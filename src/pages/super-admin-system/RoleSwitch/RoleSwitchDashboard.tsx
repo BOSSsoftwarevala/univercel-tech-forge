@@ -550,8 +550,25 @@ const RoleSwitchDashboard = () => {
   const fullScreenRoles: (ActiveRole | null)[] = ['continent_super_admin', 'country_head', 'finance_manager', 'reseller_dashboard'];
   const isFullScreenModule = fullScreenRoles.includes(activeRole);
 
+  // Roles that use their own light/custom theme (not dark parent wrapper)
+  const lightThemeRoles: (ActiveRole | null)[] = ['finance_manager', 'reseller_dashboard'];
+  const isLightThemeModule = lightThemeRoles.includes(activeRole);
+
   // Full-screen modules render without the parent header/sidebar
   if (isFullScreenModule) {
+    // Light-theme modules get a clean wrapper without dark class or dark background
+    if (isLightThemeModule) {
+      return (
+        <div className="min-h-screen w-full">
+          <ErrorBoundary>
+            <Suspense fallback={<ModuleLoader />}>
+              {renderRoleView()}
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      );
+    }
+    
     return (
       <div className="dark min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <ErrorBoundary>
