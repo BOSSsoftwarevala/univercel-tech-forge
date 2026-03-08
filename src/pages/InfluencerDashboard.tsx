@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Link2, Megaphone, Video, Palette, 
   Users, Wallet, Bell, Sparkles, MousePointer, Shield,
   Image, Trophy, PieChart, FileText, GraduationCap, Gift,
-  HeadphonesIcon, BarChart3, Share2, ArrowLeft, Lock, KeyRound, LogOut, Loader2
+  HeadphonesIcon, BarChart3, Share2, ArrowLeft, Lock, KeyRound, LogOut, Loader2, DollarSign
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useInfluencerGuard } from '@/hooks/useInfluencerGuard';
