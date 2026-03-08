@@ -20777,33 +20777,237 @@ export type Database = {
           },
         ]
       }
-      seo_keywords: {
+      seo_activity_logs: {
         Row: {
+          action_type: string
           created_at: string | null
-          current_rank: number | null
+          description: string | null
           id: string
-          keyword: string
-          module: string
-          region: string | null
-          status: string | null
+          metadata: Json | null
+          project_id: string | null
+          user_id: string | null
         }
         Insert: {
+          action_type: string
           created_at?: string | null
-          current_rank?: number | null
+          description?: string | null
           id?: string
-          keyword: string
-          module: string
-          region?: string | null
-          status?: string | null
+          metadata?: Json | null
+          project_id?: string | null
+          user_id?: string | null
         }
         Update: {
+          action_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      seo_audit_reports: {
+        Row: {
+          audit_type: string | null
+          completed_at: string | null
+          created_at: string | null
+          error_pages: number | null
+          healthy_pages: number | null
+          id: string
+          issues: Json | null
+          project_id: string
+          recommendations: Json | null
+          seo_score: number | null
+          started_at: string | null
+          status: string | null
+          total_pages_crawled: number | null
+          warning_pages: number | null
+        }
+        Insert: {
+          audit_type?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_pages?: number | null
+          healthy_pages?: number | null
+          id?: string
+          issues?: Json | null
+          project_id: string
+          recommendations?: Json | null
+          seo_score?: number | null
+          started_at?: string | null
+          status?: string | null
+          total_pages_crawled?: number | null
+          warning_pages?: number | null
+        }
+        Update: {
+          audit_type?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_pages?: number | null
+          healthy_pages?: number | null
+          id?: string
+          issues?: Json | null
+          project_id?: string
+          recommendations?: Json | null
+          seo_score?: number | null
+          started_at?: string | null
+          status?: string | null
+          total_pages_crawled?: number | null
+          warning_pages?: number | null
+        }
+        Relationships: []
+      }
+      seo_backlinks: {
+        Row: {
+          anchor_text: string | null
+          created_at: string | null
+          domain_authority: number | null
+          first_seen: string | null
+          id: string
+          is_toxic: boolean | null
+          last_checked: string | null
+          link_type: string | null
+          project_id: string
+          source_url: string
+          status: string | null
+          target_url: string
+        }
+        Insert: {
+          anchor_text?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          first_seen?: string | null
+          id?: string
+          is_toxic?: boolean | null
+          last_checked?: string | null
+          link_type?: string | null
+          project_id: string
+          source_url: string
+          status?: string | null
+          target_url: string
+        }
+        Update: {
+          anchor_text?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          first_seen?: string | null
+          id?: string
+          is_toxic?: boolean | null
+          last_checked?: string | null
+          link_type?: string | null
+          project_id?: string
+          source_url?: string
+          status?: string | null
+          target_url?: string
+        }
+        Relationships: []
+      }
+      seo_competitors: {
+        Row: {
+          backlink_count: number | null
+          common_keywords: number | null
+          competitor_domain: string
+          competitor_name: string | null
+          created_at: string | null
+          domain_authority: number | null
+          id: string
+          keyword_gap: number | null
+          last_analyzed_at: string | null
+          organic_traffic: number | null
+          project_id: string
+          total_keywords: number | null
+        }
+        Insert: {
+          backlink_count?: number | null
+          common_keywords?: number | null
+          competitor_domain: string
+          competitor_name?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          id?: string
+          keyword_gap?: number | null
+          last_analyzed_at?: string | null
+          organic_traffic?: number | null
+          project_id: string
+          total_keywords?: number | null
+        }
+        Update: {
+          backlink_count?: number | null
+          common_keywords?: number | null
+          competitor_domain?: string
+          competitor_name?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          id?: string
+          keyword_gap?: number | null
+          last_analyzed_at?: string | null
+          organic_traffic?: number | null
+          project_id?: string
+          total_keywords?: number | null
+        }
+        Relationships: []
+      }
+      seo_keywords: {
+        Row: {
+          country: string | null
+          cpc: number | null
+          created_at: string | null
+          current_rank: number | null
+          difficulty: number | null
+          id: string
+          intent: string | null
+          keyword: string
+          module: string
+          page_url: string | null
+          position: number | null
+          prev_position: number | null
+          project_id: string | null
+          region: string | null
+          search_volume: number | null
+          status: string | null
+          trend: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          country?: string | null
+          cpc?: number | null
           created_at?: string | null
           current_rank?: number | null
+          difficulty?: number | null
           id?: string
+          intent?: string | null
+          keyword: string
+          module: string
+          page_url?: string | null
+          position?: number | null
+          prev_position?: number | null
+          project_id?: string | null
+          region?: string | null
+          search_volume?: number | null
+          status?: string | null
+          trend?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          country?: string | null
+          cpc?: number | null
+          created_at?: string | null
+          current_rank?: number | null
+          difficulty?: number | null
+          id?: string
+          intent?: string | null
           keyword?: string
           module?: string
+          page_url?: string | null
+          position?: number | null
+          prev_position?: number | null
+          project_id?: string | null
           region?: string | null
+          search_volume?: number | null
           status?: string | null
+          trend?: Json | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -20879,6 +21083,90 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_projects: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          description: string | null
+          domain: string
+          id: string
+          language: string | null
+          last_audit_at: string | null
+          project_name: string
+          search_engine: string | null
+          seo_score: number | null
+          status: string | null
+          total_backlinks: number | null
+          total_keywords: number | null
+          total_pages: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          domain: string
+          id?: string
+          language?: string | null
+          last_audit_at?: string | null
+          project_name: string
+          search_engine?: string | null
+          seo_score?: number | null
+          status?: string | null
+          total_backlinks?: number | null
+          total_keywords?: number | null
+          total_pages?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          domain?: string
+          id?: string
+          language?: string | null
+          last_audit_at?: string | null
+          project_name?: string
+          search_engine?: string | null
+          seo_score?: number | null
+          status?: string | null
+          total_backlinks?: number | null
+          total_keywords?: number | null
+          total_pages?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seo_rankings: {
+        Row: {
+          country: string | null
+          id: string
+          keyword_id: string
+          position: number
+          recorded_at: string | null
+          search_engine: string | null
+        }
+        Insert: {
+          country?: string | null
+          id?: string
+          keyword_id: string
+          position: number
+          recorded_at?: string | null
+          search_engine?: string | null
+        }
+        Update: {
+          country?: string | null
+          id?: string
+          keyword_id?: string
+          position?: number
+          recorded_at?: string | null
+          search_engine?: string | null
+        }
+        Relationships: []
+      }
       seo_reports: {
         Row: {
           clicks: number | null
@@ -20916,6 +21204,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seo_traffic_stats: {
+        Row: {
+          avg_session_duration: number | null
+          bounce_rate: number | null
+          created_at: string | null
+          date: string
+          direct_traffic: number | null
+          id: string
+          organic_traffic: number | null
+          pages_per_session: number | null
+          paid_traffic: number | null
+          project_id: string
+          referral_traffic: number | null
+        }
+        Insert: {
+          avg_session_duration?: number | null
+          bounce_rate?: number | null
+          created_at?: string | null
+          date: string
+          direct_traffic?: number | null
+          id?: string
+          organic_traffic?: number | null
+          pages_per_session?: number | null
+          paid_traffic?: number | null
+          project_id: string
+          referral_traffic?: number | null
+        }
+        Update: {
+          avg_session_duration?: number | null
+          bounce_rate?: number | null
+          created_at?: string | null
+          date?: string
+          direct_traffic?: number | null
+          id?: string
+          organic_traffic?: number | null
+          pages_per_session?: number | null
+          paid_traffic?: number | null
+          project_id?: string
+          referral_traffic?: number | null
+        }
+        Relationships: []
       }
       server_actions: {
         Row: {

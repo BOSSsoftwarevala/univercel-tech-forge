@@ -6,57 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link2, TrendingUp, TrendingDown, AlertTriangle, Shield, ExternalLink, Search, Plus, Trash2, Eye } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Link2, AlertTriangle, Shield, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-const backlinkGrowth = [
-  { month: "Oct", total: 10800, new: 420, lost: 180 },
-  { month: "Nov", total: 11200, new: 580, lost: 180 },
-  { month: "Dec", total: 11600, new: 540, lost: 140 },
-  { month: "Jan", total: 11900, new: 480, lost: 180 },
-  { month: "Feb", total: 12100, new: 380, lost: 180 },
-  { month: "Mar", total: 12400, new: 460, lost: 160 },
-];
-
-interface Backlink {
-  id: string;
-  source: string;
-  target: string;
-  anchor: string;
-  da: number;
-  type: "dofollow" | "nofollow";
-  status: "active" | "lost" | "toxic";
-  firstSeen: string;
-}
-
-const mockBacklinks: Backlink[] = [
-  { id: "BL001", source: "techcrunch.com/article/...", target: "/products/software", anchor: "software development", da: 94, type: "dofollow", status: "active", firstSeen: "Jan 2026" },
-  { id: "BL002", source: "forbes.com/business/...", target: "/enterprise", anchor: "enterprise solution", da: 95, type: "dofollow", status: "active", firstSeen: "Feb 2026" },
-  { id: "BL003", source: "medium.com/@author/...", target: "/blog/trends", anchor: "read more", da: 62, type: "nofollow", status: "active", firstSeen: "Dec 2025" },
-  { id: "BL004", source: "spamsite123.xyz/link", target: "/home", anchor: "click here", da: 5, type: "dofollow", status: "toxic", firstSeen: "Mar 2026" },
-  { id: "BL005", source: "github.com/repo/...", target: "/docs/api", anchor: "API docs", da: 97, type: "nofollow", status: "active", firstSeen: "Nov 2025" },
-  { id: "BL006", source: "reddit.com/r/...", target: "/products/crm", anchor: "best CRM", da: 91, type: "nofollow", status: "active", firstSeen: "Jan 2026" },
-  { id: "BL007", source: "old-blog.net/post", target: "/services", anchor: "services", da: 28, type: "dofollow", status: "lost", firstSeen: "Sep 2025" },
-];
+import { useSEOBacklinks } from "@/hooks/useSEOData";
 
 const SEOBacklinks = () => {
+  const { backlinks, loading } = useSEOBacklinks();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
   const getDaColor = (da: number) => da >= 70 ? "text-emerald-400" : da >= 40 ? "text-amber-400" : "text-red-400";
-  const filtered = mockBacklinks.filter(bl => {
-    if (searchQuery && !bl.source.includes(searchQuery) && !bl.anchor.includes(searchQuery)) return false;
-    if (activeTab === "dofollow") return bl.type === "dofollow" && bl.status !== "toxic";
-    if (activeTab === "toxic") return bl.status === "toxic";
+  
+  const filtered = backlinks.filter((bl: any) => {
+    if (searchQuery && !bl.source_url?.includes(searchQuery) && !bl.anchor_text?.includes(searchQuery)) return false;
+    if (activeTab === "dofollow") return bl.link_type === "dofollow" && !bl.is_toxic;
+    if (activeTab === "toxic") return bl.is_toxic;
     if (activeTab === "lost") return bl.status === "lost";
     return true;
   });
 
-  const totalActive = mockBacklinks.filter(b => b.status === "active").length;
-  const toxicCount = mockBacklinks.filter(b => b.status === "toxic").length;
-  const dofollowCount = mockBacklinks.filter(b => b.type === "dofollow" && b.status === "active").length;
-  const avgDA = Math.round(mockBacklinks.filter(b => b.status === "active").reduce((s, b) => s + b.da, 0) / totalActive);
+  const totalActive = backlinks.filter((b: any) => b.status === "active").length;
+  const toxicCount = backlinks.filter((b: any) => b.is_toxic).length;
+  const dofollowCount = backlinks.filter((b: any) => b.link_type === "dofollow" && b.status === "active").length;
+  const avgDA = totalActive > 0 ? Math.round(backlinks.filter((b: any) => b.status === "active").reduce((s: number, b: any) => s + (b.domain_authority || 0), 0) / totalActive) : 0;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+        <span className="ml-3 text-slate-400">Loading backlinks...</span>
+      </div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -68,34 +49,12 @@ const SEOBacklinks = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="bg-slate-900/50 border-slate-700/50"><CardContent className="pt-4 pb-3 text-center"><p className="text-xs text-slate-400">Total Backlinks</p><p className="text-2xl font-bold text-white">12,400</p></CardContent></Card>
+        <Card className="bg-slate-900/50 border-slate-700/50"><CardContent className="pt-4 pb-3 text-center"><p className="text-xs text-slate-400">Total Backlinks</p><p className="text-2xl font-bold text-white">{backlinks.length}</p></CardContent></Card>
         <Card className="bg-emerald-500/10 border-emerald-500/20"><CardContent className="pt-4 pb-3 text-center"><p className="text-xs text-emerald-400">Active</p><p className="text-2xl font-bold text-emerald-400">{totalActive}</p></CardContent></Card>
         <Card className="bg-blue-500/10 border-blue-500/20"><CardContent className="pt-4 pb-3 text-center"><p className="text-xs text-blue-400">Dofollow</p><p className="text-2xl font-bold text-blue-400">{dofollowCount}</p></CardContent></Card>
         <Card className="bg-red-500/10 border-red-500/20"><CardContent className="pt-4 pb-3 text-center"><p className="text-xs text-red-400">Toxic</p><p className="text-2xl font-bold text-red-400">{toxicCount}</p></CardContent></Card>
         <Card className="bg-purple-500/10 border-purple-500/20"><CardContent className="pt-4 pb-3 text-center"><p className="text-xs text-purple-400">Avg DA</p><p className="text-2xl font-bold text-purple-400">{avgDA}</p></CardContent></Card>
       </div>
-
-      <Card className="bg-slate-900/50 border-slate-700/50">
-        <CardHeader className="pb-2"><CardTitle className="text-cyan-400 text-base">Backlink Growth</CardTitle></CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={backlinkGrowth}>
-              <defs>
-                <linearGradient id="blGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-              <YAxis stroke="#64748b" fontSize={12} />
-              <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }} />
-              <Area type="monotone" dataKey="total" stroke="#06b6d4" fill="url(#blGrad)" strokeWidth={2} name="Total" />
-              <Area type="monotone" dataKey="new" stroke="#10b981" fill="none" strokeWidth={1.5} name="New" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
 
       <div className="flex gap-3">
         <div className="relative flex-1">
@@ -113,41 +72,51 @@ const SEOBacklinks = () => {
         </TabsList>
       </Tabs>
 
-      <Card className="bg-slate-900/50 border-slate-700/50">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-slate-700 hover:bg-transparent">
-                <TableHead className="text-slate-400">Source</TableHead>
-                <TableHead className="text-slate-400">Target</TableHead>
-                <TableHead className="text-slate-400">Anchor</TableHead>
-                <TableHead className="text-slate-400">DA</TableHead>
-                <TableHead className="text-slate-400">Type</TableHead>
-                <TableHead className="text-slate-400">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map(bl => (
-                <TableRow key={bl.id} className="border-slate-700/50 hover:bg-slate-800/30">
-                  <TableCell className="text-slate-300 text-xs font-mono max-w-xs truncate">{bl.source}</TableCell>
-                  <TableCell className="text-slate-400 text-xs font-mono">{bl.target}</TableCell>
-                  <TableCell className="text-white text-sm">{bl.anchor}</TableCell>
-                  <TableCell className={`font-bold ${getDaColor(bl.da)}`}>{bl.da}</TableCell>
-                  <TableCell>
-                    <Badge className={bl.type === "dofollow" ? "bg-blue-500/20 text-blue-400" : "bg-slate-500/20 text-slate-400"}>{bl.type}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={bl.status === "active" ? "bg-emerald-500/20 text-emerald-400" : bl.status === "toxic" ? "bg-red-500/20 text-red-400" : "bg-slate-500/20 text-slate-400"}>
-                      {bl.status === "toxic" && <AlertTriangle className="h-3 w-3 mr-1" />}
-                      {bl.status}
-                    </Badge>
-                  </TableCell>
+      {backlinks.length === 0 ? (
+        <Card className="bg-slate-900/50 border-slate-700/50">
+          <CardContent className="pt-8 pb-8 text-center">
+            <Link2 className="h-10 w-10 text-slate-500 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-white mb-1">No Backlinks Found</h3>
+            <p className="text-slate-400 text-sm">Backlinks will appear here once scanned or imported.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="bg-slate-900/50 border-slate-700/50">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-700 hover:bg-transparent">
+                  <TableHead className="text-slate-400">Source</TableHead>
+                  <TableHead className="text-slate-400">Target</TableHead>
+                  <TableHead className="text-slate-400">Anchor</TableHead>
+                  <TableHead className="text-slate-400">DA</TableHead>
+                  <TableHead className="text-slate-400">Type</TableHead>
+                  <TableHead className="text-slate-400">Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((bl: any) => (
+                  <TableRow key={bl.id} className="border-slate-700/50 hover:bg-slate-800/30">
+                    <TableCell className="text-slate-300 text-xs font-mono max-w-xs truncate">{bl.source_url}</TableCell>
+                    <TableCell className="text-slate-400 text-xs font-mono">{bl.target_url}</TableCell>
+                    <TableCell className="text-white text-sm">{bl.anchor_text || "—"}</TableCell>
+                    <TableCell className={`font-bold ${getDaColor(bl.domain_authority || 0)}`}>{bl.domain_authority || "—"}</TableCell>
+                    <TableCell>
+                      <Badge className={bl.link_type === "dofollow" ? "bg-blue-500/20 text-blue-400" : "bg-slate-500/20 text-slate-400"}>{bl.link_type || "—"}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={bl.is_toxic ? "bg-red-500/20 text-red-400" : bl.status === "active" ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-500/20 text-slate-400"}>
+                        {bl.is_toxic && <AlertTriangle className="h-3 w-3 mr-1" />}
+                        {bl.is_toxic ? "toxic" : bl.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {toxicCount > 0 && (
         <Card className="bg-red-500/10 border-red-500/20">
