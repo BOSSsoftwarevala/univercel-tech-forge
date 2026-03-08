@@ -234,13 +234,59 @@ export const MMMarketplaceScreen = () => {
     navigate(`/marketplace/product/${product.product_id}`);
   };
 
-  const handlePartnerRequest = (requestType: PartnerRequestType, label: string) => {
+  const handlePartnerRequest = async (requestType: PartnerRequestType, label: string) => {
+    const needsApplicationRecord = requestType === 'reseller_request' || requestType === 'job_apply' || requestType === 'developer_request';
+
+    if (needsApplicationRecord && !user) {
+      void logEvent(requestType, undefined, {
+        severity: 'warning',
+        metadata: { request_label: label, requires_auth: true },
+      });
+      toast.error('Please login first so we can process your application');
+      return;
+    }
+
+    let applicationInsertError: string | null = null;
+
+    if (needsApplicationRecord && user) {
+      const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const fallbackName = user.email?.split('@')[0] || 'Marketplace User';
+      const fullName = String(userMeta.full_name || fallbackName);
+
+      const applicationType = requestType === 'reseller_request' ? 'reseller' : 'developer';
+
+      const { error } = await supabase
+        .from('reseller_applications')
+        .insert({
+          user_id: user.id,
+          application_type: applicationType,
+          full_name: fullName,
+          email: user.email || `${user.id}@softwarevala.local`,
+          phone: null,
+          country: null,
+          id_proof_uploaded: false,
+          terms_accepted: true,
+          promise_acknowledged: true,
+          status: 'pending',
+        });
+
+      if (error) {
+        applicationInsertError = error.message;
+      }
+    }
+
     void logEvent(requestType, undefined, {
       severity: 'warning',
       metadata: {
         request_label: label,
+        application_sync: applicationInsertError ? 'failed' : (needsApplicationRecord ? 'created' : 'not_required'),
       },
     });
+
+    if (applicationInsertError) {
+      toast.error(`Request logged but application save failed: ${applicationInsertError}`);
+      return;
+    }
 
     toast.success(`${label} submitted — Boss has been notified`);
   };
