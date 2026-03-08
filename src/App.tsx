@@ -104,6 +104,8 @@ const lazyLoad = (importFn: () => Promise<any>) => {
 const Homepage = lazyLoad(() => import("./pages/Homepage"));
 const Dashboard = lazyLoad(() => import("./pages/Dashboard"));
 const NotFound = lazyLoad(() => import("./pages/NotFound"));
+const PaymentSuccess = lazyLoad(() => import("./pages/PaymentSuccess"));
+const PaymentFailure = lazyLoad(() => import("./pages/PaymentFailure"));
 const CategoryOnboarding = lazyLoad(() => import("./pages/CategoryOnboarding"));
 
 // Auth Pages
