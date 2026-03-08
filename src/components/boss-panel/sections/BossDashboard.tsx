@@ -1,21 +1,23 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { 
   Users, 
-  Globe, 
-  MapPin, 
   DollarSign, 
   AlertTriangle, 
   Activity,
   TrendingUp,
+  TrendingDown,
   ArrowUpRight,
-  ArrowDownRight,
-  Briefcase,
   CheckCircle2,
   Clock,
-  Calendar,
-  Mail,
-  Phone
+  XCircle,
+  FileText,
+  Server,
+  Shield,
+  Boxes,
+  Globe,
+  BarChart3,
+  Zap,
+  Eye
 } from 'lucide-react';
 import { 
   AreaChart,
@@ -27,14 +29,11 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Cell,
   PieChart,
-  Pie,
-  Cell
+  Pie
 } from 'recharts';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { GlobalNetworkMap } from './GlobalNetworkMap';
 import {
   useResellerApplications,
   useFranchiseAccounts,
@@ -42,438 +41,362 @@ import {
   useDashboardMetrics,
   useDashboardRealtime,
 } from '@/hooks/boss-panel/useDashboardData';
+import { useBossDashboard } from '@/hooks/boss-panel/useBossDashboard';
 
-const bookingData = [
-  { day: 'Sun', value: 30 },
-  { day: 'Mon', value: 42 },
-  { day: 'Tue', value: 35 },
-  { day: 'Wed', value: 45 },
-  { day: 'Thu', value: 58 },
-  { day: 'Fri', value: 48 },
-  { day: 'Sat', value: 52 },
-];
+// ─── SAP FIORI COLOR TOKENS ────────────────────────────────────
+const SAP = {
+  shell:       'hsl(214, 27%, 26%)',   // SAP shell bar
+  blue:        'hsl(210, 100%, 46%)',  // SAP Brand Blue
+  blueDark:    'hsl(210, 100%, 36%)',
+  blueLight:   'hsl(210, 100%, 95%)',
+  positive:    'hsl(145, 63%, 42%)',   // SAP Positive/Good
+  critical:    'hsl(27, 100%, 50%)',   // SAP Critical/Warning
+  negative:    'hsl(0, 78%, 55%)',     // SAP Negative/Error
+  neutral:     'hsl(213, 14%, 55%)',   // SAP Neutral
+  tileBg:      'hsl(0, 0%, 100%)',
+  tileBorder:  'hsl(213, 18%, 90%)',
+  sectionBg:   'hsl(210, 25%, 97%)',
+  text:        'hsl(214, 27%, 19%)',
+  textLight:   'hsl(213, 14%, 55%)',
+  tableHeader: 'hsl(210, 25%, 97%)',
+  tableHover:  'hsl(210, 25%, 95%)',
+  tableStripe: 'hsl(210, 25%, 98.5%)',
+};
 
-const scheduleData = [
-  { title: 'Aspirus Hospital', time: '8:00am - 10:00am', color: 'bg-emerald-500' },
-  { title: 'Ron sesame st', time: '2:00pm - 4:00pm', color: 'bg-orange-500' },
-  { title: 'Mayo Clinic', time: '5:00pm - 7:00pm', color: 'bg-violet-500' },
-];
+// ─── SAP-STYLE SEMANTIC STATUS BADGE ───────────────────────────
+function StatusBadge({ status }: { status: string }) {
+  const config: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+    approved: { bg: 'hsl(145, 63%, 94%)', text: SAP.positive, dot: SAP.positive, label: 'Approved' },
+    active:   { bg: 'hsl(145, 63%, 94%)', text: SAP.positive, dot: SAP.positive, label: 'Active' },
+    pending:  { bg: 'hsl(27, 100%, 94%)', text: SAP.critical, dot: SAP.critical, label: 'Pending' },
+    rejected: { bg: 'hsl(0, 78%, 95%)',   text: SAP.negative, dot: SAP.negative, label: 'Rejected' },
+  };
+  const c = config[status] || config.pending;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium"
+      style={{ background: c.bg, color: c.text }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full" style={{ background: c.dot }} />
+      {c.label}
+    </span>
+  );
+}
 
+// ─── SAP KPI NUMERIC TILE ──────────────────────────────────────
+function KPITile({ 
+  title, value, unit, trend, trendValue, icon: Icon, status 
+}: { 
+  title: string; value: string | number; unit?: string; trend?: 'up' | 'down' | 'neutral'; 
+  trendValue?: string; icon: React.ElementType; status?: 'good' | 'warning' | 'critical' 
+}) {
+  const statusColor = status === 'good' ? SAP.positive : status === 'warning' ? SAP.critical : status === 'critical' ? SAP.negative : SAP.blue;
+  return (
+    <div
+      className="flex flex-col justify-between p-4 rounded-lg transition-shadow hover:shadow-md"
+      style={{
+        background: SAP.tileBg,
+        border: `1px solid ${SAP.tileBorder}`,
+        borderLeft: `4px solid ${statusColor}`,
+        minHeight: '120px',
+      }}
+    >
+      <div className="flex items-start justify-between">
+        <span className="text-xs font-medium uppercase tracking-wide" style={{ color: SAP.textLight }}>{title}</span>
+        <Icon className="w-4 h-4" style={{ color: SAP.textLight }} />
+      </div>
+      <div className="mt-2">
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-bold tabular-nums" style={{ color: SAP.text }}>{value}</span>
+          {unit && <span className="text-sm" style={{ color: SAP.textLight }}>{unit}</span>}
+        </div>
+        {trend && trendValue && (
+          <div className="flex items-center gap-1 mt-1">
+            {trend === 'up' ? (
+              <TrendingUp className="w-3 h-3" style={{ color: SAP.positive }} />
+            ) : trend === 'down' ? (
+              <TrendingDown className="w-3 h-3" style={{ color: SAP.negative }} />
+            ) : null}
+            <span className="text-xs font-medium" style={{ color: trend === 'up' ? SAP.positive : trend === 'down' ? SAP.negative : SAP.neutral }}>
+              {trendValue}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── SAP SECTION HEADER ────────────────────────────────────────
+function SectionHeader({ title, count }: { title: string; count?: number }) {
+  return (
+    <div className="flex items-center justify-between pb-3 mb-0" style={{ borderBottom: `1px solid ${SAP.tileBorder}` }}>
+      <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: SAP.text }}>{title}</h2>
+      {count !== undefined && (
+        <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: SAP.blueLight, color: SAP.blue }}>
+          {count}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ─── MAIN DASHBOARD ────────────────────────────────────────────
 export function BossDashboard() {
-  const { data: resellerData, isLoading: resellerLoading } = useResellerApplications();
-  const { data: franchiseData, isLoading: franchiseLoading } = useFranchiseAccounts();
-  const { data: jobData, isLoading: jobLoading } = useJobApplications();
-  const { data: metrics, isLoading: metricsLoading } = useDashboardMetrics();
+  const { data: resellerData, isLoading: rL } = useResellerApplications();
+  const { data: franchiseData, isLoading: fL } = useFranchiseAccounts();
+  const { data: jobData, isLoading: jL } = useJobApplications();
+  const { data: metrics, isLoading: mL } = useDashboardMetrics();
+  const { summary, systemHealth, isLoading: sL } = useBossDashboard();
   useDashboardRealtime();
 
-  const summaryCards = [
-    {
-      label: 'Reseller Applications',
-      value: resellerLoading ? '...' : String(resellerData?.total ?? 0),
-      icon: Users,
-      gradient: 'from-blue-500 to-cyan-400',
-      bgGradient: 'from-blue-500/20 to-cyan-400/10',
-    },
-    {
-      label: 'Franchise Accounts',
-      value: franchiseLoading ? '...' : String(franchiseData?.total ?? 0),
-      icon: Clock,
-      gradient: 'from-orange-500 to-amber-400',
-      bgGradient: 'from-orange-500/20 to-amber-400/10',
-    },
-    {
-      label: 'Job Applications',
-      value: jobLoading ? '...' : String(jobData?.total ?? 0),
-      icon: CheckCircle2,
-      gradient: 'from-purple-500 to-pink-400',
-      bgGradient: 'from-purple-500/20 to-pink-400/10',
-    },
+  const loading = rL || fL || jL || mL || sL;
+  const fmt = (n: number | undefined) => n?.toLocaleString() ?? '—';
+
+  const revenueData = metrics?.revenueByMonth ?? Array.from({ length: 6 }, (_, i) => ({
+    month: ['Jan','Feb','Mar','Apr','May','Jun'][i], revenue: 0, trend: 0
+  }));
+
+  const moduleBreakdown = systemHealth?.modules ?? [];
+  const activeModules = moduleBreakdown.filter(m => m.status === 'active').length;
+  const totalModules = moduleBreakdown.length || 1;
+
+  // Application pipeline data
+  const pipelineData = [
+    { stage: 'Reseller', pending: resellerData?.pending ?? 0, approved: resellerData?.approved ?? 0, rejected: resellerData?.rejected ?? 0 },
+    { stage: 'Franchise', pending: franchiseData?.pending ?? 0, approved: franchiseData?.active ?? 0, rejected: 0 },
+    { stage: 'Jobs', pending: jobData?.pending ?? 0, approved: jobData?.approved ?? 0, rejected: jobData?.rejected ?? 0 },
   ];
 
-  const revenueData = metrics?.revenueByMonth ?? [
-    { month: 'Jan', revenue: 0, trend: 0 },
-    { month: 'Feb', revenue: 0, trend: 0 },
-    { month: 'Mar', revenue: 0, trend: 0 },
-    { month: 'Apr', revenue: 0, trend: 0 },
-    { month: 'May', revenue: 0, trend: 0 },
-    { month: 'Jun', revenue: 0, trend: 0 },
-  ];
-
-  const incomeData = metrics?.totalRevenue || (resellerData?.pending ?? 0) + (jobData?.pending ?? 0)
-    ? [
-        { name: 'Revenue', value: metrics?.totalRevenue || 0, color: '#8B5CF6' },
-        { name: 'Pending', value: (resellerData?.pending ?? 0) + (jobData?.pending ?? 0), color: '#F97316' },
-      ]
-    : [{ name: 'No Data', value: 1, color: '#CBD5E1' }];
-
-  const getInitials = (name: string) =>
-    name.trim()
-      ? name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2).toUpperCase()
-      : '?';
-
-  const recentActivity = [
-    ...(resellerData?.recentApplications ?? []).map(a => ({
-      name: a.full_name,
-      time: new Date(a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      duration: a.status,
-      avatar: getInitials(a.full_name),
-    })),
-    ...(jobData?.recentApplications ?? []).map(a => ({
-      name: a.full_name,
-      time: new Date(a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      duration: a.application_type,
-      avatar: getInitials(a.full_name),
-    })),
-  ].slice(0, 5);
+  const recentApplications = [
+    ...(resellerData?.recentApplications ?? []).map(a => ({ ...a, type: 'Reseller' })),
+    ...(jobData?.recentApplications ?? []).map(a => ({ ...a, type: a.application_type, status: a.status })),
+  ]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 8);
 
   return (
-    <div className="p-6 space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-full">
-      {/* Header */}
+    <div className="space-y-5" style={{ color: SAP.text }}>
+      {/* ── SHELL: Page Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Command Dashboard
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Real-time overview of all operations
+          <h1 className="text-xl font-bold" style={{ color: SAP.text }}>Boss Command Center</h1>
+          <p className="text-xs mt-0.5" style={{ color: SAP.textLight }}>
+            Enterprise Overview • Last refreshed {new Date().toLocaleTimeString()}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500 dark:text-slate-400">
-            Last updated: {new Date().toLocaleTimeString()}
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium" style={{ background: 'hsl(145, 63%, 94%)', color: SAP.positive }}>
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: SAP.positive }} />
+            System Online
           </span>
         </div>
       </div>
 
-      {/* Global Network Map - Full Width */}
-      <GlobalNetworkMap className="w-full" />
+      {/* ── ROW 1: KPI Tiles ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+        <KPITile title="Total Revenue" value={`$${fmt(metrics?.totalRevenue)}`} icon={DollarSign} trend="up" trendValue="+12.4%" status="good" />
+        <KPITile title="Active Users" value={fmt(metrics?.activeUsers)} icon={Users} trend="up" trendValue="+8.2%" status="good" />
+        <KPITile title="New Users (30d)" value={fmt(metrics?.newUsers)} icon={TrendingUp} trend="up" trendValue="+15%" status="good" />
+        <KPITile title="Reseller Apps" value={fmt(resellerData?.total)} icon={FileText} trend={resellerData?.pending ? 'up' : 'neutral'} trendValue={`${resellerData?.pending ?? 0} pending`} status={resellerData?.pending ? 'warning' : 'good'} />
+        <KPITile title="Franchise Accts" value={fmt(franchiseData?.total)} icon={Globe} trend="neutral" trendValue={`${franchiseData?.active ?? 0} active`} status="good" />
+        <KPITile title="System Health" value={`${summary?.systemHealth ?? 100}%`} icon={Activity} status={(summary?.systemHealth ?? 100) >= 90 ? 'good' : (summary?.systemHealth ?? 100) >= 70 ? 'warning' : 'critical'} trend="neutral" trendValue={`${activeModules}/${totalModules} modules`} />
+      </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Left Column - Charts */}
-        <div className="col-span-12 lg:col-span-8 space-y-6">
-          {/* Revenue Chart Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Incoming Activity History
-              </h2>
-              <select className="text-sm bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-lg border-0">
-                <option>Monthly</option>
-                <option>Weekly</option>
-                <option>Daily</option>
-              </select>
-            </div>
-            
-            {/* Stats Cards Row */}
-            <div className="flex gap-4 mb-6">
-              <div className="flex items-center gap-3 bg-gradient-to-r from-blue-500/10 to-blue-400/5 dark:from-blue-500/20 dark:to-blue-400/10 px-4 py-3 rounded-2xl">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">
-                    {metricsLoading ? '...' : metrics?.newUsers ?? 0}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">New Users</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-gradient-to-r from-orange-500/10 to-amber-400/5 dark:from-orange-500/20 dark:to-amber-400/10 px-4 py-3 rounded-2xl">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">
-                    {metricsLoading ? '...' : metrics?.activeUsers ?? 0}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Active</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-gradient-to-r from-purple-500/10 to-pink-400/5 dark:from-purple-500/20 dark:to-pink-400/10 px-4 py-3 rounded-2xl">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-slate-900 dark:text-white">
-                    {resellerLoading ? '...' : resellerData?.approved ?? 0}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Approved</p>
-                </div>
-              </div>
-            </div>
-
-            <ResponsiveContainer width="100%" height={220}>
+      {/* ── ROW 2: Charts + Pipeline ── */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Revenue Trend Chart */}
+        <div className="col-span-12 lg:col-span-8 rounded-lg p-5" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}` }}>
+          <SectionHeader title="Revenue Trend" />
+          <div className="mt-4">
+            <ResponsiveContainer width="100%" height={240}>
               <AreaChart data={revenueData}>
                 <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#06B6D4" stopOpacity={0}/>
+                  <linearGradient id="sapBlueGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={SAP.blue} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={SAP.blue} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-slate-700" />
-                <XAxis dataKey="month" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                <CartesianGrid strokeDasharray="3 3" stroke={SAP.tileBorder} />
+                <XAxis dataKey="month" stroke={SAP.textLight} fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke={SAP.textLight} fontSize={11} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: SAP.tileBg,
+                    border: `1px solid ${SAP.tileBorder}`,
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                   }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#8B5CF6" 
-                  strokeWidth={3}
-                  fill="url(#colorRevenue)"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="trend" 
-                  stroke="#06B6D4" 
-                  strokeWidth={2}
-                  fill="url(#colorTrend)"
-                  strokeDasharray="5 5"
-                />
+                <Area type="monotone" dataKey="revenue" stroke={SAP.blue} strokeWidth={2} fill="url(#sapBlueGrad)" />
+                <Area type="monotone" dataKey="trend" stroke={SAP.neutral} strokeWidth={1.5} fill="none" strokeDasharray="4 4" />
               </AreaChart>
             </ResponsiveContainer>
-          </motion.div>
+          </div>
+        </div>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            {summaryCards.map((card, index) => {
-              const Icon = card.icon;
+        {/* Application Pipeline */}
+        <div className="col-span-12 lg:col-span-4 rounded-lg p-5" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}` }}>
+          <SectionHeader title="Application Pipeline" />
+          <div className="mt-4 space-y-4">
+            {pipelineData.map((p) => {
+              const total = p.pending + p.approved + p.rejected || 1;
               return (
-                <motion.div
-                  key={card.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`bg-gradient-to-br ${card.bgGradient} backdrop-blur-sm rounded-2xl p-5 border border-white/50 dark:border-slate-700/50 shadow-lg`}
-                >
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${card.gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                    <Icon className="w-6 h-6 text-white" />
+                <div key={p.stage}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-medium" style={{ color: SAP.text }}>{p.stage}</span>
+                    <span className="text-xs tabular-nums" style={{ color: SAP.textLight }}>{p.pending + p.approved + p.rejected}</span>
                   </div>
-                  <p className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{card.value}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{card.label}</p>
-                </motion.div>
+                  <div className="flex h-2 rounded-full overflow-hidden" style={{ background: SAP.sectionBg }}>
+                    <div className="h-full" style={{ width: `${(p.approved / total) * 100}%`, background: SAP.positive }} />
+                    <div className="h-full" style={{ width: `${(p.pending / total) * 100}%`, background: SAP.critical }} />
+                    <div className="h-full" style={{ width: `${(p.rejected / total) * 100}%`, background: SAP.negative }} />
+                  </div>
+                  <div className="flex gap-3 mt-1">
+                    <span className="text-[10px]" style={{ color: SAP.positive }}>✓ {p.approved}</span>
+                    <span className="text-[10px]" style={{ color: SAP.critical }}>⏳ {p.pending}</span>
+                    {p.rejected > 0 && <span className="text-[10px]" style={{ color: SAP.negative }}>✕ {p.rejected}</span>}
+                  </div>
+                </div>
               );
             })}
           </div>
 
-          {/* Bottom Charts Row */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Booking Rate */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Booking Rate</h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400">Weekly</span>
-              </div>
-              <div className="flex items-end gap-4 mb-4">
-                <span className="text-4xl font-bold text-slate-900 dark:text-white">58%</span>
-                <div className="flex items-center gap-1 text-emerald-500 text-sm pb-1">
-                  <ArrowUpRight className="w-4 h-4" />
-                  <span>6%</span>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Your total booking on Friday</p>
-              <ResponsiveContainer width="100%" height={120}>
-                <BarChart data={bookingData}>
-                  <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                    {bookingData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={index === 4 ? '#F97316' : '#E2E8F0'} 
-                        className="dark:fill-slate-600"
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </motion.div>
-
-            {/* My Schedule */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">My Schedule</h3>
-                <select className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-lg border-0">
-                  <option>Monthly</option>
-                </select>
-              </div>
-              
-              {/* Calendar Header */}
-              <div className="flex justify-between mb-4">
-                {['12', '13', '14', '15', '16', '17', '18', '19', '20', '21'].map((day, i) => (
-                  <div 
-                    key={day} 
-                    className={`text-center ${i === 3 ? 'bg-gradient-to-br from-orange-500 to-amber-400 text-white rounded-xl px-2 py-1' : ''}`}
-                  >
-                    <p className="text-xs text-slate-400">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'][i]}</p>
-                    <p className={`text-sm font-semibold ${i === 3 ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{day}</p>
+          {/* System Modules Mini */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium" style={{ color: SAP.text }}>System Modules</span>
+              <span className="text-xs" style={{ color: SAP.positive }}>{activeModules}/{totalModules} active</span>
+            </div>
+            <Progress value={(activeModules / totalModules) * 100} className="h-1.5" />
+            {moduleBreakdown.length > 0 && (
+              <div className="mt-2 max-h-28 overflow-y-auto space-y-1">
+                {moduleBreakdown.slice(0, 6).map((m) => (
+                  <div key={m.name} className="flex items-center justify-between text-[11px] py-0.5">
+                    <span style={{ color: SAP.text }}>{m.name}</span>
+                    <StatusBadge status={m.status === 'active' ? 'approved' : m.status === 'maintenance' ? 'pending' : 'rejected'} />
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-              {/* Schedule Items */}
-              <div className="space-y-2">
-                {scheduleData.map((item, i) => (
-                  <div key={i} className={`${item.color} text-white text-xs px-3 py-2 rounded-lg`}>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="opacity-80">{item.time}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+      {/* ── ROW 3: Data Table + Quick Stats ── */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Recent Applications Table (SAP List Report style) */}
+        <div className="col-span-12 lg:col-span-8 rounded-lg overflow-hidden" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}` }}>
+          <div className="px-5 pt-4 pb-3">
+            <SectionHeader title="Recent Applications" count={recentApplications.length} />
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr style={{ background: SAP.tableHeader }}>
+                  <th className="text-left px-5 py-2.5 font-semibold uppercase tracking-wider" style={{ color: SAP.textLight, borderBottom: `1px solid ${SAP.tileBorder}` }}>Name</th>
+                  <th className="text-left px-5 py-2.5 font-semibold uppercase tracking-wider" style={{ color: SAP.textLight, borderBottom: `1px solid ${SAP.tileBorder}` }}>Type</th>
+                  <th className="text-left px-5 py-2.5 font-semibold uppercase tracking-wider" style={{ color: SAP.textLight, borderBottom: `1px solid ${SAP.tileBorder}` }}>Date</th>
+                  <th className="text-left px-5 py-2.5 font-semibold uppercase tracking-wider" style={{ color: SAP.textLight, borderBottom: `1px solid ${SAP.tileBorder}` }}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-8" style={{ color: SAP.textLight }}>No applications found</td>
+                  </tr>
+                ) : (
+                  recentApplications.map((app, i) => (
+                    <tr
+                      key={app.id}
+                      className="transition-colors cursor-pointer"
+                      style={{
+                        background: i % 2 === 0 ? SAP.tileBg : SAP.tableStripe,
+                        borderBottom: `1px solid ${SAP.tileBorder}`,
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = SAP.tableHover)}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = i % 2 === 0 ? SAP.tileBg : SAP.tableStripe)}
+                    >
+                      <td className="px-5 py-3 font-medium" style={{ color: SAP.text }}>{app.full_name}</td>
+                      <td className="px-5 py-3" style={{ color: SAP.textLight }}>{app.type}</td>
+                      <td className="px-5 py-3 tabular-nums" style={{ color: SAP.textLight }}>
+                        {new Date(app.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+                      <td className="px-5 py-3"><StatusBadge status={app.status} /></td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Right Column - Profile & Stats */}
-        <div className="col-span-12 lg:col-span-4 space-y-6">
-          {/* Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 text-center"
-          >
-            <Avatar className="w-20 h-20 mx-auto mb-4 ring-4 ring-violet-500/20">
-              <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150" />
-              <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xl">BA</AvatarFallback>
-            </Avatar>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Boss Admin</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">System Administrator</p>
-            
-            <div className="grid grid-cols-3 gap-2">
-              <div className="bg-gradient-to-br from-blue-500/10 to-cyan-400/5 dark:from-blue-500/20 dark:to-cyan-400/10 rounded-xl p-3">
-                <Briefcase className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                <p className="text-xs text-slate-500 dark:text-slate-400">Workload</p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">16 Projects</p>
-              </div>
-              <div className="bg-gradient-to-br from-emerald-500/10 to-teal-400/5 dark:from-emerald-500/20 dark:to-teal-400/10 rounded-xl p-3">
-                <Calendar className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
-                <p className="text-xs text-slate-500 dark:text-slate-400">Available</p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">17/60 Slots</p>
-              </div>
-              <div className="bg-gradient-to-br from-violet-500/10 to-purple-400/5 dark:from-violet-500/20 dark:to-purple-400/10 rounded-xl p-3">
-                <Mail className="w-5 h-5 text-violet-500 mx-auto mb-1" />
-                <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">10 New</p>
-              </div>
+        {/* Quick Stats Cards */}
+        <div className="col-span-12 lg:col-span-4 space-y-3">
+          {/* Alerts Card */}
+          <div className="rounded-lg p-4" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}`, borderLeft: `4px solid ${(summary?.criticalAlerts ?? 0) > 0 ? SAP.negative : SAP.positive}` }}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium uppercase tracking-wide" style={{ color: SAP.textLight }}>Critical Alerts</span>
+              <AlertTriangle className="w-4 h-4" style={{ color: (summary?.criticalAlerts ?? 0) > 0 ? SAP.negative : SAP.neutral }} />
             </div>
-          </motion.div>
+            <p className="text-3xl font-bold mt-2 tabular-nums" style={{ color: (summary?.criticalAlerts ?? 0) > 0 ? SAP.negative : SAP.text }}>
+              {summary?.criticalAlerts ?? 0}
+            </p>
+            <p className="text-xs mt-1" style={{ color: SAP.textLight }}>
+              {(summary?.criticalAlerts ?? 0) === 0 ? 'All systems nominal' : 'Requires immediate attention'}
+            </p>
+          </div>
 
-          {/* Income Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Your Income</h3>
-              <span className="text-xs text-slate-500 dark:text-slate-400">Monthly</span>
+          {/* Super Admins Card */}
+          <div className="rounded-lg p-4" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}`, borderLeft: `4px solid ${SAP.blue}` }}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium uppercase tracking-wide" style={{ color: SAP.textLight }}>Super Admins</span>
+              <Shield className="w-4 h-4" style={{ color: SAP.blue }} />
             </div>
-            
-            <div className="flex items-center justify-center mb-4">
-              <div className="relative">
-                <ResponsiveContainer width={160} height={160}>
-                  <PieChart>
-                    <Pie
-                      data={incomeData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={55}
-                      outerRadius={75}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {incomeData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">
-                      ${metricsLoading ? '...' : (metrics?.totalRevenue ?? 0).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-violet-500" />
-                <span className="text-xs text-slate-500 dark:text-slate-400">Revenue</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-orange-500" />
-                <span className="text-xs text-slate-500 dark:text-slate-400">Pending</span>
-              </div>
-            </div>
-          </motion.div>
+            <p className="text-3xl font-bold mt-2 tabular-nums" style={{ color: SAP.text }}>{summary?.totalSuperAdmins ?? 0}</p>
+            <p className="text-xs mt-1" style={{ color: SAP.textLight }}>Active administrators</p>
+          </div>
 
-          {/* Appointments */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Activity</h3>
-              <Button variant="link" className="text-violet-500 text-xs p-0 h-auto">View All</Button>
+          {/* Revenue Breakdown Mini */}
+          <div className="rounded-lg p-4" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}`, borderLeft: `4px solid ${SAP.positive}` }}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium uppercase tracking-wide" style={{ color: SAP.textLight }}>Revenue Summary</span>
+              <BarChart3 className="w-4 h-4" style={{ color: SAP.positive }} />
             </div>
-            
-            <div className="space-y-3">
-              {recentActivity.length === 0 ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">No recent activity</p>
-              ) : recentActivity.map((apt, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.05 }}
-                  className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xs">
-                        {apt.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">{apt.name}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{apt.time} · {apt.duration}</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" className="text-violet-500 text-xs">
-                    View
-                  </Button>
-                </motion.div>
-              ))}
+            <div className="mt-3 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs" style={{ color: SAP.text }}>Total Earned</span>
+                <span className="text-sm font-bold tabular-nums" style={{ color: SAP.positive }}>${fmt(metrics?.totalRevenue)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs" style={{ color: SAP.text }}>Pending</span>
+                <span className="text-sm font-medium tabular-nums" style={{ color: SAP.critical }}>{(resellerData?.pending ?? 0) + (jobData?.pending ?? 0)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs" style={{ color: SAP.text }}>Approved</span>
+                <span className="text-sm font-medium tabular-nums" style={{ color: SAP.positive }}>{(resellerData?.approved ?? 0) + (jobData?.approved ?? 0)}</span>
+              </div>
             </div>
-          </motion.div>
+          </div>
+
+          {/* Operations Summary */}
+          <div className="rounded-lg p-4" style={{ background: SAP.tileBg, border: `1px solid ${SAP.tileBorder}`, borderLeft: `4px solid ${SAP.neutral}` }}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium uppercase tracking-wide" style={{ color: SAP.textLight }}>Operations</span>
+              <Zap className="w-4 h-4" style={{ color: SAP.neutral }} />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="text-center p-2 rounded" style={{ background: SAP.sectionBg }}>
+                <p className="text-lg font-bold tabular-nums" style={{ color: SAP.text }}>{summary?.activeContinents ?? 0}</p>
+                <p className="text-[10px] uppercase" style={{ color: SAP.textLight }}>Continents</p>
+              </div>
+              <div className="text-center p-2 rounded" style={{ background: SAP.sectionBg }}>
+                <p className="text-lg font-bold tabular-nums" style={{ color: SAP.text }}>{summary?.countriesLive ?? 0}</p>
+                <p className="text-[10px] uppercase" style={{ color: SAP.textLight }}>Countries</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
