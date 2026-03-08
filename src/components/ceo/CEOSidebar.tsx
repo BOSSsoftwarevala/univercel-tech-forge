@@ -1,10 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
+  Globe2, 
   TrendingUp, 
+  Users, 
   Activity, 
+  Sparkles, 
   CheckSquare, 
+  ShieldAlert,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -28,16 +33,17 @@ interface CEOSidebarProps {
 }
 
 const menuItems = [
-  { id: "scanner", label: "Dashboard", icon: LayoutDashboard },
-  { id: "analytics", label: "Analytics", icon: TrendingUp },
+  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+  { id: "revenue", label: "Analytics", icon: TrendingUp },
   { id: "products", label: "Product Performance", icon: Package },
   { id: "regions", label: "Regional Performance", icon: MapPin },
   { id: "system", label: "System Health", icon: Activity },
   { id: "alerts", label: "Alerts", icon: AlertCircle },
   { id: "reports", label: "Reports", icon: FileText },
   { id: "chat", label: "AIRA Chat", icon: Bot },
-  { id: "insights", label: "AI Insights", icon: Brain },
+  { id: "ai-insights", label: "AI Insights", icon: Brain },
   { id: "approvals", label: "Strategic Approvals", icon: CheckSquare },
+  { id: "risks", label: "Risk & Compliance", icon: ShieldAlert },
   { id: "notes", label: "CEO Notes", icon: MessageSquare },
 ];
 
@@ -54,6 +60,7 @@ const CEOSidebar = ({
       animate={{ width: collapsed ? 80 : 260 }}
       className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[#0d0d14] via-[#12121a] to-[#0a0a10] backdrop-blur-xl border-r border-violet-500/15 z-50 flex flex-col"
     >
+      {/* Collapse Toggle */}
       <button
         onClick={() => onCollapsedChange(!collapsed)}
         className="absolute -right-3 top-6 w-6 h-6 bg-violet-500/20 border border-violet-500/40 rounded-full flex items-center justify-center text-violet-400 hover:bg-violet-500/30 transition-colors"
@@ -61,6 +68,7 @@ const CEOSidebar = ({
         {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
       </button>
 
+      {/* Back to Control Panel */}
       <div className="p-3 border-b border-violet-500/10">
         <Tooltip>
           <TooltipTrigger asChild>
@@ -80,6 +88,7 @@ const CEOSidebar = ({
         </Tooltip>
       </div>
 
+      {/* Menu Items */}
       <nav className="flex-1 py-4 px-2 overflow-y-auto">
         <div className="space-y-1">
           {menuItems.map((item) => {
@@ -122,6 +131,7 @@ const CEOSidebar = ({
         </div>
       </nav>
 
+      {/* CEO Status Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-violet-500/10">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-violet-500/5 border border-violet-500/20">

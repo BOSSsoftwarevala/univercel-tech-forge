@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import {
   Eye, TrendingUp, Globe2, BarChart3, AlertTriangle,
   Lightbulb, ThumbsUp, ThumbsDown, MessageSquare, Shield, Clock,
-  DollarSign, Users, Activity, Brain, Zap, CheckCircle2,
-  XCircle, FileText, RefreshCw, Server, Package,
+  Target, DollarSign, Users, Activity, Brain, Zap, CheckCircle2,
+  XCircle, FileText, Sparkles, RefreshCw, Server, Package,
   ShoppingCart, AlertCircle, Layers, ScanLine, Bot, MapPin
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,10 +24,11 @@ import {
   ModuleBarChart,
   RoleDistributionPie,
   SystemHealthRadar,
+  ActivityTimeline,
   KPISparkline,
   CategoryTreemap,
 } from "@/components/aira/AIRACharts";
-import { AIRASystemScanner } from "@/components/aira/AIRASystemScanner";
+import { AIRASystemScanner, ScanReport } from "@/components/aira/AIRASystemScanner";
 import AIRAChatInterface from "@/components/aira/AIRAChatInterface";
 import AIRAReports from "@/components/aira/AIRAReports";
 import CEOProductPerformance from "@/components/ceo/CEOProductPerformance";
@@ -39,26 +40,18 @@ interface CEODashboardProps {
   activeNav?: string;
 }
 
-// Maps sidebar menu IDs to dashboard section IDs
 const NAV_MAP: Record<string, string> = {
+  dashboard: "scanner",
   overview: "scanner",
+  "global-overview": "scanner",
   revenue: "analytics",
+  "active-users": "scanner",
+  retention: "scanner",
   "ai-insights": "insights",
+  approvals: "approvals",
+  risks: "risks",
+  notes: "notes",
 };
-
-const SECTIONS = [
-  { id: "scanner", label: "Dashboard", icon: ScanLine },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "products", label: "Products", icon: Package },
-  { id: "regions", label: "Regions", icon: MapPin },
-  { id: "system", label: "System Health", icon: Activity },
-  { id: "alerts", label: "Alerts", icon: AlertCircle },
-  { id: "reports", label: "Reports", icon: FileText },
-  { id: "chat", label: "AIRA Chat", icon: Bot },
-  { id: "insights", label: "AI Insights", icon: Brain },
-  { id: "approvals", label: "Approvals", icon: FileText },
-  { id: "notes", label: "CEO Notes", icon: MessageSquare },
-];
 
 const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const [activeSection, setActiveSection] = useState("scanner");
@@ -70,13 +63,14 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
     productPerformance,
     regionPerformance,
     systemHealth,
+    scanResult,
     loading: ceoLoading,
     runScan,
     fetchAll: refreshCEO,
   } = useCEODashboard();
 
   useEffect(() => {
-    if (activeNav) setActiveSection(NAV_MAP[activeNav] || activeNav);
+    if (activeNav) setActiveSection(NAV_MAP[activeNav] || "scanner");
   }, [activeNav]);
 
   const logAction = useCallback(
@@ -107,6 +101,21 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
     setShowNoteDialog(false);
   };
 
+  // ─── Sections ────────────────────────────────────────────────
+  const sections = [
+    { id: "scanner", label: "Dashboard", icon: ScanLine },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "products", label: "Products", icon: Package },
+    { id: "regions", label: "Regions", icon: MapPin },
+    { id: "system", label: "System Health", icon: Activity },
+    { id: "alerts", label: "Alerts", icon: AlertCircle },
+    { id: "reports", label: "Reports", icon: FileText },
+    { id: "chat", label: "AIRA Chat", icon: Bot },
+    { id: "insights", label: "AI Insights", icon: Brain },
+    { id: "approvals", label: "Approvals", icon: FileText },
+    { id: "notes", label: "CEO Notes", icon: MessageSquare },
+  ];
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -122,7 +131,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
+      {/* ─── Tableau-style Header ──────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -142,8 +151,9 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Section tabs */}
             <div className="flex bg-slate-800/60 rounded-lg p-0.5 border border-slate-700/50 overflow-x-auto max-w-[700px]">
-              {SECTIONS.map((s) => (
+              {sections.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setActiveSection(s.id)}
@@ -178,12 +188,25 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
         </div>
       </motion.div>
 
-      {/* CEO Action Buttons */}
+      {/* ─── CEO Action Buttons ──────────────────────────────── */}
       <div className="px-6 pt-4 pb-0">
         <div className="flex flex-wrap gap-2">
           {[
             { label: "System Scan", icon: ScanLine, action: () => { runScan(); setActiveSection("system"); logAction("ceo_action", "system_scan"); toast.info("System scan initiated"); } },
-            { label: "Generate Report", icon: FileText, action: () => { setActiveSection("reports"); logAction("ceo_action", "generate_report"); } },
+            { label: "Generate Report", icon: FileText, action: async () => {
+              logAction("ceo_action", "generate_report");
+              toast.info("Generating executive report...");
+              try {
+                await (supabase as any).from("system_events").insert({
+                  event_type: "aira_executive_report",
+                  source_role: "ceo",
+                  source_user_id: user?.id || null,
+                  payload: { type: "executive_report", generated_at: new Date().toISOString(), metrics: { users: m.totalUsers, revenue: m.totalRevenue, orders: m.totalOrders, alerts: m.criticalAlerts } },
+                  status: "PENDING",
+                });
+                toast.success("Executive report generated");
+              } catch { toast.error("Report generation failed"); }
+            }},
             { label: "Open AI Chat", icon: Bot, action: () => { setActiveSection("chat"); logAction("ceo_action", "open_ai_chat"); } },
             { label: "View Alerts", icon: AlertCircle, action: () => { setActiveSection("alerts"); logAction("ceo_action", "view_alerts"); } },
             { label: "View System Health", icon: Activity, action: () => { setActiveSection("system"); logAction("ceo_action", "view_system_health"); } },
@@ -216,9 +239,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* SCANNER / DASHBOARD */}
+        {/* ─── SCANNER / DASHBOARD ──────────────────────────── */}
         {activeSection === "scanner" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+            {/* KPI Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
               {[
                 { label: "Users", value: m.totalUsers.toLocaleString(), icon: Users, color: "violet", spark: m.kpiSparklines.users },
@@ -250,8 +274,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
               ))}
             </div>
 
+            {/* AIRA 37-Module System Scanner */}
             <AIRASystemScanner />
 
+            {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
                 <CardHeader className="pb-2">
@@ -282,7 +308,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
-        {/* ANALYTICS */}
+        {/* ─── ANALYTICS ────────────────────────────────────── */}
         {activeSection === "analytics" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -347,17 +373,17 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
-        {/* PRODUCT PERFORMANCE */}
+        {/* ─── PRODUCT PERFORMANCE ──────────────────────────── */}
         {activeSection === "products" && (
           <CEOProductPerformance products={productPerformance} />
         )}
 
-        {/* REGIONAL PERFORMANCE */}
+        {/* ─── REGIONAL PERFORMANCE ─────────────────────────── */}
         {activeSection === "regions" && (
           <CEORegionPerformance regions={regionPerformance} />
         )}
 
-        {/* SYSTEM HEALTH */}
+        {/* ─── SYSTEM HEALTH ───────────────────────────────── */}
         {activeSection === "system" && (
           <CEOSystemHealthPanel
             health={systemHealth.length > 0 ? systemHealth : m.systemHealth.map(h => ({ metric_name: h.metric, score: h.score, benchmark: h.benchmark, status: h.score >= 90 ? 'healthy' : 'warning' }))}
@@ -366,24 +392,26 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           />
         )}
 
-        {/* ALERTS */}
-        {activeSection === "alerts" && <CEOAlertsPanel />}
+        {/* ─── ALERTS ──────────────────────────────────────── */}
+        {activeSection === "alerts" && (
+          <CEOAlertsPanel />
+        )}
 
-        {/* REPORTS */}
+        {/* ─── REPORTS ─────────────────────────────────────── */}
         {activeSection === "reports" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <AIRAReports />
           </motion.div>
         )}
 
-        {/* AIRA CHAT */}
+        {/* ─── AIRA CHAT ──────────────────────────────────── */}
         {activeSection === "chat" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <AIRAChatInterface />
           </motion.div>
         )}
 
-        {/* AI INSIGHTS */}
+        {/* ─── AI INSIGHTS ──────────────────────────────────── */}
         {activeSection === "insights" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
@@ -438,7 +466,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
-        {/* APPROVALS */}
+        {/* ─── APPROVALS ────────────────────────────────────── */}
         {activeSection === "approvals" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
@@ -486,7 +514,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
-        {/* NOTES */}
+        {/* ─── NOTES ────────────────────────────────────────── */}
         {activeSection === "notes" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
@@ -540,7 +568,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           </motion.div>
         )}
 
-        {/* CEO Access Footer */}
+        {/* ─── CEO Access Footer ────────────────────────────── */}
         <Card className="bg-gradient-to-r from-violet-900/20 to-indigo-900/20 border-violet-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3 mb-3">
