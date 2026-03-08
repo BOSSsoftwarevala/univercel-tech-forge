@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { createSystemRequest } from '@/hooks/useSystemRequestLogger';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, Star, Heart, Play, ShoppingCart, ChevronLeft, ChevronRight, X, Monitor, Zap, TrendingUp, Sparkles, Package } from 'lucide-react';
+import { Search, Star, Heart, Play, ShoppingCart, ChevronLeft, ChevronRight, X, Monitor, Zap, TrendingUp, Sparkles, Package, Github, ExternalLink, GitCommit, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +25,12 @@ interface Product {
   is_active: boolean | null;
   status: string | null;
   created_at: string;
+  demo_url?: string | null;
+  demo_id?: string | null;
+  github_repo_url?: string | null;
+  repo_language?: string | null;
+  demo_build_status?: string | null;
+  last_repo_sync_at?: string | null;
 }
 
 type PartnerRequestType =
@@ -107,7 +113,7 @@ export const MMMarketplaceScreen = () => {
         data = (catalogResult.data as any[]).map((item: any) => ({
           product_id: item.id || item.product_id,
           product_name: item.name || item.product_name || 'Unnamed Product',
-          description: item.description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
+          description: item.description || item.short_description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
           category: item.category,
           monthly_price: item.base_price ? Number(item.base_price) : null,
           lifetime_price: item.base_price ? Math.round(Number(item.base_price) * 10) : null,
@@ -119,6 +125,10 @@ export const MMMarketplaceScreen = () => {
           created_at: item.created_at,
           demo_url: item.demo_url || null,
           demo_id: item.demo_id || null,
+          github_repo_url: item.github_repo_url || null,
+          repo_language: item.repo_language || null,
+          demo_build_status: item.demo_build_status || null,
+          last_repo_sync_at: item.last_repo_sync_at || null,
         }));
       } else {
         // Fallback to products table
@@ -795,19 +805,29 @@ function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, discountedP
     <div className="group relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all cursor-pointer" onClick={() => onView(product)}>
       <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative">
         <Monitor className="w-10 h-10 text-slate-700" />
-        <div className="absolute top-2 left-2">
+        <div className="absolute top-2 left-2 flex gap-1">
           <Badge variant="outline" className="text-[10px] border-slate-600 text-slate-400 bg-slate-900/80">
             {product.category || 'Software'}
           </Badge>
+          {product.github_repo_url && (
+            <Badge variant="outline" className="text-[10px] border-emerald-600/50 text-emerald-400 bg-slate-900/80">
+              <Github className="w-2.5 h-2.5 mr-0.5" /> Connected
+            </Badge>
+          )}
         </div>
         <button onClick={(event) => { event.stopPropagation(); onFav(product.product_id); }} className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 transition">
           <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-slate-500'}`} />
         </button>
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-          <button onClick={(event) => { event.stopPropagation(); onDemo(product); }} className="p-2 rounded-full bg-cyan-500/20 hover:bg-cyan-500/40 transition">
+          <button onClick={(event) => { event.stopPropagation(); onDemo(product); }} className="p-2 rounded-full bg-cyan-500/20 hover:bg-cyan-500/40 transition" title="Try Demo">
             <Play className="w-4 h-4 text-cyan-400" />
           </button>
-          <button onClick={(event) => { event.stopPropagation(); onBuy(product); }} className="p-2 rounded-full bg-emerald-500/20 hover:bg-emerald-500/40 transition">
+          {product.github_repo_url && (
+            <button onClick={(event) => { event.stopPropagation(); window.open(product.github_repo_url!, '_blank'); }} className="p-2 rounded-full bg-slate-500/20 hover:bg-slate-500/40 transition" title="View Repository">
+              <Github className="w-4 h-4 text-slate-300" />
+            </button>
+          )}
+          <button onClick={(event) => { event.stopPropagation(); onBuy(product); }} className="p-2 rounded-full bg-emerald-500/20 hover:bg-emerald-500/40 transition" title="Buy Now">
             <ShoppingCart className="w-4 h-4 text-emerald-400" />
           </button>
         </div>
@@ -862,7 +882,61 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
               {product.category && <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">{product.category}</Badge>}
               {product.tech_stack && <Badge variant="outline" className="border-purple-500/50 text-purple-400">{product.tech_stack}</Badge>}
               {product.product_type && <Badge variant="outline" className="border-slate-600 text-slate-400">{product.product_type}</Badge>}
+              {product.repo_language && <Badge variant="outline" className="border-amber-500/50 text-amber-400">{product.repo_language}</Badge>}
+              {product.github_repo_url && <Badge variant="outline" className="border-emerald-500/50 text-emerald-400"><Github className="w-3 h-3 mr-1" /> Repo Connected</Badge>}
             </div>
+
+            {/* GitHub Repository & Demo Connection */}
+            {(product.github_repo_url || product.demo_url) && (
+              <div className="bg-slate-800/70 rounded-lg p-4 border border-slate-700/50">
+                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <GitCommit className="w-4 h-4 text-cyan-400" />
+                  Repository & Demo Connection
+                </h3>
+                <div className="space-y-2">
+                  {product.github_repo_url && (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Github className="w-4 h-4 text-slate-400" />
+                        <span className="text-xs text-slate-400">GitHub Repository</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-cyan-400 hover:text-cyan-300"
+                        onClick={() => window.open(product.github_repo_url!, '_blank')}
+                      >
+                        <ExternalLink className="w-3 h-3 mr-1" /> View Repo
+                      </Button>
+                    </div>
+                  )}
+                  {product.demo_url && (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Play className="w-4 h-4 text-emerald-400" />
+                        <span className="text-xs text-slate-400">Live Demo</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-emerald-400 hover:text-emerald-300"
+                        onClick={() => window.open(product.demo_url!, '_blank')}
+                      >
+                        <ExternalLink className="w-3 h-3 mr-1" /> Open Demo
+                      </Button>
+                    </div>
+                  )}
+                  {product.last_repo_sync_at && (
+                    <div className="flex items-center gap-2 pt-1 border-t border-slate-700/50">
+                      <RefreshCw className="w-3 h-3 text-slate-500" />
+                      <span className="text-[10px] text-slate-500">
+                        Last synced: {new Date(product.last_repo_sync_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div>
               <h3 className="text-sm font-semibold mb-1">Description</h3>
