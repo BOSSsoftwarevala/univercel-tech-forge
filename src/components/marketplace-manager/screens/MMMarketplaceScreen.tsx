@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { createSystemRequest } from '@/hooks/useSystemRequestLogger';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, Star, Heart, Play, ShoppingCart, ChevronLeft, ChevronRight, X, Monitor, Zap, TrendingUp, Sparkles, Package } from 'lucide-react';
+import { Search, Star, Heart, Play, ShoppingCart, ChevronLeft, ChevronRight, X, Monitor, Zap, TrendingUp, Sparkles, Package, Github, ExternalLink, GitCommit, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
