@@ -69,6 +69,13 @@ const continentMarkers = [
     franchises: 4, resellers: 160, healthScore: 88, latency: '38ms',
     alerts: 0, liveEvents: 38, sales: '$680K', licenses: 920,
   },
+  {
+    id: 'middle_east', name: 'Middle East', coordinates: [45, 25] as [number, number],
+    icon: '🕌', color: '#f59e0b', countries: 15, activeAdmins: 14,
+    revenue: '$1.6M', revenueChange: 22.8, users: '1,850', products: 2400,
+    franchises: 10, resellers: 220, healthScore: 92, latency: '45ms',
+    alerts: 1, liveEvents: 78, sales: '$980K', licenses: 1450,
+  },
 ];
 
 // Activity signal points across the globe

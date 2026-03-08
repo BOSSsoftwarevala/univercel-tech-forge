@@ -82,7 +82,7 @@ const FinanceManager = lazyWithRetry(() => import("@/pages/FinanceManager"));
 const CustomerSupportManagementDashboard = lazyWithRetry(() => import("./CustomerSupportManagementDashboard"));
 const RoleManagerDashboard = lazyWithRetry(() => import("./RoleManagerDashboard"));
 const RMEnterpriseLayout = lazyWithRetry(() => import("@/components/role-manager/RMEnterpriseLayout"));
-const CountryHeadDashboard = lazyWithRetry(() => import("@/components/country-dashboard/CountryHeadDashboard"));
+const CountryHeadDashboard = lazyWithRetry(() => import("@/components/country-dashboard/CountryAdminStripeAtlas"));
 const PMEnterpriseLayout = lazyWithRetry(() => import("@/components/product-manager/PMEnterpriseLayout"));
 const LMEnterpriseLayout = lazyWithRetry(() => import("@/components/legal-manager/LMEnterpriseLayout"));
 const AAMEnterpriseLayout = lazyWithRetry(() => import("@/components/api-ai-manager/AAMEnterpriseLayout"));

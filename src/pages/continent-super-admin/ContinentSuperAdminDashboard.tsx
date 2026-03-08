@@ -88,7 +88,13 @@ const sidebarSections: SidebarSection[] = [
   },
 ];
 
-const ContinentSuperAdminDashboard = () => {
+interface ContinentDashboardProps {
+  continentId?: string;
+  continentName?: string;
+  onBack?: () => void;
+}
+
+const ContinentSuperAdminDashboard = ({ continentId, continentName, onBack }: ContinentDashboardProps = {}) => {
   const [activeView, setActiveView] = useState<ViewType>('overview');
   const [sessionTime, setSessionTime] = useState('00:00');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -158,7 +164,7 @@ const ContinentSuperAdminDashboard = () => {
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-[#1c1e21] text-base font-semibold">Business Manager</span>
+              <span className="text-[#1c1e21] text-base font-semibold">{continentName || 'Business Manager'}</span>
               <ChevronDown className="w-3.5 h-3.5 text-[#65676b]" />
             </div>
           </div>
@@ -211,8 +217,8 @@ const ContinentSuperAdminDashboard = () => {
                 <Globe2 className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-[#1c1e21] truncate">Software Vala Global</p>
-                <p className="text-[12px] text-[#65676b]">Continent Admin · ID: SV-CONT-001</p>
+                <p className="text-[14px] font-semibold text-[#1c1e21] truncate">{continentName || 'Software Vala Global'}</p>
+                <p className="text-[12px] text-[#65676b]">Continent Admin · {continentId?.toUpperCase() || 'SV-CONT-001'}</p>
               </div>
             </div>
           </div>
