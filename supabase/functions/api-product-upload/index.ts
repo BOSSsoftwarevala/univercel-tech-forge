@@ -59,7 +59,7 @@ serve(async (req: Request) => {
         }
 
         await supabaseAdmin.from("ai_action_audit_log").insert({
-          user_id: user.id,
+          user_id: user.userId,
           action_type: "product_upload",
           action_name: `Upload image: ${file.name}`,
           action_status: "executed",
