@@ -49,7 +49,7 @@ serve(async (req: Request) => {
           mime_type: file.type,
           storage_path: storagePath,
           upload_status: "completed",
-          created_by: user.id,
+          created_by: user.userId,
         }).select().single();
 
         if (dbError) return errorResponse(`Database error: ${dbError.message}`, 500);
@@ -59,7 +59,7 @@ serve(async (req: Request) => {
         }
 
         await supabaseAdmin.from("ai_action_audit_log").insert({
-          user_id: user.id,
+          user_id: user.userId,
           action_type: "product_upload",
           action_name: `Upload image: ${file.name}`,
           action_status: "executed",
@@ -70,7 +70,7 @@ serve(async (req: Request) => {
 
         return jsonResponse({ success: true, message: "Image uploaded successfully", image: imageRecord });
       } catch (error) {
-        return errorResponse(`Error: ${error.message}`, 500);
+        return errorResponse(`Error: ${(error as Error).message}`, 500);
       }
     });
   }

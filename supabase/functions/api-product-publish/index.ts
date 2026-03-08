@@ -30,9 +30,10 @@ async function productPublishHandler(product: Product): Promise<void> {
 
         // Step 4: Update product status
         console.log(`Product ${product.name} published successfully.`);
-    } catch (error) {
-        logAuditTrail(`Error during publishing: ${error.message}`);
-        console.error(`Failed to publish product: ${error.message}`);
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        logAuditTrail(`Error during publishing: ${msg}`);
+        console.error(`Failed to publish product: ${msg}`);
     }
 }
 

@@ -18,7 +18,7 @@ export async function checkProductPermission(context: RequestContext, permission
   const { data: perms } = await context.supabaseAdmin
     .from("product_manager_permissions")
     .select("*")
-    .eq("user_id", context.user.id)
+    .eq("user_id", context.user.userId)
     .eq("permission_type", permission)
     .eq("is_active", true)
     .single();
