@@ -94,6 +94,11 @@ async function streamChat({
     });
 
     if (!resp.ok) {
+      const errorData = await resp.json().catch(() => ({ error: `Server error ${resp.status}` }));
+      if (resp.status === 422 && errorData.blocked) {
+        onError(`⚠️ ${errorData.error || 'Message blocked due to inappropriate content.'}`);
+        return;
+      }
       if (resp.status === 429) {
         onError('Rate limit exceeded. Please wait a moment and try again.');
         return;
@@ -102,7 +107,6 @@ async function streamChat({
         onError('AI credits exhausted. Please add credits to continue.');
         return;
       }
-      const errorData = await resp.json().catch(() => ({ error: `Server error ${resp.status}` }));
       onError(errorData.error || `Error ${resp.status}`);
       return;
     }
