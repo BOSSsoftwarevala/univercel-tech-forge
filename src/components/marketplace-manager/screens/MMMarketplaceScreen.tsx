@@ -144,7 +144,12 @@ export const MMMarketplaceScreen = () => {
       }
 
       if (fetchError) throw fetchError;
-      setProducts((data as Product[]) || []);
+      const allProducts = (data as Product[]) || [];
+      setProducts(allProducts);
+
+      // Extract dynamic categories from product data
+      const cats = Array.from(new Set(allProducts.map(p => p.category).filter(Boolean) as string[])).sort();
+      setDynamicCategories(cats);
     } catch (err) {
       console.error('Failed to fetch products:', err);
       setProducts([]);
