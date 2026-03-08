@@ -33,7 +33,7 @@ export const useSEOKeywords = (projectId?: string) => {
   }, [projectId]);
 
   const addKeyword = async (keyword: Record<string, any>) => {
-    const { data, error } = await supabase.from("seo_keywords").insert([keyword]).select().single();
+    const { data, error } = await supabase.from("seo_keywords").insert([keyword as any]).select().single();
     if (error) { toast.error("Failed to add keyword"); return null; }
     toast.success(`Keyword "${keyword.keyword}" added`);
     fetchKeywords();
