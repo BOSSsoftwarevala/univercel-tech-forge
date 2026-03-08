@@ -17,7 +17,8 @@ import {
   RotateCcw, 
   Lock, 
   Cpu, 
-  Wallet, 
+  Wallet,
+  Infinity as InfinityIcon,
   Settings as SettingsIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
