@@ -19,7 +19,9 @@ import {
   Cpu,
   ScanSearch,
   ListTodo,
-  Megaphone
+  Megaphone,
+  Globe,
+  Handshake
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
