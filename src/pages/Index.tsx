@@ -3437,7 +3437,7 @@ const Index = () => {
 
       {/* ===== NETFLIX HERO — Featured Product with Cinematic Visual ===== */}
       {(() => {
-        const activeDemos = allDemos.filter(d => d.status === 'ACTIVE');
+        const activeDemos = mergedDemos.filter(d => d.status === 'ACTIVE');
         const heroDemo = activeDemos[heroIndex % activeDemos.length];
         if (!heroDemo) return null;
         const HeroIcon = heroDemo.icon;
