@@ -255,17 +255,17 @@
     @apply bg-card/70 backdrop-blur-xl border border-border/40 rounded-xl;
     box-shadow: 
       0 0 0 1px hsl(var(--glass-border)),
-      0 8px 32px hsl(230 25% 4% / 0.4),
-      inset 0 1px 0 hsl(var(--aurora-violet) / 0.08);
+      0 8px 32px hsl(222 55% 4% / 0.5),
+      inset 0 1px 0 hsl(var(--sv-royal) / 0.1);
   }
 
   .glass-panel-glow {
     @apply glass-panel;
     box-shadow: 
       0 0 0 1px hsl(var(--glass-border)),
-      0 0 40px hsl(var(--aurora-violet) / 0.15),
-      0 8px 32px hsl(230 25% 4% / 0.4),
-      inset 0 1px 0 hsl(var(--aurora-violet) / 0.1);
+      0 0 40px hsl(var(--sv-royal) / 0.12),
+      0 8px 32px hsl(222 55% 4% / 0.5),
+      inset 0 1px 0 hsl(var(--sv-royal) / 0.15);
   }
 
   .glass-aurora {
@@ -276,9 +276,9 @@
       hsl(var(--surface-1) / 0.7) 100%
     );
     box-shadow: 
-      0 0 0 1px hsl(var(--aurora-violet) / 0.2),
-      0 0 60px hsl(var(--aurora-violet) / 0.1),
-      0 20px 60px hsl(230 25% 4% / 0.5);
+      0 0 0 1px hsl(var(--sv-royal) / 0.2),
+      0 0 60px hsl(var(--sv-royal) / 0.08),
+      0 20px 60px hsl(222 55% 4% / 0.6);
   }
 
   /* ========================================
