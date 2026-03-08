@@ -99,6 +99,9 @@ const SEOManagerDashboard = () => {
       case "issues": return <SEOIssuesFixes />;
       case "reports": return <SEOReports />;
       case "audit": return <SEOAudit />;
+      case "backlinks": return <SEOBacklinks />;
+      case "competitors": return <SEOCompetitors />;
+      case "settings": return <SEOSettings />;
       default: return <SEOOverview />;
     }
   };
