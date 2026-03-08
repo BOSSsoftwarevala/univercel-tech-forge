@@ -4,7 +4,7 @@
 // It includes status updates, audit trail logging,
 // marketplace sync triggers, and approval workflow support.
 
-import { publishToMarketplace, logAuditTrail, sendApprovalRequest } from './helpers';
+import { publishToMarketplace, logAuditTrail, sendApprovalRequest } from './helpers.ts';
 
 interface Product {
     id: string;
