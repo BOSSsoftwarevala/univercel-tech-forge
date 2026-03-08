@@ -3563,7 +3563,7 @@ const Index = () => {
       <section className="pb-12 px-4 md:px-12 space-y-10">
         <div className="max-w-[1400px] mx-auto space-y-10">
           {NETFLIX_ROWS.map(row => {
-            const rowDemos = allDemos.filter(row.filter);
+            const rowDemos = mergedDemos.filter(row.filter);
             const displayDemos = row.type === 'special' ? rowDemos.slice(0, 20) : rowDemos;
             const isEmpty = displayDemos.length === 0;
 
