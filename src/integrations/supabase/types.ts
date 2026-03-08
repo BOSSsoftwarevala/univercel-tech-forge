@@ -21742,15 +21742,25 @@ export type Database = {
           demo_domain: string | null
           demo_id: string | null
           demo_url: string | null
+          feature_tags: string[] | null
           generated_by_vala: boolean | null
           github_repo_url: string | null
+          hreflang_codes: string[] | null
           id: string
           is_active: boolean | null
           is_demo_registered: boolean | null
           listing_status: string | null
+          long_description: string | null
+          marketing_hashtags: string[] | null
+          meta_description: string | null
+          meta_title: string | null
           name: string
+          og_image_url: string | null
           product_icon_url: string | null
           product_thumbnail_url: string | null
+          seo_keywords: string[] | null
+          seo_slug: string | null
+          short_description: string | null
           type: string
           updated_at: string | null
           vendor: string | null
@@ -21765,15 +21775,25 @@ export type Database = {
           demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
+          feature_tags?: string[] | null
           generated_by_vala?: boolean | null
           github_repo_url?: string | null
+          hreflang_codes?: string[] | null
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
           listing_status?: string | null
+          long_description?: string | null
+          marketing_hashtags?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
           name: string
+          og_image_url?: string | null
           product_icon_url?: string | null
           product_thumbnail_url?: string | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          short_description?: string | null
           type: string
           updated_at?: string | null
           vendor?: string | null
@@ -21788,15 +21808,25 @@ export type Database = {
           demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
+          feature_tags?: string[] | null
           generated_by_vala?: boolean | null
           github_repo_url?: string | null
+          hreflang_codes?: string[] | null
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
           listing_status?: string | null
+          long_description?: string | null
+          marketing_hashtags?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
           name?: string
+          og_image_url?: string | null
           product_icon_url?: string | null
           product_thumbnail_url?: string | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          short_description?: string | null
           type?: string
           updated_at?: string | null
           vendor?: string | null
