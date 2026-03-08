@@ -94,6 +94,9 @@ export function filterContent(text: string): ContentFilterResult {
   if (hasThreat) {
     severity = 'critical';
     penaltyLevel = 4;
+  } else if (hasProhibitedActivity) {
+    severity = 'severe';
+    penaltyLevel = 3;
   } else if (blockedWords.length >= 3) {
     severity = 'severe';
     penaltyLevel = 3;
@@ -102,7 +105,9 @@ export function filterContent(text: string): ContentFilterResult {
     penaltyLevel = 2;
   }
 
-  const warningMessage = severity === 'critical'
+  const warningMessage = hasProhibitedActivity
+    ? '🚫 Software Vala does not support gambling, scamming, fraud, or any illegal/unethical business activities. This request has been blocked and logged.'
+    : severity === 'critical'
     ? '⚠️ Your message contains threatening language and has been blocked. This incident has been reported.'
     : severity === 'severe'
     ? '⚠️ Please maintain respectful and professional language. Repeated violations may result in account restrictions.'
