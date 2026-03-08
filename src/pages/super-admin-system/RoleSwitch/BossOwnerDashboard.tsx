@@ -399,7 +399,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     setShowLock(false); setReason(""); setConfirmed(false);
   };
 
-  const totalPendingApprovals = approvals.resellers.length + approvals.franchises.length + approvals.influencers.length;
+  const totalPendingApprovals = approvals.resellers.length + approvals.franchises.length + approvals.influencers.length + approvals.jobApplications.length;
 
   // If module is selected, show module container with back button
   if (activeNav && activeNav in modules) {
