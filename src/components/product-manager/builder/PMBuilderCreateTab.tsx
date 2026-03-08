@@ -176,8 +176,7 @@ const PMBuilderCreateTab = ({ onProductUpdate, onPipelineStep }: PMBuilderCreate
     setIsLoading(true);
 
     // Trigger pipeline steps
-    onPipelineStep?.(1, 'done'); // Prompt received
-    onPipelineStep?.(2, 'running'); // Understanding
+    onPipelineStep?.(1, 'running'); // Idea Understanding
 
     let assistantSoFar = '';
     const assistantId = (Date.now() + 1).toString();
@@ -204,15 +203,29 @@ const PMBuilderCreateTab = ({ onProductUpdate, onPipelineStep }: PMBuilderCreate
         throw new Error(`AI error: ${response.status}`);
       }
 
-      onPipelineStep?.(2, 'done');
-      onPipelineStep?.(3, 'running'); // Architecture
+      onPipelineStep?.(1, 'done');
+      onPipelineStep?.(2, 'running'); // Market Research
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No response stream');
 
       const decoder = new TextDecoder();
       let buffer = '';
-      let stepTriggered = { 4: false, 5: false, 6: false, 7: false, 8: false };
+      const stepTriggers: Record<number, { keywords: string[]; triggered: boolean }> = {
+        3: { keywords: ['Architecture', 'Product Planning'], triggered: false },
+        4: { keywords: ['Feature', 'Screen'], triggered: false },
+        5: { keywords: ['UI', 'Design', 'Color', 'Typography'], triggered: false },
+        6: { keywords: ['Database', 'CREATE TABLE', 'Schema'], triggered: false },
+        7: { keywords: ['API', 'Endpoint'], triggered: false },
+        8: { keywords: ['Implementation', 'Component', 'import React'], triggered: false },
+        9: { keywords: ['Self-Review', 'Review', 'Quality'], triggered: false },
+        10: { keywords: ['Bug', 'Security', 'audit'], triggered: false },
+        11: { keywords: ['Fix', 'Optimization', 'Performance'], triggered: false },
+        12: { keywords: ['Build Summary', 'Total Screens'], triggered: false },
+        13: { keywords: ['Deploy', 'Next Steps', 'Production'], triggered: false },
+      };
+
+      let lastStep = 2;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -238,31 +251,20 @@ const PMBuilderCreateTab = ({ onProductUpdate, onPipelineStep }: PMBuilderCreate
             if (content) {
               assistantSoFar += content;
 
-              // Trigger pipeline steps based on content
-              if (!stepTriggered[4] && assistantSoFar.includes('Screen')) {
-                onPipelineStep?.(3, 'done');
-                onPipelineStep?.(4, 'running');
-                stepTriggered[4] = true;
-              }
-              if (!stepTriggered[5] && assistantSoFar.includes('API')) {
-                onPipelineStep?.(4, 'done');
-                onPipelineStep?.(5, 'running');
-                stepTriggered[5] = true;
-              }
-              if (!stepTriggered[6] && (assistantSoFar.includes('Database') || assistantSoFar.includes('CREATE TABLE'))) {
-                onPipelineStep?.(5, 'done');
-                onPipelineStep?.(6, 'running');
-                stepTriggered[6] = true;
-              }
-              if (!stepTriggered[7] && assistantSoFar.includes('Implementation')) {
-                onPipelineStep?.(6, 'done');
-                onPipelineStep?.(7, 'running');
-                stepTriggered[7] = true;
-              }
-              if (!stepTriggered[8] && assistantSoFar.includes('Build Summary')) {
-                onPipelineStep?.(7, 'done');
-                onPipelineStep?.(8, 'running');
-                stepTriggered[8] = true;
+              // Trigger pipeline steps based on content keywords
+              for (const [stepId, trigger] of Object.entries(stepTriggers)) {
+                const id = Number(stepId);
+                if (!trigger.triggered && trigger.keywords.some(kw => assistantSoFar.includes(kw))) {
+                  // Complete previous step, start this one
+                  if (lastStep < id) {
+                    for (let s = lastStep; s < id; s++) {
+                      onPipelineStep?.(s, 'done');
+                    }
+                  }
+                  onPipelineStep?.(id, 'running');
+                  trigger.triggered = true;
+                  lastStep = id;
+                }
               }
 
               setMessages(prev => {
@@ -280,8 +282,8 @@ const PMBuilderCreateTab = ({ onProductUpdate, onPipelineStep }: PMBuilderCreate
         }
       }
 
-      // Complete remaining pipeline steps
-      for (let s = 3; s <= 8; s++) {
+      // Complete all remaining pipeline steps
+      for (let s = 2; s <= 13; s++) {
         onPipelineStep?.(s, 'done');
       }
 

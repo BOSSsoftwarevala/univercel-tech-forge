@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Sparkles, Settings2, Zap } from 'lucide-react';
+import { Sparkles, Settings2 } from 'lucide-react';
 import PMBuilderTopBar from './PMBuilderTopBar';
 import PMBuilderCreateTab from './PMBuilderCreateTab';
 import PMBuilderConfigureTab from './PMBuilderConfigureTab';
@@ -18,14 +18,19 @@ export interface PipelineStep {
 }
 
 const INITIAL_PIPELINE: PipelineStep[] = [
-  { id: 1, label: 'Prompt Understanding', status: 'idle' },
-  { id: 2, label: 'Requirement Analysis', status: 'idle' },
-  { id: 3, label: 'Feature Mapping', status: 'idle' },
-  { id: 4, label: 'Screen Generation', status: 'idle' },
-  { id: 5, label: 'API Planning', status: 'idle' },
-  { id: 6, label: 'Database Schema', status: 'idle' },
-  { id: 7, label: 'Flow Generation', status: 'idle' },
-  { id: 8, label: 'Build System', status: 'idle' },
+  { id: 1, label: 'Idea Understanding', status: 'idle' },
+  { id: 2, label: 'Market Research', status: 'idle' },
+  { id: 3, label: 'Product Planning', status: 'idle' },
+  { id: 4, label: 'Feature Architecture', status: 'idle' },
+  { id: 5, label: 'UI / UX Design', status: 'idle' },
+  { id: 6, label: 'Database Design', status: 'idle' },
+  { id: 7, label: 'API Architecture', status: 'idle' },
+  { id: 8, label: 'Code Generation', status: 'idle' },
+  { id: 9, label: 'Self Review', status: 'idle' },
+  { id: 10, label: 'Bug Detection', status: 'idle' },
+  { id: 11, label: 'Auto Fix', status: 'idle' },
+  { id: 12, label: 'Rebuild System', status: 'idle' },
+  { id: 13, label: 'Deploy Ready', status: 'idle' },
 ];
 
 const PMBuilderLayout = () => {
@@ -63,7 +68,6 @@ const PMBuilderLayout = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Top Bar */}
       <PMBuilderTopBar
         productName={config?.name || productData?.projectName || ''}
         onSave={handleSave}
@@ -71,9 +75,8 @@ const PMBuilderLayout = () => {
         isSaving={isSaving}
       />
 
-      {/* Main Split: Left Chat | Center Preview | Right Pipeline */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Create / Configure */}
+        {/* Left Panel */}
         <div className="w-[440px] border-r border-border/50 flex flex-col bg-background">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             <div className="px-4 pt-3 pb-0">
@@ -99,12 +102,12 @@ const PMBuilderLayout = () => {
           </Tabs>
         </div>
 
-        {/* Center Panel - Preview */}
+        {/* Center Panel */}
         <div className="flex-1 overflow-hidden">
           <PMBuilderPreview productData={productData} config={config} />
         </div>
 
-        {/* Right Panel - AI Pipeline */}
+        {/* Right Panel - 13-Stage Pipeline */}
         <PMBuilderPipeline steps={pipeline} />
       </div>
     </div>
