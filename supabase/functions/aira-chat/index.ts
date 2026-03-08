@@ -70,6 +70,26 @@ Deno.serve(async (req) => {
         aira_notes: 'Auto-delegated by AIRA from Boss command',
       });
       contextData += '\n[SYSTEM: Task has been delegated to VALA AI. Confirm to Boss.]';
+
+      // If it's a product build command, trigger auto-builder
+      if (lastMsg.includes('product') || lastMsg.includes('build') || lastMsg.includes('create') || lastMsg.includes('software')) {
+        try {
+          await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/product-auto-builder`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+            },
+            body: JSON.stringify({
+              command: lastUserMsg.content,
+              productName: lastMsg.match(/(?:make|create|build)\s+(?:a\s+)?(.+?)(?:\s+with|\s+for|\s+using|$)/i)?.[1] || 'Auto Product',
+              category: 'General',
+              description: lastUserMsg.content,
+            }),
+          });
+          contextData += '\n[SYSTEM: Product auto-builder pipeline triggered. Product will be generated, built, and published to marketplace automatically.]';
+        } catch {}
+      }
     }
 
     // 2. Payment follow-up detection

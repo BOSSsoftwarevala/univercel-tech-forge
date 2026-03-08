@@ -9,6 +9,7 @@ import { MMSupportScreen } from './screens/MMSupportScreen';
 import { MMSettingsScreen } from './screens/MMSettingsScreen';
 import { MMLibraryScreen } from './screens/MMLibraryScreen';
 import { MMLicensesScreen } from './screens/MMLicensesScreen';
+import AIRAClientChat from '@/components/aira/AIRAClientChat';
 
 type MarketplaceScreen = 'marketplace' | 'my-orders' | 'development' | 'wallet' | 'support' | 'settings' | 'library' | 'licenses';
 
@@ -79,6 +80,7 @@ export function MMFullLayout() {
     <div className="flex h-screen bg-slate-950 text-white">
       <MMFullSidebar activeScreen={activeScreen} onScreenChange={handleScreenChange} />
       <main className="flex-1 overflow-auto">{renderScreen()}</main>
+      <AIRAClientChat conversationType="general" />
     </div>
   );
 }

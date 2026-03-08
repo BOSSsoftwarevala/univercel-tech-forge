@@ -957,6 +957,45 @@ export type Database = {
         }
         Relationships: []
       }
+      aira_client_conversations: {
+        Row: {
+          client_email: string | null
+          client_id: string | null
+          conversation_type: string | null
+          created_at: string | null
+          follow_up_count: number | null
+          id: string
+          last_message_at: string | null
+          messages: Json | null
+          product_id: string | null
+          status: string | null
+        }
+        Insert: {
+          client_email?: string | null
+          client_id?: string | null
+          conversation_type?: string | null
+          created_at?: string | null
+          follow_up_count?: number | null
+          id?: string
+          last_message_at?: string | null
+          messages?: Json | null
+          product_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          client_email?: string | null
+          client_id?: string | null
+          conversation_type?: string | null
+          created_at?: string | null
+          follow_up_count?: number | null
+          id?: string
+          last_message_at?: string | null
+          messages?: Json | null
+          product_id?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       aira_task_delegations: {
         Row: {
           aira_notes: string | null
@@ -15777,6 +15816,48 @@ export type Database = {
           },
         ]
       }
+      product_build_pipeline: {
+        Row: {
+          boss_command: string
+          build_result: Json | null
+          completed_at: string | null
+          created_at: string | null
+          demo_url: string | null
+          id: string
+          marketplace_published: boolean | null
+          product_name: string | null
+          stage: string | null
+          status: string | null
+          vala_task_id: string | null
+        }
+        Insert: {
+          boss_command: string
+          build_result?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          demo_url?: string | null
+          id?: string
+          marketplace_published?: boolean | null
+          product_name?: string | null
+          stage?: string | null
+          status?: string | null
+          vala_task_id?: string | null
+        }
+        Update: {
+          boss_command?: string
+          build_result?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          demo_url?: string | null
+          id?: string
+          marketplace_published?: boolean | null
+          product_name?: string | null
+          stage?: string | null
+          status?: string | null
+          vala_task_id?: string | null
+        }
+        Relationships: []
+      }
       product_demo_mappings: {
         Row: {
           demo_id: string
@@ -15875,6 +15956,36 @@ export type Database = {
           name?: string
           product_id?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      product_ratings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_verified_purchase: boolean | null
+          product_id: string
+          rating: number
+          review_text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          product_id: string
+          rating: number
+          review_text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          product_id?: string
+          rating?: number
+          review_text?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -22054,8 +22165,10 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          avg_rating: number | null
           base_price: number | null
           build_metadata: Json | null
+          business_name: string | null
           category: string | null
           created_at: string | null
           demo_build_status: string | null
@@ -22069,6 +22182,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_demo_registered: boolean | null
+          is_verified: boolean | null
           last_repo_sync_at: string | null
           listing_status: string | null
           long_description: string | null
@@ -22085,6 +22199,8 @@ export type Database = {
           seo_slug: string | null
           short_description: string | null
           source: string | null
+          total_ratings: number | null
+          trust_score: number | null
           type: string
           updated_at: string | null
           vendor: string | null
@@ -22092,8 +22208,10 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          avg_rating?: number | null
           base_price?: number | null
           build_metadata?: Json | null
+          business_name?: string | null
           category?: string | null
           created_at?: string | null
           demo_build_status?: string | null
@@ -22107,6 +22225,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
+          is_verified?: boolean | null
           last_repo_sync_at?: string | null
           listing_status?: string | null
           long_description?: string | null
@@ -22123,6 +22242,8 @@ export type Database = {
           seo_slug?: string | null
           short_description?: string | null
           source?: string | null
+          total_ratings?: number | null
+          trust_score?: number | null
           type: string
           updated_at?: string | null
           vendor?: string | null
@@ -22130,8 +22251,10 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          avg_rating?: number | null
           base_price?: number | null
           build_metadata?: Json | null
+          business_name?: string | null
           category?: string | null
           created_at?: string | null
           demo_build_status?: string | null
@@ -22145,6 +22268,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
+          is_verified?: boolean | null
           last_repo_sync_at?: string | null
           listing_status?: string | null
           long_description?: string | null
@@ -22161,6 +22285,8 @@ export type Database = {
           seo_slug?: string | null
           short_description?: string | null
           source?: string | null
+          total_ratings?: number | null
+          trust_score?: number | null
           type?: string
           updated_at?: string | null
           vendor?: string | null
