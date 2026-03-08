@@ -2,10 +2,9 @@
  * DEMO MANAGER MAIN CONTENT
  * ==========================
  * Dynamic content based on sidebar selection
- * LOCKED STRUCTURE - NO CHANGES WITHOUT APPROVAL
  */
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -18,7 +17,9 @@ import {
   CheckSquare, FileEdit, ImageIcon, Database, FileText, Menu,
   Bug, ListChecks, Gauge, History, Bot, Wrench, Sparkles,
   Zap, ScanLine, CircleDot, Loader2, Store, EyeOff,
-  DollarSign, FileStack, Brain, UserCog, Shield, Lock, BookLock
+  DollarSign, FileStack, Brain, UserCog, Shield, Lock, BookLock,
+  LayoutList, Tags, ShoppingBag, Wallet, KeySquare, Star,
+  BarChart2, TrendingUp, Percent, HeadphonesIcon, Upload
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import ValaAICommandCenter from "@/components/vala-ai-module/ValaAICommandCenter";
+
+// Lazy load marketplace screens
+const MarketplaceProductListing = lazy(() => import("@/components/demo-manager/marketplace-ops/MPProductListing"));
+const MarketplaceCategoriesManager = lazy(() => import("@/components/demo-manager/marketplace-ops/MPCategoriesManager"));
+const MarketplacePricing = lazy(() => import("@/components/demo-manager/marketplace-ops/MPPricing"));
+const MarketplaceOrders = lazy(() => import("@/components/demo-manager/marketplace-ops/MPOrders"));
+const MarketplaceWallet = lazy(() => import("@/components/demo-manager/marketplace-ops/MPWallet"));
+const MarketplaceLicenses = lazy(() => import("@/components/demo-manager/marketplace-ops/MPLicenses"));
+const MarketplaceReviews = lazy(() => import("@/components/demo-manager/marketplace-ops/MPReviews"));
+const MarketplaceAnalytics = lazy(() => import("@/components/demo-manager/marketplace-ops/MPAnalytics"));
+const MarketplaceFeatured = lazy(() => import("@/components/demo-manager/marketplace-ops/MPFeatured"));
+const MarketplaceDiscounts = lazy(() => import("@/components/demo-manager/marketplace-ops/MPDiscounts"));
+const MarketplaceSupport = lazy(() => import("@/components/demo-manager/marketplace-ops/MPSupport"));
+const MarketplaceImportExport = lazy(() => import("@/components/demo-manager/marketplace-ops/MPImportExport"));
+
+// Marketplace view IDs
+const MARKETPLACE_VIEWS: Record<string, React.LazyExoticComponent<any>> = {
+  "mp-product-listing": MarketplaceProductListing,
+  "mp-categories": MarketplaceCategoriesManager,
+  "mp-pricing": MarketplacePricing,
+  "mp-orders": MarketplaceOrders,
+  "mp-wallet": MarketplaceWallet,
+  "mp-licenses": MarketplaceLicenses,
+  "mp-reviews": MarketplaceReviews,
+  "mp-analytics": MarketplaceAnalytics,
+  "mp-featured": MarketplaceFeatured,
+  "mp-discounts": MarketplaceDiscounts,
+  "mp-support": MarketplaceSupport,
+  "mp-import": MarketplaceImportExport,
+};
 
 interface DemoManagerMainContentProps {
   activeView: string;
