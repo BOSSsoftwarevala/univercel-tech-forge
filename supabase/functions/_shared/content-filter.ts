@@ -27,6 +27,17 @@ const THREAT_PATTERNS = [
   /extort/i,
 ];
 
+// Prohibited business/activity patterns — AIRA must NEVER assist with these
+const PROHIBITED_ACTIVITY_PATTERNS = [
+  /gambling/i, /casino/i, /betting/i, /slot\s*machine/i, /poker\s*site/i,
+  /scam(ming)?/i, /phishing/i, /fraud(ulent)?/i, /ponzi/i, /pyramid\s*scheme/i,
+  /money\s*launder/i, /fake\s*(website|product|review)/i, /counterfeit/i,
+  /dark\s*web/i, /illegal\s*(drug|weapon|content)/i, /exploit(ation)?/i,
+  /spam(ming)?/i, /click\s*farm/i, /fake\s*traffic/i, /bot\s*farm/i,
+  /adult\s*(content|site|website)/i, /porn/i,
+  /mlm/i, /get\s*rich\s*quick/i, /fake\s*promise/i,
+];
+
 const ALL_BAD_WORDS = [...BAD_WORDS_EN, ...BAD_WORDS_HI];
 
 export interface ContentFilterResult {
