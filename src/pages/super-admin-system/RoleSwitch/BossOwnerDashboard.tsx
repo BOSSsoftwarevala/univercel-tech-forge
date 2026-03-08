@@ -24,6 +24,9 @@ import { MarketingModuleContainer } from "@/components/marketing-module/Marketin
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { BossLiveStatsRow } from "@/components/boss-panel/BossLiveStatsRow";
+import { BossOperationalRow } from "@/components/boss-panel/BossOperationalRow";
+import { BossActivityAlertsRow } from "@/components/boss-panel/BossActivityAlertsRow";
 
 // ===== BOX TYPES =====
 type BoxType = 'data' | 'process' | 'ai' | 'approval' | 'live';
