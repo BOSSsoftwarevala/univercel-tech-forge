@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+import { ProductSEOHead } from '@/components/seo/ProductSEOHead';
 
 interface Product {
   product_id: string;
@@ -563,16 +564,25 @@ export const MMMarketplaceScreen = () => {
       </div>
 
       {selectedProduct && (
-        <ProductDetailDialog
-          product={selectedProduct}
-          open={Boolean(selectedProduct)}
-          onClose={handleCloseProductDialog}
-          onDemo={handleDemo}
-          onBuy={handleBuy}
-          isFav={favorites.has(selectedProduct.product_id)}
-          onFav={toggleFavorite}
-          discountedPrice={discountedPrice}
-        />
+        <>
+          <ProductSEOHead
+            productName={selectedProduct.product_name}
+            category={selectedProduct.category || undefined}
+            price={selectedProduct.monthly_price || undefined}
+            type={selectedProduct.product_type || undefined}
+            slug={selectedProduct.product_id}
+          />
+          <ProductDetailDialog
+            product={selectedProduct}
+            open={Boolean(selectedProduct)}
+            onClose={handleCloseProductDialog}
+            onDemo={handleDemo}
+            onBuy={handleBuy}
+            isFav={favorites.has(selectedProduct.product_id)}
+            onFav={toggleFavorite}
+            discountedPrice={discountedPrice}
+          />
+        </>
       )}
     </div>
   );

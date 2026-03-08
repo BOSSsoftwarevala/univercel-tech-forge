@@ -240,13 +240,44 @@ serve(async (req) => {
     }
 
     // ─────────────────────────────────────────────
-    // STEP 4: Create Boss Approval Request
+    // STEP 4: Generate SEO Metadata via AI
+    // ─────────────────────────────────────────────
+    try {
+      const seoResponse = await fetch(`${supabaseUrl}/functions/v1/generate-product-seo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({
+          productId,
+          productName,
+          category,
+          type,
+          description,
+          features,
+          price,
+        }),
+      });
+
+      if (seoResponse.ok) {
+        steps.push({ step: "seo_generation", status: "success", detail: "Meta tags, keywords, hashtags generated" });
+      } else {
+        steps.push({ step: "seo_generation", status: "failed", detail: `SEO function returned ${seoResponse.status}` });
+      }
+    } catch (seoErr) {
+      console.error("[AutoPublish] SEO generation error:", seoErr);
+      steps.push({ step: "seo_generation", status: "failed", detail: String(seoErr) });
+    }
+
+    // ─────────────────────────────────────────────
+    // STEP 5: Create Boss Approval Request
     // ─────────────────────────────────────────────
     const { error: approvalError } = await supabase.from("approvals").insert({
       request_type: "marketplace_publish",
       requested_by_user_id: userId,
       status: "pending",
-      risk_score: 20, // Low risk - auto-generated product
+      risk_score: 20,
       request_data: {
         product_id: productId,
         product_name: productName,
@@ -269,7 +300,7 @@ serve(async (req) => {
     }
 
     // ─────────────────────────────────────────────
-    // STEP 5: Log activity
+    // STEP 6: Log activity
     // ─────────────────────────────────────────────
     await supabase.from("activity_log").insert({
       action_type: "product_auto_publish",
