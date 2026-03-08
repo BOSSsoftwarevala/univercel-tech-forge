@@ -113,7 +113,7 @@ export const MMMarketplaceScreen = () => {
         data = (catalogResult.data as any[]).map((item: any) => ({
           product_id: item.id || item.product_id,
           product_name: item.name || item.product_name || 'Unnamed Product',
-          description: item.description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
+          description: item.description || item.short_description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
           category: item.category,
           monthly_price: item.base_price ? Number(item.base_price) : null,
           lifetime_price: item.base_price ? Math.round(Number(item.base_price) * 10) : null,
@@ -125,6 +125,10 @@ export const MMMarketplaceScreen = () => {
           created_at: item.created_at,
           demo_url: item.demo_url || null,
           demo_id: item.demo_id || null,
+          github_repo_url: item.github_repo_url || null,
+          repo_language: item.repo_language || null,
+          demo_build_status: item.demo_build_status || null,
+          last_repo_sync_at: item.last_repo_sync_at || null,
         }));
       } else {
         // Fallback to products table
