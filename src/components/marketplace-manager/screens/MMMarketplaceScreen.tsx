@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { createSystemRequest } from '@/hooks/useSystemRequestLogger';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, Star, Heart, Play, ShoppingCart, ChevronLeft, ChevronRight, X, Monitor, Zap, TrendingUp, Sparkles, Package, Github, ExternalLink, GitCommit, RefreshCw } from 'lucide-react';
+import { Search, Star, Heart, Play, ShoppingCart, ChevronLeft, ChevronRight, X, Monitor, Zap, TrendingUp, Sparkles, Package, Github, ExternalLink, GitCommit, RefreshCw, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { useValaVoice } from '@/hooks/useValaVoice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -917,7 +918,17 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
   discountedPrice: (price: number | null) => string;
 }) {
   const features = Array.isArray(product.features_json) ? product.features_json : [];
+  const { speak, stop, isPlaying, isLoading: isSpeaking } = useValaVoice();
 
+  const handleSpeak = useCallback(() => {
+    if (isPlaying) {
+      stop();
+      return;
+    }
+    const featureList = features.length > 0 ? ` Key features include: ${features.slice(0, 5).join(', ')}.` : '';
+    const speechText = `${product.product_name}. ${product.description || 'Enterprise-grade software solution for your business.'}${featureList} Category: ${product.category || 'Software'}. Price: just 249 dollars, lifetime access with full source code, no hidden charges, and 24/7 support.`;
+    speak(speechText);
+  }, [product, features, isPlaying, speak, stop]);
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl bg-slate-900 border-slate-700 text-white max-h-[85vh]">
@@ -1032,6 +1043,10 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
           <Button onClick={() => onFav(product.product_id)} variant="outline" size="sm" className={`border-slate-700 ${isFav ? 'text-red-400' : 'text-slate-400'}`}>
             <Heart className={`w-4 h-4 mr-1 ${isFav ? 'fill-red-500' : ''}`} />
             {isFav ? 'Saved' : 'Save'}
+          </Button>
+          <Button onClick={handleSpeak} variant="outline" size="sm" className={`border-slate-700 ${isPlaying ? 'text-cyan-400 border-cyan-500/50' : 'text-slate-400'}`}>
+            {isSpeaking ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : isPlaying ? <VolumeX className="w-4 h-4 mr-1" /> : <Volume2 className="w-4 h-4 mr-1" />}
+            {isSpeaking ? 'Loading...' : isPlaying ? 'Stop' : '🔊 Listen'}
           </Button>
           <Button onClick={() => onDemo(product)} variant="outline" size="sm" className="border-cyan-500/50 text-cyan-400">
             <Play className="w-4 h-4 mr-1" /> Demo
