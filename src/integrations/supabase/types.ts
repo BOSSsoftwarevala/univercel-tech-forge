@@ -957,6 +957,48 @@ export type Database = {
         }
         Relationships: []
       }
+      aira_task_delegations: {
+        Row: {
+          aira_notes: string | null
+          boss_user_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          delegated_to: string | null
+          id: string
+          priority: string | null
+          status: string | null
+          task_description: string
+          task_type: string | null
+          vala_result: Json | null
+        }
+        Insert: {
+          aira_notes?: string | null
+          boss_user_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          delegated_to?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          task_description: string
+          task_type?: string | null
+          vala_result?: Json | null
+        }
+        Update: {
+          aira_notes?: string | null
+          boss_user_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          delegated_to?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          task_description?: string
+          task_type?: string | null
+          vala_result?: Json | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           api_key_hash: string
@@ -18005,6 +18047,92 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      revenue_allocations: {
+        Row: {
+          boss_amount: number
+          created_at: string | null
+          government_amount: number
+          id: string
+          marketing_amount: number
+          office_amount: number
+          order_id: string | null
+          split_config_id: string | null
+          status: string | null
+          total_amount: number
+        }
+        Insert: {
+          boss_amount?: number
+          created_at?: string | null
+          government_amount?: number
+          id?: string
+          marketing_amount?: number
+          office_amount?: number
+          order_id?: string | null
+          split_config_id?: string | null
+          status?: string | null
+          total_amount: number
+        }
+        Update: {
+          boss_amount?: number
+          created_at?: string | null
+          government_amount?: number
+          id?: string
+          marketing_amount?: number
+          office_amount?: number
+          order_id?: string | null
+          split_config_id?: string | null
+          status?: string | null
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_allocations_split_config_id_fkey"
+            columns: ["split_config_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_split_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      revenue_split_config: {
+        Row: {
+          boss_percent: number
+          created_at: string | null
+          government_percent: number
+          id: string
+          is_active: boolean | null
+          marketing_percent: number
+          office_percent: number
+          split_name: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          boss_percent?: number
+          created_at?: string | null
+          government_percent?: number
+          id?: string
+          is_active?: boolean | null
+          marketing_percent?: number
+          office_percent?: number
+          split_name: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          boss_percent?: number
+          created_at?: string | null
+          government_percent?: number
+          id?: string
+          is_active?: boolean | null
+          marketing_percent?: number
+          office_percent?: number
+          split_name?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       risk_alerts: {
         Row: {

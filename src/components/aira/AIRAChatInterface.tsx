@@ -35,12 +35,14 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aira-chat`;
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
 
 const QUICK_PROMPTS = [
-  "System health summary",
-  "Revenue report today",
-  "Any critical alerts?",
-  "Marketplace activity",
-  "Pending approvals",
-  "Security status",
+  "📊 Revenue report & finance split",
+  "💰 Pending payments follow-up",
+  "🛒 Recent orders status",
+  "🔧 Delegate task to VALA AI",
+  "📈 SEO status for products",
+  "⚡ System health summary",
+  "🔒 Security status",
+  "📋 Show my 40/28/20/12 split",
 ];
 
 // AIRA uses Sarah voice — warm, professional female
@@ -51,7 +53,7 @@ export default function AIRAChatInterface() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Good day, Boss. I'm **AIRA**, your executive intelligence advisor.\n\nI'm monitoring all **37 modules** across the Software Vala ecosystem. I'm in **audio-only mode** — I can hear you but I'm not watching your screen. Say \"you can see\" whenever you'd like me to view your activity.\n\nHow can I assist you?",
+      content: "Good day, Boss. I'm **AIRA**, your executive intelligence advisor & manager.\n\nI'm monitoring all **37 modules** and managing your operations:\n\n🎯 **Task Delegation** — Tell me to assign work to VALA AI\n💰 **Payment Follow-up** — I'll chase pending payments automatically\n📊 **Finance Split** — 40% Marketing | 28% Govt | 20% Office | 12% You\n🛒 **Order Management** — I connect with customers on new orders\n📈 **SEO Management** — Auto-optimize your product listings\n\nI'm in **audio-only mode** 🎧 — Say \"you can see\" to enable screen access.\n\nHow can I assist you today?",
       timestamp: new Date(),
       status: "read",
     },

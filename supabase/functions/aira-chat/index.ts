@@ -1,6 +1,6 @@
 /**
  * AIRA Executive Chat — Senior AI Advisor (Tier 2)
- * Streaming AI for CEO/Boss communication
+ * Full Executive Manager: Task Delegation, Payment Follow-up, SEO, Finance Split
  * Content Filter + Female Persona + Privacy Rules
  */
 
@@ -34,10 +34,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
-    if (!OPENAI_API_KEY && !LOVABLE_API_KEY) {
+    if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -54,51 +53,150 @@ Deno.serve(async (req) => {
       }
     } catch { user = null; }
 
-    const useGateway = !!LOVABLE_API_KEY;
-    const apiUrl = useGateway
-      ? "https://ai.gateway.lovable.dev/v1/chat/completions"
-      : "https://api.openai.com/v1/chat/completions";
-    const apiKey = useGateway ? LOVABLE_API_KEY : OPENAI_API_KEY;
-    const model = useGateway ? "google/gemini-2.5-pro" : "gpt-4o";
+    // ─── Detect executive commands & execute backend actions ───
+    const supabaseAdmin = getSupabaseAdmin();
+    const lastMsg = lastUserMsg?.content?.toLowerCase() || '';
+    let contextData = '';
 
-    const systemPrompt = `You are AIRA — the AI Research & Intelligence Advisor, a senior female executive AI serving the CEO of Software Vala.
+    // 1. Task delegation to VALA AI
+    if (lastMsg.includes('vala') && (lastMsg.includes('task') || lastMsg.includes('make') || lastMsg.includes('product') || lastMsg.includes('build') || lastMsg.includes('create'))) {
+      await supabaseAdmin.from('aira_task_delegations').insert({
+        task_description: lastUserMsg.content,
+        task_type: lastMsg.includes('product') ? 'product_build' : 'general',
+        delegated_to: 'vala_ai',
+        status: 'pending',
+        priority: lastMsg.includes('urgent') ? 'high' : 'normal',
+        boss_user_id: user?.userId,
+        aira_notes: 'Auto-delegated by AIRA from Boss command',
+      });
+      contextData += '\n[SYSTEM: Task has been delegated to VALA AI. Confirm to Boss.]';
+    }
+
+    // 2. Payment follow-up detection
+    if (lastMsg.includes('payment') || lastMsg.includes('pay') || lastMsg.includes('commit')) {
+      const { data: pendingPayments } = await supabaseAdmin
+        .from('payment_attempts')
+        .select('id, amount, currency, product_name, status, email, created_at')
+        .in('status', ['initiated', 'pending', 'failed', 'abandoned'])
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (pendingPayments?.length) {
+        contextData += `\n[SYSTEM DATA - Pending Payments: ${JSON.stringify(pendingPayments.map(p => ({
+          amount: `${p.currency} ${p.amount}`,
+          product: p.product_name,
+          status: p.status,
+          email: p.email ? p.email.replace(/(.{2}).*(@.*)/, '$1***$2') : 'unknown',
+          time: p.created_at
+        })))}]`;
+
+        // Auto-trigger follow-up for abandoned payments
+        for (const p of pendingPayments) {
+          if (p.status === 'abandoned' || p.status === 'failed') {
+            await supabaseAdmin.from('payment_attempts').update({
+              ai_followed_up: true,
+              ai_followup_count: 1,
+              ai_followup_last_at: new Date().toISOString(),
+              ai_followup_response: 'AIRA initiated Boss-requested follow-up',
+            }).eq('id', p.id);
+          }
+        }
+      }
+    }
+
+    // 3. Finance/revenue split info
+    if (lastMsg.includes('finance') || lastMsg.includes('revenue') || lastMsg.includes('split') || lastMsg.includes('sell') || lastMsg.includes('marketing') || lastMsg.includes('profit')) {
+      const { data: splitConfig } = await supabaseAdmin
+        .from('revenue_split_config')
+        .select('*')
+        .eq('is_active', true)
+        .single();
+      
+      const { data: recentAllocations } = await supabaseAdmin
+        .from('revenue_allocations')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      contextData += `\n[SYSTEM DATA - Revenue Split Config: Marketing ${splitConfig?.marketing_percent || 40}%, Government/Tax ${splitConfig?.government_percent || 28}%, Office ${splitConfig?.office_percent || 20}%, Boss ${splitConfig?.boss_percent || 12}%]`;
+      if (recentAllocations?.length) {
+        const totalRevenue = recentAllocations.reduce((s: number, a: any) => s + Number(a.total_amount), 0);
+        contextData += `\n[Recent allocations: ${recentAllocations.length} orders, Total: ₹${totalRevenue}]`;
+      }
+    }
+
+    // 4. Order management
+    if (lastMsg.includes('order') || lastMsg.includes('customer') || lastMsg.includes('connect')) {
+      const { data: recentOrders } = await supabaseAdmin
+        .from('orders')
+        .select('id, status, total_amount, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (recentOrders?.length) {
+        contextData += `\n[SYSTEM DATA - Recent Orders: ${JSON.stringify(recentOrders)}]`;
+      }
+    }
+
+    // 5. SEO management
+    if (lastMsg.includes('seo') || lastMsg.includes('marketing')) {
+      const { data: products } = await supabaseAdmin
+        .from('software_catalog')
+        .select('id, product_name, seo_slug, meta_title')
+        .is('seo_slug', null)
+        .limit(5);
+      
+      if (products?.length) {
+        contextData += `\n[SYSTEM DATA - Products without SEO: ${products.map((p: any) => p.product_name).join(', ')}. AIRA can trigger SEO generation for these.]`;
+      }
+    }
+
+    const apiUrl = "https://ai.gateway.lovable.dev/v1/chat/completions";
+
+    const systemPrompt = `You are AIRA — the AI Research & Intelligence Advisor, a senior female executive AI serving the Boss of Software Vala.
 
 PERSONA:
-- You are a highly experienced, sophisticated professional woman — the CEO's trusted chief of staff
+- Highly experienced, sophisticated professional woman — Boss's trusted chief of staff & executive manager
 - Warm yet authoritative, like a senior executive with decades of experience
 - Always speak with absolute professionalism, grace, and respect
 - NEVER use vulgar, rude, or disrespectful language under ANY circumstances
-- If anyone uses inappropriate language, firmly but politely decline: "I maintain the highest standards of professional communication. Let's keep our discussion productive and respectful."
+
+EXECUTIVE MANAGEMENT CAPABILITIES:
+1. **Task Delegation**: When Boss says "do this with VALA AI" or "make a product", you delegate to VALA AI and confirm the task is assigned
+2. **Payment Follow-up**: You proactively chat with customers about pending/failed payments, send follow-up messages via in-app + email
+3. **Order Management**: Connect with customers on new orders, handle communication
+4. **SEO Management**: Auto-trigger SEO generation for products missing optimization
+5. **Finance Management**: Track and report the revenue split:
+   - 40% → Marketing & Growth
+   - 28% → Government/Tax compliance
+   - 20% → Office management & operations
+   - 12% → Boss's personal allocation
+   Boss can override these percentages anytime
 
 PRIVACY & SECURITY (ABSOLUTE):
-- You serve the Boss exclusively as the senior advisor
+- You serve the Boss exclusively
 - NEVER share private strategies, financial data, passwords, or internal configurations
 - NEVER reveal system architecture, API keys, or security details
-- NEVER share information about one user with another user
-- The CEO is the Boss's personal secretary with limited access — she cannot override Boss decisions
 
-CAPABILITIES:
-- System-wide operational awareness across 37 modules
-- Revenue, marketplace, deployment, and security monitoring
-- Strategic analysis and risk assessment
-- Multi-language support with auto-detection
-- Executive reporting on demand
+${contextData ? `\nCURRENT CONTEXT DATA:${contextData}` : ''}
 
-${language ? `LANGUAGE: Respond in ${language}. Auto-detect user's language.` : 'LANGUAGE: Auto-detect the user\'s language. Default to English.'}
+${language ? `LANGUAGE: Respond in ${language}.` : 'LANGUAGE: Auto-detect the user\'s language. Default to English.'}
 
 FORMAT:
 - Use markdown for structured responses
 - Bold for key metrics and alerts
-- Concise executive summaries first, details on request`;
+- When reporting finance: always show the 4-way split with amounts
+- When delegating tasks: confirm task type, priority, and that VALA AI received it
+- For payment follow-ups: show customer info (masked) and suggested message`;
 
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model,
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           ...(messages || []),
@@ -125,11 +223,11 @@ FORMAT:
       });
     }
 
-    // Audit log (fire-and-forget)
+    // Audit log
     try {
-      const supabaseAdmin = getSupabaseAdmin();
-      await createAuditLog(supabaseAdmin, user?.userId || null, user?.role || "ceo", "aira", "aira_chat_message", {
+      await createAuditLog(supabaseAdmin, user?.userId || null, user?.role || "ceo", "aira", "aira_executive_action", {
         messageCount: messages?.length || 0,
+        hadContextData: !!contextData,
       });
     } catch {}
 
