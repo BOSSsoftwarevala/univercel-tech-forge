@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
-import { Mail, Lock, User, ArrowRight, Zap, Eye, EyeOff, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
 import { useAnimationContext } from '@/contexts/AnimationContext';
+import LoginMascot from '@/components/auth/LoginMascot';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -34,12 +35,12 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { showWelcome, showWelcomeBack } = useAnimationContext();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (user) {
       navigate('/dashboard');
@@ -48,21 +49,11 @@ const Auth = () => {
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
-    
     const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) {
-      newErrors.email = emailResult.error.errors[0].message;
-    }
-
+    if (!emailResult.success) newErrors.email = emailResult.error.errors[0].message;
     const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) {
-      newErrors.password = passwordResult.error.errors[0].message;
-    }
-
-    if (!isLogin && !fullName.trim()) {
-      newErrors.name = 'Full name is required';
-    }
-
+    if (!passwordResult.success) newErrors.password = passwordResult.error.errors[0].message;
+    if (!isLogin && !fullName.trim()) newErrors.name = 'Full name is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -70,9 +61,7 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
     setLoading(true);
-
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
@@ -84,7 +73,6 @@ const Auth = () => {
           }
         } else {
           showWelcomeBack(email.split('@')[0], 'default', 'SV-' + Math.random().toString(36).substring(2, 6).toUpperCase());
-          // Navigate to dashboard - the Dashboard component handles role-based routing
           setTimeout(() => navigate('/dashboard', { replace: true }), 3000);
         }
       } else {
@@ -97,7 +85,6 @@ const Auth = () => {
           }
         } else {
           showWelcome(fullName || email.split('@')[0], selectedRole);
-          // Navigate to dashboard - the Dashboard component handles role-based routing
           setTimeout(() => navigate('/dashboard', { replace: true }), 4000);
         }
       }
@@ -109,62 +96,52 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-teal/10 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{
+      background: 'linear-gradient(135deg, hsl(180, 25%, 92%) 0%, hsl(200, 30%, 95%) 50%, hsl(180, 20%, 90%) 100%)'
+    }}>
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
+        backgroundImage: 'radial-gradient(circle at 25% 25%, hsl(200, 40%, 88%) 0%, transparent 50%), radial-gradient(circle at 75% 75%, hsl(180, 30%, 88%) 0%, transparent 50%)'
+      }} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         className="relative w-full max-w-md"
       >
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <motion.div 
-            className="inline-flex items-center gap-3 cursor-pointer"
-            whileHover={{ scale: 1.02 }}
-            onClick={() => navigate('/')}
-          >
-            <div className="relative">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-neon-teal flex items-center justify-center">
-                <Zap className="w-6 h-6 text-background" />
-              </div>
-              <div className="absolute inset-0 rounded-xl bg-primary/50 blur-xl -z-10" />
-            </div>
-            <div>
-              <h1 className="font-mono font-bold text-xl text-foreground tracking-tight">
-                SOFTWARE <span className="text-primary">VALA</span>
-              </h1>
-            </div>
-          </motion.div>
-        </div>
-
         {/* Auth Card */}
-        <div className="glass-panel p-8 rounded-2xl border border-border/50">
+        <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl shadow-black/5 border border-white/60">
+          {/* Mascot */}
+          <LoginMascot isPasswordFocused={isPasswordFocused} emailLength={email.length} />
+
           {/* Toggle */}
-          <div className="flex bg-muted/50 rounded-lg p-1 mb-6">
+          <div className="flex rounded-lg p-1 mb-6" style={{ background: 'hsl(200, 30%, 95%)' }}>
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                isLogin ? 'bg-primary text-primary-foreground shadow-lg' : 'text-muted-foreground hover:text-foreground'
+              className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all ${
+                isLogin
+                  ? 'text-white shadow-md'
+                  : 'hover:text-foreground'
               }`}
+              style={isLogin ? { background: 'hsl(195, 60%, 55%)' } : { color: 'hsl(200, 20%, 50%)' }}
             >
-              Login
+              Log in
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                !isLogin ? 'bg-primary text-primary-foreground shadow-lg' : 'text-muted-foreground hover:text-foreground'
+              className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all ${
+                !isLogin
+                  ? 'text-white shadow-md'
+                  : 'hover:text-foreground'
               }`}
+              style={!isLogin ? { background: 'hsl(195, 60%, 55%)' } : { color: 'hsl(200, 20%, 50%)' }}
             >
               Sign Up
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <AnimatePresence mode="wait">
               {!isLogin && (
                 <motion.div
@@ -175,15 +152,20 @@ const Auth = () => {
                 >
                   {/* Full Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground">Full Name</Label>
+                    <Label htmlFor="name" className="text-sm font-semibold" style={{ color: 'hsl(200, 50%, 35%)' }}>
+                      Full Name
+                    </Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'hsl(200, 30%, 65%)' }} />
                       <Input
                         id="name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="John Doe"
-                        className="pl-10 bg-background/50 border-border/50 focus:border-primary"
+                        className="pl-10 h-12 rounded-lg border-2 bg-white/70 focus:ring-0 transition-colors"
+                        style={{ borderColor: 'hsl(200, 40%, 85%)', outline: 'none' }}
+                        onFocus={(e) => { e.target.style.borderColor = 'hsl(195, 60%, 55%)'; }}
+                        onBlur={(e) => { e.target.style.borderColor = 'hsl(200, 40%, 85%)'; }}
                       />
                     </div>
                     {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
@@ -191,28 +173,27 @@ const Auth = () => {
 
                   {/* Role Selection */}
                   <div className="space-y-2">
-                    <Label className="text-foreground">Select Your Role</Label>
-                    <div className="grid gap-2">
+                    <Label className="text-sm font-semibold" style={{ color: 'hsl(200, 50%, 35%)' }}>Select Your Role</Label>
+                    <div className="grid gap-2 max-h-48 overflow-y-auto pr-1">
                       {roleOptions.map((role) => (
                         <motion.button
                           key={role.value}
                           type="button"
                           onClick={() => setSelectedRole(role.value)}
-                          className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                            selectedRole === role.value
-                              ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20'
-                              : 'border-border/50 hover:border-primary/50 bg-background/30'
-                          }`}
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
+                          className="flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left"
+                          style={{
+                            borderColor: selectedRole === role.value ? 'hsl(195, 60%, 55%)' : 'hsl(200, 30%, 90%)',
+                            background: selectedRole === role.value ? 'hsl(195, 60%, 96%)' : 'white',
+                          }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <span className="text-2xl">{role.icon}</span>
+                          <span className="text-xl">{role.icon}</span>
                           <div className="flex-1">
-                            <p className="font-medium text-foreground">{role.label}</p>
-                            <p className="text-xs text-muted-foreground">{role.description}</p>
+                            <p className="font-medium text-sm" style={{ color: 'hsl(200, 40%, 25%)' }}>{role.label}</p>
+                            <p className="text-xs" style={{ color: 'hsl(200, 15%, 55%)' }}>{role.description}</p>
                           </div>
                           {selectedRole === role.value && (
-                            <CheckCircle2 className="w-5 h-5 text-primary" />
+                            <CheckCircle2 className="w-5 h-5" style={{ color: 'hsl(195, 60%, 50%)' }} />
                           )}
                         </motion.button>
                       ))}
@@ -224,16 +205,21 @@ const Auth = () => {
 
             {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
+              <Label htmlFor="email" className="text-sm font-semibold" style={{ color: 'hsl(200, 50%, 35%)' }}>
+                Email
+              </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'hsl(200, 30%, 65%)' }} />
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="pl-10 bg-background/50 border-border/50 focus:border-primary"
+                  placeholder="email@domain.com"
+                  className="pl-10 h-12 rounded-lg border-2 bg-white/70 focus:ring-0 transition-colors"
+                  style={{ borderColor: 'hsl(200, 40%, 85%)' }}
+                  onFocus={(e) => { setIsPasswordFocused(false); e.target.style.borderColor = 'hsl(195, 60%, 55%)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = 'hsl(200, 40%, 85%)'; }}
                 />
               </div>
               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
@@ -241,21 +227,27 @@ const Auth = () => {
 
             {/* Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
+              <Label htmlFor="password" className="text-sm font-semibold" style={{ color: 'hsl(200, 50%, 35%)' }}>
+                Password
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'hsl(200, 30%, 65%)' }} />
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
+                  className="pl-10 pr-10 h-12 rounded-lg border-2 bg-white/70 focus:ring-0 transition-colors"
+                  style={{ borderColor: 'hsl(200, 40%, 85%)' }}
+                  onFocus={(e) => { setIsPasswordFocused(true); e.target.style.borderColor = 'hsl(195, 60%, 55%)'; }}
+                  onBlur={(e) => { setIsPasswordFocused(false); e.target.style.borderColor = 'hsl(200, 40%, 85%)'; }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'hsl(200, 30%, 65%)' }}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -266,49 +258,56 @@ const Auth = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold py-5 mt-6"
+              className="w-full h-12 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all text-base border-0"
+              style={{ 
+                background: 'linear-gradient(135deg, hsl(195, 60%, 55%) 0%, hsl(195, 55%, 48%) 100%)',
+              }}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   {isLogin ? 'Signing in...' : 'Creating account...'}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  {isLogin ? 'Sign In' : 'Create Account'}
+                  {isLogin ? 'Log in' : 'Create Account'}
                   <ArrowRight className="w-4 h-4" />
                 </div>
               )}
             </Button>
           </form>
 
-          {/* Forgot Password Link - only show on login */}
           {isLogin && (
             <div className="text-center mt-4">
-              <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+              <Link to="/forgot-password" className="text-sm hover:underline" style={{ color: 'hsl(195, 60%, 45%)' }}>
                 Forgot your password?
               </Link>
             </div>
           )}
 
-          <p className="text-center text-sm text-muted-foreground mt-4">
+          <p className="text-center text-sm mt-4" style={{ color: 'hsl(200, 15%, 55%)' }}>
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-primary hover:underline font-medium"
+              className="font-semibold hover:underline"
+              style={{ color: 'hsl(195, 60%, 45%)' }}
             >
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </p>
 
-          {/* Back to Home */}
           <div className="text-center mt-4">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+            <Link to="/" className="text-sm inline-flex items-center gap-1 hover:underline" style={{ color: 'hsl(200, 15%, 55%)' }}>
               <ArrowLeft className="w-3 h-3" />
               Back to Home
             </Link>
           </div>
         </div>
+
+        {/* Branding */}
+        <p className="text-center text-xs mt-6" style={{ color: 'hsl(200, 15%, 60%)' }}>
+          Powered by <span className="font-semibold">SOFTWARE VALA</span>
+        </p>
       </motion.div>
     </div>
   );
