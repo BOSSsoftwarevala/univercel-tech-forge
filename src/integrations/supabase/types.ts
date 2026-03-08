@@ -21733,43 +21733,70 @@ export type Database = {
       }
       software_catalog: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           base_price: number | null
+          build_metadata: Json | null
           category: string | null
           created_at: string | null
+          demo_domain: string | null
           demo_id: string | null
           demo_url: string | null
+          generated_by_vala: boolean | null
+          github_repo_url: string | null
           id: string
           is_active: boolean | null
           is_demo_registered: boolean | null
+          listing_status: string | null
           name: string
+          product_icon_url: string | null
+          product_thumbnail_url: string | null
           type: string
           updated_at: string | null
           vendor: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           base_price?: number | null
+          build_metadata?: Json | null
           category?: string | null
           created_at?: string | null
+          demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
+          generated_by_vala?: boolean | null
+          github_repo_url?: string | null
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
+          listing_status?: string | null
           name: string
+          product_icon_url?: string | null
+          product_thumbnail_url?: string | null
           type: string
           updated_at?: string | null
           vendor?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           base_price?: number | null
+          build_metadata?: Json | null
           category?: string | null
           created_at?: string | null
+          demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
+          generated_by_vala?: boolean | null
+          github_repo_url?: string | null
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
+          listing_status?: string | null
           name?: string
+          product_icon_url?: string | null
+          product_thumbnail_url?: string | null
           type?: string
           updated_at?: string | null
           vendor?: string | null
