@@ -863,6 +863,58 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
                 )}
               </ScrollArea>
             </div>
+
+            {/* JOB / CAREER APPROVALS */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <Briefcase size={14} style={{ color: '#22c55e' }} />
+                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>JOB / CAREER APPLICATIONS</span>
+                <Badge className="ml-auto text-[10px] bg-emerald-500/20 text-emerald-400">{approvals.jobApplications.length}</Badge>
+              </div>
+              <ScrollArea className="h-[280px]">
+                {approvals.jobApplications.length === 0 ? (
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No job applications waiting</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.jobApplications.map((item: any) => (
+                      <div key={item.id} className="p-3 rounded-lg" style={{ 
+                        background: 'rgba(59, 130, 246, 0.08)', 
+                        border: '1px solid rgba(59, 130, 246, 0.15)' 
+                      }}>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: T.text }}>{item.name || 'Applicant'}</p>
+                            <p className="text-[11px]" style={{ color: T.muted }}>{item.email}</p>
+                            <p className="text-[10px]" style={{ color: T.dim }}>{item.phone || 'No phone'} • {item.application_type?.toUpperCase()}</p>
+                          </div>
+                          <Badge className="bg-blue-500/30 text-blue-300 text-[10px]">
+                            <Briefcase className="w-3 h-3 mr-0.5" />
+                            {item.application_type?.toUpperCase() || 'JOB'}
+                          </Badge>
+                        </div>
+                        <p className="text-[9px] mt-1" style={{ color: T.dim }}>
+                          Exp: {item.experience || 'Not specified'} • Applied: {new Date(item.created_at).toLocaleDateString()}
+                        </p>
+                        {item.message && (
+                          <p className="text-[9px] mt-1 italic" style={{ color: T.dim }}>"{item.message.substring(0, 80)}{item.message.length > 80 ? '...' : ''}"</p>
+                        )}
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('job', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
+                          </Button>
+                          <Button size="sm" className="h-7 px-2 text-[11px] bg-amber-600 hover:bg-amber-700" onClick={() => handleApproval('job', item.id, 'hold')} disabled={processingId === item.id}>
+                            <PauseCircle className="w-3 h-3 mr-1" /> Hold
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-7 px-3 text-[11px]" onClick={() => handleApproval('job', item.id, 'reject')} disabled={processingId === item.id}>
+                            <XCircle className="w-3 h-3 mr-1" /> Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
           </div>
         )}
       </motion.div>
