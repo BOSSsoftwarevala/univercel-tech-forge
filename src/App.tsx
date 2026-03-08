@@ -124,6 +124,7 @@ const BossRegister = lazyLoad(() => import("./pages/auth/BossRegister"));
 const EasyAuth = lazyLoad(() => import("./pages/auth/EasyAuth"));
 const RoleBasedLogin = lazyLoad(() => import("./pages/auth/RoleBasedLogin"));
 const SessionExpiredPage = lazyLoad(() => import("./pages/error/SessionExpiredPage"));
+const DeadlineAnimationDemo = lazyLoad(() => import("./pages/DeadlineAnimationDemo"));
 
 // Demo Pages
 const PublicDemos = lazyLoad(() => import("./pages/demos/PublicDemos"));
@@ -459,6 +460,7 @@ const App = memo(() => (
                             <Route path="/sectors" element={<SectorsBrowse />} />
                             <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
                             <Route path="/auto-dev" element={<AutoDevEngine />} />
+                            <Route path="/deadline-animation" element={<DeadlineAnimationDemo />} />
                             <Route path="/ai-builder" element={<RequireRole allowed={["boss_owner", "super_admin", "developer", "ai_manager", "demo_manager", "product_demo_manager"]}><AIBuilderPage /></RequireRole>} />
                             <Route path="/marketplace" element={<RequireRole allowed={["master", "boss_owner", "super_admin", "franchise", "reseller", "developer", "support", "demo_manager", "client", "user"]}><MMFullLayout /></RequireRole>} />
                             <Route path="/marketplace/product/:productId" element={<RequireRole allowed={["master", "boss_owner", "super_admin", "franchise", "reseller", "developer", "support", "demo_manager", "client", "user"]}><MMFullLayout /></RequireRole>} />
