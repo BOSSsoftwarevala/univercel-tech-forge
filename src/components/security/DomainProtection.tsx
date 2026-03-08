@@ -9,7 +9,7 @@ const ALLOWED_DOMAINS = [
   'www.softwarevala.net',
   'localhost',
   '127.0.0.1',
-  'lovable.dev',
+  'lovable.dev', // platform domain - required for preview
 ];
 
 interface DomainProtectionProps {
