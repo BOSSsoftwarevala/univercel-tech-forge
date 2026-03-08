@@ -182,7 +182,7 @@ Provide your analysis in JSON format with:
 }
 
 async function analyzeServerHealth(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   // Get server data
   const { data: server } = await supabase
