@@ -126,16 +126,29 @@ export const MMMarketplaceScreen = () => {
       metadata?: Record<string, unknown>;
     }
   ) => {
-    try {
-      const actorId = user?.id ?? null;
-      const eventMetadata = {
-        module: 'marketplace',
-        product_name: product?.product_name,
-        category: product?.category,
-        timestamp: new Date().toISOString(),
-        ...(options?.metadata || {}),
-      };
+    const actorId = user?.id ?? null;
+    const eventMetadata = {
+      module: 'marketplace',
+      product_name: product?.product_name,
+      category: product?.category,
+      timestamp: new Date().toISOString(),
+      ...(options?.metadata || {}),
+    };
 
+    // 1. Always queue to system_events for Boss Panel visibility
+    try {
+      await createSystemRequest({
+        action_type: eventType,
+        role_type: userRole || 'public',
+        payload_json: eventMetadata,
+        user_id: actorId,
+      });
+    } catch (err) {
+      console.error('[Marketplace] System event failed:', err);
+    }
+
+    // 2. Also log to activity_log for historical audit trail
+    try {
       await supabase.from('activity_log').insert({
         action_type: eventType,
         entity_type: product ? 'product' : 'marketplace',
@@ -145,17 +158,8 @@ export const MMMarketplaceScreen = () => {
         severity_level: options?.severity || 'info',
         metadata: eventMetadata,
       });
-
-      if (options?.queueForBoss) {
-        await createSystemRequest({
-          action_type: eventType,
-          role_type: userRole || 'client',
-          payload_json: eventMetadata,
-          user_id: actorId,
-        });
-      }
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('[Marketplace] Activity log failed:', err);
     }
   };
 
