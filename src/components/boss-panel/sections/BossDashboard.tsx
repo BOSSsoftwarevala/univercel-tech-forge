@@ -391,7 +391,7 @@ export function BossDashboard() {
                     <td className="px-5 py-3 font-mono tabular-nums" style={{ color: T.dim }}>
                       {new Date(app.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </td>
-                    <td className="px-5 py-3"><Badge status={app.status} /></td>
+                    <td className="px-5 py-3"><StatusBadge status={app.status} /></td>
                   </motion.tr>
                 ))}
               </tbody>
