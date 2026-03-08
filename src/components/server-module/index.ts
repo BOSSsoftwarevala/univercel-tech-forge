@@ -23,3 +23,6 @@ export { DomainLockSystem } from './DomainLockSystem';
 export { CodeProtection } from './CodeProtection';
 export { DeploySecurity } from './DeploySecurity';
 export { SecurityDashboard } from './SecurityDashboard';
+export { CpanelManager } from './CpanelManager';
+export { WhoisDnsTools } from './WhoisDnsTools';
+export { HostingReseller } from './HostingReseller';

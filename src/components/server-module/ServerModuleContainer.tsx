@@ -48,6 +48,9 @@ export const ServerModuleContainer: React.FC<ServerModuleContainerProps> = ({
       case 'add-server': return <AddServerForm />;
       case 'active-servers': return <ActiveServersList />;
       case 'hosting': return <HostingConnection />;
+      case 'cpanel-manager': return <CpanelManager />;
+      case 'whois-dns': return <WhoisDnsTools />;
+      case 'hosting-reseller': return <HostingReseller />;
       case 'ai-tools': return <AIToolMonitor />;
       case 'auto-scan': return <ServerAutoScan />;
       case 'downtime': return <DowntimeDetection />;
