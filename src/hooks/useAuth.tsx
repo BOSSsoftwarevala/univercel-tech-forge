@@ -125,6 +125,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
 
+        // Session start marker for force-logout comparisons (new login only)
+        if (event === 'SIGNED_IN' && session?.user) {
+          setSessionStartNow();
+        }
+
         // If this SIGNED_IN came from our own signIn() call, we will fetch role
         // after clearing any force-logout flag to avoid an immediate signOut race.
         if (event === 'SIGNED_IN' && pendingSignInRef.current) {
@@ -139,6 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }, 0);
           }
         } else if (event === 'SIGNED_OUT' || !session) {
+          clearSessionStart();
           setUserRole(null);
           setApprovalStatus(null);
           setRoleChecked(false);
