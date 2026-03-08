@@ -3408,11 +3408,16 @@ const Index = () => {
               </Button>
               {/* Pricing Badge */}
               <Badge className="bg-white text-green-600 font-bold text-sm px-3 py-1.5 animate-pulse">
-                💰 $249 Lifetime
+                💰 $249 Lifetime • Source Code Included
               </Badge>
               <Badge className="bg-white/20 text-white border-0 text-xs px-3 py-1.5">
-                🎉 40% OFF
+                🎉 No Hidden Charges
               </Badge>
+              {festivalBanner && (
+                <Badge className={`bg-gradient-to-r ${BANNER_COLORS[bannerColorIdx]} text-white border-0 text-xs px-3 py-1.5 font-bold animate-pulse`}>
+                  🔥 Festival Week: ALL Software $99 for 7 Days!
+                </Badge>
+              )}
               {/* Login Button - For regular users */}
               <Button asChild className="bg-white text-orange-600 hover:bg-white/90 font-bold gap-2">
                 <Link to="/auth">
