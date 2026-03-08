@@ -13,12 +13,17 @@ import {
   PanelLeftClose, PanelLeftOpen, ChevronDown, Globe,
   RefreshCw, Smartphone, Monitor, ExternalLink,
   FolderTree, File, ChevronRight, Copy, Check,
-  Plus, Trash2, MessageSquare, Settings2
+  Plus, Trash2, MessageSquare, Settings2,
+  Rocket, Store, Package
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useAutoPublish } from '@/hooks/useAutoPublish';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // ===== TYPES =====
 type Message = {
