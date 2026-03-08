@@ -5,7 +5,7 @@ import {
   Lightbulb, ThumbsUp, ThumbsDown, MessageSquare, Shield, Clock,
   Target, DollarSign, Users, Activity, Brain, Zap, CheckCircle2,
   XCircle, FileText, Sparkles, RefreshCw, Server, Package,
-  ShoppingCart, AlertCircle, Layers, ScanLine
+  ShoppingCart, AlertCircle, Layers, ScanLine, Bot
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,7 @@ import {
   CategoryTreemap,
 } from "@/components/aira/AIRACharts";
 import { AIRASystemScanner, ScanReport } from "@/components/aira/AIRASystemScanner";
+import AIRAChatInterface from "@/components/aira/AIRAChatInterface";
 
 interface CEODashboardProps {
   activeNav?: string;
@@ -89,6 +90,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const sections = [
     { id: "scanner", label: "System Scanner", icon: ScanLine },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "chat", label: "AIRA Chat", icon: Bot },
     { id: "insights", label: "AI Insights", icon: Brain },
     { id: "approvals", label: "Approvals", icon: FileText },
     { id: "risks", label: "Risk Radar", icon: AlertTriangle },
@@ -321,6 +323,13 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 </CardContent>
               </Card>
             </div>
+          </motion.div>
+        )}
+
+        {/* ─── AIRA CHAT ──────────────────────────────────── */}
+        {activeSection === "chat" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <AIRAChatInterface />
           </motion.div>
         )}
 
