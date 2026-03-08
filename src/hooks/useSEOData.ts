@@ -119,7 +119,7 @@ export const useSEOCompetitors = (projectId?: string) => {
   }, [projectId]);
 
   const addCompetitor = async (competitor: Record<string, any>) => {
-    const { data, error } = await supabase.from("seo_competitors").insert([competitor]).select().single();
+    const { data, error } = await supabase.from("seo_competitors").insert([competitor as any]).select().single();
     if (error) { toast.error("Failed to add competitor"); return null; }
     toast.success(`Competitor "${competitor.competitor_domain}" added`);
     fetchCompetitors();
