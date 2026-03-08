@@ -3204,6 +3204,39 @@ const allDemos: Demo[] = [
   }
 ];
 
+// Merge old demos with new marketplace products (deduplicate by masterCategory match)
+const mergedDemos: Demo[] = [
+  ...allDemos,
+  ...allMarketplaceProducts
+    .filter(mp => !allDemos.some(d => d.id === mp.id))
+    .map(mp => ({
+      ...mp,
+      url: mp.url,
+      icon: mp.icon,
+      price: "$249",
+      discountPrice: "$249",
+    }))
+];
+
+// ===== ROTATING BANNER COLORS (changes every 30 min) =====
+const BANNER_COLORS = [
+  "from-red-600 to-orange-500",
+  "from-purple-600 to-pink-500",
+  "from-blue-600 to-cyan-500",
+  "from-green-600 to-emerald-500",
+  "from-amber-600 to-yellow-500",
+  "from-rose-600 to-red-500",
+  "from-indigo-600 to-violet-500",
+  "from-teal-600 to-green-500",
+  "from-fuchsia-600 to-pink-500",
+  "from-cyan-600 to-blue-500",
+];
+
+const getBannerColorIndex = () => {
+  const mins = Math.floor(Date.now() / (30 * 60 * 1000));
+  return mins % BANNER_COLORS.length;
+};
+
 // ===== 50 NETFLIX ROWS =====
 interface NetflixRow {
   id: number;
