@@ -18,3 +18,8 @@ export { AIToolMonitor } from './AIToolMonitor';
 export { ServerAutoScan } from './ServerAutoScan';
 export { DowntimeDetection } from './DowntimeDetection';
 export { AutoRepairEngine } from './AutoRepairEngine';
+export { AutoSSLManager } from './AutoSSLManager';
+export { DomainLockSystem } from './DomainLockSystem';
+export { CodeProtection } from './CodeProtection';
+export { DeploySecurity } from './DeploySecurity';
+export { SecurityDashboard } from './SecurityDashboard';

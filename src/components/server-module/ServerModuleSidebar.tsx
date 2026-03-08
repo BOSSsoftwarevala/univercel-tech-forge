@@ -9,7 +9,8 @@ import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Plus, Server, Activity, Shield, 
   Database, FileText, Brain, Settings, ArrowLeft,
-  Globe, Cpu, AlertTriangle, Wrench, Search
+  Globe, Cpu, AlertTriangle, Wrench, Search,
+  Lock, Code, Rocket, Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
@@ -23,6 +24,11 @@ export type ServerModuleSection =
   | 'auto-scan'
   | 'downtime'
   | 'auto-repair'
+  | 'ssl-manager'
+  | 'domain-lock'
+  | 'code-protection'
+  | 'deploy-security'
+  | 'security-dashboard'
   | 'health-load'
   | 'security'
   | 'backups'
@@ -39,6 +45,11 @@ const sidebarItems: { id: ServerModuleSection; label: string; icon: React.Elemen
   { id: 'auto-scan', label: 'Auto Scan', icon: Search },
   { id: 'downtime', label: 'Downtime Detection', icon: AlertTriangle },
   { id: 'auto-repair', label: 'Auto Repair', icon: Wrench },
+  { id: 'ssl-manager', label: 'SSL Manager', icon: Lock },
+  { id: 'domain-lock', label: 'Domain Lock', icon: Eye },
+  { id: 'code-protection', label: 'Code Protection', icon: Code },
+  { id: 'deploy-security', label: 'Deploy Security', icon: Rocket },
+  { id: 'security-dashboard', label: 'Security Dashboard', icon: Shield },
   { id: 'health-load', label: 'Health & Load', icon: Activity },
   { id: 'security', label: 'Security', icon: Shield },
   { id: 'backups', label: 'Backups', icon: Database },
@@ -46,7 +57,6 @@ const sidebarItems: { id: ServerModuleSection; label: string; icon: React.Elemen
   { id: 'ai-actions', label: 'AI Actions', icon: Cpu },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
-
 interface ServerModuleSidebarProps {
   activeSection: ServerModuleSection;
   onSectionChange: (section: ServerModuleSection) => void;
