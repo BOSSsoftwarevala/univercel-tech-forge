@@ -395,7 +395,7 @@ export const MMMarketplaceScreen = () => {
         ) : (
           <>
             {featuredProducts.length > 0 && (
-              <HeroBanner product={featuredProducts[0]} onDemo={handleDemo} onBuy={handleBuy} discountedPrice={discountedPrice} />
+              <HeroBanner products={featuredProducts} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} discountedPrice={discountedPrice} />
             )}
 
             <ProductRow
@@ -467,39 +467,142 @@ export const MMMarketplaceScreen = () => {
   );
 };
 
-function HeroBanner({ product, onDemo, onBuy, discountedPrice }: {
-  product: Product;
+function HeroBanner({ products, onDemo, onBuy, onView, discountedPrice }: {
+  products: Product[];
   onDemo: (product: Product) => void;
   onBuy: (product: Product) => void;
+  onView: (product: Product) => void;
   discountedPrice: (price: number | null) => string;
 }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const bannerProducts = products.slice(0, 5);
+
+  useEffect(() => {
+    if (isPaused || bannerProducts.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % bannerProducts.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isPaused, bannerProducts.length]);
+
+  if (bannerProducts.length === 0) return null;
+
+  const product = bannerProducts[activeIndex];
+
+  const GRADIENTS = [
+    'from-cyan-900/60 via-slate-900 to-purple-900/40',
+    'from-emerald-900/60 via-slate-900 to-cyan-900/40',
+    'from-purple-900/60 via-slate-900 to-pink-900/40',
+    'from-amber-900/60 via-slate-900 to-red-900/40',
+    'from-blue-900/60 via-slate-900 to-indigo-900/40',
+  ];
+
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-cyan-900/60 via-slate-900 to-purple-900/40 border border-slate-800 p-8 md:p-12">
-      <div className="relative z-10 max-w-2xl">
-        <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 mb-3">{product.category || 'Software'}</Badge>
-        <h2 className="text-3xl md:text-4xl font-bold mb-3">{product.product_name}</h2>
-        <p className="text-slate-300 text-sm md:text-base mb-6 line-clamp-2">{product.description || 'Enterprise-grade software solution'}</p>
-        <div className="flex items-center gap-4 mb-6">
-          {product.monthly_price && (
-            <div>
-              <span className="text-slate-500 line-through text-sm">₹{product.monthly_price}/mo</span>
-              <span className="text-2xl font-bold text-cyan-400 ml-2">₹{discountedPrice(product.monthly_price)}/mo</span>
-              <Badge className="ml-2 bg-emerald-500/20 text-emerald-400 border-0 text-xs">30% OFF</Badge>
+    <div
+      className="relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-r ${GRADIENTS[activeIndex % GRADIENTS.length]} border border-slate-800 transition-all duration-700`}>
+        {/* Progress bar */}
+        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1.5 px-6 pt-3">
+          {bannerProducts.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveIndex(idx)}
+              className="flex-1 h-1 rounded-full overflow-hidden bg-white/20 cursor-pointer"
+            >
+              <div
+                className={`h-full rounded-full transition-all ${
+                  idx === activeIndex
+                    ? 'bg-cyan-400 animate-[progress_5s_linear]'
+                    : idx < activeIndex
+                    ? 'bg-white/40 w-full'
+                    : 'w-0'
+                }`}
+                style={idx === activeIndex ? { animation: isPaused ? 'none' : 'progress 5s linear forwards' } : idx < activeIndex ? { width: '100%' } : { width: '0%' }}
+              />
+            </button>
+          ))}
+        </div>
+
+        <div className="p-8 md:p-12 min-h-[280px] flex items-center">
+          <div className="relative z-10 max-w-2xl">
+            <div className="flex items-center gap-2 mb-3">
+              <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">{product.category || 'Software'}</Badge>
+              <Badge className="bg-white/10 text-white/70 border-white/20 text-[10px]">AD</Badge>
             </div>
-          )}
+            <h2
+              className="text-3xl md:text-5xl font-bold mb-3 cursor-pointer hover:text-cyan-300 transition-colors"
+              onClick={() => onView(product)}
+            >
+              {product.product_name}
+            </h2>
+            <p className="text-slate-300 text-sm md:text-base mb-6 line-clamp-2 max-w-lg">
+              {product.description || 'Enterprise-grade software solution built for scale.'}
+            </p>
+            <div className="flex items-center gap-4 mb-6">
+              {product.monthly_price && (
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 line-through text-sm">₹{product.monthly_price}/mo</span>
+                  <span className="text-2xl font-bold text-cyan-400">₹{discountedPrice(product.monthly_price)}/mo</span>
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs">30% OFF</Badge>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => onDemo(product)} variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
+                <Play className="w-4 h-4 mr-2" /> Try Demo
+              </Button>
+              <Button onClick={() => onBuy(product)} className="bg-cyan-500 hover:bg-cyan-600 text-white">
+                <ShoppingCart className="w-4 h-4 mr-2" /> Buy Now
+              </Button>
+            </div>
+          </div>
+
+          <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">
+            <Monitor className="w-full h-full" />
+          </div>
         </div>
-        <div className="flex gap-3">
-          <Button onClick={() => onDemo(product)} variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
-            <Play className="w-4 h-4 mr-2" /> Try Demo
-          </Button>
-          <Button onClick={() => onBuy(product)} className="bg-cyan-500 hover:bg-cyan-600 text-white">
-            <ShoppingCart className="w-4 h-4 mr-2" /> Buy Now
-          </Button>
+
+        {/* Navigation arrows */}
+        {bannerProducts.length > 1 && (
+          <>
+            <button
+              onClick={() => setActiveIndex((prev) => (prev - 1 + bannerProducts.length) % bannerProducts.length)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/70 hover:text-white transition-all"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setActiveIndex((prev) => (prev + 1) % bannerProducts.length)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/70 hover:text-white transition-all"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Thumbnail strip */}
+      {bannerProducts.length > 1 && (
+        <div className="flex gap-2 mt-3 justify-center">
+          {bannerProducts.map((bp, idx) => (
+            <button
+              key={bp.product_id}
+              onClick={() => setActiveIndex(idx)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                idx === activeIndex
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                  : 'bg-slate-800/60 text-slate-500 hover:text-slate-300 border border-transparent'
+              }`}
+            >
+              {bp.product_name.length > 15 ? bp.product_name.slice(0, 15) + '…' : bp.product_name}
+            </button>
+          ))}
         </div>
-      </div>
-      <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">
-        <Monitor className="w-full h-full" />
-      </div>
+      )}
     </div>
   );
 }

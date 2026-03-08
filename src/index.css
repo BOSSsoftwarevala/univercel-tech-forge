@@ -777,3 +777,8 @@ html {
   transform: translateZ(0);
   will-change: transform;
 }
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
