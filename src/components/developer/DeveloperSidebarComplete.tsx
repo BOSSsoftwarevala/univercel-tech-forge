@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, ListTodo, Bug, Code2, Timer, Bot, BarChart3, Settings, 
-  LogOut, ChevronLeft, ChevronRight, Zap, Target, AlertCircle, Sparkles
+  LogOut, ChevronLeft, ChevronRight, Zap, Target, AlertCircle, Sparkles,
+  FolderLock, Brain
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
