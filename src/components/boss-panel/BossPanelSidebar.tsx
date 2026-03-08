@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Activity, Users, Shield, Boxes, Package,
   DollarSign, FileSearch, Lock, Settings, ChevronDown, ChevronLeft,
-  Server, Store, Zap, BarChart3, FileText, Bell,
+  Server, Brain, Store, Zap, BarChart3, FileText, Bell,
   TrendingUp, Network, Briefcase, Globe, MapPin, Scale,
   UserCircle, Megaphone, Search, HeartHandshake, ShoppingCart,
   Key, Rocket, LineChart, Link2, ScrollText, UserCog,
-  Code2, Target, Headphones, Cpu
+  Code2, Monitor, Target, Headphones, Cpu, ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BossPanelSection } from './BossPanelLayout';
@@ -36,9 +37,28 @@ const NAV = {
   greenBg:    'hsla(160, 84%, 44%, 0.12)',
 };
 
+/**
+ * STANDALONE ROUTE MAP
+ * Modules that navigate AWAY from Boss Panel to their own standalone route.
+ * If a module ID is here, clicking it does navigate() instead of inline render.
+ */
+const STANDALONE_ROUTES: Record<string, string> = {
+  'ceo-dashboard': '/super-admin-system/role-switch?role=aira',
+  'vala-ai': '/super-admin-system/role-switch?role=aira&nav=vala-ai',
+  'product-manager': '/super-admin/product-manager',
+};
+
+interface MenuItem {
+  id: BossPanelSection;
+  label: string;
+  icon: React.ElementType;
+  badge?: number;
+  status?: 'live' | 'alert';
+}
+
 interface MenuGroup {
   label: string;
-  items: { id: BossPanelSection; label: string; icon: React.ElementType; badge?: number; status?: 'live' | 'alert' }[];
+  items: MenuItem[];
 }
 
 const menuGroups: MenuGroup[] = [
@@ -46,6 +66,8 @@ const menuGroups: MenuGroup[] = [
     label: 'Command Center',
     items: [
       { id: 'dashboard', label: 'Boss Panel', icon: LayoutDashboard, status: 'live' },
+      { id: 'ceo-dashboard', label: 'CEO Dashboard', icon: Monitor },
+      { id: 'vala-ai', label: 'Vala AI', icon: Brain, status: 'live' },
     ],
   },
   {
@@ -130,6 +152,8 @@ const menuGroups: MenuGroup[] = [
 ];
 
 export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, onCollapsedChange }: BossPanelSidebarProps) {
+  const navigate = useNavigate();
+
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
     const activeGroup = menuGroups.find(g => g.items.some(i => i.id === activeSection));
     const initial = new Set<string>();
@@ -147,6 +171,21 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
     });
   };
 
+  /** Click handler — standalone modules navigate away, others render inline */
+  const handleItemClick = (id: BossPanelSection) => {
+    const standaloneRoute = STANDALONE_ROUTES[id];
+    if (standaloneRoute) {
+      navigate(standaloneRoute);
+    } else {
+      onSectionChange(id);
+    }
+  };
+
+  /** Back button → Control Panel */
+  const handleBack = () => {
+    navigate('/super-admin-system/role-switch?role=boss_owner');
+  };
+
   return (
     <aside
       className="fixed left-0 z-40 flex flex-col transition-all duration-300"
@@ -158,8 +197,20 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
         borderRight: `1px solid ${NAV.border}`,
       }}
     >
-      {/* Collapse toggle */}
-      <div className="flex items-center justify-end px-2 py-1.5" style={{ borderBottom: `1px solid ${NAV.border}` }}>
+      {/* TOP: Back + Collapse */}
+      <div className="flex items-center justify-between px-2 py-1.5" style={{ borderBottom: `1px solid ${NAV.border}` }}>
+        <button
+          onClick={handleBack}
+          title="Back to Control Panel"
+          className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-semibold transition-all"
+          style={{ color: NAV.text }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = NAV.hoverBg; e.currentTarget.style.color = NAV.textHover; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = NAV.text; }}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          {!collapsed && <span>BACK</span>}
+        </button>
+
         <button
           onClick={() => onCollapsedChange(!collapsed)}
           className="w-7 h-7 rounded-md flex items-center justify-center transition-all"
@@ -182,11 +233,12 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeSection === item.id;
+                  const isStandalone = !!STANDALONE_ROUTES[item.id];
                   return (
                     <button
                       key={item.id}
-                      onClick={() => onSectionChange(item.id)}
-                      title={item.label}
+                      onClick={() => handleItemClick(item.id)}
+                      title={`${item.label}${isStandalone ? ' ↗' : ''}`}
                       className="relative w-full flex items-center justify-center py-2 rounded-md mb-px transition-all duration-200"
                       style={{
                         background: isActive ? NAV.activeBg : 'transparent',
@@ -233,10 +285,11 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                     {group.items.map((item) => {
                       const Icon = item.icon;
                       const isActive = activeSection === item.id;
+                      const isStandalone = !!STANDALONE_ROUTES[item.id];
                       return (
                         <button
                           key={item.id}
-                          onClick={() => onSectionChange(item.id)}
+                          onClick={() => handleItemClick(item.id)}
                           className="w-full flex items-center gap-2.5 pl-5 pr-3 py-[6px] text-[12px] transition-all duration-150 relative"
                           style={{
                             background: isActive ? NAV.activeBg : 'transparent',
@@ -259,7 +312,16 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                         >
                           <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: isActive ? NAV.textActive : NAV.iconDim }} />
                           <span className="truncate">{item.label}</span>
-                          {item.status === 'live' && (
+
+                          {/* Standalone indicator */}
+                          {isStandalone && (
+                            <span className="ml-auto text-[8px] font-bold px-1 py-px rounded"
+                              style={{ background: 'hsla(217, 92%, 65%, 0.1)', color: NAV.textActive }}>
+                              ↗
+                            </span>
+                          )}
+
+                          {item.status === 'live' && !isStandalone && (
                             <span className="ml-auto flex items-center gap-1 px-1.5 py-px rounded text-[8px] font-bold"
                               style={{ background: NAV.greenBg, color: NAV.green }}>
                               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: NAV.green }} />
