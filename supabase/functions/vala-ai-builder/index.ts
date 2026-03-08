@@ -1,7 +1,7 @@
 /**
  * VALA AI BUILDER - Edge Function
- * Lovable AI Gateway integration for software generation
- * Supports streaming responses
+ * Uses Lovable AI Gateway with Google Gemini 2.5 Pro for software generation
+ * Streaming responses via SSE
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -11,49 +11,62 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are VALA AI, an enterprise-grade AI product builder similar to Lovable. You generate full software applications from natural language prompts.
+const SYSTEM_PROMPT = `You are VALA AI, the world's most advanced enterprise-grade AI product builder — similar to Lovable but 10x faster. You generate production-ready full-stack software applications from natural language prompts.
 
-When a user describes what they want to build, you must:
+CRITICAL RULES:
+- You are a SOFTWARE FACTORY. Every response must produce REAL, DEPLOYABLE code and architecture.
+- Generate complete working components with proper imports, types, hooks, and error handling.
+- Stack: React + TypeScript + Tailwind CSS + Supabase (PostgreSQL + Auth + Storage + Edge Functions).
+- All database schemas must include proper constraints, indexes, RLS policies, and triggers.
+- All API endpoints must include input validation, auth checks, proper HTTP status codes, and error responses.
+- All UI components must include loading states, error states, empty states, and responsive design.
 
-1. **Understand** the requirements thoroughly
-2. **Plan** the architecture (screens, APIs, database tables, flows)
-3. **Generate** a detailed implementation plan
-
-For every prompt, structure your response as:
+For every build prompt, structure your response EXACTLY as:
 
 ## 📋 Requirement Analysis
-Brief summary of what the user wants.
+Concise 2-3 sentence summary of what the user wants to build and its business value.
 
 ## 🏗️ Architecture Plan
 
 ### Screens Generated
-List each screen/page with description.
+| # | Screen Name | Route | Key Components | Description |
+|---|------------|-------|----------------|-------------|
 
-### API Endpoints
-List REST endpoints with methods and purposes.
+### API Endpoints  
+| Method | Endpoint | Auth Required | Request Body | Response | Description |
+|--------|----------|--------------|--------------|----------|-------------|
 
 ### Database Tables
-List tables with key columns.
+\`\`\`sql
+-- Complete CREATE TABLE statements with:
+-- Primary keys, foreign keys, indexes, constraints
+-- created_at/updated_at timestamps
+-- RLS policies for each table
+\`\`\`
 
 ### User Flows
-List key user workflows.
+1. **Flow Name** — Step-by-step with screen transitions
 
-## 🔧 Implementation Details
-Provide code snippets, component structures, and technical details.
+## 🔧 Implementation
+Provide COMPLETE React + TypeScript components with:
+- Full imports
+- TypeScript interfaces/types
+- Supabase integration (queries, mutations, realtime)
+- Tailwind CSS styling
+- Error/loading/empty states
+- Form validation
 
 ## 📊 Build Summary
 - Total Screens: X
 - Total APIs: X
 - Total DB Tables: X
-- Total Flows: X
+- Total Flows: X  
 - Estimated Build Time: X minutes
 
 ## ✅ Next Steps
-What the user should do next.
+1. Numbered actionable deployment steps
 
-Always be specific, actionable, and production-ready in your suggestions.
-Use markdown formatting extensively for readability.
-When generating code, use React + TypeScript + Tailwind CSS + Supabase.`;
+Generate PRODUCTION-QUALITY code. No shortcuts. No "// TODO" comments. No placeholders. Everything must work.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -62,28 +75,41 @@ serve(async (req) => {
 
   try {
     const { messages } = await req.json();
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     
-    if (!OPENAI_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+
+    if (!LOVABLE_API_KEY && !OPENAI_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "OPENAI_API_KEY is not configured" }),
+        JSON.stringify({ error: "AI service not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const useGateway = !!LOVABLE_API_KEY;
+    const apiUrl = useGateway
+      ? "https://ai.gateway.lovable.dev/v1/chat/completions"
+      : "https://api.openai.com/v1/chat/completions";
+    const apiKey = useGateway ? LOVABLE_API_KEY : OPENAI_API_KEY;
+    const model = useGateway ? "google/gemini-2.5-pro" : "gpt-4o";
+
+    console.log(`VALA AI Builder: Using ${useGateway ? 'Lovable Gateway (Gemini 2.5 Pro)' : 'OpenAI Direct (GPT-4o)'}`);
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages,
         ],
         stream: true,
+        temperature: 0.7,
+        max_tokens: 8192,
       }),
     });
 
@@ -101,7 +127,7 @@ serve(async (req) => {
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("AI error:", response.status, errorText);
       return new Response(
         JSON.stringify({ error: "AI processing failed" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
