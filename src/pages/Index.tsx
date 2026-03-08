@@ -2540,72 +2540,122 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - Complete Business Software Marketplace */}
-      <section className="relative py-16 px-4 bg-gradient-to-b from-[#0d1e36] to-transparent overflow-hidden">
-        {/* Ambient glow */}
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-orange-500/4 rounded-full blur-[120px]" />
+      {/* ===== NETFLIX HERO — Featured Product with Cinematic Visual ===== */}
+      {(() => {
+        const activeDemos = allDemos.filter(d => d.status === 'ACTIVE');
+        const heroDemo = activeDemos[heroIndex % activeDemos.length];
+        if (!heroDemo) return null;
+        const HeroIcon = heroDemo.icon;
+        return (
+          <section className="relative h-[70vh] min-h-[480px] max-h-[680px] overflow-hidden">
+            {/* Cinematic gradient backdrop */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${heroDemo.color} opacity-40`} />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/30" />
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
 
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 mb-5 text-sm px-4 py-1.5">
-              <Star className="h-3.5 w-3.5 mr-1.5" /> 20 Master Categories • 147 Software Solutions • 20 Live Demos
-            </Badge>
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-5 leading-tight">
-              Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">Business Software</span>
-              <br />Marketplace
-            </h2>
-            <p className="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed">
-              Premium enterprise solutions across Education, Healthcare, Finance, Retail, Logistics & more.
-              Start your business today with our ready-to-deploy software!
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 mb-4">
-              <div className="flex items-center gap-2 text-emerald-400 font-medium">
-                <CheckCircle className="h-5 w-5" /> Full Source Code
-              </div>
-              <div className="flex items-center gap-2 text-cyan-400 font-medium">
-                <CheckCircle className="h-5 w-5" /> 1 Year Free Support
-              </div>
-              <div className="flex items-center gap-2 text-orange-400 font-medium">
-                <CheckCircle className="h-5 w-5" /> Free Installation
-              </div>
-              <div className="flex items-center gap-2 text-purple-400 font-medium">
-                <CheckCircle className="h-5 w-5" /> Lifetime Updates
-              </div>
+            {/* Large icon visual */}
+            <div className="absolute right-[10%] top-1/2 -translate-y-1/2 opacity-[0.07]">
+              <HeroIcon className="w-[400px] h-[400px]" />
             </div>
-            {!geoLocale.loading && geoLocale.country !== 'IN' && (
-              <p className="text-xs text-slate-500 mt-2">
-                📍 Showing prices in {geoLocale.currency} ({geoLocale.countryName})
-              </p>
-            )}
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Festival / Special Day Banner - Netflix Style */}
+            {/* Content */}
+            <div className="relative z-20 h-full flex items-center px-6 md:px-16 lg:px-24">
+              <motion.div
+                key={heroDemo.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="max-w-2xl"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Badge className="bg-emerald-500/90 text-white font-bold text-xs flex items-center gap-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" /> LIVE DEMO
+                  </Badge>
+                  <Badge className="bg-white/10 text-white/70 border-white/20 text-xs">
+                    {heroDemo.masterCategory}
+                  </Badge>
+                  <Badge className="bg-red-500/80 text-white border-0 text-xs font-bold">
+                    40% OFF
+                  </Badge>
+                </div>
+
+                <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-3 leading-[1.05]">
+                  {heroDemo.name}
+                </h2>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-1">
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                  <span className="text-white/60 text-sm">50+ clients</span>
+                </div>
+
+                <p className="text-slate-300 text-base md:text-lg mb-6 line-clamp-2 max-w-lg">
+                  {heroDemo.description}
+                </p>
+
+                <div className="flex items-center gap-3 mb-8">
+                  <span className="text-white/40 line-through text-lg">{localPrice(heroDemo.price)}</span>
+                  <span className="text-3xl font-extrabold text-emerald-400">{localPrice(heroDemo.discountPrice)}</span>
+                </div>
+
+                <div className="flex gap-3">
+                  <Link to={heroDemo.url}>
+                    <Button size="lg" className="bg-white text-black hover:bg-white/90 font-bold text-base px-8 gap-2 rounded-sm">
+                      <Play className="h-5 w-5 fill-black" /> Try Demo
+                    </Button>
+                  </Link>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white/30 text-white hover:bg-white/10 font-medium text-base px-8 gap-2 rounded-sm"
+                    onClick={() => {
+                      onToggleFavoriteGlobal(heroDemo.id);
+                    }}
+                  >
+                    <Heart className={`h-5 w-5 ${favorites.includes(heroDemo.id) ? 'fill-red-500 text-red-500' : ''}`} /> 
+                    {favorites.includes(heroDemo.id) ? 'Saved' : 'My List'}
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Hero nav dots */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {activeDemos.slice(0, 8).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setHeroIndex(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${idx === heroIndex % activeDemos.slice(0, 8).length ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'}`}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* Festival Banner */}
       {festivalBanner && (
-        <section className="px-4 md:px-8 mb-6">
+        <section className="px-4 md:px-12 -mt-8 relative z-20 mb-6">
           <div className="max-w-[1400px] mx-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className={`relative rounded-2xl overflow-hidden bg-gradient-to-r ${festivalBanner.gradient} p-8 md:p-12`}
+              className={`relative rounded-xl overflow-hidden bg-gradient-to-r ${festivalBanner.gradient} p-6 md:p-8`}
             >
               <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 flex items-center justify-center">
-                <span className="text-[120px]">{festivalBanner.emoji}</span>
-              </div>
-              <div className="relative z-10">
-                <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-2">{festivalBanner.title}</h3>
-                <p className="text-white/80 text-lg mb-4">{festivalBanner.subtitle}</p>
+              <div className="absolute top-0 right-8 opacity-10 text-[80px]">{festivalBanner.emoji}</div>
+              <div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white">{festivalBanner.title}</h3>
+                  <p className="text-white/80 text-sm">{festivalBanner.subtitle}</p>
+                </div>
                 {festivalBanner.offer && (
-                  <Badge className="bg-white/20 text-white border-white/30 text-base px-4 py-1.5 backdrop-blur-sm">
-                    🎉 {festivalBanner.offer} — Limited Time!
+                  <Badge className="bg-white/20 text-white border-white/30 text-lg px-5 py-2 font-bold backdrop-blur-sm">
+                    {festivalBanner.offer}
                   </Badge>
                 )}
               </div>
@@ -2614,22 +2664,22 @@ const Index = () => {
         </section>
       )}
 
-      {/* Netflix-Style Horizontal Rows */}
-      <section className="pt-8 pb-12 px-4 md:px-8">
-        <div className="max-w-[1400px] mx-auto space-y-10">
+      {/* ===== NETFLIX HORIZONTAL ROWS ===== */}
+      <section className="pb-12 px-4 md:px-12 space-y-8">
+        <div className="max-w-[1400px] mx-auto space-y-8">
           {masterCategories.slice(1).map(masterCat => {
             const categoryDemos = allDemos.filter(d => d.masterCategory === masterCat);
             if (categoryDemos.length === 0) return null;
 
             return (
-              <div key={masterCat}>
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-xl font-bold text-white">{masterCat}</h3>
-                  <span className="text-xs text-slate-500">{categoryDemos.length} titles</span>
+              <div key={masterCat} className="group/row">
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-lg font-bold text-white group-hover/row:text-cyan-400 transition-colors">{masterCat}</h3>
+                  <span className="text-xs text-slate-600">{categoryDemos.length}</span>
                 </div>
-                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
                   {categoryDemos.map((demo, index) => (
-                    <div key={demo.id} className="flex-shrink-0 w-[280px]">
+                    <div key={demo.id} className="flex-shrink-0 w-[200px] md:w-[220px]">
                       <DemoCard
                         demo={demo}
                         index={index}
@@ -2647,10 +2697,10 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0a1628] border-t border-cyan-500/20 py-8 px-4">
+      <footer className="bg-[#060d18] border-t border-white/5 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-400">© 2024 Software Vala - The Name of Trust. All rights reserved.</p>
-          <p className="text-cyan-400 mt-2">20 Master Categories • 147 Software Solutions • 20 Live Demos Ready</p>
+          <p className="text-slate-600 text-sm">© 2024 Software Vala - The Name of Trust</p>
+          <p className="text-slate-700 text-xs mt-1">20 Categories • 147 Software • 20 Live Demos</p>
         </div>
       </footer>
     </div>
