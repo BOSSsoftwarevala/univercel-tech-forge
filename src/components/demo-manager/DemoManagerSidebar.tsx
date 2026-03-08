@@ -66,7 +66,23 @@ import {
   Shield,
   BookLock,
   Copy,
-  Search
+  Search,
+  ShoppingBag,
+  CreditCard,
+  Tags,
+  LayoutList,
+  Star,
+  TrendingUp,
+  Wallet,
+  HeadphonesIcon,
+  Layers,
+  GitBranch,
+  Upload,
+  BookOpen,
+  KeySquare,
+  BarChart2,
+  MessageSquare,
+  Percent
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
