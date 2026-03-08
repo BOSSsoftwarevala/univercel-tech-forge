@@ -107,7 +107,7 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
           style={{ color: SIDEBAR_COLORS.textMuted }}
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>← Back to Control Panel</span>
+          <span>Back to Control Panel</span>
         </motion.button>
       </div>
       

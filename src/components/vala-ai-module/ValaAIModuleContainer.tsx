@@ -36,11 +36,23 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
         // All core functions route to Command Center
         return <ValaAICommandCenter />;
       case 'models':
-        return <AIModelsPanel />;
+        return (
+          <div className="p-6 overflow-y-auto h-full">
+            <AIModelsPanel />
+          </div>
+        );
       case 'credits':
-        return <AICreditsPanel />;
+        return (
+          <div className="p-6 overflow-y-auto h-full">
+            <AICreditsPanel />
+          </div>
+        );
       case 'settings':
-        return <DevSettings />;
+        return (
+          <div className="p-6 overflow-y-auto h-full">
+            <DevSettings />
+          </div>
+        );
       default:
         return <ValaAICommandCenter />;
     }
