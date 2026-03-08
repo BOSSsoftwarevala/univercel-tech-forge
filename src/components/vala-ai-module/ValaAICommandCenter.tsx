@@ -87,15 +87,28 @@ async function streamChat({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token || ''}`,
+        'Authorization': `Bearer ${token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       },
       body: JSON.stringify({ messages }),
     });
 
-    if (!resp.ok || !resp.body) {
-      const errorData = await resp.json().catch(() => ({ error: 'Unknown error' }));
+    if (!resp.ok) {
+      if (resp.status === 429) {
+        onError('Rate limit exceeded. Please wait a moment and try again.');
+        return;
+      }
+      if (resp.status === 402) {
+        onError('AI credits exhausted. Please add credits to continue.');
+        return;
+      }
+      const errorData = await resp.json().catch(() => ({ error: `Server error ${resp.status}` }));
       onError(errorData.error || `Error ${resp.status}`);
+      return;
+    }
+    
+    if (!resp.body) {
+      onError('No response stream received');
       return;
     }
 
