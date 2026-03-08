@@ -27,6 +27,7 @@ import {
   KPISparkline,
   CategoryTreemap,
 } from "@/components/aira/AIRACharts";
+import { AIRASystemScanner, ScanReport } from "@/components/aira/AIRASystemScanner";
 
 interface CEODashboardProps {
   activeNav?: string;
@@ -180,7 +181,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
             animate={{ opacity: 1 }}
             className="space-y-6"
           >
-            {/* KPI Row - Tableau style metric cards */}
+            {/* KPI Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
               {[
                 { label: "Users", value: m.totalUsers.toLocaleString(), icon: Users, color: "violet", spark: m.kpiSparklines.users },
@@ -217,7 +218,10 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
               ))}
             </div>
 
-            {/* Charts Row 1: Revenue + Module Activity */}
+            {/* ─── AIRA 37-Module System Scanner ──────────────── */}
+            <AIRASystemScanner />
+
+            {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
                 <CardHeader className="pb-2">
@@ -242,95 +246,6 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 </CardHeader>
                 <CardContent>
                   <ModuleBarChart data={m.moduleActivity} />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Charts Row 2: Role Pie + System Radar + Category Treemap */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Users className="w-4 h-4 text-emerald-400" />
-                    Role Distribution
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RoleDistributionPie data={m.roleDistribution} />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-amber-400" />
-                    System Health Radar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <SystemHealthRadar data={m.systemHealth} />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Package className="w-4 h-4 text-cyan-400" />
-                    Product Categories
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CategoryTreemap data={m.categoryBreakdown} />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Activity Timeline + Live Feed */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <Card className="lg:col-span-2 bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-purple-400" />
-                    24h Activity Heatmap
-                    <Badge className="text-[9px] bg-slate-700/50 text-slate-400">LIVE</Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ActivityTimeline data={m.hourlyActivity} />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-900/60 border-slate-700/40 backdrop-blur">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <ScanLine className="w-4 h-4 text-violet-400 animate-pulse" />
-                    Live Event Feed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[180px]">
-                    <div className="space-y-1.5">
-                      {m.recentActivity.map((a) => (
-                        <div
-                          key={a.id}
-                          className="flex items-center gap-2 p-1.5 rounded bg-slate-800/40 text-[11px]"
-                        >
-                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${severityColor(a.severity)}`}>
-                            {a.severity.toUpperCase().slice(0, 4)}
-                          </span>
-                          <span className="text-slate-300 truncate flex-1">
-                            {a.action}
-                          </span>
-                          <span className="text-slate-600">{a.time}</span>
-                        </div>
-                      ))}
-                      {m.recentActivity.length === 0 && (
-                        <p className="text-slate-600 text-xs text-center py-4">
-                          No recent activity
-                        </p>
-                      )}
-                    </div>
-                  </ScrollArea>
                 </CardContent>
               </Card>
             </div>
