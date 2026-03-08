@@ -403,8 +403,8 @@ export const MMMarketplaceScreen = () => {
         <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => handleCategoryFilter(null)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-              !selectedCategory ? 'bg-cyan-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border ${
+              !selectedCategory ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-300'
             }`}
           >
             All
@@ -413,8 +413,8 @@ export const MMMarketplaceScreen = () => {
             <button
               key={category}
               onClick={() => handleCategoryFilter(selectedCategory === category ? null : category)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                selectedCategory === category ? 'bg-cyan-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border ${
+                selectedCategory === category ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-300'
               }`}
             >
               {CATEGORY_ICONS[category] || '📦'} {category}
