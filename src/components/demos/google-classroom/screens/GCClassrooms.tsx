@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, MoreVertical, Users, ClipboardList, Archive, Copy, BookOpen } from 'lucide-react';
+import { Plus, MoreVertical, Users, ClipboardList, Copy, BookOpen } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { demoClassrooms, demoClassMembers, demoAssignments } from '../gcDemoData';
 
 export function GCClassrooms() {
-  const [classrooms, setClassrooms] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [classrooms, setClassrooms] = useState<any[]>(demoClassrooms);
+  const [loading, setLoading] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: '', section: '', subject: '', room: '', description: '' });
 
   useEffect(() => { fetchClassrooms(); }, []);
 
   const fetchClassrooms = async () => {
-    const { data } = await supabase
-      .from('gc_classrooms')
-      .select('*')
-      .eq('is_archived', false)
-      .order('created_at', { ascending: false });
-    setClassrooms(data || []);
-    setLoading(false);
+    try {
+      const { data } = await supabase
+        .from('gc_classrooms')
+        .select('*')
+        .eq('is_archived', false)
+        .order('created_at', { ascending: false });
+      if (data && data.length > 0) setClassrooms(data);
+    } catch {}
   };
 
   const createClassroom = async () => {
@@ -52,28 +54,23 @@ export function GCClassrooms() {
 
   const classColors = ['#1967d2', '#0d904f', '#e37400', '#8430ce', '#d93025', '#137333'];
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-2 border-[#1967d2] border-t-transparent rounded-full animate-spin" /></div>;
-  }
-
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800">Classrooms</h1>
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">Classrooms</h1>
+          <p className="text-sm text-gray-500 mt-1">{classrooms.length} active classes</p>
+        </div>
         <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2.5 bg-[#1967d2] text-white rounded-lg hover:bg-[#1557b0] text-sm font-medium">
           <Plus className="w-4 h-4" /> Create Class
         </button>
       </div>
 
-      {classrooms.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-lg font-medium text-gray-600">No classrooms yet</p>
-          <p className="text-gray-400 text-sm mt-1">Create your first class to start teaching</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {classrooms.map((cls, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {classrooms.map((cls, i) => {
+          const members = demoClassMembers[cls.id] || { students: 0, teachers: 1 };
+          const assignmentCount = demoAssignments.filter(a => a.classroom_id === cls.id).length;
+          return (
             <div key={cls.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all group">
               <div className="h-28 p-4 flex flex-col justify-between relative" style={{ backgroundColor: classColors[i % classColors.length] }}>
                 <div className="flex justify-between items-start">
@@ -91,8 +88,8 @@ export function GCClassrooms() {
                 {cls.description && <p className="text-sm text-gray-600 line-clamp-2">{cls.description}</p>}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> 0 students</span>
-                    <span className="flex items-center gap-1"><ClipboardList className="w-3.5 h-3.5" /> 0 work</span>
+                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {members.students} students</span>
+                    <span className="flex items-center gap-1"><ClipboardList className="w-3.5 h-3.5" /> {assignmentCount} work</span>
                   </div>
                   <button onClick={() => copyCode(cls.class_code)} className="flex items-center gap-1 text-xs text-[#1967d2] hover:underline" title="Copy class code">
                     <Copy className="w-3 h-3" /> {cls.class_code}
@@ -100,9 +97,9 @@ export function GCClassrooms() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
