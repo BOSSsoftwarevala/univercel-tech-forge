@@ -2332,6 +2332,348 @@ export type Database = {
           },
         ]
       }
+      ceo_ai_insights: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          action_taken: string | null
+          category: string | null
+          confidence_score: number | null
+          created_at: string
+          description: string | null
+          id: string
+          impact_level: string | null
+          insight_type: string
+          is_acknowledged: boolean | null
+          metadata: Json | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_level?: string | null
+          insight_type?: string
+          is_acknowledged?: boolean | null
+          metadata?: Json | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_level?: string | null
+          insight_type?: string
+          is_acknowledged?: boolean | null
+          metadata?: Json | null
+          title?: string
+        }
+        Relationships: []
+      }
+      ceo_kpi_metrics: {
+        Row: {
+          change_percent: number | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_category: string
+          metric_name: string
+          metric_value: number
+          period_date: string
+          period_type: string
+          previous_value: number | null
+        }
+        Insert: {
+          change_percent?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_category?: string
+          metric_name: string
+          metric_value?: number
+          period_date?: string
+          period_type?: string
+          previous_value?: number | null
+        }
+        Update: {
+          change_percent?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_category?: string
+          metric_name?: string
+          metric_value?: number
+          period_date?: string
+          period_type?: string
+          previous_value?: number | null
+        }
+        Relationships: []
+      }
+      ceo_product_performance: {
+        Row: {
+          avg_rating: number | null
+          category: string | null
+          created_at: string
+          growth_percent: number | null
+          id: string
+          metadata: Json | null
+          period_month: string
+          product_id: string | null
+          product_name: string
+          return_rate: number | null
+          total_revenue: number
+          total_sales: number
+        }
+        Insert: {
+          avg_rating?: number | null
+          category?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          metadata?: Json | null
+          period_month: string
+          product_id?: string | null
+          product_name: string
+          return_rate?: number | null
+          total_revenue?: number
+          total_sales?: number
+        }
+        Update: {
+          avg_rating?: number | null
+          category?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          metadata?: Json | null
+          period_month?: string
+          product_id?: string | null
+          product_name?: string
+          return_rate?: number | null
+          total_revenue?: number
+          total_sales?: number
+        }
+        Relationships: []
+      }
+      ceo_region_performance: {
+        Row: {
+          active_franchises: number | null
+          country_code: string | null
+          created_at: string
+          growth_percent: number | null
+          id: string
+          market_share: number | null
+          metadata: Json | null
+          period_month: string
+          region_name: string
+          risk_level: string | null
+          total_revenue: number
+          total_users: number
+        }
+        Insert: {
+          active_franchises?: number | null
+          country_code?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          market_share?: number | null
+          metadata?: Json | null
+          period_month: string
+          region_name: string
+          risk_level?: string | null
+          total_revenue?: number
+          total_users?: number
+        }
+        Update: {
+          active_franchises?: number | null
+          country_code?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          market_share?: number | null
+          metadata?: Json | null
+          period_month?: string
+          region_name?: string
+          risk_level?: string | null
+          total_revenue?: number
+          total_users?: number
+        }
+        Relationships: []
+      }
+      ceo_reports: {
+        Row: {
+          boss_response: string | null
+          content: string | null
+          created_at: string
+          generated_by: string | null
+          id: string
+          period_end: string | null
+          period_start: string | null
+          report_data: Json | null
+          report_type: string
+          status: string
+          submitted_at: string | null
+          submitted_to_boss: boolean | null
+          summary: string | null
+          title: string
+        }
+        Insert: {
+          boss_response?: string | null
+          content?: string | null
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_data?: Json | null
+          report_type?: string
+          status?: string
+          submitted_at?: string | null
+          submitted_to_boss?: boolean | null
+          summary?: string | null
+          title: string
+        }
+        Update: {
+          boss_response?: string | null
+          content?: string | null
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_data?: Json | null
+          report_type?: string
+          status?: string
+          submitted_at?: string | null
+          submitted_to_boss?: boolean | null
+          summary?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      ceo_revenue_metrics: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json | null
+          period_month: string
+          period_year: number
+          region: string | null
+          revenue_source: string
+          target_amount: number | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          period_month: string
+          period_year?: number
+          region?: string | null
+          revenue_source: string
+          target_amount?: number | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          period_month?: string
+          period_year?: number
+          region?: string | null
+          revenue_source?: string
+          target_amount?: number | null
+        }
+        Relationships: []
+      }
+      ceo_scan_logs: {
+        Row: {
+          created_at: string
+          critical_issues: number | null
+          id: string
+          initiated_by: string | null
+          issues_found: number | null
+          modules_scanned: number | null
+          scan_duration_ms: number | null
+          scan_results: Json | null
+          scan_type: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          critical_issues?: number | null
+          id?: string
+          initiated_by?: string | null
+          issues_found?: number | null
+          modules_scanned?: number | null
+          scan_duration_ms?: number | null
+          scan_results?: Json | null
+          scan_type?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          critical_issues?: number | null
+          id?: string
+          initiated_by?: string | null
+          issues_found?: number | null
+          modules_scanned?: number | null
+          scan_duration_ms?: number | null
+          scan_results?: Json | null
+          scan_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      ceo_system_health: {
+        Row: {
+          benchmark: number | null
+          created_at: string
+          details: Json | null
+          id: string
+          metric_name: string
+          module_name: string | null
+          recorded_at: string
+          score: number
+          status: string
+        }
+        Insert: {
+          benchmark?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          metric_name: string
+          module_name?: string | null
+          recorded_at?: string
+          score?: number
+          status?: string
+        }
+        Update: {
+          benchmark?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          metric_name?: string
+          module_name?: string | null
+          recorded_at?: string
+          score?: number
+          status?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           cannot_delete: boolean | null
