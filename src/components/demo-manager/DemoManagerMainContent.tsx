@@ -33,32 +33,88 @@ import ValaAICommandCenter from "@/components/vala-ai-module/ValaAICommandCenter
 
 // Lazy load marketplace screens
 const MarketplaceProductListing = lazy(() => import("@/components/demo-manager/marketplace-ops/MPProductListing"));
+const MarketplaceCreateProduct = lazy(() => import("@/components/demo-manager/marketplace-ops/MPCreateProduct"));
+const MarketplaceEditProduct = lazy(() => import("@/components/demo-manager/marketplace-ops/MPEditProduct"));
+const MarketplaceDeleteProduct = lazy(() => import("@/components/demo-manager/marketplace-ops/MPDeleteProduct"));
 const MarketplaceCategoriesManager = lazy(() => import("@/components/demo-manager/marketplace-ops/MPCategoriesManager"));
+const MarketplaceTags = lazy(() => import("@/components/demo-manager/marketplace-ops/MPTags"));
+const MarketplaceModules = lazy(() => import("@/components/demo-manager/marketplace-ops/MPModules"));
+const MarketplaceVersions = lazy(() => import("@/components/demo-manager/marketplace-ops/MPVersions"));
 const MarketplacePricing = lazy(() => import("@/components/demo-manager/marketplace-ops/MPPricing"));
-const MarketplaceOrders = lazy(() => import("@/components/demo-manager/marketplace-ops/MPOrders"));
-const MarketplaceWallet = lazy(() => import("@/components/demo-manager/marketplace-ops/MPWallet"));
-const MarketplaceLicenses = lazy(() => import("@/components/demo-manager/marketplace-ops/MPLicenses"));
-const MarketplaceReviews = lazy(() => import("@/components/demo-manager/marketplace-ops/MPReviews"));
-const MarketplaceAnalytics = lazy(() => import("@/components/demo-manager/marketplace-ops/MPAnalytics"));
-const MarketplaceFeatured = lazy(() => import("@/components/demo-manager/marketplace-ops/MPFeatured"));
 const MarketplaceDiscounts = lazy(() => import("@/components/demo-manager/marketplace-ops/MPDiscounts"));
+const MarketplaceOffers = lazy(() => import("@/components/demo-manager/marketplace-ops/MPOffers"));
+const MarketplaceCoupons = lazy(() => import("@/components/demo-manager/marketplace-ops/MPCoupons"));
+const MarketplaceBanners = lazy(() => import("@/components/demo-manager/marketplace-ops/MPBanners"));
+const MarketplaceHomepage = lazy(() => import("@/components/demo-manager/marketplace-ops/MPHomepage"));
+const MarketplaceFeatured = lazy(() => import("@/components/demo-manager/marketplace-ops/MPFeatured"));
+const MarketplaceTrending = lazy(() => import("@/components/demo-manager/marketplace-ops/MPTrending"));
+const MarketplaceSections = lazy(() => import("@/components/demo-manager/marketplace-ops/MPSections"));
+const MarketplaceProductAssets = lazy(() => import("@/components/demo-manager/marketplace-ops/MPProductAssets"));
+const MarketplaceScreenshots = lazy(() => import("@/components/demo-manager/marketplace-ops/MPScreenshots"));
+const MarketplaceDemoVideos = lazy(() => import("@/components/demo-manager/marketplace-ops/MPDemoVideos"));
+const MarketplaceDocumentation = lazy(() => import("@/components/demo-manager/marketplace-ops/MPDocumentation"));
+const MarketplaceReviews = lazy(() => import("@/components/demo-manager/marketplace-ops/MPReviews"));
+const MarketplaceRatings = lazy(() => import("@/components/demo-manager/marketplace-ops/MPRatings"));
+const MarketplaceFavorites = lazy(() => import("@/components/demo-manager/marketplace-ops/MPFavorites"));
+const MarketplaceOrders = lazy(() => import("@/components/demo-manager/marketplace-ops/MPOrders"));
+const MarketplacePayments = lazy(() => import("@/components/demo-manager/marketplace-ops/MPPayments"));
+const MarketplaceRefunds = lazy(() => import("@/components/demo-manager/marketplace-ops/MPRefunds"));
+const MarketplaceUserProducts = lazy(() => import("@/components/demo-manager/marketplace-ops/MPUserProducts"));
+const MarketplaceLicenses = lazy(() => import("@/components/demo-manager/marketplace-ops/MPLicenses"));
+const MarketplaceWallet = lazy(() => import("@/components/demo-manager/marketplace-ops/MPWallet"));
+const MarketplaceSearch = lazy(() => import("@/components/demo-manager/marketplace-ops/MPSearch"));
+const MarketplaceRecommendations = lazy(() => import("@/components/demo-manager/marketplace-ops/MPRecommendations"));
+const MarketplaceProductAnalytics = lazy(() => import("@/components/demo-manager/marketplace-ops/MPProductAnalytics"));
+const MarketplaceAnalytics = lazy(() => import("@/components/demo-manager/marketplace-ops/MPAnalytics"));
+const MarketplaceDemoViews = lazy(() => import("@/components/demo-manager/marketplace-ops/MPDemoViews"));
+const MarketplaceNotifications = lazy(() => import("@/components/demo-manager/marketplace-ops/MPNotifications"));
+const MarketplaceAuditLogs = lazy(() => import("@/components/demo-manager/marketplace-ops/MPAuditLogs"));
 const MarketplaceSupport = lazy(() => import("@/components/demo-manager/marketplace-ops/MPSupport"));
 const MarketplaceImportExport = lazy(() => import("@/components/demo-manager/marketplace-ops/MPImportExport"));
+const MarketplaceSettings = lazy(() => import("@/components/demo-manager/marketplace-ops/MPSettings"));
 
 // Marketplace view IDs
 const MARKETPLACE_VIEWS: Record<string, React.LazyExoticComponent<any>> = {
   "mp-product-listing": MarketplaceProductListing,
+  "mp-create-product": MarketplaceCreateProduct,
+  "mp-edit-product": MarketplaceEditProduct,
+  "mp-delete-product": MarketplaceDeleteProduct,
   "mp-categories": MarketplaceCategoriesManager,
+  "mp-tags": MarketplaceTags,
+  "mp-modules": MarketplaceModules,
+  "mp-versions": MarketplaceVersions,
   "mp-pricing": MarketplacePricing,
-  "mp-orders": MarketplaceOrders,
-  "mp-wallet": MarketplaceWallet,
-  "mp-licenses": MarketplaceLicenses,
-  "mp-reviews": MarketplaceReviews,
-  "mp-analytics": MarketplaceAnalytics,
-  "mp-featured": MarketplaceFeatured,
   "mp-discounts": MarketplaceDiscounts,
+  "mp-offers": MarketplaceOffers,
+  "mp-coupons": MarketplaceCoupons,
+  "mp-banners": MarketplaceBanners,
+  "mp-homepage": MarketplaceHomepage,
+  "mp-featured": MarketplaceFeatured,
+  "mp-trending": MarketplaceTrending,
+  "mp-sections": MarketplaceSections,
+  "mp-product-assets": MarketplaceProductAssets,
+  "mp-screenshots": MarketplaceScreenshots,
+  "mp-demo-videos": MarketplaceDemoVideos,
+  "mp-documentation": MarketplaceDocumentation,
+  "mp-reviews": MarketplaceReviews,
+  "mp-ratings": MarketplaceRatings,
+  "mp-favorites": MarketplaceFavorites,
+  "mp-orders": MarketplaceOrders,
+  "mp-payments": MarketplacePayments,
+  "mp-refunds": MarketplaceRefunds,
+  "mp-user-products": MarketplaceUserProducts,
+  "mp-licenses": MarketplaceLicenses,
+  "mp-wallet": MarketplaceWallet,
+  "mp-search": MarketplaceSearch,
+  "mp-recommendations": MarketplaceRecommendations,
+  "mp-product-analytics": MarketplaceProductAnalytics,
+  "mp-analytics": MarketplaceAnalytics,
+  "mp-demo-views": MarketplaceDemoViews,
+  "mp-notifications": MarketplaceNotifications,
+  "mp-audit-logs": MarketplaceAuditLogs,
   "mp-support": MarketplaceSupport,
   "mp-import": MarketplaceImportExport,
+  "mp-settings": MarketplaceSettings,
 };
 
 interface DemoManagerMainContentProps {
