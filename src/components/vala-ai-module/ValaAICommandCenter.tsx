@@ -1,371 +1,524 @@
 /**
- * VALA AI ENGINE - ENTERPRISE AI PRODUCT BUILDER
+ * VALA AI ENGINE - LOVABLE-STYLE BUILDER INTERFACE
  * ================================================
- * AI-Powered Software Builder Interface
+ * Split-pane: Left Chat + Right Preview/Code
  * ================================================
- * LOCKED: DO NOT CHANGE COLORS/FONTS/THEME
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  Play, RefreshCw, Trash2, Save, Upload, Loader2,
-  Layers, Code2, Database, GitBranch, TrendingUp, Rocket,
-  Sparkles, Settings2, Circle, CheckCircle2, Clock,
-  Pause, Eye
+  Send, Loader2, Bot, User, Sparkles, Code2, Eye,
+  PanelLeftClose, PanelLeftOpen, ChevronDown, Globe,
+  RefreshCw, Smartphone, Monitor, ExternalLink,
+  FolderTree, File, ChevronRight, Copy, Check,
+  Plus, Trash2, MessageSquare, Settings2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-// ===== LOCKED COLORS (DO NOT CHANGE) =====
-const COLORS = {
-  bg: '#0B0F1A',
-  bgSecondary: '#0d1b2a',
-  bgCard: '#111827',
-  border: '#1e3a5f',
-  accent: '#2563eb',
-  success: '#10b981',
-  error: '#ef4444',
-  warning: '#f59e0b',
-  cyan: '#06b6d4',
-  purple: '#8b5cf6',
-  orange: '#f97316',
-  text: '#ffffff',
-  textMuted: 'rgba(255, 255, 255, 0.6)',
-};
-
-type PipelineStep = {
+// ===== TYPES =====
+type Message = {
   id: string;
-  label: string;
-  status: 'idle' | 'running' | 'done' | 'error';
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
 };
 
-type SavedPrompt = {
-  id: string;
-  text: string;
+type WorkspaceTab = 'preview' | 'code';
+
+type FileNode = {
+  name: string;
+  type: 'file' | 'folder';
+  children?: FileNode[];
+  content?: string;
 };
 
-const INITIAL_PIPELINE: PipelineStep[] = [
-  { id: '1', label: 'Requirement Analysis', status: 'idle' },
-  { id: '2', label: 'Feature Mapping', status: 'idle' },
-  { id: '3', label: 'Screen Generation', status: 'idle' },
-  { id: '4', label: 'API Planning', status: 'idle' },
-  { id: '5', label: 'Database Schema', status: 'idle' },
-  { id: '6', label: 'Flow Generation', status: 'idle' },
-  { id: '7', label: 'Code Assembly', status: 'idle' },
-  { id: '8', label: 'Deploy Package', status: 'idle' },
+// ===== MOCK FILE TREE =====
+const MOCK_FILES: FileNode[] = [
+  {
+    name: 'src', type: 'folder', children: [
+      {
+        name: 'components', type: 'folder', children: [
+          { name: 'App.tsx', type: 'file', content: '// App component\nimport React from "react";\n\nconst App = () => {\n  return (\n    <div className="min-h-screen bg-background">\n      <h1>Your App</h1>\n    </div>\n  );\n};\n\nexport default App;' },
+          { name: 'Header.tsx', type: 'file', content: '// Header component\nexport const Header = () => {\n  return <header>Header</header>;\n};' },
+        ]
+      },
+      {
+        name: 'pages', type: 'folder', children: [
+          { name: 'Index.tsx', type: 'file', content: '// Index page\nconst Index = () => <div>Home Page</div>;\nexport default Index;' },
+        ]
+      },
+      { name: 'main.tsx', type: 'file', content: 'import React from "react";\nimport ReactDOM from "react-dom/client";\nimport App from "./App";\n\nReactDOM.createRoot(\n  document.getElementById("root")!\n).render(<App />);' },
+    ]
+  },
+  { name: 'package.json', type: 'file', content: '{\n  "name": "vala-project",\n  "version": "1.0.0"\n}' },
+  { name: 'index.html', type: 'file', content: '<!DOCTYPE html>\n<html>\n<body>\n  <div id="root"></div>\n</body>\n</html>' },
 ];
 
-const SAVED_PROMPTS: SavedPrompt[] = [
-  { id: '1', text: 'Build a user dashboard with role-based access control' },
-  { id: '2', text: 'Create an e-commerce checkout flow with payment integration' },
-  { id: '3', text: 'Design a social media feed with real-time updates' },
-];
+// ===== STREAMING CHAT =====
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-openai`;
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-chat`;
+async function streamChat({
+  messages,
+  onDelta,
+  onDone,
+  onError,
+}: {
+  messages: { role: string; content: string }[];
+  onDelta: (text: string) => void;
+  onDone: () => void;
+  onError: (err: string) => void;
+}) {
+  try {
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
 
-const ValaAICommandCenter: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [pipeline, setPipeline] = useState<PipelineStep[]>(INITIAL_PIPELINE);
-  const [pipelineStatus, setPipelineStatus] = useState<'draft' | 'running' | 'done' | 'error'>('draft');
-  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>(SAVED_PROMPTS);
-  const [engineStatus, setEngineStatus] = useState<'Idle' | 'Running' | 'Done'>('Idle');
-  const [version, setVersion] = useState('v1');
+    const resp = await fetch(CHAT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token || ''}`,
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify({ messages }),
+    });
 
-  // KPI counters
-  const [kpis, setKpis] = useState({
-    screens: 0,
-    apis: 0,
-    dbTables: 0,
-    flows: 0,
-    stepsDone: 0,
-    totalSteps: 8,
-    deploy: 'Ready' as string,
-  });
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Simulate pipeline execution step by step
-  const runPipeline = async () => {
-    if (!prompt.trim()) {
-      toast.error('Enter a prompt first');
+    if (!resp.ok || !resp.body) {
+      const errorData = await resp.json().catch(() => ({ error: 'Unknown error' }));
+      onError(errorData.error || `Error ${resp.status}`);
       return;
     }
 
-    setIsGenerating(true);
-    setEngineStatus('Running');
-    setPipelineStatus('running');
-    const updatedKpis = { ...kpis, screens: 0, apis: 0, dbTables: 0, flows: 0, stepsDone: 0, deploy: 'Building' };
-    setKpis(updatedKpis);
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = '';
+    let streamDone = false;
 
-    // Reset pipeline
-    setPipeline(INITIAL_PIPELINE.map(s => ({ ...s, status: 'idle' })));
+    while (!streamDone) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      textBuffer += decoder.decode(value, { stream: true });
 
-    // Run each step
-    for (let i = 0; i < INITIAL_PIPELINE.length; i++) {
-      setPipeline(prev => prev.map((s, idx) => 
-        idx === i ? { ...s, status: 'running' } : s
-      ));
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
 
-      // Simulate AI work with varying delays
-      await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+        if (line.endsWith('\r')) line = line.slice(0, -1);
+        if (line.startsWith(':') || line.trim() === '') continue;
+        if (!line.startsWith('data: ')) continue;
 
-      // Update KPIs per step
-      setPipeline(prev => prev.map((s, idx) => 
-        idx === i ? { ...s, status: 'done' } : s
-      ));
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === '[DONE]') {
+          streamDone = true;
+          break;
+        }
 
-      const stepKpis = { ...updatedKpis };
-      switch (i) {
-        case 0: stepKpis.screens = 0; break;
-        case 1: stepKpis.screens = 3; break;
-        case 2: stepKpis.screens = 6; stepKpis.apis = 2; break;
-        case 3: stepKpis.apis = 5; break;
-        case 4: stepKpis.dbTables = 4; break;
-        case 5: stepKpis.flows = 3; break;
-        case 6: stepKpis.flows = 5; break;
-        case 7: stepKpis.deploy = 'Ready'; break;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch {
+          textBuffer = line + '\n' + textBuffer;
+          break;
+        }
       }
-      stepKpis.stepsDone = i + 1;
-      setKpis(stepKpis);
     }
 
-    setPipelineStatus('done');
-    setEngineStatus('Done');
-    setIsGenerating(false);
-    toast.success('AI Pipeline complete — product ready for deployment');
-  };
-
-  const handleRegenerate = () => {
-    if (!prompt.trim()) return;
-    runPipeline();
-  };
-
-  const handleClear = () => {
-    setPrompt('');
-    setPipeline(INITIAL_PIPELINE);
-    setPipelineStatus('draft');
-    setEngineStatus('Idle');
-    setKpis({ screens: 0, apis: 0, dbTables: 0, flows: 0, stepsDone: 0, totalSteps: 8, deploy: 'Ready' });
-    textareaRef.current?.focus();
-  };
-
-  const handleSave = () => {
-    if (!prompt.trim()) return;
-    const newPrompt: SavedPrompt = { id: Date.now().toString(), text: prompt };
-    setSavedPrompts(prev => [newPrompt, ...prev.slice(0, 9)]);
-    toast.success('Prompt saved');
-  };
-
-  const loadPrompt = (text: string) => {
-    setPrompt(text);
-    textareaRef.current?.focus();
-  };
-
-  const getStepIcon = (status: string) => {
-    switch (status) {
-      case 'done': return <CheckCircle2 className="w-5 h-5" style={{ color: COLORS.success }} />;
-      case 'running': return <Loader2 className="w-5 h-5 animate-spin" style={{ color: COLORS.cyan }} />;
-      case 'error': return <Circle className="w-5 h-5" style={{ color: COLORS.error }} />;
-      default: return <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.25)' }} />;
+    // Final flush
+    if (textBuffer.trim()) {
+      for (let raw of textBuffer.split('\n')) {
+        if (!raw) continue;
+        if (raw.endsWith('\r')) raw = raw.slice(0, -1);
+        if (raw.startsWith(':') || raw.trim() === '') continue;
+        if (!raw.startsWith('data: ')) continue;
+        const jsonStr = raw.slice(6).trim();
+        if (jsonStr === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch { /* ignore */ }
+      }
     }
-  };
 
-  const kpiCards = [
-    { label: 'Screens', value: kpis.screens, icon: Layers, color: COLORS.accent },
-    { label: 'APIs', value: kpis.apis, icon: Code2, color: COLORS.cyan },
-    { label: 'DB Tables', value: kpis.dbTables, icon: Database, color: COLORS.success },
-    { label: 'Flows', value: kpis.flows, icon: GitBranch, color: COLORS.purple },
-    { label: 'Steps Done', value: `${kpis.stepsDone}/${kpis.totalSteps}`, icon: TrendingUp, color: COLORS.orange },
-    { label: 'Deploy', value: kpis.deploy, icon: Rocket, color: kpis.deploy === 'Ready' ? COLORS.success : COLORS.warning },
-  ];
+    onDone();
+  } catch (err) {
+    onError(err instanceof Error ? err.message : 'Stream failed');
+  }
+}
 
-  return (
-    <div className="h-full flex flex-col overflow-hidden" style={{ background: COLORS.bg }}>
-      {/* Header */}
-      <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-        <div className="flex items-center gap-4">
-          <div 
-            className="w-12 h-12 rounded-2xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #2563eb, #06b6d4)' }}
-          >
-            <Settings2 className="w-6 h-6" style={{ color: '#fff' }} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold" style={{ color: COLORS.text }}>VALA AI Engine</h1>
-            <p className="text-sm" style={{ color: COLORS.textMuted }}>Enterprise AI Product Builder</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Badge 
-            className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium"
-            style={{ 
-              background: engineStatus === 'Running' ? 'rgba(6, 182, 212, 0.15)' : engineStatus === 'Done' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.08)',
-              color: engineStatus === 'Running' ? COLORS.cyan : engineStatus === 'Done' ? COLORS.success : COLORS.textMuted,
-              border: 'none'
-            }}
-          >
-            {engineStatus === 'Running' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Pause className="w-3 h-3" />}
-            {engineStatus}
-          </Badge>
-          <Badge 
-            className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium"
-            style={{ background: 'rgba(255,255,255,0.08)', color: COLORS.textMuted, border: 'none' }}
-          >
-            <Eye className="w-3 h-3" />
-            {version}
-          </Badge>
-        </div>
-      </div>
+// ===== FILE TREE COMPONENT =====
+const FileTreeItem: React.FC<{
+  node: FileNode;
+  depth: number;
+  selectedFile: string | null;
+  onSelect: (name: string, content: string) => void;
+}> = ({ node, depth, selectedFile, onSelect }) => {
+  const [expanded, setExpanded] = useState(depth === 0);
 
-      {/* KPI Cards Row */}
-      <div className="px-6 py-4 grid grid-cols-6 gap-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-        {kpiCards.map((kpi) => (
-          <div
-            key={kpi.label}
-            className="rounded-xl px-4 py-3 flex items-center justify-between"
-            style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}` }}
-          >
-            <div>
-              <p className="text-xs mb-1" style={{ color: COLORS.textMuted }}>{kpi.label}</p>
-              <p className="text-xl font-bold" style={{ color: COLORS.text }}>{kpi.value}</p>
-            </div>
-            <kpi.icon className="w-6 h-6 opacity-40" style={{ color: kpi.color }} />
-          </div>
+  if (node.type === 'folder') {
+    return (
+      <div>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center gap-1.5 px-2 py-1 text-xs hover:bg-white/5 rounded transition-colors"
+          style={{ paddingLeft: `${depth * 12 + 8}px` }}
+        >
+          <ChevronRight
+            className="w-3 h-3 shrink-0 transition-transform"
+            style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)', color: 'rgba(255,255,255,0.4)' }}
+          />
+          <FolderTree className="w-3.5 h-3.5 shrink-0" style={{ color: '#60a5fa' }} />
+          <span style={{ color: 'rgba(255,255,255,0.8)' }}>{node.name}</span>
+        </button>
+        {expanded && node.children?.map((child, i) => (
+          <FileTreeItem key={i} node={child} depth={depth + 1} selectedFile={selectedFile} onSelect={onSelect} />
         ))}
       </div>
+    );
+  }
 
-      {/* Main Content: Prompt + Pipeline */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left: Prompt Input */}
-        <div className="flex-1 flex flex-col p-6 overflow-hidden" style={{ borderRight: `1px solid ${COLORS.border}` }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5" style={{ color: COLORS.cyan }} />
-            <h2 className="text-base font-semibold" style={{ color: COLORS.text }}>Prompt Input</h2>
-          </div>
+  const isSelected = selectedFile === node.name;
+  return (
+    <button
+      onClick={() => onSelect(node.name, node.content || '')}
+      className="w-full flex items-center gap-1.5 px-2 py-1 text-xs rounded transition-colors"
+      style={{
+        paddingLeft: `${depth * 12 + 20}px`,
+        background: isSelected ? 'rgba(37, 99, 235, 0.15)' : 'transparent',
+        color: isSelected ? '#60a5fa' : 'rgba(255,255,255,0.6)',
+      }}
+    >
+      <File className="w-3.5 h-3.5 shrink-0" style={{ color: node.name.endsWith('.tsx') ? '#06b6d4' : node.name.endsWith('.json') ? '#f59e0b' : 'rgba(255,255,255,0.4)' }} />
+      <span className="truncate">{node.name}</span>
+    </button>
+  );
+};
 
-          <textarea
-            ref={textareaRef}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe what you want to build... e.g., 'Create a user management dashboard with role-based access control'"
-            className="flex-1 w-full resize-none rounded-xl p-4 text-sm leading-relaxed"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: `1px solid ${COLORS.border}`,
-              color: COLORS.text,
-              minHeight: '160px',
-              maxHeight: '240px',
-            }}
-          />
+// ===== MAIN COMPONENT =====
+const ValaAICommandCenter: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: "Hi! I'm **VALA AI** — your enterprise software builder. Describe what you want to build and I'll generate the full architecture, code, and deployment plan.\n\nTry something like:\n- *\"Build a restaurant POS with table management\"*\n- *\"Create a CRM with lead tracking and analytics\"*\n- *\"Design an inventory management system\"*",
+      timestamp: new Date(),
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>('preview');
+  const [showFileTree, setShowFileTree] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [fileContent, setFileContent] = useState('');
+  const [previewHtml, setPreviewHtml] = useState('<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f172a;color:white;font-family:system-ui;"><div style="text-align:center;"><h1 style="font-size:2rem;margin-bottom:1rem;">🚀 VALA AI Preview</h1><p style="color:rgba(255,255,255,0.6);">Your generated app will appear here</p></div></div>');
+  const [copied, setCopied] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 mt-4">
-            <Button
-              onClick={runPipeline}
-              disabled={isGenerating || !prompt.trim()}
-              className="px-5 h-10 text-sm font-medium gap-2"
-              style={{ background: COLORS.success, color: '#fff' }}
-            >
-              {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-              Generate
-            </Button>
-            <Button
-              onClick={handleRegenerate}
-              disabled={isGenerating || !prompt.trim()}
-              variant="outline"
-              className="px-4 h-10 text-sm gap-2"
-              style={{ borderColor: COLORS.border, color: COLORS.text, background: 'transparent' }}
-            >
-              <RefreshCw className="w-4 h-4" />
-              Regenerate
-            </Button>
-            <Button
-              onClick={handleClear}
-              variant="outline"
-              className="px-4 h-10 text-sm gap-2"
-              style={{ borderColor: COLORS.border, color: COLORS.text, background: 'transparent' }}
-            >
-              <Trash2 className="w-4 h-4" />
-              Clear
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!prompt.trim()}
-              variant="outline"
-              className="px-4 h-10 text-sm gap-2"
-              style={{ borderColor: COLORS.border, color: COLORS.text, background: 'transparent' }}
-            >
-              <Save className="w-4 h-4" />
-              Save
-            </Button>
-          </div>
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-          {/* Saved Prompts */}
-          <div className="mt-5">
-            <p className="text-xs font-medium mb-2" style={{ color: COLORS.textMuted }}>Saved Prompts:</p>
-            <div className="flex flex-wrap gap-2">
-              {savedPrompts.slice(0, 5).map((sp) => (
-                <button
-                  key={sp.id}
-                  onClick={() => loadPrompt(sp.text)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all hover:opacity-80 max-w-[220px] truncate"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: COLORS.textMuted, border: `1px solid ${COLORS.border}` }}
-                >
-                  <Upload className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{sp.text}</span>
-                </button>
-              ))}
+  const handleSend = useCallback(async () => {
+    if (!input.trim() || isStreaming) return;
+
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    setIsStreaming(true);
+
+    let assistantContent = '';
+
+    const upsertAssistant = (chunk: string) => {
+      assistantContent += chunk;
+      setMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === 'assistant' && last.id.startsWith('stream-')) {
+          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantContent } : m);
+        }
+        return [...prev, { id: `stream-${Date.now()}`, role: 'assistant', content: assistantContent, timestamp: new Date() }];
+      });
+    };
+
+    await streamChat({
+      messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+      onDelta: upsertAssistant,
+      onDone: () => setIsStreaming(false),
+      onError: (err) => {
+        setIsStreaming(false);
+        toast.error(err);
+      },
+    });
+  }, [input, isStreaming, messages]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleFileSelect = (name: string, content: string) => {
+    setSelectedFile(name);
+    setFileContent(content);
+    setActiveTab('code');
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(fileContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleNewChat = () => {
+    setMessages([{
+      id: '1',
+      role: 'assistant',
+      content: "New session started! What would you like to build?",
+      timestamp: new Date(),
+    }]);
+  };
+
+  return (
+    <div className="h-full flex overflow-hidden" style={{ background: '#0a0a0a' }}>
+      {/* ===== LEFT: CHAT PANEL ===== */}
+      <div className="flex flex-col" style={{ width: '420px', minWidth: '360px', borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
+        {/* Chat Header */}
+        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
+            <span className="text-sm font-semibold text-white">VALA AI</span>
+            <Badge className="text-[10px] px-1.5 py-0" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'none' }}>
+              Online
+            </Badge>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="w-7 h-7 text-white/40 hover:text-white hover:bg-white/5" onClick={handleNewChat}>
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
-        {/* Right: AI Pipeline */}
-        <div className="w-[420px] flex flex-col p-6 overflow-hidden">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Settings2 className="w-5 h-5" style={{ color: COLORS.accent }} />
-              <h2 className="text-base font-semibold" style={{ color: COLORS.text }}>AI Pipeline</h2>
-            </div>
-            <Badge
-              className="text-xs px-3 py-1"
-              style={{
-                background: pipelineStatus === 'done' ? 'rgba(16,185,129,0.15)' : pipelineStatus === 'running' ? 'rgba(6,182,212,0.15)' : 'rgba(255,255,255,0.08)',
-                color: pipelineStatus === 'done' ? COLORS.success : pipelineStatus === 'running' ? COLORS.cyan : COLORS.textMuted,
-                border: 'none',
-              }}
-            >
-              {pipelineStatus}
-            </Badge>
-          </div>
-
-          <ScrollArea className="flex-1">
-            <div className="space-y-1">
-              {pipeline.map((step, idx) => (
+        {/* Chat Messages */}
+        <ScrollArea className="flex-1 px-4 py-4">
+          <div className="space-y-4">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                {msg.role === 'assistant' && (
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                )}
                 <div
-                  key={step.id}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
+                  className="max-w-[85%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed"
                   style={{
-                    background: step.status === 'running' ? 'rgba(6, 182, 212, 0.08)' : step.status === 'done' ? 'rgba(16, 185, 129, 0.05)' : 'transparent',
-                    border: step.status === 'running' ? `1px solid rgba(6, 182, 212, 0.2)` : '1px solid transparent',
+                    background: msg.role === 'user' ? '#2563eb' : 'rgba(255,255,255,0.06)',
+                    color: msg.role === 'user' ? '#fff' : 'rgba(255,255,255,0.85)',
                   }}
                 >
-                  {getStepIcon(step.status)}
-                  <span
-                    className="text-sm font-medium"
-                    style={{
-                      color: step.status === 'done' ? COLORS.text : step.status === 'running' ? COLORS.cyan : 'rgba(255,255,255,0.4)',
-                    }}
-                  >
-                    {step.label}
-                  </span>
+                  {msg.role === 'assistant' ? (
+                    <div className="prose prose-sm prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_code]:bg-white/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_pre]:bg-black/40 [&_pre]:rounded-lg [&_pre]:p-3 [&_pre]:my-2 [&_h2]:text-base [&_h2]:mt-3 [&_h2]:mb-1 [&_h3]:text-sm [&_h3]:mt-2 [&_h3]:mb-1 [&_strong]:text-white">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  )}
                 </div>
+                {msg.role === 'user' && (
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                    <User className="w-4 h-4 text-white/60" />
+                  </div>
+                )}
+              </div>
+            ))}
+            {isStreaming && messages[messages.length - 1]?.role !== 'assistant' && (
+              <div className="flex gap-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                  <span className="text-sm text-white/50">Thinking...</span>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+        </ScrollArea>
+
+        {/* Chat Input */}
+        <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="relative rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Describe what you want to build..."
+              rows={3}
+              className="w-full bg-transparent text-white text-sm px-4 py-3 resize-none outline-none placeholder:text-white/30"
+              disabled={isStreaming}
+            />
+            <div className="flex items-center justify-between px-3 py-2">
+              <span className="text-[10px] text-white/20">Shift+Enter for new line</span>
+              <Button
+                size="sm"
+                onClick={handleSend}
+                disabled={!input.trim() || isStreaming}
+                className="h-7 px-3 text-xs gap-1.5 rounded-lg"
+                style={{ background: input.trim() ? '#2563eb' : 'rgba(255,255,255,0.06)', color: input.trim() ? '#fff' : 'rgba(255,255,255,0.3)' }}
+              >
+                {isStreaming ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+                Send
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== RIGHT: WORKSPACE ===== */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: '#0a0a0a' }}>
+        {/* Workspace Header / Tab Bar */}
+        <div className="flex items-center justify-between px-4 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: '#111' }}>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setActiveTab('preview')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+              style={{
+                background: activeTab === 'preview' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: activeTab === 'preview' ? '#fff' : 'rgba(255,255,255,0.4)',
+              }}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Preview
+            </button>
+            <button
+              onClick={() => setActiveTab('code')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+              style={{
+                background: activeTab === 'code' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: activeTab === 'code' ? '#fff' : 'rgba(255,255,255,0.4)',
+              }}
+            >
+              <Code2 className="w-3.5 h-3.5" />
+              Code
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {activeTab === 'preview' && (
+              <>
+                {/* URL Bar */}
+                <div className="flex items-center gap-2 px-3 py-1 rounded-md text-xs" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', minWidth: '240px' }}>
+                  <Globe className="w-3 h-3 text-white/30" />
+                  <span className="text-white/40 truncate">vala-preview.local</span>
+                </div>
+                <Button variant="ghost" size="icon" className="w-7 h-7 text-white/30 hover:text-white hover:bg-white/5">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </Button>
+                <div className="flex items-center gap-0.5 ml-1">
+                  <Button variant="ghost" size="icon" className="w-7 h-7 text-white/30 hover:text-white hover:bg-white/5">
+                    <Monitor className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="w-7 h-7 text-white/30 hover:text-white hover:bg-white/5">
+                    <Smartphone className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </>
+            )}
+            {activeTab === 'code' && selectedFile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyCode}
+                className="h-7 px-2 text-xs gap-1.5 text-white/40 hover:text-white hover:bg-white/5"
+              >
+                {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                {copied ? 'Copied' : 'Copy'}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Workspace Content */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* File Tree (Code mode) */}
+          {activeTab === 'code' && showFileTree && (
+            <div className="w-[200px] overflow-y-auto py-2" style={{ borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0d0d0d' }}>
+              <div className="px-3 py-1 mb-1 flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-white/30">Files</span>
+                <Button variant="ghost" size="icon" className="w-5 h-5 text-white/20 hover:text-white" onClick={() => setShowFileTree(false)}>
+                  <PanelLeftClose className="w-3 h-3" />
+                </Button>
+              </div>
+              {MOCK_FILES.map((node, i) => (
+                <FileTreeItem key={i} node={node} depth={0} selectedFile={selectedFile} onSelect={handleFileSelect} />
               ))}
             </div>
-          </ScrollArea>
+          )}
+
+          {/* Main View */}
+          <div className="flex-1 overflow-hidden">
+            {activeTab === 'preview' ? (
+              /* Preview iframe */
+              <iframe
+                srcDoc={previewHtml}
+                className="w-full h-full border-0"
+                title="VALA Preview"
+                sandbox="allow-scripts"
+                style={{ background: '#0f172a' }}
+              />
+            ) : (
+              /* Code Editor */
+              <div className="h-full flex flex-col">
+                {!showFileTree && (
+                  <div className="px-2 py-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <Button variant="ghost" size="icon" className="w-6 h-6 text-white/20 hover:text-white" onClick={() => setShowFileTree(true)}>
+                      <PanelLeftOpen className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                )}
+                {selectedFile ? (
+                  <div className="flex-1 flex flex-col">
+                    {/* File Tab */}
+                    <div className="flex items-center px-4 py-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)' }}>
+                        <File className="w-3 h-3" style={{ color: '#06b6d4' }} />
+                        {selectedFile}
+                      </div>
+                    </div>
+                    {/* Code Content */}
+                    <ScrollArea className="flex-1">
+                      <pre className="p-4 text-xs leading-relaxed font-mono" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                        <code>{fileContent}</code>
+                      </pre>
+                    </ScrollArea>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <Code2 className="w-12 h-12 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.1)' }} />
+                      <p className="text-sm text-white/30">Select a file to view code</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
