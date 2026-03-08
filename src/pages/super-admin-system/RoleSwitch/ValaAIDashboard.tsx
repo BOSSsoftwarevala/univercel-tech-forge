@@ -17,7 +17,7 @@ import {
   Loader2, ChevronDown, Rocket, Image, Paperclip, Mic, MicOff,
   PanelLeftClose, PanelLeftOpen, Globe, CheckCircle,
   Layers, Database, GitBranch, Workflow, Clock, Zap,
-  Activity, Package, X
+  Activity, Package, X, Volume2, VolumeX
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
