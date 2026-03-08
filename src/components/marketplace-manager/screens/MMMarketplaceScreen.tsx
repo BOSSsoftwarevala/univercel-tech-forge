@@ -1044,6 +1044,10 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
             <Heart className={`w-4 h-4 mr-1 ${isFav ? 'fill-red-500' : ''}`} />
             {isFav ? 'Saved' : 'Save'}
           </Button>
+          <Button onClick={handleSpeak} variant="outline" size="sm" className={`border-slate-700 ${isPlaying ? 'text-cyan-400 border-cyan-500/50' : 'text-slate-400'}`}>
+            {isSpeaking ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : isPlaying ? <VolumeX className="w-4 h-4 mr-1" /> : <Volume2 className="w-4 h-4 mr-1" />}
+            {isSpeaking ? 'Loading...' : isPlaying ? 'Stop' : '🔊 Listen'}
+          </Button>
           <Button onClick={() => onDemo(product)} variant="outline" size="sm" className="border-cyan-500/50 text-cyan-400">
             <Play className="w-4 h-4 mr-1" /> Demo
           </Button>
