@@ -14,7 +14,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  Eye
+  Eye,
+  Package,
+  MapPin,
+  AlertCircle,
+  Bot,
+  Brain,
+  MessageSquare
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
