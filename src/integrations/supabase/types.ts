@@ -25771,6 +25771,66 @@ export type Database = {
         }
         Relationships: []
       }
+      vala_auto_builds: {
+        Row: {
+          build_progress: number
+          category: string
+          completed_at: string | null
+          created_at: string
+          current_step: string | null
+          demo_domain: string | null
+          error_message: string | null
+          id: string
+          logo_description: string
+          logo_url: string | null
+          marketplace_card_id: string | null
+          repository_url: string | null
+          software_name: string
+          specs_json: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          build_progress?: number
+          category: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: string | null
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description: string
+          logo_url?: string | null
+          marketplace_card_id?: string | null
+          repository_url?: string | null
+          software_name: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          build_progress?: number
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: string | null
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description?: string
+          logo_url?: string | null
+          marketplace_card_id?: string | null
+          repository_url?: string | null
+          software_name?: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       verification_records: {
         Row: {
           activated_at: string | null

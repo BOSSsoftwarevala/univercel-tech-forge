@@ -6,12 +6,14 @@
  * LOCKED: DO NOT CHANGE COLORS/FONTS/THEME
  */
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { ValaAISidebar, ValaAISection } from './ValaAISidebar';
 import ValaAICommandCenter from './ValaAICommandCenter';
 import { AIModelsPanel } from './AIModelsPanel';
 import { AICreditsPanel } from './AICreditsPanel';
 import { DevSettings } from './DevSettings';
+
+const ContinuousCreationDashboard = lazy(() => import('./ContinuousCreationDashboard'));
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
@@ -33,8 +35,13 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
       case 'error-detection':
       case 'rollback':
       case 'lock-status':
-        // All core functions route to Command Center
         return <ValaAICommandCenter />;
+      case 'continuous-creation':
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="text-white/50 font-mono text-sm">Loading Auto Builder...</div></div>}>
+            <ContinuousCreationDashboard />
+          </Suspense>
+        );
       case 'models':
         return (
           <div className="p-6 overflow-y-auto h-full">

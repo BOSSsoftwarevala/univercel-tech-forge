@@ -116,3 +116,6 @@ verify_jwt = false
 
 [functions.elevenlabs-tts]
 verify_jwt = false
+
+[functions.vala-continuous-builder]
+verify_jwt = false
