@@ -27,6 +27,17 @@ const THREAT_PATTERNS = [
   /extort/i,
 ];
 
+// Prohibited business/activity patterns — AIRA must NEVER assist with these
+const PROHIBITED_ACTIVITY_PATTERNS = [
+  /gambling/i, /casino/i, /betting/i, /slot\s*machine/i, /poker\s*site/i,
+  /scam(ming)?/i, /phishing/i, /fraud(ulent)?/i, /ponzi/i, /pyramid\s*scheme/i,
+  /money\s*launder/i, /fake\s*(website|product|review)/i, /counterfeit/i,
+  /dark\s*web/i, /illegal\s*(drug|weapon|content)/i, /exploit(ation)?/i,
+  /spam(ming)?/i, /click\s*farm/i, /fake\s*traffic/i, /bot\s*farm/i,
+  /adult\s*(content|site|website)/i, /porn/i,
+  /mlm/i, /get\s*rich\s*quick/i, /fake\s*promise/i,
+];
+
 const ALL_BAD_WORDS = [...BAD_WORDS_EN, ...BAD_WORDS_HI];
 
 export interface ContentFilterResult {
@@ -62,6 +73,16 @@ export function filterContent(text: string): ContentFilterResult {
     }
   }
 
+  // Check prohibited business activities
+  let hasProhibitedActivity = false;
+  for (const pattern of PROHIBITED_ACTIVITY_PATTERNS) {
+    if (pattern.test(text)) {
+      hasProhibitedActivity = true;
+      blockedWords.push('[prohibited activity]');
+      break;
+    }
+  }
+
   if (blockedWords.length === 0) {
     return { isClean: true, severity: 'none', blockedWords: [], penaltyLevel: 0, warningMessage: '' };
   }
@@ -73,6 +94,9 @@ export function filterContent(text: string): ContentFilterResult {
   if (hasThreat) {
     severity = 'critical';
     penaltyLevel = 4;
+  } else if (hasProhibitedActivity) {
+    severity = 'severe';
+    penaltyLevel = 3;
   } else if (blockedWords.length >= 3) {
     severity = 'severe';
     penaltyLevel = 3;
@@ -81,7 +105,9 @@ export function filterContent(text: string): ContentFilterResult {
     penaltyLevel = 2;
   }
 
-  const warningMessage = severity === 'critical'
+  const warningMessage = hasProhibitedActivity
+    ? '🚫 Software Vala does not support gambling, scamming, fraud, or any illegal/unethical business activities. This request has been blocked and logged.'
+    : severity === 'critical'
     ? '⚠️ Your message contains threatening language and has been blocked. This incident has been reported.'
     : severity === 'severe'
     ? '⚠️ Please maintain respectful and professional language. Repeated violations may result in account restrictions.'
