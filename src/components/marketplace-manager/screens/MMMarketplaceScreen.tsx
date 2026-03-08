@@ -731,13 +731,10 @@ function HeroBanner({ products, onDemo, onBuy, onView, discountedPrice }: {
               {product.description || 'Enterprise-grade software solution built for scale.'}
             </p>
             <div className="flex items-center gap-4 mb-6">
-              {product.monthly_price && (
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-500 line-through text-sm">₹{product.monthly_price}/mo</span>
-                  <span className="text-2xl font-bold text-cyan-400">₹{discountedPrice(product.monthly_price)}/mo</span>
-                  <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs">30% OFF</Badge>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-cyan-400">$249</span>
+                <span className="text-sm text-slate-400">Lifetime • Source Code Included</span>
+              </div>
             </div>
             <div className="flex gap-3">
               <Button onClick={() => onDemo(product)} variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
