@@ -5,7 +5,7 @@ import {
   DollarSign, Wallet, BarChart3, ShieldAlert, FileText,
   Scale, Cpu, Clock, ArrowLeft, Eye, Edit3, RefreshCw,
   Play, StopCircle, Pause, CheckCircle, XCircle, UserPlus,
-  Megaphone, Store, Loader2, Bell, Bot, Sparkles
+  Megaphone, Store, Loader2, Bell, Bot, Sparkles, Briefcase, PauseCircle
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
