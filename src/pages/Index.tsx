@@ -3544,7 +3544,7 @@ const Index = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className={`relative rounded-xl overflow-hidden bg-gradient-to-r ${festivalBanner.gradient} p-6 md:p-8`}
+              className={`relative rounded-xl overflow-hidden bg-gradient-to-r ${BANNER_COLORS[bannerColorIdx]} p-6 md:p-8`}
             >
               <div className="absolute inset-0 bg-black/20" />
               <div className="absolute top-0 right-8 opacity-10 text-[80px]">{festivalBanner.emoji}</div>
@@ -3552,12 +3552,22 @@ const Index = () => {
                 <div>
                   <h3 className="text-2xl font-extrabold text-white">{festivalBanner.title}</h3>
                   <p className="text-white/80 text-sm">{festivalBanner.subtitle}</p>
+                  <p className="text-white font-bold text-lg mt-2">🔥 Festival Special: ALL Software just $99 for 7 Days!</p>
+                  <p className="text-white/70 text-xs mt-1">$249 Lifetime with Full Source Code • No Hidden Charges • No Advance</p>
                 </div>
-                {festivalBanner.offer && (
-                  <Badge className="bg-white/20 text-white border-white/30 text-lg px-5 py-2 font-bold backdrop-blur-sm">
-                    {festivalBanner.offer}
+                <div className="flex flex-col items-center gap-2">
+                  <Badge className="bg-white text-green-600 border-0 text-2xl px-6 py-3 font-extrabold">
+                    $99 / 7 Days
                   </Badge>
-                )}
+                  <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1.5 font-bold backdrop-blur-sm">
+                    Regular: $249 Lifetime
+                  </Badge>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
               </div>
             </motion.div>
           </div>
