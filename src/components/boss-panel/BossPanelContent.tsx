@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { Navigate, useOutletContext } from 'react-router-dom';
 import type { BossPanelSection } from './BossPanelLayout';
 import { useBossPanelContext } from './BossPanelLayout';
 import { BossDashboard } from './sections/BossDashboard';
@@ -17,11 +17,9 @@ import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
 import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
 import { MMFullLayout } from '@/components/marketplace-manager/MMFullLayout';
-import { ProductManagerModule } from '@/components/product-manager/ProductManagerModule';
 
 const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
 const FranchiseDashboardEmbed = lazy(() => import('@/pages/franchise/Dashboard'));
-const CEODashboardEmbed = lazy(() => import('@/pages/super-admin-system/RoleSwitch/CEODashboard'));
 
 interface BossPanelOutletContext {
   activeSection: BossPanelSection;
@@ -57,6 +55,8 @@ export function BossPanelContent() {
     switch (activeSection) {
       case 'dashboard':
         return <BossDashboard />;
+      case 'ceo-dashboard':
+        return <Navigate to="/super-admin-system/role-switch?role=aira" replace />;
       case 'live-activity':
         return <LiveActivityStream streamingOn={streamingOn} />;
       case 'hierarchy':
@@ -70,7 +70,7 @@ export function BossPanelContent() {
       case 'products':
         return <ProductDemo />;
       case 'product-manager':
-        return <ProductManagerModule />;
+        return <Navigate to="/super-admin/product-manager" replace />;
       case 'revenue':
         return <RevenueSnapshot />;
       case 'audit':
@@ -90,7 +90,7 @@ export function BossPanelContent() {
       case 'franchise-dashboard':
         return <Suspense fallback={<div className="p-6 text-center">Loading Franchise Dashboard...</div>}><FranchiseDashboardEmbed /></Suspense>;
       case 'aira':
-        return <Suspense fallback={<div className="p-6 text-center">Loading AIRA...</div>}><CEODashboardEmbed /></Suspense>;
+        return <Navigate to="/super-admin-system/role-switch?role=aira" replace />;
       case 'settings':
         return <BossSettings />;
       default:
