@@ -7154,6 +7154,62 @@ export type Database = {
         }
         Relationships: []
       }
+      device_bindings: {
+        Row: {
+          bound_at: string | null
+          created_at: string | null
+          device_fingerprint: string
+          device_name: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          last_seen_at: string | null
+          license_id: string
+          os_info: string | null
+          unbound_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bound_at?: string | null
+          created_at?: string | null
+          device_fingerprint: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_seen_at?: string | null
+          license_id: string
+          os_info?: string | null
+          unbound_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bound_at?: string | null
+          created_at?: string | null
+          device_fingerprint?: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_seen_at?: string | null
+          license_id?: string
+          os_info?: string | null
+          unbound_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_bindings_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "user_licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       device_fingerprints: {
         Row: {
           blocked_reason: string | null
@@ -11107,6 +11163,42 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_webhooks: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          event_type: string
+          id: string
+          is_active: boolean | null
+          retry_policy: Json | null
+          secret_hash: string | null
+          target_url: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          event_type: string
+          id?: string
+          is_active?: boolean | null
+          retry_policy?: Json | null
+          secret_hash?: string | null
+          target_url: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          retry_policy?: Json | null
+          secret_hash?: string | null
+          target_url?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       masked_identities: {
         Row: {
           created_at: string | null
@@ -13042,6 +13134,62 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "personal_chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_processing_queue: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          max_retries: number | null
+          metadata: Json | null
+          order_id: string
+          retry_count: number | null
+          started_at: string | null
+          status: string
+          step_name: string
+          step_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          max_retries?: number | null
+          metadata?: Json | null
+          order_id: string
+          retry_count?: number | null
+          started_at?: string | null
+          status?: string
+          step_name: string
+          step_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          max_retries?: number | null
+          metadata?: Json | null
+          order_id?: string
+          retry_count?: number | null
+          started_at?: string | null
+          status?: string
+          step_name?: string
+          step_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_processing_queue_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -15154,6 +15302,7 @@ export type Database = {
           product_id: string
           product_name: string
           product_type: string | null
+          search_vector: unknown
           status: string | null
           subcategory_id: string | null
           tech_stack: string | null
@@ -15174,6 +15323,7 @@ export type Database = {
           product_id?: string
           product_name: string
           product_type?: string | null
+          search_vector?: unknown
           status?: string | null
           subcategory_id?: string | null
           tech_stack?: string | null
@@ -15194,6 +15344,7 @@ export type Database = {
           product_id?: string
           product_name?: string
           product_type?: string | null
+          search_vector?: unknown
           status?: string | null
           subcategory_id?: string | null
           tech_stack?: string | null
@@ -25291,6 +25442,59 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_delivery_log: {
+        Row: {
+          attempt_number: number | null
+          created_at: string | null
+          delivered_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          next_retry_at: string | null
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          status: string | null
+          webhook_id: string | null
+        }
+        Insert: {
+          attempt_number?: number | null
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          status?: string | null
+          webhook_id?: string | null
+        }
+        Update: {
+          attempt_number?: number | null
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          status?: string | null
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_delivery_log_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       websocket_connections: {
         Row: {
           channel: string
@@ -25780,6 +25984,7 @@ export type Database = {
       generate_backup_codes: { Args: { p_user_id: string }; Returns: string[] }
       generate_daily_demo_id: { Args: { p_demo_id: string }; Returns: string }
       generate_deployment_license: { Args: never; Returns: string }
+      generate_license_key: { Args: { p_prefix?: string }; Returns: string }
       generate_otp: {
         Args: {
           p_action_data?: Json
@@ -26121,6 +26326,19 @@ export type Database = {
           p_rejection_reason?: string
         }
         Returns: Json
+      }
+      search_products: {
+        Args: { result_limit?: number; search_query: string }
+        Returns: {
+          category: string
+          description: string
+          lifetime_price: number
+          monthly_price: number
+          product_id: string
+          product_name: string
+          rank: number
+          tech_stack: string
+        }[]
       }
       set_financial_mode: {
         Args: { p_admin_id: string; p_mode: string; p_reason: string }
