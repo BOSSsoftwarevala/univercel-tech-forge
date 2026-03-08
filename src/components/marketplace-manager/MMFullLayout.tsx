@@ -9,6 +9,7 @@ import { MMSupportScreen } from './screens/MMSupportScreen';
 import { MMSettingsScreen } from './screens/MMSettingsScreen';
 import { MMLibraryScreen } from './screens/MMLibraryScreen';
 import { MMLicensesScreen } from './screens/MMLicensesScreen';
+import AIRAClientChat from '@/components/aira/AIRAClientChat';
 
 type MarketplaceScreen = 'marketplace' | 'my-orders' | 'development' | 'wallet' | 'support' | 'settings' | 'library' | 'licenses';
 
