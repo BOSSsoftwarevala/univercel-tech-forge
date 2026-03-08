@@ -386,7 +386,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
         {/* ─── SYSTEM HEALTH ───────────────────────────────── */}
         {activeSection === "system" && (
           <CEOSystemHealthPanel
-            health={systemHealth.length > 0 ? systemHealth : m.systemHealth}
+            health={systemHealth.length > 0 ? systemHealth : m.systemHealth.map(h => ({ metric_name: h.metric, score: h.score, benchmark: h.benchmark, status: h.score >= 90 ? 'healthy' : 'warning' }))}
             onRunScan={() => runScan()}
             scanLoading={ceoLoading}
           />
