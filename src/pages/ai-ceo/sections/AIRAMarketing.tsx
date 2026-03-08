@@ -50,6 +50,8 @@ const CAMPAIGNS = [
   { id: "3", name: "Reseller Recruitment", status: "planned", budget: "₹3,50,000", spent: 0, leads: 0, roi: "—" },
   { id: "4", name: "Product Launch — AI Suite", status: "completed", budget: "₹4,00,000", spent: 100, leads: 520, roi: "+240%" },
 ];
+
+const AIRAMarketing = () => {
   const impactStyle = (i: string) => {
     if (i === "high") return "bg-red-500/20 text-red-400 border-red-500/30";
     if (i === "medium") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
