@@ -69,22 +69,22 @@ const SH = ({ title, count, icon: Icon }: { title: string; count?: number; icon?
   </div>
 );
 
-const Badge = ({ status }: { status: string }) => {
+const StatusBadge = ({ status }: { status: string }) => {
   const c: Record<string, { bg: string; fg: string; label: string }> = {
-    active: { bg: `${T.green}15`, fg: T.green, label: 'Active' },
-    approved: { bg: `${T.green}15`, fg: T.green, label: 'Approved' },
-    pending: { bg: `${T.amber}15`, fg: T.amber, label: 'Pending' },
-    rejected: { bg: `${T.red}15`, fg: T.red, label: 'Rejected' },
-    maintenance: { bg: `${T.amber}15`, fg: T.amber, label: 'Maint.' },
-    critical: { bg: `${T.red}15`, fg: T.red, label: 'Critical' },
-    warning: { bg: `${T.amber}15`, fg: T.amber, label: 'Warning' },
-    healthy: { bg: `${T.green}15`, fg: T.green, label: 'Healthy' },
+    active: { bg: `${T.green}18`, fg: T.green, label: 'Active' },
+    approved: { bg: `${T.green}18`, fg: T.green, label: 'Approved' },
+    pending: { bg: `${T.amber}18`, fg: T.amber, label: 'Pending' },
+    rejected: { bg: `${T.red}18`, fg: T.red, label: 'Rejected' },
+    maintenance: { bg: `${T.amber}18`, fg: T.amber, label: 'Maint.' },
+    critical: { bg: `${T.red}18`, fg: T.red, label: 'Critical' },
+    warning: { bg: `${T.amber}18`, fg: T.amber, label: 'Warning' },
+    healthy: { bg: `${T.green}18`, fg: T.green, label: 'Healthy' },
   };
   const s = c[status] || c.pending;
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
-      style={{ background: s.bg, color: s.fg, border: `1px solid ${s.fg}20` }}>
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.fg }} />
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold"
+      style={{ background: s.bg, color: s.fg, border: `1px solid ${s.fg}22`, boxShadow: `0 0 8px ${s.fg}10` }}>
+      <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.fg, boxShadow: `0 0 4px ${s.fg}` }} />
       {s.label}
     </span>
   );
