@@ -24,9 +24,9 @@ const SalesCRMDashboard = () => {
         const todayLeads = leadsRes.data || [];
         setStats({
           newLeads: todayLeads.length,
-          dealsWon: todayLeads.filter(l => l.status === 'won' || l.status === 'converted').length,
-          dealsLost: todayLeads.filter(l => l.status === 'lost').length,
-          pendingFollowups: todayLeads.filter(l => l.status === 'follow_up' || l.status === 'pending').length,
+          dealsWon: todayLeads.filter(l => l.status === 'closed_won').length,
+          dealsLost: todayLeads.filter(l => l.status === 'closed_lost').length,
+          pendingFollowups: todayLeads.filter(l => l.status === 'follow_up').length,
         });
         setRecentLeads(recentRes.data || []);
       } catch (e) { console.error(e); }
