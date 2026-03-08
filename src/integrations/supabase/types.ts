@@ -21739,6 +21739,7 @@ export type Database = {
           demo_id: string | null
           demo_url: string | null
           id: string
+          is_active: boolean | null
           is_demo_registered: boolean | null
           name: string
           type: string
@@ -21752,6 +21753,7 @@ export type Database = {
           demo_id?: string | null
           demo_url?: string | null
           id?: string
+          is_active?: boolean | null
           is_demo_registered?: boolean | null
           name: string
           type: string
@@ -21765,6 +21767,7 @@ export type Database = {
           demo_id?: string | null
           demo_url?: string | null
           id?: string
+          is_active?: boolean | null
           is_demo_registered?: boolean | null
           name?: string
           type?: string
