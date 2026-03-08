@@ -27,6 +27,7 @@ import softwareValaLogo from '@/assets/software-vala-logo-transparent.png';
 
 export type ValaAISection = 
   | 'command-center'
+  | 'continuous-creation'
   | 'active-project'
   | 'prompt-history'
   | 'execution-logs'
