@@ -236,6 +236,21 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
       )
       .on(
         'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'job_applications' },
+        (payload) => {
+          console.log('New job application:', payload);
+          const newApp = payload.new as any;
+          toast.success(`🆕 New ${(newApp.application_type || 'Job').toUpperCase()} Application!`, {
+            description: `${newApp.name || 'Applicant'} - ${newApp.email || ''}`,
+            duration: 10000,
+          });
+          setApprovals(prev => ({
+            ...prev,
+            jobApplications: [newApp, ...prev.jobApplications]
+          }));
+        }
+      .on(
+        'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
