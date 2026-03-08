@@ -546,6 +546,23 @@ const RoleSwitchDashboard = () => {
     );
   };
 
+  // Roles that are full-screen standalone modules with their own headers
+  const fullScreenRoles: (ActiveRole | null)[] = ['continent_super_admin', 'country_head'];
+  const isFullScreenModule = fullScreenRoles.includes(activeRole);
+
+  // Full-screen modules render without the parent header/sidebar
+  if (isFullScreenModule) {
+    return (
+      <div className="dark min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <ErrorBoundary>
+          <Suspense fallback={<ModuleLoader />}>
+            {renderRoleView()}
+          </Suspense>
+        </ErrorBoundary>
+      </div>
+    );
+  }
+
   return (
     <div className={cn(
       "dark min-h-screen flex flex-col transition-colors duration-300",
