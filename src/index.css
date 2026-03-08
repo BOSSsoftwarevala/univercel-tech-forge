@@ -893,6 +893,14 @@ html {
 html, body, #root {
   overflow-x: hidden;
   max-width: 100vw;
+  min-height: 100%;
+}
+
+/* Native-app like viewport fill for mobile webview / APK wrappers */
+@supports (height: 100dvh) {
+  html, body, #root {
+    min-height: 100dvh;
+  }
 }
 
 /* Touch-optimized buttons — instant response */
