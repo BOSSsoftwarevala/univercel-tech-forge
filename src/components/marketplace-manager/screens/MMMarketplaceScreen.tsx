@@ -205,14 +205,21 @@ export const MMMarketplaceScreen = () => {
   };
 
   const handleDemo = (product: Product) => {
-    void logEvent('demo_click', product);
+    void logEvent('demo_request', product, {
+      severity: 'info',
+      metadata: { stage: 'demo_requested' },
+    });
     toast.info(`Loading demo for ${product.product_name}...`);
   };
 
   const handleBuy = (product: Product) => {
-    void logEvent('purchase_click', product, {
-      queueForBoss: true,
-      metadata: { stage: 'purchase_initiated' },
+    void logEvent('purchase_request', product, {
+      severity: 'warning',
+      metadata: {
+        stage: 'purchase_initiated',
+        price: product.monthly_price,
+        discounted_price: product.monthly_price ? Math.round(product.monthly_price * 0.7) : null,
+      },
     });
     toast.success(`Order initiated for ${product.product_name}`);
   };
