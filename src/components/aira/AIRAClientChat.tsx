@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import ReactMarkdown from 'react-markdown';
+import airaAvatar from '@/assets/aira-avatar.png';
 
 interface ChatMessage {
   id: string;
@@ -167,9 +168,9 @@ export default function AIRAClientChat({ productId, productName, conversationTyp
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/25 flex items-center justify-center hover:shadow-violet-500/40 transition-shadow"
+            className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full overflow-hidden shadow-lg shadow-violet-500/25 flex items-center justify-center hover:shadow-violet-500/40 transition-shadow border-2 border-violet-500/50"
           >
-            <MessageCircle className="w-6 h-6" />
+            <img src={airaAvatar} alt="AIRA" className="w-full h-full object-cover" />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
           </motion.button>
         )}
@@ -187,9 +188,7 @@ export default function AIRAClientChat({ productId, productName, conversationTyp
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-600/90 to-indigo-600/90 border-b border-white/10">
               <div className="relative">
-                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
+                <img src={airaAvatar} alt="AIRA" className="w-9 h-9 rounded-full object-cover border-2 border-white/30" />
                 <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-violet-600" />
               </div>
               <div className="flex-1">

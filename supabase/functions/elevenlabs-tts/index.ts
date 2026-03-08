@@ -32,7 +32,7 @@ serve(async (req) => {
       });
     }
 
-    const selectedVoice = voiceId || "JBFqnCBsd6RMkjVDRZzb"; // George default
+    const selectedVoice = voiceId || "pFZP5JQG7iQjIQuC4Bku"; // Lily - sweet young female voice (AIRA default)
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoice}?output_format=mp3_44100_128`,
