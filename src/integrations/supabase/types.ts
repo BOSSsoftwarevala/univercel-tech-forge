@@ -1570,6 +1570,66 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_builds: {
+        Row: {
+          build_progress: number
+          category: string
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          current_step: string
+          demo_domain: string | null
+          error_message: string | null
+          id: string
+          logo_description: string | null
+          logo_url: string | null
+          repository_url: string | null
+          software_name: string
+          specs_json: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          build_progress?: number
+          category?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_step?: string
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description?: string | null
+          logo_url?: string | null
+          repository_url?: string | null
+          software_name: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          build_progress?: number
+          category?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_step?: string
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description?: string | null
+          logo_url?: string | null
+          repository_url?: string | null
+          software_name?: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       auto_healing_config: {
         Row: {
           auto_shutdown_on_failure: boolean | null
