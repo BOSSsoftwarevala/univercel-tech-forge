@@ -3369,8 +3369,8 @@ const Index = () => {
 
   // Count demos per master category
   const getCategoryCount = (category: string) => {
-    if (category === "All") return allDemos.length;
-    return allDemos.filter(d => d.masterCategory === category).length;
+    if (category === "All") return mergedDemos.length;
+    return mergedDemos.filter(d => d.masterCategory === category).length;
   };
 
   return (
