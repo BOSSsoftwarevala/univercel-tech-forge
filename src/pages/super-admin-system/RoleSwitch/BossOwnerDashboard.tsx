@@ -103,7 +103,8 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     resellers: any[];
     franchises: any[];
     influencers: any[];
-  }>({ resellers: [], franchises: [], influencers: [] });
+    jobApplications: any[];
+  }>({ resellers: [], franchises: [], influencers: [], jobApplications: [] });
   const [loadingApprovals, setLoadingApprovals] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
