@@ -585,6 +585,7 @@ const App = memo(() => (
                               <Route path="reports" element={<AICEOReports />} />
                               <Route path="learning" element={<AICEOLearning />} />
                               <Route path="settings" element={<AICEOSettings />} />
+                              <Route path="auto-healing" element={<AutoHealingEngine />} />
                             </Route>
 
                             {/* Super Admin Routes */}
