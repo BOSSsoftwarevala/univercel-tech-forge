@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Plus, Server, Activity, Shield, 
   Database, FileText, Brain, Settings, ArrowLeft,
   Globe, Cpu, AlertTriangle, Wrench, Search,
-  Lock, Code, Rocket, Eye
+  Lock, Code, Rocket, Eye, Store, HardDrive
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
@@ -20,6 +20,9 @@ export type ServerModuleSection =
   | 'add-server'
   | 'active-servers'
   | 'hosting'
+  | 'cpanel-manager'
+  | 'whois-dns'
+  | 'hosting-reseller'
   | 'ai-tools'
   | 'auto-scan'
   | 'downtime'
@@ -41,6 +44,9 @@ const sidebarItems: { id: ServerModuleSection; label: string; icon: React.Elemen
   { id: 'add-server', label: 'Add Server', icon: Plus },
   { id: 'active-servers', label: 'Active Servers', icon: Server },
   { id: 'hosting', label: 'Hosting Connect', icon: Globe },
+  { id: 'cpanel-manager', label: 'cPanel / WHM', icon: HardDrive },
+  { id: 'whois-dns', label: 'WHOIS & DNS', icon: Search },
+  { id: 'hosting-reseller', label: 'Hosting Reseller', icon: Store },
   { id: 'ai-tools', label: 'AI Tool Monitor', icon: Brain },
   { id: 'auto-scan', label: 'Auto Scan', icon: Search },
   { id: 'downtime', label: 'Downtime Detection', icon: AlertTriangle },
