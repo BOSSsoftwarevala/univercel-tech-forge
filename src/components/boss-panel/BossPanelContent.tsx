@@ -15,7 +15,7 @@ import { SecurityLegal } from './sections/SecurityLegal';
 import { BossSettings } from './sections/BossSettings';
 import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
-import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
+
 import { MMFullLayout } from '@/components/marketplace-manager/MMFullLayout';
 
 const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
