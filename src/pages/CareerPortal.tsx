@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { logCriticalActivity } from "@/hooks/useActivityLogger";
 import softwareValaLogo from "@/assets/software-vala-logo.jpg";
 
 type PortalType = "developer" | "influencer" | "job";
