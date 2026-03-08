@@ -367,53 +367,6 @@ export default function GeneratedApp() {
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ background: C.bg, color: C.text }}>
-      {/* Top Toolbar */}
-      <div className="flex items-center justify-between px-4 h-12 shrink-0" style={{ borderBottom: `1px solid ${C.border}`, background: C.bgSidebar }}>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setShowSidebar(!showSidebar)} className="p-1.5 rounded-md hover:bg-white/5" style={{ color: C.textMuted }}>
-            {showSidebar ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold" style={{ background: C.accent, color: '#fff' }}>V</div>
-            <span className="text-sm font-medium">VALA AI Engine</span>
-          </div>
-        </div>
-
-        {/* Pipeline Status */}
-        <div className="flex items-center gap-4">
-          {[
-            { label: 'Screens', value: metrics.screens, color: C.accent },
-            { label: 'APIs', value: metrics.apis, color: C.cyan },
-            { label: 'Tables', value: metrics.dbTables, color: C.green },
-            { label: 'Flows', value: metrics.flows, color: C.amber },
-          ].map(m => (
-            <div key={m.label} className="flex items-center gap-1.5 text-xs">
-              <span style={{ color: C.textDim }}>{m.label}</span>
-              <span className="font-bold" style={{ color: m.color }}>{m.value}</span>
-            </div>
-          ))}
-          <div className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-md" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <span style={{ color: C.textDim }}>Steps</span>
-            <span className="font-bold" style={{ color: completedSteps === totalSteps && completedSteps > 0 ? C.green : C.text }}>
-              {completedSteps}/{totalSteps}
-            </span>
-          </div>
-          {buildTime && (
-            <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-md" style={{ background: 'rgba(34,197,94,0.1)', color: C.green }}>
-              <Zap className="w-3 h-3" /> {buildTime}s (10x)
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium hover:bg-white/5" style={{ color: C.textMuted, border: `1px solid ${C.border}` }}>
-            <Share2 className="w-3.5 h-3.5" /> Share
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium" style={{ background: C.accent, color: '#fff' }}>
-            <Rocket className="w-3.5 h-3.5" /> Publish
-          </button>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
