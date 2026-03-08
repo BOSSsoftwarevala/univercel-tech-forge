@@ -26,7 +26,7 @@ const DomainProtection: React.FC<DomainProtectionProps> = ({ children }) => {
       const hostname = window.location.hostname;
       setCurrentDomain(hostname);
 
-      // Check if domain is in allowed list or is a lovable preview domain
+      // Check if domain is in allowed list or is a preview domain
       const isDomainAllowed = ALLOWED_DOMAINS.some(domain => 
         hostname === domain || 
         hostname.endsWith('.lovable.app') ||
