@@ -547,7 +547,7 @@ const RoleSwitchDashboard = () => {
   };
 
   // Roles that are full-screen standalone modules with their own headers
-  const fullScreenRoles: (ActiveRole | null)[] = ['continent_super_admin', 'country_head'];
+  const fullScreenRoles: (ActiveRole | null)[] = ['continent_super_admin', 'country_head', 'finance_manager'];
   const isFullScreenModule = fullScreenRoles.includes(activeRole);
 
   // Full-screen modules render without the parent header/sidebar
