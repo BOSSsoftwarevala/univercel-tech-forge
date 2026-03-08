@@ -565,10 +565,15 @@ const App = memo(() => (
                             <Route path="/ai-ceo" element={<RequireRole allowed={["boss_owner", "ceo"]}><AICEODashboard /></RequireRole>}>
                               <Route index element={<AICEODashboardMain />} />
                               <Route path="live-monitor" element={<AICEOLiveMonitor />} />
+                              <Route path="voice-commands" element={<AIRAVoiceCommands />} />
+                              <Route path="ai-providers" element={<AIRAProviders />} />
+                              <Route path="project-scanner" element={<AIRAProjectScanner />} />
+                              <Route path="task-engine" element={<AIRATaskEngine />} />
                               <Route path="decision-engine" element={<AICEODecisionEngine />} />
                               <Route path="approvals" element={<AICEOApprovals />} />
                               <Route path="risk" element={<AICEORiskCompliance />} />
                               <Route path="performance" element={<AICEOPerformance />} />
+                              <Route path="marketing" element={<AIRAMarketing />} />
                               <Route path="predictions" element={<AICEOPredictions />} />
                               <Route path="reports" element={<AICEOReports />} />
                               <Route path="learning" element={<AICEOLearning />} />
