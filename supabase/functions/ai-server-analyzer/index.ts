@@ -461,7 +461,7 @@ async function detectThreats(supabase: any, serverId: string) {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     return {
       threatsDetected: false,
       threats: [],
