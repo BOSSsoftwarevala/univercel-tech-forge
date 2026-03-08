@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { Navigate, useOutletContext } from 'react-router-dom';
 import type { BossPanelSection } from './BossPanelLayout';
 import { useBossPanelContext } from './BossPanelLayout';
 import { BossDashboard } from './sections/BossDashboard';
@@ -17,11 +17,9 @@ import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
 import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
 import { MMFullLayout } from '@/components/marketplace-manager/MMFullLayout';
-import { ProductManagerModule } from '@/components/product-manager/ProductManagerModule';
 
 const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
 const FranchiseDashboardEmbed = lazy(() => import('@/pages/franchise/Dashboard'));
-const CEODashboardEmbed = lazy(() => import('@/pages/super-admin-system/RoleSwitch/CEODashboard'));
 
 interface BossPanelOutletContext {
   activeSection: BossPanelSection;
