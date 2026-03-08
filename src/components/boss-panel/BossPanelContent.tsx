@@ -17,6 +17,7 @@ import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
 import { ValaAIModuleContainer } from '@/components/vala-ai-module/ValaAIModuleContainer';
 import { MMFullLayout } from '@/components/marketplace-manager/MMFullLayout';
+import { ProductManagerModule } from '@/components/product-manager/ProductManagerModule';
 
 const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
 const FranchiseDashboardEmbed = lazy(() => import('@/pages/franchise/Dashboard'));
@@ -28,7 +29,6 @@ interface BossPanelOutletContext {
 }
 
 export function BossPanelContent() {
-  // Try outlet context first (for router-based usage), fallback to React context
   let activeSection: BossPanelSection = 'dashboard';
   let streamingOn = true;
   
@@ -39,17 +39,15 @@ export function BossPanelContent() {
       streamingOn = outletContext.streamingOn ?? true;
     }
   } catch {
-    // Outlet context not available, use React context
+    // Outlet context not available
   }
   
-  // Fallback to React context if outlet didn't provide values
   const bossPanelContext = useBossPanelContext();
   if (activeSection === 'dashboard' && bossPanelContext.activeSection !== 'dashboard') {
     activeSection = bossPanelContext.activeSection;
     streamingOn = bossPanelContext.streamingOn;
   }
   
-  // Use the context values if available
   if (bossPanelContext.activeSection) {
     activeSection = bossPanelContext.activeSection;
     streamingOn = bossPanelContext.streamingOn;
@@ -71,6 +69,8 @@ export function BossPanelContent() {
         return <SystemModules />;
       case 'products':
         return <ProductDemo />;
+      case 'product-manager':
+        return <ProductManagerModule />;
       case 'revenue':
         return <RevenueSnapshot />;
       case 'audit':
