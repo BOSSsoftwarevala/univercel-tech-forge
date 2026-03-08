@@ -544,7 +544,21 @@ export const MMMarketplaceScreen = () => {
         ) : (
           <>
             {featuredProducts.length > 0 && (
-              <HeroBanner products={featuredProducts} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} discountedPrice={discountedPrice} />
+              <HeroBanner products={latestLaunches.length > 0 ? latestLaunches : featuredProducts} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} discountedPrice={discountedPrice} />
+            )}
+
+            {latestLaunches.length > 0 && (
+              <ProductRow
+                title="🚀 Latest Launch"
+                icon={<Zap className="w-5 h-5 text-red-400" />}
+                products={latestLaunches}
+                favorites={favorites}
+                onView={handleProductView}
+                onDemo={handleDemo}
+                onBuy={handleBuy}
+                onFav={toggleFavorite}
+                discountedPrice={discountedPrice}
+              />
             )}
 
             <ProductRow
