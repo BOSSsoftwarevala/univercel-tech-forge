@@ -1921,6 +1921,291 @@ export type Database = {
         }
         Relationships: []
       }
+      boss_alerts: {
+        Row: {
+          alert_type: string
+          auto_generated: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          is_read: boolean | null
+          is_resolved: boolean | null
+          metadata: Json | null
+          priority: number | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          source_entity_id: string | null
+          source_module: string | null
+          title: string
+        }
+        Insert: {
+          alert_type: string
+          auto_generated?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          priority?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_entity_id?: string | null
+          source_module?: string | null
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          auto_generated?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          priority?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_entity_id?: string | null
+          source_module?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      boss_audit_logs: {
+        Row: {
+          action_target: string | null
+          action_type: string
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          new_values: Json | null
+          old_values: Json | null
+          risk_level: string | null
+          session_id: string | null
+          status: string | null
+          target_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_target?: string | null
+          action_type: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          risk_level?: string | null
+          session_id?: string | null
+          status?: string | null
+          target_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_target?: string | null
+          action_type?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          risk_level?: string | null
+          session_id?: string | null
+          status?: string | null
+          target_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      boss_financial_metrics: {
+        Row: {
+          created_at: string
+          currency: string
+          expense_breakdown: Json | null
+          gross_margin: number | null
+          id: string
+          is_forecast: boolean | null
+          metadata: Json | null
+          net_profit: number
+          period_end: string
+          period_start: string
+          period_type: string
+          revenue_by_source: Json | null
+          total_expenses: number
+          total_revenue: number
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          expense_breakdown?: Json | null
+          gross_margin?: number | null
+          id?: string
+          is_forecast?: boolean | null
+          metadata?: Json | null
+          net_profit?: number
+          period_end: string
+          period_start: string
+          period_type?: string
+          revenue_by_source?: Json | null
+          total_expenses?: number
+          total_revenue?: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          expense_breakdown?: Json | null
+          gross_margin?: number | null
+          id?: string
+          is_forecast?: boolean | null
+          metadata?: Json | null
+          net_profit?: number
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          revenue_by_source?: Json | null
+          total_expenses?: number
+          total_revenue?: number
+        }
+        Relationships: []
+      }
+      boss_module_status: {
+        Row: {
+          avg_response_ms: number | null
+          created_at: string
+          dependencies: Json | null
+          error_count: number | null
+          health_score: number | null
+          id: string
+          last_heartbeat_at: string | null
+          metadata: Json | null
+          module_key: string
+          module_name: string
+          request_count_24h: number | null
+          status: string
+          updated_at: string
+          uptime_percentage: number | null
+          version: string | null
+          warning_count: number | null
+        }
+        Insert: {
+          avg_response_ms?: number | null
+          created_at?: string
+          dependencies?: Json | null
+          error_count?: number | null
+          health_score?: number | null
+          id?: string
+          last_heartbeat_at?: string | null
+          metadata?: Json | null
+          module_key: string
+          module_name: string
+          request_count_24h?: number | null
+          status?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+          version?: string | null
+          warning_count?: number | null
+        }
+        Update: {
+          avg_response_ms?: number | null
+          created_at?: string
+          dependencies?: Json | null
+          error_count?: number | null
+          health_score?: number | null
+          id?: string
+          last_heartbeat_at?: string | null
+          metadata?: Json | null
+          module_key?: string
+          module_name?: string
+          request_count_24h?: number | null
+          status?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+          version?: string | null
+          warning_count?: number | null
+        }
+        Relationships: []
+      }
+      boss_reports: {
+        Row: {
+          created_at: string
+          file_format: string | null
+          file_url: string | null
+          generated_by: string | null
+          id: string
+          is_scheduled: boolean | null
+          last_run_at: string | null
+          metadata: Json | null
+          next_run_at: string | null
+          period_end: string | null
+          period_start: string | null
+          report_category: string
+          report_data: Json | null
+          report_name: string
+          report_type: string
+          schedule_cron: string | null
+          status: string
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          file_format?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          is_scheduled?: boolean | null
+          last_run_at?: string | null
+          metadata?: Json | null
+          next_run_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_category?: string
+          report_data?: Json | null
+          report_name: string
+          report_type: string
+          schedule_cron?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          file_format?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          is_scheduled?: boolean | null
+          last_run_at?: string | null
+          metadata?: Json | null
+          next_run_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_category?: string
+          report_data?: Json | null
+          report_name?: string
+          report_type?: string
+          schedule_cron?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       boss_sessions: {
         Row: {
           boss_id: string | null
@@ -1955,6 +2240,96 @@ export type Database = {
             referencedColumns: ["boss_id"]
           },
         ]
+      }
+      boss_system_metrics: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_key: string
+          metric_unit: string | null
+          metric_value: number
+          recorded_at: string
+          trend_direction: string | null
+          trend_percentage: number | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_key: string
+          metric_unit?: string | null
+          metric_value?: number
+          recorded_at?: string
+          trend_direction?: string | null
+          trend_percentage?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_key?: string
+          metric_unit?: string | null
+          metric_value?: number
+          recorded_at?: string
+          trend_direction?: string | null
+          trend_percentage?: number | null
+        }
+        Relationships: []
+      }
+      boss_user_activity: {
+        Row: {
+          active_users: number
+          activity_by_region: Json | null
+          activity_by_role: Json | null
+          avg_session_duration_seconds: number | null
+          bounce_rate: number | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_signups: number | null
+          period_end: string
+          period_start: string
+          period_type: string
+          top_pages: Json | null
+          total_sessions: number | null
+        }
+        Insert: {
+          active_users?: number
+          activity_by_region?: Json | null
+          activity_by_role?: Json | null
+          avg_session_duration_seconds?: number | null
+          bounce_rate?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_signups?: number | null
+          period_end: string
+          period_start: string
+          period_type?: string
+          top_pages?: Json | null
+          total_sessions?: number | null
+        }
+        Update: {
+          active_users?: number
+          activity_by_region?: Json | null
+          activity_by_role?: Json | null
+          avg_session_duration_seconds?: number | null
+          bounce_rate?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_signups?: number | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          top_pages?: Json | null
+          total_sessions?: number | null
+        }
+        Relationships: []
       }
       box_action_logs: {
         Row: {
