@@ -2657,11 +2657,12 @@ const Index = () => {
 };
 
 // Demo Card Component - Enhanced with interactions
-const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: { 
+const DemoCard = ({ demo, index, isFavorite, onToggleFavorite, localPrice }: { 
   demo: Demo; 
   index: number; 
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  localPrice?: (inrStr: string) => string;
 }) => {
   const Icon = demo.icon;
   const { logAction } = useEnterpriseAudit();
