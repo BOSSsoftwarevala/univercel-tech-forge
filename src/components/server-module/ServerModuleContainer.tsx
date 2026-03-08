@@ -22,6 +22,11 @@ import { AIToolMonitor } from './AIToolMonitor';
 import { ServerAutoScan } from './ServerAutoScan';
 import { DowntimeDetection } from './DowntimeDetection';
 import { AutoRepairEngine } from './AutoRepairEngine';
+import { AutoSSLManager } from './AutoSSLManager';
+import { DomainLockSystem } from './DomainLockSystem';
+import { CodeProtection } from './CodeProtection';
+import { DeploySecurity } from './DeploySecurity';
+import { SecurityDashboard } from './SecurityDashboard';
 
 interface ServerModuleContainerProps {
   initialSection?: ServerModuleSection;
