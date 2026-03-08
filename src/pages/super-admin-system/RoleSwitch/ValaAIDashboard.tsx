@@ -1,7 +1,7 @@
 /**
- * VALA AI DASHBOARD - LOVABLE-CLONE AI PRODUCT BUILDER
+ * VALA AI DASHBOARD - ENTERPRISE AI PRODUCT BUILDER
  * =====================================================
- * Real AI integration via Lovable AI Gateway
+ * Real AI integration via AI Gateway
  * Voice input via ElevenLabs STT
  * Streaming chat + live preview
  * Parallel pipeline visualization

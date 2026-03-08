@@ -1,7 +1,7 @@
 /**
- * VALA AI ENGINE - LOVABLE-STYLE AI PRODUCT BUILDER
+ * VALA AI ENGINE - ENTERPRISE AI PRODUCT BUILDER
  * ================================================
- * Clone of Lovable's AI Builder Interface
+ * AI-Powered Software Builder Interface
  * ================================================
  * LOCKED: DO NOT CHANGE COLORS/FONTS/THEME
  */
@@ -196,7 +196,7 @@ const ValaAICommandCenter: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold" style={{ color: COLORS.text }}>VALA AI Engine</h1>
-            <p className="text-sm" style={{ color: COLORS.textMuted }}>Lovable-Style AI Product Builder</p>
+            <p className="text-sm" style={{ color: COLORS.textMuted }}>Enterprise AI Product Builder</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
