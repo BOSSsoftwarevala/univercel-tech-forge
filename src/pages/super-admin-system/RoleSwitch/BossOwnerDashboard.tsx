@@ -249,6 +249,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
             jobApplications: [newApp, ...prev.jobApplications]
           }));
         }
+      )
       .on(
         'postgres_changes',
         {
