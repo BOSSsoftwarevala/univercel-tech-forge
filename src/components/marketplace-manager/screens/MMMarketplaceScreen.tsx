@@ -250,7 +250,18 @@ export const MMMarketplaceScreen = () => {
       severity: 'info',
       metadata: { stage: 'demo_requested' },
     });
-    toast.info(`Loading demo for ${product.product_name}...`);
+
+    // Check if product has a demo_url
+    const demoUrl = (product as any).demo_url;
+    if (demoUrl) {
+      window.open(demoUrl, '_blank');
+      toast.success(`Opening demo for ${product.product_name}`);
+    } else {
+      // Navigate to demo directory for this category
+      const category = product.category?.toLowerCase().replace(/[^a-z]/g, '-') || 'general';
+      navigate(`/demo-directory?category=${category}&product=${product.product_id}`);
+      toast.info(`Loading demo for ${product.product_name}...`);
+    }
   };
 
   const handleBuy = (product: Product) => {
@@ -262,7 +273,10 @@ export const MMMarketplaceScreen = () => {
         discounted_price: product.monthly_price ? Math.round(product.monthly_price * 0.7) : null,
       },
     });
-    toast.success(`Order initiated for ${product.product_name}`);
+    // Navigate to purchase flow
+    navigate(`/marketplace/product/${product.product_id}`);
+    setSelectedProduct(product);
+    toast.success(`Opening purchase page for ${product.product_name}`);
   };
 
   const handleProductView = (product: Product) => {
