@@ -3792,6 +3792,62 @@ export type Database = {
         }
         Relationships: []
       }
+      client_domains: {
+        Row: {
+          a_record_ip: string | null
+          created_at: string | null
+          deployment_id: string | null
+          dns_status: string | null
+          domain_name: string
+          domain_type: string | null
+          id: string
+          is_primary: boolean | null
+          ssl_expires_at: string | null
+          ssl_status: string | null
+          txt_record: string | null
+          updated_at: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          a_record_ip?: string | null
+          created_at?: string | null
+          deployment_id?: string | null
+          dns_status?: string | null
+          domain_name: string
+          domain_type?: string | null
+          id?: string
+          is_primary?: boolean | null
+          ssl_expires_at?: string | null
+          ssl_status?: string | null
+          txt_record?: string | null
+          updated_at?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          a_record_ip?: string | null
+          created_at?: string | null
+          deployment_id?: string | null
+          dns_status?: string | null
+          domain_name?: string
+          domain_type?: string | null
+          id?: string
+          is_primary?: boolean | null
+          ssl_expires_at?: string | null
+          ssl_status?: string | null
+          txt_record?: string | null
+          updated_at?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_domains_deployment_id_fkey"
+            columns: ["deployment_id"]
+            isOneToOne: false
+            referencedRelation: "client_deployments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_feedback: {
         Row: {
           category: string | null
@@ -16083,6 +16139,57 @@ export type Database = {
             referencedColumns: ["product_id"]
           },
         ]
+      }
+      product_files: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          download_count: number | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_active: boolean | null
+          product_id: string | null
+          storage_path: string
+          updated_at: string | null
+          uploaded_by: string | null
+          version: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_active?: boolean | null
+          product_id?: string | null
+          storage_path: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          version?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_active?: boolean | null
+          product_id?: string | null
+          storage_path?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          version?: string | null
+        }
+        Relationships: []
       }
       product_modules: {
         Row: {
