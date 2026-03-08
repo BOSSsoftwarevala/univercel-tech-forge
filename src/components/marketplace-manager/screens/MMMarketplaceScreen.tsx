@@ -942,6 +942,9 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
 
             <div className="flex flex-wrap gap-2">
               {product.category && <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">{product.category}</Badge>}
+              {(product.source === 'vala_ai' || product.source === 'repository') && (
+                <Badge variant="outline" className="border-amber-500/50 text-amber-300 bg-amber-500/10">🏭 From Our Repository</Badge>
+              )}
               {product.tech_stack && <Badge variant="outline" className="border-purple-500/50 text-purple-400">{product.tech_stack}</Badge>}
               {product.product_type && <Badge variant="outline" className="border-slate-600 text-slate-400">{product.product_type}</Badge>}
               {product.repo_language && <Badge variant="outline" className="border-amber-500/50 text-amber-400">{product.repo_language}</Badge>}
