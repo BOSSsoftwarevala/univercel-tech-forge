@@ -21914,6 +21914,7 @@ export type Database = {
           seo_keywords: string[] | null
           seo_slug: string | null
           short_description: string | null
+          source: string | null
           type: string
           updated_at: string | null
           vendor: string | null
@@ -21951,6 +21952,7 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_slug?: string | null
           short_description?: string | null
+          source?: string | null
           type: string
           updated_at?: string | null
           vendor?: string | null
@@ -21988,6 +21990,7 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_slug?: string | null
           short_description?: string | null
+          source?: string | null
           type?: string
           updated_at?: string | null
           vendor?: string | null

@@ -32,6 +32,7 @@ interface Product {
   demo_build_status?: string | null;
   last_repo_sync_at?: string | null;
   listing_status?: string | null;
+  source?: string | null;
 }
 
 type PartnerRequestType =
@@ -149,6 +150,7 @@ export const MMMarketplaceScreen = () => {
           demo_build_status: item.demo_build_status || null,
           last_repo_sync_at: item.last_repo_sync_at || null,
           listing_status: item.listing_status || 'draft',
+          source: item.source || 'vala_ai',
         }));
       } else if (!fetchError) {
         // Fallback to products table
@@ -860,10 +862,15 @@ function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, discountedP
     <div className="group relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all cursor-pointer" onClick={() => onView(product)}>
       <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative">
         <Monitor className="w-10 h-10 text-slate-700" />
-        <div className="absolute top-2 left-2 flex gap-1">
+        <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
           <Badge variant="outline" className="text-[10px] border-slate-600 text-slate-400 bg-slate-900/80">
             {product.category || 'Software'}
           </Badge>
+          {(product.source === 'vala_ai' || product.source === 'repository') && (
+            <Badge variant="outline" className="text-[10px] border-amber-500/50 text-amber-300 bg-slate-900/80">
+              🏭 Our Repository
+            </Badge>
+          )}
           {product.github_repo_url && (
             <Badge variant="outline" className="text-[10px] border-emerald-600/50 text-emerald-400 bg-slate-900/80">
               <Github className="w-2.5 h-2.5 mr-0.5" /> Connected
@@ -935,6 +942,9 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
 
             <div className="flex flex-wrap gap-2">
               {product.category && <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">{product.category}</Badge>}
+              {(product.source === 'vala_ai' || product.source === 'repository') && (
+                <Badge variant="outline" className="border-amber-500/50 text-amber-300 bg-amber-500/10">🏭 From Our Repository</Badge>
+              )}
               {product.tech_stack && <Badge variant="outline" className="border-purple-500/50 text-purple-400">{product.tech_stack}</Badge>}
               {product.product_type && <Badge variant="outline" className="border-slate-600 text-slate-400">{product.product_type}</Badge>}
               {product.repo_language && <Badge variant="outline" className="border-amber-500/50 text-amber-400">{product.repo_language}</Badge>}
