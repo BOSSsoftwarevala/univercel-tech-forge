@@ -23,6 +23,68 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import softwareValaLogo from "@/assets/software-vala-logo.jpg";
 
+// Netflix poster thumbnails
+import thumbEducation from "@/assets/thumbnails/education.jpg";
+import thumbHealthcare from "@/assets/thumbnails/healthcare.jpg";
+import thumbFinance from "@/assets/thumbnails/finance.jpg";
+import thumbHospitality from "@/assets/thumbnails/hospitality.jpg";
+import thumbRetail from "@/assets/thumbnails/retail.jpg";
+import thumbTransport from "@/assets/thumbnails/transport.jpg";
+import thumbRealEstate from "@/assets/thumbnails/realestate.jpg";
+import thumbIndustry from "@/assets/thumbnails/industry.jpg";
+import thumbFitness from "@/assets/thumbnails/fitness.jpg";
+import thumbSalon from "@/assets/thumbnails/salon.jpg";
+import thumbReligious from "@/assets/thumbnails/religious.jpg";
+import thumbTechnology from "@/assets/thumbnails/technology.jpg";
+import thumbAgriculture from "@/assets/thumbnails/agriculture.jpg";
+import thumbLegal from "@/assets/thumbnails/legal.jpg";
+import thumbAutomotive from "@/assets/thumbnails/automotive.jpg";
+import thumbHR from "@/assets/thumbnails/hr.jpg";
+
+// Map masterCategory/category to thumbnails
+const CATEGORY_THUMBNAILS: Record<string, string> = {
+  'Education': thumbEducation,
+  'Healthcare': thumbHealthcare,
+  'Finance & Accounting': thumbFinance,
+  'Banking & Finance': thumbFinance,
+  'Hospitality': thumbHospitality,
+  'Retail & POS': thumbRetail,
+  'Transport & Logistics': thumbTransport,
+  'Real Estate': thumbRealEstate,
+  'Industry & Manufacturing': thumbIndustry,
+  'Agriculture & Farming': thumbAgriculture,
+  'Legal & Compliance': thumbLegal,
+  'Technology': thumbTechnology,
+  'Religious & Community': thumbReligious,
+  'HR & Workforce': thumbHR,
+  'Sales & CRM': thumbAutomotive,
+  'Marketing': thumbRetail,
+  'Government & Public': thumbLegal,
+  'Media & Entertainment': thumbTechnology,
+  'Sports & Recreation': thumbFitness,
+  'NGO & Non-Profit': thumbReligious,
+};
+
+// Get thumbnail for a demo based on category or masterCategory
+const getThumbnail = (demo: Demo): string => {
+  // Check specific categories first
+  if (demo.category.includes('Gym') || demo.category.includes('Fitness')) return thumbFitness;
+  if (demo.category.includes('Salon') || demo.category.includes('Spa')) return thumbSalon;
+  if (demo.category.includes('Church') || demo.category.includes('Temple') || demo.category.includes('Mosque')) return thumbReligious;
+  if (demo.category.includes('Garage') || demo.category.includes('Auto')) return thumbAutomotive;
+  if (demo.category.includes('Hotel') || demo.category.includes('Restaurant')) return thumbHospitality;
+  if (demo.category.includes('Hospital') || demo.category.includes('Clinic') || demo.category.includes('Medical')) return thumbHealthcare;
+  if (demo.category.includes('Bank') || demo.category.includes('Finance') || demo.category.includes('Account')) return thumbFinance;
+  if (demo.category.includes('Transport') || demo.category.includes('Courier') || demo.category.includes('Fleet') || demo.category.includes('Logistics')) return thumbTransport;
+  if (demo.category.includes('Farm') || demo.category.includes('Agri')) return thumbAgriculture;
+  if (demo.category.includes('Legal') || demo.category.includes('Law')) return thumbLegal;
+  if (demo.category.includes('HR') || demo.category.includes('Payroll') || demo.category.includes('Employee')) return thumbHR;
+  if (demo.category.includes('Real Estate') || demo.category.includes('Property')) return thumbRealEstate;
+  // Fallback to masterCategory
+  return CATEGORY_THUMBNAILS[demo.masterCategory] || thumbIndustry;
+};
+
+
 interface Demo {
   id: string;
   name: string;
@@ -2743,14 +2805,14 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite, localPrice }: {
     >
       {/* Poster Card */}
       <div className={`relative rounded-lg overflow-hidden aspect-[3/4] transition-all duration-300 ${isHovered ? 'scale-105 z-30 shadow-2xl shadow-black/80' : 'scale-100 z-0'}`}>
-        {/* Poster Visual — gradient + icon */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${demo.color}`} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-        
-        {/* Large centered icon */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-20 group-hover:opacity-30 transition-opacity">
-          <Icon className="w-24 h-24 text-white" />
-        </div>
+        {/* Poster Visual — AI Generated Thumbnail */}
+        <img 
+          src={getThumbnail(demo)} 
+          alt={demo.name}
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
 
         {/* Status badge */}
         <div className="absolute top-2 right-2 z-10">
