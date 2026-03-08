@@ -4,10 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Megaphone, TrendingUp, Users, Target, BarChart3,
   Globe, Lightbulb, MessageSquare, Zap, DollarSign,
-  ArrowUp, ArrowDown, Star, Eye
+  ArrowUp, ArrowDown, Star, Eye, Shield, Calendar,
+  Clock, CheckCircle2, AlertTriangle
 } from "lucide-react";
 
 const STRATEGIES = [
