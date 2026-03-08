@@ -175,6 +175,57 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
         </div>
       </motion.div>
 
+      {/* ─── CEO Action Buttons ──────────────────────────────── */}
+      <div className="px-6 pt-4 pb-0">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "System Scan", icon: ScanLine, action: () => { setActiveSection("scanner"); logAction("ceo_action", "system_scan"); toast.info("System scan initiated"); } },
+            { label: "Generate Report", icon: FileText, action: async () => {
+              logAction("ceo_action", "generate_report");
+              toast.info("Generating executive report...");
+              // Submit scan report to system_events
+              try {
+                await (supabase as any).from("system_events").insert({
+                  event_type: "aira_executive_report",
+                  source_role: "ceo",
+                  source_user_id: user?.id || null,
+                  payload: { type: "executive_report", generated_at: new Date().toISOString(), metrics: { users: m.totalUsers, revenue: m.totalRevenue, orders: m.totalOrders, alerts: m.criticalAlerts } },
+                  status: "PENDING",
+                });
+                toast.success("Executive report generated");
+              } catch { toast.error("Report generation failed"); }
+            }},
+            { label: "Open AI Chat", icon: Bot, action: () => { setActiveSection("chat"); logAction("ceo_action", "open_ai_chat"); } },
+            { label: "View Alerts", icon: AlertCircle, action: () => { setActiveSection("risks"); logAction("ceo_action", "view_alerts"); } },
+            { label: "View System Health", icon: Activity, action: () => { setActiveSection("scanner"); logAction("ceo_action", "view_system_health"); } },
+            { label: "Submit to Boss Panel", icon: Zap, action: async () => {
+              logAction("ceo_action", "submit_to_boss");
+              try {
+                await (supabase as any).from("system_events").insert({
+                  event_type: "aira_boss_submission",
+                  source_role: "ceo",
+                  source_user_id: user?.id || null,
+                  payload: { type: "ceo_submission", submitted_at: new Date().toISOString(), summary: { totalUsers: m.totalUsers, totalRevenue: m.totalRevenue, totalOrders: m.totalOrders, activeServers: m.activeServers, pendingApprovals: m.pendingApprovals, criticalAlerts: m.criticalAlerts } },
+                  status: "PENDING",
+                });
+                toast.success("Report submitted to Boss Panel");
+              } catch { toast.error("Submission failed"); }
+            }},
+          ].map((btn) => (
+            <Button
+              key={btn.label}
+              variant="outline"
+              size="sm"
+              onClick={btn.action}
+              className="gap-1.5 text-xs bg-slate-800/60 border-slate-700/50 text-slate-300 hover:bg-violet-500/20 hover:text-violet-300 hover:border-violet-500/40"
+            >
+              <btn.icon className="w-3.5 h-3.5" />
+              {btn.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       <div className="p-6 space-y-6">
         {/* ─── SCANNER ──────────────────────────────────────── */}
         {activeSection === "scanner" && (
