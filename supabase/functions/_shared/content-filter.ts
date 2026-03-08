@@ -73,6 +73,16 @@ export function filterContent(text: string): ContentFilterResult {
     }
   }
 
+  // Check prohibited business activities
+  let hasProhibitedActivity = false;
+  for (const pattern of PROHIBITED_ACTIVITY_PATTERNS) {
+    if (pattern.test(text)) {
+      hasProhibitedActivity = true;
+      blockedWords.push('[prohibited activity]');
+      break;
+    }
+  }
+
   if (blockedWords.length === 0) {
     return { isClean: true, severity: 'none', blockedWords: [], penaltyLevel: 0, warningMessage: '' };
   }
