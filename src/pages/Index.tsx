@@ -2449,6 +2449,16 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
+  const geoLocale = useGeoLocale();
+  const festivalBanner = useFestivalBanner(geoLocale.country);
+
+  /** Convert INR price string to local currency */
+  const localPrice = (inrStr: string) => {
+    if (geoLocale.currency === 'INR') return inrStr;
+    const num = parseINRPrice(inrStr);
+    if (!num) return inrStr;
+    return convertPrice(num, geoLocale.exchangeRate, geoLocale.currencySymbol);
+  };
 
   const filteredDemos = allDemos.filter(demo => {
     const matchesCategory = activeCategory === "All" || demo.masterCategory === activeCategory;
