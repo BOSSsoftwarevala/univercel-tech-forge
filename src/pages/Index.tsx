@@ -3568,11 +3568,6 @@ const Index = () => {
           </div>
         </section>
       )}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      )}
 
       {/* ===== 50 NETFLIX HORIZONTAL ROWS ===== */}
       <section className="pb-12 px-4 md:px-12 space-y-10">
