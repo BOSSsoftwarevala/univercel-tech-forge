@@ -8769,6 +8769,80 @@ export type Database = {
           },
         ]
       }
+      github_repo_sync: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          default_branch: string | null
+          demo_build_status: string | null
+          demo_url: string | null
+          id: string
+          is_active: boolean | null
+          language: string | null
+          last_commit_at: string | null
+          last_commit_message: string | null
+          last_commit_sha: string | null
+          last_sync_at: string | null
+          product_id: string | null
+          repo_full_name: string
+          repo_url: string
+          repo_visibility: string | null
+          stars_count: number | null
+          topics: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          default_branch?: string | null
+          demo_build_status?: string | null
+          demo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          last_commit_at?: string | null
+          last_commit_message?: string | null
+          last_commit_sha?: string | null
+          last_sync_at?: string | null
+          product_id?: string | null
+          repo_full_name: string
+          repo_url: string
+          repo_visibility?: string | null
+          stars_count?: number | null
+          topics?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          default_branch?: string | null
+          demo_build_status?: string | null
+          demo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          last_commit_at?: string | null
+          last_commit_message?: string | null
+          last_commit_sha?: string | null
+          last_sync_at?: string | null
+          product_id?: string | null
+          repo_full_name?: string
+          repo_url?: string
+          repo_visibility?: string | null
+          stars_count?: number | null
+          topics?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_repo_sync_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "software_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       global_offers: {
         Row: {
           banner_text: string | null
@@ -21814,6 +21888,7 @@ export type Database = {
           build_metadata: Json | null
           category: string | null
           created_at: string | null
+          demo_build_status: string | null
           demo_domain: string | null
           demo_id: string | null
           demo_url: string | null
@@ -21824,6 +21899,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_demo_registered: boolean | null
+          last_repo_sync_at: string | null
           listing_status: string | null
           long_description: string | null
           marketing_hashtags: string[] | null
@@ -21833,6 +21909,8 @@ export type Database = {
           og_image_url: string | null
           product_icon_url: string | null
           product_thumbnail_url: string | null
+          repo_language: string | null
+          repo_last_commit_sha: string | null
           seo_keywords: string[] | null
           seo_slug: string | null
           short_description: string | null
@@ -21847,6 +21925,7 @@ export type Database = {
           build_metadata?: Json | null
           category?: string | null
           created_at?: string | null
+          demo_build_status?: string | null
           demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
@@ -21857,6 +21936,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
+          last_repo_sync_at?: string | null
           listing_status?: string | null
           long_description?: string | null
           marketing_hashtags?: string[] | null
@@ -21866,6 +21946,8 @@ export type Database = {
           og_image_url?: string | null
           product_icon_url?: string | null
           product_thumbnail_url?: string | null
+          repo_language?: string | null
+          repo_last_commit_sha?: string | null
           seo_keywords?: string[] | null
           seo_slug?: string | null
           short_description?: string | null
@@ -21880,6 +21962,7 @@ export type Database = {
           build_metadata?: Json | null
           category?: string | null
           created_at?: string | null
+          demo_build_status?: string | null
           demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
@@ -21890,6 +21973,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_demo_registered?: boolean | null
+          last_repo_sync_at?: string | null
           listing_status?: string | null
           long_description?: string | null
           marketing_hashtags?: string[] | null
@@ -21899,6 +21983,8 @@ export type Database = {
           og_image_url?: string | null
           product_icon_url?: string | null
           product_thumbnail_url?: string | null
+          repo_language?: string | null
+          repo_last_commit_sha?: string | null
           seo_keywords?: string[] | null
           seo_slug?: string | null
           short_description?: string | null
