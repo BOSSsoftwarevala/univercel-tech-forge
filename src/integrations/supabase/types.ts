@@ -7631,6 +7631,81 @@ export type Database = {
         }
         Relationships: []
       }
+      finance_security_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          description: string
+          id: string
+          is_resolved: boolean | null
+          metadata: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      finance_security_policies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          enforced_at: string | null
+          enforced_by: string | null
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          policy_name: string
+          policy_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          enforced_at?: string | null
+          enforced_by?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          policy_name: string
+          policy_type?: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          enforced_at?: string | null
+          enforced_by?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          policy_name?: string
+          policy_type?: string
+        }
+        Relationships: []
+      }
       firewall_rules: {
         Row: {
           created_at: string | null
@@ -24626,6 +24701,54 @@ export type Database = {
           user_id?: string
           velocity_check_passed?: boolean | null
           wallet_id?: string | null
+        }
+        Relationships: []
+      }
+      transaction_security_locks: {
+        Row: {
+          amount: number
+          boss_approved: boolean | null
+          created_at: string | null
+          gateway_verified: boolean | null
+          id: string
+          lock_status: string
+          lock_type: string
+          locked_at: string | null
+          metadata: Json | null
+          otp_verified: boolean | null
+          transaction_id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          boss_approved?: boolean | null
+          created_at?: string | null
+          gateway_verified?: boolean | null
+          id?: string
+          lock_status?: string
+          lock_type?: string
+          locked_at?: string | null
+          metadata?: Json | null
+          otp_verified?: boolean | null
+          transaction_id: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          boss_approved?: boolean | null
+          created_at?: string | null
+          gateway_verified?: boolean | null
+          id?: string
+          lock_status?: string
+          lock_type?: string
+          locked_at?: string | null
+          metadata?: Json | null
+          otp_verified?: boolean | null
+          transaction_id?: string
+          unlocked_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
