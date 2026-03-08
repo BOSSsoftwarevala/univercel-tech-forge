@@ -3633,6 +3633,84 @@ export type Database = {
         }
         Relationships: []
       }
+      client_deployments: {
+        Row: {
+          client_email: string
+          client_name: string
+          client_password_hash: string
+          client_password_plain: string | null
+          client_phone: string | null
+          client_username: string
+          created_at: string | null
+          deploy_completed_at: string | null
+          deploy_error: string | null
+          deploy_started_at: string | null
+          deploy_url: string | null
+          deployed_by: string | null
+          github_repo_url: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          product_id: string | null
+          source_code_hash: string | null
+          status: string
+          subdomain: string
+          updated_at: string | null
+          vps_path: string | null
+          vps_port: number | null
+        }
+        Insert: {
+          client_email: string
+          client_name: string
+          client_password_hash: string
+          client_password_plain?: string | null
+          client_phone?: string | null
+          client_username: string
+          created_at?: string | null
+          deploy_completed_at?: string | null
+          deploy_error?: string | null
+          deploy_started_at?: string | null
+          deploy_url?: string | null
+          deployed_by?: string | null
+          github_repo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          product_id?: string | null
+          source_code_hash?: string | null
+          status?: string
+          subdomain: string
+          updated_at?: string | null
+          vps_path?: string | null
+          vps_port?: number | null
+        }
+        Update: {
+          client_email?: string
+          client_name?: string
+          client_password_hash?: string
+          client_password_plain?: string | null
+          client_phone?: string | null
+          client_username?: string
+          created_at?: string | null
+          deploy_completed_at?: string | null
+          deploy_error?: string | null
+          deploy_started_at?: string | null
+          deploy_url?: string | null
+          deployed_by?: string | null
+          github_repo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          product_id?: string | null
+          source_code_hash?: string | null
+          status?: string
+          subdomain?: string
+          updated_at?: string | null
+          vps_path?: string | null
+          vps_port?: number | null
+        }
+        Relationships: []
+      }
       client_feedback: {
         Row: {
           category: string | null

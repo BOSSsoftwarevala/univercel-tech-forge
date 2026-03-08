@@ -22,6 +22,7 @@ import PMSecurityLicense from './screens/PMSecurityLicense';
 import PMReports from './screens/PMReports';
 import PMSoftwareProfile from './screens/PMSoftwareProfile';
 import ValaAICommandCenter from '@/components/vala-ai-module/ValaAICommandCenter';
+import PMDeployScreen from './screens/PMDeployScreen';
 
 type PMSection = 
   | 'dashboard' 
@@ -91,6 +92,7 @@ type PMSection =
   | 'activity'
   | 'settings'
   | 'add-product'
+  | 'client-deploy'
   | 'dev-studio';
 
 interface PMEnterpriseLayoutProps {
@@ -193,6 +195,9 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
     }
     
     // Deployment Control
+    if (activeSection === 'client-deploy') {
+      return <PMDeployScreen />;
+    }
     if (['server-assignment', 'environment-select', 'deploy', 'rollback', 'stop-deployment', 'deployment-logs'].includes(activeSection)) {
       return <PMDeploymentControl deploymentType={activeSection} />;
     }
