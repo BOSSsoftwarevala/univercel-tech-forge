@@ -81,23 +81,23 @@ export function BossPanelContent() {
       case 'ai-api-manager':
         return <AIAPIManagerLayout />;
       case 'deployment-manager':
-        return <ModulePlaceholder title="Deployment Manager" />;
+        return <Navigate to="/super-admin-system/role-switch?role=deployment_manager" replace />;
       case 'integration-manager':
         return <ModulePlaceholder title="Integration Manager" />;
 
       // ─── Development ───
       case 'dev-manager':
-        return <ModulePlaceholder title="Development Manager" />;
+        return <Navigate to="/super-admin-system/role-switch?role=dev_manager" replace />;
       case 'product-manager':
         return <Navigate to="/super-admin/product-manager" replace />;
       case 'demo-manager':
-        return <ModulePlaceholder title="Demo Manager" />;
+        return <Navigate to="/super-admin/demo-manager" replace />;
       case 'demo-system-manager':
-        return <ModulePlaceholder title="Demo System Manager" />;
+        return <Navigate to="/super-admin/demo-manager" replace />;
       case 'task-manager':
-        return <ModulePlaceholder title="Task Manager" />;
+        return <Navigate to="/task-manager" replace />;
       case 'promise-tracker':
-        return <ModulePlaceholder title="Promise Tracker" />;
+        return <Navigate to="/promise-tracker" replace />;
 
       // ─── Business & Sales ───
       case 'marketplace-manager':
@@ -107,19 +107,19 @@ export function BossPanelContent() {
       case 'license-manager':
         return <ModulePlaceholder title="License Manager" />;
       case 'lead-manager':
-        return <ModulePlaceholder title="Lead Manager" />;
+        return <Navigate to="/lead-manager" replace />;
       case 'sales-manager':
-        return <ModulePlaceholder title="Sales Manager" />;
+        return <Navigate to="/super-admin-system/role-switch?role=sales_manager" replace />;
       case 'asset-manager':
         return <ModulePlaceholder title="Asset Manager" />;
 
       // ─── Marketing & Growth ───
       case 'marketing-manager':
-        return <ModulePlaceholder title="Marketing Manager" />;
+        return <Navigate to="/marketing-manager" replace />;
       case 'seo-manager':
-        return <ModulePlaceholder title="SEO Manager" />;
+        return <Navigate to="/seo-manager" replace />;
       case 'influencer-manager':
-        return <ModulePlaceholder title="Influencer Manager" />;
+        return <Navigate to="/super-admin/influencer-manager" replace />;
 
       // ─── Distribution Network ───
       case 'franchise-manager':
@@ -127,13 +127,13 @@ export function BossPanelContent() {
       case 'reseller-manager':
         return <Suspense fallback={<LoadingFallback label="Reseller Manager" />}><ResellerDashboardEmbed /></Suspense>;
       case 'continent-admin':
-        return <ModulePlaceholder title="Continent Admin" />;
+        return <Navigate to="/super-admin-system/role-switch?role=continent_super_admin" replace />;
       case 'country-admin':
-        return <ModulePlaceholder title="Country Admin" />;
+        return <Navigate to="/super-admin-system/role-switch?role=country_head" replace />;
 
       // ─── People & Support ───
       case 'customer-support':
-        return <ModulePlaceholder title="Customer Support" />;
+        return <Navigate to="/super-admin/support-center" replace />;
       case 'developer-dashboard':
         return <ModulePlaceholder title="Developer Dashboard" />;
       case 'pro-manager':
@@ -143,23 +143,23 @@ export function BossPanelContent() {
 
       // ─── Finance & Legal ───
       case 'finance-manager':
-        return <ModulePlaceholder title="Finance Manager" />;
+        return <Navigate to="/super-admin/finance-center" replace />;
       case 'legal-manager':
-        return <ModulePlaceholder title="Legal Manager" />;
+        return <Navigate to="/legal-manager" replace />;
 
       // ─── Security & Audit ───
       case 'security-manager':
-        return <ModulePlaceholder title="Security Manager" />;
+        return <Navigate to="/super-admin/security-center" replace />;
       case 'audit-logs-manager':
-        return <ModulePlaceholder title="Audit Logs Manager" />;
+        return <Navigate to="/super-admin/system-audit" replace />;
       case 'analytics-manager':
-        return <ModulePlaceholder title="Analytics Manager" />;
+        return <Navigate to="/super-admin-system/role-switch?role=aira" replace />;
       case 'notification-manager':
         return <ModulePlaceholder title="Notification Manager" />;
 
       // ─── Configuration ───
       case 'system-settings':
-        return <ModulePlaceholder title="System Settings" />;
+        return <Navigate to="/super-admin/system-settings" replace />;
 
       // ─── Legacy aliases ───
       case 'live-activity':
