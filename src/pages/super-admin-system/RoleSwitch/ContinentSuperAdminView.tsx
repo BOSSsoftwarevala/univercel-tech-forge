@@ -822,8 +822,16 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     return renderRegistryView();
   }
 
-  // Default: Show the Meta Business Manager clone dashboard
-  return <MetaContinentDashboard />;
+  // Default: Show the Global Command Center with 7D World Map
+  return (
+    <GlobalCommandCenter
+      onSelectContinent={(continentId) => {
+        if (continentId !== "antarctica") {
+          setShowContinentDashboard(continentId);
+        }
+      }}
+    />
+  );
 };
 
 export default ContinentSuperAdminView;
