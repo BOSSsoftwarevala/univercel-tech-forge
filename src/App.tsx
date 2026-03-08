@@ -572,6 +572,7 @@ const App = memo(() => (
                               <Route path="language" element={<AIRALanguageIntelligence />} />
                               <Route path="sales" element={<AIRASalesIntelligence />} />
                               <Route path="ai-providers" element={<AIRAProviders />} />
+                              <Route path="tool-stack" element={<AIRAToolStack />} />
                               <Route path="project-scanner" element={<AIRAProjectScanner />} />
                               <Route path="task-engine" element={<AIRATaskEngine />} />
                               <Route path="decision-engine" element={<AICEODecisionEngine />} />
