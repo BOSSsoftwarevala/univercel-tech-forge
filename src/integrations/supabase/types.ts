@@ -10367,6 +10367,47 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string
+          id: string
+          lead_id: string
+          metadata: Json | null
+          performed_by: string | null
+          performed_by_role: string | null
+        }
+        Insert: {
+          activity_type?: string
+          created_at?: string
+          description: string
+          id?: string
+          lead_id: string
+          metadata?: Json | null
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          lead_id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -10729,6 +10770,45 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_integrations: {
+        Row: {
+          config: Json | null
+          created_at: string
+          id: string
+          integration_type: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          name: string
+          status: string
+          sync_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          integration_type: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name: string
+          status?: string
+          sync_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          integration_type?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name?: string
+          status?: string
+          sync_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lead_logs: {
         Row: {
           action: string
@@ -10779,6 +10859,51 @@ export type Database = {
           },
         ]
       }
+      lead_routing_rules: {
+        Row: {
+          assigned_to_pool: string[] | null
+          conditions: Json | null
+          created_at: string
+          description: string | null
+          execution_count: number | null
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          name: string
+          priority: number | null
+          rule_type: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to_pool?: string[] | null
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          execution_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name: string
+          priority?: number | null
+          rule_type?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to_pool?: string[] | null
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          execution_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name?: string
+          priority?: number | null
+          rule_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lead_scores: {
         Row: {
           confidence: number | null
@@ -10819,6 +10944,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lead_settings: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_enabled: boolean | null
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       lead_sources: {
         Row: {

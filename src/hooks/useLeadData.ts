@@ -1,6 +1,7 @@
 /**
  * LEAD DATA HOOK - Enterprise Lead Manager
- * Connects to leads, lead_assignments, lead_conversions, lead_alerts tables
+ * Connects to leads, lead_assignments, lead_conversions, lead_alerts,
+ * lead_activities, lead_routing_rules, lead_settings, lead_integrations
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -197,6 +198,139 @@ export const useLeadPipeline = () => {
       });
 
       return stages;
+    },
+  });
+};
+
+// ─── Lead Activities ───
+export const useLeadActivities = (leadId?: string) => {
+  return useQuery({
+    queryKey: ['lead-activities', leadId],
+    queryFn: async () => {
+      let query = supabase.from('lead_activities').select('*').order('created_at', { ascending: false }).limit(50);
+      if (leadId) query = query.eq('lead_id', leadId);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+};
+
+export const useCreateLeadActivity = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (activity: { lead_id: string; activity_type: string; description: string; performed_by?: string; performed_by_role?: string }) => {
+      const { data, error } = await supabase.from('lead_activities').insert(activity).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['lead-activities'] });
+    },
+  });
+};
+
+// ─── Lead Routing Rules ───
+export const useLeadRoutingRules = () => {
+  return useQuery({
+    queryKey: ['lead-routing-rules'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lead_routing_rules').select('*').order('priority', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+};
+
+export const useUpdateRoutingRule = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, any> }) => {
+      const { data, error } = await supabase.from('lead_routing_rules').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['lead-routing-rules'] });
+      toast.success('Routing rule updated');
+    },
+  });
+};
+
+// ─── Lead Settings ───
+export const useLeadSettings = () => {
+  return useQuery({
+    queryKey: ['lead-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lead_settings').select('*').order('category');
+      if (error) throw error;
+      return data || [];
+    },
+  });
+};
+
+export const useUpdateLeadSetting = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, any> }) => {
+      const { data, error } = await supabase.from('lead_settings').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['lead-settings'] });
+      toast.success('Setting updated');
+    },
+  });
+};
+
+// ─── Lead Integrations ───
+export const useLeadIntegrations = () => {
+  return useQuery({
+    queryKey: ['lead-integrations'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lead_integrations').select('*').order('name');
+      if (error) throw error;
+      return data || [];
+    },
+  });
+};
+
+export const useUpdateLeadIntegration = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, any> }) => {
+      const { data, error } = await supabase.from('lead_integrations').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['lead-integrations'] });
+      toast.success('Integration updated');
+    },
+  });
+};
+
+// ─── Lead Logs (Audit) ───
+export const useLeadLogs = () => {
+  return useQuery({
+    queryKey: ['lead-logs'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lead_logs').select('*').order('created_at', { ascending: false }).limit(50);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+};
+
+// ─── Lead Escalations ───
+export const useLeadEscalations = () => {
+  return useQuery({
+    queryKey: ['lead-escalations'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lead_escalations').select('*').order('created_at', { ascending: false }).limit(20);
+      if (error) throw error;
+      return data || [];
     },
   });
 };
