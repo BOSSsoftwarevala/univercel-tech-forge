@@ -97,9 +97,61 @@ const SoftwareCatalogManager = () => {
   
   // Import state
   const [isImporting, setIsImporting] = useState(false);
+  const [isGitHubImporting, setIsGitHubImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [importStats, setImportStats] = useState<ImportStats | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const importFromGitHub = async () => {
+    setIsGitHubImporting(true);
+    setImportProgress(10);
+    
+    try {
+      toast({
+        title: "GitHub Import Started",
+        description: "Fetching all repositories and categorizing...",
+      });
+
+      setImportProgress(30);
+
+      const { data, error } = await supabase.functions.invoke('import-github-repos');
+
+      setImportProgress(90);
+
+      if (error) throw error;
+
+      if (data.success) {
+        setImportStats({
+          total: data.total_repos,
+          imported: data.imported,
+          failed: data.failed,
+          categories: data.categories,
+        });
+        toast({
+          title: "GitHub Import Complete ✅",
+          description: `${data.imported} products imported from ${data.total_repos} repos (${data.skipped_duplicates} duplicates skipped)`,
+        });
+        fetchCatalog();
+        fetchTotalCount();
+        fetchTypeStats();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      console.error('GitHub import error:', error);
+      toast({
+        title: "GitHub Import Failed",
+        description: error.message || "Failed to import from GitHub",
+        variant: "destructive"
+      });
+    } finally {
+      setImportProgress(100);
+      setTimeout(() => {
+        setIsGitHubImporting(false);
+        setImportProgress(0);
+      }, 1500);
+    }
+  };
 
   // Pagination
   const [page, setPage] = useState(0);
