@@ -371,7 +371,17 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     "csa-north-america": "north_america",
     "csa-south-america": "south_america",
     "csa-australia": "oceania",
-    "csa-antarctica": "antarctica"
+    "csa-middle-east": "middle_east"
+  };
+
+  const continentNameMap: Record<string, string> = {
+    "asia": "Asia",
+    "africa": "Africa",
+    "europe": "Europe",
+    "north_america": "North America",
+    "south_america": "South America",
+    "oceania": "Australia / Oceania",
+    "middle_east": "Middle East"
   };
 
   // Handle sub-item selection from sidebar - always update when selectedSubItem changes
