@@ -209,7 +209,10 @@ const PMEnterpriseLayout: React.FC<PMEnterpriseLayoutProps> = ({ viewOnly = fals
     }
     
     // Security & License
-    if (['license-lock', 'domain-lock', 'api-key-binding', 'expiry-control', 'abuse-protection'].includes(activeSection)) {
+    if (activeSection === 'domain-lock') {
+      return <PMClientDomains />;
+    }
+    if (['license-lock', 'api-key-binding', 'expiry-control', 'abuse-protection'].includes(activeSection)) {
       return <PMSecurityLicense securityType={activeSection} />;
     }
     
