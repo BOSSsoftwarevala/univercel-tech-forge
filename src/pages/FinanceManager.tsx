@@ -129,10 +129,26 @@ const FinanceManager = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex w-full">
+    <div className="h-screen flex w-full overflow-hidden" style={{ background: '#f0f3f5', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <FinanceSidebar activeView={activeView} onViewChange={handleViewChange} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* QuickBooks-style top bar */}
+        <header className="h-[52px] bg-[#0d333f] flex items-center justify-between px-6 flex-shrink-0">
+          <div className="flex items-center gap-4">
+            <h1 className="text-[15px] font-semibold text-white">Finance Manager</h1>
+            <span className="text-[12px] text-white/50">·</span>
+            <span className="text-[13px] text-white/70">
+              {activeView.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="px-3 py-1.5 rounded-full bg-[#2ca01c] text-white text-[12px] font-medium hover:bg-[#249317] transition-colors">
+              + New Transaction
+            </button>
+          </div>
+        </header>
+
         <main className="flex-1 p-6 overflow-auto">
           {renderContent()}
         </main>

@@ -404,46 +404,36 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
   };
 
   return (
-    <aside className="w-72 flex flex-col h-screen sticky top-0 left-0 z-40" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1b2a 100%)', borderRight: '1px solid #1e3a5f' }}>
-      {/* Back Button */}
-      <div className="p-2 flex-shrink-0" style={{ borderBottom: '1px solid #1e3a5f' }}>
-        <motion.button
-          onClick={handleBack}
-          whileHover={{ x: -2 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all"
-          style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>← Back to Control Panel</span>
-        </motion.button>
-      </div>
-      
-      {/* Logo */}
-      <div className="p-4 flex-shrink-0 flex justify-center" style={{ borderBottom: '1px solid #1e3a5f' }}>
-        <img 
-          src={softwareValaLogo} 
-          alt="Software Vala Logo" 
-          className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30"
-        />
+    <aside className="w-[260px] flex flex-col h-screen sticky top-0 left-0 z-40 bg-white border-r border-[#d4d7dc]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+      {/* QuickBooks Logo Header */}
+      <div className="px-5 py-4 flex-shrink-0 border-b border-[#d4d7dc]">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#2ca01c] flex items-center justify-center">
+            <DollarSign className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-[14px] font-bold text-[#0d333f]">Software Vala</p>
+            <p className="text-[11px] text-[#6b7280]">Finance Manager</p>
+          </div>
+        </div>
       </div>
 
       {/* User Info */}
-      <div className="p-3 flex-shrink-0" style={{ borderBottom: '1px solid #1e3a5f' }}>
-        <div className="rounded-lg p-2" style={{ background: 'rgba(30, 58, 95, 0.3)' }}>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium truncate" style={{ color: '#ffffff' }}>{userName}</span>
-            <Badge variant="outline" className="text-[9px] px-1.5" style={{ borderColor: '#1e3a5f', color: 'rgba(255, 255, 255, 0.7)' }}>
-              FINANCE
-            </Badge>
+      <div className="px-4 py-3 flex-shrink-0 border-b border-[#e5e7eb]">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#2ca01c]/10 flex items-center justify-center text-[12px] font-bold text-[#2ca01c]">
+            {userName.charAt(0).toUpperCase()}
           </div>
-          <span className="text-[10px] font-mono" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{maskedId}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-medium text-[#0d333f] truncate">{userName}</p>
+            <p className="text-[10px] text-[#6b7280] font-mono">{maskedId}</p>
+          </div>
         </div>
       </div>
 
       {/* Finance Modules Navigation - Scrollable */}
       <ScrollArea className="flex-1">
-        <nav className="p-2 space-y-0.5">
+        <nav className="py-2 px-2">
           {financeSections.map((section) => {
             const isExpanded = expandedSections.includes(section.id);
             const hasActiveItem = section.items.some(item => item.id === activeView);
@@ -452,25 +442,25 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
             return (
               <div key={section.id} className="mb-0.5">
                 {/* Section Header */}
-                <motion.button
+                <button
                   onClick={() => toggleSection(section.id)}
-                  whileHover={{ x: 1 }}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all"
-                  style={{
-                    background: hasActiveItem ? 'rgba(37, 99, 235, 0.15)' : 'transparent',
-                    color: hasActiveItem ? '#60a5fa' : 'rgba(255, 255, 255, 0.8)',
-                  }}
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 rounded-md text-[12px] font-semibold transition-all",
+                    hasActiveItem 
+                      ? "bg-[#e8f5e3] text-[#2ca01c]" 
+                      : "text-[#393a3d] hover:bg-[#f3f4f6]"
+                  )}
                 >
-                  <div className="flex items-center gap-2">
-                    <SectionIcon className="w-4 h-4" style={{ color: hasActiveItem ? '#60a5fa' : 'rgba(255, 255, 255, 0.6)' }} />
+                  <div className="flex items-center gap-2.5">
+                    <SectionIcon className={cn("w-[16px] h-[16px]", hasActiveItem ? "text-[#2ca01c]" : "text-[#6b7280]")} />
                     <span>{section.label}</span>
                   </div>
                   {isExpanded ? (
-                    <ChevronDown className="w-3.5 h-3.5" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                    <ChevronDown className="w-3.5 h-3.5 text-[#9ca3af]" />
                   ) : (
-                    <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                    <ChevronRight className="w-3.5 h-3.5 text-[#9ca3af]" />
                   )}
-                </motion.button>
+                </button>
                 
                 {/* Section Items */}
                 <AnimatePresence>
@@ -479,29 +469,28 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ duration: 0.15 }}
                       className="overflow-hidden"
                     >
-                      <div className="ml-4 pl-2 border-l border-slate-700/50 space-y-0.5 py-1">
+                      <div className="ml-5 pl-3 border-l-2 border-[#e5e7eb] space-y-0.5 py-1">
                         {section.items.map((item) => {
                           const isActive = activeView === item.id;
                           const ItemIcon = item.icon;
                           
                           return (
-                            <motion.button
+                            <button
                               key={item.id}
                               onClick={() => onViewChange(item.id)}
-                              whileHover={{ x: 2 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[11px] transition-all"
-                              style={{
-                                background: isActive ? '#2563eb' : 'transparent',
-                                color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.65)',
-                              }}
+                              className={cn(
+                                "w-full flex items-center gap-2 px-2.5 py-[7px] rounded-md text-[11px] transition-all",
+                                isActive 
+                                  ? "bg-[#2ca01c] text-white font-medium" 
+                                  : "text-[#4b5563] hover:bg-[#f3f4f6] hover:text-[#0d333f]"
+                              )}
                             >
-                              <ItemIcon className="w-3.5 h-3.5" style={{ color: isActive ? '#ffffff' : '#60a5fa' }} />
+                              <ItemIcon className={cn("w-3.5 h-3.5 flex-shrink-0", isActive ? "text-white" : "text-[#2ca01c]")} />
                               <span className="truncate">{item.label}</span>
-                            </motion.button>
+                            </button>
                           );
                         })}
                       </div>
@@ -514,18 +503,16 @@ const FinanceSidebar = ({ activeView, onViewChange, onBack }: FinanceSidebarProp
         </nav>
       </ScrollArea>
 
-      {/* Gateway Status */}
-      <div className="p-3 flex-shrink-0" style={{ borderTop: '1px solid #1e3a5f' }}>
-        <div className="rounded-lg p-2" style={{ background: 'rgba(30, 58, 95, 0.3)' }}>
-          <p className="text-[10px] font-medium mb-1.5" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Payment Gateways</p>
-          <div className="grid grid-cols-2 gap-1">
-            {['UPI', 'Stripe', 'PayPal', 'Bank'].map((gateway) => (
-              <div key={gateway} className="flex items-center gap-1 text-[9px]">
-                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{gateway}</span>
-              </div>
-            ))}
-          </div>
+      {/* Gateway Status — QuickBooks style */}
+      <div className="px-4 py-3 flex-shrink-0 border-t border-[#e5e7eb]">
+        <p className="text-[10px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Payment Gateways</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {['UPI', 'Stripe', 'PayPal', 'Bank'].map((gateway) => (
+            <div key={gateway} className="flex items-center gap-1.5 text-[10px] text-[#4b5563]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2ca01c]" />
+              <span>{gateway}</span>
+            </div>
+          ))}
         </div>
       </div>
     </aside>
