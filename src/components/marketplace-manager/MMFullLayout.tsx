@@ -80,6 +80,7 @@ export function MMFullLayout() {
     <div className="flex h-screen bg-slate-950 text-white">
       <MMFullSidebar activeScreen={activeScreen} onScreenChange={handleScreenChange} />
       <main className="flex-1 overflow-auto">{renderScreen()}</main>
+      <AIRAClientChat conversationType="general" />
     </div>
   );
 }
