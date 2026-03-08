@@ -231,11 +231,32 @@ const menuSections: MenuItem[] = [
       { id: "ui-integrity-check", label: "UI Integrity Check", icon: Monitor },
     ],
   },
-  // 🔟 Marketplace Sync
+  // 🔟 Marketplace Operations (Full)
+  {
+    id: "marketplace-ops",
+    label: "Marketplace Operations",
+    icon: Store,
+    badge: "LIVE",
+    subItems: [
+      { id: "mp-product-listing", label: "Product Listing", icon: LayoutList },
+      { id: "mp-categories", label: "Categories Manager", icon: Tags },
+      { id: "mp-pricing", label: "Pricing & Plans", icon: DollarSign },
+      { id: "mp-orders", label: "Orders & Transactions", icon: ShoppingBag },
+      { id: "mp-wallet", label: "Wallet & Payments", icon: Wallet },
+      { id: "mp-licenses", label: "License Manager", icon: KeySquare },
+      { id: "mp-reviews", label: "Reviews & Ratings", icon: Star },
+      { id: "mp-analytics", label: "Sales Analytics", icon: BarChart2 },
+      { id: "mp-featured", label: "Featured Products", icon: TrendingUp },
+      { id: "mp-discounts", label: "Discounts & Coupons", icon: Percent },
+      { id: "mp-support", label: "Customer Support", icon: HeadphonesIcon },
+      { id: "mp-import", label: "Bulk Import / Export", icon: Upload },
+    ],
+  },
+  // Marketplace Sync (existing)
   {
     id: "marketplace-sync",
     label: "Marketplace Sync",
-    icon: Store,
+    icon: RefreshCw,
     subItems: [
       { id: "demo-visible-marketplace", label: "Visible on Marketplace", icon: Eye },
       { id: "hide-show-demo", label: "Hide / Show Demo", icon: EyeOff },
