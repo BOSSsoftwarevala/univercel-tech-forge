@@ -545,7 +545,7 @@ async function checkCompliance(supabase: any, serverId: string) {
     .eq('id', serverId)
     .single();
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     return {
       compliant: true,
       status: 'review_required',
