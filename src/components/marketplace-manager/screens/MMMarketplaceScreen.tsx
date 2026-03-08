@@ -31,6 +31,7 @@ interface Product {
   repo_language?: string | null;
   demo_build_status?: string | null;
   last_repo_sync_at?: string | null;
+  listing_status?: string | null;
 }
 
 type PartnerRequestType =
