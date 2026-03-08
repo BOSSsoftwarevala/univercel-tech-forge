@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Plus, Server, Activity, Shield, 
   Database, FileText, Brain, Settings, ArrowLeft,
   Globe, Cpu, AlertTriangle, Wrench, Search,
-  Lock, Code, Rocket, Eye
+  Lock, Code, Rocket, Eye, Store, HardDrive
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
