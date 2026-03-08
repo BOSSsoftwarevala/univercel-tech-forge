@@ -168,7 +168,7 @@ serve(async (req) => {
         ],
         stream: true,
         temperature: 0.7,
-        max_tokens: 16384,
+        max_completion_tokens: 16384,
       }),
     });
 
