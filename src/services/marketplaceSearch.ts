@@ -44,19 +44,17 @@ class MarketplaceSearchService {
       .map(word => `${word}:*`)
       .join(' & ');
 
-    let rpcQuery = supabase.rpc('search_products', {
+    const { data, error } = await (supabase as any).rpc('search_products', {
       search_query: tsQuery,
       result_limit: options?.limit || 50,
     });
-
-    const { data, error } = await rpcQuery;
 
     if (error) {
       console.error('[Search] FTS error, falling back to ILIKE:', error.message);
       return this.fallbackSearch(trimmed, options);
     }
 
-    const results: SearchResult[] = (data || []).map((row: any) => ({
+    const results: SearchResult[] = ((data as any[]) || []).map((row: any) => ({
       product_id: row.product_id,
       product_name: row.product_name,
       description: row.description,
