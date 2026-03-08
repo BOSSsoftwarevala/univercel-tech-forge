@@ -474,7 +474,7 @@ export const MMMarketplaceScreen = () => {
           >
             All
           </button>
-          {CATEGORIES.map((category) => (
+          {dynamicCategories.map((category) => (
             <button
               key={category}
               onClick={() => handleCategoryFilter(selectedCategory === category ? null : category)}
