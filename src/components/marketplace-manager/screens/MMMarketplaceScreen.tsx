@@ -1014,23 +1014,15 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
 
             <div className="bg-slate-800/50 rounded-lg p-4">
               <h3 className="text-sm font-semibold mb-3">Pricing</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {product.monthly_price && (
-                  <div className="bg-slate-900 rounded-lg p-3 border border-slate-700">
-                    <p className="text-xs text-slate-500">Monthly</p>
-                    <p className="text-slate-500 line-through text-xs">₹{product.monthly_price}</p>
-                    <p className="text-lg font-bold text-cyan-400">₹{discountedPrice(product.monthly_price)}/mo</p>
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-[10px] mt-1">30% Franchise Discount</Badge>
-                  </div>
-                )}
-                {product.lifetime_price && (
-                  <div className="bg-slate-900 rounded-lg p-3 border border-cyan-500/30">
-                    <p className="text-xs text-slate-500">Lifetime</p>
-                    <p className="text-slate-500 line-through text-xs">₹{product.lifetime_price}</p>
-                    <p className="text-lg font-bold text-cyan-400">₹{discountedPrice(product.lifetime_price)}</p>
-                    <Badge className="bg-yellow-500/20 text-yellow-400 border-0 text-[10px] mt-1">Best Value</Badge>
-                  </div>
-                )}
+              <div className="bg-slate-900 rounded-lg p-4 border border-cyan-500/30 text-center">
+                <p className="text-xs text-slate-500 mb-1">All Software — One Price</p>
+                <p className="text-3xl font-bold text-cyan-400">$249</p>
+                <p className="text-xs text-slate-400 mt-1">Lifetime Access • Full Source Code • No Hidden Charges</p>
+                <div className="flex flex-wrap justify-center gap-2 mt-3">
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-[10px]">✅ No Advance</Badge>
+                  <Badge className="bg-cyan-500/20 text-cyan-400 border-0 text-[10px]">✅ Free Updates</Badge>
+                  <Badge className="bg-purple-500/20 text-purple-400 border-0 text-[10px]">✅ 24/7 Support</Badge>
+                </div>
               </div>
             </div>
           </div>
