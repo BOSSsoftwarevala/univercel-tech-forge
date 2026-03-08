@@ -324,7 +324,7 @@ Analyze potential security vulnerabilities and provide in JSON format:
 - complianceIssues: string[]
 - immediateActions: string[]`;
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     const result = {
       riskScore: 30,
       vulnerabilities: [],
