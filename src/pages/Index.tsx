@@ -3596,7 +3596,7 @@ const Index = () => {
       <footer className="bg-[#060d18] border-t border-white/5 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-slate-600 text-sm">© 2024 Software Vala - The Name of Trust</p>
-          <p className="text-slate-700 text-xs mt-1">20 Categories • 147 Software • 20 Live Demos</p>
+          <p className="text-slate-700 text-xs mt-1">50 Categories • {mergedDemos.length}+ Software • $249 Lifetime • Source Code Included</p>
         </div>
       </footer>
     </div>
