@@ -150,7 +150,7 @@ serve(async (req) => {
       ? "https://ai.gateway.lovable.dev/v1/chat/completions"
       : "https://api.openai.com/v1/chat/completions";
     const apiKey = useGateway ? LOVABLE_API_KEY : OPENAI_API_KEY;
-    const model = useGateway ? "openai/gpt-5" : "gpt-4o";
+    const model = useGateway ? "google/gemini-3-flash-preview" : "gpt-4o";
 
     console.log(`VALA AI Ultra: Using ${useGateway ? 'Lovable Gateway (GPT-5)' : 'OpenAI Direct (GPT-4o)'}`);
 
