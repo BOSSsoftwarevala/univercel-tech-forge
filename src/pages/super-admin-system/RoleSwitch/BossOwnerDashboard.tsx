@@ -694,7 +694,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           <div className="p-8 text-center">
             <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-400" />
             <p className="text-sm font-medium" style={{ color: T.text }}>All approvals cleared</p>
-            <p className="text-xs" style={{ color: T.muted }}>No pending reseller, franchise, or influencer applications</p>
+            <p className="text-xs" style={{ color: T.muted }}>No pending reseller, franchise, influencer, or job applications</p>
           </div>
         ) : (
           <div className="p-4 grid grid-cols-3 gap-4">
