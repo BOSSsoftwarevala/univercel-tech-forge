@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { LiveActivityPipeline } from './LiveActivityPipeline';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -590,6 +591,9 @@ const ValaAICommandCenter: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* ===== RIGHT: LIVE ACTIVITY PIPELINE ===== */}
+      <LiveActivityPipeline isActive={isStreaming} />
       {/* ===== PUBLISH TO MARKETPLACE DIALOG ===== */}
       <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
         <DialogContent className="bg-[#111] border-white/10 text-white max-w-md">
