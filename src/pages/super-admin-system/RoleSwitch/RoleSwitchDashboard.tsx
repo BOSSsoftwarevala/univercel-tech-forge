@@ -96,7 +96,6 @@ const BossOwnerDashboard = lazyWithRetry(() => import("./BossOwnerDashboard"));
 const DeveloperManagementDashboard = lazyWithRetry(() => import("./DeveloperManagementDashboard"));
 const FranchiseDashboardEmbed = lazyWithRetry(() => import("@/pages/franchise/Dashboard"));
 const ResellerDashboardEmbed = lazyWithRetry(() => import("@/pages/ResellerDashboard"));
-const BossPanelView = lazyWithRetry(() => import("@/pages/BossPanel"));
 
 // Define which roles can switch to which views
 const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
@@ -426,7 +425,6 @@ const RoleSwitchDashboard = () => {
   
   // Default accent color for timer
   const timerAccentColor = 'text-primary';
-  const shouldUseBossPanel = activeRole === 'boss_owner' && activeNav === 'dashboard' && !selectedSubItem;
 
   if (loading || !initialized) {
     return (
@@ -436,16 +434,6 @@ const RoleSwitchDashboard = () => {
       )}>
         <LoadingSkeleton message="System is preparing this section" />
       </div>
-    );
-  }
-
-  if (shouldUseBossPanel) {
-    return (
-      <ErrorBoundary>
-        <Suspense fallback={<ModuleLoader />}>
-          <BossPanelView />
-        </Suspense>
-      </ErrorBoundary>
     );
   }
 
@@ -567,7 +555,7 @@ const RoleSwitchDashboard = () => {
       <header className={cn(
         "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
         "bg-gradient-to-r from-[#0a1628] via-[#0d1b2a] to-[#0a1628] border-[#1e3a5f]",
-        isInControlPanelView && !isInModuleView && "ml-[320px]"
+        shouldShowGlobalSidebar && "ml-[320px]"
       )}>
         <div className="flex items-center gap-4">
           {(!isInControlPanelView || isInModuleView) && (
@@ -629,7 +617,7 @@ const RoleSwitchDashboard = () => {
         {/* MAIN CONTENT */}
         <main className={cn(
           "flex-1 overflow-auto transition-all duration-300",
-          shouldShowGlobalSidebar && !collapsed && "ml-0"
+          shouldShowGlobalSidebar && "ml-[320px]"
         )}>
           <ErrorBoundary>
             {renderRoleView()}
