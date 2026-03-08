@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  LayoutDashboard, Activity, Network, Users, Shield, Boxes,
-  Package, DollarSign, FileSearch, Lock, Settings, ChevronDown,
-  ChevronRight, Code2, Server, Brain, Store, ChevronLeft,
-  ChevronLeftCircle, Zap, BarChart3, AlertTriangle, FileText,
-  Bell, TrendingUp
+  LayoutDashboard, Activity, Users, Shield, Boxes, Package,
+  DollarSign, FileSearch, Lock, Settings, ChevronDown, ChevronLeft,
+  Server, Brain, Store, Zap, BarChart3, FileText, Bell,
+  TrendingUp, Network, Briefcase, Globe, MapPin, Scale,
+  UserCircle, Megaphone, Search, HeartHandshake, ShoppingCart,
+  Key, Rocket, LineChart, Link2, ScrollText, UserCog,
+  Code2, Monitor, Target, Headphones, Cpu
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BossPanelSection } from './BossPanelLayout';
@@ -17,7 +19,6 @@ interface BossPanelSidebarProps {
   onCollapsedChange: (collapsed: boolean) => void;
 }
 
-// ─── ENTERPRISE DARK SIDEBAR TOKENS ──────────────────────────
 const NAV = {
   bg:         'hsl(222, 47%, 8%)',
   border:     'hsla(215, 28%, 30%, 0.3)',
@@ -42,56 +43,90 @@ interface MenuGroup {
 
 const menuGroups: MenuGroup[] = [
   {
-    label: 'Overview',
+    label: 'Command Center',
     items: [
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'live-activity', label: 'Live Activity', icon: Activity, status: 'live' },
+      { id: 'dashboard', label: 'Boss Panel', icon: LayoutDashboard, status: 'live' },
+      { id: 'ceo-dashboard', label: 'CEO Dashboard', icon: Monitor },
+      { id: 'vala-ai', label: 'Vala AI', icon: Brain, status: 'live' },
     ],
   },
   {
-    label: 'Organization',
+    label: 'Infrastructure',
     items: [
-      { id: 'hierarchy', label: 'Hierarchy Control', icon: Network },
-      { id: 'super-admins', label: 'Super Admins', icon: Users },
-      { id: 'roles', label: 'Roles & Permissions', icon: Shield },
+      { id: 'server-manager', label: 'Server Manager', icon: Server },
+      { id: 'ai-api-manager', label: 'AI API Manager', icon: Cpu },
+      { id: 'deployment-manager', label: 'Deployment Manager', icon: Rocket },
+      { id: 'integration-manager', label: 'Integration Manager', icon: Link2 },
     ],
   },
   {
-    label: 'Operations',
+    label: 'Development',
     items: [
-      { id: 'modules', label: 'System Modules', icon: Boxes },
-      { id: 'products', label: 'Product & Demo', icon: Package },
-      { id: 'marketplace-manager', label: 'Marketplace', icon: Store },
-      { id: 'server-hosting', label: 'CodeLab Cloud', icon: Server },
+      { id: 'dev-manager', label: 'Development Manager', icon: Code2 },
+      { id: 'product-manager', label: 'Product Manager', icon: Package },
+      { id: 'demo-manager', label: 'Demo Manager', icon: Activity },
+      { id: 'demo-system-manager', label: 'Demo System Manager', icon: Boxes },
+      { id: 'task-manager', label: 'Task Manager', icon: FileText },
+      { id: 'promise-tracker', label: 'Promise Tracker', icon: HeartHandshake },
     ],
   },
   {
-    label: 'Intelligence',
+    label: 'Business & Sales',
     items: [
-      { id: 'vala-ai', label: 'VALA AI', icon: Brain },
-      { id: 'aira', label: 'AIRA', icon: Zap },
-      { id: 'codepilot', label: 'CodePilot', icon: Code2 },
+      { id: 'marketplace-manager', label: 'Marketplace Manager', icon: Store },
+      { id: 'marketplace-user-system', label: 'Marketplace User System', icon: ShoppingCart },
+      { id: 'license-manager', label: 'License Manager', icon: Key },
+      { id: 'lead-manager', label: 'Lead Manager', icon: Target },
+      { id: 'sales-manager', label: 'Sales Manager', icon: TrendingUp },
+      { id: 'asset-manager', label: 'Asset Manager', icon: Briefcase },
     ],
   },
   {
-    label: 'Distribution',
+    label: 'Marketing & Growth',
     items: [
-      { id: 'reseller-dashboard', label: 'Reseller Network', icon: TrendingUp },
-      { id: 'franchise-dashboard', label: 'Franchise Ops', icon: Network },
+      { id: 'marketing-manager', label: 'Marketing Manager', icon: Megaphone },
+      { id: 'seo-manager', label: 'SEO Manager', icon: Search },
+      { id: 'influencer-manager', label: 'Influencer Manager', icon: Zap },
     ],
   },
   {
-    label: 'Finance & Security',
+    label: 'Distribution Network',
     items: [
-      { id: 'revenue', label: 'Revenue Snapshot', icon: DollarSign },
-      { id: 'audit', label: 'Audit & Blackbox', icon: FileSearch },
-      { id: 'security', label: 'Security & Legal', icon: Lock },
+      { id: 'franchise-manager', label: 'Franchise Manager', icon: Network },
+      { id: 'reseller-manager', label: 'Reseller Manager', icon: TrendingUp },
+      { id: 'continent-admin', label: 'Continent Admin', icon: Globe },
+      { id: 'country-admin', label: 'Country Admin', icon: MapPin },
+    ],
+  },
+  {
+    label: 'People & Support',
+    items: [
+      { id: 'customer-support', label: 'Customer Support', icon: Headphones },
+      { id: 'developer-dashboard', label: 'Developer Dashboard', icon: Code2 },
+      { id: 'pro-manager', label: 'Pro Manager', icon: UserCog },
+      { id: 'user-dashboard', label: 'User Dashboard', icon: UserCircle },
+    ],
+  },
+  {
+    label: 'Finance & Legal',
+    items: [
+      { id: 'finance-manager', label: 'Finance Manager', icon: DollarSign },
+      { id: 'legal-manager', label: 'Legal Manager', icon: Scale },
+    ],
+  },
+  {
+    label: 'Security & Audit',
+    items: [
+      { id: 'security-manager', label: 'Security Manager', icon: Shield },
+      { id: 'audit-logs-manager', label: 'Audit Logs Manager', icon: ScrollText },
+      { id: 'analytics-manager', label: 'Analytics Manager', icon: LineChart },
+      { id: 'notification-manager', label: 'Notification Manager', icon: Bell },
     ],
   },
   {
     label: 'Configuration',
     items: [
-      { id: 'settings', label: 'Settings', icon: Settings },
+      { id: 'system-settings', label: 'System Settings', icon: Settings },
     ],
   },
 ];
@@ -101,7 +136,7 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
     const activeGroup = menuGroups.find(g => g.items.some(i => i.id === activeSection));
     const initial = new Set<string>();
     if (activeGroup) initial.add(activeGroup.label);
-    initial.add('Overview');
+    initial.add('Command Center');
     return initial;
   });
 
@@ -126,7 +161,7 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
       }}
     >
       {/* Collapse toggle */}
-      <div className="flex items-center justify-end px-2 py-2" style={{ borderBottom: `1px solid ${NAV.border}` }}>
+      <div className="flex items-center justify-end px-2 py-1.5" style={{ borderBottom: `1px solid ${NAV.border}` }}>
         <button
           onClick={() => onCollapsedChange(!collapsed)}
           className="w-7 h-7 rounded-md flex items-center justify-center transition-all"
@@ -139,14 +174,13 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-2" style={{ scrollbarWidth: 'thin', scrollbarColor: `${NAV.border} transparent` }}>
+      <nav className="flex-1 overflow-y-auto py-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${NAV.border} transparent` }}>
         {menuGroups.map((group) => {
           const isExpanded = expandedGroups.has(group.label);
-          const hasActive = group.items.some(i => i.id === activeSection);
 
           if (collapsed) {
             return (
-              <div key={group.label} className="px-1.5 mb-1">
+              <div key={group.label} className="px-1.5 mb-0.5">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeSection === item.id;
@@ -155,7 +189,7 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                       key={item.id}
                       onClick={() => onSectionChange(item.id)}
                       title={item.label}
-                      className="relative w-full flex items-center justify-center py-2.5 rounded-lg mb-0.5 transition-all duration-200"
+                      className="relative w-full flex items-center justify-center py-2 rounded-md mb-px transition-all duration-200"
                       style={{
                         background: isActive ? NAV.activeBg : 'transparent',
                         borderLeft: isActive ? `3px solid ${NAV.activeBar}` : '3px solid transparent',
@@ -163,9 +197,9 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                       onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = NAV.hoverBg; }}
                       onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = isActive ? NAV.activeBg : 'transparent'; }}
                     >
-                      <Icon className="w-4 h-4" style={{ color: isActive ? NAV.textActive : NAV.iconDim }} />
+                      <Icon className="w-3.5 h-3.5" style={{ color: isActive ? NAV.textActive : NAV.iconDim }} />
                       {item.status === 'live' && (
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full animate-pulse" style={{ background: NAV.green }} />
+                        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: NAV.green }} />
                       )}
                     </button>
                   );
@@ -175,29 +209,27 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
           }
 
           return (
-            <div key={group.label} className="mb-1">
-              {/* Group Header */}
+            <div key={group.label} className="mb-0.5">
               <button
                 onClick={() => toggleGroup(group.label)}
-                className="w-full flex items-center justify-between px-4 py-2 text-[10px] font-bold uppercase tracking-[0.12em] transition-colors"
+                className="w-full flex items-center justify-between px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors"
                 style={{ color: NAV.groupLabel }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = NAV.textHover)}
                 onMouseLeave={(e) => (e.currentTarget.style.color = NAV.groupLabel)}
               >
                 <span>{group.label}</span>
-                <motion.div animate={{ rotate: isExpanded ? 0 : -90 }} transition={{ duration: 0.2 }}>
+                <motion.div animate={{ rotate: isExpanded ? 0 : -90 }} transition={{ duration: 0.15 }}>
                   <ChevronDown className="w-3 h-3" />
                 </motion.div>
               </button>
 
-              {/* Group Items */}
               <AnimatePresence initial={false}>
                 {isExpanded && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    transition={{ duration: 0.15, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
                     {group.items.map((item) => {
@@ -207,7 +239,7 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                         <button
                           key={item.id}
                           onClick={() => onSectionChange(item.id)}
-                          className="w-full flex items-center gap-3 pl-5 pr-3 py-2 text-[13px] transition-all duration-200 relative"
+                          className="w-full flex items-center gap-2.5 pl-5 pr-3 py-[6px] text-[12px] transition-all duration-150 relative"
                           style={{
                             background: isActive ? NAV.activeBg : 'transparent',
                             color: isActive ? NAV.textActive : NAV.text,
@@ -227,17 +259,17 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
                             }
                           }}
                         >
-                          <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? NAV.textActive : NAV.iconDim }} />
+                          <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: isActive ? NAV.textActive : NAV.iconDim }} />
                           <span className="truncate">{item.label}</span>
                           {item.status === 'live' && (
-                            <span className="ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold"
+                            <span className="ml-auto flex items-center gap-1 px-1.5 py-px rounded text-[8px] font-bold"
                               style={{ background: NAV.greenBg, color: NAV.green }}>
                               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: NAV.green }} />
                               LIVE
                             </span>
                           )}
                           {item.badge !== undefined && item.badge > 0 && (
-                            <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                            <span className="ml-auto text-[9px] font-bold px-1.5 py-px rounded-full"
                               style={{ background: NAV.badgeBg, color: NAV.badge }}>{item.badge}</span>
                           )}
                         </button>
@@ -253,10 +285,10 @@ export function BossPanelSidebar({ activeSection, onSectionChange, collapsed, on
 
       {/* Footer */}
       {!collapsed && (
-        <div className="px-4 py-3" style={{ borderTop: `1px solid ${NAV.border}` }}>
+        <div className="px-4 py-2" style={{ borderTop: `1px solid ${NAV.border}` }}>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: NAV.green }} />
-            <p className="text-[10px] font-bold uppercase tracking-[0.1em]" style={{ color: NAV.groupLabel }}>
+            <p className="text-[9px] font-bold uppercase tracking-[0.1em]" style={{ color: NAV.groupLabel }}>
               Software Vala • Enterprise
             </p>
           </div>
