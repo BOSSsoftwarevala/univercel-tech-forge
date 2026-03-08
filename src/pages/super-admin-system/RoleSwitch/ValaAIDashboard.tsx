@@ -471,6 +471,13 @@ export default function GeneratedApp() {
                     {msg.role === 'assistant' && !isGenerating && msg.id !== '1' && (
                       <div className="flex items-center gap-1 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => { navigator.clipboard.writeText(msg.content); toast.success('Copied!'); }} className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><Copy className="w-3.5 h-3.5" /></button>
+                        <button
+                          onClick={() => speakMessage(msg.id, msg.content)}
+                          className="p-1 rounded hover:bg-white/5"
+                          style={{ color: playingMsgId === msg.id ? '#8b5cf6' : C.textDim }}
+                        >
+                          {ttsLoading === msg.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : playingMsgId === msg.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                        </button>
                         <button className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><ThumbsUp className="w-3.5 h-3.5" /></button>
                         <button className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><ThumbsDown className="w-3.5 h-3.5" /></button>
                         <button className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><RefreshCw className="w-3.5 h-3.5" /></button>
