@@ -26,7 +26,7 @@ serve(async (req) => {
       ? "https://ai.gateway.lovable.dev/v1/chat/completions"
       : "https://api.openai.com/v1/chat/completions";
     const apiKey = useGateway ? LOVABLE_API_KEY : OPENAI_API_KEY;
-    const model = useGateway ? "openai/gpt-5-mini" : "gpt-4o";
+    const model = useGateway ? "google/gemini-2.5-flash" : "gpt-4o";
 
     let systemPrompt = "";
     let userPrompt = "";
