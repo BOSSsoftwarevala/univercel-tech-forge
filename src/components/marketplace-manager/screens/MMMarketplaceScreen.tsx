@@ -30,7 +30,9 @@ type PartnerRequestType =
   | 'franchise_request'
   | 'reseller_request'
   | 'developer_request'
-  | 'support_request';
+  | 'support_request'
+  | 'job_apply'
+  | 'enquiry';
 
 const CATEGORIES = [
   'Restaurant', 'Education', 'Healthcare', 'E-commerce', 'Hotel',
@@ -50,6 +52,8 @@ const PARTNER_REQUEST_BUTTONS: { event: PartnerRequestType; label: string }[] = 
   { event: 'reseller_request', label: 'Reseller Request' },
   { event: 'developer_request', label: 'Developer Request' },
   { event: 'support_request', label: 'Support Request' },
+  { event: 'job_apply', label: 'Job Apply' },
+  { event: 'enquiry', label: 'Enquiry' },
 ];
 
 export const MMMarketplaceScreen = () => {
@@ -126,16 +130,29 @@ export const MMMarketplaceScreen = () => {
       metadata?: Record<string, unknown>;
     }
   ) => {
-    try {
-      const actorId = user?.id ?? null;
-      const eventMetadata = {
-        module: 'marketplace',
-        product_name: product?.product_name,
-        category: product?.category,
-        timestamp: new Date().toISOString(),
-        ...(options?.metadata || {}),
-      };
+    const actorId = user?.id ?? null;
+    const eventMetadata = {
+      module: 'marketplace',
+      product_name: product?.product_name,
+      category: product?.category,
+      timestamp: new Date().toISOString(),
+      ...(options?.metadata || {}),
+    };
 
+    // 1. Always queue to system_events for Boss Panel visibility
+    try {
+      await createSystemRequest({
+        action_type: eventType,
+        role_type: userRole || 'public',
+        payload_json: eventMetadata,
+        user_id: actorId,
+      });
+    } catch (err) {
+      console.error('[Marketplace] System event failed:', err);
+    }
+
+    // 2. Also log to activity_log for historical audit trail
+    try {
       await supabase.from('activity_log').insert({
         action_type: eventType,
         entity_type: product ? 'product' : 'marketplace',
@@ -145,17 +162,8 @@ export const MMMarketplaceScreen = () => {
         severity_level: options?.severity || 'info',
         metadata: eventMetadata,
       });
-
-      if (options?.queueForBoss) {
-        await createSystemRequest({
-          action_type: eventType,
-          role_type: userRole || 'client',
-          payload_json: eventMetadata,
-          user_id: actorId,
-        });
-      }
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('[Marketplace] Activity log failed:', err);
     }
   };
 
@@ -201,14 +209,21 @@ export const MMMarketplaceScreen = () => {
   };
 
   const handleDemo = (product: Product) => {
-    void logEvent('demo_click', product);
+    void logEvent('demo_request', product, {
+      severity: 'info',
+      metadata: { stage: 'demo_requested' },
+    });
     toast.info(`Loading demo for ${product.product_name}...`);
   };
 
   const handleBuy = (product: Product) => {
-    void logEvent('purchase_click', product, {
-      queueForBoss: true,
-      metadata: { stage: 'purchase_initiated' },
+    void logEvent('purchase_request', product, {
+      severity: 'warning',
+      metadata: {
+        stage: 'purchase_initiated',
+        price: product.monthly_price,
+        discounted_price: product.monthly_price ? Math.round(product.monthly_price * 0.7) : null,
+      },
     });
     toast.success(`Order initiated for ${product.product_name}`);
   };
@@ -221,14 +236,13 @@ export const MMMarketplaceScreen = () => {
 
   const handlePartnerRequest = (requestType: PartnerRequestType, label: string) => {
     void logEvent(requestType, undefined, {
-      queueForBoss: true,
       severity: 'warning',
       metadata: {
         request_label: label,
       },
     });
 
-    toast.success(`${label} submitted`);
+    toast.success(`${label} submitted — Boss has been notified`);
   };
 
   const handleCategoryFilter = (category: string | null) => {
