@@ -91,11 +91,23 @@ export const MMMarketplaceScreen = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
+      // Try software_catalog first (primary product database), fallback to products
+      let result = await supabase
+        .from('software_catalog' as any)
         .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
+
+      if (result.error) {
+        // Fallback to products table
+        result = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+      }
+
+      const { data, error } = result;
 
       if (error) throw error;
       setProducts(data || []);
