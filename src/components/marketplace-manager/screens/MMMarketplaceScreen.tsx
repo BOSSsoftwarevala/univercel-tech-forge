@@ -91,7 +91,6 @@ export const MMMarketplaceScreen = () => {
 
   const fetchProducts = async () => {
     try {
-      // Try software_catalog first (primary product database), fallback to products
       let data: any[] | null = null;
       let fetchError: any = null;
 
@@ -99,10 +98,27 @@ export const MMMarketplaceScreen = () => {
         .from('software_catalog' as any)
         .select('*')
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(1000);
 
-      if (!catalogResult.error && catalogResult.data) {
-        data = catalogResult.data as any[];
+      if (!catalogResult.error && catalogResult.data && catalogResult.data.length > 0) {
+        // Map software_catalog columns to Product interface
+        data = (catalogResult.data as any[]).map((item: any) => ({
+          product_id: item.id || item.product_id,
+          product_name: item.name || item.product_name || 'Unnamed Product',
+          description: item.description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
+          category: item.category,
+          monthly_price: item.base_price ? Number(item.base_price) : null,
+          lifetime_price: item.base_price ? Math.round(Number(item.base_price) * 10) : null,
+          tech_stack: item.tech_stack || item.type || null,
+          product_type: item.type || item.product_type || 'SaaS',
+          features_json: item.features_json || null,
+          is_active: item.is_active ?? true,
+          status: item.status || 'active',
+          created_at: item.created_at,
+          demo_url: item.demo_url || null,
+          demo_id: item.demo_id || null,
+        }));
       } else {
         // Fallback to products table
         const productsResult = await supabase
@@ -234,7 +250,18 @@ export const MMMarketplaceScreen = () => {
       severity: 'info',
       metadata: { stage: 'demo_requested' },
     });
-    toast.info(`Loading demo for ${product.product_name}...`);
+
+    // Check if product has a demo_url
+    const demoUrl = (product as any).demo_url;
+    if (demoUrl) {
+      window.open(demoUrl, '_blank');
+      toast.success(`Opening demo for ${product.product_name}`);
+    } else {
+      // Navigate to demo directory for this category
+      const category = product.category?.toLowerCase().replace(/[^a-z]/g, '-') || 'general';
+      navigate(`/demo-directory?category=${category}&product=${product.product_id}`);
+      toast.info(`Loading demo for ${product.product_name}...`);
+    }
   };
 
   const handleBuy = (product: Product) => {
@@ -246,7 +273,10 @@ export const MMMarketplaceScreen = () => {
         discounted_price: product.monthly_price ? Math.round(product.monthly_price * 0.7) : null,
       },
     });
-    toast.success(`Order initiated for ${product.product_name}`);
+    // Navigate to purchase flow
+    navigate(`/marketplace/product/${product.product_id}`);
+    setSelectedProduct(product);
+    toast.success(`Opening purchase page for ${product.product_name}`);
   };
 
   const handleProductView = (product: Product) => {
