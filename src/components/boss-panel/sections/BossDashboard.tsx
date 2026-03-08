@@ -97,25 +97,35 @@ function KPI({ title, value, trend, trendVal, icon: Icon, gradient, accent }: {
 }) {
   return (
     <motion.div variants={rise}
-      whileHover={{ scale: 1.03, y: -3, boxShadow: `0 16px 48px -8px ${accent}22` }}
-      className="relative group cursor-pointer overflow-hidden rounded-xl"
-      style={{ background: gradient, backdropFilter: 'blur(20px)', border: `1px solid ${T.glassBorder}`, minHeight: '120px' }}>
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: T.glassHighlight }} />
-      <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-3xl opacity-15 group-hover:opacity-30 transition-opacity duration-700"
+      whileHover={{ scale: 1.04, y: -4, boxShadow: `0 20px 60px -12px ${accent}30` }}
+      className="relative group cursor-pointer overflow-hidden rounded-2xl"
+      style={{ 
+        background: gradient, 
+        backdropFilter: 'blur(24px) saturate(1.5)', 
+        border: `1px solid ${T.glassBorder}`, 
+        minHeight: '130px',
+        boxShadow: `0 4px 20px -4px ${accent}15`,
+      }}>
+      {/* Ambient glow overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+        style={{ background: `radial-gradient(circle at 70% 30%, ${accent}12 0%, transparent 60%)` }} />
+      <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"
         style={{ background: accent }} />
       <motion.div variants={float} initial="initial" animate="animate"
-        className="absolute top-3 right-3 w-9 h-9 rounded-lg flex items-center justify-center"
-        style={{ background: `${accent}18`, border: `1px solid ${accent}25` }}>
-        <Icon className="w-4 h-4" style={{ color: accent }} />
+        className="absolute top-3.5 right-3.5 w-10 h-10 rounded-xl flex items-center justify-center"
+        style={{ background: `${accent}15`, border: `1px solid ${accent}22`, boxShadow: `0 0 12px ${accent}15` }}>
+        <Icon className="w-4.5 h-4.5" style={{ color: accent }} />
       </motion.div>
-      <div className="relative z-10 p-4">
-        <span className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: T.muted }}>{title}</span>
-        <p className="text-2xl font-black tabular-nums tracking-tight mt-1.5" style={{ color: T.text }}>{value}</p>
+      <div className="relative z-10 p-5">
+        <span className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: T.muted }}>{title}</span>
+        <p className="text-[28px] font-black tabular-nums tracking-tight mt-2 leading-none" style={{ color: T.text }}>{value}</p>
         {trend && trendVal && (
-          <div className="flex items-center gap-1 mt-1.5">
-            <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full"
-              style={{ background: trend === 'up' ? `${T.green}15` : trend === 'down' ? `${T.red}15` : `${T.dim}15` }}>
+          <div className="flex items-center gap-1 mt-2.5">
+            <div className="flex items-center gap-0.5 px-2 py-0.5 rounded-full"
+              style={{ 
+                background: trend === 'up' ? `${T.green}12` : trend === 'down' ? `${T.red}12` : `${T.dim}12`,
+                border: `1px solid ${trend === 'up' ? `${T.green}20` : trend === 'down' ? `${T.red}20` : `${T.dim}15`}`,
+              }}>
               {trend === 'up' && <TrendingUp className="w-3 h-3" style={{ color: T.green }} />}
               {trend === 'down' && <TrendingDown className="w-3 h-3" style={{ color: T.red }} />}
               <span className="text-[10px] font-bold" style={{ color: trend === 'up' ? T.green : trend === 'down' ? T.red : T.muted }}>

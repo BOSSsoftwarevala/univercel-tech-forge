@@ -87,9 +87,9 @@ const LAYOUT = {
   shellHeight: '48px',
   sidebarWidth: '260px',
   sidebarCollapsed: '56px',
-  pageBg: 'hsl(222, 47%, 7%)',
-  contentBg: 'hsl(222, 47%, 9%)',
-  text: 'hsl(210, 40%, 96%)',
+  pageBg: 'hsl(222, 47%, 6%)',
+  contentBg: 'hsl(222, 47%, 8%)',
+  text: 'hsl(210, 40%, 98%)',
 };
 
 export function BossPanelLayout({ children }: BossPanelLayoutProps) {

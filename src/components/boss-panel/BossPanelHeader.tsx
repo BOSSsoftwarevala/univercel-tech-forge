@@ -131,7 +131,11 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   return (
     <header 
       className="fixed top-0 left-0 right-0 z-50 flex items-center h-12 px-4"
-      style={{ background: S.bg, borderBottom: `1px solid ${S.border}` }}
+      style={{ 
+        background: S.bg, 
+        borderBottom: `1px solid ${S.border}`,
+        boxShadow: '0 4px 20px -4px hsla(222,47%,4%,0.6)',
+      }}
     >
       {/* LEFT: Brand + Breadcrumb */}
       <div className="flex items-center gap-3">

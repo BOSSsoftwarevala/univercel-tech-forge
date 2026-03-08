@@ -20,20 +20,20 @@ interface BossPanelSidebarProps {
 }
 
 const NAV = {
-  bg:         'hsl(222, 47%, 8%)',
-  border:     'hsla(215, 28%, 30%, 0.3)',
-  groupLabel: 'hsl(215, 20%, 50%)',
-  text:       'hsl(210, 20%, 70%)',
-  textActive: 'hsl(217, 91%, 60%)',
-  textHover:  'hsl(210, 40%, 96%)',
-  activeBg:   'hsla(217, 91%, 60%, 0.1)',
-  activeBar:  'hsl(217, 91%, 60%)',
-  hoverBg:    'hsla(215, 100%, 60%, 0.06)',
-  iconDim:    'hsl(215, 20%, 45%)',
-  badge:      'hsl(346, 77%, 49%)',
-  badgeBg:    'hsla(346, 77%, 49%, 0.15)',
-  green:      'hsl(160, 84%, 39%)',
-  greenBg:    'hsla(160, 84%, 39%, 0.12)',
+  bg:         'hsl(222, 47%, 7%)',
+  border:     'hsla(215, 40%, 35%, 0.2)',
+  groupLabel: 'hsl(215, 22%, 50%)',
+  text:       'hsl(210, 22%, 72%)',
+  textActive: 'hsl(217, 92%, 65%)',
+  textHover:  'hsl(210, 40%, 98%)',
+  activeBg:   'hsla(217, 92%, 65%, 0.12)',
+  activeBar:  'hsl(217, 92%, 65%)',
+  hoverBg:    'hsla(217, 92%, 65%, 0.06)',
+  iconDim:    'hsl(215, 20%, 46%)',
+  badge:      'hsl(346, 82%, 55%)',
+  badgeBg:    'hsla(346, 82%, 55%, 0.15)',
+  green:      'hsl(160, 84%, 44%)',
+  greenBg:    'hsla(160, 84%, 44%, 0.12)',
 };
 
 interface MenuGroup {
