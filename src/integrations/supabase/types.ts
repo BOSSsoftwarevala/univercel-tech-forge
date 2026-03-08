@@ -26327,6 +26327,19 @@ export type Database = {
         }
         Returns: Json
       }
+      search_products: {
+        Args: { result_limit?: number; search_query: string }
+        Returns: {
+          category: string
+          description: string
+          lifetime_price: number
+          monthly_price: number
+          product_id: string
+          product_name: string
+          rank: number
+          tech_stack: string
+        }[]
+      }
       set_financial_mode: {
         Args: { p_admin_id: string; p_mode: string; p_reason: string }
         Returns: Json
