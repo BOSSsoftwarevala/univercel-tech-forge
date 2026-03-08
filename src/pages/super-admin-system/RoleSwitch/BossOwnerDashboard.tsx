@@ -588,76 +588,8 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
       {/* ===== ROW 3: OPERATIONAL AUTHORITY (DB-DRIVEN) ===== */}
       <BossOperationalRow handleBoxAction={handleBoxAction} />
 
-      {/* ===== ROW 4: ACTIVITY & ALERTS — FULL WIDTH PANEL WITH ACTIONS ===== */}
-      <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
-        <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.15)' }}>
-          <div className="flex items-center gap-2">
-            <Activity size={16} style={{ color: '#60a5fa' }} />
-            <span className="text-sm font-semibold tracking-wider" style={{ color: '#60a5fa' }}>ACTIVITY & ALERTS</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Badge className={STATUS_COLORS['active']}>AI: Online</Badge>
-            <Badge className={STATUS_COLORS['pending']}>5 Pending</Badge>
-            <Badge className={STATUS_COLORS['error']}>3 Alerts</Badge>
-          </div>
-        </div>
-        <div className="p-4 grid grid-cols-4 gap-4">
-          {/* AI Status */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <Brain size={14} style={{ color: '#60a5fa' }} />
-              <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>AI STATUS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>Processing 12 requests</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>Avg response: 1.2s</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'ai-status')} />
-              <ActionBtn icon={FileText} label="Logs" onClick={() => handleBoxAction('viewLogs', 'ai-status')} />
-            </div>
-          </motion.div>
-
-          {/* Pending Actions */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <Clock size={14} style={{ color: '#60a5fa' }} />
-              <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>PENDING ACTIONS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>5 items need review</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>3 high priority</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'pending-actions')} />
-            </div>
-          </motion.div>
-
-          {/* Alerts */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(220, 38, 38, 0.05)', border: '1px solid rgba(220, 38, 38, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <ShieldAlert size={14} style={{ color: '#dc2626' }} />
-              <span className="text-xs font-medium" style={{ color: '#dc2626' }}>ALERTS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>3 security alerts</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>1 critical • 2 warnings</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'alerts')} />
-              <ActionBtn icon={Pause} label="Pause" onClick={() => handleBoxAction('pause', 'alerts')} />
-            </div>
-          </motion.div>
-
-          {/* Logs */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <FileText size={14} style={{ color: '#60a5fa' }} />
-              <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>LOGS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>1,247 entries today</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>Last: 2 mins ago</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'logs')} />
-              <ActionBtn icon={RefreshCw} label="Refresh" onClick={() => handleBoxAction('update', 'logs')} />
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
+      {/* ===== ROW 4: ACTIVITY & ALERTS (DB-DRIVEN) ===== */}
+      <BossActivityAlertsRow handleBoxAction={handleBoxAction} />
 
       {/* ===== ROW 5: APPROVAL QUEUE — RESELLER / FRANCHISE / INFLUENCER ===== */}
       <motion.div 
