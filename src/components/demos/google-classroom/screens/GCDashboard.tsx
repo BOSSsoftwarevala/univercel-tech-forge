@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { BookOpen, ClipboardList, Users, TrendingUp, Plus, Clock } from 'lucide-react';
+import { BookOpen, ClipboardList, Users, TrendingUp, Plus, Clock, Bell } from 'lucide-react';
+import { demoClassrooms, demoAssignments, demoAnnouncements, demoClassMembers } from '../gcDemoData';
 import type { GCScreen } from '../GCLayout';
 
 interface GCDashboardProps {
@@ -8,35 +9,25 @@ interface GCDashboardProps {
 }
 
 export function GCDashboard({ onNavigate }: GCDashboardProps) {
-  const [stats, setStats] = useState({ classrooms: 0, assignments: 0, submissions: 0, students: 0 });
-  const [recentClasses, setRecentClasses] = useState<any[]>([]);
+  const [stats, setStats] = useState({ classrooms: 6, assignments: 8, submissions: 47, students: 175 });
+  const [recentClasses, setRecentClasses] = useState<any[]>(demoClassrooms.slice(0, 6));
+  const [recentAnnouncements] = useState(demoAnnouncements.slice(0, 3));
 
   useEffect(() => {
-    loadStats();
-    loadRecentClasses();
+    loadRealData();
   }, []);
 
-  const loadStats = async () => {
-    const [c, a] = await Promise.all([
-      supabase.from('gc_classrooms').select('id', { count: 'exact', head: true }),
-      supabase.from('gc_assignments').select('id', { count: 'exact', head: true }),
-    ]);
-    setStats({
-      classrooms: c.count || 0,
-      assignments: a.count || 0,
-      submissions: 0,
-      students: 0,
-    });
-  };
-
-  const loadRecentClasses = async () => {
-    const { data } = await supabase
-      .from('gc_classrooms')
-      .select('*')
-      .eq('is_archived', false)
-      .order('created_at', { ascending: false })
-      .limit(6);
-    setRecentClasses(data || []);
+  const loadRealData = async () => {
+    try {
+      const [c, a] = await Promise.all([
+        supabase.from('gc_classrooms').select('*').eq('is_archived', false).order('created_at', { ascending: false }).limit(6),
+        supabase.from('gc_assignments').select('id', { count: 'exact', head: true }),
+      ]);
+      if (c.data && c.data.length > 0) {
+        setRecentClasses(c.data);
+        setStats(prev => ({ ...prev, classrooms: c.data!.length, assignments: a.count || prev.assignments }));
+      }
+    } catch {}
   };
 
   const kpis = [
@@ -52,8 +43,8 @@ export function GCDashboard({ onNavigate }: GCDashboardProps) {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Welcome back</h1>
-          <p className="text-gray-500 text-sm mt-1">Here's what's happening in your school</p>
+          <h1 className="text-2xl font-semibold text-gray-800">Welcome back, Teacher</h1>
+          <p className="text-gray-500 text-sm mt-1">Here's what's happening in your school today</p>
         </div>
         <button 
           onClick={() => onNavigate('classrooms')}
@@ -69,11 +60,12 @@ export function GCDashboard({ onNavigate }: GCDashboardProps) {
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
-            <div key={kpi.label} className="bg-white rounded-xl border border-gray-200 p-5">
+            <div key={kpi.label} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer" onClick={() => onNavigate(kpi.label.toLowerCase() as GCScreen)}>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: kpi.bg }}>
                   <Icon className="w-5 h-5" style={{ color: kpi.color }} />
                 </div>
+                <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">Active</span>
               </div>
               <p className="text-2xl font-bold text-gray-800">{kpi.value}</p>
               <p className="text-xs text-gray-500 mt-1">{kpi.label}</p>
@@ -82,39 +74,60 @@ export function GCDashboard({ onNavigate }: GCDashboardProps) {
         })}
       </div>
 
-      {/* Recent Classrooms */}
+      {/* Recent Announcements */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Your Classrooms</h2>
-        {recentClasses.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No classrooms yet</p>
-            <p className="text-gray-400 text-sm mt-1">Create your first classroom to get started</p>
-            <button 
-              onClick={() => onNavigate('classrooms')}
-              className="mt-4 px-4 py-2 bg-[#1967d2] text-white rounded-lg hover:bg-[#1557b0] text-sm font-medium"
-            >
-              Create Classroom
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recentClasses.map((cls, i) => (
-              <div key={cls.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                <div className="h-24 p-4 flex flex-col justify-end" style={{ backgroundColor: classColors[i % classColors.length] }}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2"><Bell className="w-5 h-5 text-[#1967d2]" /> Recent Updates</h2>
+          <button onClick={() => onNavigate('announcements')} className="text-sm text-[#1967d2] hover:underline">View all</button>
+        </div>
+        <div className="space-y-3">
+          {recentAnnouncements.map((a) => (
+            <div key={a.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-sm transition-shadow">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#1967d2] flex items-center justify-center text-white text-xs font-medium shrink-0">
+                  {a.author_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-800 text-sm">{a.author_name}</span>
+                    <span className="text-xs text-gray-400">• {a.classroom_name}</span>
+                  </div>
+                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">{a.content}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Your Classrooms */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">Your Classrooms</h2>
+          <button onClick={() => onNavigate('classrooms')} className="text-sm text-[#1967d2] hover:underline">View all</button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {recentClasses.map((cls, i) => {
+            const members = demoClassMembers[cls.id] || { students: 0, teachers: 1 };
+            return (
+              <div key={cls.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+                <div className="h-24 p-4 flex flex-col justify-end relative" style={{ backgroundColor: classColors[i % classColors.length] }}>
                   <h3 className="text-white font-semibold text-lg truncate">{cls.name}</h3>
                   <p className="text-white/80 text-sm truncate">{cls.section || cls.subject || 'No section'}</p>
                 </div>
                 <div className="p-4">
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>Code: {cls.class_code}</span>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {members.students} students</span>
+                      <span className="flex items-center gap-1"><ClipboardList className="w-3.5 h-3.5" /> {demoAssignments.filter(a => a.classroom_id === cls.id).length} work</span>
+                    </div>
+                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {cls.class_code}</span>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
