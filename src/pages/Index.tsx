@@ -2528,36 +2528,44 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-12 px-4 bg-gradient-to-b from-[#0d1e36] to-transparent">
-        <div className="max-w-7xl mx-auto text-center">
+      {/* Netflix-Style Hero */}
+      <section className="relative h-[60vh] min-h-[400px] max-h-[550px] overflow-hidden">
+        {/* Cinematic gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0d2847] to-[#0a1628]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/60" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
+        
+        {/* Animated glow accents */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-500/5 rounded-full blur-[100px]" />
+
+        <div className="relative z-20 h-full flex items-center px-6 md:px-16">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl"
           >
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 mb-4">
-              <Star className="h-3 w-3 mr-1" /> 20 Master Categories • 147 Software Solutions • 20 Live Demos
+            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 mb-5 text-xs backdrop-blur-sm">
+              <Star className="h-3 w-3 mr-1" /> 20 Categories • 147 Software • 20 Live Demos
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">Business Software</span> Marketplace
+            <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-4 leading-[1.1] tracking-tight">
+              Software<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400">Marketplace</span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-8">
-              Premium enterprise solutions across Education, Healthcare, Finance, Retail, Logistics & more.
-              Start your business today with our ready-to-deploy software!
+            <p className="text-slate-400 text-lg md:text-xl max-w-xl mb-8 leading-relaxed">
+              Premium enterprise solutions. Ready to deploy. Built for scale.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <div className="flex items-center gap-2 text-emerald-400">
-                <CheckCircle className="h-5 w-5" /> Full Source Code
-              </div>
-              <div className="flex items-center gap-2 text-cyan-400">
-                <CheckCircle className="h-5 w-5" /> 1 Year Free Support
-              </div>
-              <div className="flex items-center gap-2 text-orange-400">
-                <CheckCircle className="h-5 w-5" /> Free Installation
-              </div>
-              <div className="flex items-center gap-2 text-purple-400">
-                <CheckCircle className="h-5 w-5" /> Lifetime Updates
+            <div className="flex items-center gap-6 flex-wrap">
+              <Button asChild size="lg" className="bg-white text-black hover:bg-white/90 font-bold text-base px-8 rounded-sm">
+                <Link to="/demos">
+                  <Play className="h-5 w-5 mr-2 fill-black" /> Explore Demos
+                </Link>
+              </Button>
+              <div className="flex items-center gap-5 text-sm text-slate-500">
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-emerald-500" /> Source Code</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-cyan-500" /> Free Support</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-orange-500" /> Free Install</span>
               </div>
             </div>
           </motion.div>
