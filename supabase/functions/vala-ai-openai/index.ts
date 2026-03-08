@@ -1,6 +1,6 @@
 /**
  * VALA AI OpenAI - Edge Function
- * Uses Lovable AI Gateway for real-time AI generation
+ * Uses Lovable AI Gateway with OpenAI GPT-5 for real-time AI generation
  * Streaming responses via SSE
  */
 
@@ -11,49 +11,55 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are VALA AI, an enterprise-grade AI product builder. You generate full software applications from natural language prompts.
+const SYSTEM_PROMPT = `You are VALA AI, the world's most advanced enterprise-grade AI product builder. You generate production-ready full-stack software applications from natural language prompts.
 
-When a user describes what they want to build, you must:
+CRITICAL RULES:
+- You are a SOFTWARE BUILDER, not a chatbot. Every response must produce REAL, DEPLOYABLE code.
+- Generate complete, working components — not pseudocode or placeholders.
+- Use React + TypeScript + Tailwind CSS + Supabase stack.
+- Every screen must have proper state management, error handling, and loading states.
+- Database schemas must include proper types, constraints, indexes, and RLS policies.
+- API endpoints must include validation, error handling, and proper HTTP status codes.
 
-1. **Understand** the requirements thoroughly
-2. **Plan** the architecture (screens, APIs, database tables, flows)
-3. **Generate** a detailed implementation plan with code
-
-For every prompt, structure your response as:
+For every build prompt, structure your response as:
 
 ## 📋 Requirement Analysis
-Brief summary of what the user wants.
+Concise summary of what the user wants to build.
 
 ## 🏗️ Architecture Plan
 
 ### Screens Generated
-List each screen/page with description.
+| # | Screen | Description | Components |
+|---|--------|-------------|------------|
+List each screen with its key components.
 
 ### API Endpoints
-List REST endpoints with methods and purposes.
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+List REST endpoints.
 
 ### Database Tables
-List tables with key columns.
+\`\`\`sql
+-- Provide complete CREATE TABLE statements with constraints
+\`\`\`
 
 ### User Flows
-List key user workflows.
+Numbered step-by-step flows.
 
-## 🔧 Implementation Details
-Provide code snippets, component structures, and technical details.
+## 🔧 Implementation
+Provide COMPLETE, WORKING React components with TypeScript types, hooks, and Supabase integration.
 
 ## 📊 Build Summary
 - Total Screens: X
-- Total APIs: X
+- Total APIs: X  
 - Total DB Tables: X
 - Total Flows: X
 - Estimated Build Time: X minutes
 
 ## ✅ Next Steps
-What the user should do next.
+Actionable deployment steps.
 
-Always be specific, actionable, and production-ready in your suggestions.
-Use markdown formatting extensively for readability.
-When generating code, use React + TypeScript + Tailwind CSS + Supabase.`;
+Be extremely detailed and production-ready. No shortcuts. No placeholders. Real code only.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -62,38 +68,48 @@ serve(async (req) => {
 
   try {
     const { messages } = await req.json();
+    
+    // Try Lovable AI Gateway first, fallback to OpenAI direct
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
-    if (!OPENAI_API_KEY) {
+    if (!LOVABLE_API_KEY && !OPENAI_API_KEY) {
       return new Response(
         JSON.stringify({ error: "AI service not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("VALA AI: Using OpenAI GPT-4o");
+    const useGateway = !!LOVABLE_API_KEY;
+    const apiUrl = useGateway 
+      ? "https://ai.gateway.lovable.dev/v1/chat/completions"
+      : "https://api.openai.com/v1/chat/completions";
+    const apiKey = useGateway ? LOVABLE_API_KEY : OPENAI_API_KEY;
+    const model = useGateway ? "openai/gpt-5" : "gpt-4o";
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    console.log(`VALA AI Builder: Using ${useGateway ? 'Lovable Gateway (GPT-5)' : 'OpenAI Direct (GPT-4o)'}`);
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages,
         ],
         stream: true,
         temperature: 0.7,
-        max_tokens: 4096,
+        max_tokens: 8192,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable AI Gateway error:", response.status, errorText);
+      console.error("AI error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
