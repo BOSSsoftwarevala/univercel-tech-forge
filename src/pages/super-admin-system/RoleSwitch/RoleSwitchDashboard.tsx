@@ -96,7 +96,6 @@ const BossOwnerDashboard = lazyWithRetry(() => import("./BossOwnerDashboard"));
 const DeveloperManagementDashboard = lazyWithRetry(() => import("./DeveloperManagementDashboard"));
 const FranchiseDashboardEmbed = lazyWithRetry(() => import("@/pages/franchise/Dashboard"));
 const ResellerDashboardEmbed = lazyWithRetry(() => import("@/pages/ResellerDashboard"));
-const BossPanelView = lazyWithRetry(() => import("@/pages/BossPanel"));
 
 // Define which roles can switch to which views
 const ROLE_VIEW_ACCESS: Record<string, ActiveRole[]> = {
