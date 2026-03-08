@@ -485,7 +485,20 @@ const SoftwareCatalogManager = () => {
             ) : (
               <Download className="w-4 h-4 mr-2" />
             )}
-            {totalCount > 0 ? 'Reload 5000+ Software' : 'Load 5000+ Software'}
+             {totalCount > 0 ? 'Reload 5000+ Software' : 'Load 5000+ Software'}
+          </Button>
+          <Button 
+            variant="default"
+            onClick={importFromGitHub}
+            disabled={isGitHubImporting || isImporting}
+            className="bg-gradient-to-r from-primary to-neon-purple text-white font-bold px-6 hover:opacity-90 shadow-lg shadow-primary/30"
+          >
+            {isGitHubImporting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Database className="w-4 h-4 mr-2" />
+            )}
+            {isGitHubImporting ? 'Importing Repos...' : 'Import from Repos'}
           </Button>
           <Button 
             variant="outline"
