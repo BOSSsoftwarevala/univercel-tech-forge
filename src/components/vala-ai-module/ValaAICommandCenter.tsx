@@ -1,7 +1,7 @@
 /**
- * VALA AI ENGINE - LOVABLE-STYLE AI PRODUCT BUILDER
+ * VALA AI ENGINE - ENTERPRISE AI PRODUCT BUILDER
  * ================================================
- * Clone of Lovable's AI Builder Interface
+ * AI-Powered Software Builder Interface
  * ================================================
  * LOCKED: DO NOT CHANGE COLORS/FONTS/THEME
  */
