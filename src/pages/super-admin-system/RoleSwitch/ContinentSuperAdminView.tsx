@@ -510,7 +510,7 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
                       <div className={cn(
                         "w-4 h-4 rounded-full shadow-lg",
                         csa.status === "active" && "bg-emerald-500 shadow-emerald-500/50",
-                        csa.status === "locked" && "bg-slate-500 shadow-slate-500/50"
+                        csa.status !== "active" && "bg-slate-500 shadow-slate-500/50"
                       )} />
                       {csa.status === "active" && (
                         <div className="absolute inset-0 w-4 h-4 rounded-full bg-emerald-500 animate-ping opacity-40" />
