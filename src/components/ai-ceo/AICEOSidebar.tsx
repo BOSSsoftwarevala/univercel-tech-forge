@@ -14,7 +14,12 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Bot
+  Bot,
+  Mic,
+  Cpu,
+  ScanSearch,
+  ListTodo,
+  Megaphone
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
