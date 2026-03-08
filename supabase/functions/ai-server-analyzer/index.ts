@@ -537,7 +537,7 @@ Detect threats and respond in JSON:
 }
 
 async function checkCompliance(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   const { data: server } = await supabase
     .from('server_instances')
