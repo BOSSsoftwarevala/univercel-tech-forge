@@ -48,20 +48,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isBossOwner = userRole === 'boss_owner' || userRole === 'master' || userRole === 'super_admin';
   const isCEO = userRole === 'ceo';
 
+  // Track this browser-tab session start for force-logout comparisons
+  const setSessionStartNow = useCallback(() => {
+    try {
+      const nowIso = new Date().toISOString();
+      sessionStorage.setItem('session_start', nowIso);
+      sessionStorage.setItem('last_activity', nowIso);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const clearSessionStart = useCallback(() => {
+    try {
+      sessionStorage.removeItem('session_start');
+      sessionStorage.removeItem('last_activity');
+      sessionStorage.removeItem('last_activity_update');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Check if user was force logged out
   const checkForceLogout = useCallback(async (userId: string) => {
     try {
-      const { data, error } = await supabase.rpc('check_force_logout', { 
-        check_user_id: userId 
+      const { data: logoutTime, error } = await supabase.rpc('check_force_logout', {
+        check_user_id: userId,
       });
-      
-      if (!error && data) {
+
+      if (error || !logoutTime) return false;
+
+      const sessionStart = sessionStorage.getItem('session_start');
+      if (!sessionStart) {
+        // Strict default: if we can't validate the session timeline, terminate.
         setWasForceLoggedOut(true);
         await supabase.auth.signOut();
+        sessionStorage.clear();
         return true;
       }
+
+      const sessionStartTime = new Date(sessionStart).getTime();
+      const forceLogoutTime = new Date(String(logoutTime)).getTime();
+
+      if (Number.isFinite(forceLogoutTime) && forceLogoutTime > sessionStartTime) {
+        setWasForceLoggedOut(true);
+        await supabase.auth.signOut();
+        sessionStorage.clear();
+        return true;
+      }
+
       return false;
-    } catch (err) {
+    } catch {
       return false;
     }
   }, []);
@@ -71,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await supabase.rpc('clear_force_logout', { clear_user_id: userId });
       setWasForceLoggedOut(false);
-    } catch (err) {
+    } catch {
       // Silent fail
     }
   }, []);
