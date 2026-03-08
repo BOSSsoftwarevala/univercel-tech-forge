@@ -7,8 +7,10 @@ import { MMDevelopmentScreen } from './screens/MMDevelopmentScreen';
 import { MMWalletScreen } from './screens/MMWalletScreen';
 import { MMSupportScreen } from './screens/MMSupportScreen';
 import { MMSettingsScreen } from './screens/MMSettingsScreen';
+import { MMLibraryScreen } from './screens/MMLibraryScreen';
+import { MMLicensesScreen } from './screens/MMLicensesScreen';
 
-type MarketplaceScreen = 'marketplace' | 'my-orders' | 'development' | 'wallet' | 'support' | 'settings';
+type MarketplaceScreen = 'marketplace' | 'my-orders' | 'development' | 'wallet' | 'support' | 'settings' | 'library' | 'licenses';
 
 const SCREEN_PATHS: Record<MarketplaceScreen, string> = {
   marketplace: '',
@@ -17,17 +19,22 @@ const SCREEN_PATHS: Record<MarketplaceScreen, string> = {
   wallet: 'wallet',
   support: 'support',
   settings: 'settings',
+  library: 'library',
+  licenses: 'licenses',
 };
 
 const getScreenFromPath = (pathname: string): MarketplaceScreen => {
   if (pathname.startsWith('/user/orders')) return 'my-orders';
-  if (pathname.startsWith('/user/library')) return 'marketplace';
+  if (pathname.startsWith('/user/library')) return 'library';
+  if (pathname.startsWith('/user/licenses')) return 'licenses';
 
   if (pathname.includes('/orders')) return 'my-orders';
   if (pathname.includes('/development')) return 'development';
   if (pathname.includes('/wallet')) return 'wallet';
   if (pathname.includes('/support')) return 'support';
   if (pathname.includes('/settings')) return 'settings';
+  if (pathname.includes('/library')) return 'library';
+  if (pathname.includes('/licenses')) return 'licenses';
 
   return 'marketplace';
 };
@@ -42,29 +49,29 @@ export function MMFullLayout() {
     setActiveScreen((prev) => (prev === nextScreen ? prev : nextScreen));
   }, [location.pathname]);
 
-  const handleScreenChange = (screen: MarketplaceScreen) => {
-    setActiveScreen(screen);
+  const handleScreenChange = (screen: string) => {
+    const s = screen as MarketplaceScreen;
+    setActiveScreen(s);
 
-    const suffix = SCREEN_PATHS[screen];
+    // Library / Licenses go under /user/ path
+    if (s === 'library') { navigate('/user/library'); return; }
+    if (s === 'licenses') { navigate('/user/licenses'); return; }
+
+    const suffix = SCREEN_PATHS[s];
     navigate(suffix ? `/marketplace/${suffix}` : '/marketplace');
   };
 
   const renderScreen = () => {
     switch (activeScreen) {
-      case 'marketplace':
-        return <MMMarketplaceScreen />;
-      case 'my-orders':
-        return <MMOrdersScreen />;
-      case 'development':
-        return <MMDevelopmentScreen />;
-      case 'wallet':
-        return <MMWalletScreen />;
-      case 'support':
-        return <MMSupportScreen />;
-      case 'settings':
-        return <MMSettingsScreen />;
-      default:
-        return <MMMarketplaceScreen />;
+      case 'marketplace': return <MMMarketplaceScreen />;
+      case 'my-orders': return <MMOrdersScreen />;
+      case 'development': return <MMDevelopmentScreen />;
+      case 'wallet': return <MMWalletScreen />;
+      case 'support': return <MMSupportScreen />;
+      case 'settings': return <MMSettingsScreen />;
+      case 'library': return <MMLibraryScreen />;
+      case 'licenses': return <MMLicensesScreen />;
+      default: return <MMMarketplaceScreen />;
     }
   };
 
@@ -75,4 +82,3 @@ export function MMFullLayout() {
     </div>
   );
 }
-

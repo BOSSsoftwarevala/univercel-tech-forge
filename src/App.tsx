@@ -494,7 +494,7 @@ const App = memo(() => (
                             <Route path="/user/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
                             <Route path="/user/library" element={<RequireRole allowed={["boss_owner", "super_admin", "client", "user", "franchise", "reseller"]}><MMFullLayout /></RequireRole>} />
                             <Route path="/user/orders" element={<RequireRole allowed={["boss_owner", "super_admin", "client", "user", "franchise", "reseller"]}><MMFullLayout /></RequireRole>} />
-                            <Route path="/user/licenses" element={<RequireAuth><UserDashboard /></RequireAuth>} />
+                            <Route path="/user/licenses" element={<RequireRole allowed={["boss_owner", "super_admin", "client", "user", "franchise", "reseller"]}><MMFullLayout /></RequireRole>} />
                             <Route path="/demo-login" element={<DemoLogin />} />
                             <Route path="/premium-demos" element={<PremiumDemoShowcase />} />
                             <Route path="/client-portal" element={<ClientPortal />} />
