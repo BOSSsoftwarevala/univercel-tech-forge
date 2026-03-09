@@ -31,8 +31,8 @@ const generateLogs = (): LogEntry[] => [
 
 const LEVEL_META: Record<LogEntry['level'], { icon: React.ElementType; badge: string; className: string }> = {
   info: { icon: Zap, badge: 'INFO', className: 'bg-primary/10 text-primary' },
-  success: { icon: CheckCircle2, badge: 'OK', className: 'bg-emerald-500/10 text-emerald-400' },
-  warning: { icon: AlertCircle, badge: 'WARN', className: 'bg-amber-500/10 text-amber-400' },
+  success: { icon: CheckCircle2, badge: 'OK', className: 'bg-primary/10 text-primary' },
+  warning: { icon: AlertCircle, badge: 'WARN', className: 'bg-secondary/70 text-secondary-foreground' },
   error: { icon: AlertCircle, badge: 'ERR', className: 'bg-destructive/10 text-destructive' },
 };
 

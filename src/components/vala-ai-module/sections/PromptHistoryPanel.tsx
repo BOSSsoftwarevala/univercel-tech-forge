@@ -118,7 +118,7 @@ const PromptHistoryPanel: React.FC = () => {
                         {entry.category}
                       </span>
                       <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => handleCopy(entry.prompt, entry.id)}>
-                        {copiedId === entry.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        {copiedId === entry.id ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
                       </Button>
                     </div>
                   </div>

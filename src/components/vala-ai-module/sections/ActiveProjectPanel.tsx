@@ -194,7 +194,7 @@ const ActiveProjectPanel: React.FC = () => {
                     transition={{ delay: i * 0.06 }}
                     className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/20"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                     <span className="text-xs text-foreground/80 flex-1">{action.action}</span>
                     <span className="text-[10px] text-muted-foreground">{action.time}</span>
                   </motion.div>
