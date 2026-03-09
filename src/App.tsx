@@ -462,10 +462,15 @@ const App = memo(() => (
                             <Route path="/auto-dev" element={<AutoDevEngine />} />
                             <Route path="/deadline-animation" element={<DeadlineAnimationDemo />} />
                             <Route path="/ai-builder" element={<RequireRole allowed={["boss_owner", "super_admin", "developer", "ai_manager", "demo_manager", "product_demo_manager"]}><AIBuilderPage /></RequireRole>} />
-                            <Route path="/marketplace" element={<RequireRole allowed={["master", "boss_owner", "super_admin", "franchise", "reseller", "developer", "support", "demo_manager", "client", "user"]}><MMFullLayout /></RequireRole>} />
-                            <Route path="/marketplace/product/:productId" element={<RequireRole allowed={["master", "boss_owner", "super_admin", "franchise", "reseller", "developer", "support", "demo_manager", "client", "user"]}><MMFullLayout /></RequireRole>} />
-                            <Route path="/marketplace/category/:categoryId" element={<RequireRole allowed={["master", "boss_owner", "super_admin", "franchise", "reseller", "developer", "support", "demo_manager", "client", "user"]}><MMFullLayout /></RequireRole>} />
-                            <Route path="/marketplace/*" element={<RequireRole allowed={["master", "boss_owner", "super_admin", "franchise", "reseller", "developer", "support", "demo_manager", "client", "user"]}><MMFullLayout /></RequireRole>} />
+                            {/* Marketplace - PUBLIC browsing for visitors, auth only for transactional areas */}
+                            <Route path="/marketplace" element={<MMFullLayout />} />
+                            <Route path="/marketplace/product/:productId" element={<MMFullLayout />} />
+                            <Route path="/marketplace/category/:categoryId" element={<MMFullLayout />} />
+                            <Route path="/marketplace/orders" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/wallet" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/settings" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/development" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/*" element={<MMFullLayout />} />
 
                             {/* Demo Routes - Clean client-facing URLs */}
                             <Route path="/google-classroom" element={<GoogleClassroomDemo />} />
