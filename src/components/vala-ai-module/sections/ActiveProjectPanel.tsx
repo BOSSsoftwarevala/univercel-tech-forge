@@ -75,7 +75,7 @@ const ActiveProjectPanel: React.FC = () => {
             <h1 className="text-lg font-bold text-foreground">{MOCK_PROJECT.name}</h1>
             <p className="text-xs text-muted-foreground flex items-center gap-2">
               <span className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 Active
               </span>
               <span>•</span>
