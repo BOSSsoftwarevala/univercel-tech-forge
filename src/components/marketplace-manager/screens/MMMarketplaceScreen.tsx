@@ -569,7 +569,7 @@ export const MMMarketplaceScreen = () => {
                 onDemo={handleDemo}
                 onBuy={handleBuy}
                 onFav={toggleFavorite}
-                discountedPrice={discountedPrice}
+                formatPrice={formatPrice}
               />
             )}
 
