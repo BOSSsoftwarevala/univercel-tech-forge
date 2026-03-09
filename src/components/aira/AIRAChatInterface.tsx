@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import AIRAVoiceOrb from "./AIRAVoiceOrb";
 
 interface ChatMessage {
   id: string;
@@ -582,6 +583,15 @@ export default function AIRAChatInterface() {
           </Button>
         </div>
       </div>
+
+      {/* Floating Voice Orb */}
+      <AIRAVoiceOrb
+        isSpeaking={isSpeaking}
+        isLoadingVoice={isLoadingVoice}
+        autoSpeak={autoSpeak}
+        onToggleAutoSpeak={() => setAutoSpeak(prev => !prev)}
+        onStopSpeaking={stopSpeaking}
+      />
     </div>
   );
 }
