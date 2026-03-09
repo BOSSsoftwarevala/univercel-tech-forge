@@ -838,19 +838,19 @@ function ProductRow({ title, icon, products, favorites, onView, onDemo, onBuy, o
         </div>
       </div>
       <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-        {products.map((product) => (
-          <div key={product.product_id} className="flex-shrink-0 w-56">
-            <ProductCard
-              product={product}
-              isFav={favorites.has(product.product_id)}
-              onView={onView}
-              onDemo={onDemo}
-              onBuy={onBuy}
-              onFav={onFav}
-              discountedPrice={discountedPrice}
-            />
-          </div>
-        ))}
+          {products.map((product) => (
+            <div key={product.product_id} className="flex-shrink-0 w-56">
+              <ProductCard
+                product={product}
+                isFav={favorites.has(product.product_id)}
+                onView={onView}
+                onDemo={onDemo}
+                onBuy={onBuy}
+                onFav={onFav}
+                formatPrice={formatPrice}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );
