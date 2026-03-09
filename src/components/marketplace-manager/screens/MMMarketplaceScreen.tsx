@@ -1067,7 +1067,7 @@ function ProductDetailDialog({
   onFav: (id: string) => void;
   formatPrice: (p: number | null) => string;
 }) {
-  const { speak, stop, isSpeaking } = useValaVoice();
+  const { speak, stop, isPlaying } = useValaVoice();
 
   const handleVoice = () => {
     if (isSpeaking) {
