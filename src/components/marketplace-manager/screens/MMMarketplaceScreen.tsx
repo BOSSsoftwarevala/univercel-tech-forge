@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { createSystemRequest } from '@/hooks/useSystemRequestLogger';
@@ -66,126 +66,250 @@ const PARTNER_REQUEST_BUTTONS: { event: PartnerRequestType; label: string }[] = 
   { event: 'enquiry', label: 'Enquiry' },
 ];
 
+// Constants for pagination - optimized for 10K+ products
+const PAGE_SIZE = 50;
+const CATEGORY_PREVIEW_SIZE = 15;
+const SEARCH_DEBOUNCE_MS = 300;
+
+// Transform raw DB data to Product format
+const transformProduct = (item: any): Product => ({
+  product_id: item.id || item.product_id,
+  product_name: item.name || item.product_name || 'Unnamed Product',
+  description: item.description || item.short_description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
+  category: item.category,
+  monthly_price: item.base_price ? Number(item.base_price) : 249,
+  lifetime_price: item.base_price ? Math.round(Number(item.base_price) * 10) : 2490,
+  tech_stack: item.tech_stack || item.type || null,
+  product_type: item.type || item.product_type || 'SaaS',
+  features_json: item.features_json || null,
+  is_active: item.is_active ?? true,
+  status: item.status || 'active',
+  created_at: item.created_at,
+  demo_url: item.demo_url || null,
+  demo_id: item.demo_id || null,
+  github_repo_url: item.github_repo_url || null,
+  repo_language: item.repo_language || null,
+  demo_build_status: item.demo_build_status || null,
+  last_repo_sync_at: item.last_repo_sync_at || null,
+  listing_status: item.listing_status || 'draft',
+  source: item.source || 'vala_ai',
+  product_thumbnail_url: item.product_thumbnail_url || null,
+  product_icon_url: item.product_icon_url || null,
+});
+
 export const MMMarketplaceScreen = () => {
   const navigate = useNavigate();
   const { productId, categoryId } = useParams();
   const { user, userRole } = useAuth();
 
-  const [products, setProducts] = useState<Product[]>([]);
+  // Core state
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
 
+  // Paginated data
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [searchPage, setSearchPage] = useState(0);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [hasMoreSearch, setHasMoreSearch] = useState(true);
+
+  // Featured sections (cached)
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [latestLaunches, setLatestLaunches] = useState<Product[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [upcomingProducts, setUpcomingProducts] = useState<Product[]>([]);
+
+  // Category data
+  const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
+  const [categoryProducts, setCategoryProducts] = useState<Record<string, Product[]>>({});
+  const [categoryLoading, setCategoryLoading] = useState<Record<string, boolean>>({});
+
+  // Refs for infinite scroll
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search
   useEffect(() => {
-    fetchProducts();
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Initial load - get counts and featured products only
+  useEffect(() => {
+    initializeMarketplace();
     fetchFavorites();
   }, []);
 
+  // Handle URL params
   useEffect(() => {
     setSelectedCategory(categoryId ? decodeURIComponent(categoryId) : null);
   }, [categoryId]);
 
+  // Fetch product from URL
   useEffect(() => {
     if (!productId) {
       setSelectedProduct(null);
       return;
     }
+    fetchProductById(productId);
+  }, [productId]);
 
-    const matched = products.find((product) => product.product_id === productId);
-    if (matched) {
-      setSelectedProduct(matched);
+  // Database search when debounced query changes
+  useEffect(() => {
+    if (debouncedSearch || selectedCategory) {
+      performSearch(0, true);
+    } else {
+      setSearchResults([]);
+      setSearchPage(0);
+      setHasMoreSearch(true);
     }
-  }, [productId, products]);
+  }, [debouncedSearch, selectedCategory]);
 
-  const fetchProducts = async () => {
+  // Intersection observer for infinite scroll
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreSearch && !searchLoading && (debouncedSearch || selectedCategory)) {
+          performSearch(searchPage + 1, false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasMoreSearch, searchLoading, searchPage, debouncedSearch, selectedCategory]);
+
+  const initializeMarketplace = async () => {
     try {
-      let allData: any[] = [];
-      let fetchError: any = null;
-      const PAGE_SIZE = 1000;
+      // Parallel fetch: count, categories, and featured sections
+      const [countResult, categoriesResult, featuredResult, latestResult, trendingResult, upcomingResult] = await Promise.all([
+        supabase.from('software_catalog' as any).select('id', { count: 'exact', head: true }),
+        supabase.from('software_catalog' as any).select('category').not('category', 'is', null),
+        supabase.from('software_catalog' as any).select('*').order('created_at', { ascending: false }).limit(5),
+        supabase.from('software_catalog' as any).select('*').or('listing_status.eq.live,demo_url.not.is.null').order('created_at', { ascending: false }).limit(10),
+        supabase.from('software_catalog' as any).select('*').order('created_at', { ascending: false }).range(100, 115),
+        supabase.from('software_catalog' as any).select('*').or('listing_status.eq.upcoming,listing_status.eq.coming_soon').limit(10),
+      ]);
 
-      // Paginate through software_catalog to get all 5000+ products
-      let page = 0;
-      let hasMore = true;
-      while (hasMore) {
-        const from = page * PAGE_SIZE;
-        const to = from + PAGE_SIZE - 1;
-        const catalogResult = await supabase
-          .from('software_catalog' as any)
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
-          .range(from, to);
+      // Set total count
+      setTotalCount(countResult.count || 0);
 
-        if (catalogResult.error) { fetchError = catalogResult.error; break; }
-        if (catalogResult.data && catalogResult.data.length > 0) {
-          allData = allData.concat(catalogResult.data);
-          hasMore = catalogResult.data.length === PAGE_SIZE;
-        } else {
-          hasMore = false;
-        }
-        page++;
-        if (page > 10) break; // Safety cap at 10k
+      // Extract unique categories
+      if (categoriesResult.data) {
+        const cats = Array.from(new Set(categoriesResult.data.map((p: any) => p.category).filter(Boolean) as string[])).sort();
+        setDynamicCategories(cats);
       }
 
-      let data: any[] | null = null;
-
-      if (!fetchError && allData.length > 0) {
-        data = allData.map((item: any) => ({
-          product_id: item.id || item.product_id,
-          product_name: item.name || item.product_name || 'Unnamed Product',
-          description: item.description || item.short_description || `${item.category || 'Enterprise'} software solution by ${item.vendor || 'Software Vala'}`,
-          category: item.category,
-          monthly_price: item.base_price ? Number(item.base_price) : 249,
-          lifetime_price: item.base_price ? Math.round(Number(item.base_price) * 10) : 2490,
-          tech_stack: item.tech_stack || item.type || null,
-          product_type: item.type || item.product_type || 'SaaS',
-          features_json: item.features_json || null,
-          is_active: item.is_active ?? true,
-          status: item.status || 'active',
-          created_at: item.created_at,
-          demo_url: item.demo_url || null,
-          demo_id: item.demo_id || null,
-          github_repo_url: item.github_repo_url || null,
-          repo_language: item.repo_language || null,
-          demo_build_status: item.demo_build_status || null,
-          last_repo_sync_at: item.last_repo_sync_at || null,
-          listing_status: item.listing_status || 'draft',
-          source: item.source || 'vala_ai',
-          product_thumbnail_url: item.product_thumbnail_url || null,
-          product_icon_url: item.product_icon_url || null,
-        }));
-      } else if (!fetchError) {
-        // Fallback to products table
-        const productsResult = await supabase
-          .from('products')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false });
-
-        if (productsResult.error) {
-          fetchError = productsResult.error;
-        } else {
-          data = productsResult.data;
-        }
+      // Set featured sections
+      if (featuredResult.data) setFeaturedProducts(featuredResult.data.map(transformProduct));
+      if (latestResult.data && latestResult.data.length > 0) {
+        setLatestLaunches(latestResult.data.map(transformProduct));
+      } else if (featuredResult.data) {
+        setLatestLaunches(featuredResult.data.slice(0, 10).map(transformProduct));
       }
+      if (trendingResult.data) setTrendingProducts(trendingResult.data.map(transformProduct));
+      if (upcomingResult.data) setUpcomingProducts(upcomingResult.data.map(transformProduct));
 
-      if (fetchError) throw fetchError;
-      const allProducts = (data as Product[]) || [];
-      setProducts(allProducts);
-
-      // Extract dynamic categories from product data
-      const cats = Array.from(new Set(allProducts.map(p => p.category).filter(Boolean) as string[])).sort();
-      setDynamicCategories(cats);
     } catch (err) {
-      console.error('Failed to fetch products:', err);
-      setProducts([]);
+      console.error('Failed to initialize marketplace:', err);
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchProductById = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('software_catalog' as any)
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (!error && data) {
+        setSelectedProduct(transformProduct(data));
+      }
+    } catch (err) {
+      console.error('Failed to fetch product:', err);
+    }
+  };
+
+  const performSearch = async (page: number, reset: boolean) => {
+    if (searchLoading) return;
+    setSearchLoading(true);
+
+    try {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      let query = supabase
+        .from('software_catalog' as any)
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      // Apply category filter
+      if (selectedCategory) {
+        query = query.ilike('category', selectedCategory);
+      }
+
+      // Apply text search using database ILIKE (faster than client-side)
+      if (debouncedSearch) {
+        query = query.or(`name.ilike.%${debouncedSearch}%,category.ilike.%${debouncedSearch}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const products = (data || []).map(transformProduct);
+
+      if (reset) {
+        setSearchResults(products);
+        setSearchPage(0);
+      } else {
+        setSearchResults(prev => [...prev, ...products]);
+        setSearchPage(page);
+      }
+
+      setHasMoreSearch(products.length === PAGE_SIZE);
+    } catch (err) {
+      console.error('Search failed:', err);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const loadCategoryProducts = useCallback(async (category: string) => {
+    if (categoryProducts[category] || categoryLoading[category]) return;
+
+    setCategoryLoading(prev => ({ ...prev, [category]: true }));
+
+    try {
+      const { data, error } = await supabase
+        .from('software_catalog' as any)
+        .select('*')
+        .ilike('category', category)
+        .order('created_at', { ascending: false })
+        .limit(CATEGORY_PREVIEW_SIZE);
+
+      if (!error && data) {
+        setCategoryProducts(prev => ({ ...prev, [category]: data.map(transformProduct) }));
+      }
+    } catch (err) {
+      console.error(`Failed to load ${category}:`, err);
+    } finally {
+      setCategoryLoading(prev => ({ ...prev, [category]: false }));
+    }
+  }, [categoryProducts, categoryLoading]);
 
   const fetchFavorites = async () => {
     try {
@@ -219,7 +343,6 @@ export const MMMarketplaceScreen = () => {
       ...(options?.metadata || {}),
     };
 
-    // 1. Always queue to system_events for Boss Panel visibility
     try {
       await createSystemRequest({
         action_type: eventType,
@@ -231,7 +354,6 @@ export const MMMarketplaceScreen = () => {
       console.error('[Marketplace] System event failed:', err);
     }
 
-    // 2. Also log to activity_log for historical audit trail
     try {
       await supabase.from('activity_log').insert({
         action_type: eventType,
@@ -255,7 +377,6 @@ export const MMMarketplaceScreen = () => {
         return;
       }
 
-      const product = products.find((item) => item.product_id === productIdToToggle);
       const wasFavorite = favorites.has(productIdToToggle);
 
       if (wasFavorite) {
@@ -277,30 +398,18 @@ export const MMMarketplaceScreen = () => {
         setFavorites((prev) => new Set(prev).add(productIdToToggle));
         toast.success('Added to favorites');
       }
-
-      void logEvent('favorite_toggle', product, {
-        metadata: {
-          favorite_state: wasFavorite ? 'removed' : 'added',
-        },
-      });
     } catch {
       toast.error('Failed to update favorites');
     }
   };
 
   const handleDemo = (product: Product) => {
-    void logEvent('demo_request', product, {
-      severity: 'info',
-      metadata: { stage: 'demo_requested' },
-    });
-
-    // Check if product has a demo_url
-    const demoUrl = (product as any).demo_url;
+    void logEvent('demo_request', product, { severity: 'info' });
+    const demoUrl = product.demo_url;
     if (demoUrl) {
       window.open(demoUrl, '_blank');
       toast.success(`Opening demo for ${product.product_name}`);
     } else {
-      // Navigate to demo directory for this category
       const category = product.category?.toLowerCase().replace(/[^a-z]/g, '-') || 'general';
       navigate(`/demo-directory?category=${category}&product=${product.product_id}`);
       toast.info(`Loading demo for ${product.product_name}...`);
@@ -308,15 +417,7 @@ export const MMMarketplaceScreen = () => {
   };
 
   const handleBuy = (product: Product) => {
-    void logEvent('purchase_request', product, {
-      severity: 'warning',
-      metadata: {
-        stage: 'purchase_initiated',
-        price: product.monthly_price,
-        discounted_price: product.monthly_price ? Math.round(product.monthly_price * 0.7) : null,
-      },
-    });
-    // Navigate to purchase flow
+    void logEvent('purchase_request', product, { severity: 'warning' });
     navigate(`/marketplace/product/${product.product_id}`);
     setSelectedProduct(product);
     toast.success(`Opening purchase page for ${product.product_name}`);
@@ -332,118 +433,50 @@ export const MMMarketplaceScreen = () => {
     const needsApplicationRecord = requestType === 'reseller_request' || requestType === 'job_apply' || requestType === 'developer_request';
 
     if (needsApplicationRecord && !user) {
-      void logEvent(requestType, undefined, {
-        severity: 'warning',
-        metadata: { request_label: label, requires_auth: true },
-      });
       toast.error('Please login first so we can process your application');
       return;
     }
-
-    let applicationInsertError: string | null = null;
 
     if (needsApplicationRecord && user) {
       const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
       const fallbackName = user.email?.split('@')[0] || 'Marketplace User';
       const fullName = String(userMeta.full_name || fallbackName);
-
       const applicationType = requestType === 'reseller_request' ? 'reseller' : 'developer';
 
-      const { error } = await supabase
-        .from('reseller_applications')
-        .insert({
-          user_id: user.id,
-          application_type: applicationType,
-          full_name: fullName,
-          email: user.email || `${user.id}@softwarevala.local`,
-          phone: null,
-          country: null,
-          id_proof_uploaded: false,
-          terms_accepted: true,
-          promise_acknowledged: true,
-          status: 'pending',
-        });
-
-      if (error) {
-        applicationInsertError = error.message;
-      }
+      await supabase.from('reseller_applications').insert({
+        user_id: user.id,
+        application_type: applicationType,
+        full_name: fullName,
+        email: user.email || `${user.id}@softwarevala.local`,
+        phone: null,
+        country: null,
+        id_proof_uploaded: false,
+        terms_accepted: true,
+        promise_acknowledged: true,
+        status: 'pending',
+      });
     }
 
-    void logEvent(requestType, undefined, {
-      severity: 'warning',
-      metadata: {
-        request_label: label,
-        application_sync: applicationInsertError ? 'failed' : (needsApplicationRecord ? 'created' : 'not_required'),
-      },
-    });
-
-    if (applicationInsertError) {
-      toast.error(`Request logged but application save failed: ${applicationInsertError}`);
-      return;
-    }
-
+    void logEvent(requestType, undefined, { severity: 'warning', metadata: { request_label: label } });
     toast.success(`${label} submitted — Boss has been notified`);
   };
 
   const handleCategoryFilter = (category: string | null) => {
     if (category) {
       navigate(`/marketplace/category/${encodeURIComponent(category)}`);
-      return;
-    }
-
-    navigate('/marketplace');
-  };
-
-  const handleCloseProductDialog = () => {
-    setSelectedProduct(null);
-    if (productId) {
+    } else {
       navigate('/marketplace');
     }
   };
 
-  const filtered = useMemo(() => {
-    let result = products;
+  const handleCloseProductDialog = () => {
+    setSelectedProduct(null);
+    if (productId) navigate('/marketplace');
+  };
 
-    if (searchQuery) {
-      const normalizedQuery = searchQuery.toLowerCase();
-      result = result.filter((product) =>
-        product.product_name.toLowerCase().includes(normalizedQuery) ||
-        product.description?.toLowerCase().includes(normalizedQuery) ||
-        product.category?.toLowerCase().includes(normalizedQuery)
-      );
-    }
-
-    if (selectedCategory) {
-      result = result.filter((product) => product.category?.toLowerCase() === selectedCategory.toLowerCase());
-    }
-
-    return result;
-  }, [products, searchQuery, selectedCategory]);
-
-  const groupedByCategory = useMemo(() => {
-    const groups: Record<string, Product[]> = {};
-
-    products.forEach((product) => {
-      const category = product.category || 'Other';
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(product);
-    });
-
-    return groups;
-  }, [products]);
-
-  // Show products with live status or demo_url, OR show recent products if none available
-  const latestLaunches = useMemo(() => {
-    const live = products.filter(p => p.listing_status === 'live' || p.demo_url);
-    return live.length > 0 ? live : products.slice(0, 10);
-  }, [products]);
-  const upcomingProducts = useMemo(() => products.filter(p => p.listing_status === 'upcoming' || p.listing_status === 'coming_soon').slice(0, 10), [products]);
-  const featuredProducts = useMemo(() => products.slice(0, 5), [products]);
-  const trendingProducts = useMemo(() => [...products].sort(() => 0.5 - Math.random()).slice(0, 8), [products]);
-  const newReleases = useMemo(() => products.slice(0, 8), [products]);
-
-  // Format price for display
   const formatPrice = (price: number | null) => price ? `$${price.toLocaleString()}` : '$249';
+
+  const isSearching = Boolean(debouncedSearch || selectedCategory);
 
   if (loading) {
     return (
@@ -456,17 +489,16 @@ export const MMMarketplaceScreen = () => {
     );
   }
 
-  const isSearching = Boolean(searchQuery || selectedCategory);
-
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-slate-950 text-white" ref={scrollContainerRef}>
+      {/* Header */}
       <div className="sticky top-0 z-30 bg-slate-950/95 backdrop-blur border-b border-slate-800 px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Package className="w-6 h-6 text-cyan-400" />
             <h1 className="text-xl font-bold">Software Marketplace</h1>
             <Badge variant="outline" className="border-cyan-500/50 text-cyan-400 text-xs">
-              {products.length} Products
+              {totalCount.toLocaleString()} Products
             </Badge>
           </div>
           <div className="flex items-center gap-3 flex-1 max-w-xl">
@@ -474,7 +506,7 @@ export const MMMarketplaceScreen = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <Input
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search software..."
                 className="pl-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-500"
               />
@@ -487,6 +519,7 @@ export const MMMarketplaceScreen = () => {
           </div>
         </div>
 
+        {/* Partner Buttons */}
         <div className="flex flex-wrap gap-2 mt-3">
           {PARTNER_REQUEST_BUTTONS.map((request) => (
             <Button
@@ -501,11 +534,12 @@ export const MMMarketplaceScreen = () => {
           ))}
         </div>
 
+        {/* Category Pills */}
         <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => handleCategoryFilter(null)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border ${
-              !selectedCategory ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-300'
+              !selectedCategory ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500'
             }`}
           >
             All
@@ -515,7 +549,7 @@ export const MMMarketplaceScreen = () => {
               key={category}
               onClick={() => handleCategoryFilter(selectedCategory === category ? null : category)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border ${
-                selectedCategory === category ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-300'
+                selectedCategory === category ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500'
               }`}
             >
               {CATEGORY_ICONS[category] || '📦'} {category}
@@ -524,29 +558,46 @@ export const MMMarketplaceScreen = () => {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="px-6 py-4 space-y-8">
         {isSearching ? (
           <div>
             <h2 className="text-lg font-semibold mb-4">
-              {filtered.length} result{filtered.length !== 1 ? 's' : ''}
+              {searchResults.length}+ result{searchResults.length !== 1 ? 's' : ''}
               {selectedCategory && ` in ${selectedCategory}`}
-              {searchQuery && ` for "${searchQuery}"`}
+              {debouncedSearch && ` for "${debouncedSearch}"`}
             </h2>
+            
+            {/* Virtualized Grid for Search Results */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filtered.map((product) => (
-                  <ProductCard
-                    key={product.product_id}
-                    product={product}
-                    isFav={favorites.has(product.product_id)}
-                    onView={handleProductView}
-                    onDemo={handleDemo}
-                    onBuy={handleBuy}
-                    onFav={toggleFavorite}
-                    formatPrice={formatPrice}
-                  />
-                ))}
+              {searchResults.map((product) => (
+                <ProductCard
+                  key={product.product_id}
+                  product={product}
+                  isFav={favorites.has(product.product_id)}
+                  onView={handleProductView}
+                  onDemo={handleDemo}
+                  onBuy={handleBuy}
+                  onFav={toggleFavorite}
+                  formatPrice={formatPrice}
+                />
+              ))}
             </div>
-            {filtered.length === 0 && (
+
+            {/* Infinite scroll trigger */}
+            <div ref={loadMoreRef} className="py-8 flex justify-center">
+              {searchLoading && (
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Loading more...</span>
+                </div>
+              )}
+              {!hasMoreSearch && searchResults.length > 0 && (
+                <p className="text-slate-500 text-sm">All products loaded</p>
+              )}
+            </div>
+
+            {searchResults.length === 0 && !searchLoading && (
               <div className="text-center py-16 text-slate-500">
                 <Search className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>No products found</p>
@@ -555,10 +606,12 @@ export const MMMarketplaceScreen = () => {
           </div>
         ) : (
           <>
-            {featuredProducts.length > 0 && (
-              <HeroBanner products={latestLaunches.length > 0 ? latestLaunches : featuredProducts} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} formatPrice={formatPrice} />
+            {/* Hero Banner */}
+            {latestLaunches.length > 0 && (
+              <HeroBanner products={latestLaunches} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} formatPrice={formatPrice} />
             )}
 
+            {/* Featured Rows */}
             {latestLaunches.length > 0 && (
               <ProductRow
                 title="🚀 Latest Launch"
@@ -597,21 +650,9 @@ export const MMMarketplaceScreen = () => {
               formatPrice={formatPrice}
             />
 
-            <ProductRow
-              title="New Releases"
-              icon={<Zap className="w-5 h-5 text-purple-400" />}
-              products={newReleases}
-              favorites={favorites}
-              onView={handleProductView}
-              onDemo={handleDemo}
-              onBuy={handleBuy}
-              onFav={toggleFavorite}
-              formatPrice={formatPrice}
-            />
-
             {upcomingProducts.length > 0 && (
               <ProductRow
-                title="🔜 Upcoming Soon"
+                title="🔜 Coming Soon"
                 icon={<Monitor className="w-5 h-5 text-amber-400" />}
                 products={upcomingProducts}
                 favorites={favorites}
@@ -623,11 +664,15 @@ export const MMMarketplaceScreen = () => {
               />
             )}
 
-            {Object.entries(groupedByCategory).slice(0, 6).map(([category, categoryProducts]) => (
-              <ProductRow
+            {/* Lazy-loaded Category Rows */}
+            {dynamicCategories.slice(0, 8).map((category) => (
+              <LazyProductRow
                 key={category}
                 title={`${CATEGORY_ICONS[category] || '📦'} ${category}`}
-                products={categoryProducts}
+                category={category}
+                products={categoryProducts[category]}
+                loading={categoryLoading[category]}
+                onLoad={() => loadCategoryProducts(category)}
                 favorites={favorites}
                 onView={handleProductView}
                 onDemo={handleDemo}
@@ -640,6 +685,7 @@ export const MMMarketplaceScreen = () => {
         )}
       </div>
 
+      {/* Product Detail Dialog */}
       {selectedProduct && (
         <>
           <ProductSEOHead
@@ -664,6 +710,79 @@ export const MMMarketplaceScreen = () => {
     </div>
   );
 };
+
+// Lazy-loaded category row with intersection observer
+function LazyProductRow({
+  title,
+  category,
+  products,
+  loading,
+  onLoad,
+  favorites,
+  onView,
+  onDemo,
+  onBuy,
+  onFav,
+  formatPrice,
+}: {
+  title: string;
+  category: string;
+  products?: Product[];
+  loading?: boolean;
+  onLoad: () => void;
+  favorites: Set<string>;
+  onView: (p: Product) => void;
+  onDemo: (p: Product) => void;
+  onBuy: (p: Product) => void;
+  onFav: (id: string) => void;
+  formatPrice: (p: number | null) => string;
+}) {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!rowRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true);
+          onLoad();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(rowRef.current);
+    return () => observer.disconnect();
+  }, [isVisible, onLoad]);
+
+  return (
+    <div ref={rowRef} className="space-y-3">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {loading ? (
+        <div className="flex items-center gap-2 text-slate-400 py-8">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Loading...</span>
+        </div>
+      ) : products && products.length > 0 ? (
+        <ProductRow
+          title=""
+          products={products}
+          favorites={favorites}
+          onView={onView}
+          onDemo={onDemo}
+          onBuy={onBuy}
+          onFav={onFav}
+          formatPrice={formatPrice}
+          hideTitle
+        />
+      ) : (
+        <div className="text-slate-500 text-sm py-4">No products yet</div>
+      )}
+    </div>
+  );
+}
 
 function HeroBanner({ products, onDemo, onBuy, onView, formatPrice }: {
   products: Product[];
@@ -698,385 +817,367 @@ function HeroBanner({ products, onDemo, onBuy, onView, formatPrice }: {
 
   return (
     <div
-      className="relative"
+      className={`relative rounded-xl overflow-hidden bg-gradient-to-r ${GRADIENTS[activeIndex % GRADIENTS.length]} p-8 md:p-12`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-r ${GRADIENTS[activeIndex % GRADIENTS.length]} border border-slate-800 transition-all duration-700`}>
-        {/* Progress bar */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1.5 px-6 pt-3">
-          {bannerProducts.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveIndex(idx)}
-              className="flex-1 h-1 rounded-full overflow-hidden bg-white/20 cursor-pointer"
-            >
-              <div
-                className={`h-full rounded-full transition-all ${
-                  idx === activeIndex
-                    ? 'bg-cyan-400 animate-[progress_5s_linear]'
-                    : idx < activeIndex
-                    ? 'bg-white/40 w-full'
-                    : 'w-0'
-                }`}
-                style={idx === activeIndex ? { animation: isPaused ? 'none' : 'progress 5s linear forwards' } : idx < activeIndex ? { width: '100%' } : { width: '0%' }}
-              />
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-col md:flex-row items-center gap-8">
+        <div className="flex-1 space-y-4">
+          <div className="flex items-center gap-2">
+            {product.category && (
+              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                {CATEGORY_ICONS[product.category] || '📦'} {product.category}
+              </Badge>
+            )}
+            <Badge variant="outline" className="border-emerald-500/50 text-emerald-400">
+              New Launch
+            </Badge>
+          </div>
 
-        <div className="p-8 md:p-12 min-h-[280px] flex items-center">
-          <div className="relative z-10 max-w-2xl">
-            <div className="flex items-center gap-2 mb-3">
-              <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">{product.category || 'Software'}</Badge>
-              <Badge className="bg-white/10 text-white/70 border-white/20 text-[10px]">AD</Badge>
-            </div>
-            <h2
-              className="text-3xl md:text-5xl font-bold mb-3 cursor-pointer hover:text-cyan-300 transition-colors"
-              onClick={() => onView(product)}
-            >
-              {product.product_name}
-            </h2>
-            <p className="text-slate-300 text-sm md:text-base mb-6 line-clamp-2 max-w-lg">
-              {product.description || 'Enterprise-grade software solution built for scale.'}
-            </p>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-cyan-400">{formatPrice(product.monthly_price)}</span>
-                <span className="text-sm text-slate-400">Lifetime • Source Code Included</span>
+          <h2 className="text-2xl md:text-4xl font-bold">{product.product_name}</h2>
+          <p className="text-slate-300 text-sm md:text-base line-clamp-2">{product.description}</p>
+
+          <div className="flex items-center gap-4">
+            <div className="text-2xl font-bold text-cyan-400">{formatPrice(product.monthly_price)}</div>
+            {product.lifetime_price && (
+              <div className="text-sm text-slate-400">
+                <span className="line-through">${Math.round(product.lifetime_price * 1.5)}</span> Lifetime
               </div>
-            </div>
-            <div className="flex gap-3">
-              <Button onClick={() => onDemo(product)} variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
-                <Play className="w-4 h-4 mr-2" /> Try Demo
-              </Button>
-              <Button onClick={() => onBuy(product)} className="bg-cyan-500 hover:bg-cyan-600 text-white">
-                <ShoppingCart className="w-4 h-4 mr-2" /> Buy Now
-              </Button>
-            </div>
+            )}
           </div>
 
-          <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">
-            <Monitor className="w-full h-full" />
+          <div className="flex gap-3 pt-2">
+            <Button onClick={() => onDemo(product)} variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
+              <Play className="w-4 h-4 mr-2" /> Watch Demo
+            </Button>
+            <Button onClick={() => onBuy(product)} className="bg-gradient-to-r from-cyan-500 to-blue-600">
+              <ShoppingCart className="w-4 h-4 mr-2" /> Buy Now
+            </Button>
           </div>
         </div>
 
-        {/* Navigation arrows */}
-        {bannerProducts.length > 1 && (
-          <>
-            <button
-              onClick={() => setActiveIndex((prev) => (prev - 1 + bannerProducts.length) % bannerProducts.length)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/70 hover:text-white transition-all"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setActiveIndex((prev) => (prev + 1) % bannerProducts.length)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/70 hover:text-white transition-all"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </>
+        {product.product_thumbnail_url && (
+          <div className="w-64 h-40 rounded-lg overflow-hidden bg-slate-800">
+            <img src={product.product_thumbnail_url} alt={product.product_name} className="w-full h-full object-cover" />
+          </div>
         )}
       </div>
 
-      {/* Thumbnail strip */}
+      {/* Dots */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {bannerProducts.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setActiveIndex(idx)}
+            className={`w-2 h-2 rounded-full transition-all ${idx === activeIndex ? 'bg-cyan-400 w-6' : 'bg-slate-600'}`}
+          />
+        ))}
+      </div>
+
+      {/* Nav Arrows */}
       {bannerProducts.length > 1 && (
-        <div className="flex gap-2 mt-3 justify-center">
-          {bannerProducts.map((bp, idx) => (
-            <button
-              key={bp.product_id}
-              onClick={() => setActiveIndex(idx)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                idx === activeIndex
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                  : 'bg-slate-800/60 text-slate-500 hover:text-slate-300 border border-transparent'
-              }`}
-            >
-              {bp.product_name.length > 15 ? bp.product_name.slice(0, 15) + '…' : bp.product_name}
-            </button>
-          ))}
-        </div>
+        <>
+          <button
+            onClick={() => setActiveIndex((prev) => (prev - 1 + bannerProducts.length) % bannerProducts.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/50 hover:bg-slate-900/80"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setActiveIndex((prev) => (prev + 1) % bannerProducts.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/50 hover:bg-slate-900/80"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
       )}
     </div>
   );
 }
 
-function ProductRow({ title, icon, products, favorites, onView, onDemo, onBuy, onFav, formatPrice }: {
+function ProductRow({
+  title,
+  icon,
+  products,
+  favorites,
+  onView,
+  onDemo,
+  onBuy,
+  onFav,
+  formatPrice,
+  hideTitle,
+}: {
   title: string;
   icon?: React.ReactNode;
   products: Product[];
   favorites: Set<string>;
-  onView: (product: Product) => void;
-  onDemo: (product: Product) => void;
-  onBuy: (product: Product) => void;
+  onView: (p: Product) => void;
+  onDemo: (p: Product) => void;
+  onBuy: (p: Product) => void;
   onFav: (id: string) => void;
-  formatPrice: (price: number | null) => string;
+  formatPrice: (p: number | null) => string;
+  hideTitle?: boolean;
 }) {
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
-    scrollRef.current?.scrollBy({ left: direction === 'left' ? -320 : 320, behavior: 'smooth' });
+    if (!scrollRef.current) return;
+    const scrollAmount = 300;
+    scrollRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
   };
 
-  if (!products.length) return null;
+  if (products.length === 0) return null;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          {icon}
-          <h3 className="text-lg font-semibold">{title}</h3>
-        </div>
-        <div className="flex gap-1">
-          <button onClick={() => scroll('left')} className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 transition">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button onClick={() => scroll('right')} className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 transition">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-      <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-          {products.map((product) => (
-            <div key={product.product_id} className="flex-shrink-0 w-56">
-              <ProductCard
-                product={product}
-                isFav={favorites.has(product.product_id)}
-                onView={onView}
-                onDemo={onDemo}
-                onBuy={onBuy}
-                onFav={onFav}
-                formatPrice={formatPrice}
-              />
-            </div>
-          ))}
-      </div>
-    </div>
-  );
-}
-
-function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, formatPrice }: {
-  product: Product;
-  isFav: boolean;
-  onView: (product: Product) => void;
-  onDemo: (product: Product) => void;
-  onBuy: (product: Product) => void;
-  onFav: (id: string) => void;
-  formatPrice: (price: number | null) => string;
-}) {
-  const thumbnail = product.product_thumbnail_url || product.product_icon_url;
-  return (
-    <div className="group relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all cursor-pointer" onClick={() => onView(product)}>
-      <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
-        {thumbnail ? (
-          <img src={thumbnail} alt={product.product_name} className="w-full h-full object-cover" />
-        ) : (
-          <Monitor className="w-10 h-10 text-slate-700" />
-        )}
-        <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
-          <Badge variant="outline" className="text-[10px] border-slate-600 text-slate-400 bg-slate-900/80">
-            {product.category || 'Software'}
-          </Badge>
-          {(product.source === 'vala_ai' || product.source === 'repository') && (
-            <Badge variant="outline" className="text-[10px] border-amber-500/50 text-amber-300 bg-slate-900/80">
-              🏭 Our Repository
-            </Badge>
-          )}
-          {product.github_repo_url && (
-            <Badge variant="outline" className="text-[10px] border-emerald-600/50 text-emerald-400 bg-slate-900/80">
-              <Github className="w-2.5 h-2.5 mr-0.5" /> Connected
-            </Badge>
-          )}
-        </div>
-        <button onClick={(event) => { event.stopPropagation(); onFav(product.product_id); }} className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 transition">
-          <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-slate-500'}`} />
-        </button>
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-          <button onClick={(event) => { event.stopPropagation(); onDemo(product); }} className="p-2 rounded-full bg-cyan-500/20 hover:bg-cyan-500/40 transition" title="Try Demo">
-            <Play className="w-4 h-4 text-cyan-400" />
-          </button>
-          {product.github_repo_url && (
-            <button onClick={(event) => { event.stopPropagation(); window.open(product.github_repo_url!, '_blank'); }} className="p-2 rounded-full bg-slate-500/20 hover:bg-slate-500/40 transition" title="View Repository">
-              <Github className="w-4 h-4 text-slate-300" />
+    <div className="space-y-3">
+      {!hideTitle && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {icon}
+            <h3 className="text-lg font-semibold">{title}</h3>
+          </div>
+          <div className="flex gap-1">
+            <button onClick={() => scroll('left')} className="p-1.5 rounded-full hover:bg-slate-800">
+              <ChevronLeft className="w-5 h-5" />
             </button>
-          )}
-          <button onClick={(event) => { event.stopPropagation(); onBuy(product); }} className="p-2 rounded-full bg-emerald-500/20 hover:bg-emerald-500/40 transition" title="Buy Now">
-            <ShoppingCart className="w-4 h-4 text-emerald-400" />
-          </button>
-        </div>
-      </div>
-      <div className="p-3">
-        <h4 className="text-sm font-medium truncate">{product.product_name}</h4>
-        <p className="text-xs text-slate-500 truncate mt-0.5">{product.description || 'Enterprise software'}</p>
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-sm font-bold text-cyan-400">{formatPrice(product.monthly_price)}</span>
-          <div className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-            <span className="text-[10px] text-slate-400">4.8</span>
+            <button onClick={() => scroll('right')} className="p-1.5 rounded-full hover:bg-slate-800">
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
+      )}
+
+      <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth">
+        {products.map((product) => (
+          <ProductCard
+            key={product.product_id}
+            product={product}
+            isFav={favorites.has(product.product_id)}
+            onView={onView}
+            onDemo={onDemo}
+            onBuy={onBuy}
+            onFav={onFav}
+            formatPrice={formatPrice}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onFav, formatPrice }: {
+function ProductCard({
+  product,
+  isFav,
+  onView,
+  onDemo,
+  onBuy,
+  onFav,
+  formatPrice,
+}: {
+  product: Product;
+  isFav: boolean;
+  onView: (p: Product) => void;
+  onDemo: (p: Product) => void;
+  onBuy: (p: Product) => void;
+  onFav: (id: string) => void;
+  formatPrice: (p: number | null) => string;
+}) {
+  return (
+    <div
+      onClick={() => onView(product)}
+      className="flex-shrink-0 w-48 bg-slate-900/80 rounded-lg overflow-hidden border border-slate-800 hover:border-cyan-500/50 transition-all cursor-pointer group"
+    >
+      {/* Thumbnail */}
+      <div className="h-28 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
+        {product.product_thumbnail_url ? (
+          <img src={product.product_thumbnail_url} alt={product.product_name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="text-4xl">{CATEGORY_ICONS[product.category || ''] || '📦'}</div>
+        )}
+        
+        {/* Favorite Button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onFav(product.product_id); }}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <Heart className={`w-4 h-4 ${isFav ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
+        </button>
+
+        {/* Category Badge */}
+        {product.category && (
+          <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded text-xs bg-slate-900/80 text-slate-300">
+            {product.category}
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="p-3 space-y-2">
+        <h4 className="font-medium text-sm line-clamp-2 text-white">{product.product_name}</h4>
+        
+        <div className="flex items-center justify-between">
+          <span className="text-cyan-400 font-bold text-sm">{formatPrice(product.monthly_price)}</span>
+          <Badge variant="outline" className="text-xs border-slate-700 text-slate-400">
+            {product.product_type || 'SaaS'}
+          </Badge>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 pt-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => { e.stopPropagation(); onDemo(product); }}
+            className="flex-1 h-7 text-xs border-slate-700 hover:border-cyan-500"
+          >
+            <Play className="w-3 h-3 mr-1" /> Demo
+          </Button>
+          <Button
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); onBuy(product); }}
+            className="flex-1 h-7 text-xs bg-cyan-600 hover:bg-cyan-500"
+          >
+            Buy
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductDetailDialog({
+  product,
+  open,
+  onClose,
+  onDemo,
+  onBuy,
+  isFav,
+  onFav,
+  formatPrice,
+}: {
   product: Product;
   open: boolean;
   onClose: () => void;
-  onDemo: (product: Product) => void;
-  onBuy: (product: Product) => void;
+  onDemo: (p: Product) => void;
+  onBuy: (p: Product) => void;
   isFav: boolean;
   onFav: (id: string) => void;
-  formatPrice: (price: number | null) => string;
+  formatPrice: (p: number | null) => string;
 }) {
-  const features = Array.isArray(product.features_json) ? product.features_json : [];
-  const { speak, stop, isPlaying, isLoading: isSpeaking } = useValaVoice();
-  const thumbnail = product.product_thumbnail_url || product.product_icon_url;
-  const priceDisplay = formatPrice(product.monthly_price);
+  const { speak, stop, isSpeaking } = useValaVoice();
 
-  const handleSpeak = useCallback(() => {
-    if (isPlaying) {
+  const handleVoice = () => {
+    if (isSpeaking) {
       stop();
       return;
     }
-    const featureList = features.length > 0 ? ` Key features include: ${features.slice(0, 5).join(', ')}.` : '';
-    const speechText = `${product.product_name}. ${product.description || 'Enterprise-grade software solution for your business.'}${featureList} Category: ${product.category || 'Software'}. Price: ${priceDisplay}, lifetime access with full source code, no hidden charges, and 24/7 support.`;
-    speak(speechText);
-  }, [product, features, isPlaying, speak, stop, priceDisplay]);
+    speak(`${product.product_name}. ${product.description || ''} Price: ${formatPrice(product.monthly_price)}`);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-slate-900 border-slate-700 text-white max-h-[85vh]">
+      <DialogContent className="max-w-2xl bg-slate-900 border-slate-700 text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl">{product.product_name}</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="max-h-[60vh] pr-4">
-          <div className="space-y-4">
-            <div className="h-40 bg-gradient-to-br from-cyan-900/40 to-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-              {thumbnail ? (
-                <img src={thumbnail} alt={product.product_name} className="w-full h-full object-cover" />
-              ) : (
-                <Monitor className="w-16 h-16 text-slate-600" />
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {product.category && <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">{product.category}</Badge>}
-              {(product.source === 'vala_ai' || product.source === 'repository') && (
-                <Badge variant="outline" className="border-amber-500/50 text-amber-300 bg-amber-500/10">🏭 From Our Repository</Badge>
-              )}
-              {product.tech_stack && <Badge variant="outline" className="border-purple-500/50 text-purple-400">{product.tech_stack}</Badge>}
-              {product.product_type && <Badge variant="outline" className="border-slate-600 text-slate-400">{product.product_type}</Badge>}
-              {product.repo_language && <Badge variant="outline" className="border-amber-500/50 text-amber-400">{product.repo_language}</Badge>}
-              {product.github_repo_url && <Badge variant="outline" className="border-emerald-500/50 text-emerald-400"><Github className="w-3 h-3 mr-1" /> Repo Connected</Badge>}
-            </div>
-
-            {/* GitHub Repository & Demo Connection */}
-            {(product.github_repo_url || product.demo_url) && (
-              <div className="bg-slate-800/70 rounded-lg p-4 border border-slate-700/50">
-                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <GitCommit className="w-4 h-4 text-cyan-400" />
-                  Repository & Demo Connection
-                </h3>
-                <div className="space-y-2">
-                  {product.github_repo_url && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Github className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs text-slate-400">GitHub Repository</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-cyan-400 hover:text-cyan-300"
-                        onClick={() => window.open(product.github_repo_url!, '_blank')}
-                      >
-                        <ExternalLink className="w-3 h-3 mr-1" /> View Repo
-                      </Button>
-                    </div>
-                  )}
-                  {product.demo_url && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Play className="w-4 h-4 text-emerald-400" />
-                        <span className="text-xs text-slate-400">Live Demo</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-emerald-400 hover:text-emerald-300"
-                        onClick={() => window.open(product.demo_url!, '_blank')}
-                      >
-                        <ExternalLink className="w-3 h-3 mr-1" /> Open Demo
-                      </Button>
-                    </div>
-                  )}
-                  {product.last_repo_sync_at && (
-                    <div className="flex items-center gap-2 pt-1 border-t border-slate-700/50">
-                      <RefreshCw className="w-3 h-3 text-slate-500" />
-                      <span className="text-[10px] text-slate-500">
-                        Last synced: {new Date(product.last_repo_sync_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
+          <div className="flex items-start justify-between">
             <div>
-              <h3 className="text-sm font-semibold mb-1">Description</h3>
-              <p className="text-sm text-slate-400">{product.description || 'Enterprise-grade software solution for your business.'}</p>
+              <DialogTitle className="text-xl">{product.product_name}</DialogTitle>
+              <div className="flex items-center gap-2 mt-2">
+                {product.category && (
+                  <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                    {CATEGORY_ICONS[product.category] || '📦'} {product.category}
+                  </Badge>
+                )}
+                <Badge variant="outline" className="border-slate-600">{product.product_type || 'SaaS'}</Badge>
+              </div>
             </div>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="icon" onClick={handleVoice}>
+                {isSpeaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onFav(product.product_id)}
+              >
+                <Heart className={`w-5 h-5 ${isFav ? 'fill-red-500 text-red-500' : ''}`} />
+              </Button>
+            </div>
+          </div>
+        </DialogHeader>
 
-            {features.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold mb-2">Features</h3>
-                <ul className="grid grid-cols-2 gap-1.5">
-                  {features.map((feature: string, index: number) => (
-                    <li key={index} className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-6 pr-4">
+            {/* Thumbnail */}
+            {product.product_thumbnail_url && (
+              <div className="rounded-lg overflow-hidden bg-slate-800">
+                <img src={product.product_thumbnail_url} alt={product.product_name} className="w-full h-48 object-cover" />
               </div>
             )}
 
+            {/* Description */}
+            <div>
+              <h4 className="font-semibold mb-2">Description</h4>
+              <p className="text-slate-300 text-sm">{product.description}</p>
+            </div>
+
+            {/* Tech Stack */}
+            {product.tech_stack && (
+              <div>
+                <h4 className="font-semibold mb-2">Technology</h4>
+                <Badge variant="outline" className="border-slate-600">{product.tech_stack}</Badge>
+              </div>
+            )}
+
+            {/* Pricing */}
             <div className="bg-slate-800/50 rounded-lg p-4">
-              <h3 className="text-sm font-semibold mb-3">Pricing</h3>
-              <div className="bg-slate-900 rounded-lg p-4 border border-cyan-500/30 text-center">
-                <p className="text-xs text-slate-500 mb-1">All Software — One Price</p>
-                <p className="text-3xl font-bold text-cyan-400">{priceDisplay}</p>
-                <p className="text-xs text-slate-400 mt-1">Lifetime Access • Full Source Code • No Hidden Charges</p>
-                <div className="flex flex-wrap justify-center gap-2 mt-3">
-                  <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-[10px]">✅ No Advance</Badge>
-                  <Badge className="bg-cyan-500/20 text-cyan-400 border-0 text-[10px]">✅ Free Updates</Badge>
-                  <Badge className="bg-purple-500/20 text-purple-400 border-0 text-[10px]">✅ 24/7 Support</Badge>
+              <h4 className="font-semibold mb-3">Pricing</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 rounded-lg bg-slate-900">
+                  <div className="text-2xl font-bold text-cyan-400">{formatPrice(product.monthly_price)}</div>
+                  <div className="text-xs text-slate-400">Starting Price</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-slate-900">
+                  <div className="text-2xl font-bold text-emerald-400">{formatPrice(product.lifetime_price)}</div>
+                  <div className="text-xs text-slate-400">Lifetime License</div>
                 </div>
               </div>
             </div>
+
+            {/* Demo URL */}
+            {product.demo_url && (
+              <div className="flex items-center gap-2 text-sm">
+                <ExternalLink className="w-4 h-4 text-cyan-400" />
+                <a href={product.demo_url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                  Live Demo Available
+                </a>
+              </div>
+            )}
+
+            {/* GitHub */}
+            {product.github_repo_url && (
+              <div className="flex items-center gap-2 text-sm">
+                <Github className="w-4 h-4 text-slate-400" />
+                <a href={product.github_repo_url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white">
+                  View Source
+                </a>
+              </div>
+            )}
           </div>
         </ScrollArea>
 
-        <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
-          <Button onClick={() => onFav(product.product_id)} variant="outline" size="sm" className={`border-slate-700 ${isFav ? 'text-red-400' : 'text-slate-400'}`}>
-            <Heart className={`w-4 h-4 mr-1 ${isFav ? 'fill-red-500' : ''}`} />
-            {isFav ? 'Saved' : 'Save'}
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-slate-700">
+          <Button onClick={() => onDemo(product)} variant="outline" className="flex-1 border-cyan-500 text-cyan-400">
+            <Play className="w-4 h-4 mr-2" /> Watch Demo
           </Button>
-          <Button onClick={handleSpeak} variant="outline" size="sm" className={`border-slate-700 ${isPlaying ? 'text-cyan-400 border-cyan-500/50' : 'text-slate-400'}`}>
-            {isSpeaking ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : isPlaying ? <VolumeX className="w-4 h-4 mr-1" /> : <Volume2 className="w-4 h-4 mr-1" />}
-            {isSpeaking ? 'Loading...' : isPlaying ? 'Stop' : '🔊 Listen'}
-          </Button>
-          <Button onClick={() => onDemo(product)} variant="outline" size="sm" className="border-cyan-500/50 text-cyan-400">
-            <Play className="w-4 h-4 mr-1" /> Demo
-          </Button>
-          <Button onClick={() => onBuy(product)} size="sm" className="bg-cyan-500 hover:bg-cyan-600 text-white ml-auto">
-            <ShoppingCart className="w-4 h-4 mr-1" /> Buy Now
+          <Button onClick={() => onBuy(product)} className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600">
+            <ShoppingCart className="w-4 h-4 mr-2" /> Purchase Now
           </Button>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
-
