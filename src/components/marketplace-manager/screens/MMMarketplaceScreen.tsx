@@ -742,7 +742,7 @@ function HeroBanner({ products, onDemo, onBuy, onView, formatPrice }: {
             </p>
             <div className="flex items-center gap-4 mb-6">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-cyan-400">$249</span>
+                <span className="text-2xl font-bold text-cyan-400">{formatPrice(product.monthly_price)}</span>
                 <span className="text-sm text-slate-400">Lifetime • Source Code Included</span>
               </div>
             </div>
