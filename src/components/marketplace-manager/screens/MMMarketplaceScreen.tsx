@@ -657,7 +657,7 @@ export const MMMarketplaceScreen = () => {
             onBuy={handleBuy}
             isFav={favorites.has(selectedProduct.product_id)}
             onFav={toggleFavorite}
-            discountedPrice={discountedPrice}
+            formatPrice={formatPrice}
           />
         </>
       )}
