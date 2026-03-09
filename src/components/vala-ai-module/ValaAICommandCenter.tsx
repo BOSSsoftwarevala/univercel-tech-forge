@@ -367,9 +367,9 @@ const ValaAICommandCenter: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex overflow-hidden" style={{ background: '#0a0a0a' }}>
+    <div className="h-full max-h-screen flex overflow-hidden" style={{ background: '#0a0a0a' }}>
       {/* ===== LEFT: CHAT PANEL ===== */}
-      <div className="flex flex-col" style={{ width: '420px', minWidth: '360px', borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
+      <div className="flex flex-col h-full" style={{ width: '420px', minWidth: '360px', borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
         {/* Chat Header */}
         <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2">
