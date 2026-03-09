@@ -665,12 +665,12 @@ export const MMMarketplaceScreen = () => {
   );
 };
 
-function HeroBanner({ products, onDemo, onBuy, onView, discountedPrice }: {
+function HeroBanner({ products, onDemo, onBuy, onView, formatPrice }: {
   products: Product[];
   onDemo: (product: Product) => void;
   onBuy: (product: Product) => void;
   onView: (product: Product) => void;
-  discountedPrice: (price: number | null) => string;
+  formatPrice: (price: number | null) => string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
