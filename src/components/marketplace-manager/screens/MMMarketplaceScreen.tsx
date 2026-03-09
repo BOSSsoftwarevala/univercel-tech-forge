@@ -942,9 +942,9 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
       return;
     }
     const featureList = features.length > 0 ? ` Key features include: ${features.slice(0, 5).join(', ')}.` : '';
-    const speechText = `${product.product_name}. ${product.description || 'Enterprise-grade software solution for your business.'}${featureList} Category: ${product.category || 'Software'}. Price: just 249 dollars, lifetime access with full source code, no hidden charges, and 24/7 support.`;
+    const speechText = `${product.product_name}. ${product.description || 'Enterprise-grade software solution for your business.'}${featureList} Category: ${product.category || 'Software'}. Price: ${priceDisplay}, lifetime access with full source code, no hidden charges, and 24/7 support.`;
     speak(speechText);
-  }, [product, features, isPlaying, speak, stop]);
+  }, [product, features, isPlaying, speak, stop, priceDisplay]);
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl bg-slate-900 border-slate-700 text-white max-h-[85vh]">
