@@ -415,9 +415,9 @@ const ValaAICommandCenter: React.FC = () => {
   };
 
   return (
-    <div className="h-full max-h-screen flex overflow-hidden" style={{ background: '#0a0a0a' }}>
+    <div className="h-full min-h-0 flex overflow-hidden" style={{ background: '#0a0a0a' }}>
       {/* ===== LEFT: CHAT PANEL ===== */}
-      <div className="flex flex-col h-full" style={{ width: '420px', minWidth: '360px', borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
+      <div className="flex flex-col h-full min-h-0" style={{ width: '420px', minWidth: '360px', borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
         {/* Chat Header */}
         <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2">
@@ -526,7 +526,7 @@ const ValaAICommandCenter: React.FC = () => {
       </div>
 
       {/* ===== RIGHT: WORKSPACE ===== */}
-      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: '#0a0a0a' }}>
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0" style={{ background: '#0a0a0a' }}>
         {/* Workspace Header / Tab Bar */}
         <div className="flex items-center justify-between px-4 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: '#111' }}>
           <div className="flex items-center gap-1">
@@ -605,7 +605,7 @@ const ValaAICommandCenter: React.FC = () => {
         </div>
 
         {/* Workspace Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-h-0">
           {/* File Tree (Code mode) */}
           {activeTab === 'code' && showFileTree && (
             <div className="w-[200px] overflow-y-auto py-2" style={{ borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0d0d0d' }}>
@@ -622,7 +622,7 @@ const ValaAICommandCenter: React.FC = () => {
           )}
 
           {/* Main View */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden min-h-0">
             {activeTab === 'preview' ? (
               /* Preview iframe */
               <div className="w-full h-full flex items-center justify-center" style={{ background: '#0f172a' }}>

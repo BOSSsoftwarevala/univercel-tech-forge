@@ -78,13 +78,13 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: '#0B0F1A' }}>
+    <div className="flex w-full overflow-hidden min-h-[100dvh] h-[100dvh]" style={{ background: '#0B0F1A' }}>
       <ValaAISidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}
         onBack={onBack}
       />
-      <div className="flex-1 overflow-hidden h-full" style={{ color: '#FFFFFF' }}>
+      <div className="flex-1 overflow-hidden h-full min-h-0" style={{ color: '#FFFFFF' }}>
         {renderContent()}
       </div>
     </div>
