@@ -1070,7 +1070,7 @@ function ProductDetailDialog({
   const { speak, stop, isPlaying } = useValaVoice();
 
   const handleVoice = () => {
-    if (isSpeaking) {
+    if (isPlaying) {
       stop();
       return;
     }
