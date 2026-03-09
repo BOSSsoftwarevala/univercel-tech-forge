@@ -533,18 +533,18 @@ export const MMMarketplaceScreen = () => {
               {searchQuery && ` for "${searchQuery}"`}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {filtered.map((product) => (
-                <ProductCard
-                  key={product.product_id}
-                  product={product}
-                  isFav={favorites.has(product.product_id)}
-                  onView={handleProductView}
-                  onDemo={handleDemo}
-                  onBuy={handleBuy}
-                  onFav={toggleFavorite}
-                  discountedPrice={discountedPrice}
-                />
-              ))}
+                {filtered.map((product) => (
+                  <ProductCard
+                    key={product.product_id}
+                    product={product}
+                    isFav={favorites.has(product.product_id)}
+                    onView={handleProductView}
+                    onDemo={handleDemo}
+                    onBuy={handleBuy}
+                    onFav={toggleFavorite}
+                    formatPrice={formatPrice}
+                  />
+                ))}
             </div>
             {filtered.length === 0 && (
               <div className="text-center py-16 text-slate-500">
