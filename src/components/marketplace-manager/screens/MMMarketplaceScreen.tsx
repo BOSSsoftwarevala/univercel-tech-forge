@@ -582,7 +582,7 @@ export const MMMarketplaceScreen = () => {
               onDemo={handleDemo}
               onBuy={handleBuy}
               onFav={toggleFavorite}
-              discountedPrice={discountedPrice}
+              formatPrice={formatPrice}
             />
 
             <ProductRow
@@ -594,7 +594,7 @@ export const MMMarketplaceScreen = () => {
               onDemo={handleDemo}
               onBuy={handleBuy}
               onFav={toggleFavorite}
-              discountedPrice={discountedPrice}
+              formatPrice={formatPrice}
             />
 
             <ProductRow
@@ -606,7 +606,7 @@ export const MMMarketplaceScreen = () => {
               onDemo={handleDemo}
               onBuy={handleBuy}
               onFav={toggleFavorite}
-              discountedPrice={discountedPrice}
+              formatPrice={formatPrice}
             />
 
             {upcomingProducts.length > 0 && (
@@ -619,7 +619,7 @@ export const MMMarketplaceScreen = () => {
                 onDemo={handleDemo}
                 onBuy={handleBuy}
                 onFav={toggleFavorite}
-                discountedPrice={discountedPrice}
+                formatPrice={formatPrice}
               />
             )}
 
@@ -633,7 +633,7 @@ export const MMMarketplaceScreen = () => {
                 onDemo={handleDemo}
                 onBuy={handleBuy}
                 onFav={toggleFavorite}
-                discountedPrice={discountedPrice}
+                formatPrice={formatPrice}
               />
             ))}
           </>
