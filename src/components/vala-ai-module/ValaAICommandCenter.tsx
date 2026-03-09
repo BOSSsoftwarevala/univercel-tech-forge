@@ -626,13 +626,20 @@ const ValaAICommandCenter: React.FC = () => {
           <div className="flex-1 overflow-hidden">
             {activeTab === 'preview' ? (
               /* Preview iframe */
-              <iframe
-                srcDoc={previewHtml}
-                className="w-full h-full border-0"
-                title="VALA Preview"
-                sandbox="allow-scripts"
-                style={{ background: '#0f172a' }}
-              />
+              <div className="w-full h-full flex items-center justify-center" style={{ background: '#0f172a' }}>
+                <iframe
+                  key={previewKey}
+                  srcDoc={previewHtml}
+                  className="h-full border-0"
+                  title="VALA Preview"
+                  sandbox="allow-scripts"
+                  style={{
+                    background: '#0f172a',
+                    width: previewDevice === 'mobile' ? 390 : '100%',
+                    maxWidth: '100%',
+                  }}
+                />
+              </div>
             ) : (
               /* Code Editor */
               <div className="h-full flex flex-col">
