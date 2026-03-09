@@ -556,7 +556,7 @@ export const MMMarketplaceScreen = () => {
         ) : (
           <>
             {featuredProducts.length > 0 && (
-              <HeroBanner products={latestLaunches.length > 0 ? latestLaunches : featuredProducts} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} discountedPrice={discountedPrice} />
+              <HeroBanner products={latestLaunches.length > 0 ? latestLaunches : featuredProducts} onDemo={handleDemo} onBuy={handleBuy} onView={handleProductView} formatPrice={formatPrice} />
             )}
 
             {latestLaunches.length > 0 && (
