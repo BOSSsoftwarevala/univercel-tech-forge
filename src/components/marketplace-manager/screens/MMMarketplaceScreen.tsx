@@ -921,7 +921,7 @@ function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, formatPrice
   );
 }
 
-function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onFav, discountedPrice }: {
+function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onFav, formatPrice }: {
   product: Product;
   open: boolean;
   onClose: () => void;
@@ -929,10 +929,12 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
   onBuy: (product: Product) => void;
   isFav: boolean;
   onFav: (id: string) => void;
-  discountedPrice: (price: number | null) => string;
+  formatPrice: (price: number | null) => string;
 }) {
   const features = Array.isArray(product.features_json) ? product.features_json : [];
   const { speak, stop, isPlaying, isLoading: isSpeaking } = useValaVoice();
+  const thumbnail = product.product_thumbnail_url || product.product_icon_url;
+  const priceDisplay = formatPrice(product.monthly_price);
 
   const handleSpeak = useCallback(() => {
     if (isPlaying) {
