@@ -572,10 +572,20 @@ const ValaAICommandCenter: React.FC = () => {
                   <RefreshCw className="w-3.5 h-3.5" />
                 </Button>
                 <div className="flex items-center gap-0.5 ml-1">
-                  <Button variant="ghost" size="icon" className="w-7 h-7 text-white/30 hover:text-white hover:bg-white/5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setPreviewDevice('desktop')}
+                    className={`w-7 h-7 hover:bg-white/5 ${previewDevice === 'desktop' ? 'text-white' : 'text-white/30 hover:text-white'}`}
+                  >
                     <Monitor className="w-3.5 h-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="w-7 h-7 text-white/30 hover:text-white hover:bg-white/5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setPreviewDevice('mobile')}
+                    className={`w-7 h-7 hover:bg-white/5 ${previewDevice === 'mobile' ? 'text-white' : 'text-white/30 hover:text-white'}`}
+                  >
                     <Smartphone className="w-3.5 h-3.5" />
                   </Button>
                 </div>
