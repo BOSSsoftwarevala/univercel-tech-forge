@@ -336,7 +336,10 @@ const ValaAICommandCenter: React.FC = () => {
     };
 
     await streamChat({
-      messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+      messages: [
+        { role: 'system', content: PREVIEW_HINT },
+        ...[...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+      ],
       onDelta: upsertAssistant,
       onDone: () => setIsStreaming(false),
       onError: (err) => {
@@ -344,6 +347,13 @@ const ValaAICommandCenter: React.FC = () => {
         toast.error(err);
       },
     });
+
+    // Update preview after the stream finishes
+    const extracted = extractPreviewHtmlFromMarkdown(assistantContent);
+    const nextHtml = extracted || fallbackPreviewHtml(assistantContent);
+    setPreviewHtml(nextHtml);
+    setPreviewKey(Date.now());
+    setActiveTab('preview');
   }, [input, isStreaming, messages]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
