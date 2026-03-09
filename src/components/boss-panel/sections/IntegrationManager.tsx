@@ -38,7 +38,7 @@ const INTEGRATIONS = [
   { id: 'sendgrid', name: 'SendGrid Email', icon: Mail, status: 'connected', category: 'Email', lastSync: '5 min ago', requests: '2.4K/day', color: T.cyan },
   { id: 'twilio', name: 'Twilio SMS/OTP', icon: MessageSquare, status: 'connected', category: 'Messaging', lastSync: '1 min ago', requests: '8.7K/day', color: T.green },
   { id: 'openai', name: 'Vala AI Engine', icon: Zap, status: 'connected', category: 'AI', lastSync: 'Live', requests: '45K/day', color: T.amber },
-  { id: 'cloudflare', name: 'Cloudflare CDN', icon: Globe, status: 'connected', category: 'CDN', lastSync: '10 min ago', requests: '1.2M/day', color: T.orange || T.amber },
+  { id: 'cloudflare', name: 'Cloudflare CDN', icon: Globe, status: 'connected', category: 'CDN', lastSync: '10 min ago', requests: '1.2M/day', color: T.amber },
   { id: 'aws-s3', name: 'Cloud Storage', icon: Cloud, status: 'connected', category: 'Storage', lastSync: '3 min ago', requests: '6.8K/day', color: T.muted },
   { id: 'sentry', name: 'Sentry Monitoring', icon: Shield, status: 'warning', category: 'Monitoring', lastSync: '15 min ago', requests: '3.1K/day', color: T.red },
   { id: 'slack', name: 'Slack Alerts', icon: MessageSquare, status: 'disconnected', category: 'Alerts', lastSync: '2 days ago', requests: '0/day', color: T.dim },

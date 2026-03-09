@@ -66,7 +66,7 @@ export function NotificationManager() {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
-      if (filterType !== 'all') q = q.eq('notification_type', filterType);
+      if (filterType !== 'all') q = q.eq('type', filterType);
       const { data, error } = await q;
       if (error) throw error;
       return data || [];

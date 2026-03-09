@@ -49,18 +49,16 @@ export function LicenseManager() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
+  // Use api_keys table as license proxy
   const { data: licenses, isLoading } = useQuery({
     queryKey: ['boss-licenses'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('software_licenses')
-        .select('*, profiles(email)')
+        .from('api_keys')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(200);
-      if (error) {
-        // Table may not exist - return empty
-        return [];
-      }
+      if (error) return [];
       return data || [];
     },
     retry: false,
