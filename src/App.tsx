@@ -722,6 +722,14 @@ const App = memo(() => (
                             <Route path="/secure/api-ai-manager" element={<RequireRole allowed={["ai_manager", "boss_owner"]}><SecureAPIAIManagerDashboard /></RequireRole>} />
                             <Route path="/secure/reseller-manager" element={<RequireRole allowed={["reseller_manager", "boss_owner"]}><SecureResellerManagerDashboard /></RequireRole>} />
                             <Route path="/secure/sales-support-manager" element={<RequireRole allowed={["sales_support_manager", "boss_owner"]}><SecureSalesSupportManagerDashboard /></RequireRole>} />
+                            <Route path="/secure/franchise-manager" element={<RequireRole allowed={["franchise_manager", "boss_owner"]}><SecureFranchiseManagerDashboard /></RequireRole>} />
+
+                            {/* Missing Page Routes */}
+                            <Route path="/over-ai" element={<RequireRole allowed={["boss_owner", "ceo"]}><OverAI /></RequireRole>} />
+                            <Route path="/internal-support-ai" element={<RequireRole allowed={["boss_owner", "support"]}><InternalSupportAI /></RequireRole>} />
+                            <Route path="/simple-landing" element={<SimpleLanding />} />
+                            <Route path="/apply-portal" element={<ApplyPortal />} />
+                            <Route path="/admin/bulk-actions" element={<RequireRole allowed={["boss_owner"]}><BulkActionsReference /></RequireRole>} />
 
                             {/* Control System Routes */}
                             <Route path="/control-system" element={<RequireRole allowed={["boss_owner", "master"]}><SecureControlSystem /></RequireRole>} />
