@@ -868,8 +868,12 @@ function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, formatPrice
   const thumbnail = product.product_thumbnail_url || product.product_icon_url;
   return (
     <div className="group relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all cursor-pointer" onClick={() => onView(product)}>
-      <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative">
-        <Monitor className="w-10 h-10 text-slate-700" />
+      <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
+        {thumbnail ? (
+          <img src={thumbnail} alt={product.product_name} className="w-full h-full object-cover" />
+        ) : (
+          <Monitor className="w-10 h-10 text-slate-700" />
+        )}
         <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
           <Badge variant="outline" className="text-[10px] border-slate-600 text-slate-400 bg-slate-900/80">
             {product.category || 'Software'}
