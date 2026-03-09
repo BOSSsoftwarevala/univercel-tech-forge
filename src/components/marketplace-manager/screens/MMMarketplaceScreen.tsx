@@ -953,8 +953,12 @@ function ProductDetailDialog({ product, open, onClose, onDemo, onBuy, isFav, onF
         </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4">
           <div className="space-y-4">
-            <div className="h-40 bg-gradient-to-br from-cyan-900/40 to-slate-800 rounded-lg flex items-center justify-center">
-              <Monitor className="w-16 h-16 text-slate-600" />
+            <div className="h-40 bg-gradient-to-br from-cyan-900/40 to-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
+              {thumbnail ? (
+                <img src={thumbnail} alt={product.product_name} className="w-full h-full object-cover" />
+              ) : (
+                <Monitor className="w-16 h-16 text-slate-600" />
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2">
