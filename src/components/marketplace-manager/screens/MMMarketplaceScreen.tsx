@@ -856,15 +856,16 @@ function ProductRow({ title, icon, products, favorites, onView, onDemo, onBuy, o
   );
 }
 
-function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, discountedPrice }: {
+function ProductCard({ product, isFav, onView, onDemo, onBuy, onFav, formatPrice }: {
   product: Product;
   isFav: boolean;
   onView: (product: Product) => void;
   onDemo: (product: Product) => void;
   onBuy: (product: Product) => void;
   onFav: (id: string) => void;
-  discountedPrice: (price: number | null) => string;
+  formatPrice: (price: number | null) => string;
 }) {
+  const thumbnail = product.product_thumbnail_url || product.product_icon_url;
   return (
     <div className="group relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all cursor-pointer" onClick={() => onView(product)}>
       <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative">
