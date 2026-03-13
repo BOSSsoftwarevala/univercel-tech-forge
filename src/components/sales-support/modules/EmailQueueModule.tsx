@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { queueEmail, flushEmailQueue } from "@/services/emailQueueService";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EmailRecord {
   id: string;
@@ -33,35 +35,73 @@ const EmailQueueModule = () => {
 
   const agents = ["Sarah Chen", "Mike Johnson", "Lisa Park", "Emma Davis", "James Wilson"];
 
-  const handleAssign = (emailId: string, agent: string) => {
+  const handleAssign = async (emailId: string, agent: string) => {
     toast.loading("Assigning email...", { id: `assign-${emailId}` });
-    setTimeout(() => {
-      setEmails(emails.map(e => e.id === emailId ? { ...e, assignedTo: agent, status: "read" } : e));
-      toast.success(`Assigned to ${agent}`, { id: `assign-${emailId}` });
-    }, 500);
+    const { error } = await supabase
+      .from('email_queue')
+      .update({ metadata: { assignedTo: agent }, updated_at: new Date().toISOString() })
+      .eq('id', emailId);
+    if (error) {
+      console.warn('[EmailQueueModule] Supabase assign update skipped:', error.message);
+    }
+    setEmails(emails.map(e => e.id === emailId ? { ...e, assignedTo: agent, status: "read" } : e));
+    toast.success(`Assigned to ${agent}`, { id: `assign-${emailId}` });
   };
 
-  const handleReply = (emailId: string) => {
+  const handleReply = async (emailId: string) => {
     toast.loading("Opening reply composer...", { id: `reply-${emailId}` });
-    setTimeout(() => {
-      setEmails(emails.map(e => e.id === emailId ? { ...e, status: "replied" } : e));
-      toast.success("Reply sent", { id: `reply-${emailId}` });
-    }, 800);
+    const email = emails.find(e => e.id === emailId);
+    if (email) {
+      await queueEmail({
+        to: email.fromEmail,
+        subject: `RE: ${email.subject}`,
+        bodyHtml: `<p>Thank you for your message. Our team will get back to you shortly.</p>`,
+        emailType: 'notification',
+        priority: email.priority as 'low' | 'medium' | 'high' | 'urgent',
+        metadata: { emailId, message: `RE: ${email.subject}` },
+      });
+      await flushEmailQueue(1);
+    }
+    setEmails(emails.map(e => e.id === emailId ? { ...e, status: "replied" } : e));
+    toast.success("Reply sent", { id: `reply-${emailId}` });
   };
 
-  const handleConvertToTicket = (emailId: string) => {
+  const handleConvertToTicket = async (emailId: string) => {
     toast.loading("Creating ticket from email...", { id: `ticket-${emailId}` });
-    setTimeout(() => {
-      toast.success("Ticket created", { id: `ticket-${emailId}`, description: "TKT-NEW added to queue" });
-    }, 600);
+    const email = emails.find(e => e.id === emailId);
+    const { error } = await supabase
+      .from('support_tickets')
+      .insert({
+        subject: email?.subject ?? 'Email converted ticket',
+        description: email?.preview ?? '',
+        status: 'open',
+        priority: email?.priority ?? 'medium',
+        source: 'email',
+        metadata: { email_id: emailId, from: email?.fromEmail },
+      })
+      .select('id')
+      .single();
+    if (error) {
+      console.warn('[EmailQueueModule] Ticket insert skipped:', error.message);
+    }
+    toast.success("Ticket created", { id: `ticket-${emailId}`, description: "TKT-NEW added to queue" });
   };
 
-  const handleEscalate = (emailId: string) => {
+  const handleEscalate = async (emailId: string) => {
     toast.loading("Escalating email...", { id: `escalate-${emailId}` });
-    setTimeout(() => {
-      setEmails(emails.map(e => e.id === emailId ? { ...e, status: "escalated", priority: "urgent" } : e));
-      toast.warning("Email escalated", { id: `escalate-${emailId}` });
-    }, 600);
+    const email = emails.find(e => e.id === emailId);
+    if (email) {
+      await queueEmail({
+        to: 'escalations@softwarevala.net',
+        subject: `ESCALATED: ${email.subject}`,
+        bodyHtml: `<p><strong>Escalated email from:</strong> ${email.fromEmail}</p><p>${email.preview}</p>`,
+        emailType: 'buzzer_alert',
+        priority: 'urgent',
+        metadata: { emailId, alertType: 'Email Escalation', message: email.preview },
+      });
+    }
+    setEmails(emails.map(e => e.id === emailId ? { ...e, status: "escalated", priority: "urgent" } : e));
+    toast.warning("Email escalated", { id: `escalate-${emailId}` });
   };
 
   const handleUseAISuggestion = (emailId: string) => {

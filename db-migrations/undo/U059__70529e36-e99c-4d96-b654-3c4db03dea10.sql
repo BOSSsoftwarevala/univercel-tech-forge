@@ -1,0 +1,2 @@
+-- Undo migration for V059
+-- Auto-generated. Manual undo scripts needed.

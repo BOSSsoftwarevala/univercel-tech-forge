@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Box, Package, Play, Eye, Plus, Edit2, Trash2, Search, Filter,
@@ -21,6 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 // Mock products data - Including School Management System (LIVE)
 const mockProducts = [
@@ -285,6 +286,43 @@ const ProductManagerDashboard = () => {
   const [showCreateDemo, setShowCreateDemo] = useState(false);
   const [createDemoStep, setCreateDemoStep] = useState(1);
   const [demoConfig, setDemoConfig] = useState({ product: "", type: "time_based", duration: "15" });
+  const [demoStats, setDemoStats] = useState({ totalDemos: 0, activeDemos: 0, expiredDemos: 0 });
+  const [productStats, setProductStats] = useState({ totalProducts: 0, activeProducts: 0 });
+
+  useEffect(() => {
+    const fetchDemoStats = async () => {
+      const { data, error } = await supabase
+        .from('demos')
+        .select('id, status, expires_at');
+      if (error) {
+        console.error('Failed to fetch demos:', error);
+        setDemoStats({ totalDemos: 0, activeDemos: 0, expiredDemos: 0 });
+        return;
+      }
+      const now = new Date();
+      const totalDemos = data?.length || 0;
+      const activeDemos = data?.filter((d: { status: string }) => d.status === 'active').length || 0;
+      const expiredDemos = data?.filter((d: { expires_at: string }) => d.expires_at && new Date(d.expires_at) < now).length || 0;
+      setDemoStats({ totalDemos, activeDemos, expiredDemos });
+    };
+
+    const fetchProductStats = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, status');
+      if (error) {
+        console.error('Failed to fetch products:', error);
+        setProductStats({ totalProducts: 0, activeProducts: 0 });
+        return;
+      }
+      const totalProducts = data?.length || 0;
+      const activeProducts = data?.filter((p: { status: string }) => p.status === 'active').length || 0;
+      setProductStats({ totalProducts, activeProducts });
+    };
+
+    fetchDemoStats();
+    fetchProductStats();
+  }, []);
 
   // ===== ACTION HANDLERS =====
   const handleEditProduct = useCallback(() => {
@@ -428,12 +466,12 @@ const ProductManagerDashboard = () => {
       {/* Stats Bar */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
         {[
-          { label: "Products", value: "156", icon: Box, color: "indigo" },
-          { label: "Active", value: "142", icon: CheckCircle2, color: "emerald" },
-          { label: "Total Demos", value: "324", icon: Play, color: "violet" },
-          { label: "Active Demos", value: "289", icon: Zap, color: "blue" },
-          { label: "Conversion", value: "18.5%", icon: TrendingUp, color: "emerald" },
-          { label: "Users", value: "45.2K", icon: Users, color: "amber" },
+          { label: "Products", value: productStats.totalProducts.toString(), icon: Box, color: "indigo" },
+          { label: "Active", value: productStats.activeProducts.toString(), icon: CheckCircle2, color: "emerald" },
+          { label: "Total Demos", value: demoStats.totalDemos.toString(), icon: Play, color: "violet" },
+          { label: "Active Demos", value: demoStats.activeDemos.toString(), icon: Zap, color: "blue" },
+          { label: "Conversion", value: "—", icon: TrendingUp, color: "emerald" },
+          { label: "Users", value: "—", icon: Users, color: "amber" },
         ].map((stat) => (
           <Card key={stat.label} className="bg-card/50 border-indigo-500/10">
             <CardContent className="p-3">
@@ -1094,11 +1132,11 @@ const ProductManagerDashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="p-3 rounded-lg bg-indigo-500/10 text-center">
-                    <p className="text-2xl font-bold text-indigo-400">156</p>
+                    <p className="text-2xl font-bold text-indigo-400">{productStats.totalProducts}</p>
                     <p className="text-xs text-muted-foreground">Total Products</p>
                   </div>
                   <div className="p-3 rounded-lg bg-emerald-500/10 text-center">
-                    <p className="text-2xl font-bold text-emerald-400">142</p>
+                    <p className="text-2xl font-bold text-emerald-400">{productStats.activeProducts}</p>
                     <p className="text-xs text-muted-foreground">Active Products</p>
                   </div>
                 </div>
@@ -1128,21 +1166,21 @@ const ProductManagerDashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="p-3 rounded-lg bg-violet-500/10 text-center">
-                    <p className="text-2xl font-bold text-violet-400">324</p>
+                    <p className="text-2xl font-bold text-violet-400">{demoStats.totalDemos}</p>
                     <p className="text-xs text-muted-foreground">Total Demos</p>
                   </div>
                   <div className="p-3 rounded-lg bg-emerald-500/10 text-center">
-                    <p className="text-2xl font-bold text-emerald-400">289</p>
+                    <p className="text-2xl font-bold text-emerald-400">{demoStats.activeDemos}</p>
                     <p className="text-xs text-muted-foreground">Active Demos</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 rounded-lg bg-amber-500/10 text-center">
-                    <p className="text-2xl font-bold text-amber-400">35</p>
+                    <p className="text-2xl font-bold text-amber-400">{demoStats.expiredDemos}</p>
                     <p className="text-xs text-muted-foreground">Expired</p>
                   </div>
                   <div className="p-3 rounded-lg bg-blue-500/10 text-center">
-                    <p className="text-2xl font-bold text-blue-400">18.5%</p>
+                    <p className="text-2xl font-bold text-blue-400">—</p>
                     <p className="text-xs text-muted-foreground">Conversion Rate</p>
                   </div>
                 </div>
@@ -1151,7 +1189,7 @@ const ProductManagerDashboard = () => {
                     <TrendingUp className="w-5 h-5 text-emerald-400" />
                     <div>
                       <p className="text-sm font-medium text-foreground">Demo → Paid Conversion</p>
-                      <p className="text-xs text-muted-foreground">58 conversions this month (+12%)</p>
+                      <p className="text-xs text-muted-foreground">Demo → Paid conversion data</p>
                     </div>
                   </div>
                 </div>

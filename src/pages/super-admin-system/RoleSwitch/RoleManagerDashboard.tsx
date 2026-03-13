@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Shield, Users, CheckCircle, XCircle, Eye, Edit, Copy, Trash2,
@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -31,115 +32,37 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Mock Roles Data
-const rolesData = [
-  {
-    id: "1",
-    name: "Super Admin",
-    type: "system",
-    level: "Global",
-    assignedUsers: 3,
-    status: "active",
-    createdBy: "System",
-    createdAt: "2024-01-01",
-    description: "Full system access with all permissions",
-    permissions: 145
-  },
-  {
-    id: "2",
-    name: "Continent Manager",
-    type: "system",
-    level: "Continent",
-    assignedUsers: 12,
-    status: "active",
-    createdBy: "System",
-    createdAt: "2024-01-01",
-    description: "Manage continent-level operations",
-    permissions: 98
-  },
-  {
-    id: "3",
-    name: "Country Admin",
-    type: "system",
-    level: "Country",
-    assignedUsers: 45,
-    status: "active",
-    createdBy: "System",
-    createdAt: "2024-01-01",
-    description: "Country-level administration",
-    permissions: 72
-  },
-  {
-    id: "4",
-    name: "Finance Auditor",
-    type: "custom",
-    level: "Module",
-    assignedUsers: 8,
-    status: "active",
-    createdBy: "Admin User",
-    createdAt: "2024-06-15",
-    description: "Read-only access to financial reports",
-    permissions: 24
-  },
-  {
-    id: "5",
-    name: "Support Team Lead",
-    type: "custom",
-    level: "Area",
-    assignedUsers: 0,
-    status: "pending",
-    createdBy: "HR Manager",
-    createdAt: "2024-12-28",
-    description: "Lead support team with escalation powers",
-    permissions: 56
-  },
-  {
-    id: "6",
-    name: "Marketing Viewer",
-    type: "custom",
-    level: "Module",
-    assignedUsers: 15,
-    status: "disabled",
-    createdBy: "Marketing Head",
-    createdAt: "2024-09-10",
-    description: "View-only marketing analytics",
-    permissions: 12
-  },
-];
+// Role and approval type definitions
+interface RoleData {
+  id: string;
+  name: string;
+  type: string;
+  level: string;
+  assignedUsers: number;
+  status: string;
+  createdBy: string;
+  createdAt: string;
+  description: string;
+  permissions: number;
+}
 
-// Pending Approvals
-const pendingApprovals = [
-  {
-    id: "PA-001",
-    roleName: "Support Team Lead",
-    requestedBy: "HR Manager",
-    level: "Area",
-    permissionCount: 56,
-    riskLevel: "medium",
-    requestedAt: "2024-12-28",
-    description: "Lead support team with escalation powers"
-  },
-  {
-    id: "PA-002",
-    roleName: "Regional Sales Manager",
-    requestedBy: "Sales Director",
-    level: "Country",
-    permissionCount: 42,
-    riskLevel: "low",
-    requestedAt: "2024-12-29",
-    description: "Manage regional sales operations"
-  },
-  {
-    id: "PA-003",
-    roleName: "System Integrator",
-    requestedBy: "Tech Lead",
-    level: "Global",
-    permissionCount: 89,
-    riskLevel: "high",
-    requestedAt: "2024-12-30",
-    description: "API and integration management"
-  },
-];
+interface PendingApproval {
+  id: string;
+  roleName: string;
+  requestedBy: string;
+  level: string;
+  permissionCount: number;
+  riskLevel: string;
+  requestedAt: string;
+  description: string;
+}
+
+interface ActivityLogEntry {
+  action: string;
+  time: string;
+  type: string;
+  user: string;
+}
 
 // Permission Matrix Structure
 const permissionCategories = [
@@ -190,15 +113,6 @@ const permissionCategories = [
 ];
 
 const permissionActions = ["View", "Create", "Edit", "Delete", "Approve", "Assign", "Export", "Lock", "Configure"];
-
-// Activity log
-const activityLog = [
-  { action: "Role 'Finance Auditor' permissions updated", time: "5 mins ago", type: "edit", user: "Admin" },
-  { action: "Role 'Support Team Lead' submitted for approval", time: "2 hours ago", type: "create", user: "HR Manager" },
-  { action: "Role 'Marketing Viewer' disabled", time: "1 day ago", type: "disable", user: "System" },
-  { action: "Role 'Country Admin' assigned to 3 users", time: "2 days ago", type: "assign", user: "Super Admin" },
-  { action: "Role 'Regional Sales Manager' rejected", time: "3 days ago", type: "reject", user: "Super Admin" },
-];
 
 // Create Role Modal
 interface CreateRoleModalProps {
@@ -506,7 +420,7 @@ const PermissionMatrixModal = ({ open, onClose, roleName, readOnly = true }: Per
 
 // Approval Detail Panel
 interface ApprovalDetailProps {
-  approval: typeof pendingApprovals[0];
+  approval: PendingApproval;
   onClose: () => void;
 }
 
@@ -730,8 +644,70 @@ const RoleManagerDashboard = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showMatrixModal, setShowMatrixModal] = useState(false);
-  const [selectedApproval, setSelectedApproval] = useState<typeof pendingApprovals[0] | null>(null);
+  const [selectedApproval, setSelectedApproval] = useState<PendingApproval | null>(null);
+  const [rolesData, setRolesData] = useState<RoleData[]>([]);
+  const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
+  const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const { data, error } = await supabase
+        .from('roles')
+        .select('id, name, type, level, status, created_by, created_at, description');
+      if (error) { console.error('Failed to fetch roles:', error); setRolesData([]); return; }
+      setRolesData((data || []).map((r: { id: string; name: string; type: string; level: string; status: string; created_by: string; created_at: string; description: string }) => ({
+        id: r.id,
+        name: r.name,
+        type: r.type || 'custom',
+        level: r.level || '—',
+        assignedUsers: 0,
+        status: r.status || 'active',
+        createdBy: r.created_by || '—',
+        createdAt: r.created_at ? new Date(r.created_at).toLocaleDateString() : '—',
+        description: r.description || '',
+        permissions: 0,
+      })));
+    };
+
+    const fetchPendingApprovals = async () => {
+      const { data, error } = await supabase
+        .from('approvals')
+        .select('id, title, requested_by, level, risk_level, created_at, description')
+        .eq('status', 'pending');
+      if (error) { console.error('Failed to fetch approvals:', error); setPendingApprovals([]); return; }
+      setPendingApprovals((data || []).map((a: { id: string; title: string; requested_by: string; level: string; risk_level: string; created_at: string; description: string }) => ({
+        id: a.id,
+        roleName: a.title,
+        requestedBy: a.requested_by || '—',
+        level: a.level || '—',
+        permissionCount: 0,
+        riskLevel: a.risk_level || 'low',
+        requestedAt: a.created_at ? new Date(a.created_at).toLocaleDateString() : '—',
+        description: a.description || '',
+      })));
+    };
+
+    const fetchActivityLog = async () => {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('action, created_at, role, user_id')
+        .eq('module', 'roles')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (error) { console.error('Failed to fetch activity log:', error); setActivityLog([]); return; }
+      setActivityLog((data || []).map((l: { action: string; created_at: string; role: string; user_id: string }) => ({
+        action: l.action,
+        time: new Date(l.created_at).toLocaleString(),
+        type: 'log',
+        user: l.role || l.user_id || '—',
+      })));
+    };
+
+    fetchRoles();
+    fetchPendingApprovals();
+    fetchActivityLog();
+  }, []);
 
   const filteredRoles = rolesData.filter((role) => {
     const matchesSearch = role.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -778,10 +754,10 @@ const RoleManagerDashboard = () => {
         className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
       >
         {[
-          { label: "Total Roles", value: "24", icon: Shield, color: "border-violet-500/50", textColor: "text-violet-400" },
-          { label: "Pending Approvals", value: "3", icon: Clock, color: "border-amber-500/50", textColor: "text-amber-400" },
-          { label: "Active Users", value: "156", icon: Users, color: "border-emerald-500/50", textColor: "text-emerald-400" },
-          { label: "Permissions", value: "312", icon: Lock, color: "border-blue-500/50", textColor: "text-blue-400" },
+          { label: "Total Roles", value: rolesData.length.toString(), icon: Shield, color: "border-violet-500/50", textColor: "text-violet-400" },
+          { label: "Pending Approvals", value: pendingApprovals.length.toString(), icon: Clock, color: "border-amber-500/50", textColor: "text-amber-400" },
+          { label: "Active Roles", value: rolesData.filter(r => r.status === 'active').length.toString(), icon: Users, color: "border-emerald-500/50", textColor: "text-emerald-400" },
+          { label: "Custom Roles", value: rolesData.filter(r => r.type === 'custom').length.toString(), icon: Lock, color: "border-blue-500/50", textColor: "text-blue-400" },
         ].map((stat, idx) => (
           <motion.div
             key={idx}

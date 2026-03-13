@@ -4,14 +4,7 @@ metadata:
   name: softwarewala-ingress
   namespace: default
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-spec:
-  tls:
-  - hosts:
-    - softwarewala.net
-    secretName: softwarewala-tls
-  rules:
+
   - host: softwarewala.net
     http:
       paths:

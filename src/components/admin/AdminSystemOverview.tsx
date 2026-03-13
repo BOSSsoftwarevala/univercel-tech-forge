@@ -11,6 +11,7 @@ import {
   Activity, Users, FileCheck, AlertTriangle,
   CheckCircle, Clock, TrendingUp, Shield
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SystemMetric {
   label: string;
@@ -35,21 +36,71 @@ export function AdminSystemOverview() {
     escalations: 0,
     complianceAlerts: 0,
   });
+  const [activeUserCount, setActiveUserCount] = useState(0);
 
   useEffect(() => {
-    // Simulated non-technical metrics
-    setMetrics([
-      { label: 'System Health', value: 94, max: 100, status: 'healthy', trend: 'stable' },
-      { label: 'User Activity', value: 78, max: 100, status: 'healthy', trend: 'up' },
-      { label: 'Operations Completed', value: 156, max: 200, status: 'healthy', trend: 'up' },
-      { label: 'Compliance Score', value: 98, max: 100, status: 'healthy', trend: 'stable' },
-    ]);
+    const fetchPendingApprovals = async () => {
+      const { count, error } = await supabase
+        .from('approvals')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      if (error) { console.error('Failed to fetch approvals:', error); return 0; }
+      return count || 0;
+    };
 
-    setSummary({
-      pendingApprovals: 12,
-      activeOperations: 8,
-      escalations: 3,
-      complianceAlerts: 2,
+    const fetchActiveOperations = async () => {
+      const { count, error } = await supabase
+        .from('operations')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'in_progress');
+      if (error) { console.error('Failed to fetch operations:', error); return 0; }
+      return count || 0;
+    };
+
+    const fetchEscalations = async () => {
+      const { count, error } = await supabase
+        .from('tickets')
+        .select('*', { count: 'exact', head: true })
+        .eq('priority', 'critical');
+      if (error) { console.error('Failed to fetch escalations:', error); return 0; }
+      return count || 0;
+    };
+
+    const fetchComplianceAlerts = async () => {
+      const { count, error } = await supabase
+        .from('compliance_alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'open');
+      if (error) { console.error('Failed to fetch compliance alerts:', error); return 0; }
+      return count || 0;
+    };
+
+    const fetchActiveUsers = async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { count, error } = await supabase
+        .from('user_activity')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', today.toISOString());
+      if (error) { console.error('Failed to fetch active users:', error); return 0; }
+      return count || 0;
+    };
+
+    Promise.all([
+      fetchPendingApprovals(),
+      fetchActiveOperations(),
+      fetchEscalations(),
+      fetchComplianceAlerts(),
+      fetchActiveUsers(),
+    ]).then(([pendingApprovals, activeOperations, escalations, complianceAlerts, activeUsersToday]) => {
+      setSummary({ pendingApprovals, activeOperations, escalations, complianceAlerts });
+      setActiveUserCount(activeUsersToday);
+      setMetrics([
+        { label: 'System Health', value: 0, max: 100, status: 'healthy', trend: 'stable' },
+        { label: 'User Activity', value: Math.min(activeUsersToday, 100), max: 100, status: 'healthy', trend: 'up' },
+        { label: 'Operations Completed', value: activeOperations, max: Math.max(activeOperations * 2, 1), status: 'healthy', trend: 'up' },
+        { label: 'Compliance Score', value: complianceAlerts === 0 ? 100 : Math.max(0, 100 - complianceAlerts * 10), max: 100, status: complianceAlerts === 0 ? 'healthy' : 'warning', trend: 'stable' },
+      ]);
     });
   }, []);
 
@@ -162,21 +213,21 @@ export function AdminSystemOverview() {
         <Card className="bg-card border-border">
           <CardContent className="p-4 text-center">
             <Users className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-2xl font-bold">1,247</p>
+            <p className="text-2xl font-bold">{activeUserCount.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Active Users Today</p>
           </CardContent>
         </Card>
         <Card className="bg-card border-border">
           <CardContent className="p-4 text-center">
             <CheckCircle className="h-6 w-6 mx-auto mb-2 text-green-400" />
-            <p className="text-2xl font-bold">98.5%</p>
+            <p className="text-2xl font-bold">—</p>
             <p className="text-xs text-muted-foreground">Uptime This Month</p>
           </CardContent>
         </Card>
         <Card className="bg-card border-border">
           <CardContent className="p-4 text-center">
             <Clock className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-2xl font-bold">2.3s</p>
+            <p className="text-2xl font-bold">—</p>
             <p className="text-xs text-muted-foreground">Avg Response Time</p>
           </CardContent>
         </Card>

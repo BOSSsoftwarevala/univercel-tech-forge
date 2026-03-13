@@ -319,6 +319,51 @@ export type Database = {
         }
         Relationships: []
       }
+      activity_log: {
+        Row: {
+          action_type: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          role: string | null
+          severity_level: string | null
+          tenant_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          role?: string | null
+          severity_level?: string | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          role?: string | null
+          severity_level?: string | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       admin_scope_history: {
         Row: {
           admin_id: string
@@ -912,6 +957,87 @@ export type Database = {
         }
         Relationships: []
       }
+      aira_client_conversations: {
+        Row: {
+          client_email: string | null
+          client_id: string | null
+          conversation_type: string | null
+          created_at: string | null
+          follow_up_count: number | null
+          id: string
+          last_message_at: string | null
+          messages: Json | null
+          product_id: string | null
+          status: string | null
+        }
+        Insert: {
+          client_email?: string | null
+          client_id?: string | null
+          conversation_type?: string | null
+          created_at?: string | null
+          follow_up_count?: number | null
+          id?: string
+          last_message_at?: string | null
+          messages?: Json | null
+          product_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          client_email?: string | null
+          client_id?: string | null
+          conversation_type?: string | null
+          created_at?: string | null
+          follow_up_count?: number | null
+          id?: string
+          last_message_at?: string | null
+          messages?: Json | null
+          product_id?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      aira_task_delegations: {
+        Row: {
+          aira_notes: string | null
+          boss_user_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          delegated_to: string | null
+          id: string
+          priority: string | null
+          status: string | null
+          task_description: string
+          task_type: string | null
+          vala_result: Json | null
+        }
+        Insert: {
+          aira_notes?: string | null
+          boss_user_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          delegated_to?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          task_description: string
+          task_type?: string | null
+          vala_result?: Json | null
+        }
+        Update: {
+          aira_notes?: string | null
+          boss_user_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          delegated_to?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          task_description?: string
+          task_type?: string | null
+          vala_result?: Json | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           api_key_hash: string
@@ -1444,6 +1570,66 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_builds: {
+        Row: {
+          build_progress: number
+          category: string
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          current_step: string
+          demo_domain: string | null
+          error_message: string | null
+          id: string
+          logo_description: string | null
+          logo_url: string | null
+          repository_url: string | null
+          software_name: string
+          specs_json: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          build_progress?: number
+          category?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_step?: string
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description?: string | null
+          logo_url?: string | null
+          repository_url?: string | null
+          software_name: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          build_progress?: number
+          category?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_step?: string
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description?: string | null
+          logo_url?: string | null
+          repository_url?: string | null
+          software_name?: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       auto_healing_config: {
         Row: {
           auto_shutdown_on_failure: boolean | null
@@ -1876,6 +2062,291 @@ export type Database = {
         }
         Relationships: []
       }
+      boss_alerts: {
+        Row: {
+          alert_type: string
+          auto_generated: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          is_read: boolean | null
+          is_resolved: boolean | null
+          metadata: Json | null
+          priority: number | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          source_entity_id: string | null
+          source_module: string | null
+          title: string
+        }
+        Insert: {
+          alert_type: string
+          auto_generated?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          priority?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_entity_id?: string | null
+          source_module?: string | null
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          auto_generated?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          priority?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_entity_id?: string | null
+          source_module?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      boss_audit_logs: {
+        Row: {
+          action_target: string | null
+          action_type: string
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          new_values: Json | null
+          old_values: Json | null
+          risk_level: string | null
+          session_id: string | null
+          status: string | null
+          target_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_target?: string | null
+          action_type: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          risk_level?: string | null
+          session_id?: string | null
+          status?: string | null
+          target_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_target?: string | null
+          action_type?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          risk_level?: string | null
+          session_id?: string | null
+          status?: string | null
+          target_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      boss_financial_metrics: {
+        Row: {
+          created_at: string
+          currency: string
+          expense_breakdown: Json | null
+          gross_margin: number | null
+          id: string
+          is_forecast: boolean | null
+          metadata: Json | null
+          net_profit: number
+          period_end: string
+          period_start: string
+          period_type: string
+          revenue_by_source: Json | null
+          total_expenses: number
+          total_revenue: number
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          expense_breakdown?: Json | null
+          gross_margin?: number | null
+          id?: string
+          is_forecast?: boolean | null
+          metadata?: Json | null
+          net_profit?: number
+          period_end: string
+          period_start: string
+          period_type?: string
+          revenue_by_source?: Json | null
+          total_expenses?: number
+          total_revenue?: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          expense_breakdown?: Json | null
+          gross_margin?: number | null
+          id?: string
+          is_forecast?: boolean | null
+          metadata?: Json | null
+          net_profit?: number
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          revenue_by_source?: Json | null
+          total_expenses?: number
+          total_revenue?: number
+        }
+        Relationships: []
+      }
+      boss_module_status: {
+        Row: {
+          avg_response_ms: number | null
+          created_at: string
+          dependencies: Json | null
+          error_count: number | null
+          health_score: number | null
+          id: string
+          last_heartbeat_at: string | null
+          metadata: Json | null
+          module_key: string
+          module_name: string
+          request_count_24h: number | null
+          status: string
+          updated_at: string
+          uptime_percentage: number | null
+          version: string | null
+          warning_count: number | null
+        }
+        Insert: {
+          avg_response_ms?: number | null
+          created_at?: string
+          dependencies?: Json | null
+          error_count?: number | null
+          health_score?: number | null
+          id?: string
+          last_heartbeat_at?: string | null
+          metadata?: Json | null
+          module_key: string
+          module_name: string
+          request_count_24h?: number | null
+          status?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+          version?: string | null
+          warning_count?: number | null
+        }
+        Update: {
+          avg_response_ms?: number | null
+          created_at?: string
+          dependencies?: Json | null
+          error_count?: number | null
+          health_score?: number | null
+          id?: string
+          last_heartbeat_at?: string | null
+          metadata?: Json | null
+          module_key?: string
+          module_name?: string
+          request_count_24h?: number | null
+          status?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+          version?: string | null
+          warning_count?: number | null
+        }
+        Relationships: []
+      }
+      boss_reports: {
+        Row: {
+          created_at: string
+          file_format: string | null
+          file_url: string | null
+          generated_by: string | null
+          id: string
+          is_scheduled: boolean | null
+          last_run_at: string | null
+          metadata: Json | null
+          next_run_at: string | null
+          period_end: string | null
+          period_start: string | null
+          report_category: string
+          report_data: Json | null
+          report_name: string
+          report_type: string
+          schedule_cron: string | null
+          status: string
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          file_format?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          is_scheduled?: boolean | null
+          last_run_at?: string | null
+          metadata?: Json | null
+          next_run_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_category?: string
+          report_data?: Json | null
+          report_name: string
+          report_type: string
+          schedule_cron?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          file_format?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          is_scheduled?: boolean | null
+          last_run_at?: string | null
+          metadata?: Json | null
+          next_run_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_category?: string
+          report_data?: Json | null
+          report_name?: string
+          report_type?: string
+          schedule_cron?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       boss_sessions: {
         Row: {
           boss_id: string | null
@@ -1910,6 +2381,96 @@ export type Database = {
             referencedColumns: ["boss_id"]
           },
         ]
+      }
+      boss_system_metrics: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_key: string
+          metric_unit: string | null
+          metric_value: number
+          recorded_at: string
+          trend_direction: string | null
+          trend_percentage: number | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_key: string
+          metric_unit?: string | null
+          metric_value?: number
+          recorded_at?: string
+          trend_direction?: string | null
+          trend_percentage?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_key?: string
+          metric_unit?: string | null
+          metric_value?: number
+          recorded_at?: string
+          trend_direction?: string | null
+          trend_percentage?: number | null
+        }
+        Relationships: []
+      }
+      boss_user_activity: {
+        Row: {
+          active_users: number
+          activity_by_region: Json | null
+          activity_by_role: Json | null
+          avg_session_duration_seconds: number | null
+          bounce_rate: number | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_signups: number | null
+          period_end: string
+          period_start: string
+          period_type: string
+          top_pages: Json | null
+          total_sessions: number | null
+        }
+        Insert: {
+          active_users?: number
+          activity_by_region?: Json | null
+          activity_by_role?: Json | null
+          avg_session_duration_seconds?: number | null
+          bounce_rate?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_signups?: number | null
+          period_end: string
+          period_start: string
+          period_type?: string
+          top_pages?: Json | null
+          total_sessions?: number | null
+        }
+        Update: {
+          active_users?: number
+          activity_by_region?: Json | null
+          activity_by_role?: Json | null
+          avg_session_duration_seconds?: number | null
+          bounce_rate?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_signups?: number | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          top_pages?: Json | null
+          total_sessions?: number | null
+        }
+        Relationships: []
       }
       box_action_logs: {
         Row: {
@@ -2286,6 +2847,348 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ceo_ai_insights: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          action_taken: string | null
+          category: string | null
+          confidence_score: number | null
+          created_at: string
+          description: string | null
+          id: string
+          impact_level: string | null
+          insight_type: string
+          is_acknowledged: boolean | null
+          metadata: Json | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_level?: string | null
+          insight_type?: string
+          is_acknowledged?: boolean | null
+          metadata?: Json | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          action_taken?: string | null
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_level?: string | null
+          insight_type?: string
+          is_acknowledged?: boolean | null
+          metadata?: Json | null
+          title?: string
+        }
+        Relationships: []
+      }
+      ceo_kpi_metrics: {
+        Row: {
+          change_percent: number | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_category: string
+          metric_name: string
+          metric_value: number
+          period_date: string
+          period_type: string
+          previous_value: number | null
+        }
+        Insert: {
+          change_percent?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_category?: string
+          metric_name: string
+          metric_value?: number
+          period_date?: string
+          period_type?: string
+          previous_value?: number | null
+        }
+        Update: {
+          change_percent?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_category?: string
+          metric_name?: string
+          metric_value?: number
+          period_date?: string
+          period_type?: string
+          previous_value?: number | null
+        }
+        Relationships: []
+      }
+      ceo_product_performance: {
+        Row: {
+          avg_rating: number | null
+          category: string | null
+          created_at: string
+          growth_percent: number | null
+          id: string
+          metadata: Json | null
+          period_month: string
+          product_id: string | null
+          product_name: string
+          return_rate: number | null
+          total_revenue: number
+          total_sales: number
+        }
+        Insert: {
+          avg_rating?: number | null
+          category?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          metadata?: Json | null
+          period_month: string
+          product_id?: string | null
+          product_name: string
+          return_rate?: number | null
+          total_revenue?: number
+          total_sales?: number
+        }
+        Update: {
+          avg_rating?: number | null
+          category?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          metadata?: Json | null
+          period_month?: string
+          product_id?: string | null
+          product_name?: string
+          return_rate?: number | null
+          total_revenue?: number
+          total_sales?: number
+        }
+        Relationships: []
+      }
+      ceo_region_performance: {
+        Row: {
+          active_franchises: number | null
+          country_code: string | null
+          created_at: string
+          growth_percent: number | null
+          id: string
+          market_share: number | null
+          metadata: Json | null
+          period_month: string
+          region_name: string
+          risk_level: string | null
+          total_revenue: number
+          total_users: number
+        }
+        Insert: {
+          active_franchises?: number | null
+          country_code?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          market_share?: number | null
+          metadata?: Json | null
+          period_month: string
+          region_name: string
+          risk_level?: string | null
+          total_revenue?: number
+          total_users?: number
+        }
+        Update: {
+          active_franchises?: number | null
+          country_code?: string | null
+          created_at?: string
+          growth_percent?: number | null
+          id?: string
+          market_share?: number | null
+          metadata?: Json | null
+          period_month?: string
+          region_name?: string
+          risk_level?: string | null
+          total_revenue?: number
+          total_users?: number
+        }
+        Relationships: []
+      }
+      ceo_reports: {
+        Row: {
+          boss_response: string | null
+          content: string | null
+          created_at: string
+          generated_by: string | null
+          id: string
+          period_end: string | null
+          period_start: string | null
+          report_data: Json | null
+          report_type: string
+          status: string
+          submitted_at: string | null
+          submitted_to_boss: boolean | null
+          summary: string | null
+          title: string
+        }
+        Insert: {
+          boss_response?: string | null
+          content?: string | null
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_data?: Json | null
+          report_type?: string
+          status?: string
+          submitted_at?: string | null
+          submitted_to_boss?: boolean | null
+          summary?: string | null
+          title: string
+        }
+        Update: {
+          boss_response?: string | null
+          content?: string | null
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_data?: Json | null
+          report_type?: string
+          status?: string
+          submitted_at?: string | null
+          submitted_to_boss?: boolean | null
+          summary?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      ceo_revenue_metrics: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json | null
+          period_month: string
+          period_year: number
+          region: string | null
+          revenue_source: string
+          target_amount: number | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          period_month: string
+          period_year?: number
+          region?: string | null
+          revenue_source: string
+          target_amount?: number | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          period_month?: string
+          period_year?: number
+          region?: string | null
+          revenue_source?: string
+          target_amount?: number | null
+        }
+        Relationships: []
+      }
+      ceo_scan_logs: {
+        Row: {
+          created_at: string
+          critical_issues: number | null
+          id: string
+          initiated_by: string | null
+          issues_found: number | null
+          modules_scanned: number | null
+          scan_duration_ms: number | null
+          scan_results: Json | null
+          scan_type: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          critical_issues?: number | null
+          id?: string
+          initiated_by?: string | null
+          issues_found?: number | null
+          modules_scanned?: number | null
+          scan_duration_ms?: number | null
+          scan_results?: Json | null
+          scan_type?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          critical_issues?: number | null
+          id?: string
+          initiated_by?: string | null
+          issues_found?: number | null
+          modules_scanned?: number | null
+          scan_duration_ms?: number | null
+          scan_results?: Json | null
+          scan_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      ceo_system_health: {
+        Row: {
+          benchmark: number | null
+          created_at: string
+          details: Json | null
+          id: string
+          metric_name: string
+          module_name: string | null
+          recorded_at: string
+          score: number
+          status: string
+        }
+        Insert: {
+          benchmark?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          metric_name: string
+          module_name?: string | null
+          recorded_at?: string
+          score?: number
+          status?: string
+        }
+        Update: {
+          benchmark?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          metric_name?: string
+          module_name?: string | null
+          recorded_at?: string
+          score?: number
+          status?: string
+        }
+        Relationships: []
       }
       chat_messages: {
         Row: {
@@ -2871,6 +3774,140 @@ export type Database = {
         }
         Relationships: []
       }
+      client_deployments: {
+        Row: {
+          client_email: string
+          client_name: string
+          client_password_hash: string
+          client_password_plain: string | null
+          client_phone: string | null
+          client_username: string
+          created_at: string | null
+          deploy_completed_at: string | null
+          deploy_error: string | null
+          deploy_started_at: string | null
+          deploy_url: string | null
+          deployed_by: string | null
+          github_repo_url: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          product_id: string | null
+          source_code_hash: string | null
+          status: string
+          subdomain: string
+          updated_at: string | null
+          vps_path: string | null
+          vps_port: number | null
+        }
+        Insert: {
+          client_email: string
+          client_name: string
+          client_password_hash: string
+          client_password_plain?: string | null
+          client_phone?: string | null
+          client_username: string
+          created_at?: string | null
+          deploy_completed_at?: string | null
+          deploy_error?: string | null
+          deploy_started_at?: string | null
+          deploy_url?: string | null
+          deployed_by?: string | null
+          github_repo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          product_id?: string | null
+          source_code_hash?: string | null
+          status?: string
+          subdomain: string
+          updated_at?: string | null
+          vps_path?: string | null
+          vps_port?: number | null
+        }
+        Update: {
+          client_email?: string
+          client_name?: string
+          client_password_hash?: string
+          client_password_plain?: string | null
+          client_phone?: string | null
+          client_username?: string
+          created_at?: string | null
+          deploy_completed_at?: string | null
+          deploy_error?: string | null
+          deploy_started_at?: string | null
+          deploy_url?: string | null
+          deployed_by?: string | null
+          github_repo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          product_id?: string | null
+          source_code_hash?: string | null
+          status?: string
+          subdomain?: string
+          updated_at?: string | null
+          vps_path?: string | null
+          vps_port?: number | null
+        }
+        Relationships: []
+      }
+      client_domains: {
+        Row: {
+          a_record_ip: string | null
+          created_at: string | null
+          deployment_id: string | null
+          dns_status: string | null
+          domain_name: string
+          domain_type: string | null
+          id: string
+          is_primary: boolean | null
+          ssl_expires_at: string | null
+          ssl_status: string | null
+          txt_record: string | null
+          updated_at: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          a_record_ip?: string | null
+          created_at?: string | null
+          deployment_id?: string | null
+          dns_status?: string | null
+          domain_name: string
+          domain_type?: string | null
+          id?: string
+          is_primary?: boolean | null
+          ssl_expires_at?: string | null
+          ssl_status?: string | null
+          txt_record?: string | null
+          updated_at?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          a_record_ip?: string | null
+          created_at?: string | null
+          deployment_id?: string | null
+          dns_status?: string | null
+          domain_name?: string
+          domain_type?: string | null
+          id?: string
+          is_primary?: boolean | null
+          ssl_expires_at?: string | null
+          ssl_status?: string | null
+          txt_record?: string | null
+          updated_at?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_domains_deployment_id_fkey"
+            columns: ["deployment_id"]
+            isOneToOne: false
+            referencedRelation: "client_deployments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_feedback: {
         Row: {
           category: string | null
@@ -3423,6 +4460,48 @@ export type Database = {
           id?: string
           name?: string
           status?: string | null
+        }
+        Relationships: []
+      }
+      country_daily_offers: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string | null
+          day: number
+          discount_percentage: number
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          month: number
+          national_day_name: string
+          offer_price: number
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string | null
+          day: number
+          discount_percentage?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          month: number
+          national_day_name: string
+          offer_price?: number
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string | null
+          day?: number
+          discount_percentage?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          month?: number
+          national_day_name?: string
+          offer_price?: number
         }
         Relationships: []
       }
@@ -6392,6 +7471,62 @@ export type Database = {
         }
         Relationships: []
       }
+      device_bindings: {
+        Row: {
+          bound_at: string | null
+          created_at: string | null
+          device_fingerprint: string
+          device_name: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          last_seen_at: string | null
+          license_id: string
+          os_info: string | null
+          unbound_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bound_at?: string | null
+          created_at?: string | null
+          device_fingerprint: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_seen_at?: string | null
+          license_id: string
+          os_info?: string | null
+          unbound_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bound_at?: string | null
+          created_at?: string | null
+          device_fingerprint?: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_seen_at?: string | null
+          license_id?: string
+          os_info?: string | null
+          unbound_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_bindings_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "user_licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       device_fingerprints: {
         Row: {
           blocked_reason: string | null
@@ -6732,6 +7867,81 @@ export type Database = {
           name?: string
           theme_primary?: string | null
           theme_secondary?: string | null
+        }
+        Relationships: []
+      }
+      finance_security_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          description: string
+          id: string
+          is_resolved: boolean | null
+          metadata: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_resolved?: boolean | null
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      finance_security_policies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          enforced_at: string | null
+          enforced_by: string | null
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          policy_name: string
+          policy_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          enforced_at?: string | null
+          enforced_by?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          policy_name: string
+          policy_type?: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          enforced_at?: string | null
+          enforced_by?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          policy_name?: string
+          policy_type?: string
         }
         Relationships: []
       }
@@ -7540,6 +8750,337 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      gc_announcements: {
+        Row: {
+          attachments: Json | null
+          author_id: string
+          classroom_id: string
+          content: string
+          created_at: string | null
+          id: string
+          is_pinned: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          author_id: string
+          classroom_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          author_id?: string
+          classroom_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_announcements_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "gc_classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gc_assignments: {
+        Row: {
+          assignment_type: string | null
+          attachments: Json | null
+          classroom_id: string
+          created_at: string | null
+          created_by: string
+          description: string | null
+          due_date: string | null
+          id: string
+          max_points: number | null
+          status: string | null
+          title: string
+          topic: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_type?: string | null
+          attachments?: Json | null
+          classroom_id: string
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          max_points?: number | null
+          status?: string | null
+          title: string
+          topic?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_type?: string | null
+          attachments?: Json | null
+          classroom_id?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          max_points?: number | null
+          status?: string | null
+          title?: string
+          topic?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_assignments_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "gc_classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gc_class_members: {
+        Row: {
+          classroom_id: string
+          id: string
+          joined_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          classroom_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          classroom_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_class_members_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "gc_classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gc_classrooms: {
+        Row: {
+          class_code: string | null
+          cover_color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_archived: boolean | null
+          name: string
+          owner_id: string
+          room: string | null
+          section: string | null
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          class_code?: string | null
+          cover_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean | null
+          name: string
+          owner_id: string
+          room?: string | null
+          section?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          class_code?: string | null
+          cover_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean | null
+          name?: string
+          owner_id?: string
+          room?: string | null
+          section?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      gc_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          parent_id: string
+          parent_type: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          parent_id: string
+          parent_type: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string
+          parent_type?: string
+        }
+        Relationships: []
+      }
+      gc_submissions: {
+        Row: {
+          assignment_id: string
+          attachments: Json | null
+          created_at: string | null
+          feedback: string | null
+          grade: number | null
+          graded_at: string | null
+          graded_by: string | null
+          id: string
+          status: string | null
+          student_id: string
+          submission_text: string | null
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_id: string
+          attachments?: Json | null
+          created_at?: string | null
+          feedback?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          graded_by?: string | null
+          id?: string
+          status?: string | null
+          student_id: string
+          submission_text?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_id?: string
+          attachments?: Json | null
+          created_at?: string | null
+          feedback?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          graded_by?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string
+          submission_text?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gc_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "gc_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      github_repo_sync: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          default_branch: string | null
+          demo_build_status: string | null
+          demo_url: string | null
+          id: string
+          is_active: boolean | null
+          language: string | null
+          last_commit_at: string | null
+          last_commit_message: string | null
+          last_commit_sha: string | null
+          last_sync_at: string | null
+          product_id: string | null
+          repo_full_name: string
+          repo_url: string
+          repo_visibility: string | null
+          stars_count: number | null
+          topics: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          default_branch?: string | null
+          demo_build_status?: string | null
+          demo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          last_commit_at?: string | null
+          last_commit_message?: string | null
+          last_commit_sha?: string | null
+          last_sync_at?: string | null
+          product_id?: string | null
+          repo_full_name: string
+          repo_url: string
+          repo_visibility?: string | null
+          stars_count?: number | null
+          topics?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          default_branch?: string | null
+          demo_build_status?: string | null
+          demo_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          last_commit_at?: string | null
+          last_commit_message?: string | null
+          last_commit_sha?: string | null
+          last_sync_at?: string | null
+          product_id?: string | null
+          repo_full_name?: string
+          repo_url?: string
+          repo_visibility?: string | null
+          stars_count?: number | null
+          topics?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_repo_sync_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "software_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       global_offers: {
         Row: {
@@ -8814,6 +10355,57 @@ export type Database = {
         }
         Relationships: []
       }
+      job_applications: {
+        Row: {
+          application_type: string
+          created_at: string
+          email: string
+          experience: string | null
+          id: string
+          ip_address: string | null
+          message: string | null
+          name: string
+          phone: string | null
+          portfolio: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          application_type?: string
+          created_at?: string
+          email: string
+          experience?: string | null
+          id?: string
+          ip_address?: string | null
+          message?: string | null
+          name: string
+          phone?: string | null
+          portfolio?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          application_type?: string
+          created_at?: string
+          email?: string
+          experience?: string | null
+          id?: string
+          ip_address?: string | null
+          message?: string | null
+          name?: string
+          phone?: string | null
+          portfolio?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       job_execution_logs: {
         Row: {
           completed_at: string | null
@@ -8890,6 +10482,47 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: []
+      }
+      lead_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string
+          id: string
+          lead_id: string
+          metadata: Json | null
+          performed_by: string | null
+          performed_by_role: string | null
+        }
+        Insert: {
+          activity_type?: string
+          created_at?: string
+          description: string
+          id?: string
+          lead_id: string
+          metadata?: Json | null
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          lead_id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_alerts: {
         Row: {
@@ -9253,6 +10886,45 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_integrations: {
+        Row: {
+          config: Json | null
+          created_at: string
+          id: string
+          integration_type: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          name: string
+          status: string
+          sync_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          integration_type: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name: string
+          status?: string
+          sync_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          integration_type?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name?: string
+          status?: string
+          sync_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lead_logs: {
         Row: {
           action: string
@@ -9303,6 +10975,51 @@ export type Database = {
           },
         ]
       }
+      lead_routing_rules: {
+        Row: {
+          assigned_to_pool: string[] | null
+          conditions: Json | null
+          created_at: string
+          description: string | null
+          execution_count: number | null
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          name: string
+          priority: number | null
+          rule_type: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to_pool?: string[] | null
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          execution_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name: string
+          priority?: number | null
+          rule_type?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to_pool?: string[] | null
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          execution_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name?: string
+          priority?: number | null
+          rule_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lead_scores: {
         Row: {
           confidence: number | null
@@ -9343,6 +11060,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lead_settings: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_enabled: boolean | null
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       lead_sources: {
         Row: {
@@ -10003,6 +11753,381 @@ export type Database = {
           start_date?: string | null
           status?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      marketplace_analytics: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          product_id: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          product_id: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          product_id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_analytics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      marketplace_banners: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          cta_link: string | null
+          cta_text: string | null
+          display_order: number
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          product_id: string | null
+          starts_at: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          cta_link?: string | null
+          cta_text?: string | null
+          display_order?: number
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          product_id?: string | null
+          starts_at?: string | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          cta_link?: string | null
+          cta_text?: string | null
+          display_order?: number
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          product_id?: string | null
+          starts_at?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_banners_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      marketplace_featured: {
+        Row: {
+          display_order: number
+          expires_at: string | null
+          featured_at: string
+          id: string
+          is_active: boolean
+          product_id: string
+          section_id: string
+        }
+        Insert: {
+          display_order?: number
+          expires_at?: string | null
+          featured_at?: string
+          id?: string
+          is_active?: boolean
+          product_id: string
+          section_id: string
+        }
+        Update: {
+          display_order?: number
+          expires_at?: string | null
+          featured_at?: string
+          id?: string
+          is_active?: boolean
+          product_id?: string
+          section_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_featured_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "marketplace_featured_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_order_items: {
+        Row: {
+          created_at: string
+          deployed: boolean
+          discount_percent: number | null
+          id: string
+          license_key: string | null
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          deployed?: boolean
+          discount_percent?: number | null
+          id?: string
+          license_key?: string | null
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity?: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          deployed?: boolean
+          discount_percent?: number | null
+          id?: string
+          license_key?: string | null
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      marketplace_order_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_status: string
+          old_status: string | null
+          order_id: string
+          reason: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status: string
+          old_status?: string | null
+          order_id: string
+          reason?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status?: string
+          old_status?: string | null
+          order_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_orders: {
+        Row: {
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string
+          discount_amount: number
+          final_amount: number
+          franchise_id: string | null
+          id: string
+          metadata: Json | null
+          notes: string | null
+          order_number: string
+          payment_status: string
+          requirements: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          discount_amount?: number
+          final_amount?: number
+          franchise_id?: string | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          order_number: string
+          payment_status?: string
+          requirements?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          discount_amount?: number
+          final_amount?: number
+          franchise_id?: string | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          order_number?: string
+          payment_status?: string
+          requirements?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      marketplace_sections: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          filter_criteria: Json | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          max_items: number | null
+          section_type: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          filter_criteria?: Json | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          max_items?: number | null
+          section_type?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          filter_criteria?: Json | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          max_items?: number | null
+          section_type?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      marketplace_webhooks: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          event_type: string
+          id: string
+          is_active: boolean | null
+          retry_policy: Json | null
+          secret_hash: string | null
+          target_url: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          event_type: string
+          id?: string
+          is_active?: boolean | null
+          retry_policy?: Json | null
+          secret_hash?: string | null
+          target_url: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          retry_policy?: Json | null
+          secret_hash?: string | null
+          target_url?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -11941,6 +14066,62 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "personal_chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_processing_queue: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          max_retries: number | null
+          metadata: Json | null
+          order_id: string
+          retry_count: number | null
+          started_at: string | null
+          status: string
+          step_name: string
+          step_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          max_retries?: number | null
+          metadata?: Json | null
+          order_id: string
+          retry_count?: number | null
+          started_at?: string | null
+          status?: string
+          step_name: string
+          step_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          max_retries?: number | null
+          metadata?: Json | null
+          order_id?: string
+          retry_count?: number | null
+          started_at?: string | null
+          status?: string
+          step_name?: string
+          step_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_processing_queue_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -13909,6 +16090,48 @@ export type Database = {
           },
         ]
       }
+      product_build_pipeline: {
+        Row: {
+          boss_command: string
+          build_result: Json | null
+          completed_at: string | null
+          created_at: string | null
+          demo_url: string | null
+          id: string
+          marketplace_published: boolean | null
+          product_name: string | null
+          stage: string | null
+          status: string | null
+          vala_task_id: string | null
+        }
+        Insert: {
+          boss_command: string
+          build_result?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          demo_url?: string | null
+          id?: string
+          marketplace_published?: boolean | null
+          product_name?: string | null
+          stage?: string | null
+          status?: string | null
+          vala_task_id?: string | null
+        }
+        Update: {
+          boss_command?: string
+          build_result?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          demo_url?: string | null
+          id?: string
+          marketplace_published?: boolean | null
+          product_name?: string | null
+          stage?: string | null
+          status?: string | null
+          vala_task_id?: string | null
+        }
+        Relationships: []
+      }
       product_demo_mappings: {
         Row: {
           demo_id: string
@@ -13948,6 +16171,86 @@ export type Database = {
           },
         ]
       }
+      product_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      product_files: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          download_count: number | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_active: boolean | null
+          product_id: string | null
+          storage_path: string
+          updated_at: string | null
+          uploaded_by: string | null
+          version: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_active?: boolean | null
+          product_id?: string | null
+          storage_path: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          version?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_active?: boolean | null
+          product_id?: string | null
+          storage_path?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       product_modules: {
         Row: {
           additional_price: number | null
@@ -13981,6 +16284,36 @@ export type Database = {
         }
         Relationships: []
       }
+      product_ratings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_verified_purchase: boolean | null
+          product_id: string
+          rating: number
+          review_text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          product_id: string
+          rating: number
+          review_text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          product_id?: string
+          rating?: number
+          review_text?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       product_versions: {
         Row: {
           changes_notes: string | null
@@ -14008,6 +16341,170 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          activation_date: string | null
+          amount: number
+          buyer_email: string
+          buyer_name: string
+          created_at: string
+          currency: string | null
+          id: string
+          is_lifetime: boolean | null
+          is_verified: boolean | null
+          license_id: string | null
+          license_type: string | null
+          order_number: string
+          payment_gateway: string | null
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          product_id: string
+          status: string | null
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          activation_date?: string | null
+          amount: number
+          buyer_email: string
+          buyer_name: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_verified?: boolean | null
+          license_id?: string | null
+          license_type?: string | null
+          order_number: string
+          payment_gateway?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          product_id: string
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          activation_date?: string | null
+          amount?: number
+          buyer_email?: string
+          buyer_name?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_verified?: boolean | null
+          license_id?: string | null
+          license_type?: string | null
+          order_number?: string
+          payment_gateway?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          product_id?: string
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          activation_date: string
+          active_devices: number | null
+          created_at: string
+          expiry_date: string | null
+          id: string
+          is_lifetime: boolean | null
+          is_revoked: boolean | null
+          license_key: string
+          license_type: string | null
+          max_devices: number | null
+          order_id: string
+          product_id: string
+          revoked_at: string | null
+          revoked_reason: string | null
+          status: string | null
+          updated_at: string
+          usage_stats: Json | null
+          user_id: string
+        }
+        Insert: {
+          activation_date?: string
+          active_devices?: number | null
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_revoked?: boolean | null
+          license_key: string
+          license_type?: string | null
+          max_devices?: number | null
+          order_id: string
+          product_id: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          status?: string | null
+          updated_at?: string
+          usage_stats?: Json | null
+          user_id: string
+        }
+        Update: {
+          activation_date?: string
+          active_devices?: number | null
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_lifetime?: boolean | null
+          is_revoked?: boolean | null
+          license_key?: string
+          license_type?: string | null
+          max_devices?: number | null
+          order_id?: string
+          product_id?: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          status?: string | null
+          updated_at?: string
+          usage_stats?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       products: {
         Row: {
           business_category_id: string | null
@@ -14024,6 +16521,7 @@ export type Database = {
           product_id: string
           product_name: string
           product_type: string | null
+          search_vector: unknown
           status: string | null
           subcategory_id: string | null
           tech_stack: string | null
@@ -14044,6 +16542,7 @@ export type Database = {
           product_id?: string
           product_name: string
           product_type?: string | null
+          search_vector?: unknown
           status?: string | null
           subcategory_id?: string | null
           tech_stack?: string | null
@@ -14064,6 +16563,7 @@ export type Database = {
           product_id?: string
           product_name?: string
           product_type?: string | null
+          search_vector?: unknown
           status?: string | null
           subcategory_id?: string | null
           tech_stack?: string | null
@@ -16147,6 +18647,92 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      revenue_allocations: {
+        Row: {
+          boss_amount: number
+          created_at: string | null
+          government_amount: number
+          id: string
+          marketing_amount: number
+          office_amount: number
+          order_id: string | null
+          split_config_id: string | null
+          status: string | null
+          total_amount: number
+        }
+        Insert: {
+          boss_amount?: number
+          created_at?: string | null
+          government_amount?: number
+          id?: string
+          marketing_amount?: number
+          office_amount?: number
+          order_id?: string | null
+          split_config_id?: string | null
+          status?: string | null
+          total_amount: number
+        }
+        Update: {
+          boss_amount?: number
+          created_at?: string | null
+          government_amount?: number
+          id?: string
+          marketing_amount?: number
+          office_amount?: number
+          order_id?: string | null
+          split_config_id?: string | null
+          status?: string | null
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_allocations_split_config_id_fkey"
+            columns: ["split_config_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_split_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      revenue_split_config: {
+        Row: {
+          boss_percent: number
+          created_at: string | null
+          government_percent: number
+          id: string
+          is_active: boolean | null
+          marketing_percent: number
+          office_percent: number
+          split_name: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          boss_percent?: number
+          created_at?: string | null
+          government_percent?: number
+          id?: string
+          is_active?: boolean | null
+          marketing_percent?: number
+          office_percent?: number
+          split_name: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          boss_percent?: number
+          created_at?: string | null
+          government_percent?: number
+          id?: string
+          is_active?: boolean | null
+          marketing_percent?: number
+          office_percent?: number
+          split_name?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       risk_alerts: {
         Row: {
@@ -18680,33 +21266,237 @@ export type Database = {
           },
         ]
       }
-      seo_keywords: {
+      seo_activity_logs: {
         Row: {
+          action_type: string
           created_at: string | null
-          current_rank: number | null
+          description: string | null
           id: string
-          keyword: string
-          module: string
-          region: string | null
-          status: string | null
+          metadata: Json | null
+          project_id: string | null
+          user_id: string | null
         }
         Insert: {
+          action_type: string
           created_at?: string | null
-          current_rank?: number | null
+          description?: string | null
           id?: string
-          keyword: string
-          module: string
-          region?: string | null
-          status?: string | null
+          metadata?: Json | null
+          project_id?: string | null
+          user_id?: string | null
         }
         Update: {
+          action_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      seo_audit_reports: {
+        Row: {
+          audit_type: string | null
+          completed_at: string | null
+          created_at: string | null
+          error_pages: number | null
+          healthy_pages: number | null
+          id: string
+          issues: Json | null
+          project_id: string
+          recommendations: Json | null
+          seo_score: number | null
+          started_at: string | null
+          status: string | null
+          total_pages_crawled: number | null
+          warning_pages: number | null
+        }
+        Insert: {
+          audit_type?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_pages?: number | null
+          healthy_pages?: number | null
+          id?: string
+          issues?: Json | null
+          project_id: string
+          recommendations?: Json | null
+          seo_score?: number | null
+          started_at?: string | null
+          status?: string | null
+          total_pages_crawled?: number | null
+          warning_pages?: number | null
+        }
+        Update: {
+          audit_type?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_pages?: number | null
+          healthy_pages?: number | null
+          id?: string
+          issues?: Json | null
+          project_id?: string
+          recommendations?: Json | null
+          seo_score?: number | null
+          started_at?: string | null
+          status?: string | null
+          total_pages_crawled?: number | null
+          warning_pages?: number | null
+        }
+        Relationships: []
+      }
+      seo_backlinks: {
+        Row: {
+          anchor_text: string | null
+          created_at: string | null
+          domain_authority: number | null
+          first_seen: string | null
+          id: string
+          is_toxic: boolean | null
+          last_checked: string | null
+          link_type: string | null
+          project_id: string
+          source_url: string
+          status: string | null
+          target_url: string
+        }
+        Insert: {
+          anchor_text?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          first_seen?: string | null
+          id?: string
+          is_toxic?: boolean | null
+          last_checked?: string | null
+          link_type?: string | null
+          project_id: string
+          source_url: string
+          status?: string | null
+          target_url: string
+        }
+        Update: {
+          anchor_text?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          first_seen?: string | null
+          id?: string
+          is_toxic?: boolean | null
+          last_checked?: string | null
+          link_type?: string | null
+          project_id?: string
+          source_url?: string
+          status?: string | null
+          target_url?: string
+        }
+        Relationships: []
+      }
+      seo_competitors: {
+        Row: {
+          backlink_count: number | null
+          common_keywords: number | null
+          competitor_domain: string
+          competitor_name: string | null
+          created_at: string | null
+          domain_authority: number | null
+          id: string
+          keyword_gap: number | null
+          last_analyzed_at: string | null
+          organic_traffic: number | null
+          project_id: string
+          total_keywords: number | null
+        }
+        Insert: {
+          backlink_count?: number | null
+          common_keywords?: number | null
+          competitor_domain: string
+          competitor_name?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          id?: string
+          keyword_gap?: number | null
+          last_analyzed_at?: string | null
+          organic_traffic?: number | null
+          project_id: string
+          total_keywords?: number | null
+        }
+        Update: {
+          backlink_count?: number | null
+          common_keywords?: number | null
+          competitor_domain?: string
+          competitor_name?: string | null
+          created_at?: string | null
+          domain_authority?: number | null
+          id?: string
+          keyword_gap?: number | null
+          last_analyzed_at?: string | null
+          organic_traffic?: number | null
+          project_id?: string
+          total_keywords?: number | null
+        }
+        Relationships: []
+      }
+      seo_keywords: {
+        Row: {
+          country: string | null
+          cpc: number | null
+          created_at: string | null
+          current_rank: number | null
+          difficulty: number | null
+          id: string
+          intent: string | null
+          keyword: string
+          module: string
+          page_url: string | null
+          position: number | null
+          prev_position: number | null
+          project_id: string | null
+          region: string | null
+          search_volume: number | null
+          status: string | null
+          trend: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          country?: string | null
+          cpc?: number | null
           created_at?: string | null
           current_rank?: number | null
+          difficulty?: number | null
           id?: string
+          intent?: string | null
+          keyword: string
+          module: string
+          page_url?: string | null
+          position?: number | null
+          prev_position?: number | null
+          project_id?: string | null
+          region?: string | null
+          search_volume?: number | null
+          status?: string | null
+          trend?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          country?: string | null
+          cpc?: number | null
+          created_at?: string | null
+          current_rank?: number | null
+          difficulty?: number | null
+          id?: string
+          intent?: string | null
           keyword?: string
           module?: string
+          page_url?: string | null
+          position?: number | null
+          prev_position?: number | null
+          project_id?: string | null
           region?: string | null
+          search_volume?: number | null
           status?: string | null
+          trend?: Json | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -18782,6 +21572,90 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_projects: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          description: string | null
+          domain: string
+          id: string
+          language: string | null
+          last_audit_at: string | null
+          project_name: string
+          search_engine: string | null
+          seo_score: number | null
+          status: string | null
+          total_backlinks: number | null
+          total_keywords: number | null
+          total_pages: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          domain: string
+          id?: string
+          language?: string | null
+          last_audit_at?: string | null
+          project_name: string
+          search_engine?: string | null
+          seo_score?: number | null
+          status?: string | null
+          total_backlinks?: number | null
+          total_keywords?: number | null
+          total_pages?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          domain?: string
+          id?: string
+          language?: string | null
+          last_audit_at?: string | null
+          project_name?: string
+          search_engine?: string | null
+          seo_score?: number | null
+          status?: string | null
+          total_backlinks?: number | null
+          total_keywords?: number | null
+          total_pages?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seo_rankings: {
+        Row: {
+          country: string | null
+          id: string
+          keyword_id: string
+          position: number
+          recorded_at: string | null
+          search_engine: string | null
+        }
+        Insert: {
+          country?: string | null
+          id?: string
+          keyword_id: string
+          position: number
+          recorded_at?: string | null
+          search_engine?: string | null
+        }
+        Update: {
+          country?: string | null
+          id?: string
+          keyword_id?: string
+          position?: number
+          recorded_at?: string | null
+          search_engine?: string | null
+        }
+        Relationships: []
+      }
       seo_reports: {
         Row: {
           clicks: number | null
@@ -18819,6 +21693,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seo_traffic_stats: {
+        Row: {
+          avg_session_duration: number | null
+          bounce_rate: number | null
+          created_at: string | null
+          date: string
+          direct_traffic: number | null
+          id: string
+          organic_traffic: number | null
+          pages_per_session: number | null
+          paid_traffic: number | null
+          project_id: string
+          referral_traffic: number | null
+        }
+        Insert: {
+          avg_session_duration?: number | null
+          bounce_rate?: number | null
+          created_at?: string | null
+          date: string
+          direct_traffic?: number | null
+          id?: string
+          organic_traffic?: number | null
+          pages_per_session?: number | null
+          paid_traffic?: number | null
+          project_id: string
+          referral_traffic?: number | null
+        }
+        Update: {
+          avg_session_duration?: number | null
+          bounce_rate?: number | null
+          created_at?: string | null
+          date?: string
+          direct_traffic?: number | null
+          id?: string
+          organic_traffic?: number | null
+          pages_per_session?: number | null
+          paid_traffic?: number | null
+          project_id?: string
+          referral_traffic?: number | null
+        }
+        Relationships: []
       }
       server_actions: {
         Row: {
@@ -20066,40 +22982,130 @@ export type Database = {
       }
       software_catalog: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          avg_rating: number | null
           base_price: number | null
+          build_metadata: Json | null
+          business_name: string | null
           category: string | null
           created_at: string | null
+          demo_build_status: string | null
+          demo_domain: string | null
           demo_id: string | null
           demo_url: string | null
+          feature_tags: string[] | null
+          generated_by_vala: boolean | null
+          github_repo_url: string | null
+          hreflang_codes: string[] | null
           id: string
+          is_active: boolean | null
           is_demo_registered: boolean | null
+          is_verified: boolean | null
+          last_repo_sync_at: string | null
+          listing_status: string | null
+          long_description: string | null
+          marketing_hashtags: string[] | null
+          meta_description: string | null
+          meta_title: string | null
           name: string
+          og_image_url: string | null
+          product_icon_url: string | null
+          product_thumbnail_url: string | null
+          repo_language: string | null
+          repo_last_commit_sha: string | null
+          seo_keywords: string[] | null
+          seo_slug: string | null
+          short_description: string | null
+          source: string | null
+          total_ratings: number | null
+          trust_score: number | null
           type: string
           updated_at: string | null
           vendor: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          avg_rating?: number | null
           base_price?: number | null
+          build_metadata?: Json | null
+          business_name?: string | null
           category?: string | null
           created_at?: string | null
+          demo_build_status?: string | null
+          demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
+          feature_tags?: string[] | null
+          generated_by_vala?: boolean | null
+          github_repo_url?: string | null
+          hreflang_codes?: string[] | null
           id?: string
+          is_active?: boolean | null
           is_demo_registered?: boolean | null
+          is_verified?: boolean | null
+          last_repo_sync_at?: string | null
+          listing_status?: string | null
+          long_description?: string | null
+          marketing_hashtags?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
           name: string
+          og_image_url?: string | null
+          product_icon_url?: string | null
+          product_thumbnail_url?: string | null
+          repo_language?: string | null
+          repo_last_commit_sha?: string | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          short_description?: string | null
+          source?: string | null
+          total_ratings?: number | null
+          trust_score?: number | null
           type: string
           updated_at?: string | null
           vendor?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          avg_rating?: number | null
           base_price?: number | null
+          build_metadata?: Json | null
+          business_name?: string | null
           category?: string | null
           created_at?: string | null
+          demo_build_status?: string | null
+          demo_domain?: string | null
           demo_id?: string | null
           demo_url?: string | null
+          feature_tags?: string[] | null
+          generated_by_vala?: boolean | null
+          github_repo_url?: string | null
+          hreflang_codes?: string[] | null
           id?: string
+          is_active?: boolean | null
           is_demo_registered?: boolean | null
+          is_verified?: boolean | null
+          last_repo_sync_at?: string | null
+          listing_status?: string | null
+          long_description?: string | null
+          marketing_hashtags?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
           name?: string
+          og_image_url?: string | null
+          product_icon_url?: string | null
+          product_thumbnail_url?: string | null
+          repo_language?: string | null
+          repo_last_commit_sha?: string | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          short_description?: string | null
+          source?: string | null
+          total_ratings?: number | null
+          trust_score?: number | null
           type?: string
           updated_at?: string | null
           vendor?: string | null
@@ -22902,6 +25908,54 @@ export type Database = {
         }
         Relationships: []
       }
+      transaction_security_locks: {
+        Row: {
+          amount: number
+          boss_approved: boolean | null
+          created_at: string | null
+          gateway_verified: boolean | null
+          id: string
+          lock_status: string
+          lock_type: string
+          locked_at: string | null
+          metadata: Json | null
+          otp_verified: boolean | null
+          transaction_id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          boss_approved?: boolean | null
+          created_at?: string | null
+          gateway_verified?: boolean | null
+          id?: string
+          lock_status?: string
+          lock_type?: string
+          locked_at?: string | null
+          metadata?: Json | null
+          otp_verified?: boolean | null
+          transaction_id: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          boss_approved?: boolean | null
+          created_at?: string | null
+          gateway_verified?: boolean | null
+          id?: string
+          lock_status?: string
+          lock_type?: string
+          locked_at?: string | null
+          metadata?: Json | null
+          otp_verified?: boolean | null
+          transaction_id?: string
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -23312,8 +26366,75 @@ export type Database = {
           },
         ]
       }
+      user_licenses: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          current_installations: number | null
+          expires_at: string | null
+          id: string
+          license_key: string
+          license_type: string
+          max_installations: number | null
+          metadata: Json | null
+          order_item_id: string | null
+          product_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          current_installations?: number | null
+          expires_at?: string | null
+          id?: string
+          license_key: string
+          license_type?: string
+          max_installations?: number | null
+          metadata?: Json | null
+          order_item_id?: string | null
+          product_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          current_installations?: number | null
+          expires_at?: string | null
+          id?: string
+          license_key?: string
+          license_type?: string
+          max_installations?: number | null
+          metadata?: Json | null
+          order_item_id?: string | null
+          product_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_licenses_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_licenses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       user_notifications: {
         Row: {
+          action_id: string | null
           action_label: string | null
           action_url: string | null
           created_at: string
@@ -23326,10 +26447,12 @@ export type Database = {
           message: string
           read_at: string | null
           role_target: string[] | null
+          title: string | null
           type: string
           user_id: string
         }
         Insert: {
+          action_id?: string | null
           action_label?: string | null
           action_url?: string | null
           created_at?: string
@@ -23342,10 +26465,12 @@ export type Database = {
           message: string
           read_at?: string | null
           role_target?: string[] | null
+          title?: string | null
           type: string
           user_id: string
         }
         Update: {
+          action_id?: string | null
           action_label?: string | null
           action_url?: string | null
           created_at?: string
@@ -23358,6 +26483,7 @@ export type Database = {
           message?: string
           read_at?: string | null
           role_target?: string[] | null
+          title?: string | null
           type?: string
           user_id?: string
         }
@@ -23721,6 +26847,66 @@ export type Database = {
           reference_type?: string | null
           transaction_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      vala_auto_builds: {
+        Row: {
+          build_progress: number
+          category: string
+          completed_at: string | null
+          created_at: string
+          current_step: string | null
+          demo_domain: string | null
+          error_message: string | null
+          id: string
+          logo_description: string
+          logo_url: string | null
+          marketplace_card_id: string | null
+          repository_url: string | null
+          software_name: string
+          specs_json: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          build_progress?: number
+          category: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: string | null
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description: string
+          logo_url?: string | null
+          marketplace_card_id?: string | null
+          repository_url?: string | null
+          software_name: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          build_progress?: number
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: string | null
+          demo_domain?: string | null
+          error_message?: string | null
+          id?: string
+          logo_description?: string
+          logo_url?: string | null
+          marketplace_card_id?: string | null
+          repository_url?: string | null
+          software_name?: string
+          specs_json?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -24094,6 +27280,59 @@ export type Database = {
           wallet_id?: string
         }
         Relationships: []
+      }
+      webhook_delivery_log: {
+        Row: {
+          attempt_number: number | null
+          created_at: string | null
+          delivered_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          next_retry_at: string | null
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          status: string | null
+          webhook_id: string | null
+        }
+        Insert: {
+          attempt_number?: number | null
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          status?: string | null
+          webhook_id?: string | null
+        }
+        Update: {
+          attempt_number?: number | null
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          status?: string | null
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_delivery_log_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       websocket_connections: {
         Row: {
@@ -24584,6 +27823,7 @@ export type Database = {
       generate_backup_codes: { Args: { p_user_id: string }; Returns: string[] }
       generate_daily_demo_id: { Args: { p_demo_id: string }; Returns: string }
       generate_deployment_license: { Args: never; Returns: string }
+      generate_license_key: { Args: { p_prefix?: string }; Returns: string }
       generate_otp: {
         Args: {
           p_action_data?: Json
@@ -24925,6 +28165,19 @@ export type Database = {
           p_rejection_reason?: string
         }
         Returns: Json
+      }
+      search_products: {
+        Args: { result_limit?: number; search_query: string }
+        Returns: {
+          category: string
+          description: string
+          lifetime_price: number
+          monthly_price: number
+          product_id: string
+          product_name: string
+          rank: number
+          tech_stack: string
+        }[]
       }
       set_financial_mode: {
         Args: { p_admin_id: string; p_mode: string; p_reason: string }

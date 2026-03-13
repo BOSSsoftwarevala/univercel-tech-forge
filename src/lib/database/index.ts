@@ -5,3 +5,4 @@
 
 export * from './resilient-client';
 export { default as resilientClient } from './resilient-client';
+export * from './transaction';

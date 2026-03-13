@@ -164,6 +164,7 @@ const menuItems: MenuItem[] = [
     children: [
       { id: 'server-assignment', label: 'Server Assignment', icon: Server },
       { id: 'environment-select', label: 'Environment Select', icon: GitBranch },
+      { id: 'client-deploy', label: '🚀 Client Deploy', icon: Rocket },
       { id: 'deploy', label: 'Deploy', icon: Rocket },
       { id: 'rollback', label: 'Rollback', icon: RotateCcw },
       { id: 'stop-deployment', label: 'Stop Deployment', icon: StopCircle },

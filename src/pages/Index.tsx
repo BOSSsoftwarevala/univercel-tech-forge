@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useGeoLocale, convertPrice, parseINRPrice } from "@/hooks/useGeoLocale";
+import { useFestivalBanner } from "@/hooks/useFestivalBanner";
 import { useEnterpriseAudit } from "@/hooks/useEnterpriseAudit";
-import { 
-  Play, Heart, ShoppingCart, Filter, Search, Bell,
+import { allMarketplaceProducts, totalProductCount } from "@/data/marketplace";
+import {
+  Play, Heart, ShoppingCart, Filter, Search, Bell, ChevronLeft, ChevronRight,
   GraduationCap, Stethoscope, Utensils, Hotel, Home, Car, Plane,
   CreditCard, Factory, Users, Truck, Building, BookOpen, FlaskConical,
   Phone, Pill, Package, MapPin, Star, Award, CheckCircle, Wallet, Landmark,
@@ -20,6 +23,68 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import softwareValaLogo from "@/assets/software-vala-logo.jpg";
+
+// Netflix poster thumbnails
+import thumbEducation from "@/assets/thumbnails/education.jpg";
+import thumbHealthcare from "@/assets/thumbnails/healthcare.jpg";
+import thumbFinance from "@/assets/thumbnails/finance.jpg";
+import thumbHospitality from "@/assets/thumbnails/hospitality.jpg";
+import thumbRetail from "@/assets/thumbnails/retail.jpg";
+import thumbTransport from "@/assets/thumbnails/transport.jpg";
+import thumbRealEstate from "@/assets/thumbnails/realestate.jpg";
+import thumbIndustry from "@/assets/thumbnails/industry.jpg";
+import thumbFitness from "@/assets/thumbnails/fitness.jpg";
+import thumbSalon from "@/assets/thumbnails/salon.jpg";
+import thumbReligious from "@/assets/thumbnails/religious.jpg";
+import thumbTechnology from "@/assets/thumbnails/technology.jpg";
+import thumbAgriculture from "@/assets/thumbnails/agriculture.jpg";
+import thumbLegal from "@/assets/thumbnails/legal.jpg";
+import thumbAutomotive from "@/assets/thumbnails/automotive.jpg";
+import thumbHR from "@/assets/thumbnails/hr.jpg";
+
+// Map masterCategory/category to thumbnails
+const CATEGORY_THUMBNAILS: Record<string, string> = {
+  'Education': thumbEducation,
+  'Healthcare': thumbHealthcare,
+  'Finance & Accounting': thumbFinance,
+  'Banking & Finance': thumbFinance,
+  'Hospitality': thumbHospitality,
+  'Retail & POS': thumbRetail,
+  'Transport & Logistics': thumbTransport,
+  'Real Estate': thumbRealEstate,
+  'Industry & Manufacturing': thumbIndustry,
+  'Agriculture & Farming': thumbAgriculture,
+  'Legal & Compliance': thumbLegal,
+  'Technology': thumbTechnology,
+  'Religious & Community': thumbReligious,
+  'HR & Workforce': thumbHR,
+  'Sales & CRM': thumbAutomotive,
+  'Marketing': thumbRetail,
+  'Government & Public': thumbLegal,
+  'Media & Entertainment': thumbTechnology,
+  'Sports & Recreation': thumbFitness,
+  'NGO & Non-Profit': thumbReligious,
+};
+
+// Get thumbnail for a demo based on category or masterCategory
+const getThumbnail = (demo: Demo): string => {
+  // Check specific categories first
+  if (demo.category.includes('Gym') || demo.category.includes('Fitness')) return thumbFitness;
+  if (demo.category.includes('Salon') || demo.category.includes('Spa')) return thumbSalon;
+  if (demo.category.includes('Church') || demo.category.includes('Temple') || demo.category.includes('Mosque')) return thumbReligious;
+  if (demo.category.includes('Garage') || demo.category.includes('Auto')) return thumbAutomotive;
+  if (demo.category.includes('Hotel') || demo.category.includes('Restaurant')) return thumbHospitality;
+  if (demo.category.includes('Hospital') || demo.category.includes('Clinic') || demo.category.includes('Medical')) return thumbHealthcare;
+  if (demo.category.includes('Bank') || demo.category.includes('Finance') || demo.category.includes('Account')) return thumbFinance;
+  if (demo.category.includes('Transport') || demo.category.includes('Courier') || demo.category.includes('Fleet') || demo.category.includes('Logistics')) return thumbTransport;
+  if (demo.category.includes('Farm') || demo.category.includes('Agri')) return thumbAgriculture;
+  if (demo.category.includes('Legal') || demo.category.includes('Law')) return thumbLegal;
+  if (demo.category.includes('HR') || demo.category.includes('Payroll') || demo.category.includes('Employee')) return thumbHR;
+  if (demo.category.includes('Real Estate') || demo.category.includes('Property')) return thumbRealEstate;
+  // Fallback to masterCategory
+  return CATEGORY_THUMBNAILS[demo.masterCategory] || thumbIndustry;
+};
+
 
 interface Demo {
   id: string;
@@ -249,6 +314,727 @@ const allDemos: Demo[] = [
     color: "from-emerald-600 to-green-600",
     price: "₹34,999",
     discountPrice: "₹20,999"
+  },
+  // ===== EDUCATION EXPANDED: 43 more products (total 50 with existing 7) =====
+  {
+    id: "university-erp",
+    name: "University ERP System",
+    category: "University ERP",
+    masterCategory: "Education",
+    description: "Enterprise university management — Similar Clone: PeopleSoft Campus Solutions.",
+    url: "#",
+    icon: Building,
+    status: "COMING_SOON",
+    features: ["Multi-Faculty", "Research Mgmt", "Campus Admin", "Finance"],
+    frontend: ["React", "TypeScript", "Enterprise UI"],
+    backend: ["Node.js", "PostgreSQL", "Analytics"],
+    color: "from-indigo-700 to-blue-700",
+    price: "₹1,49,999",
+    discountPrice: "₹89,999"
+  },
+  {
+    id: "online-classroom",
+    name: "Online Classroom Platform",
+    category: "Online Classroom",
+    masterCategory: "Education",
+    description: "Virtual classroom with live sessions, assignments — Similar Clone: Google Classroom.",
+    url: "#",
+    icon: MonitorPlay,
+    status: "COMING_SOON",
+    features: ["Live Classes", "Assignments", "Grading", "Stream"],
+    frontend: ["React", "TypeScript", "Video UI"],
+    backend: ["Node.js", "PostgreSQL", "WebRTC"],
+    color: "from-green-600 to-emerald-600",
+    price: "₹59,999",
+    discountPrice: "₹35,999"
+  },
+  {
+    id: "assignment-mgmt",
+    name: "Assignment Management System",
+    category: "Assignment Mgmt",
+    masterCategory: "Education",
+    description: "Assignment submission, grading, plagiarism check — Similar Clone: Canvas LMS.",
+    url: "#",
+    icon: FileCheck,
+    status: "COMING_SOON",
+    features: ["Submissions", "Grading", "Plagiarism", "Rubrics"],
+    frontend: ["React", "TypeScript", "Editor UI"],
+    backend: ["Node.js", "PostgreSQL", "AI Check"],
+    color: "from-orange-600 to-amber-600",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "exam-management",
+    name: "Exam Management System",
+    category: "Exam Mgmt",
+    masterCategory: "Education",
+    description: "Exam scheduling, hall tickets, seating, results — Similar Clone: ExamSoft.",
+    url: "#",
+    icon: ClipboardCheck,
+    status: "COMING_SOON",
+    features: ["Scheduling", "Hall Tickets", "Seating", "Results"],
+    frontend: ["React", "TypeScript", "Exam UI"],
+    backend: ["Node.js", "PostgreSQL", "PDF API"],
+    color: "from-red-600 to-pink-600",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "result-management",
+    name: "Result Management System",
+    category: "Result Mgmt",
+    masterCategory: "Education",
+    description: "Result processing, grade calculation, transcripts — Similar Clone: PowerSchool SIS.",
+    url: "#",
+    icon: BarChart3,
+    status: "COMING_SOON",
+    features: ["Grade Calc", "Transcripts", "Analytics", "Reports"],
+    frontend: ["React", "TypeScript", "Data Grid"],
+    backend: ["Node.js", "PostgreSQL", "Reports"],
+    color: "from-purple-600 to-violet-600",
+    price: "₹29,999",
+    discountPrice: "₹17,999"
+  },
+  {
+    id: "digital-marksheet",
+    name: "Digital Marksheet System",
+    category: "Digital Marksheet",
+    masterCategory: "Education",
+    description: "Digital marksheet generation with QR verification — Similar Clone: Gradelink.",
+    url: "#",
+    icon: FileText,
+    status: "COMING_SOON",
+    features: ["Marksheets", "QR Verify", "Templates", "Bulk Print"],
+    frontend: ["React", "TypeScript", "PDF UI"],
+    backend: ["Node.js", "PostgreSQL", "QR API"],
+    color: "from-teal-600 to-cyan-600",
+    price: "₹24,999",
+    discountPrice: "₹14,999"
+  },
+  {
+    id: "teacher-management",
+    name: "Teacher Management System",
+    category: "Teacher Mgmt",
+    masterCategory: "Education",
+    description: "Teacher profiles, schedules, performance tracking — Similar Clone: Teachmint.",
+    url: "#",
+    icon: UserCog,
+    status: "COMING_SOON",
+    features: ["Profiles", "Schedules", "Performance", "Payroll"],
+    frontend: ["React", "TypeScript", "HR UI"],
+    backend: ["Node.js", "PostgreSQL", "Analytics"],
+    color: "from-blue-600 to-indigo-600",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "parent-portal",
+    name: "Parent Portal System",
+    category: "Parent Portal",
+    masterCategory: "Education",
+    description: "Parent access to grades, attendance, communication — Similar Clone: Edsby.",
+    url: "#",
+    icon: Users,
+    status: "COMING_SOON",
+    features: ["Grades View", "Attendance", "Messages", "Fees"],
+    frontend: ["React", "TypeScript", "Portal UI"],
+    backend: ["Node.js", "PostgreSQL", "Push API"],
+    color: "from-pink-600 to-rose-600",
+    price: "₹29,999",
+    discountPrice: "₹17,999"
+  },
+  {
+    id: "student-portal",
+    name: "Student Portal System",
+    category: "Student Portal",
+    masterCategory: "Education",
+    description: "Student self-service portal for academics — Similar Clone: Infinite Campus.",
+    url: "#",
+    icon: GraduationCap,
+    status: "COMING_SOON",
+    features: ["Dashboard", "Courses", "Results", "Feedback"],
+    frontend: ["React", "TypeScript", "Student UI"],
+    backend: ["Node.js", "PostgreSQL", "Auth"],
+    color: "from-cyan-600 to-blue-600",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "attendance-management",
+    name: "Attendance Management System",
+    category: "Attendance Mgmt",
+    masterCategory: "Education",
+    description: "Digital attendance with reports and analytics — Similar Clone: MyAttendanceTracker.",
+    url: "#",
+    icon: CheckCircle,
+    status: "COMING_SOON",
+    features: ["Mark Attendance", "Reports", "Alerts", "Analytics"],
+    frontend: ["React", "TypeScript", "Tracker UI"],
+    backend: ["Node.js", "PostgreSQL", "SMS API"],
+    color: "from-emerald-600 to-green-600",
+    price: "₹24,999",
+    discountPrice: "₹14,999"
+  },
+  {
+    id: "biometric-attendance",
+    name: "Biometric Attendance System",
+    category: "Biometric Attendance",
+    masterCategory: "Education",
+    description: "Biometric device integrated attendance — Similar Clone: ZKTeco Attendance.",
+    url: "#",
+    icon: Fingerprint,
+    status: "COMING_SOON",
+    features: ["Fingerprint", "Device Sync", "Reports", "Alerts"],
+    frontend: ["React", "TypeScript", "Device UI"],
+    backend: ["Node.js", "PostgreSQL", "Hardware API"],
+    color: "from-slate-600 to-gray-600",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "face-recognition-attendance",
+    name: "Face Recognition Attendance",
+    category: "Face Attendance",
+    masterCategory: "Education",
+    description: "AI face recognition based attendance — Similar Clone: Hikvision Face Attendance.",
+    url: "#",
+    icon: Eye,
+    status: "COMING_SOON",
+    features: ["Face Detect", "Auto Mark", "Reports", "AI Engine"],
+    frontend: ["React", "TypeScript", "Camera UI"],
+    backend: ["Node.js", "PostgreSQL", "AI/ML"],
+    color: "from-violet-600 to-purple-600",
+    price: "₹69,999",
+    discountPrice: "₹41,999"
+  },
+  {
+    id: "timetable-management",
+    name: "Timetable Management System",
+    category: "Timetable Mgmt",
+    masterCategory: "Education",
+    description: "Auto timetable generation with conflict resolution — Similar Clone: Untis Timetable.",
+    url: "#",
+    icon: Calendar,
+    status: "COMING_SOON",
+    features: ["Auto Generate", "Conflicts", "Substitution", "Export"],
+    frontend: ["React", "TypeScript", "Calendar UI"],
+    backend: ["Node.js", "PostgreSQL", "Solver"],
+    color: "from-amber-600 to-orange-600",
+    price: "₹29,999",
+    discountPrice: "₹17,999"
+  },
+  {
+    id: "hostel-management",
+    name: "Hostel Management System",
+    category: "Hostel Mgmt",
+    masterCategory: "Education",
+    description: "Hostel room allocation, mess, complaints — Similar Clone: HostelMate.",
+    url: "#",
+    icon: Hotel,
+    status: "COMING_SOON",
+    features: ["Room Allot", "Mess Mgmt", "Complaints", "Fees"],
+    frontend: ["React", "TypeScript", "Hostel UI"],
+    backend: ["Node.js", "PostgreSQL", "Booking API"],
+    color: "from-rose-600 to-red-600",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "edu-transport",
+    name: "Transport Management System",
+    category: "Edu Transport",
+    masterCategory: "Education",
+    description: "School bus tracking, routes, drivers — Similar Clone: TrackSchoolBus.",
+    url: "#",
+    icon: Truck,
+    status: "COMING_SOON",
+    features: ["GPS Track", "Routes", "Drivers", "Parent App"],
+    frontend: ["React", "TypeScript", "Map UI"],
+    backend: ["Node.js", "PostgreSQL", "GPS API"],
+    color: "from-yellow-600 to-amber-600",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "library-management",
+    name: "Library Management System",
+    category: "Library Mgmt",
+    masterCategory: "Education",
+    description: "Library catalog, issue/return, e-books — Similar Clone: Koha Library.",
+    url: "#",
+    icon: BookOpen,
+    status: "COMING_SOON",
+    features: ["Catalog", "Issue/Return", "E-Books", "Fines"],
+    frontend: ["React", "TypeScript", "Library UI"],
+    backend: ["Node.js", "PostgreSQL", "Barcode API"],
+    color: "from-brown-600 to-amber-700",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "fee-management",
+    name: "Fee Management System",
+    category: "Fee Mgmt",
+    masterCategory: "Education",
+    description: "Fee collection, online payment, receipts — Similar Clone: QuickSchools.",
+    url: "#",
+    icon: CreditCard,
+    status: "COMING_SOON",
+    features: ["Online Pay", "Receipts", "Dues", "Reports"],
+    frontend: ["React", "TypeScript", "Payment UI"],
+    backend: ["Node.js", "PostgreSQL", "Payment Gateway"],
+    color: "from-green-700 to-emerald-700",
+    price: "₹29,999",
+    discountPrice: "₹17,999"
+  },
+  {
+    id: "scholarship-management",
+    name: "Scholarship Management System",
+    category: "Scholarship Mgmt",
+    masterCategory: "Education",
+    description: "Scholarship applications, eligibility, disbursement — Similar Clone: AwardSpring.",
+    url: "#",
+    icon: Award,
+    status: "COMING_SOON",
+    features: ["Applications", "Eligibility", "Disbursement", "Reports"],
+    frontend: ["React", "TypeScript", "Form UI"],
+    backend: ["Node.js", "PostgreSQL", "Workflow"],
+    color: "from-gold-600 to-yellow-600",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "admission-management",
+    name: "Admission Management System",
+    category: "Admission Mgmt",
+    masterCategory: "Education",
+    description: "Online admissions, document verification — Similar Clone: OpenApply.",
+    url: "#",
+    icon: UserCheck,
+    status: "COMING_SOON",
+    features: ["Online Apply", "Documents", "Merit List", "Enrollment"],
+    frontend: ["React", "TypeScript", "Admission UI"],
+    backend: ["Node.js", "PostgreSQL", "Workflow"],
+    color: "from-blue-700 to-indigo-700",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "course-management",
+    name: "Course Management System",
+    category: "Course Mgmt",
+    masterCategory: "Education",
+    description: "Course creation, curriculum mapping — Similar Clone: Blackboard Learn.",
+    url: "#",
+    icon: BookOpen,
+    status: "COMING_SOON",
+    features: ["Curriculum", "Modules", "Resources", "Mapping"],
+    frontend: ["React", "TypeScript", "Course UI"],
+    backend: ["Node.js", "PostgreSQL", "CDN"],
+    color: "from-purple-700 to-pink-700",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "homework-management",
+    name: "Homework Management System",
+    category: "Homework Mgmt",
+    masterCategory: "Education",
+    description: "Homework assignment, submission tracking — Similar Clone: Show My Homework.",
+    url: "#",
+    icon: FileText,
+    status: "COMING_SOON",
+    features: ["Assign", "Submit", "Track", "Feedback"],
+    frontend: ["React", "TypeScript", "Task UI"],
+    backend: ["Node.js", "PostgreSQL", "Notification"],
+    color: "from-orange-700 to-red-700",
+    price: "₹19,999",
+    discountPrice: "₹11,999"
+  },
+  {
+    id: "online-quiz",
+    name: "Online Quiz System",
+    category: "Online Quiz",
+    masterCategory: "Education",
+    description: "Interactive quizzes with gamification — Similar Clone: Kahoot.",
+    url: "#",
+    icon: Zap,
+    status: "COMING_SOON",
+    features: ["Live Quiz", "Gamification", "Leaderboard", "Reports"],
+    frontend: ["React", "TypeScript", "Game UI"],
+    backend: ["Node.js", "PostgreSQL", "WebSocket"],
+    color: "from-pink-600 to-purple-600",
+    price: "₹29,999",
+    discountPrice: "₹17,999"
+  },
+  {
+    id: "question-bank",
+    name: "Question Bank System",
+    category: "Question Bank",
+    masterCategory: "Education",
+    description: "Question bank with difficulty tagging — Similar Clone: ExamView.",
+    url: "#",
+    icon: Database,
+    status: "COMING_SOON",
+    features: ["Questions", "Tags", "Difficulty", "Auto Paper"],
+    frontend: ["React", "TypeScript", "Editor UI"],
+    backend: ["Node.js", "PostgreSQL", "Search"],
+    color: "from-teal-700 to-cyan-700",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "certificate-generator",
+    name: "Certificate Generator System",
+    category: "Certificate Gen",
+    masterCategory: "Education",
+    description: "Auto certificate generation with templates — Similar Clone: Sertifier.",
+    url: "#",
+    icon: Award,
+    status: "COMING_SOON",
+    features: ["Templates", "Bulk Gen", "QR Verify", "Share"],
+    frontend: ["React", "TypeScript", "Design UI"],
+    backend: ["Node.js", "PostgreSQL", "PDF API"],
+    color: "from-gold-700 to-amber-700",
+    price: "₹19,999",
+    discountPrice: "₹11,999"
+  },
+  {
+    id: "student-performance-analytics",
+    name: "Student Performance Analytics",
+    category: "Performance Analytics",
+    masterCategory: "Education",
+    description: "AI-driven student performance tracking — Similar Clone: Schoolytics.",
+    url: "#",
+    icon: PieChart,
+    status: "COMING_SOON",
+    features: ["AI Analytics", "Trends", "Predictions", "Reports"],
+    frontend: ["React", "TypeScript", "Chart UI"],
+    backend: ["Node.js", "PostgreSQL", "ML Engine"],
+    color: "from-cyan-700 to-blue-700",
+    price: "₹54,999",
+    discountPrice: "₹32,999"
+  },
+  {
+    id: "ai-homework-checker",
+    name: "AI Homework Checker",
+    category: "AI Homework",
+    masterCategory: "Education",
+    description: "AI-powered homework evaluation — Similar Clone: Gradescope.",
+    url: "#",
+    icon: Lightbulb,
+    status: "COMING_SOON",
+    features: ["AI Grading", "Feedback", "Plagiarism", "Rubrics"],
+    frontend: ["React", "TypeScript", "AI UI"],
+    backend: ["Node.js", "PostgreSQL", "AI/ML"],
+    color: "from-emerald-700 to-teal-700",
+    price: "₹59,999",
+    discountPrice: "₹35,999"
+  },
+  {
+    id: "ai-question-generator",
+    name: "AI Question Generator",
+    category: "AI Question Gen",
+    masterCategory: "Education",
+    description: "AI auto question generation from content — Similar Clone: Quizgecko AI.",
+    url: "#",
+    icon: Zap,
+    status: "COMING_SOON",
+    features: ["AI Generate", "Topics", "Difficulty", "Export"],
+    frontend: ["React", "TypeScript", "AI UI"],
+    backend: ["Node.js", "PostgreSQL", "GPT API"],
+    color: "from-violet-700 to-indigo-700",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "virtual-classroom",
+    name: "Virtual Classroom System",
+    category: "Virtual Classroom",
+    masterCategory: "Education",
+    description: "Full virtual classroom with whiteboard — Similar Clone: Zoom Classroom.",
+    url: "#",
+    icon: MonitorPlay,
+    status: "COMING_SOON",
+    features: ["Whiteboard", "Screen Share", "Recording", "Chat"],
+    frontend: ["React", "TypeScript", "Video UI"],
+    backend: ["Node.js", "PostgreSQL", "WebRTC"],
+    color: "from-blue-800 to-purple-800",
+    price: "₹69,999",
+    discountPrice: "₹41,999"
+  },
+  {
+    id: "online-course-marketplace",
+    name: "Online Course Marketplace",
+    category: "Course Marketplace",
+    masterCategory: "Education",
+    description: "Course marketplace for instructors — Similar Clone: Udemy.",
+    url: "#",
+    icon: Globe,
+    status: "COMING_SOON",
+    features: ["Instructor Panel", "Courses", "Payments", "Reviews"],
+    frontend: ["React", "TypeScript", "Marketplace UI"],
+    backend: ["Node.js", "PostgreSQL", "Stripe"],
+    color: "from-purple-800 to-pink-800",
+    price: "₹99,999",
+    discountPrice: "₹59,999"
+  },
+  {
+    id: "teacher-training",
+    name: "Teacher Training Platform",
+    category: "Teacher Training",
+    masterCategory: "Education",
+    description: "Professional development for teachers — Similar Clone: Coursera for Teachers.",
+    url: "#",
+    icon: GraduationCap,
+    status: "COMING_SOON",
+    features: ["Courses", "Certification", "Workshops", "Tracking"],
+    frontend: ["React", "TypeScript", "Training UI"],
+    backend: ["Node.js", "PostgreSQL", "LMS"],
+    color: "from-rose-700 to-red-700",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "education-crm",
+    name: "Education CRM",
+    category: "Education CRM",
+    masterCategory: "Education",
+    description: "CRM for educational institutions — Similar Clone: Creatrix Campus CRM.",
+    url: "#",
+    icon: Target,
+    status: "COMING_SOON",
+    features: ["Lead Mgmt", "Follow-ups", "Enrollment", "Analytics"],
+    frontend: ["React", "TypeScript", "CRM UI"],
+    backend: ["Node.js", "PostgreSQL", "Email API"],
+    color: "from-indigo-800 to-blue-800",
+    price: "₹54,999",
+    discountPrice: "₹32,999"
+  },
+  {
+    id: "student-counseling",
+    name: "Student Counseling System",
+    category: "Student Counseling",
+    masterCategory: "Education",
+    description: "Student counseling and wellness tracking — Similar Clone: Navigate360.",
+    url: "#",
+    icon: Heart,
+    status: "COMING_SOON",
+    features: ["Appointments", "Wellness", "Notes", "Referrals"],
+    frontend: ["React", "TypeScript", "Wellness UI"],
+    backend: ["Node.js", "PostgreSQL", "Calendar"],
+    color: "from-pink-700 to-rose-700",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "alumni-management",
+    name: "Alumni Management System",
+    category: "Alumni Mgmt",
+    masterCategory: "Education",
+    description: "Alumni network, events, donations — Similar Clone: Almabase.",
+    url: "#",
+    icon: Users,
+    status: "COMING_SOON",
+    features: ["Directory", "Events", "Donations", "Jobs"],
+    frontend: ["React", "TypeScript", "Network UI"],
+    backend: ["Node.js", "PostgreSQL", "Email API"],
+    color: "from-amber-700 to-orange-700",
+    price: "₹39,999",
+    discountPrice: "₹23,999"
+  },
+  {
+    id: "internship-management",
+    name: "Internship Management System",
+    category: "Internship Mgmt",
+    masterCategory: "Education",
+    description: "Internship postings, applications, tracking — Similar Clone: Symplicity.",
+    url: "#",
+    icon: Briefcase,
+    status: "COMING_SOON",
+    features: ["Postings", "Applications", "Tracking", "Reports"],
+    frontend: ["React", "TypeScript", "Job UI"],
+    backend: ["Node.js", "PostgreSQL", "Workflow"],
+    color: "from-green-800 to-teal-800",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "placement-management",
+    name: "Placement Management System",
+    category: "Placement Mgmt",
+    masterCategory: "Education",
+    description: "Campus placement drives, company tie-ups — Similar Clone: Handshake.",
+    url: "#",
+    icon: Briefcase,
+    status: "COMING_SOON",
+    features: ["Drives", "Companies", "Students", "Analytics"],
+    frontend: ["React", "TypeScript", "Placement UI"],
+    backend: ["Node.js", "PostgreSQL", "Matching"],
+    color: "from-teal-800 to-emerald-800",
+    price: "₹44,999",
+    discountPrice: "₹26,999"
+  },
+  {
+    id: "research-paper-mgmt",
+    name: "Research Paper Management",
+    category: "Research Mgmt",
+    masterCategory: "Education",
+    description: "Research paper submission, review — Similar Clone: Mendeley.",
+    url: "#",
+    icon: ScrollText,
+    status: "COMING_SOON",
+    features: ["Submissions", "Peer Review", "Citations", "Archive"],
+    frontend: ["React", "TypeScript", "Paper UI"],
+    backend: ["Node.js", "PostgreSQL", "Search"],
+    color: "from-slate-700 to-gray-700",
+    price: "₹49,999",
+    discountPrice: "₹29,999"
+  },
+  {
+    id: "digital-notice-board",
+    name: "Digital Notice Board System",
+    category: "Notice Board",
+    masterCategory: "Education",
+    description: "Digital signage and announcements — Similar Clone: Rise Vision.",
+    url: "#",
+    icon: MonitorPlay,
+    status: "COMING_SOON",
+    features: ["Announcements", "Scheduling", "Templates", "Multi-Screen"],
+    frontend: ["React", "TypeScript", "Display UI"],
+    backend: ["Node.js", "PostgreSQL", "Push API"],
+    color: "from-red-700 to-orange-700",
+    price: "₹19,999",
+    discountPrice: "₹11,999"
+  },
+  {
+    id: "school-event-mgmt",
+    name: "Event Management for Schools",
+    category: "School Events",
+    masterCategory: "Education",
+    description: "School events, sports day, cultural programs — Similar Clone: Eventbrite Education.",
+    url: "#",
+    icon: Calendar,
+    status: "COMING_SOON",
+    features: ["Events", "Registration", "Scheduling", "Photos"],
+    frontend: ["React", "TypeScript", "Event UI"],
+    backend: ["Node.js", "PostgreSQL", "Media"],
+    color: "from-purple-600 to-violet-600",
+    price: "₹24,999",
+    discountPrice: "₹14,999"
+  },
+  {
+    id: "campus-communication",
+    name: "Campus Communication System",
+    category: "Campus Comm",
+    masterCategory: "Education",
+    description: "School-wide communication platform — Similar Clone: ParentSquare.",
+    url: "#",
+    icon: MessageSquare,
+    status: "COMING_SOON",
+    features: ["Messages", "Broadcast", "Groups", "Translations"],
+    frontend: ["React", "TypeScript", "Chat UI"],
+    backend: ["Node.js", "PostgreSQL", "Push API"],
+    color: "from-cyan-800 to-blue-800",
+    price: "₹29,999",
+    discountPrice: "₹17,999"
+  },
+  {
+    id: "classroom-booking",
+    name: "Classroom Booking System",
+    category: "Classroom Booking",
+    masterCategory: "Education",
+    description: "Room and lab booking management — Similar Clone: Skedda.",
+    url: "#",
+    icon: Home,
+    status: "COMING_SOON",
+    features: ["Room Book", "Calendar", "Availability", "Reports"],
+    frontend: ["React", "TypeScript", "Booking UI"],
+    backend: ["Node.js", "PostgreSQL", "Calendar API"],
+    color: "from-indigo-600 to-cyan-600",
+    price: "₹24,999",
+    discountPrice: "₹14,999"
+  },
+  {
+    id: "school-mobile-app",
+    name: "School Mobile App",
+    category: "School App",
+    masterCategory: "Education",
+    description: "Complete school mobile application — Similar Clone: Schoology App.",
+    url: "#",
+    icon: Phone,
+    status: "COMING_SOON",
+    features: ["Mobile App", "Push Notify", "Offline", "Dashboard"],
+    frontend: ["React Native", "TypeScript", "Mobile UI"],
+    backend: ["Node.js", "PostgreSQL", "FCM"],
+    color: "from-blue-600 to-purple-600",
+    price: "₹59,999",
+    discountPrice: "₹35,999"
+  },
+  {
+    id: "parent-communication-app",
+    name: "Parent Communication App",
+    category: "Parent App",
+    masterCategory: "Education",
+    description: "Parent-teacher communication app — Similar Clone: ClassDojo.",
+    url: "#",
+    icon: MessageSquare,
+    status: "COMING_SOON",
+    features: ["Messages", "Photos", "Behavior", "Stories"],
+    frontend: ["React Native", "TypeScript", "App UI"],
+    backend: ["Node.js", "PostgreSQL", "Push API"],
+    color: "from-green-600 to-cyan-600",
+    price: "₹34,999",
+    discountPrice: "₹20,999"
+  },
+  {
+    id: "elearning-content",
+    name: "E-Learning Content Platform",
+    category: "E-Learning",
+    masterCategory: "Education",
+    description: "Free educational content platform — Similar Clone: Khan Academy.",
+    url: "#",
+    icon: Globe,
+    status: "COMING_SOON",
+    features: ["Video Lessons", "Practice", "Progress", "Subjects"],
+    frontend: ["React", "TypeScript", "Learning UI"],
+    backend: ["Node.js", "PostgreSQL", "CDN"],
+    color: "from-emerald-800 to-green-800",
+    price: "₹79,999",
+    discountPrice: "₹47,999"
+  },
+  {
+    id: "edu-subscription",
+    name: "Education Subscription Platform",
+    category: "Edu Subscription",
+    masterCategory: "Education",
+    description: "Subscription-based learning platform — Similar Clone: Coursera.",
+    url: "#",
+    icon: Coins,
+    status: "COMING_SOON",
+    features: ["Subscriptions", "Courses", "Certificates", "Enterprise"],
+    frontend: ["React", "TypeScript", "Sub UI"],
+    backend: ["Node.js", "PostgreSQL", "Stripe"],
+    color: "from-blue-900 to-indigo-900",
+    price: "₹1,29,999",
+    discountPrice: "₹77,999"
+  },
+  {
+    id: "multi-branch-school",
+    name: "Multi-Branch School Management",
+    category: "Multi-Branch School",
+    masterCategory: "Education",
+    description: "Multi-branch school chain management — Similar Clone: EduSys.",
+    url: "#",
+    icon: Building2,
+    status: "COMING_SOON",
+    features: ["Multi-Branch", "Central Admin", "Reports", "Sync"],
+    frontend: ["React", "TypeScript", "Enterprise UI"],
+    backend: ["Node.js", "PostgreSQL", "Multi-tenant"],
+    color: "from-violet-800 to-purple-800",
+    price: "₹1,49,999",
+    discountPrice: "₹89,999"
   },
 
   // ============= 2. RETAIL & POS SYSTEMS (7 Sub-categories) =============
@@ -2418,37 +3204,158 @@ const allDemos: Demo[] = [
   }
 ];
 
-// Master Categories for filtering (20 Categories)
+// Merge old demos with new marketplace products (deduplicate by masterCategory match)
+const mergedDemos: Demo[] = [
+  ...allDemos,
+  ...allMarketplaceProducts
+    .filter(mp => !allDemos.some(d => d.id === mp.id))
+    .map(mp => ({
+      ...mp,
+      url: mp.url,
+      icon: mp.icon,
+      price: "$249",
+      discountPrice: "$249",
+    }))
+];
+
+// ===== ROTATING BANNER COLORS (changes every 30 min) =====
+const BANNER_COLORS = [
+  "from-red-600 to-orange-500",
+  "from-purple-600 to-pink-500",
+  "from-blue-600 to-cyan-500",
+  "from-green-600 to-emerald-500",
+  "from-amber-600 to-yellow-500",
+  "from-rose-600 to-red-500",
+  "from-indigo-600 to-violet-500",
+  "from-teal-600 to-green-500",
+  "from-fuchsia-600 to-pink-500",
+  "from-cyan-600 to-blue-500",
+];
+
+const getBannerColorIndex = () => {
+  const mins = Math.floor(Date.now() / (30 * 60 * 1000));
+  return mins % BANNER_COLORS.length;
+};
+
+// ===== 50 NETFLIX ROWS =====
+interface NetflixRow {
+  id: number;
+  title: string;
+  type: 'special' | 'category';
+  filter: (demo: Demo) => boolean;
+}
+
+const NETFLIX_ROWS: NetflixRow[] = [
+  // Special Curated Rows
+  { id: 1, title: '🔥 Upcoming Products', type: 'special', filter: d => d.status === 'COMING_SOON' },
+  { id: 2, title: '⚡ On Demand Solutions', type: 'special', filter: d => d.status === 'ACTIVE' },
+  { id: 3, title: '🏆 This Week Top Products', type: 'special', filter: d => d.status === 'ACTIVE' || ['school-management', 'crm-software', 'hotel-management', 'manufacturing-erp', 'ecommerce-platform'].includes(d.id) },
+  { id: 4, title: '🌿 Evergreen Software', type: 'special', filter: d => ['school-management', 'hospital-hms', 'retail-pos', 'accounting-software', 'crm-software', 'hrms-software', 'fleet-management', 'property-management'].includes(d.id) },
+
+  // Category Rows (5-50)
+  { id: 5, title: 'Education & EdTech', type: 'category', filter: d => d.masterCategory === 'Education' },
+  { id: 6, title: 'Healthcare & Medical Services', type: 'category', filter: d => d.masterCategory === 'Healthcare' && !['Gym Fitness', 'Salon Spa'].includes(d.category) },
+  { id: 7, title: 'Real Estate & Property Services', type: 'category', filter: d => d.masterCategory === 'Real Estate' },
+  { id: 8, title: 'E-Commerce & Online Marketplaces', type: 'category', filter: d => d.masterCategory === 'E-commerce & Online Marketplaces' },
+  { id: 9, title: 'Retail & POS Systems', type: 'category', filter: d => d.masterCategory === 'Retail & POS' },
+  { id: 10, title: 'Food Delivery & Restaurant Systems', type: 'category', filter: d => ['Restaurant POS', 'Restaurant Mgmt', 'Kitchen KOT'].includes(d.category) || d.name.toLowerCase().includes('food') || d.name.toLowerCase().includes('restaurant') },
+  { id: 11, title: 'Hospitality & Hotel Booking', type: 'category', filter: d => d.masterCategory === 'Hospitality (Hotel, Restaurant, Travel)' || d.masterCategory === 'Hospitality' },
+  { id: 12, title: 'Transportation & Ride Sharing', type: 'category', filter: d => ['Fleet', 'Transport ERP', 'Route Planning', 'Driver Mgmt'].includes(d.category) },
+  { id: 13, title: 'Logistics & Supply Chain', type: 'category', filter: d => d.masterCategory === 'Logistics' || d.masterCategory === 'Inventory, Warehouse & Supply Chain' },
+  { id: 14, title: 'Finance & FinTech Platforms', type: 'category', filter: d => d.masterCategory === 'Finance' && !['Core Banking', 'Investment'].includes(d.category) },
+  { id: 15, title: 'Investment & Trading Platforms', type: 'category', filter: d => ['Investment', 'Trading ERP'].includes(d.category) || d.name.toLowerCase().includes('investment') || d.name.toLowerCase().includes('trading') },
+  { id: 16, title: 'Banking Systems', type: 'category', filter: d => d.category === 'Core Banking' || d.name.toLowerCase().includes('banking') },
+  { id: 17, title: 'Insurance Platforms', type: 'category', filter: d => d.name.toLowerCase().includes('insurance') || d.category.toLowerCase().includes('insurance') },
+  { id: 18, title: 'Productivity & Workspace Apps', type: 'category', filter: d => ['ESS Portal', 'DMS'].includes(d.category) || d.name.toLowerCase().includes('workspace') || d.name.toLowerCase().includes('productivity') },
+  { id: 19, title: 'Cybersecurity & Privacy Tools', type: 'category', filter: d => d.masterCategory === 'Cyber Security & Data Protection' },
+  { id: 20, title: 'Data Analytics & Business Intelligence', type: 'category', filter: d => d.category.includes('Analytics') || d.category.includes('Reports') || d.name.toLowerCase().includes('analytics') },
+  { id: 21, title: 'Marketing & Advertising Platforms', type: 'category', filter: d => d.masterCategory === 'Marketing' },
+  { id: 22, title: 'Sales & CRM Systems', type: 'category', filter: d => d.masterCategory === 'Sales & CRM' },
+  { id: 23, title: 'HRM & Workforce Management', type: 'category', filter: d => d.masterCategory === 'HR & Payroll' },
+  { id: 24, title: 'Developer Tools & DevOps', type: 'category', filter: d => d.name.toLowerCase().includes('developer') || d.name.toLowerCase().includes('devops') || d.category.toLowerCase().includes('code') },
+  { id: 25, title: 'Artificial Intelligence Tools', type: 'category', filter: d => d.name.toLowerCase().includes('ai') || d.features.some(f => f.toLowerCase().includes('ai')) },
+  { id: 26, title: 'Social Media Platforms', type: 'category', filter: d => d.category === 'Social Media' || d.name.toLowerCase().includes('social media') },
+  { id: 27, title: 'Media & Streaming Platforms', type: 'category', filter: d => d.name.toLowerCase().includes('media') || d.name.toLowerCase().includes('streaming') || d.name.toLowerCase().includes('broadcast') },
+  { id: 28, title: 'Gaming Platforms', type: 'category', filter: d => d.name.toLowerCase().includes('gaming') || d.name.toLowerCase().includes('esport') },
+  { id: 29, title: 'Creator Economy Platforms', type: 'category', filter: d => d.name.toLowerCase().includes('creator') || d.name.toLowerCase().includes('influencer') },
+  { id: 30, title: 'Legal Tech Systems', type: 'category', filter: d => d.masterCategory === 'Legal, Compliance & Documentation' },
+  { id: 31, title: 'Government & Public Administration', type: 'category', filter: d => d.masterCategory === 'Government & e-Governance Systems' },
+  { id: 32, title: 'Security & Surveillance Systems', type: 'category', filter: d => d.masterCategory === 'Security, Surveillance & Access Control' },
+  { id: 33, title: 'Smart Home & IoT Platforms', type: 'category', filter: d => d.name.toLowerCase().includes('iot') || d.name.toLowerCase().includes('smart') || d.category === 'Smart City' },
+  { id: 34, title: 'Research & Innovation Platforms', type: 'category', filter: d => d.name.toLowerCase().includes('research') || d.name.toLowerCase().includes('innovation') || d.category.includes('Lab') },
+  { id: 35, title: 'Environment & Sustainability Systems', type: 'category', filter: d => d.name.toLowerCase().includes('environment') || d.name.toLowerCase().includes('sustainability') || d.name.toLowerCase().includes('energy') },
+  { id: 36, title: 'Mining & Natural Resources', type: 'category', filter: d => d.name.toLowerCase().includes('mining') || d.name.toLowerCase().includes('resource') },
+  { id: 37, title: 'Wholesale & Distribution Systems', type: 'category', filter: d => ['Distribution ERP', 'Vendor Mgmt'].includes(d.category) || d.name.toLowerCase().includes('wholesale') || d.name.toLowerCase().includes('distribution') },
+  { id: 38, title: 'Pharmaceuticals & Biotechnology', type: 'category', filter: d => d.category === 'Pharmacy' || d.name.toLowerCase().includes('pharma') || d.name.toLowerCase().includes('biotech') },
+  { id: 39, title: 'NGO & Social Development', type: 'category', filter: d => d.name.toLowerCase().includes('ngo') || d.name.toLowerCase().includes('non-profit') || d.name.toLowerCase().includes('social') },
+  { id: 40, title: 'Event Management Platforms', type: 'category', filter: d => d.category === 'Event Mgmt' || d.name.toLowerCase().includes('event') },
+  { id: 41, title: 'Travel & Tourism Platforms', type: 'category', filter: d => d.category === 'Travel Booking' || d.name.toLowerCase().includes('travel') || d.name.toLowerCase().includes('tourism') },
+  { id: 42, title: 'Booking & Reservation Systems', type: 'category', filter: d => d.category.includes('Booking') || d.category.includes('Reserve') || d.category === 'Appointments' },
+  { id: 43, title: 'Franchise & Multi-Branch Systems', type: 'category', filter: d => d.category.includes('Multi-Branch') || d.category.includes('Multi-Store') || d.name.toLowerCase().includes('franchise') },
+  { id: 44, title: 'Subscription & SaaS Platforms', type: 'category', filter: d => d.category === 'Subscription' || d.name.toLowerCase().includes('subscription') || d.name.toLowerCase().includes('saas') },
+  { id: 45, title: 'Enterprise ERP Systems', type: 'category', filter: d => d.masterCategory === 'ERP' || d.masterCategory === 'Enterprise Resource Planning (ERP)' },
+  { id: 46, title: 'Manufacturing & Industrial Systems', type: 'category', filter: d => d.category === 'Manufacturing ERP' || d.name.toLowerCase().includes('manufacturing') || d.name.toLowerCase().includes('industrial') },
+  { id: 47, title: 'Construction & Infrastructure', type: 'category', filter: d => d.name.toLowerCase().includes('construction') || d.name.toLowerCase().includes('infrastructure') || d.category === 'Maintenance' },
+  { id: 48, title: 'Automotive & Vehicle Platforms', type: 'category', filter: d => d.category === 'Automotive' || d.name.toLowerCase().includes('automotive') || d.name.toLowerCase().includes('vehicle') },
+  { id: 49, title: 'Agriculture & Dairy Systems', type: 'category', filter: d => d.name.toLowerCase().includes('agriculture') || d.name.toLowerCase().includes('farm') || d.name.toLowerCase().includes('dairy') },
+  { id: 50, title: 'Telecom & Internet Services', type: 'category', filter: d => d.masterCategory === 'Telecom, Call Center & VoIP' },
+];
+
+// Master Categories for filtering header tabs
 const masterCategories = [
   "All",
   "Education",
-  "Retail & POS",
   "Healthcare",
-  "Logistics",
-  "Real Estate",
   "Finance",
-  "Accounting",
+  "Retail & POS",
+  "Real Estate",
+  "Logistics",
   "Sales & CRM",
   "Marketing",
   "HR & Payroll",
   "ERP",
-  "Inventory",
   "E-commerce",
   "Hospitality",
   "Telecom",
-  "Support",
   "Legal",
   "Government",
   "Security",
-  "Cyber Security"
+  "Cyber Security",
+  "Accounting",
+  "Support"
 ];
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [heroIndex, setHeroIndex] = useState(0);
+  const [bannerColorIdx, setBannerColorIdx] = useState(getBannerColorIndex());
+  const geoLocale = useGeoLocale();
+  const festivalBanner = useFestivalBanner(geoLocale.country);
 
-  const filteredDemos = allDemos.filter(demo => {
+  // Auto-rotate hero every 6s
+  useEffect(() => {
+    const activeDemos = mergedDemos.filter(d => d.status === 'ACTIVE');
+    if (activeDemos.length <= 1) return;
+    const timer = setInterval(() => {
+      setHeroIndex(prev => (prev + 1) % Math.min(activeDemos.length, 8));
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Rotate banner color every 30 minutes
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBannerColorIdx(getBannerColorIndex());
+    }, 60000); // check every minute
+    return () => clearInterval(timer);
+  }, []);
+
+  /** All prices are $249 fixed */
+  const localPrice = (priceStr: string) => priceStr;
+
+  const filteredDemos = mergedDemos.filter(demo => {
     const matchesCategory = activeCategory === "All" || demo.masterCategory === activeCategory;
     const matchesSearch = demo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           demo.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -2462,8 +3369,8 @@ const Index = () => {
 
   // Count demos per master category
   const getCategoryCount = (category: string) => {
-    if (category === "All") return allDemos.length;
-    return allDemos.filter(d => d.masterCategory === category).length;
+    if (category === "All") return mergedDemos.length;
+    return mergedDemos.filter(d => d.masterCategory === category).length;
   };
 
   return (
@@ -2501,11 +3408,16 @@ const Index = () => {
               </Button>
               {/* Pricing Badge */}
               <Badge className="bg-white text-green-600 font-bold text-sm px-3 py-1.5 animate-pulse">
-                💰 $249 Lifetime
+                💰 $249 Lifetime • Source Code Included
               </Badge>
               <Badge className="bg-white/20 text-white border-0 text-xs px-3 py-1.5">
-                🎉 40% OFF
+                🎉 No Hidden Charges
               </Badge>
+              {festivalBanner && (
+                <Badge className={`bg-gradient-to-r ${BANNER_COLORS[bannerColorIdx]} text-white border-0 text-xs px-3 py-1.5 font-bold animate-pulse`}>
+                  🔥 Festival Week: ALL Software $99 for 7 Days!
+                </Badge>
+              )}
               {/* Login Button - For regular users */}
               <Button asChild className="bg-white text-orange-600 hover:bg-white/90 font-bold gap-2">
                 <Link to="/auth">
@@ -2528,329 +3440,388 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-12 px-4 bg-gradient-to-b from-[#0d1e36] to-transparent">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 mb-4">
-              <Star className="h-3 w-3 mr-1" /> 20 Master Categories • 147 Software Solutions • 20 Live Demos
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">Business Software</span> Marketplace
-            </h2>
-            <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-8">
-              Premium enterprise solutions across Education, Healthcare, Finance, Retail, Logistics & more.
-              Start your business today with our ready-to-deploy software!
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <div className="flex items-center gap-2 text-emerald-400">
-                <CheckCircle className="h-5 w-5" /> Full Source Code
-              </div>
-              <div className="flex items-center gap-2 text-cyan-400">
-                <CheckCircle className="h-5 w-5" /> 1 Year Free Support
-              </div>
-              <div className="flex items-center gap-2 text-orange-400">
-                <CheckCircle className="h-5 w-5" /> Free Installation
-              </div>
-              <div className="flex items-center gap-2 text-purple-400">
-                <CheckCircle className="h-5 w-5" /> Lifetime Updates
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* ===== NETFLIX HERO — Featured Product with Cinematic Visual ===== */}
+      {(() => {
+        const activeDemos = mergedDemos.filter(d => d.status === 'ACTIVE');
+        const heroDemo = activeDemos[heroIndex % activeDemos.length];
+        if (!heroDemo) return null;
+        const HeroIcon = heroDemo.icon;
+        return (
+          <section className="relative h-[70vh] min-h-[480px] max-h-[680px] overflow-hidden">
+            {/* Cinematic gradient backdrop */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${heroDemo.color} opacity-40`} />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/30" />
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
 
-      {/* Category Filter - Master Categories */}
-      <div className="bg-[#0d1e36]/80 backdrop-blur-sm border-b border-cyan-500/20 py-4 px-4 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <Input 
-                placeholder="Search software..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-[#1a2d4a] border-cyan-500/30 text-white placeholder:text-gray-400"
-              />
+            {/* Large icon visual */}
+            <div className="absolute right-[10%] top-1/2 -translate-y-1/2 opacity-[0.07]">
+              <HeroIcon className="w-[400px] h-[400px]" />
             </div>
-            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-              {filteredDemos.length} Products
-            </Badge>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {masterCategories.map(cat => (
-              <Button
-                key={cat}
-                variant={activeCategory === cat ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveCategory(cat)}
-                className={activeCategory === cat 
-                  ? "bg-cyan-500 text-white hover:bg-cyan-600" 
-                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200"
-                }
+
+            {/* Content */}
+            <div className="relative z-20 h-full flex items-center px-6 md:px-16 lg:px-24">
+              <motion.div
+                key={heroDemo.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="max-w-2xl"
               >
-                {cat === "All" ? `All (${getCategoryCount(cat)})` : cat}
-                {cat !== "All" && (
-                  <span className="ml-1 text-xs opacity-70">({getCategoryCount(cat)})</span>
-                )}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <Badge className="bg-emerald-500/90 text-white font-bold text-xs flex items-center gap-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" /> LIVE DEMO
+                  </Badge>
+                  <Badge className="bg-white/10 text-white/70 border-white/20 text-xs">
+                    {heroDemo.masterCategory}
+                  </Badge>
+                  <Badge className="bg-red-500/80 text-white border-0 text-xs font-bold">
+                    40% OFF
+                  </Badge>
+                </div>
 
-      {/* Demo Cards Grid */}
-      <section className="py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Group by Master Category when "All" is selected */}
-          {activeCategory === "All" ? (
-            masterCategories.slice(1).map(masterCat => {
-              const categoryDemos = filteredDemos.filter(d => d.masterCategory === masterCat);
-              if (categoryDemos.length === 0) return null;
-              
-              return (
-                <div key={masterCat} className="mb-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <h3 className="text-2xl font-bold text-white">{masterCat}</h3>
-                    <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
-                      {categoryDemos.length} Products
-                    </Badge>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {categoryDemos.map((demo, index) => (
-                      <DemoCard 
-                        key={demo.id} 
-                        demo={demo} 
-                        index={index}
-                        isFavorite={favorites.includes(demo.id)}
-                        onToggleFavorite={() => toggleFavorite(demo.id)}
-                      />
+                <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-3 leading-[1.05]">
+                  {heroDemo.name}
+                </h2>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-1">
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                     ))}
                   </div>
+                  <span className="text-white/60 text-sm">50+ clients</span>
                 </div>
-              );
-            })
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredDemos.map((demo, index) => (
-                <DemoCard 
-                  key={demo.id} 
-                  demo={demo} 
-                  index={index}
-                  isFavorite={favorites.includes(demo.id)}
-                  onToggleFavorite={() => toggleFavorite(demo.id)}
+
+                <p className="text-slate-300 text-base md:text-lg mb-6 line-clamp-2 max-w-lg">
+                  {heroDemo.description}
+                </p>
+
+                <div className="flex items-center gap-3 mb-8">
+                  <span className="text-white/40 line-through text-lg">{localPrice(heroDemo.price)}</span>
+                  <span className="text-3xl font-extrabold text-emerald-400">{localPrice(heroDemo.discountPrice)}</span>
+                </div>
+
+                <div className="flex gap-3">
+                  <Link to={heroDemo.url}>
+                    <Button size="lg" className="bg-white text-black hover:bg-white/90 font-bold text-base px-8 gap-2 rounded-sm">
+                      <Play className="h-5 w-5 fill-black" /> Try Demo
+                    </Button>
+                  </Link>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white/30 text-white hover:bg-white/10 font-medium text-base px-8 gap-2 rounded-sm"
+                    onClick={() => {
+                      toggleFavorite(heroDemo.id);
+                    }}
+                  >
+                    <Heart className={`h-5 w-5 ${favorites.includes(heroDemo.id) ? 'fill-red-500 text-red-500' : ''}`} /> 
+                    {favorites.includes(heroDemo.id) ? 'Saved' : 'My List'}
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Hero nav dots */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {activeDemos.slice(0, 8).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setHeroIndex(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${idx === heroIndex % activeDemos.slice(0, 8).length ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'}`}
                 />
               ))}
             </div>
-          )}
+          </section>
+        );
+      })()}
+
+      {/* Festival Banner */}
+      {festivalBanner && (
+        <section className="px-4 md:px-12 -mt-8 relative z-20 mb-6">
+          <div className="max-w-[1400px] mx-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={`relative rounded-xl overflow-hidden bg-gradient-to-r ${BANNER_COLORS[bannerColorIdx]} p-6 md:p-8`}
+            >
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute top-0 right-8 opacity-10 text-[80px]">{festivalBanner.emoji}</div>
+              <div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white">{festivalBanner.title}</h3>
+                  <p className="text-white/80 text-sm">{festivalBanner.subtitle}</p>
+                  <p className="text-white font-bold text-lg mt-2">🔥 Festival Special: ALL Software just $99 for 7 Days!</p>
+                  <p className="text-white/70 text-xs mt-1">$249 Lifetime with Full Source Code • No Hidden Charges • No Advance</p>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <Badge className="bg-white text-green-600 border-0 text-2xl px-6 py-3 font-extrabold">
+                    $99 / 7 Days
+                  </Badge>
+                  <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1.5 font-bold backdrop-blur-sm">
+                    Regular: $249 Lifetime
+                  </Badge>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== 50 NETFLIX HORIZONTAL ROWS ===== */}
+      <section className="pb-12 px-4 md:px-12 space-y-10">
+        <div className="max-w-[1400px] mx-auto space-y-10">
+          {NETFLIX_ROWS.map(row => {
+            const rowDemos = mergedDemos.filter(row.filter);
+            const displayDemos = row.type === 'special' ? rowDemos.slice(0, 20) : rowDemos;
+            const isEmpty = displayDemos.length === 0;
+
+            return (
+              <NetflixScrollRow
+                key={row.id}
+                row={row}
+                demos={displayDemos}
+                isEmpty={isEmpty}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+                localPrice={localPrice}
+              />
+            );
+          })}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0a1628] border-t border-cyan-500/20 py-8 px-4">
+      <footer className="bg-[#060d18] border-t border-white/5 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-400">© 2024 Software Vala - The Name of Trust. All rights reserved.</p>
-          <p className="text-cyan-400 mt-2">20 Master Categories • 147 Software Solutions • 20 Live Demos Ready</p>
+          <p className="text-slate-600 text-sm">© 2024 Software Vala - The Name of Trust</p>
+          <p className="text-slate-700 text-xs mt-1">50 Categories • {mergedDemos.length}+ Software • $249 Lifetime • Source Code Included</p>
         </div>
       </footer>
     </div>
   );
 };
 
-// Demo Card Component - Enhanced with interactions
-const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: { 
+// ===== NETFLIX SCROLL ROW — Horizontal scroll with left/right arrows =====
+const NetflixScrollRow = ({ row, demos, isEmpty, favorites, toggleFavorite, localPrice: localPriceFn }: {
+  row: NetflixRow;
+  demos: Demo[];
+  isEmpty: boolean;
+  favorites: string[];
+  toggleFavorite: (id: string) => void;
+  localPrice: (inrStr: string) => string;
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, demos]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.75;
+    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="group/row relative">
+      <div className="flex items-center gap-3 mb-3">
+        <span className="text-xs text-slate-500 font-mono w-6">{String(row.id).padStart(2, '0')}</span>
+        <h3 className="text-lg font-bold text-white group-hover/row:text-cyan-400 transition-colors">
+          {row.title}
+        </h3>
+        <span className="text-xs text-slate-600 bg-slate-800/50 px-2 py-0.5 rounded-full">
+          {isEmpty ? 'Coming Soon' : `${demos.length}`}
+        </span>
+      </div>
+
+      {isEmpty ? (
+        /* Placeholder row for empty categories */
+        <div className="flex gap-3 overflow-hidden pb-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex-shrink-0 w-[200px] md:w-[220px]">
+              <div className="aspect-[3/4] rounded-lg bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-slate-700/30 flex flex-col items-center justify-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-slate-700/50 flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-slate-500" />
+                </div>
+                <span className="text-slate-500 text-xs font-medium">Coming Soon</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="relative">
+          {/* Left Arrow */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 top-0 bottom-3 w-12 z-30 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/90 to-transparent flex items-center justify-start pl-1 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200"
+            >
+              <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10">
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </div>
+            </button>
+          )}
+
+          {/* Scrollable Row */}
+          <div
+            ref={scrollRef}
+            className="flex gap-3 overflow-x-auto pb-3 scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {demos.map((demo, index) => (
+              <div key={demo.id} className="flex-shrink-0 w-[200px] md:w-[220px]">
+                <DemoCard
+                  demo={demo}
+                  index={index}
+                  isFavorite={favorites.includes(demo.id)}
+                  onToggleFavorite={() => toggleFavorite(demo.id)}
+                  localPrice={localPriceFn}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Right Arrow */}
+          {canScrollRight && (
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 top-0 bottom-3 w-12 z-30 bg-gradient-to-l from-[#0a1628] via-[#0a1628]/90 to-transparent flex items-center justify-end pr-1 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200"
+            >
+              <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10">
+                <ChevronRight className="w-5 h-5 text-white" />
+              </div>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ===== NETFLIX POSTER CARD — Image-focused, minimal text, hover reveal =====
+const DemoCard = ({ demo, index, isFavorite, onToggleFavorite, localPrice }: { 
   demo: Demo; 
   index: number; 
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  localPrice?: (inrStr: string) => string;
 }) => {
   const Icon = demo.icon;
   const { logAction } = useEnterpriseAudit();
   const [isHovered, setIsHovered] = useState(false);
-  const [activeTab, setActiveTab] = useState<'features' | 'tech'>('features');
-  const [showQuickView, setShowQuickView] = useState(false);
   
+  const displayPrice = localPrice ? localPrice(demo.discountPrice) : demo.discountPrice;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.4 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: Math.min(index * 0.04, 0.4) }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative"
+      className="relative group cursor-pointer"
     >
-      <Card className={`bg-gradient-to-br from-[#1a2d4a] to-[#0d1e36] border-cyan-500/20 transition-all duration-500 overflow-hidden group h-full ${isHovered ? 'border-cyan-400/60 shadow-2xl shadow-cyan-500/20 scale-[1.02]' : ''}`}>
-        <CardContent className="p-0 flex flex-col h-full">
-          {/* Header with gradient */}
-          <div className={`bg-gradient-to-r ${demo.color} p-4 relative overflow-hidden`}>
-            {/* Animated background pattern */}
-            <div className={`absolute inset-0 opacity-20 transition-opacity duration-500 ${isHovered ? 'opacity-40' : ''}`}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-8 -translate-y-8" />
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full blur-xl transform -translate-x-4 translate-y-4" />
-            </div>
-            
-            <div className="flex justify-between items-start relative z-10">
-              <motion.div 
-                className="bg-white/20 p-3 rounded-xl backdrop-blur-sm"
-                animate={{ rotate: isHovered ? [0, -5, 5, 0] : 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Icon className="h-8 w-8 text-white" />
-              </motion.div>
-              <div className="flex gap-2 items-center">
-                {demo.status === "COMING_SOON" && (
-                  <Badge className="bg-yellow-500/90 text-black font-bold text-xs animate-pulse">
-                    COMING SOON
-                  </Badge>
-                )}
-                {demo.status === "ACTIVE" && (
-                  <Badge className="bg-emerald-500/90 text-white font-bold text-xs flex items-center gap-1">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                    LIVE DEMO
-                  </Badge>
-                )}
-              </div>
-            </div>
-            
-            {/* Quick action buttons on hover */}
-            <motion.div 
-              className="absolute bottom-2 right-2 flex gap-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
-              transition={{ duration: 0.2 }}
+      {/* Poster Card */}
+      <div className={`relative rounded-lg overflow-hidden aspect-[3/4] transition-all duration-300 ${isHovered ? 'scale-105 z-30 shadow-2xl shadow-black/80' : 'scale-100 z-0'}`}>
+        {/* Poster Visual — AI Generated Thumbnail */}
+        <img 
+          src={getThumbnail(demo)} 
+          alt={demo.name}
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
+
+        {/* Status badge */}
+        <div className="absolute top-2 right-2 z-10">
+          {demo.status === "ACTIVE" ? (
+            <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> LIVE
+            </span>
+          ) : (
+            <span className="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">SOON</span>
+          )}
+        </div>
+
+        {/* Favorite */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+          className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <Heart className={`w-5 h-5 drop-shadow-lg ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white/80 hover:text-white'}`} />
+        </button>
+
+        {/* Bottom info — always visible */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+          <h4 className="text-white font-bold text-sm leading-tight line-clamp-2 mb-1">{demo.name}</h4>
+          <p className="text-emerald-400 font-bold text-sm">{displayPrice}</p>
+        </div>
+
+        {/* Hover overlay — actions + details */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm z-20 flex flex-col justify-end p-3"
             >
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite();
-                  toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites!');
-                }}
-                className="bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur-sm transition-all"
-              >
-                <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-              </button>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowQuickView(!showQuickView);
-                }}
-                className="bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur-sm transition-all"
-              >
-                <Eye className="h-4 w-4 text-white" />
-              </button>
-            </motion.div>
-          </div>
-
-          {/* Content */}
-          <div className="p-4 flex-1 flex flex-col">
-            <div className="flex items-start justify-between mb-1">
-              <h3 className="text-lg font-bold text-white leading-tight">{demo.name}</h3>
-              {demo.status === "ACTIVE" && (
-                <Badge className="bg-cyan-500/20 text-cyan-300 text-[10px] shrink-0 ml-2">
-                  #{index + 1}
-                </Badge>
-              )}
-            </div>
-            <p className="text-cyan-400 text-xs mb-2 flex items-center gap-1">
-              <Award className="h-3 w-3" /> {demo.category}
-            </p>
-            <p className="text-gray-400 text-sm mb-3 line-clamp-2">{demo.description}</p>
-
-            {/* Interactive Tabs */}
-            <div className="mb-3">
-              <div className="flex gap-1 mb-2">
-                <button
-                  onClick={() => setActiveTab('features')}
-                  className={`text-xs px-2 py-1 rounded transition-all ${activeTab === 'features' ? 'bg-cyan-500/30 text-cyan-300' : 'text-gray-500 hover:text-gray-300'}`}
-                >
-                  Features
-                </button>
-                <button
-                  onClick={() => setActiveTab('tech')}
-                  className={`text-xs px-2 py-1 rounded transition-all ${activeTab === 'tech' ? 'bg-purple-500/30 text-purple-300' : 'text-gray-500 hover:text-gray-300'}`}
-                >
-                  Tech Stack
-                </button>
-              </div>
+              <h4 className="text-white font-bold text-sm mb-1">{demo.name}</h4>
+              <p className="text-slate-400 text-[11px] line-clamp-2 mb-2">{demo.description}</p>
               
-              <motion.div 
-                className="min-h-[52px]"
-                initial={false}
-                animate={{ opacity: 1 }}
-                key={activeTab}
-              >
-                {activeTab === 'features' ? (
-                  <div className="flex flex-wrap gap-1">
-                    {demo.features.map((feature, i) => (
-                      <motion.div
-                        key={feature}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        <Badge variant="outline" className="text-[10px] border-cyan-500/30 text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 cursor-default transition-colors">
-                          {feature}
-                        </Badge>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {[...demo.frontend, ...demo.backend].map((tech, i) => (
-                      <motion.div
-                        key={tech}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        <Badge variant="outline" className="text-[10px] border-purple-500/30 text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 cursor-default transition-colors">
-                          {tech}
-                        </Badge>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-white/40 line-through text-xs">{localPrice ? localPrice(demo.price) : demo.price}</span>
+                <span className="text-emerald-400 font-bold text-base">{displayPrice}</span>
+                <span className="text-red-400 text-[10px] font-bold">40% OFF</span>
+              </div>
 
-            {/* Price with animation */}
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-gray-500 line-through text-sm">{demo.price}</span>
-              <motion.span 
-                className="text-emerald-400 font-bold text-xl"
-                animate={{ scale: isHovered ? [1, 1.05, 1] : 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                {demo.discountPrice}
-              </motion.span>
-              <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xs animate-pulse">
-                40% OFF
-              </Badge>
-            </div>
+              <div className="flex flex-wrap gap-1 mb-3">
+                {demo.features.slice(0, 3).map(f => (
+                  <span key={f} className="text-[9px] text-cyan-300 bg-cyan-500/15 px-1.5 py-0.5 rounded">{f}</span>
+                ))}
+              </div>
 
-            {/* Enhanced Actions */}
-            <div className="flex gap-2 mt-auto">
-              {demo.status === "ACTIVE" ? (
-                <>
-                  <Link to={demo.url} className="flex-1">
-                    <Button className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all">
-                      <Play className="h-4 w-4 mr-2" /> Live Demo
-                    </Button>
-                  </Link>
-                  <Button 
-                    className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
-                     onClick={async () => {
-                       await logAction({
-                         action: 'public_buy_now_clicked',
-                         module: 'finance',
-                         severity: 'low',
-                         target_id: demo.id,
-                         target_type: 'product_demo',
-                         metadata: {
+              <div className="flex gap-2">
+                {demo.status === "ACTIVE" ? (
+                  <>
+                    <Link to={demo.url} className="flex-1" onClick={(e) => e.stopPropagation()}>
+                      <Button size="sm" className="w-full bg-white text-black hover:bg-white/90 font-bold text-xs h-8 rounded-sm">
+                        <Play className="h-3.5 w-3.5 mr-1 fill-black" /> Demo
+                      </Button>
+                    </Link>
+                    <Button 
+                      size="sm"
+                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs h-8 rounded-sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        await logAction({
+                          action: 'public_buy_now_clicked',
+                          module: 'finance',
+                          severity: 'low',
+                          target_id: demo.id,
+                          target_type: 'product_demo',
+                          metadata: {
                             system_request: {
                               enabled: true,
                               action_type: 'order',
@@ -2867,31 +3838,20 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                                 path: window.location.pathname,
                               },
                             },
-                           status: 'pending',
-                           demo_name: demo.name,
-                           price: demo.price,
-                           discount_price: demo.discountPrice,
-                           source: 'index_buy_now',
-                           path: window.location.pathname,
-                         },
-                       });
-                       toast.success("🎉 Redirecting to purchase...", { description: `${demo.name} - ${demo.discountPrice}` });
-                     }}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" /> Buy Now
-                  </Button>
-                </>
-              ) : (
-                <>
+                          },
+                        });
+                        toast.success("🎉 Redirecting to purchase...", { description: demo.name });
+                      }}
+                    >
+                      <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Buy
+                    </Button>
+                  </>
+                ) : (
                   <Button 
-                    className="flex-1 bg-gray-600/50 cursor-not-allowed text-gray-400 border border-gray-500/30"
-                    disabled
-                  >
-                    <Clock className="h-4 w-4 mr-2" /> Coming Soon
-                  </Button>
-                  <Button 
-                    className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-lg shadow-yellow-500/25 hover:shadow-yellow-500/40 transition-all"
-                    onClick={async () => {
+                    size="sm"
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-xs h-8 rounded-sm"
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       await logAction({
                         action: 'public_notify_me_clicked',
                         module: 'lead_manager',
@@ -2913,44 +3873,19 @@ const DemoCard = ({ demo, index, isFavorite, onToggleFavorite }: {
                               path: window.location.pathname,
                             },
                           },
-                          status: 'pending',
-                          demo_name: demo.name,
-                          source: 'index_notify_me',
-                          path: window.location.pathname,
                         },
                       });
-                      toast.info("📧 We'll notify you when this is available!", { description: demo.name });
+                      toast.info("📧 We'll notify you!", { description: demo.name });
                     }}
                   >
-                    <Bell className="h-4 w-4 mr-2" /> Notify Me
+                    <Bell className="h-3.5 w-3.5 mr-1" /> Notify Me
                   </Button>
-                </>
-              )}
-            </div>
-            
-            {/* Quick Stats on hover */}
-            <motion.div 
-              className="mt-3 pt-3 border-t border-cyan-500/10 grid grid-cols-3 gap-2"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0, height: isHovered ? 'auto' : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="text-center">
-                <p className="text-cyan-400 text-lg font-bold">{Math.floor(Math.random() * 50 + 50)}+</p>
-                <p className="text-gray-500 text-[10px]">Clients</p>
-              </div>
-              <div className="text-center">
-                <p className="text-emerald-400 text-lg font-bold">4.{Math.floor(Math.random() * 3 + 7)}</p>
-                <p className="text-gray-500 text-[10px]">Rating</p>
-              </div>
-              <div className="text-center">
-                <p className="text-purple-400 text-lg font-bold">{Math.floor(Math.random() * 10 + 5)}h</p>
-                <p className="text-gray-500 text-[10px]">Delivery</p>
+                )}
               </div>
             </motion.div>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 };

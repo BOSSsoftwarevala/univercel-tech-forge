@@ -123,15 +123,18 @@ export default {
         "2xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
-        'glow-sm': '0 0 15px hsl(var(--aurora-violet) / 0.3)',
-        'glow-md': '0 0 30px hsl(var(--aurora-violet) / 0.4)',
-        'glow-lg': '0 0 50px hsl(var(--aurora-violet) / 0.5)',
+        'glow-sm': '0 0 15px hsl(217 72% 36% / 0.25)',
+        'glow-md': '0 0 30px hsl(217 72% 36% / 0.3)',
+        'glow-lg': '0 0 50px hsl(217 72% 36% / 0.4)',
         'glow-cyan': '0 0 30px hsl(var(--aurora-cyan) / 0.4)',
         'glow-success': '0 0 30px hsl(var(--status-success) / 0.4)',
         'glow-warning': '0 0 30px hsl(var(--status-warning) / 0.4)',
         'glow-error': '0 0 30px hsl(var(--status-error) / 0.4)',
-        'card': '0 8px 32px hsl(230 25% 4% / 0.4)',
-        'card-hover': '0 16px 48px hsl(230 25% 4% / 0.5)',
+        'glow-red': '0 0 30px hsl(355 78% 55% / 0.35)',
+        'card': '0 8px 32px hsl(222 55% 4% / 0.5)',
+        'card-hover': '0 16px 48px hsl(222 55% 4% / 0.6)',
+        'sv-royal': '0 4px 20px hsl(217 72% 36% / 0.3)',
+        'sv-elevated': '0 8px 40px hsl(222 55% 4% / 0.6), inset 0 1px 0 hsl(217 72% 36% / 0.1)',
       },
       keyframes: {
         "accordion-down": {

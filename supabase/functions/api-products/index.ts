@@ -93,5 +93,44 @@ serve(async (req: Request) => {
     }, { module: "products", action: "list" });
   }
 
+  // PATCH /:id/assign - Assign product to a user/entity
+  if (path.match(/^\/[\w-]+\/assign$/) && (req.method === "PATCH" || req.method === "POST")) {
+    const productId = path.split("/")[1];
+    return withAuth(req, ["boss_owner", "admin", "product_manager"], async ({ supabaseAdmin, body, user }) => {
+      const validation = validateRequired(body, ["assigned_to"]);
+      if (validation) return errorResponse(validation);
+
+      const { assigned_to, assignment_type = "user", notes } = body;
+
+      const { data: product, error: fetchError } = await supabaseAdmin
+        .from("products")
+        .select("product_id, product_name")
+        .eq("product_id", productId)
+        .single();
+
+      if (fetchError || !product) return errorResponse("Product not found", 404);
+
+      const { error: updateError } = await supabaseAdmin
+        .from("products")
+        .update({
+          assigned_to,
+          assignment_type,
+          assignment_notes: notes,
+          assigned_by: user.userId,
+          assigned_at: new Date().toISOString(),
+        })
+        .eq("product_id", productId);
+
+      if (updateError) return errorResponse(updateError.message, 400);
+
+      return jsonResponse({
+        message: "Product assigned successfully",
+        product_id: productId,
+        assigned_to,
+        assignment_type,
+      });
+    }, { module: "products", action: "assign" });
+  }
+
   return errorResponse("Not found", 404);
 });
