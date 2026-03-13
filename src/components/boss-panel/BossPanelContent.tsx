@@ -15,15 +15,7 @@ import { SecurityLegal } from './sections/SecurityLegal';
 import { BossSettings } from './sections/BossSettings';
 import { CodePilot } from './sections/CodePilot';
 import { ServerHosting } from './sections/ServerHosting';
-import { NotificationManager } from './sections/NotificationManager';
-import { IntegrationManager } from './sections/IntegrationManager';
-import { LicenseManager } from './sections/LicenseManager';
-import { AssetManager } from './sections/AssetManager';
-import { MarketplaceUserSystem } from './sections/MarketplaceUserSystem';
 
-import { MMFullLayout } from '@/components/marketplace-manager/MMFullLayout';
-import { ServerManagerLayout } from '@/components/server-manager/ServerManagerLayout';
-import { AIAPIManagerLayout } from '@/components/ai-api-manager/AIAPIManagerLayout';
 
 const ResellerDashboardEmbed = lazy(() => import('@/pages/ResellerDashboard'));
 const FranchiseDashboardEmbed = lazy(() => import('@/pages/franchise/Dashboard'));
@@ -189,6 +181,7 @@ export function BossPanelContent() {
         return <CodePilot />;
       case 'server-hosting':
         return <ServerHosting />;
+
       case 'reseller-dashboard':
         return <Suspense fallback={<LoadingFallback label="Reseller Dashboard" />}><ResellerDashboardEmbed /></Suspense>;
       case 'franchise-dashboard':

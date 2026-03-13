@@ -388,11 +388,6 @@ const LeaderSecurityAssessment = lazyLoad(() => import("./pages/leader-security/
 // Boss Panel
 const BossPanel = lazyLoad(() => import("./pages/BossPanel"));
 
-// Marketplace
-const MMFullLayout = lazyLoad(() => import("./components/marketplace-manager/MMFullLayout").then(m => ({ default: m.MMFullLayout })));
-
-// AI Builder
-const AIBuilderPage = lazyLoad(() => import("./pages/AIBuilderPage"));
 
 // ============================================
 // QUERY CLIENT - Optimized caching
@@ -450,6 +445,11 @@ const App = memo(() => (
                             <Route path="/demos" element={<Index />} />
                             <Route path="/explore" element={<Navigate to="/demos" replace />} />
                             <Route path="/products" element={<Index />} />
+                            <Route path="/marketplace" element={<MarketplacePage />} />
+                            <Route path="/marketplace/product/:id" element={<ProductDetailPage />} />
+                            <Route path="/marketplace/category/:categoryId" element={<MarketplacePage />} />
+                            <Route path="/user/library" element={<RequireAuth><UserLibraryPage /></RequireAuth>} />
+                            <Route path="/user/licenses" element={<RequireAuth><UserLicensesPage /></RequireAuth>} />
                             <Route path="/pricing" element={<SimpleDemoList />} />
                             <Route path="/demos/public" element={<PublicDemos />} />
                             <Route path="/showcase" element={<PremiumDemoShowcaseNew />} />
