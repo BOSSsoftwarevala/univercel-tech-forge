@@ -16,6 +16,7 @@ import { SecurityProvider } from "./contexts/SecurityContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { TranslationProvider } from "./contexts/TranslationContext";
 import { GlobalRealtimeProvider } from "./providers/GlobalRealtimeProvider";
+import { TenantProvider } from "./lib/multi-tenant/tenant-context";
 import SystemNotificationsInitializer from "./components/notifications/SystemNotificationsInitializer";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
@@ -24,7 +25,7 @@ import DomainProtection from "./components/security/DomainProtection";
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import { Loader2 } from "lucide-react";
-import { Analytics } from "@vercel/analytics/react";
+
 
 // ============================================
 // LAZY ROUTE IMPORTS - Code splitting for performance
@@ -387,11 +388,6 @@ const LeaderSecurityAssessment = lazyLoad(() => import("./pages/leader-security/
 // Boss Panel
 const BossPanel = lazyLoad(() => import("./pages/BossPanel"));
 
-// Marketplace
-const MMFullLayout = lazyLoad(() => import("./components/marketplace-manager/MMFullLayout").then(m => ({ default: m.MMFullLayout })));
-
-// AI Builder
-const AIBuilderPage = lazyLoad(() => import("./pages/AIBuilderPage"));
 
 // ============================================
 // QUERY CLIENT - Optimized caching
@@ -425,7 +421,8 @@ const BlockingClassCleanup = memo(() => {
 const App = memo(() => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <DemoTestModeProvider>
+      <TenantProvider>
+        <DemoTestModeProvider>
         <AnimationProvider>
           <TooltipProvider>
             <DomainProtection>
@@ -441,13 +438,18 @@ const App = memo(() => (
                           <SystemNotificationsInitializer />
                           <GlobalOfferPopup />
                           <FloatingAIChatbotWrapper />
-                          <Analytics />
+
                           <Routes>
                             {/* Public Routes */}
                             <Route path="/" element={<Index />} />
                             <Route path="/demos" element={<Index />} />
                             <Route path="/explore" element={<Navigate to="/demos" replace />} />
                             <Route path="/products" element={<Index />} />
+                            <Route path="/marketplace" element={<MarketplacePage />} />
+                            <Route path="/marketplace/product/:id" element={<ProductDetailPage />} />
+                            <Route path="/marketplace/category/:categoryId" element={<MarketplacePage />} />
+                            <Route path="/user/library" element={<RequireAuth><UserLibraryPage /></RequireAuth>} />
+                            <Route path="/user/licenses" element={<RequireAuth><UserLicensesPage /></RequireAuth>} />
                             <Route path="/pricing" element={<SimpleDemoList />} />
                             <Route path="/demos/public" element={<PublicDemos />} />
                             <Route path="/showcase" element={<PremiumDemoShowcaseNew />} />
@@ -808,6 +810,7 @@ const App = memo(() => (
           </TooltipProvider>
         </AnimationProvider>
       </DemoTestModeProvider>
+      </TenantProvider>
     </AuthProvider>
   </QueryClientProvider>
 ));
