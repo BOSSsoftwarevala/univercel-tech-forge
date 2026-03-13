@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Link2, Megaphone, Video, Palette, 
   Users, Wallet, Bell, Sparkles, MousePointer, Shield,
   Image, Trophy, PieChart, FileText, GraduationCap, Gift,
-  HeadphonesIcon, BarChart3, Share2, ArrowLeft, Lock, KeyRound, LogOut, Loader2
+  HeadphonesIcon, BarChart3, Share2, ArrowLeft, Lock, KeyRound, LogOut, Loader2, DollarSign
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useInfluencerGuard } from '@/hooks/useInfluencerGuard';
@@ -33,6 +33,8 @@ import InfluencerCampaignHub from '@/components/influencer/InfluencerCampaignHub
 import SimpleShareCenter from '@/components/influencer/SimpleShareCenter';
 import InfluencerStatusBanner from '@/components/influencer/InfluencerStatusBanner';
 import InfluencerIDCard from '@/components/influencer/InfluencerIDCard';
+import InfluencerRateChart from '@/components/influencer/InfluencerRateChart';
+import AIBrandedPostGenerator from '@/components/influencer/AIBrandedPostGenerator';
 
 const menuItems = [
   { id: 'share', label: '🔗 Share & Earn', icon: Share2, highlight: true },
@@ -43,7 +45,8 @@ const menuItems = [
   { id: 'campaigns', label: 'Campaign Hub', icon: Megaphone },
   { id: 'fraud-guard', label: 'AI Fraud Guard', icon: Shield, badge: 'AI' },
   { id: 'videos', label: 'Short Videos / Reels', icon: Video },
-  { id: 'promo', label: 'Poster Generator', icon: Palette, badge: 'AI' },
+  { id: 'rate-chart', label: 'Rate Chart', icon: DollarSign },
+  { id: 'promo', label: 'AI Post Generator', icon: Palette, badge: 'AI' },
   { id: 'assets', label: 'Asset Library', icon: Image },
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
   { id: 'audience', label: 'Audience Insights', icon: PieChart },
@@ -86,7 +89,8 @@ const InfluencerDashboard = () => {
       case 'click-tracker': return <LiveClickTracker />;
       case 'fraud-guard': return <AIFraudGuard />;
       case 'videos': return <VideoReelsManager />;
-      case 'promo': return <PromoGenerator />;
+      case 'rate-chart': return <InfluencerRateChart />;
+      case 'promo': return <AIBrandedPostGenerator />;
       case 'assets': return <VisualAssetLibrary />;
       case 'leaderboard': return <LeaderboardRewards />;
       case 'audience': return <AudienceInsights />;

@@ -115,8 +115,8 @@ const DemoManagerTopBar = ({
             <Monitor className="w-4 h-4 text-primary-foreground" />
           </div>
           <div className="hidden md:block">
-            <Badge variant="outline" className="bg-neon-teal/10 text-neon-teal border-neon-teal/30 text-[10px] px-1.5">
-              DEMO MANAGER
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[10px] px-1.5">
+              MARKETPLACE MANAGER
             </Badge>
           </div>
         </div>

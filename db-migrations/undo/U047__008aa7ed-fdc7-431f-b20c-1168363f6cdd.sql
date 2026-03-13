@@ -1,0 +1,2 @@
+-- Undo migration for V047
+-- Auto-generated. Manual undo scripts needed.

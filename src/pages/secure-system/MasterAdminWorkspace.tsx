@@ -8,18 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LayoutDashboard, BookOpen, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock data
+// VALA ID generation utility
 const generateValaId = () => {
   return `V${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-};
-
-const mockSummary = {
-  totalActions: 1247,
-  pendingReview: 23,
-  flaggedItems: 5,
-  blockedItems: 2,
-  systemHealth: 94
 };
 
 interface FlaggedItem {
@@ -35,69 +28,95 @@ interface FlaggedItem {
   actionHistory: Array<{ action: string; timestamp: string; hash: string; }>;
 }
 
-const mockFlaggedItems: FlaggedItem[] = [
-  {
-    id: 'FLG-001',
-    valaId: generateValaId(),
-    roleLevel: 'Operation',
-    flagType: 'Behavior Anomaly',
-    description: 'Unusual pattern detected in action processing.',
-    riskScore: 72,
-    detectedAt: '2024-01-15 14:30:00',
-    status: 'pending',
-    aiAnalysis: 'Pattern suggests possible automated behavior.',
-    actionHistory: [
-      { action: 'Session started', timestamp: '2024-01-15 14:00:00', hash: 'A1B2C3D4' },
-      { action: 'AI flag triggered', timestamp: '2024-01-15 14:30:00', hash: 'I9J0K1L2' }
-    ]
-  },
-  {
-    id: 'FLG-002',
-    valaId: generateValaId(),
-    roleLevel: 'Regional',
-    flagType: 'Access Pattern',
-    description: 'Multiple failed forward attempts detected.',
-    riskScore: 85,
-    detectedAt: '2024-01-15 12:45:00',
-    status: 'pending',
-    aiAnalysis: 'High confidence of intentional policy violation.',
-    actionHistory: [
-      { action: 'Forward attempt failed', timestamp: '2024-01-15 12:30:00', hash: 'M3N4O5P6' },
-      { action: 'AI flag triggered', timestamp: '2024-01-15 12:45:00', hash: 'U1V2W3X4' }
-    ]
-  },
-  {
-    id: 'FLG-003',
-    valaId: generateValaId(),
-    roleLevel: 'AI Head',
-    flagType: 'Data Integrity',
-    description: 'Checksum mismatch detected in forwarded action.',
-    riskScore: 95,
-    detectedAt: '2024-01-15 10:20:00',
-    status: 'blocked',
-    aiAnalysis: 'Critical integrity violation. Checksum verification failed.',
-    actionHistory: [
-      { action: 'Action received', timestamp: '2024-01-15 10:00:00', hash: 'Y5Z6A7B8' },
-      { action: 'Auto-block triggered', timestamp: '2024-01-15 10:20:00', hash: 'G3H4I5J6' }
-    ]
-  }
-];
-
-const mockLedgerEntries = [
-  { id: 'L-001', timestamp: '2024-01-15 14:30:22', valaId: 'V1A2B3C4', action: 'Master override applied: FLG-004', actionHash: 'A7F2B9C1D4E8A2F6', status: 'verified' as const, blockNumber: 1001 },
-  { id: 'L-002', timestamp: '2024-01-15 14:28:15', valaId: 'V5E6F7G8', action: 'AI flag reviewed and cleared', actionHash: 'B1C3D5E7F9A1B2C3', status: 'verified' as const, blockNumber: 1000 },
-  { id: 'L-003', timestamp: '2024-01-15 14:25:00', valaId: 'V9H0I1J2', action: 'System unlock: Regional node R-12', actionHash: 'C2D4E6F8A0B1C2D3', status: 'verified' as const, blockNumber: 999 },
-  { id: 'L-004', timestamp: '2024-01-15 14:20:30', valaId: 'VMASTER01', action: 'Master Admin session started', actionHash: 'D3E5F7A9B1C3D5E7', status: 'verified' as const, blockNumber: 998 },
-  { id: 'L-005', timestamp: '2024-01-15 14:15:00', valaId: 'VK3L4M5N', action: 'Critical block: Integrity violation', actionHash: 'E4F6A8B0C2D4E6F8', status: 'flagged' as const, blockNumber: 997 }
-];
-
 export default function MasterAdminWorkspace() {
   const navigate = useNavigate();
   const { security, getRemainingTime, isFrozen, logSecurityEvent } = useSecureControlGuard();
   const [valaId] = useState('VMASTER' + Math.random().toString(36).substr(2, 4).toUpperCase());
   const [sessionTime, setSessionTime] = useState(getRemainingTime());
   const [activeTab, setActiveTab] = useState('overview');
-  const [flaggedItems, setFlaggedItems] = useState(mockFlaggedItems);
+  const [flaggedItems, setFlaggedItems] = useState<FlaggedItem[]>([]);
+  const [summary, setSummary] = useState({
+    totalActions: 0,
+    pendingReview: 0,
+    flaggedItems: 0,
+    blockedItems: 0,
+    systemHealth: 0,
+  });
+  const [ledgerEntries, setLedgerEntries] = useState<Array<{ id: string; timestamp: string; valaId: string; action: string; actionHash: string; status: 'verified' | 'flagged'; blockNumber: number }>>([]);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      const { count: totalActions } = await supabase
+        .from('audit_logs')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: pendingReview } = await supabase
+        .from('approvals')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      const { data: flaggedData, error: flaggedError } = await supabase
+        .from('flagged_items')
+        .select('id, vala_id, role_level, flag_type, description, risk_score, detected_at, status, ai_analysis, action_history')
+        .order('detected_at', { ascending: false })
+        .limit(20);
+
+      if (!flaggedError && flaggedData) {
+        const mapped: FlaggedItem[] = flaggedData.map((f: { id: string; vala_id?: string; role_level?: string; flag_type?: string; description?: string; risk_score?: number; detected_at?: string; status?: string; ai_analysis?: string; action_history?: Array<{ action: string; timestamp: string; hash: string }> }) => ({
+          id: f.id,
+          valaId: f.vala_id || generateValaId(),
+          roleLevel: f.role_level || '—',
+          flagType: f.flag_type || '—',
+          description: f.description || '—',
+          riskScore: f.risk_score || 0,
+          detectedAt: f.detected_at || new Date().toISOString(),
+          status: (f.status as FlaggedItem['status']) || 'pending',
+          aiAnalysis: f.ai_analysis || '—',
+          actionHistory: f.action_history || [],
+        }));
+        setFlaggedItems(mapped);
+        const flaggedCount = mapped.length;
+        const blockedCount = mapped.filter(i => i.status === 'blocked').length;
+        setSummary({
+          totalActions: totalActions || 0,
+          pendingReview: pendingReview || 0,
+          flaggedItems: flaggedCount,
+          blockedItems: blockedCount,
+          systemHealth: 0,
+        });
+      } else {
+        setSummary({
+          totalActions: totalActions || 0,
+          pendingReview: pendingReview || 0,
+          flaggedItems: 0,
+          blockedItems: 0,
+          systemHealth: 0,
+        });
+      }
+    };
+
+    const fetchLedger = async () => {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('id, created_at, user_id, action, meta_json')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (!error && data) {
+        setLedgerEntries(data.map((l: { id: string; created_at: string; user_id?: string; action: string; meta_json?: { hash?: string; block_number?: number; status?: string } }, idx: number) => ({
+          id: l.id,
+          timestamp: l.created_at,
+          valaId: l.user_id || generateValaId(),
+          action: l.action,
+          actionHash: l.meta_json?.hash || `${l.id.substring(0, 16).toUpperCase()}`,
+          status: (l.meta_json?.status as 'verified' | 'flagged') || 'verified',
+          blockNumber: l.meta_json?.block_number || (1000 + idx),
+        })));
+      }
+    };
+
+    fetchSummary();
+    fetchLedger();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -202,7 +221,7 @@ export default function MasterAdminWorkspace() {
           <div className="container mx-auto px-6 py-6 h-[calc(100%-48px)] overflow-auto">
             <TabsContent value="overview" className="mt-0">
               <MasterAdminOverview
-                summary={mockSummary}
+                summary={summary}
                 flaggedItems={flaggedItems}
                 onOverride={handleOverride}
                 onUnlock={handleUnlock}
@@ -212,7 +231,7 @@ export default function MasterAdminWorkspace() {
 
             <TabsContent value="ledger" className="mt-0">
               <AppendOnlyLedger
-                entries={mockLedgerEntries}
+                entries={ledgerEntries}
                 currentValaId={valaId}
                 roleLevel="master"
               />

@@ -1,0 +1,1 @@
+ALTER TABLE public.software_catalog ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'vala_ai';

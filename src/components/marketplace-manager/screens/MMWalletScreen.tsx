@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Transaction {
   id: string;
@@ -40,8 +41,26 @@ const quickAmounts = [10000, 25000, 50000, 100000];
 export function MMWalletScreen() {
   const [rechargeAmount, setRechargeAmount] = useState('');
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
 
-  const walletBalance = 45230;
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (error) {
+        console.error('Failed to load wallet balance:', error);
+        return;
+      }
+      if (data?.balance != null) setWalletBalance(data.balance);
+    };
+    fetchBalance();
+  }, []);
+
   const lockedAmount = 5000;
   const availableBalance = walletBalance - lockedAmount;
 
