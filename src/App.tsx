@@ -202,7 +202,6 @@ const RoleManager = lazyLoad(() => import("./pages/super-admin/RoleManager"));
 const UserManager = lazyLoad(() => import("./pages/super-admin/UserManager"));
 const PermissionMatrix = lazyLoad(() => import("./pages/super-admin/PermissionMatrix"));
 const SecurityCenter = lazyLoad(() => import("./pages/super-admin/SecurityCenter"));
-const ProductManagerPage = lazyLoad(() => import("./pages/super-admin/ProductManagerPage"));
 const SystemAudit = lazyLoad(() => import("./pages/super-admin/SystemAudit"));
 const PrimeManager = lazyLoad(() => import("./pages/super-admin/PrimeManager"));
 const ServerManagerDashboard = lazyLoad(() => import("./pages/server-manager/ServerManagerDashboard"));
