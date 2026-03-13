@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logModuleAction, logModuleError } from '@/utils/activityLogging';
+
+const MODULE = 'finance-wallet';
 
 interface Wallet {
   id: string;
@@ -176,11 +179,19 @@ export function useUnifiedWallet() {
         description: `Your withdrawal of ₹${amount.toLocaleString()} has been submitted for approval.`,
       });
 
+      // Log successful withdrawal to Boss Dashboard
+      logModuleAction(MODULE, 'withdrawal_requested', userRole, {
+        user_id: user.id,
+        severity: 'medium',
+        metadata: { amount, payment_method: paymentMethod || 'bank_transfer' },
+      });
+
       // Refresh wallet data
       await fetchWallet();
       return true;
     } catch (err) {
       console.error('Withdrawal error:', err);
+      logModuleError(MODULE, 'withdrawal_requested', userRole, err instanceof Error ? err.message : 'Unknown error', { user_id: user.id });
       toast({
         title: "Processing",
         description: "Your request is being processed. Please wait a moment.",

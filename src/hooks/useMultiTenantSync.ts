@@ -8,6 +8,9 @@ import { useTenant } from '@/lib/multi-tenant/tenant-context';
 import { createSyncEngine, SyncEngine, SyncStatus } from '@/lib/offline-hybrid/sync-engine';
 import { orchestrator } from '@/lib/ai-orchestration/orchestrator';
 import { tenantMonitor } from '@/lib/tenant-analytics/monitor';
+import { logModuleAction, logModuleError } from '@/utils/activityLogging';
+
+const MODULE = 'marketplace-sync';
 
 export interface MultiTenantState {
   isOnline: boolean;
@@ -85,9 +88,16 @@ export const useMultiTenantSync = () => {
   // Force sync
   const forceSync = useCallback(async () => {
     if (syncEngine && navigator.onLine) {
-      await syncEngine.forceSync();
+      try {
+        await syncEngine.forceSync();
+        logModuleAction(MODULE, 'marketplace_sync_completed', 'system', {
+          metadata: { tenant_id: currentTenant?.id },
+        });
+      } catch (err) {
+        logModuleError(MODULE, 'marketplace_sync_completed', 'system', err instanceof Error ? err.message : 'Sync failed');
+      }
     }
-  }, [syncEngine]);
+  }, [syncEngine, currentTenant?.id]);
 
   // Get tenant analytics
   const getAnalytics = useCallback(() => {

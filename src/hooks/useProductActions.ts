@@ -2,6 +2,9 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Product, ProductStatus } from '@/components/product-manager/types/productTypes';
+import { logModuleAction, logModuleError } from '@/utils/activityLogging';
+
+const MODULE = 'product-manager';
 
 interface ActionState {
   loading: boolean;
@@ -11,7 +14,7 @@ interface ActionState {
 export const useProductActions = () => {
   const [actionState, setActionState] = useState<ActionState>({ loading: false, error: null });
 
-  // Log action to audit trail
+  // Log action to audit trail and system_activity_log (Boss Dashboard)
   const logAction = useCallback(async (
     productId: string,
     productName: string,
@@ -26,6 +29,12 @@ export const useProductActions = () => {
         action,
         action_details: details,
       }]);
+      // Mirror to system_activity_log so Boss Dashboard reflects this action
+      await logModuleAction(MODULE, action, user?.role as string ?? 'user', {
+        user_id: user?.id,
+        target_id: productId,
+        metadata: { product_name: productName, ...(details ?? {}) },
+      });
     } catch (error) {
       console.error('Failed to log action:', error);
     }
@@ -34,6 +43,8 @@ export const useProductActions = () => {
   // Create product
   const createProduct = useCallback(async (productData: Partial<Product>): Promise<any | null> => {
     setActionState({ loading: true, error: null });
+    const { data: { user: currentUser } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+    const actorRole = (currentUser as { role?: string } | null)?.role ?? 'user';
     try {
       // Generate product code
       const productCode = `PRD-${Date.now().toString(36).toUpperCase()}`;
@@ -63,6 +74,7 @@ export const useProductActions = () => {
     } catch (error: any) {
       setActionState({ loading: false, error: error.message });
       toast.error('Failed to create product: ' + error.message);
+      logModuleError(MODULE, 'product_created', actorRole, error.message, { user_id: currentUser?.id });
       return null;
     }
   }, [logAction]);

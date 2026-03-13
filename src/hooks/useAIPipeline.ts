@@ -10,6 +10,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useEnterpriseAudit } from './useEnterpriseAudit';
 import { toast } from 'sonner';
+import { logModuleAction, logModuleError } from '@/utils/activityLogging';
+
+const MODULE = 'aira-ai';
 
 export type AIJobType = 
   | 'suggestion' 
@@ -82,7 +85,7 @@ export function useAIPipeline() {
 
       setActiveJobs(prev => [...prev, job]);
       
-      // Log AI job creation
+      // Log AI job creation to enterprise audit
       await logAiAction(
         params.jobType,
         data.id,
@@ -91,15 +94,22 @@ export function useAIPipeline() {
         false
       );
 
+      // Mirror to system_activity_log for Boss Dashboard visibility
+      logModuleAction(MODULE, `ai_job_created_${params.jobType}`, user?.role as string ?? 'user', {
+        user_id: user?.id,
+        metadata: { job_id: data.id, source_module: params.sourceModule, job_type: params.jobType },
+      });
+
       setLoading(false);
       return job;
     } catch (error) {
       console.error('[AIPipeline] Create job failed:', error);
+      logModuleError(MODULE, 'ai_job_created', user?.role as string ?? 'user', error instanceof Error ? error.message : 'Unknown error', { user_id: user?.id });
       toast.error('Failed to create AI job');
       setLoading(false);
       return null;
     }
-  }, [logAiAction]);
+  }, [logAiAction, user]);
 
   /**
    * Process AI job steps

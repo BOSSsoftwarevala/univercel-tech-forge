@@ -1,16 +1,32 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logModuleAction, logModuleError } from '@/utils/activityLogging';
 
 const API_BASE = 'server-manager';
+const MODULE = 'server-manager';
 
 async function apiCall<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   const { data: { session } } = await supabase.auth.getSession();
-  
+  const userRole = (session?.user as { role?: string } | undefined)?.role ?? 'user';
+  const userId = session?.user?.id ?? null;
+
   const response = await supabase.functions.invoke(API_BASE, {
     body: { path, method, ...(body ? { data: body } : {}) },
     headers: { 'X-Path': path, 'X-Method': method }
   });
 
-  if (response.error) throw new Error(response.error.message);
+  if (response.error) {
+    // Log failed mutating calls to Boss Dashboard
+    if (method !== 'GET') {
+      logModuleError(MODULE, path.replace(/\//g, '_').replace(/^_/, ''), userRole, response.error.message, { user_id: userId });
+    }
+    throw new Error(response.error.message);
+  }
+
+  // Log significant mutating actions to Boss Dashboard
+  if (method !== 'GET') {
+    logModuleAction(MODULE, path.replace(/\//g, '_').replace(/^_/, ''), userRole, { user_id: userId });
+  }
+
   return response.data;
 }
 
