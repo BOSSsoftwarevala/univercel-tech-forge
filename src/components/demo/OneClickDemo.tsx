@@ -29,10 +29,8 @@ const OneClickDemo: React.FC<OneClickDemoProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleOpenDemo = () => {
-    setIsLoading(true);
     setIsOpen(true);
-    // Simulate loading
-    setTimeout(() => setIsLoading(false), 500);
+    setIsLoading(false);
   };
 
   const handleOpenExternal = () => {

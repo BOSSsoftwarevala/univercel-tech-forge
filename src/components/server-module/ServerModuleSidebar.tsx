@@ -1,18 +1,16 @@
 /**
  * SERVER MODULE SIDEBAR
- * Ultra-simple sidebar with exactly 9 items as specified
+ * Ultra-simple sidebar with navigation items
  * Includes Back to Boss button for navigation
- * 
- * SINGLE-CONTEXT ENFORCEMENT:
- * - Only renders when activeContext === 'module' AND category matches
- * - Back button triggers FULL context switch to Boss
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Plus, Server, Activity, Shield, 
-  Database, FileText, Brain, Settings, ArrowLeft 
+  Database, FileText, Brain, Settings, ArrowLeft,
+  Globe, Cpu, AlertTriangle, Wrench, Search,
+  Lock, Code, Rocket, Eye, Store, HardDrive
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
@@ -21,6 +19,19 @@ export type ServerModuleSection =
   | 'overview'
   | 'add-server'
   | 'active-servers'
+  | 'hosting'
+  | 'cpanel-manager'
+  | 'whois-dns'
+  | 'hosting-reseller'
+  | 'ai-tools'
+  | 'auto-scan'
+  | 'downtime'
+  | 'auto-repair'
+  | 'ssl-manager'
+  | 'domain-lock'
+  | 'code-protection'
+  | 'deploy-security'
+  | 'security-dashboard'
   | 'health-load'
   | 'security'
   | 'backups'
@@ -28,23 +39,35 @@ export type ServerModuleSection =
   | 'ai-actions'
   | 'settings';
 
+const sidebarItems: { id: ServerModuleSection; label: string; icon: React.ElementType }[] = [
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'add-server', label: 'Add Server', icon: Plus },
+  { id: 'active-servers', label: 'Active Servers', icon: Server },
+  { id: 'hosting', label: 'Hosting Connect', icon: Globe },
+  { id: 'cpanel-manager', label: 'cPanel / WHM', icon: HardDrive },
+  { id: 'whois-dns', label: 'WHOIS & DNS', icon: Search },
+  { id: 'hosting-reseller', label: 'Hosting Reseller', icon: Store },
+  { id: 'ai-tools', label: 'AI Tool Monitor', icon: Brain },
+  { id: 'auto-scan', label: 'Auto Scan', icon: Search },
+  { id: 'downtime', label: 'Downtime Detection', icon: AlertTriangle },
+  { id: 'auto-repair', label: 'Auto Repair', icon: Wrench },
+  { id: 'ssl-manager', label: 'SSL Manager', icon: Lock },
+  { id: 'domain-lock', label: 'Domain Lock', icon: Eye },
+  { id: 'code-protection', label: 'Code Protection', icon: Code },
+  { id: 'deploy-security', label: 'Deploy Security', icon: Rocket },
+  { id: 'security-dashboard', label: 'Security Dashboard', icon: Shield },
+  { id: 'health-load', label: 'Health & Load', icon: Activity },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'backups', label: 'Backups', icon: Database },
+  { id: 'logs', label: 'Logs', icon: FileText },
+  { id: 'ai-actions', label: 'AI Actions', icon: Cpu },
+  { id: 'settings', label: 'Settings', icon: Settings },
+];
 interface ServerModuleSidebarProps {
   activeSection: ServerModuleSection;
   onSectionChange: (section: ServerModuleSection) => void;
   onBack?: () => void;
 }
-
-const sidebarItems: { id: ServerModuleSection; label: string; icon: React.ElementType }[] = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'add-server', label: 'Add Server', icon: Plus },
-  { id: 'active-servers', label: 'Active Servers', icon: Server },
-  { id: 'health-load', label: 'Health & Load', icon: Activity },
-  { id: 'security', label: 'Security', icon: Shield },
-  { id: 'backups', label: 'Backups', icon: Database },
-  { id: 'logs', label: 'Logs', icon: FileText },
-  { id: 'ai-actions', label: 'AI Actions', icon: Brain },
-  { id: 'settings', label: 'Settings', icon: Settings },
-];
 
 const ServerModuleSidebarComponent: React.FC<ServerModuleSidebarProps> = ({
   activeSection,

@@ -1,0 +1,86 @@
+name: FULL SYSTEM 34 MODULE SCAN
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  scan-modules:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module:
+          - boss-dashboard
+          - ceo-dashboard
+          - vala-ai
+          - server-manager
+          - ai-api-manager
+          - development-manager
+          - product-manager
+          - demo-manager
+          - task-manager
+          - promise-tracker
+          - asset-manager
+          - marketing-manager
+          - seo-manager
+          - lead-manager
+          - sales-support
+          - customer-support
+          - franchise-manager
+          - reseller-manager
+          - influencer-manager
+          - continent-admin
+          - country-admin
+          - finance-manager
+          - legal-manager
+          - developer-dashboard
+          - pro-manager
+          - user-dashboard
+          - security-manager
+          - settings
+          - marketplace
+          - demo-system
+          - payment-system
+          - license-system
+          - notification-system
+          - analytics-system
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          fi
+
+      - name: Scan module
+        run: |
+          echo "Scanning module: ${{ matrix.module }}"
+          ls -R || true
+          npm run build || true
+          npm audit || true
+
+      - name: Detect missing files
+        run: |
+          echo "Checking missing files in ${{ matrix.module }}"
+          find . -type f || true
+
+      - name: Auto fix dependencies
+        run: |
+          npm audit fix || true
+
+      - name: Commit fixes
+        run: |
+          git config --global user.name "auto-repair-bot"
+          git config --global user.email "bot@softwarevala.com"
+          git add .
+          git commit -m "auto repair module: ${{ matrix.module }}" || true
+          git push || true

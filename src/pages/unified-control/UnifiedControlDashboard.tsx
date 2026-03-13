@@ -128,7 +128,7 @@ const UnifiedControlDashboard = () => {
         {/* Power Statement */}
         <div className="mt-3 p-2 rounded bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20">
           <p className="text-[9px] text-center text-orange-300 font-medium">
-            STRONGER THAN LOVABLE • SIMPLER TO USE
+            ENTERPRISE POWER • SIMPLE TO USE
           </p>
         </div>
       </div>

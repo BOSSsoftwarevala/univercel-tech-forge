@@ -17,7 +17,8 @@ import {
   RotateCcw, 
   Lock, 
   Cpu, 
-  Wallet, 
+  Wallet,
+  Infinity as InfinityIcon,
   Settings as SettingsIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ import softwareValaLogo from '@/assets/software-vala-logo-transparent.png';
 
 export type ValaAISection = 
   | 'command-center'
+  | 'continuous-creation'
   | 'active-project'
   | 'prompt-history'
   | 'execution-logs'
@@ -44,6 +46,7 @@ interface ValaAISidebarProps {
 
 const sidebarItems: { id: ValaAISection; label: string; icon: React.ElementType; badge?: string }[] = [
   { id: 'command-center', label: 'Command Center', icon: Terminal, badge: 'CORE' },
+  { id: 'continuous-creation', label: 'Auto Builder', icon: InfinityIcon, badge: 'AUTO' },
   { id: 'active-project', label: 'Active Project', icon: FolderOpen },
   { id: 'prompt-history', label: 'Prompt History', icon: History, badge: 'Read-Only' },
   { id: 'execution-logs', label: 'Execution Logs', icon: LogsIcon },
@@ -107,7 +110,7 @@ export const ValaAISidebar: React.FC<ValaAISidebarProps> = ({
           style={{ color: SIDEBAR_COLORS.textMuted }}
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>← Back to Control Panel</span>
+          <span>Back to Control Panel</span>
         </motion.button>
       </div>
       
