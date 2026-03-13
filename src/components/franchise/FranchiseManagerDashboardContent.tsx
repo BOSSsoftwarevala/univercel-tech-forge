@@ -1,4 +1,4 @@
-
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -15,12 +15,97 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { FranchiseManagerSection } from "./FranchiseManagerSidebar";
-import { supabase } from "@/integrations/supabase/client";
 
 interface FranchiseManagerDashboardContentProps {
   activeSection: FranchiseManagerSection;
 }
 
+interface FranchiseData {
+  id: string;
+  name: string;
+  status: string;
+  staff: number;
+  leads: number;
+  revenue: string;
+}
+
+interface CatalogProduct {
+  id: string;
+  name: string;
+  category: string | null;
+  type: string;
+  base_price: number | null;
+  demo_url: string | null;
+  demo_domain: string | null;
+  product_icon_url: string | null;
+  is_active: boolean | null;
+  seo_slug: string | null;
+}
+
+// Static franchise data (will be replaced by DB when franchise_accounts is populated)
+const franchiseList: FranchiseData[] = [
+  { id: "1", name: "Mumbai Central", status: "active", staff: 24, leads: 45, revenue: "₹8.5L" },
+  { id: "2", name: "Pune West", status: "active", staff: 18, leads: 32, revenue: "₹6.2L" },
+  { id: "3", name: "Ahmedabad Hub", status: "active", staff: 22, leads: 38, revenue: "₹7.1L" },
+  { id: "4", name: "Surat Branch", status: "hold", staff: 15, leads: 28, revenue: "₹4.8L" },
+  { id: "5", name: "Nashik Zone", status: "active", staff: 12, leads: 22, revenue: "₹3.9L" },
+];
+
+const recentActivity = [
+  { id: 1, action: "New lead assigned", target: "Mumbai Central", time: "5 min ago", type: "lead" },
+  { id: 2, action: "Staff onboarded", target: "Pune West", time: "1 hour ago", type: "staff" },
+  { id: 3, action: "Revenue report", target: "Weekly Summary", time: "2 hours ago", type: "report" },
+  { id: 4, action: "Approval pending", target: "Equipment Request", time: "3 hours ago", type: "approval" },
+  { id: 5, action: "Customer feedback", target: "Positive Review", time: "5 hours ago", type: "customer" },
+];
+
+const pendingApprovals = [
+  { id: 1, title: "New Equipment Purchase", franchise: "Mumbai Central", amount: "₹2.5L", priority: "high" as const },
+  { id: 2, title: "Staff Hiring Request", franchise: "Pune West", amount: null, priority: "medium" as const },
+  { id: 3, title: "Marketing Budget", franchise: "Ahmedabad Hub", amount: "₹50K", priority: "low" as const },
+];
+
+const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDashboardContentProps) => {
+  const { user } = useAuth();
+  const [catalogProducts, setCatalogProducts] = useState<CatalogProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [franchiseStats, setFranchiseStats] = useState({
+    totalFranchises: 12,
+    activeFranchises: 10,
+    onHold: 2,
+    totalStaff: 145,
+    totalLeads: 328,
+    totalRevenue: "₹42.5L",
+    catalogProducts: 0,
+  });
+
+  // Fetch real marketplace products
+  const fetchCatalogProducts = useCallback(async () => {
+    setLoadingProducts(true);
+    try {
+      const { data, error } = await supabase
+        .from('software_catalog' as any)
+        .select('id, name, category, type, base_price, demo_url, demo_domain, product_icon_url, is_active, seo_slug')
+        .eq('is_active', true)
+        .order('name')
+        .limit(50);
+
+      if (!error && data) {
+        setCatalogProducts(data as any[]);
+        setFranchiseStats(prev => ({ ...prev, catalogProducts: (data as any[]).length }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch catalog:', err);
+    } finally {
+      setLoadingProducts(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeSection === 'sales_revenue' || activeSection === 'overview') {
+      fetchCatalogProducts();
+    }
+  }, [activeSection, fetchCatalogProducts]);
 
   const handleAction = (action: string, target?: string) => {
     toast.success(`${action}${target ? ` for ${target}` : ''}`);
@@ -73,7 +158,53 @@ interface FranchiseManagerDashboardContentProps {
     });
   };
 
+  const handleShareDemoLink = (product: CatalogProduct) => {
+    const demoLink = product.demo_url || `https://${product.demo_domain}` || `https://softwarewalanet.lovable.app/demo/${product.id}`;
+    navigator.clipboard.writeText(demoLink);
+    toast.success('Demo link copied!', { description: `${product.name} - Share with clients` });
+    supabase.from('audit_logs').insert({
+      action: 'franchise_demo_link_shared',
+      module: 'franchise_manager',
+      user_id: user?.id,
+      meta_json: { product_id: product.id, product_name: product.name, link: demoLink },
+    }).then(() => {});
+  };
 
+  const handleGeneratePurchaseLink = (product: CatalogProduct) => {
+    const purchaseLink = `https://softwarewalanet.lovable.app/checkout/${product.id}?ref=franchise&uid=${user?.id}`;
+    navigator.clipboard.writeText(purchaseLink);
+    toast.success('Purchase link generated!', { description: `${product.name} - Trackable franchise link` });
+    supabase.from('audit_logs').insert({
+      action: 'franchise_purchase_link_generated',
+      module: 'franchise_manager',
+      user_id: user?.id,
+      meta_json: { product_id: product.id, product_name: product.name, link: purchaseLink },
+    }).then(() => {});
+  };
+
+  // ═══════════════════════════════════════════════
+  // RENDER: Overview
+  // ═══════════════════════════════════════════════
+  const renderOverview = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
+        {[
+          { label: "Total Franchises", value: franchiseStats.totalFranchises, icon: Building2, color: "indigo" },
+          { label: "Active", value: franchiseStats.activeFranchises, icon: CheckCircle, color: "emerald" },
+          { label: "On Hold", value: franchiseStats.onHold, icon: AlertTriangle, color: "orange" },
+          { label: "Total Staff", value: franchiseStats.totalStaff, icon: Users, color: "blue" },
+          { label: "Total Leads", value: franchiseStats.totalLeads, icon: Target, color: "purple" },
+          { label: "Revenue", value: franchiseStats.totalRevenue, icon: DollarSign, color: "cyan" },
+          { label: "Catalog Products", value: franchiseStats.catalogProducts, icon: Package, color: "pink" },
+        ].map((stat) => (
+          <Card key={stat.label} className={`bg-${stat.color}-500/10 border-${stat.color}-500/30`}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  <p className={`text-2xl font-bold text-${stat.color}-400`}>{stat.value}</p>
+                </div>
+                <stat.icon className={`w-8 h-8 text-${stat.color}-400/30`} />
               </div>
             </CardContent>
           </Card>

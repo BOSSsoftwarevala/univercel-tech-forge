@@ -38,7 +38,8 @@ serve(async (req) => {
       );
     }
 
-
+    // Generate unique order number using crypto for uniqueness
+    const orderNumber = `ORD-${Date.now()}-${crypto.randomUUID().replace(/-/g, '').substring(0, 9).toUpperCase()}`;
 
     // Create order
     const { data: order, error: orderError } = await supabase
@@ -62,7 +63,8 @@ serve(async (req) => {
 
     if (orderError) throw orderError;
 
-
+    // Generate license key using cryptographically secure random value
+    const licenseKey = `LIC-${order.id.substring(0, 8).toUpperCase()}-${crypto.randomUUID().replace(/-/g, '').substring(0, 12).toUpperCase()}`;
 
     // Create license
     const { data: license, error: licenseError } = await supabase

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-
+  Bell, ShieldAlert, LogOut, User, Radio, Loader2,
+  Headphones, MessageSquare, ListChecks, Globe, Banknote,
+  Search, ChevronRight, Crown, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,10 +19,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import {
-
+  NotificationsModal, AssistModal, PromiseTrackerModal,
+  InternalChatModal, LanguageModal, CurrencyModal,
 } from './BossActionModals';
-import { BossPanelNotificationCenter } from './BossPanelNotificationCenter';
 
+// ─── ENTERPRISE DARK SHELL ───────────────────────────────────
+const S = {
+  bg:       'hsl(222, 47%, 7%)',
+  bgHover:  'hsla(217, 92%, 65%, 0.1)',
+  border:   'hsla(215, 40%, 35%, 0.3)',
+  text:     'hsl(210, 40%, 98%)',
+  muted:    'hsl(215, 22%, 58%)',
+  brand:    'hsl(217, 92%, 65%)',
+  green:    'hsl(160, 84%, 44%)',
+  red:      'hsl(346, 82%, 55%)',
+  amber:    'hsl(38, 95%, 55%)',
+};
 
 interface BossPanelHeaderProps {
   streamingOn: boolean;
@@ -30,11 +44,47 @@ interface BossPanelHeaderProps {
 export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHeaderProps) {
   const [isLocking, setIsLocking] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showAssist, setShowAssist] = useState(false);
   const [showPromise, setShowPromise] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCurrency, setShowCurrency] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [time, setTime] = useState(new Date());
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+
+  useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchUnreadCount = async () => {
+      const { count } = await supabase
+        .from('user_notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      setUnreadCount(count ?? 0);
+    };
+    fetchUnreadCount();
+
+    const channel = supabase
+      .channel(`header-notifications:${user.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'user_notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.new && (payload.new as { is_read: boolean }).is_read === false) {
+          setUnreadCount((prev) => prev + 1);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id]);
 
   const handleEmergencyLock = async () => {
     setIsLocking(true);
@@ -135,9 +185,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           {time.toLocaleTimeString('en-US', { hour12: false })}
         </div>
 
-
-
-
+        <div className="h-5 w-px mx-1" style={{ background: S.border }} />
 
         <IconBtn onClick={() => setShowAssist(true)}><Headphones className="w-4 h-4" /></IconBtn>
         <IconBtn onClick={() => setShowPromise(true)}><ListChecks className="w-4 h-4" /></IconBtn>
@@ -196,7 +244,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       </div>
 
       {/* Modals */}
- main
+      <NotificationsModal open={showNotifications} onClose={() => setShowNotifications(false)} userId={user?.id} onUnreadCountChange={setUnreadCount} />
       <AssistModal open={showAssist} onClose={() => setShowAssist(false)} />
       <PromiseTrackerModal open={showPromise} onClose={() => setShowPromise(false)} />
       <InternalChatModal open={showChat} onClose={() => setShowChat(false)} />

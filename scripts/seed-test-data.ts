@@ -22,6 +22,12 @@ async function seedData() {
   const productId = products[0].product_id;
 
   // Note: user_id must reference an actual auth.users entry
+  // Set TEST_BOSS_USER_ID env var to a real user UUID before running this seed
+  const TEST_USER_ID = process.env.TEST_BOSS_USER_ID;
+  if (!TEST_USER_ID) {
+    console.error("❌ TEST_BOSS_USER_ID environment variable is required. Set it to a real auth.users UUID.");
+    process.exit(1);
+  }
 
   // Create test boss user role
   const { data: testBoss } = await supabase

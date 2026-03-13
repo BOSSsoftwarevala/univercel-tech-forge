@@ -9,11 +9,22 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { LiveActivityPipeline } from './LiveActivityPipeline';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
-
+import {
+  Send, Loader2, Bot, User, Sparkles, Code2, Eye,
+  PanelLeftClose, PanelLeftOpen, ChevronDown, Globe,
+  RefreshCw, Smartphone, Monitor, ExternalLink,
+  FolderTree, File, ChevronRight, Copy, Check,
+  Plus, Trash2, MessageSquare, Settings2,
+  Rocket, Store, Package
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { useAutoPublish } from '@/hooks/useAutoPublish';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // ===== TYPES =====
 type Message = {
@@ -32,7 +43,230 @@ type FileNode = {
   content?: string;
 };
 
+// ===== MOCK FILE TREE =====
+const MOCK_FILES: FileNode[] = [
+  {
+    name: 'src', type: 'folder', children: [
+      {
+        name: 'components', type: 'folder', children: [
+          { name: 'App.tsx', type: 'file', content: '// App component\nimport React from "react";\n\nconst App = () => {\n  return (\n    <div className="min-h-screen bg-background">\n      <h1>Your App</h1>\n    </div>\n  );\n};\n\nexport default App;' },
+          { name: 'Header.tsx', type: 'file', content: '// Header component\nexport const Header = () => {\n  return <header>Header</header>;\n};' },
+        ]
+      },
+      {
+        name: 'pages', type: 'folder', children: [
+          { name: 'Index.tsx', type: 'file', content: '// Index page\nconst Index = () => <div>Home Page</div>;\nexport default Index;' },
+        ]
+      },
+      { name: 'main.tsx', type: 'file', content: 'import React from "react";\nimport ReactDOM from "react-dom/client";\nimport App from "./App";\n\nReactDOM.createRoot(\n  document.getElementById("root")!\n).render(<App />);' },
+    ]
+  },
+  { name: 'package.json', type: 'file', content: '{\n  "name": "vala-project",\n  "version": "1.0.0"\n}' },
+  { name: 'index.html', type: 'file', content: '<!DOCTYPE html>\n<html>\n<body>\n  <div id="root"></div>\n</body>\n</html>' },
+];
 
+// ===== STREAMING CHAT =====
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-builder`;
+
+async function streamChat({
+  messages,
+  onDelta,
+  onDone,
+  onError,
+}: {
+  messages: { role: string; content: string }[];
+  onDelta: (text: string) => void;
+  onDone: () => void;
+  onError: (err: string) => void;
+}) {
+  try {
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+
+    const resp = await fetch(CHAT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify({ messages }),
+    });
+
+    if (!resp.ok) {
+      const errorData = await resp.json().catch(() => ({ error: `Server error ${resp.status}` }));
+      if (resp.status === 422 && errorData.blocked) {
+        onError(`⚠️ ${errorData.error || 'Message blocked due to inappropriate content.'}`);
+        return;
+      }
+      if (resp.status === 429) {
+        onError('Rate limit exceeded. Please wait a moment and try again.');
+        return;
+      }
+      if (resp.status === 402) {
+        onError('AI credits exhausted. Please add credits to continue.');
+        return;
+      }
+      onError(errorData.error || `Error ${resp.status}`);
+      return;
+    }
+    
+    if (!resp.body) {
+      onError('No response stream received');
+      return;
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = '';
+    let streamDone = false;
+
+    while (!streamDone) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      textBuffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
+
+        if (line.endsWith('\r')) line = line.slice(0, -1);
+        if (line.startsWith(':') || line.trim() === '') continue;
+        if (!line.startsWith('data: ')) continue;
+
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === '[DONE]') {
+          streamDone = true;
+          break;
+        }
+
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch {
+          textBuffer = line + '\n' + textBuffer;
+          break;
+        }
+      }
+    }
+
+    // Final flush
+    if (textBuffer.trim()) {
+      for (let raw of textBuffer.split('\n')) {
+        if (!raw) continue;
+        if (raw.endsWith('\r')) raw = raw.slice(0, -1);
+        if (raw.startsWith(':') || raw.trim() === '') continue;
+        if (!raw.startsWith('data: ')) continue;
+        const jsonStr = raw.slice(6).trim();
+        if (jsonStr === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch { /* ignore */ }
+      }
+    }
+
+    onDone();
+  } catch (err) {
+    onError(err instanceof Error ? err.message : 'Stream failed');
+  }
+}
+const PREVIEW_HINT = [
+  'IMPORTANT: Along with your normal structured response, you MUST include a complete preview-ready single-file HTML document between these tags:',
+  '<PREVIEW_HTML>',
+  '<!doctype html>',
+  '<html>',
+  '  <head>',
+  '    <meta charset="utf-8" />',
+  '    <meta name="viewport" content="width=device-width, initial-scale=1" />',
+  '    <script src="https://cdn.tailwindcss.com"></script>',
+  '  </head>',
+  '  <body class="bg-slate-950 text-white">',
+  '    <!-- UI goes here -->',
+  '  </body>',
+  '</html>',
+  '</PREVIEW_HTML>',
+  '',
+  'Rules:',
+  '- Must be a COMPLETE HTML document',
+  '- Use Tailwind CDN only (no external images)',
+  '- Keep it responsive and modern',
+  '- Put ALL preview markup inside <PREVIEW_HTML> ... </PREVIEW_HTML>',
+].join('\n');
+
+function extractPreviewHtmlFromMarkdown(text: string): string | null {
+  const match = text.match(/<PREVIEW_HTML>\s*([\s\S]*?)\s*<\/PREVIEW_HTML>/i);
+  return match?.[1]?.trim() || null;
+}
+
+function fallbackPreviewHtml(markdown: string) {
+  const escaped = markdown
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-950 text-white"><div class="max-w-3xl mx-auto p-6"><h1 class="text-2xl font-bold mb-3">VALA AI Output</h1><p class="text-slate-300 mb-4">No preview HTML found — showing raw build output.</p><pre class="text-xs whitespace-pre-wrap bg-white/5 border border-white/10 rounded-xl p-4">${escaped}</pre></div></body></html>`;
+}
+
+// ===== FILE TREE COMPONENT =====
+const FileTreeItem: React.FC<{
+  node: FileNode;
+  depth: number;
+  selectedFile: string | null;
+  onSelect: (name: string, content: string) => void;
+}> = ({ node, depth, selectedFile, onSelect }) => {
+  const [expanded, setExpanded] = useState(depth === 0);
+
+  if (node.type === 'folder') {
+    return (
+      <div>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center gap-1.5 px-2 py-1 text-xs hover:bg-white/5 rounded transition-colors"
+          style={{ paddingLeft: `${depth * 12 + 8}px` }}
+        >
+          <ChevronRight
+            className="w-3 h-3 shrink-0 transition-transform"
+            style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)', color: 'rgba(255,255,255,0.4)' }}
+          />
+          <FolderTree className="w-3.5 h-3.5 shrink-0" style={{ color: '#60a5fa' }} />
+          <span style={{ color: 'rgba(255,255,255,0.8)' }}>{node.name}</span>
+        </button>
+        {expanded && node.children?.map((child, i) => (
+          <FileTreeItem key={i} node={child} depth={depth + 1} selectedFile={selectedFile} onSelect={onSelect} />
+        ))}
+      </div>
+    );
+  }
+
+  const isSelected = selectedFile === node.name;
+  return (
+    <button
+      onClick={() => onSelect(node.name, node.content || '')}
+      className="w-full flex items-center gap-1.5 px-2 py-1 text-xs rounded transition-colors"
+      style={{
+        paddingLeft: `${depth * 12 + 20}px`,
+        background: isSelected ? 'rgba(37, 99, 235, 0.15)' : 'transparent',
+        color: isSelected ? '#60a5fa' : 'rgba(255,255,255,0.6)',
+      }}
+    >
+      <File className="w-3.5 h-3.5 shrink-0" style={{ color: node.name.endsWith('.tsx') ? '#06b6d4' : node.name.endsWith('.json') ? '#f59e0b' : 'rgba(255,255,255,0.4)' }} />
+      <span className="truncate">{node.name}</span>
+    </button>
+  );
+};
+
+// ===== MAIN COMPONENT =====
+const CATEGORIES = [
+  'Education', 'Healthcare', 'E-Commerce', 'CRM', 'ERP', 'POS', 'HRM',
+  'Finance', 'Real Estate', 'Logistics', 'Restaurant', 'Hotel/Travel',
+  'Fitness', 'Insurance', 'Automotive', 'Manufacturing', 'Subscription',
+  'Library', 'Events', 'Project Management', 'Beauty/Salon', 'Inventory',
+  'Lending', 'General',
+];
 
 const ValaAICommandCenter: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -76,6 +310,18 @@ const ValaAICommandCenter: React.FC = () => {
   const handleSend = useCallback(async () => {
     if (!input.trim() || isStreaming) return;
 
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    setIsStreaming(true);
+
+    let assistantContent = '';
 
     const upsertAssistant = (chunk: string) => {
       assistantContent += chunk;
@@ -88,6 +334,26 @@ const ValaAICommandCenter: React.FC = () => {
       });
     };
 
+    await streamChat({
+      messages: [
+        { role: 'system', content: PREVIEW_HINT },
+        ...[...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+      ],
+      onDelta: upsertAssistant,
+      onDone: () => setIsStreaming(false),
+      onError: (err) => {
+        setIsStreaming(false);
+        toast.error(err);
+      },
+    });
+
+    // Update preview after the stream finishes
+    const extracted = extractPreviewHtmlFromMarkdown(assistantContent);
+    const nextHtml = extracted || fallbackPreviewHtml(assistantContent);
+    setPreviewHtml(nextHtml);
+    setPreviewKey(Date.now());
+    setActiveTab('preview');
+  }, [input, isStreaming, messages]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -149,7 +415,35 @@ const ValaAICommandCenter: React.FC = () => {
   };
 
   return (
-
+    <div className="h-full min-h-0 flex overflow-hidden" style={{ background: '#0a0a0a' }}>
+      {/* ===== LEFT: CHAT PANEL ===== */}
+      <div className="flex flex-col h-full min-h-0" style={{ width: '420px', minWidth: '360px', borderRight: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
+        {/* Chat Header */}
+        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm font-semibold text-white">VALA AI</span>
+            <Badge className="text-[10px] px-1.5 py-0" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'none' }}>
+              Online
+            </Badge>
+          </div>
+          <div className="flex items-center gap-1">
+            {hasGeneratedContent && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-[10px] gap-1 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
+                onClick={() => setShowPublishDialog(true)}
+                disabled={isPublishing}
+              >
+                {isPublishing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Rocket className="w-3 h-3" />}
+                Publish
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" className="w-7 h-7 text-white/40 hover:text-white hover:bg-white/5" onClick={handleNewChat}>
+              <Plus className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -408,7 +702,14 @@ const ValaAICommandCenter: React.FC = () => {
               />
             </div>
 
-
+            <div>
+              <label className="text-xs text-white/50 mb-1 block">Description</label>
+              <Input
+                value={publishForm.description}
+                onChange={e => setPublishForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief product description"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -488,14 +789,28 @@ const ValaAICommandCenter: React.FC = () => {
               <Package className="w-3 h-3 inline mr-1" />
               Pipeline: Catalog Entry → AI Image → VPS Deploy → Boss Approval
             </div>
-            <div className="flex items-center justify-between">
-              <span style={{ color: COLORS.textMuted }}>Voice</span>
-              <span style={{ color: voiceEnabled ? COLORS.accent : COLORS.textMuted }}>
-                {voiceEnabled ? 'ON' : 'OFF'}
-              </span>
-            </div>
           </div>
 
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setShowPublishDialog(false)}
+              className="text-white/50 hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handlePublishToMarketplace}
+              disabled={!publishForm.productName || isPublishing}
+              className="gap-1.5"
+              style={{ background: '#10b981' }}
+            >
+              {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
+              {isPublishing ? 'Publishing...' : 'Submit for Review'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

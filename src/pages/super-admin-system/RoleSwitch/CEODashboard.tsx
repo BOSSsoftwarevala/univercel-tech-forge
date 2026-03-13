@@ -17,6 +17,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useAIRAMetrics } from "@/hooks/useAIRAMetrics";
+import { useCEODashboard } from "@/hooks/useCEODashboard";
+import {
+  RevenueAreaChart,
+  ModuleBarChart,
+  RoleDistributionPie,
+  SystemHealthRadar,
+  ActivityTimeline,
+  KPISparkline,
+  CategoryTreemap,
+} from "@/components/aira/AIRACharts";
+import { AIRASystemScanner, ScanReport } from "@/components/aira/AIRASystemScanner";
+import AIRAChatInterface from "@/components/aira/AIRAChatInterface";
+import AIRAReports from "@/components/aira/AIRAReports";
+import CEOProductPerformance from "@/components/ceo/CEOProductPerformance";
+import CEORegionPerformance from "@/components/ceo/CEORegionPerformance";
+import CEOSystemHealthPanel from "@/components/ceo/CEOSystemHealthPanel";
+import CEOAlertsPanel from "@/components/ceo/CEOAlertsPanel";
 
 interface CEODashboardProps {
   activeNav?: string;
@@ -40,6 +58,16 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
   const [noteText, setNoteText] = useState("");
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const { user } = useAuth();
+  const { metrics, loading, lastRefresh, refresh } = useAIRAMetrics();
+  const {
+    productPerformance,
+    regionPerformance,
+    systemHealth,
+    scanResult,
+    loading: ceoLoading,
+    runScan,
+    fetchAll: refreshCEO,
+  } = useCEODashboard();
 
   useEffect(() => {
     if (activeNav) setActiveSection(NAV_MAP[activeNav] || "scanner");
@@ -160,7 +188,54 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
         </div>
       </motion.div>
 
-
+      {/* ─── CEO Action Buttons ──────────────────────────────── */}
+      <div className="px-6 pt-4 pb-0">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "System Scan", icon: ScanLine, action: () => { runScan(); setActiveSection("system"); logAction("ceo_action", "system_scan"); toast.info("System scan initiated"); } },
+            { label: "Generate Report", icon: FileText, action: async () => {
+              logAction("ceo_action", "generate_report");
+              toast.info("Generating executive report...");
+              try {
+                await (supabase as any).from("system_events").insert({
+                  event_type: "aira_executive_report",
+                  source_role: "ceo",
+                  source_user_id: user?.id || null,
+                  payload: { type: "executive_report", generated_at: new Date().toISOString(), metrics: { users: m.totalUsers, revenue: m.totalRevenue, orders: m.totalOrders, alerts: m.criticalAlerts } },
+                  status: "PENDING",
+                });
+                toast.success("Executive report generated");
+              } catch { toast.error("Report generation failed"); }
+            }},
+            { label: "Open AI Chat", icon: Bot, action: () => { setActiveSection("chat"); logAction("ceo_action", "open_ai_chat"); } },
+            { label: "View Alerts", icon: AlertCircle, action: () => { setActiveSection("alerts"); logAction("ceo_action", "view_alerts"); } },
+            { label: "View System Health", icon: Activity, action: () => { setActiveSection("system"); logAction("ceo_action", "view_system_health"); } },
+            { label: "Submit to Boss Panel", icon: Zap, action: async () => {
+              logAction("ceo_action", "submit_to_boss");
+              try {
+                await (supabase as any).from("system_events").insert({
+                  event_type: "aira_boss_submission",
+                  source_role: "ceo",
+                  source_user_id: user?.id || null,
+                  payload: { type: "ceo_submission", submitted_at: new Date().toISOString(), summary: { totalUsers: m.totalUsers, totalRevenue: m.totalRevenue, totalOrders: m.totalOrders, activeServers: m.activeServers, pendingApprovals: m.pendingApprovals, criticalAlerts: m.criticalAlerts } },
+                  status: "PENDING",
+                });
+                toast.success("Report submitted to Boss Panel");
+              } catch { toast.error("Submission failed"); }
+            }},
+          ].map((btn) => (
+            <Button
+              key={btn.label}
+              variant="outline"
+              size="sm"
+              onClick={btn.action}
+              className="gap-1.5 text-xs bg-slate-800/60 border-slate-700/50 text-slate-300 hover:bg-violet-500/20 hover:text-violet-300 hover:border-violet-500/40"
+            >
+              <btn.icon className="w-3.5 h-3.5" />
+              {btn.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       <div className="p-6 space-y-6">
@@ -268,7 +343,7 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-
+                <ModuleBarChart data={m.moduleActivity} />
               </CardContent>
             </Card>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -347,7 +422,22 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-
+                <ScrollArea className="h-[500px]">
+                  <div className="space-y-3">
+                    {[
+                      { id: 1, type: "growth", title: "Expand to Southeast Asia", desc: "Vietnam and Indonesia show 40% YoY growth potential.", confidence: 92, impact: "high" },
+                      { id: 2, type: "risk", title: "Middle East Revenue Decline", desc: "Revenue dropped 2.1%. Review local franchise ops.", confidence: 87, impact: "medium" },
+                      { id: 3, type: "product", title: "Enterprise Product Gap", desc: "Competitors gaining with enterprise solutions.", confidence: 78, impact: "high" },
+                      { id: 4, type: "efficiency", title: "Support Cost Optimization", desc: "AI chatbot could reduce costs by 35%.", confidence: 94, impact: "medium" },
+                    ].map((s) => (
+                      <div key={s.id} className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/30 hover:border-violet-500/30 transition">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Lightbulb className="w-4 h-4 text-violet-400" />
+                              <h4 className="font-medium text-white text-sm">{s.title}</h4>
+                              <Badge className={s.impact === "high" ? "bg-red-500/20 text-red-400 border-red-500/50 text-[10px]" : "bg-amber-500/20 text-amber-400 border-amber-500/50 text-[10px]"}>
+                                {s.impact}
                               </Badge>
                             </div>
                             <p className="text-xs text-slate-400 mb-2">{s.desc}</p>

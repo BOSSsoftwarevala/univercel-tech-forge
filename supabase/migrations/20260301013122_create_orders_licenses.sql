@@ -87,4 +87,3 @@ CREATE INDEX idx_licenses_expiry_date ON public.licenses(expiry_date);
 ALTER TABLE public.user_notifications
   ADD COLUMN IF NOT EXISTS title TEXT,
   ADD COLUMN IF NOT EXISTS action_id UUID;
-

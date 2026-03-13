@@ -7,4 +7,3 @@ export * from './rate-limiter-enterprise';
 export * from './connection-pool';
 export * from './query-cache';
 export * from './region-router';
-export * from './pooled-db-client';

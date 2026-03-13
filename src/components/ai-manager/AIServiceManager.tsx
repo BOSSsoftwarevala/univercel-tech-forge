@@ -1,7 +1,0 @@
-
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-

@@ -13,15 +13,5 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    // Detect session from URL hash on OAuth redirects only
-    detectSessionInUrl: true,
-    // Use PKCE flow for enhanced security (prevents auth code interception)
-    flowType: 'pkce',
-  },
-  global: {
-    headers: {
-      // Identify the client application to the API layer
-      'X-Client-Info': 'softwarevala-web',
-    },
-  },
+  }
 });

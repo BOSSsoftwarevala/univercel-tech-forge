@@ -2,9 +2,6 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback,
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
-import { verifyTOTP, TOTPConfig } from '@/lib/security/2fa-totp';
-import { checkRateLimit } from '@/lib/security/rate-limiter';
-import { audit } from '@/lib/security/audit-enhanced';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -13,14 +10,6 @@ type AppRole = Database['public']['Enums']['app_role'];
 const PRIVILEGED_ROLES: string[] = ['boss_owner', 'master', 'super_admin', 'ceo'];
 // Roles that get auto-approved on signup (no waiting)
 const AUTO_APPROVED_ROLES: string[] = ['boss_owner', 'master', 'ceo', 'prime'];
-// Roles that require 2FA on every login
-const REQUIRE_2FA_ROLES: string[] = ['boss_owner', 'master', 'super_admin', 'ceo'];
-
-export interface TwoFactorStatus {
-  enabled: boolean;
-  verified: boolean;
-  method: 'totp' | 'sms' | null;
-}
 
 interface AuthContextType {
   user: User | null;
@@ -32,10 +21,8 @@ interface AuthContextType {
   isBossOwner: boolean; // Merged master + super_admin
   isCEO: boolean;
   wasForceLoggedOut: boolean;
-  twoFactorStatus: TwoFactorStatus;
   signUp: (email: string, password: string, role: AppRole, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string, deviceFingerprint?: string) => Promise<{ error: Error | null }>;
-  verifyTwoFactor: (token: string, totpSecret: string) => Promise<{ error: Error | null }>;
   generateDeviceFingerprint: () => string;
   signOut: () => Promise<void>;
   refreshApprovalStatus: () => Promise<void>;
@@ -52,11 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [approvalStatus, setApprovalStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null);
   const [wasForceLoggedOut, setWasForceLoggedOut] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false); // Cache flag
-  const [twoFactorStatus, setTwoFactorStatus] = useState<TwoFactorStatus>({
-    enabled: false,
-    verified: false,
-    method: null,
-  });
 
   // Prevent race condition: SIGNED_IN event role fetch can run before we clear force-logout flag.
   const pendingSignInRef = useRef(false);
@@ -163,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserRole(null);
           setApprovalStatus(null);
           setRoleChecked(false);
-
+          roleFetchedForUser = null;
         }
       }
     );
@@ -247,11 +229,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUserRole(data.role as AppRole);
         setApprovalStatus(data.approval_status as 'pending' | 'approved' | 'rejected');
         setRoleChecked(true);
-
-        // Determine whether this role requires 2FA
-        if (REQUIRE_2FA_ROLES.includes(data.role)) {
-          setTwoFactorStatus(prev => ({ ...prev, enabled: true }));
-        }
         return;
       }
 
@@ -375,14 +352,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email: string, password: string, deviceFingerprint?: string) => {
     pendingSignInRef.current = true;
 
-    // Client-side rate limiting for login attempts (keyed by email)
-    const rateCheck = checkRateLimit(email, 'login');
-    if (!rateCheck.allowed) {
-      pendingSignInRef.current = false;
-      const retryAfterSecs = Math.ceil((rateCheck.retryAfterMs ?? 0) / 1000);
-      return { error: new Error(`Too many login attempts. Please wait ${retryAfterSecs} seconds.`) };
-    }
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -444,44 +413,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Clear force logout flag on successful sign in BEFORE role/status fetch
         await clearForceLogout(data.user.id);
         await fetchUserRoleAndStatus(data.user.id);
-
-        await audit.loginAttempt(data.user.id, email, true, { deviceFingerprint: fingerprint });
       }
 
       return { error: null };
     } catch (error) {
-      await audit.loginAttempt(null, email, false, { reason: (error as Error).message });
       return { error: error as Error };
     } finally {
       pendingSignInRef.current = false;
-    }
-  };
-
-  // Verify a TOTP token for the current user
-  const verifyTwoFactor = async (token: string, totpSecret: string): Promise<{ error: Error | null }> => {
-    if (!user) return { error: new Error('Not authenticated') };
-
-    // Rate-limit 2FA verification attempts
-    const rateCheck = checkRateLimit(user.id, 'otp_verify');
-    if (!rateCheck.allowed) {
-      const retryAfterSecs = Math.ceil((rateCheck.retryAfterMs ?? 0) / 1000);
-      return { error: new Error(`Too many attempts. Please wait ${retryAfterSecs} seconds.`) };
-    }
-
-    try {
-      const config: TOTPConfig = { secret: totpSecret };
-      const result = await verifyTOTP(config, token);
-
-      if (!result.valid) {
-        await audit.twoFactorFailed(user.id, 'totp');
-        return { error: new Error('Invalid or expired verification code') };
-      }
-
-      setTwoFactorStatus({ enabled: true, verified: true, method: 'totp' });
-      await audit.twoFactorVerified(user.id, 'totp');
-      return { error: null };
-    } catch (err) {
-      return { error: err as Error };
     }
   };
 
@@ -523,7 +461,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
     setApprovalStatus(null);
     setWasForceLoggedOut(false);
-    setTwoFactorStatus({ enabled: false, verified: false, method: null });
   };
 
   // Boss Owner only: Force logout a user
@@ -539,11 +476,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) throw error;
-
-      await audit.privilegedAction(user.id, userRole ?? 'boss_owner', 'force_logout_user', {
-        targetUserId,
-      });
-
       return { error: null };
     } catch (error) {
       return { error: error as Error };
@@ -561,10 +493,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isBossOwner,
       isCEO,
       wasForceLoggedOut,
-      twoFactorStatus,
       signUp, 
       signIn,
-      verifyTwoFactor,
       signOut,
       refreshApprovalStatus,
       forceLogoutUser,
@@ -582,4 +512,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

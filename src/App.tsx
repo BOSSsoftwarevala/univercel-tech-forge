@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { AnimationProvider } from "./contexts/AnimationContext";
 import { DemoTestModeProvider } from "./contexts/DemoTestModeContext";
@@ -25,7 +25,7 @@ import DomainProtection from "./components/security/DomainProtection";
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import { Loader2 } from "lucide-react";
-
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // ============================================
 // LAZY ROUTE IMPORTS - Code splitting for performance
@@ -192,9 +192,6 @@ const SchoolSoftwareDashboard = lazyLoad(() => import("./pages/school-software/S
 // Settings
 const SettingsPage = lazyLoad(() => import("./pages/Settings"));
 
-// What Is Happening
-const WhatIsHappening = lazyLoad(() => import("./pages/WhatIsHappening"));
-
 // Super Admin
 const SuperAdminCommandCenter = lazyLoad(() => import("./pages/super-admin/CommandCenter"));
 const LiveTracking = lazyLoad(() => import("./pages/super-admin/LiveTracking"));
@@ -202,6 +199,7 @@ const RoleManager = lazyLoad(() => import("./pages/super-admin/RoleManager"));
 const UserManager = lazyLoad(() => import("./pages/super-admin/UserManager"));
 const PermissionMatrix = lazyLoad(() => import("./pages/super-admin/PermissionMatrix"));
 const SecurityCenter = lazyLoad(() => import("./pages/super-admin/SecurityCenter"));
+const ProductManagerPage = lazyLoad(() => import("./pages/super-admin/ProductManagerPage"));
 const SystemAudit = lazyLoad(() => import("./pages/super-admin/SystemAudit"));
 const PrimeManager = lazyLoad(() => import("./pages/super-admin/PrimeManager"));
 const ServerManagerDashboard = lazyLoad(() => import("./pages/server-manager/ServerManagerDashboard"));
@@ -390,6 +388,11 @@ const LeaderSecurityAssessment = lazyLoad(() => import("./pages/leader-security/
 // Boss Panel
 const BossPanel = lazyLoad(() => import("./pages/BossPanel"));
 
+// Marketplace
+const MMFullLayout = lazyLoad(() => import("./components/marketplace-manager/MMFullLayout").then(m => ({ default: m.MMFullLayout })));
+
+// AI Builder
+const AIBuilderPage = lazyLoad(() => import("./pages/AIBuilderPage"));
 
 // ============================================
 // QUERY CLIENT - Optimized caching
@@ -422,7 +425,6 @@ const BlockingClassCleanup = memo(() => {
 // ============================================
 const App = memo(() => (
   <QueryClientProvider client={queryClient}>
-    <Analytics />
     <AuthProvider>
       <TenantProvider>
         <DemoTestModeProvider>
@@ -441,18 +443,13 @@ const App = memo(() => (
                           <SystemNotificationsInitializer />
                           <GlobalOfferPopup />
                           <FloatingAIChatbotWrapper />
-
+                          <SpeedInsights />
                           <Routes>
                             {/* Public Routes */}
                             <Route path="/" element={<Index />} />
                             <Route path="/demos" element={<Index />} />
                             <Route path="/explore" element={<Navigate to="/demos" replace />} />
                             <Route path="/products" element={<Index />} />
-                            <Route path="/marketplace" element={<MarketplacePage />} />
-                            <Route path="/marketplace/product/:id" element={<ProductDetailPage />} />
-                            <Route path="/marketplace/category/:categoryId" element={<MarketplacePage />} />
-                            <Route path="/user/library" element={<RequireAuth><UserLibraryPage /></RequireAuth>} />
-                            <Route path="/user/licenses" element={<RequireAuth><UserLicensesPage /></RequireAuth>} />
                             <Route path="/pricing" element={<SimpleDemoList />} />
                             <Route path="/demos/public" element={<PublicDemos />} />
                             <Route path="/showcase" element={<PremiumDemoShowcaseNew />} />
@@ -618,7 +615,6 @@ const App = memo(() => (
                             <Route path="/super-admin/dashboard" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
                             <Route path="/super-admin/command-center" element={<Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />} />
                             <Route path="/super-admin/live-tracking" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><LiveTracking /></RequireRole>} />
-                            <Route path="/what-is-happening" element={<RequireRole allowed={["boss_owner", "master", "ceo", "super_admin", "admin"]}><WhatIsHappening /></RequireRole>} />
                             <Route path="/super-admin/role-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><RoleManager /></RequireRole>} />
                             <Route path="/super-admin/user-manager" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><UserManager /></RequireRole>} />
                             <Route path="/super-admin/permission-matrix" element={<RequireRole allowed={["boss_owner", "master", "ceo"]}><PermissionMatrix /></RequireRole>} />

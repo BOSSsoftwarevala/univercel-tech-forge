@@ -3,8 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, CreditCard, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-import { FIXED_PRICE, FIXED_CURRENCY } from '@/lib/payment/fixed-price-validator';
-import { initiatePayment, type PaymentGateway } from '@/lib/payment/payment-gateway-handler';
 
 const SimpleCheckout = () => {
   const { demoId } = useParams();
@@ -15,15 +13,14 @@ const SimpleCheckout = () => {
     email: '',
     country: 'India',
   });
-  const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>('stripe');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Fixed price — $249 USD for all products
+  // Mock product data
   const product = {
     id: demoId,
-    name: 'Software License',
-    price: FIXED_PRICE,
-    currency: FIXED_CURRENCY,
+    name: 'Restaurant POS',
+    price: 15000,
+    currency: '₹',
   };
 
   const countries = [
@@ -42,28 +39,14 @@ const SimpleCheckout = () => {
 
   const handlePayment = async () => {
     setIsProcessing(true);
-
-    const result = await initiatePayment({
-      productId: product.id || 'unknown',
-      productName: product.name,
-      customerName: formData.name,
-      customerEmail: formData.email,
-      gateway: selectedGateway,
-    });
-
-    if (!result.success) {
-      toast.error(result.error || 'Payment initiation failed. Please try again.');
-      setIsProcessing(false);
-      return;
-    }
-
-    toast.success('Order created! Redirecting to payment...');
-
-    if (result.redirectUrl) {
-      window.location.href = result.redirectUrl;
-    } else {
-      navigate('/user-dashboard');
-    }
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    toast.success('Payment successful! Account created.');
+    
+    // Auto-redirect to user dashboard
+    navigate('/user-dashboard');
   };
 
   return (
@@ -174,31 +157,15 @@ const SimpleCheckout = () => {
               <h2 className="text-xl font-bold mb-4">Order Summary</h2>
               <div className="flex items-center justify-between py-3 border-b border-slate-800">
                 <span className="text-slate-400">{product.name}</span>
-                <span className="font-bold">${product.price} {product.currency}</span>
+                <span className="font-bold">{product.currency}{product.price.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between py-3 border-b border-slate-800">
+                <span className="text-slate-400">Tax (18% GST)</span>
+                <span className="font-bold">{product.currency}{Math.round(product.price * 0.18).toLocaleString()}</span>
               </div>
               <div className="flex items-center justify-between py-3 text-lg">
                 <span className="font-bold">Total</span>
-                <span className="font-bold text-cyan-400">${product.price} {product.currency}</span>
-              </div>
-            </div>
-
-            {/* Gateway Selection */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-              <h2 className="text-xl font-bold mb-4">Payment Method</h2>
-              <div className="grid grid-cols-3 gap-3">
-                {(['stripe', 'flutterwave', 'payu'] as PaymentGateway[]).map((gw) => (
-                  <button
-                    key={gw}
-                    onClick={() => setSelectedGateway(gw)}
-                    className={`px-4 py-3 rounded-xl font-semibold text-sm border transition-all capitalize ${
-                      selectedGateway === gw
-                        ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
-                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
-                    }`}
-                  >
-                    {gw}
-                  </button>
-                ))}
+                <span className="font-bold text-cyan-400">{product.currency}{Math.round(product.price * 1.18).toLocaleString()}</span>
               </div>
             </div>
 
@@ -221,7 +188,7 @@ const SimpleCheckout = () => {
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5" />
-                    Pay Now — ${product.price} {product.currency}
+                    Pay Now - {product.currency}{Math.round(product.price * 1.18).toLocaleString()}
                   </>
                 )}
               </button>
