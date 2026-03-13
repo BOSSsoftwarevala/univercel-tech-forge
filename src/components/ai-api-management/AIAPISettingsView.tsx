@@ -174,7 +174,7 @@ export const AIAPISettingsView = () => {
             </div>
             <div className="p-3 rounded-lg bg-muted/10">
               <p className="text-lg font-bold text-emerald-400">Better</p>
-              <p className="text-[10px] text-muted-foreground">Than Lovable</p>
+              <p className="text-[10px] text-muted-foreground">Enterprise Grade</p>
             </div>
           </div>
         </CardContent>

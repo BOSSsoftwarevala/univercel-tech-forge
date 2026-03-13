@@ -1,0 +1,2 @@
+-- Undo migration for V006
+-- Auto-generated. Manual undo scripts needed.

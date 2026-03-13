@@ -14,7 +14,16 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Bot
+  Bot,
+  Mic,
+  Cpu,
+  ScanSearch,
+  ListTodo,
+  Megaphone,
+  Globe,
+  Handshake,
+  Wrench,
+  HeartPulse
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -27,16 +36,24 @@ interface AICEOSidebarProps {
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/ai-ceo" },
   { id: "live-monitor", label: "Live Action Monitor", icon: Activity, path: "/ai-ceo/live-monitor" },
+  { id: "voice-commands", label: "Voice Command Center", icon: Mic, path: "/ai-ceo/voice-commands" },
+  { id: "language", label: "Language Intelligence", icon: Globe, path: "/ai-ceo/language" },
+  { id: "sales", label: "Sales Intelligence", icon: Handshake, path: "/ai-ceo/sales" },
+  { id: "ai-providers", label: "AI Providers Hub", icon: Cpu, path: "/ai-ceo/ai-providers" },
+  { id: "tool-stack", label: "Tool Stack", icon: Wrench, path: "/ai-ceo/tool-stack" },
+  { id: "project-scanner", label: "Project Scanner", icon: ScanSearch, path: "/ai-ceo/project-scanner" },
+  { id: "task-engine", label: "Autonomous Tasks", icon: ListTodo, path: "/ai-ceo/task-engine" },
   { id: "decision-engine", label: "Decision Engine", icon: Brain, path: "/ai-ceo/decision-engine" },
   { id: "approvals", label: "Approval Suggestions", icon: CheckSquare, path: "/ai-ceo/approvals" },
-  { id: "risk", label: "Risk & Compliance", icon: ShieldAlert, path: "/ai-ceo/risk" },
+  { id: "risk", label: "Risk & Self-Healing", icon: ShieldAlert, path: "/ai-ceo/risk" },
   { id: "performance", label: "Performance Intelligence", icon: TrendingUp, path: "/ai-ceo/performance" },
+  { id: "marketing", label: "Marketing Intelligence", icon: Megaphone, path: "/ai-ceo/marketing" },
   { id: "predictions", label: "Predictive Insights", icon: Lightbulb, path: "/ai-ceo/predictions" },
   { id: "reports", label: "AI Reports", icon: FileText, path: "/ai-ceo/reports" },
   { id: "learning", label: "System Learning Log", icon: Database, path: "/ai-ceo/learning" },
+  { id: "auto-healing", label: "Auto Healing Engine", icon: HeartPulse, path: "/ai-ceo/auto-healing" },
   { id: "settings", label: "Settings (Read-Only)", icon: Settings, path: "/ai-ceo/settings" },
 ];
-
 const AICEOSidebar = ({ activeSection, collapsed, onCollapsedChange }: AICEOSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -110,8 +127,8 @@ const AICEOSidebar = ({ activeSection, collapsed, onCollapsedChange }: AICEOSide
           <div className="flex items-center gap-3 p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
             <Bot className="w-8 h-8 text-cyan-400" />
             <div>
-              <p className="text-xs text-cyan-400 font-medium">AI CEO v2.0</p>
-              <p className="text-[10px] text-cyan-500/60">Observer • Advisor</p>
+              <p className="text-xs text-cyan-400 font-medium">AIRA v3.0</p>
+              <p className="text-[10px] text-cyan-500/60">Autonomous • Executive AI</p>
             </div>
           </div>
         </div>

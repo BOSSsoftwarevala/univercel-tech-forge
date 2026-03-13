@@ -1,86 +1,81 @@
 /**
- * SCREEN CONTROL
- * Deep control categories - View/Control/Pause/Resume/Freeze
+ * SCREEN CONTROL - All buttons functional
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Monitor,
-  Eye,
-  Hand,
-  Pause,
-  Play,
-  Snowflake,
-  MousePointer2,
-  Keyboard,
-  AppWindow,
-  Maximize,
-} from 'lucide-react';
+import { toast } from 'sonner';
+import { Monitor, Eye, Hand, Pause, Play, Snowflake, MousePointer2, Keyboard, AppWindow, Maximize } from 'lucide-react';
 
-const CONTROL_MODES = [
-  { id: 'view', label: 'View Only', icon: Eye, description: 'Watch screen without any control', status: 'active' },
-  { id: 'control', label: 'Control', icon: Hand, description: 'Full mouse and keyboard control', status: 'disabled' },
-  { id: 'pause', label: 'Pause', icon: Pause, description: 'Temporarily freeze screen view', status: 'available' },
-  { id: 'resume', label: 'Resume', icon: Play, description: 'Continue paused session', status: 'available' },
-  { id: 'freeze', label: 'Freeze', icon: Snowflake, description: 'Lock current screen state', status: 'available' },
-];
-
-const CONTROL_OPTIONS = [
-  { id: 'cursor', label: 'Cursor Control', icon: MousePointer2, enabled: false },
-  { id: 'keyboard', label: 'Keyboard Input', icon: Keyboard, enabled: false },
-  { id: 'window', label: 'Window Specific', icon: AppWindow, enabled: true },
-  { id: 'resolution', label: 'Resolution Lock', icon: Maximize, enabled: true },
-];
+type ControlMode = 'view' | 'control' | 'pause' | 'resume' | 'freeze';
 
 export function AMScreenControl() {
+  const [activeMode, setActiveMode] = useState<ControlMode>('view');
+  const [controls, setControls] = useState({ cursor: false, keyboard: false, window: true, resolution: true });
+
+  const CONTROL_MODES = [
+    { id: 'view' as const, label: 'View Only', icon: Eye, description: 'Watch screen without any control' },
+    { id: 'control' as const, label: 'Control', icon: Hand, description: 'Full mouse and keyboard control' },
+    { id: 'pause' as const, label: 'Pause', icon: Pause, description: 'Temporarily freeze screen view' },
+    { id: 'resume' as const, label: 'Resume', icon: Play, description: 'Continue paused session' },
+    { id: 'freeze' as const, label: 'Freeze', icon: Snowflake, description: 'Lock current screen state' },
+  ];
+
+  const handleModeChange = (mode: ControlMode) => {
+    if (mode === 'control') {
+      toast.info('Control request sent', { description: 'Awaiting target user approval...' });
+      setTimeout(() => {
+        setActiveMode(mode);
+        setControls(prev => ({ ...prev, cursor: true, keyboard: true }));
+        toast.success('Control mode activated');
+      }, 1500);
+    } else {
+      setActiveMode(mode);
+      if (mode === 'view') setControls(prev => ({ ...prev, cursor: false, keyboard: false }));
+      toast.info(`Mode: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`, { description: `Switched to ${mode} mode` });
+    }
+  };
+
+  const handleToggleControl = (key: keyof typeof controls) => {
+    setControls(prev => ({ ...prev, [key]: !prev[key] }));
+    toast(controls[key] ? `${key} disabled` : `${key} enabled`);
+  };
+
+  const CONTROL_OPTIONS = [
+    { id: 'cursor' as const, label: 'Cursor Control', icon: MousePointer2 },
+    { id: 'keyboard' as const, label: 'Keyboard Input', icon: Keyboard },
+    { id: 'window' as const, label: 'Window Specific', icon: AppWindow },
+    { id: 'resolution' as const, label: 'Resolution Lock', icon: Maximize },
+  ];
+
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-6">
-        {/* Header */}
         <div>
           <h1 className="text-2xl font-bold">Screen Control</h1>
           <p className="text-muted-foreground">Manage screen viewing and control permissions</p>
         </div>
 
-        {/* Control Modes */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Monitor className="h-5 w-5" />
-              Control Modes
-            </CardTitle>
+            <CardTitle className="flex items-center gap-2"><Monitor className="h-5 w-5" /> Control Modes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               {CONTROL_MODES.map((mode) => {
                 const Icon = mode.icon;
+                const isActive = activeMode === mode.id;
                 return (
-                  <Card 
-                    key={mode.id}
-                    className={`cursor-pointer transition-colors ${
-                      mode.status === 'active' ? 'border-primary bg-primary/5' : 'hover:border-muted-foreground'
-                    }`}
-                  >
+                  <Card key={mode.id} className={`cursor-pointer transition-colors ${isActive ? 'border-primary bg-primary/5' : 'hover:border-muted-foreground'}`}
+                    onClick={() => handleModeChange(mode.id)}>
                     <CardContent className="p-4 text-center">
-                      <Icon className={`h-8 w-8 mx-auto mb-2 ${
-                        mode.status === 'active' ? 'text-primary' : 
-                        mode.status === 'disabled' ? 'text-muted-foreground' : 'text-foreground'
-                      }`} />
+                      <Icon className={`h-8 w-8 mx-auto mb-2 ${isActive ? 'text-primary' : 'text-foreground'}`} />
                       <p className="font-medium text-sm">{mode.label}</p>
                       <p className="text-xs text-muted-foreground mt-1">{mode.description}</p>
-                      <Badge 
-                        variant={
-                          mode.status === 'active' ? 'default' :
-                          mode.status === 'disabled' ? 'secondary' : 'outline'
-                        }
-                        className="mt-2"
-                      >
-                        {mode.status}
-                      </Badge>
+                      <Badge variant={isActive ? 'default' : 'outline'} className="mt-2">{isActive ? 'active' : 'available'}</Badge>
                     </CardContent>
                   </Card>
                 );
@@ -89,27 +84,16 @@ export function AMScreenControl() {
           </CardContent>
         </Card>
 
-        {/* Control Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Input Controls</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-sm">Input Controls</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               {CONTROL_OPTIONS.map((option) => {
                 const Icon = option.icon;
                 return (
-                  <div 
-                    key={option.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className="h-5 w-5" />
-                      <span className="text-sm">{option.label}</span>
-                    </div>
-                    <Badge variant={option.enabled ? 'default' : 'secondary'}>
-                      {option.enabled ? 'Enabled' : 'Disabled'}
-                    </Badge>
+                  <div key={option.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 cursor-pointer" onClick={() => handleToggleControl(option.id)}>
+                    <div className="flex items-center gap-3"><Icon className="h-5 w-5" /><span className="text-sm">{option.label}</span></div>
+                    <Badge variant={controls[option.id] ? 'default' : 'secondary'}>{controls[option.id] ? 'Enabled' : 'Disabled'}</Badge>
                   </div>
                 );
               })}
@@ -117,9 +101,7 @@ export function AMScreenControl() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Restrictions</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-sm">Restrictions</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
                 <p className="text-sm font-medium text-green-500">NO FULL SYSTEM ACCESS</p>
@@ -137,25 +119,20 @@ export function AMScreenControl() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline">
-                <Eye className="h-4 w-4 mr-2" />
-                Switch to View Only
+              <Button variant={activeMode === 'view' ? 'default' : 'outline'} onClick={() => handleModeChange('view')}>
+                <Eye className="h-4 w-4 mr-2" /> Switch to View Only
               </Button>
-              <Button variant="outline">
-                <Hand className="h-4 w-4 mr-2" />
-                Request Control
+              <Button variant={activeMode === 'control' ? 'default' : 'outline'} onClick={() => handleModeChange('control')}>
+                <Hand className="h-4 w-4 mr-2" /> Request Control
               </Button>
-              <Button variant="outline">
-                <Pause className="h-4 w-4 mr-2" />
-                Pause Session
+              <Button variant={activeMode === 'pause' ? 'default' : 'outline'} onClick={() => handleModeChange('pause')}>
+                <Pause className="h-4 w-4 mr-2" /> Pause Session
               </Button>
-              <Button variant="outline">
-                <Snowflake className="h-4 w-4 mr-2" />
-                Freeze Screen
+              <Button variant={activeMode === 'freeze' ? 'default' : 'outline'} onClick={() => handleModeChange('freeze')}>
+                <Snowflake className="h-4 w-4 mr-2" /> Freeze Screen
               </Button>
             </div>
           </CardContent>

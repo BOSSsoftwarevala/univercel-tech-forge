@@ -1,31 +1,41 @@
 /**
  * REFUND & ADJUSTMENT SECTION
- * Refund Requests, Approved, Rejected, Wallet Adjustment
+ * PERMANENT POLICY: No Return / No Exchange / No Refund for digital products
+ * Only wallet adjustments allowed (with Boss approval)
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
-  RotateCcw,
+  ShieldAlert,
   Clock,
   CheckCircle,
   XCircle,
   ArrowUpDown,
   Search,
   Eye,
-  ThumbsUp,
-  ThumbsDown
+  Ban,
+  AlertTriangle,
+  Lock,
+  FileText
 } from 'lucide-react';
 import { FinanceView } from '../FinanceSidebar';
+import { useFinanceSecurityGuard } from '@/hooks/useFinanceSecurityGuard';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface RefundAdjustmentProps {
   activeView: FinanceView;
 }
 
 const RefundAdjustment: React.FC<RefundAdjustmentProps> = ({ activeView }) => {
+  const { isRefundAllowed, logFinancialAction, requestBossApproval } = useFinanceSecurityGuard();
+  const [showPolicyDialog, setShowPolicyDialog] = useState(false);
+  const [showAdjustmentDialog, setShowAdjustmentDialog] = useState(false);
+
   const getTitle = () => {
     switch (activeView) {
       case 'refund_requests': return 'Refund Requests';
@@ -36,25 +46,42 @@ const RefundAdjustment: React.FC<RefundAdjustmentProps> = ({ activeView }) => {
     }
   };
 
-  const refunds = [
-    { id: 'REF001', user: 'Delhi User', amount: '₹15,000', reason: 'Service not delivered', date: '15 Jan 2024', status: 'Pending' },
-    { id: 'REF002', user: 'Mumbai Franchise', amount: '₹50,000', reason: 'Duplicate charge', date: '14 Jan 2024', status: 'Approved' },
-    { id: 'REF003', user: 'Bangalore Reseller', amount: '₹25,000', reason: 'Plan downgrade', date: '13 Jan 2024', status: 'Rejected' },
-    { id: 'REF004', user: 'Chennai User', amount: '₹8,500', reason: 'Technical issue', date: '12 Jan 2024', status: 'Approved' },
-    { id: 'REF005', user: 'Pune User', amount: '₹12,000', reason: 'Wrong subscription', date: '11 Jan 2024', status: 'Pending' },
-  ];
+  const handleRefundAttempt = () => {
+    const result = isRefundAllowed();
+    if (!result.allowed) {
+      toast.error('Refund Not Allowed', { description: result.reason, duration: 6000 });
+      logFinancialAction('refund_attempt_blocked', 'refund_management', {
+        policy: 'no_return_no_exchange',
+        reason: result.reason
+      });
+    }
+  };
 
-  const adjustments = [
-    { id: 'ADJ001', wallet: 'Delhi Franchise Wallet', type: 'Credit', amount: '₹10,000', reason: 'Promotional credit', date: '15 Jan 2024', by: 'Admin' },
-    { id: 'ADJ002', wallet: 'Mumbai Reseller Wallet', type: 'Debit', amount: '₹5,000', reason: 'Penalty deduction', date: '14 Jan 2024', by: 'System' },
-    { id: 'ADJ003', wallet: 'User Wallet', type: 'Credit', amount: '₹2,500', reason: 'Compensation', date: '13 Jan 2024', by: 'Support' },
+  const handleWalletAdjustment = async () => {
+    const approvalId = await requestBossApproval('wallet_adjustment', 0, {
+      type: 'wallet_credit_debit',
+      requires_boss_approval: true
+    });
+    if (approvalId) {
+      toast.info('Adjustment request sent for Boss approval', { description: 'No financial action proceeds without authorization.' });
+      await logFinancialAction('wallet_adjustment_requested', 'refund_management', { approval_id: approvalId });
+    }
+    setShowAdjustmentDialog(false);
+  };
+
+  const policies = [
+    { icon: Ban, title: 'No Return Policy', desc: 'Digital products cannot be returned once delivered.', color: 'text-red-500' },
+    { icon: Ban, title: 'No Exchange Policy', desc: 'Software products are non-exchangeable.', color: 'text-red-500' },
+    { icon: Ban, title: 'No Refund Policy', desc: 'All purchases are final sale. No refund after payment confirmation.', color: 'text-red-500' },
+    { icon: Lock, title: 'Boss Approval Required', desc: 'Any exceptional financial adjustment requires Boss/Admin approval.', color: 'text-amber-500' },
+    { icon: ShieldAlert, title: 'Fraud Prevention Active', desc: 'Suspicious refund attempts are logged and flagged.', color: 'text-blue-500' },
   ];
 
   const stats = [
-    { label: 'Pending Requests', value: '23', icon: Clock, color: 'amber' },
-    { label: 'Approved', value: '156', icon: CheckCircle, color: 'emerald' },
-    { label: 'Rejected', value: '12', icon: XCircle, color: 'red' },
-    { label: 'Total Refunded', value: '₹8.5L', icon: RotateCcw, color: 'blue' },
+    { label: 'Policy', value: 'NO REFUND', icon: Ban, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-950/30' },
+    { label: 'Attempts Blocked', value: 'All', icon: ShieldAlert, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950/30' },
+    { label: 'Adjustments', value: 'Approval Only', icon: Lock, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+    { label: 'Security Status', value: 'ENFORCED', icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
   ];
 
   return (
@@ -63,15 +90,44 @@ const RefundAdjustment: React.FC<RefundAdjustmentProps> = ({ activeView }) => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{getTitle()}</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Manage refunds and wallet adjustments</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Permanent security policy enforced on all digital products</p>
         </div>
-        {activeView === 'refund_wallet_adjust' && (
-          <Button size="sm" className="gap-2">
-            <ArrowUpDown className="w-4 h-4" />
-            New Adjustment
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowPolicyDialog(true)}>
+            <FileText className="w-4 h-4" />
+            View Policy
           </Button>
-        )}
+          {activeView === 'refund_wallet_adjust' && (
+            <Button size="sm" className="gap-2" onClick={() => setShowAdjustmentDialog(true)}>
+              <ArrowUpDown className="w-4 h-4" />
+              Request Adjustment
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* PERMANENT POLICY BANNER */}
+      <Card className="border-2 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0">
+              <ShieldAlert className="w-7 h-7 text-red-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-red-800 dark:text-red-300">⚠️ PERMANENT SECURITY POLICY</h2>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-1">
+                All marketplace digital products are <strong>FINAL SALE</strong>. No return, no exchange, no refund after purchase. 
+                Digital software cannot be returned once delivered. This policy is permanently enforced and cannot be overridden.
+              </p>
+              <div className="flex gap-3 mt-3">
+                <Badge variant="destructive" className="text-xs font-semibold">NO RETURN</Badge>
+                <Badge variant="destructive" className="text-xs font-semibold">NO EXCHANGE</Badge>
+                <Badge variant="destructive" className="text-xs font-semibold">NO REFUND</Badge>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -81,12 +137,12 @@ const RefundAdjustment: React.FC<RefundAdjustmentProps> = ({ activeView }) => {
             <Card key={index} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900/30 flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 text-${stat.color}-600`} />
+                  <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${stat.color}`} />
                   </div>
                   <div>
                     <p className="text-xs text-slate-500">{stat.label}</p>
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white">{stat.value}</p>
                   </div>
                 </div>
               </CardContent>
@@ -95,122 +151,149 @@ const RefundAdjustment: React.FC<RefundAdjustmentProps> = ({ activeView }) => {
         })}
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <Input placeholder="Search by ID, user, or amount..." className="pl-10" />
+      {/* Policy Details Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {policies.map((policy, idx) => {
+          const Icon = policy.icon;
+          return (
+            <Card key={idx} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <Icon className={`w-5 h-5 mt-0.5 ${policy.color}`} />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{policy.title}</p>
+                    <p className="text-xs text-slate-500 mt-1">{policy.desc}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {/* Wallet Adjustments Table (for refund_wallet_adjust view) */}
-      {activeView === 'refund_wallet_adjust' && (
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Wallet Adjustments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700">
-                    <th className="pb-3 font-medium">ID</th>
-                    <th className="pb-3 font-medium">Wallet</th>
-                    <th className="pb-3 font-medium">Type</th>
-                    <th className="pb-3 font-medium">Amount</th>
-                    <th className="pb-3 font-medium">Reason</th>
-                    <th className="pb-3 font-medium">Date</th>
-                    <th className="pb-3 font-medium">By</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {adjustments.map((adj) => (
-                    <tr key={adj.id} className="text-sm">
-                      <td className="py-3 font-mono text-slate-600 dark:text-slate-300">{adj.id}</td>
-                      <td className="py-3 font-medium text-slate-900 dark:text-white">{adj.wallet}</td>
-                      <td className="py-3">
-                        <Badge variant={adj.type === 'Credit' ? 'default' : 'destructive'} className="text-xs">
-                          {adj.type}
-                        </Badge>
-                      </td>
-                      <td className={`py-3 font-semibold ${adj.type === 'Credit' ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {adj.type === 'Credit' ? '+' : '-'}{adj.amount}
-                      </td>
-                      <td className="py-3 text-slate-500">{adj.reason}</td>
-                      <td className="py-3 text-slate-500">{adj.date}</td>
-                      <td className="py-3 text-slate-500">{adj.by}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Refunds Table */}
+      {/* Refund Attempt Section (shows blocked message) */}
       {activeView !== 'refund_wallet_adjust' && (
         <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Refund Requests</CardTitle>
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <Lock className="w-5 h-5 text-red-500" />
+              Refund Processing — DISABLED
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700">
-                    <th className="pb-3 font-medium">ID</th>
-                    <th className="pb-3 font-medium">User</th>
-                    <th className="pb-3 font-medium">Amount</th>
-                    <th className="pb-3 font-medium">Reason</th>
-                    <th className="pb-3 font-medium">Date</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {refunds.map((refund) => (
-                    <tr key={refund.id} className="text-sm">
-                      <td className="py-3 font-mono text-slate-600 dark:text-slate-300">{refund.id}</td>
-                      <td className="py-3 font-medium text-slate-900 dark:text-white">{refund.user}</td>
-                      <td className="py-3 font-semibold text-slate-900 dark:text-white">{refund.amount}</td>
-                      <td className="py-3 text-slate-500 max-w-[200px] truncate">{refund.reason}</td>
-                      <td className="py-3 text-slate-500">{refund.date}</td>
-                      <td className="py-3">
-                        <Badge 
-                          variant={
-                            refund.status === 'Approved' ? 'default' : 
-                            refund.status === 'Rejected' ? 'destructive' : 
-                            'secondary'
-                          }
-                          className="text-xs"
-                        >
-                          {refund.status}
-                        </Badge>
-                      </td>
-                      <td className="py-3">
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          {refund.status === 'Pending' && (
-                            <>
-                              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-emerald-600">
-                                <ThumbsUp className="w-4 h-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-600">
-                                <ThumbsDown className="w-4 h-4" />
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="text-center py-12">
+              <Ban className="w-16 h-16 mx-auto text-red-300 dark:text-red-700 mb-4" />
+              <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">Refund System Permanently Disabled</h3>
+              <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">
+                Per company policy, all digital software products are final sale. 
+                The refund processing system has been permanently disabled to prevent unauthorized refund attempts.
+              </p>
+              <Button variant="outline" size="sm" onClick={handleRefundAttempt} className="text-red-600 border-red-200">
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Why can't I process refunds?
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+      {/* Wallet Adjustments (only with approval) */}
+      {activeView === 'refund_wallet_adjust' && (
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <ArrowUpDown className="w-5 h-5 text-blue-500" />
+              Wallet Adjustments (Boss Approval Required)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <Lock className="w-12 h-12 mx-auto text-amber-400 mb-4" />
+              <p className="text-sm text-slate-500 max-w-md mx-auto mb-4">
+                Wallet adjustments (credits/debits) require Boss/Admin approval. 
+                No financial adjustment can be executed without proper authorization.
+              </p>
+              <Button size="sm" onClick={() => setShowAdjustmentDialog(true)} className="gap-2">
+                <ArrowUpDown className="w-4 h-4" />
+                Request New Adjustment
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Policy Dialog */}
+      <Dialog open={showPolicyDialog} onOpenChange={setShowPolicyDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-red-500" />
+              Finance Security Policy
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+              <p className="text-sm font-semibold text-red-800 dark:text-red-300">Policy Type: PERMANENT</p>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">This policy cannot be modified or overridden by any user.</p>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <Ban className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-700 dark:text-slate-300"><strong>No Return:</strong> Digital products cannot be returned after delivery.</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <Ban className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-700 dark:text-slate-300"><strong>No Exchange:</strong> Software products are non-exchangeable.</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <Ban className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-700 dark:text-slate-300"><strong>No Refund:</strong> All purchases are final. No refund after payment confirmation.</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <Lock className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-700 dark:text-slate-300"><strong>OTP Required:</strong> All critical financial actions require OTP verification.</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <ShieldAlert className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-700 dark:text-slate-300"><strong>Fraud Prevention:</strong> Suspicious activity automatically blocked and reported.</p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPolicyDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Adjustment Request Dialog */}
+      <Dialog open={showAdjustmentDialog} onOpenChange={setShowAdjustmentDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5 text-amber-500" />
+              Request Wallet Adjustment
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                ⚠️ This request will be sent to Boss/Admin for approval. No adjustment is executed without authorization.
+              </p>
+            </div>
+            <p className="text-sm text-slate-500">
+              Wallet adjustments are the only permitted financial modification. 
+              All adjustments are logged immutably and require Boss approval before execution.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdjustmentDialog(false)}>Cancel</Button>
+            <Button onClick={handleWalletAdjustment} className="gap-2">
+              <CheckCircle className="w-4 h-4" />
+              Submit for Approval
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

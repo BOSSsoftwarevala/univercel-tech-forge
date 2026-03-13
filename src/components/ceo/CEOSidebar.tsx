@@ -14,7 +14,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  Eye
+  Eye,
+  Package,
+  MapPin,
+  AlertCircle,
+  Bot,
+  Brain,
+  MessageSquare
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -27,15 +33,18 @@ interface CEOSidebarProps {
 }
 
 const menuItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "global-overview", label: "Global Overview", icon: Globe2 },
-  { id: "revenue", label: "Revenue Trends (Read-Only)", icon: TrendingUp },
-  { id: "active-users", label: "Active Users", icon: Users },
-  { id: "retention", label: "Retention & Growth", icon: Activity },
-  { id: "ai-insights", label: "AI Insights", icon: Sparkles },
+  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+  { id: "revenue", label: "Analytics", icon: TrendingUp },
+  { id: "products", label: "Product Performance", icon: Package },
+  { id: "regions", label: "Regional Performance", icon: MapPin },
+  { id: "system", label: "System Health", icon: Activity },
+  { id: "alerts", label: "Alerts", icon: AlertCircle },
+  { id: "reports", label: "Reports", icon: FileText },
+  { id: "chat", label: "AIRA Chat", icon: Bot },
+  { id: "ai-insights", label: "AI Insights", icon: Brain },
   { id: "approvals", label: "Strategic Approvals", icon: CheckSquare },
   { id: "risks", label: "Risk & Compliance", icon: ShieldAlert },
-  { id: "notes", label: "CEO Notes", icon: FileText },
+  { id: "notes", label: "CEO Notes", icon: MessageSquare },
 ];
 
 const CEOSidebar = ({ 
@@ -128,7 +137,7 @@ const CEOSidebar = ({
           <div className="flex items-center gap-3 p-3 rounded-lg bg-violet-500/5 border border-violet-500/20">
             <Eye className="w-8 h-8 text-violet-400" />
             <div>
-              <p className="text-xs text-violet-400 font-medium">CEO Vision Mode</p>
+              <p className="text-xs text-violet-400 font-medium">AIRA Vision Mode</p>
               <p className="text-[10px] text-violet-500/60">Read • Suggest • Approve</p>
             </div>
           </div>

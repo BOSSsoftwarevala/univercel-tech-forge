@@ -2,71 +2,15 @@ import { useState } from "react";
 import softwareValaLogo from '@/assets/software-vala-logo-transparent.png';
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  LayoutGrid, 
-  Activity, 
-  BarChart3, 
-  Package,
-  PlusCircle,
-  Monitor,
-  Globe,
-  Users,
-  Link2,
-  LogOut,
-  KeyRound,
-  Settings,
-  ArrowLeft,
-  Lock,
-  ChevronDown,
-  ChevronRight,
-  Heart,
-  AlertTriangle,
-  ArrowUpCircle,
-  FolderOpen,
-  Grid3X3,
-  Building2,
-  GraduationCap,
-  Stethoscope,
-  Briefcase,
-  Landmark,
-  Home,
-  Truck,
-  ShoppingCart,
-  Code2,
-  ExternalLink,
-  Key,
-  ToggleLeft,
-  CheckSquare,
-  FileEdit,
-  ImageIcon,
-  Database,
-  FileText,
-  Menu,
-  Bug,
-  ListChecks,
-  Gauge,
-  Clock,
-  History,
-  Bot,
-  Wrench,
-  Sparkles,
-  Zap,
-  ScanLine,
-  CircleDot,
-  CheckCircle,
-  Loader2,
-  Store,
-  Eye,
-  EyeOff,
-  RefreshCw,
-  DollarSign,
-  FileStack,
-  Brain,
-  UserCog,
-  Shield,
-  BookLock,
-  Copy,
-  Search
+import {
+  Store, Package, PlusCircle, FileEdit, Trash2,
+  FolderOpen, Tags, Layers, GitBranch, FolderArchive,
+  MonitorPlay, DollarSign, ToggleLeft, Star, TrendingUp,
+  LayoutList, Image, MessageSquare, Heart,
+  ShoppingBag, ListOrdered, CreditCard, RotateCcw,
+  Users, KeySquare, Rocket, BarChart3, Eye,
+  Search, Sparkles, Bell, FileText, Settings,
+  LogOut, ArrowLeft, Globe, ChevronDown, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,179 +37,122 @@ interface MenuItem {
   subItems?: SubMenuItem[];
 }
 
-// Full 12-section sidebar structure as per specification
 const menuSections: MenuItem[] = [
-  // 1️⃣ Demo Overview
   {
-    id: "demo-overview",
-    label: "Demo Overview",
-    icon: LayoutGrid,
-    badge: "LIVE",
+    id: "products",
+    label: "Product Management",
+    icon: Package,
+    badge: "CORE",
     subItems: [
-      { id: "live-demo-count", label: "Live Demo Count", icon: Monitor },
-      { id: "demo-health-status", label: "Demo Health Status", icon: Heart },
-      { id: "pending-demo-fix", label: "Pending Demo Fix", icon: AlertTriangle },
-      { id: "demo-upgrade-requests", label: "Demo Upgrade Requests", icon: ArrowUpCircle },
+      { id: "mp-product-listing", label: "Product List", icon: Package },
+      { id: "mp-create-product", label: "Create Product", icon: PlusCircle },
+      { id: "mp-edit-product", label: "Edit Product", icon: FileEdit },
+      { id: "mp-delete-product", label: "Delete Product", icon: Trash2 },
     ],
   },
-  // 2️⃣ Demo Library
   {
-    id: "demo-library",
-    label: "Demo Library",
+    id: "catalog",
+    label: "Catalog & Structure",
     icon: FolderOpen,
-    badge: "5K+",
     subItems: [
-      { id: "all-demos", label: "All Demos", icon: Grid3X3 },
-      { id: "category-wise-demo", label: "Category-wise Demo", icon: FolderOpen },
-      { id: "industry-wise-demo", label: "Industry-wise Demo", icon: Building2 },
-      { id: "role-wise-demo", label: "Role-wise Demo", icon: Users },
+      { id: "mp-categories", label: "Product Categories", icon: FolderOpen },
+      { id: "mp-tags", label: "Product Tags", icon: Tags },
+      { id: "mp-modules", label: "Product Modules", icon: Layers },
+      { id: "mp-versions", label: "Product Versions", icon: GitBranch },
+      { id: "mp-product-assets", label: "Product Assets", icon: FolderArchive },
+      { id: "mp-product-demos", label: "Product Demos", icon: MonitorPlay },
     ],
   },
-  // 3️⃣ Demo Categories
   {
-    id: "demo-categories",
-    label: "Demo Categories",
-    icon: Grid3X3,
-    subItems: [
-      { id: "cat-education", label: "Education", icon: GraduationCap },
-      { id: "cat-healthcare", label: "Healthcare", icon: Stethoscope },
-      { id: "cat-business", label: "Business", icon: Briefcase },
-      { id: "cat-government", label: "Government", icon: Landmark },
-      { id: "cat-society-property", label: "Society / Property", icon: Home },
-      { id: "cat-transport-logistics", label: "Transport / Logistics", icon: Truck },
-      { id: "cat-ecommerce", label: "E-Commerce", icon: ShoppingCart },
-      { id: "cat-custom-software", label: "Custom Software", icon: Code2 },
-    ],
-  },
-  // 4️⃣ Demo Details (Per Demo)
-  {
-    id: "demo-details",
-    label: "Demo Details",
-    icon: FileText,
-    subItems: [
-      { id: "demo-url", label: "Demo URL", icon: ExternalLink },
-      { id: "login-credentials", label: "Login ID / Password", icon: Key },
-      { id: "role-login-switch", label: "Role Login Switch", icon: ToggleLeft },
-      { id: "feature-coverage", label: "Feature Coverage", icon: CheckSquare },
-      { id: "active-inactive-status", label: "Active / Inactive Status", icon: Activity },
-    ],
-  },
-  // 5️⃣ Demo Content Manager
-  {
-    id: "demo-content-manager",
-    label: "Demo Content Manager",
-    icon: FileEdit,
-    subItems: [
-      { id: "update-text-content", label: "Update Text Content", icon: FileText },
-      { id: "update-images", label: "Update Images", icon: ImageIcon },
-      { id: "update-dummy-data", label: "Update Dummy Data", icon: Database },
-      { id: "update-pages", label: "Update Pages", icon: FileStack },
-      { id: "update-menu-order", label: "Update Menu Order", icon: Menu },
-    ],
-  },
-  // 6️⃣ Demo Issue Manager
-  {
-    id: "demo-issue-manager",
-    label: "Demo Issue Manager",
-    icon: Bug,
-    badge: "3",
-    subItems: [
-      { id: "report-bug", label: "Report Bug", icon: Bug },
-      { id: "view-bug-list", label: "View Bug List", icon: ListChecks },
-      { id: "bug-severity", label: "Bug Severity", icon: Gauge },
-      { id: "bug-status", label: "Bug Status", icon: Clock },
-      { id: "fix-history", label: "Fix History", icon: History },
-    ],
-  },
-  // 7️⃣ Vala AI (Demo Assistant)
-  {
-    id: "vala-ai",
-    label: "Vala AI",
-    icon: Bot,
-    badge: "AI",
-    subItems: [
-      { id: "ai-fix-demo-issue", label: "Fix Demo Issue", icon: Wrench },
-      { id: "ai-upgrade-demo-feature", label: "Upgrade Demo Feature", icon: Sparkles },
-      { id: "ai-optimize-demo-flow", label: "Optimize Demo Flow", icon: Zap },
-      { id: "ai-repair-broken-button", label: "Repair Broken Button", icon: PlusCircle },
-      { id: "ai-health-scan-demo", label: "Health Scan Demo", icon: ScanLine },
-    ],
-  },
-  // 8️⃣ Demo Upgrade Queue
-  {
-    id: "demo-upgrade-queue",
-    label: "Demo Upgrade Queue",
-    icon: ArrowUpCircle,
-    subItems: [
-      { id: "pending-upgrade", label: "Pending Upgrade", icon: CircleDot },
-      { id: "approved-upgrade", label: "Approved Upgrade", icon: CheckCircle },
-      { id: "in-progress-upgrade", label: "In-Progress Upgrade", icon: Loader2 },
-      { id: "completed-upgrade", label: "Completed Upgrade", icon: CheckSquare },
-    ],
-  },
-  // 9️⃣ Demo Validation
-  {
-    id: "demo-validation",
-    label: "Demo Validation",
-    icon: CheckSquare,
-    subItems: [
-      { id: "button-click-test", label: "Button Click Test", icon: PlusCircle },
-      { id: "flow-test", label: "Flow Test", icon: Activity },
-      { id: "role-access-test", label: "Role Access Test", icon: Users },
-      { id: "ui-integrity-check", label: "UI Integrity Check", icon: Monitor },
-    ],
-  },
-  // 🔟 Marketplace Sync
-  {
-    id: "marketplace-sync",
-    label: "Marketplace Sync",
+    id: "storefront",
+    label: "Storefront & Display",
     icon: Store,
-    subItems: [
-      { id: "demo-visible-marketplace", label: "Visible on Marketplace", icon: Eye },
-      { id: "hide-show-demo", label: "Hide / Show Demo", icon: EyeOff },
-      { id: "sync-demo-data", label: "Sync Demo Data", icon: RefreshCw },
-      { id: "pricing-preview", label: "Pricing Preview", icon: DollarSign },
-    ],
-  },
-  // 1️⃣1️⃣ Activity Logs
-  {
-    id: "activity-logs",
-    label: "Activity Logs",
-    icon: FileStack,
-    subItems: [
-      { id: "demo-changes-log", label: "Demo Changes Log", icon: History },
-      { id: "ai-actions-log", label: "AI Actions Log", icon: Brain },
-      { id: "manager-actions-log", label: "Manager Actions Log", icon: UserCog },
-    ],
-  },
-  // 1️⃣2️⃣ Security & Lock
-  {
-    id: "security-lock",
-    label: "Security & Lock",
-    icon: Shield,
-    subItems: [
-      { id: "demo-lock", label: "Demo Lock", icon: Lock },
-      { id: "read-only-mode", label: "Read-Only Mode", icon: BookLock },
-      { id: "copy-disable", label: "Copy Disable", icon: Copy },
-      { id: "inspect-disable", label: "Inspect Disable", icon: Search },
-    ],
-  },
-  // 1️⃣3️⃣ VALA AI Dev Studio
-  {
-    id: "dev-studio",
-    label: "Dev Studio",
-    icon: Code2,
     badge: "LIVE",
+    subItems: [
+      { id: "mp-pricing", label: "Product Pricing", icon: DollarSign },
+      { id: "mp-visibility", label: "Product Visibility", icon: ToggleLeft },
+      { id: "mp-featured", label: "Featured Products", icon: Star },
+      { id: "mp-trending", label: "Trending Products", icon: TrendingUp },
+      { id: "mp-homepage", label: "Homepage Rows", icon: LayoutList },
+      { id: "mp-banners", label: "Banner Management", icon: Image },
+    ],
+  },
+  {
+    id: "engagement",
+    label: "Reviews & Engagement",
+    icon: MessageSquare,
+    subItems: [
+      { id: "mp-reviews", label: "Product Reviews", icon: MessageSquare },
+      { id: "mp-ratings", label: "Product Ratings", icon: Star },
+      { id: "mp-favorites", label: "Product Favorites", icon: Heart },
+    ],
+  },
+  {
+    id: "commerce",
+    label: "Orders & Payments",
+    icon: ShoppingBag,
+    subItems: [
+      { id: "mp-orders", label: "Orders Management", icon: ShoppingBag },
+      { id: "mp-order-items", label: "Order Items", icon: ListOrdered },
+      { id: "mp-payments", label: "Payments", icon: CreditCard },
+      { id: "mp-refunds", label: "Refunds", icon: RotateCcw },
+    ],
+  },
+  {
+    id: "users",
+    label: "User & Licenses",
+    icon: Users,
+    subItems: [
+      { id: "mp-user-products", label: "User Products", icon: Users },
+      { id: "mp-licenses", label: "User Licenses", icon: KeySquare },
+    ],
+  },
+  {
+    id: "ops",
+    label: "Operations & Logs",
+    icon: Rocket,
+    subItems: [
+      { id: "mp-deployment-logs", label: "Deployment Logs", icon: Rocket },
+    ],
+  },
+  {
+    id: "analytics-section",
+    label: "Analytics",
+    icon: BarChart3,
+    subItems: [
+      { id: "mp-product-analytics", label: "Product Views", icon: BarChart3 },
+      { id: "mp-demo-views", label: "Demo Views", icon: Eye },
+      { id: "mp-analytics", label: "Sales Analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    id: "discovery",
+    label: "Search & Discovery",
+    icon: Search,
+    subItems: [
+      { id: "mp-search", label: "Search Management", icon: Search },
+      { id: "mp-recommendations", label: "Recommendations", icon: Sparkles },
+    ],
+  },
+  {
+    id: "system",
+    label: "System",
+    icon: Settings,
+    subItems: [
+      { id: "mp-notifications", label: "Notifications", icon: Bell },
+      { id: "mp-audit-logs", label: "Audit Logs", icon: FileText },
+      { id: "mp-settings", label: "Settings", icon: Settings },
+    ],
   },
 ];
 
 const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [expandedSections, setExpandedSections] = useState<string[]>(["demo-overview"]);
+  const [expandedSections, setExpandedSections] = useState<string[]>(["products"]);
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Demo Manager';
-  const maskedId = `DM-${user?.id?.slice(0, 4).toUpperCase() || 'XXXX'}`;
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Marketplace Manager';
+  const maskedId = `MM-${user?.id?.slice(0, 4).toUpperCase() || 'XXXX'}`;
 
   const handleLogout = async () => {
     await signOut();
@@ -299,41 +186,31 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
       animate={{ x: 0, opacity: 1 }}
       className="h-screen w-64 bg-card border-r border-border/30 flex flex-col sticky top-0"
     >
+      {/* Logo */}
       <div className="p-4 border-b border-border/30 flex justify-center">
-        <img 
-          src={softwareValaLogo} 
-          alt="Software Vala Logo" 
+        <img
+          src={softwareValaLogo}
+          alt="Software Vala Logo"
           className="w-14 h-14 rounded-full object-contain border-2 border-cyan-500/30"
         />
       </div>
 
-      {/* Quick Stats */}
+      {/* Title */}
       <div className="p-4 border-b border-border/30">
-        <div className="glass-panel-glow p-3 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Globe className="w-4 h-4 text-neon-teal" />
-            <span className="text-xs font-mono text-neon-teal">GLOBAL STATUS</span>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+            <Store className="w-5 h-5 text-primary-foreground" />
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <div className="text-lg font-mono font-bold text-neon-green">5K+</div>
-              <div className="text-[9px] text-muted-foreground">TOTAL</div>
-            </div>
-            <div>
-              <div className="text-lg font-mono font-bold text-neon-teal">47</div>
-              <div className="text-[9px] text-muted-foreground">ACTIVE</div>
-            </div>
-            <div>
-              <div className="text-lg font-mono font-bold text-neon-orange">3</div>
-              <div className="text-[9px] text-muted-foreground">FIX</div>
-            </div>
+          <div>
+            <h2 className="text-sm font-bold text-foreground">Marketplace Manager</h2>
+            <p className="text-[10px] text-muted-foreground">34 Features • Full Control</p>
           </div>
         </div>
       </div>
 
-      {/* Menu Items - Scrollable */}
+      {/* Menu Items */}
       <ScrollArea className="flex-1">
-        <div className="py-2 px-2 space-y-1">
+        <div className="py-2 px-2 space-y-0.5">
           {menuSections.map((section, index) => {
             const Icon = section.icon;
             const isExpanded = expandedSections.includes(section.id);
@@ -350,31 +227,31 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
                   className={cn(
                     "w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-left",
                     isActive
-                      ? "bg-neon-teal/10 text-neon-teal border-l-2 border-neon-teal"
+                      ? "bg-primary/10 text-primary border-l-2 border-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   )}
-                  style={isActive ? { boxShadow: "inset 0 0 20px hsl(174 100% 45% / 0.1)" } : {}}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
                   <span className="text-xs font-medium truncate flex-1">{section.label}</span>
                   {section.badge && (
                     <span className={cn(
                       "text-[9px] px-1.5 py-0.5 rounded-full font-mono",
-                      section.badge === "LIVE" || section.badge === "AI"
-                        ? "bg-neon-green/20 text-neon-green animate-pulse"
-                        : "bg-neon-teal/20 text-neon-teal"
+                      section.badge === "LIVE"
+                        ? "bg-emerald-500/20 text-emerald-400 animate-pulse"
+                        : section.badge === "CORE"
+                        ? "bg-primary/20 text-primary"
+                        : "bg-muted text-muted-foreground"
                     )}>
                       {section.badge}
                     </span>
                   )}
                   {hasSubItems && (
-                    isExpanded 
+                    isExpanded
                       ? <ChevronDown className="w-3 h-3 flex-shrink-0" />
                       : <ChevronRight className="w-3 h-3 flex-shrink-0" />
                   )}
                 </motion.button>
 
-                {/* Sub Items */}
                 <AnimatePresence>
                   {hasSubItems && isExpanded && (
                     <motion.div
@@ -396,7 +273,7 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
                               className={cn(
                                 "w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 text-left",
                                 isSubActive
-                                  ? "bg-neon-teal/15 text-neon-teal"
+                                  ? "bg-primary/15 text-primary"
                                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/30"
                               )}
                             >
@@ -417,9 +294,8 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
 
       {/* User Info & Actions */}
       <div className="p-3 border-t border-border/30 space-y-2">
-        {/* User Info */}
         <div className="flex items-center gap-3 px-3 py-2 bg-secondary/30 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neon-teal to-neon-green flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
             <span className="text-xs font-bold text-primary-foreground">
               {userName.charAt(0).toUpperCase()}
             </span>
@@ -427,15 +303,14 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium truncate">{userName}</p>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[8px] px-1 py-0 bg-neon-teal/10 text-neon-teal border-neon-teal/30">
-                DEMO MANAGER
+              <Badge variant="outline" className="text-[8px] px-1 py-0 bg-primary/10 text-primary border-primary/30">
+                MARKETPLACE MGR
               </Badge>
               <span className="text-[8px] text-muted-foreground font-mono">{maskedId}</span>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-1.5">
           <Button
             variant="outline"
@@ -458,7 +333,7 @@ const DemoManagerSidebar = ({ activeView, onViewChange }: DemoManagerSidebarProp
             variant="ghost"
             size="sm"
             onClick={handleLogout}
-            className="text-[10px] gap-1 h-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2"
+            className="text-[10px] gap-1 h-7 text-destructive hover:text-destructive hover:bg-destructive/10 px-2"
           >
             <LogOut className="w-3 h-3" />
           </Button>

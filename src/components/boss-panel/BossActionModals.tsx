@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Bell, Headphones, ListChecks, MessageSquare, Globe, Banknote,
@@ -63,24 +63,90 @@ const Modal = ({ open, onClose, title, icon, children }: ModalProps) => (
 interface NotificationsModalProps {
   open: boolean;
   onClose: () => void;
+  userId?: string;
+  onUnreadCountChange?: (count: number) => void;
 }
 
-export const NotificationsModal = ({ open, onClose }: NotificationsModalProps) => {
-  const notifications = [
-    { id: 1, type: 'critical', title: 'Emergency Lock Request', message: 'Finance module lock requested by SA-002', time: '2 min ago', read: false },
-    { id: 2, type: 'warning', title: 'Super Admin Escalation', message: 'Pending approval for role elevation', time: '15 min ago', read: false },
-    { id: 3, type: 'critical', title: 'Security Alert', message: 'Multiple failed login attempts detected', time: '1 hour ago', read: false },
-    { id: 4, type: 'info', title: 'System Update', message: 'Database backup completed successfully', time: '2 hours ago', read: true },
-    { id: 5, type: 'info', title: 'New Super Admin', message: 'SA-005 has been created and activated', time: '1 day ago', read: true },
-  ];
+interface UserNotification {
+  id: string;
+  title: string | null;
+  message: string;
+  type: string;
+  is_read: boolean | null;
+  created_at: string;
+  action_id: string | null;
+}
+
+export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange }: NotificationsModalProps) => {
+  const [notifications, setNotifications] = useState<UserNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const updateUnreadCount = (count: number) => {
+    setUnreadCount(count);
+    onUnreadCountChange?.(count);
+  };
+
+  useEffect(() => {
+    if (!open || !userId) return;
+
+    const fetchNotifications = async () => {
+      const { data } = await supabase
+        .from('user_notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (data) {
+
+        updateUnreadCount(data.filter((n) => !n.is_read).length);
+      }
+    };
+
+    fetchNotifications();
+
+    const channel = supabase
+      .channel(`notifications:${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'user_notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          setNotifications((prev) => [payload.new as UserNotification, ...prev]);
+
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [open, userId]);
 
   const handleMarkAllRead = async () => {
+    if (userId) {
+      await supabase
+        .from('user_notifications')
+        .update({ is_read: true })
+        .eq('user_id', userId)
+        .eq('is_read', false);
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      updateUnreadCount(0);
+    }
     await supabase.from('audit_logs').insert({
       action: 'mark_all_notifications_read',
       module: 'boss-panel',
-      meta_json: { count: notifications.filter(n => !n.read).length }
+      meta_json: { count: unreadCount }
     });
     toast.success('All notifications marked as read');
+  };
+
+
+    return 'info';
   };
 
   return (
@@ -93,44 +159,19 @@ export const NotificationsModal = ({ open, onClose }: NotificationsModalProps) =
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Badge className="bg-red-500/20 text-red-400">
-            {notifications.filter(n => !n.read).length} unread
+            {unreadCount} unread
           </Badge>
           <Button variant="ghost" size="sm" onClick={handleMarkAllRead}>
             Mark all read
           </Button>
         </div>
         <div className="space-y-2">
-          {notifications.map((notif) => (
-            <div 
-              key={notif.id}
-              className={cn(
-                "p-3 rounded-lg border transition-all cursor-pointer hover:border-blue-500/50",
-                notif.read 
-                  ? "bg-slate-800/50 border-slate-700" 
-                  : "bg-slate-800 border-slate-600"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className={cn(
-                  "w-2 h-2 rounded-full mt-2 flex-shrink-0",
-                  notif.type === 'critical' ? "bg-red-500" :
-                  notif.type === 'warning' ? "bg-amber-500" : "bg-blue-500"
-                )} />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className={cn(
-                      "text-sm font-medium",
-                      notif.read ? "text-slate-300" : "text-white"
-                    )}>
-                      {notif.title}
-                    </p>
-                    <span className="text-xs text-slate-500">{notif.time}</span>
+
                   </div>
-                  <p className="text-sm text-slate-400 mt-1">{notif.message}</p>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </Modal>

@@ -153,6 +153,38 @@ export const ACTION_MAP: Record<string, ActionDefinition> = {
   // ================= COMING SOON PLACEHOLDERS =================
   'btn_coming_soon': { type: 'COMING_SOON' },
   'btn_locked': { type: 'LOCKED' },
+
+  // ================= DEMO MANAGEMENT =================
+  'btn_demo_pause': { type: 'API', apiEndpoint: '/api-demos/pause', apiMethod: 'POST', successMessage: 'Demo paused', requiresConfirmation: false },
+  'btn_demo_resume': { type: 'API', apiEndpoint: '/api-demos/resume', apiMethod: 'POST', successMessage: 'Demo resumed' },
+  'btn_demo_delete': { type: 'API', apiEndpoint: '/api-demos/delete', apiMethod: 'DELETE', successMessage: 'Demo deleted', requiresConfirmation: true, confirmationMessage: 'Delete this demo? This cannot be undone.' },
+
+  // ================= PRODUCT ASSIGNMENT =================
+  'btn_product_assign': { type: 'API', apiEndpoint: '/api-products/assign', apiMethod: 'PATCH', successMessage: 'Product assigned successfully' },
+
+  // ================= MARKETPLACE SYNC =================
+  'btn_marketplace_sync': { type: 'API', apiEndpoint: '/api-marketplace/sync', apiMethod: 'POST', successMessage: 'Marketplace sync started' },
+
+  // ================= FINANCE COMMISSION =================
+  'btn_finance_approve_commission': { type: 'API', apiEndpoint: '/api-finance/commission/approve', apiMethod: 'PATCH', successMessage: 'Commission approved', requiresConfirmation: true, confirmationMessage: 'Approve this commission payment?' },
+
+  // ================= REPORT EXPORT =================
+  'btn_report_export': { type: 'API', apiEndpoint: '/api-reports/export', apiMethod: 'POST', successMessage: 'Report export started' },
+  'btn_report_export_csv': { type: 'API', apiEndpoint: '/api-reports/export', apiMethod: 'POST', successMessage: 'CSV export started' },
+
+  // ================= NOTIFICATION SETTINGS =================
+  'btn_notification_save': { type: 'API', apiEndpoint: '/api-notifications/settings', apiMethod: 'PATCH', successMessage: 'Notification settings saved' },
+
+  // ================= SERVER MANAGEMENT =================
+  'btn_server_restart': { type: 'API', apiEndpoint: '/server-manager/servers/restart', apiMethod: 'POST', successMessage: 'Server restart initiated', requiresConfirmation: true, confirmationMessage: 'Restart this server?' },
+  'btn_server_health_check': { type: 'API', apiEndpoint: '/server-manager/system/health-check', apiMethod: 'POST', successMessage: 'Health check triggered' },
+
+  // ================= AIRA COMMAND =================
+  'btn_aira_execute': { type: 'API', apiEndpoint: '/api-aira/execute', apiMethod: 'POST', successMessage: 'AIRA command executed' },
+  'btn_aira_log': { type: 'API', apiEndpoint: '/api-aira/log', apiMethod: 'POST', successMessage: 'AIRA command logged' },
+
+  // ================= CUSTOM ROLE CREATION =================
+  'btn_role_create': { type: 'MODAL', modalId: 'create-role-modal', successMessage: 'Opening role creation form...' },
 };
 
 // Action execution result

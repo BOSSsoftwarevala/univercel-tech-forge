@@ -62,6 +62,18 @@ const oceaniaCountries: CountryData[] = [
   { id: "FJ", name: "Fiji", admin: "Ratu Meli", status: "warning", franchises: 4, resellers: 8, leads: 18, revenue: 120000, lat: -17.7134, lng: 178.0650, pendingApprovals: 2, issues: 2, compliance: "review" },
 ];
 
+// ============ MIDDLE EAST ============
+const middleEastCountries: CountryData[] = [
+  { id: "AE", name: "UAE", admin: "Ahmed Al-Rashid", status: "healthy", franchises: 22, resellers: 55, leads: 145, revenue: 1800000, lat: 23.4241, lng: 53.8478, pendingApprovals: 2, issues: 1, compliance: "compliant" },
+  { id: "SA", name: "Saudi Arabia", admin: "Mohammed Al-Saud", status: "healthy", franchises: 18, resellers: 42, leads: 120, revenue: 1500000, lat: 23.8859, lng: 45.0792, pendingApprovals: 3, issues: 1, compliance: "compliant" },
+  { id: "QA", name: "Qatar", admin: "Khalid Al-Thani", status: "healthy", franchises: 10, resellers: 25, leads: 65, revenue: 920000, lat: 25.3548, lng: 51.1839, pendingApprovals: 1, issues: 0, compliance: "compliant" },
+  { id: "KW", name: "Kuwait", admin: "Fahad Al-Sabah", status: "healthy", franchises: 8, resellers: 18, leads: 48, revenue: 620000, lat: 29.3117, lng: 47.4818, pendingApprovals: 1, issues: 0, compliance: "compliant" },
+  { id: "BH", name: "Bahrain", admin: "Ali Al-Khalifa", status: "healthy", franchises: 6, resellers: 15, leads: 35, revenue: 450000, lat: 26.0667, lng: 50.5577, pendingApprovals: 0, issues: 0, compliance: "compliant" },
+  { id: "OM", name: "Oman", admin: "Said Al-Busaidi", status: "warning", franchises: 5, resellers: 12, leads: 28, revenue: 320000, lat: 21.4735, lng: 55.9754, pendingApprovals: 2, issues: 2, compliance: "review" },
+  { id: "JO", name: "Jordan", admin: "Omar Hassan", status: "healthy", franchises: 7, resellers: 16, leads: 42, revenue: 380000, lat: 30.5852, lng: 36.2384, pendingApprovals: 1, issues: 0, compliance: "compliant" },
+  { id: "IL", name: "Israel", admin: "David Cohen", status: "healthy", franchises: 12, resellers: 28, leads: 75, revenue: 850000, lat: 31.0461, lng: 34.8516, pendingApprovals: 2, issues: 1, compliance: "compliant" },
+];
+
 // ============ CONTINENT CONFIGURATIONS ============
 export const CONTINENT_CONFIGS: Record<string, ContinentConfig> = {
   asia: {
@@ -123,6 +135,16 @@ export const CONTINENT_CONFIGS: Record<string, ContinentConfig> = {
     countries: oceaniaCountries,
     themeGradient: "from-purple-500 to-violet-600",
     accentColor: "purple",
+  },
+  middle_east: {
+    id: "middle_east",
+    name: "Middle East",
+    icon: "🕌",
+    mapCenter: [45, 25],
+    mapScale: 500,
+    countries: middleEastCountries,
+    themeGradient: "from-yellow-500 to-orange-600",
+    accentColor: "yellow",
   },
 };
 

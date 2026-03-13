@@ -6,7 +6,9 @@ import DeveloperCommandCenterComplete from '@/components/developer/sections/Deve
 import DeveloperBugsSection from '@/components/developer/sections/DeveloperBugsSection';
 import DeveloperPerformanceSection from '@/components/developer/sections/DeveloperPerformanceSection';
 import DeveloperSettingsSection from '@/components/developer/sections/DeveloperSettingsSection';
-import DeveloperAISection from '@/components/developer/sections/DeveloperAISection';
+import DevSourceCodeLock from '@/components/developer/sections/DevSourceCodeLock';
+import DevAIChatLive from '@/components/developer/sections/DevAIChatLive';
+import DevCodeQualityPanel from '@/components/developer/sections/DevCodeQualityPanel';
 import DevTaskAssignment from '@/components/developer/DevTaskAssignment';
 import DevTimerProgress from '@/components/developer/DevTimerProgress';
 import DevCodeSubmission from '@/components/developer/DevCodeSubmission';
@@ -24,6 +26,8 @@ const DeveloperDashboard = () => {
     switch (activeSection) {
       case 'command-center':
         return <DeveloperCommandCenterComplete />;
+      case 'source-lock':
+        return <DevSourceCodeLock />;
       case 'tasks':
         return <DevTaskAssignment />;
       case 'bugs':
@@ -32,8 +36,10 @@ const DeveloperDashboard = () => {
         return <DevCodeSubmission />;
       case 'timer':
         return <DevTimerProgress />;
-      case 'ai-assistant':
-        return <DeveloperAISection />;
+      case 'ai-chat':
+        return <DevAIChatLive />;
+      case 'code-quality':
+        return <DevCodeQualityPanel />;
       case 'performance':
         return <DeveloperPerformanceSection />;
       case 'settings':

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 // Country flag mapping
 const countryFlags: Record<string, string> = {
@@ -65,52 +66,118 @@ const CountryAdminDashboard = ({ country, continent, onBack }: CountryAdminDashb
   const [activeTab, setActiveTab] = useState("overview");
   const flag = countryFlags[country.name] || "🏳️";
 
-  // Mock data for areas/cities
-  const areas = [
-    { id: "area-1", name: "North Region", cities: 12, managers: 4, status: "active", performance: 88, franchises: Math.floor(country.franchises * 0.3), leads: Math.floor(country.leads * 0.25) },
-    { id: "area-2", name: "South Region", cities: 8, managers: 3, status: "active", performance: 92, franchises: Math.floor(country.franchises * 0.25), leads: Math.floor(country.leads * 0.2) },
-    { id: "area-3", name: "East Region", cities: 10, managers: 3, status: "active", performance: 85, franchises: Math.floor(country.franchises * 0.2), leads: Math.floor(country.leads * 0.2) },
-    { id: "area-4", name: "West Region", cities: 15, managers: 5, status: "active", performance: 90, franchises: Math.floor(country.franchises * 0.15), leads: Math.floor(country.leads * 0.2) },
-    { id: "area-5", name: "Central Region", cities: 6, managers: 2, status: "warning", performance: 75, franchises: Math.floor(country.franchises * 0.1), leads: Math.floor(country.leads * 0.15) },
-  ];
+  const [areaManagers, setAreaManagers] = useState<Array<{ id: string; name: string; area: string; users: number; status: string; lastActive: string }>>([]);
+  const [franchisesList, setFranchisesList] = useState<Array<{ id: string; name: string; area: string; status: string; revenue: number; leads: number }>>([]);
+  const [resellersList, setResellersList] = useState<Array<{ id: string; name: string; tier: string; conversions: number; leads: number; status: string }>>([]);
+  const [liveActivities, setLiveActivities] = useState<Array<{ type: string; message: string; time: string; icon: React.ElementType }>>([]);
+  const [pendingApprovals, setPendingApprovals] = useState<Array<{ id: string; type: string; requester: string; priority: string; created: string }>>([]);
+  const [areas, setAreas] = useState<Array<{ id: string; name: string; cities: number; managers: number; status: string; performance: number; franchises: number; leads: number }>>([]);
 
-  const areaManagers = [
-    { id: "AM-001", name: "Manager Alpha", area: "North Region", users: 1250, status: "active", lastActive: "2 min ago" },
-    { id: "AM-002", name: "Manager Beta", area: "South Region", users: 980, status: "active", lastActive: "5 min ago" },
-    { id: "AM-003", name: "Manager Gamma", area: "East Region", users: 1100, status: "active", lastActive: "15 min ago" },
-    { id: "AM-004", name: "Manager Delta", area: "West Region", users: 1450, status: "active", lastActive: "1 hour ago" },
-    { id: "AM-005", name: "Manager Epsilon", area: "Central Region", users: 650, status: "hold", lastActive: "2 hours ago" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: managers, error: mError } = await supabase
+        .from('area_managers')
+        .select('id, name, area_id, status, last_active_at')
+        .eq('country_id', country.id);
+      if (!mError) {
+        setAreaManagers((managers || []).map((m: { id: string; name: string; area_id: string; status: string; last_active_at: string }) => ({
+          id: m.id,
+          name: m.name,
+          area: m.area_id || '—',
+          users: 0,
+          status: m.status || 'active',
+          lastActive: m.last_active_at ? new Date(m.last_active_at).toLocaleString() : '—',
+        })));
+      } else {
+        console.error('Failed to fetch area managers:', mError);
+        setAreaManagers([]);
+      }
 
-  const franchisesList = [
-    { id: "FR-001", name: `${country.name} Franchise 1`, area: "North Region", status: "active", revenue: country.revenue * 0.25, leads: Math.floor(country.leads * 0.15) },
-    { id: "FR-002", name: `${country.name} Franchise 2`, area: "South Region", status: "active", revenue: country.revenue * 0.2, leads: Math.floor(country.leads * 0.12) },
-    { id: "FR-003", name: `${country.name} Franchise 3`, area: "East Region", status: "active", revenue: country.revenue * 0.18, leads: Math.floor(country.leads * 0.1) },
-    { id: "FR-004", name: `${country.name} Franchise 4`, area: "West Region", status: "warning", revenue: country.revenue * 0.15, leads: Math.floor(country.leads * 0.08) },
-    { id: "FR-005", name: `${country.name} Franchise 5`, area: "Central Region", status: "active", revenue: country.revenue * 0.12, leads: Math.floor(country.leads * 0.06) },
-  ];
+      const { data: franchises, error: fError } = await supabase
+        .from('franchises')
+        .select('id, name, area_id, status, revenue, leads')
+        .eq('country_id', country.id);
+      if (!fError) {
+        setFranchisesList((franchises || []).map((f: { id: string; name: string; area_id: string; status: string; revenue: number; leads: number }) => ({
+          id: f.id,
+          name: f.name,
+          area: f.area_id || '—',
+          status: f.status || 'active',
+          revenue: f.revenue || 0,
+          leads: f.leads || 0,
+        })));
+      } else {
+        console.error('Failed to fetch franchises:', fError);
+        setFranchisesList([]);
+      }
 
-  const resellersList = [
-    { id: "RS-001", name: `Reseller Alpha`, tier: "Gold", conversions: 45, leads: Math.floor(country.leads * 0.08), status: "active" },
-    { id: "RS-002", name: `Reseller Beta`, tier: "Silver", conversions: 32, leads: Math.floor(country.leads * 0.06), status: "active" },
-    { id: "RS-003", name: `Reseller Gamma`, tier: "Gold", conversions: 28, leads: Math.floor(country.leads * 0.05), status: "active" },
-    { id: "RS-004", name: `Reseller Delta`, tier: "Bronze", conversions: 18, leads: Math.floor(country.leads * 0.04), status: "warning" },
-    { id: "RS-005", name: `Reseller Epsilon`, tier: "Silver", conversions: 22, leads: Math.floor(country.leads * 0.03), status: "active" },
-  ];
+      const { data: resellers, error: rError } = await supabase
+        .from('resellers')
+        .select('id, name, tier, conversions, leads, status')
+        .eq('country_id', country.id);
+      if (!rError) {
+        setResellersList((resellers || []).map((r: { id: string; name: string; tier: string; conversions: number; leads: number; status: string }) => ({
+          id: r.id,
+          name: r.name,
+          tier: r.tier || 'Bronze',
+          conversions: r.conversions || 0,
+          leads: r.leads || 0,
+          status: r.status || 'active',
+        })));
+      } else {
+        console.error('Failed to fetch resellers:', rError);
+        setResellersList([]);
+      }
 
-  const liveActivities = [
-    { type: "lead", message: `New lead created in North Region`, time: "2 min ago", icon: Target },
-    { type: "franchise", message: `Franchise outlet opened in South Region`, time: "5 min ago", icon: Building2 },
-    { type: "reseller", message: `Reseller converted 3 leads`, time: "8 min ago", icon: UserCheck },
-    { type: "alert", message: `Compliance check completed`, time: "15 min ago", icon: Shield },
-    { type: "approval", message: `Area Manager request approved`, time: "20 min ago", icon: CheckCircle2 },
-  ];
+      const { data: activity, error: aError } = await supabase
+        .from('audit_logs')
+        .select('id, action, meta_json, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (!aError) {
+        setLiveActivities((activity || []).map((a: { id: string; action: string; meta_json?: { type?: string }; created_at: string }) => ({
+          type: a.meta_json?.type || 'log',
+          message: a.action,
+          time: new Date(a.created_at).toLocaleString(),
+          icon: Activity,
+        })));
+      }
 
-  const pendingApprovals = [
-    { id: "AP-001", type: "Franchise Request", requester: "New Outlet North", priority: "high", created: "1 hour ago" },
-    { id: "AP-002", type: "Reseller Upgrade", requester: "Reseller Delta", priority: "medium", created: "3 hours ago" },
-    { id: "AP-003", type: "Discount Request", requester: "Franchise 3", priority: "low", created: "5 hours ago" },
-  ];
+      const { data: approvals, error: appError } = await supabase
+        .from('approvals')
+        .select('id, title, requested_by, priority, created_at')
+        .eq('status', 'pending')
+        .limit(5);
+      if (!appError) {
+        setPendingApprovals((approvals || []).map((a: { id: string; title: string; requested_by: string; priority: string; created_at: string }) => ({
+          id: a.id,
+          type: a.title,
+          requester: a.requested_by || '—',
+          priority: a.priority || 'medium',
+          created: new Date(a.created_at).toLocaleString(),
+        })));
+      }
+
+      const { data: areasData, error: arError } = await supabase
+        .from('areas')
+        .select('id, name, status')
+        .eq('country_id', country.id);
+      if (!arError) {
+        setAreas((areasData || []).map((a: { id: string; name: string; status: string }) => ({
+          id: a.id,
+          name: a.name,
+          cities: 0,
+          managers: 0,
+          status: a.status || 'active',
+          performance: 0,
+          franchises: 0,
+          leads: 0,
+        })));
+      }
+    };
+
+    fetchData();
+  }, [country.id]);
 
   const summaryStats = [
     { label: "Areas/Regions", value: areas.length.toString(), change: "+0", icon: Map, color: "from-blue-500 to-cyan-500" },

@@ -5,6 +5,43 @@ import { BossPanelSidebar } from './BossPanelSidebar';
 
 export type BossPanelSection = 
   | 'dashboard'
+  | 'ceo-dashboard'
+  | 'vala-ai'
+  | 'server-manager'
+  | 'ai-api-manager'
+  | 'dev-manager'
+  | 'product-manager'
+  | 'demo-manager'
+  | 'task-manager'
+  | 'promise-tracker'
+  | 'asset-manager'
+  | 'marketing-manager'
+  | 'seo-manager'
+  | 'lead-manager'
+  | 'sales-manager'
+  | 'customer-support'
+  | 'franchise-manager'
+  | 'reseller-manager'
+  | 'influencer-manager'
+  | 'continent-admin'
+  | 'country-admin'
+  | 'finance-manager'
+  | 'legal-manager'
+  | 'developer-dashboard'
+  | 'pro-manager'
+  | 'user-dashboard'
+  | 'security-manager'
+  | 'system-settings'
+  | 'marketplace-manager'
+  | 'license-manager'
+  | 'demo-system-manager'
+  | 'deployment-manager'
+  | 'analytics-manager'
+  | 'notification-manager'
+  | 'integration-manager'
+  | 'audit-logs-manager'
+  | 'marketplace-user-system'
+  // legacy aliases
   | 'live-activity'
   | 'hierarchy'
   | 'super-admins'
@@ -16,14 +53,15 @@ export type BossPanelSection =
   | 'security'
   | 'codepilot'
   | 'server-hosting'
-  | 'vala-ai'
+  | 'reseller-dashboard'
+  | 'franchise-dashboard'
+  | 'aira'
   | 'settings';
 
 interface BossPanelLayoutProps {
   children?: React.ReactNode;
 }
 
-// Context for Boss Panel state
 interface BossPanelContextType {
   activeSection: BossPanelSection;
   streamingOn: boolean;
@@ -32,11 +70,9 @@ interface BossPanelContextType {
 
 const BossPanelContext = createContext<BossPanelContextType | null>(null);
 
-// Hook to access Boss Panel context
 export function useBossPanelContext() {
   const context = useContext(BossPanelContext);
   if (!context) {
-    // Return default values if context not available (fallback)
     return {
       activeSection: 'dashboard' as BossPanelSection,
       streamingOn: true,
@@ -46,7 +82,16 @@ export function useBossPanelContext() {
   return context;
 }
 
-// LOCKED: Background #0B0F1A, text #FFFFFF
+// ─── ENTERPRISE DARK THEME TOKENS ─────────────────────────────
+const LAYOUT = {
+  shellHeight: '48px',
+  sidebarWidth: '260px',
+  sidebarCollapsed: '56px',
+  pageBg: 'hsl(222, 47%, 6%)',
+  contentBg: 'hsl(222, 47%, 8%)',
+  text: 'hsl(210, 40%, 98%)',
+};
+
 export function BossPanelLayout({ children }: BossPanelLayoutProps) {
   const [activeSection, setActiveSection] = useState<BossPanelSection>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -62,19 +107,16 @@ export function BossPanelLayout({ children }: BossPanelLayoutProps) {
     <BossPanelContext.Provider value={contextValue}>
       <div 
         className="min-h-screen flex flex-col"
-        style={{ 
-          background: '#F8FAFC',
-          color: '#1E293B'
-        }}
+        style={{ background: LAYOUT.pageBg, color: LAYOUT.text }}
       >
-        {/* Fixed Global Header - LOCKED 64px */}
+        {/* Enterprise Shell Bar */}
         <BossPanelHeader 
           streamingOn={streamingOn}
           onStreamingToggle={() => setStreamingOn(!streamingOn)}
         />
 
-        <div className="flex flex-1" style={{ paddingTop: '64px' }}>
-          {/* Left Sidebar - LOCKED 260px/80px */}
+        <div className="flex flex-1" style={{ paddingTop: LAYOUT.shellHeight }}>
+          {/* Enterprise Side Navigation */}
           <BossPanelSidebar 
             activeSection={activeSection}
             onSectionChange={setActiveSection}
@@ -82,12 +124,14 @@ export function BossPanelLayout({ children }: BossPanelLayoutProps) {
             onCollapsedChange={setSidebarCollapsed}
           />
 
-          {/* Main Content - White background like reference */}
+          {/* Main Content Area */}
           <main 
-            className="flex-1 p-6 transition-all duration-300"
+            className="flex-1 transition-all duration-200 overflow-auto"
             style={{ 
-              marginLeft: sidebarCollapsed ? '80px' : '260px',
-              background: '#F8FAFC'
+              marginLeft: sidebarCollapsed ? LAYOUT.sidebarCollapsed : LAYOUT.sidebarWidth,
+              background: LAYOUT.contentBg,
+              padding: '20px 24px',
+              minHeight: `calc(100vh - ${LAYOUT.shellHeight})`,
             }}
           >
             {children || <Outlet context={{ activeSection, streamingOn }} />}
