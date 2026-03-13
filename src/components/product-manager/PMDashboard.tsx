@@ -22,7 +22,9 @@ import {
   BarChart3,
   ShoppingCart,
   DollarSign,
+  Activity,
 } from 'lucide-react';
+import { orderToProductManagerBridge } from '@/services/OrderToProductManagerBridge';
 
 interface PMDashboardProps {
   onNavigate: (section: string) => void;
@@ -54,6 +56,10 @@ const PMDashboard: React.FC<PMDashboardProps> = ({ onNavigate, onAddProduct }) =
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [workflowStatus, setWorkflowStatus] = useState<{
+    order_id: string;
+    status: string;
+  } | null>(null);
 
   const fetchStats = async () => {
     setRefreshing(true);
@@ -88,6 +94,14 @@ const PMDashboard: React.FC<PMDashboardProps> = ({ onNavigate, onAddProduct }) =
 
   useEffect(() => {
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = orderToProductManagerBridge.onOrderConfirmed(async (payload) => {
+      setWorkflowStatus({ order_id: payload.order_id, status: 'processing' });
+      toast.info(`Deployment pipeline started for order ${payload.order_id}`);
+    });
+    return unsubscribe;
   }, []);
 
   const kpiCards: KPICard[] = [
@@ -271,6 +285,24 @@ const PMDashboard: React.FC<PMDashboardProps> = ({ onNavigate, onAddProduct }) =
           );
         })}
       </div>
+      {/* Deployment Workflow Status */}
+      {workflowStatus && (
+        <Card className="border-blue-500/30 bg-blue-500/5">
+          <CardHeader>
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Activity className="w-4 h-4 text-blue-500 animate-pulse" />
+              Deployment Pipeline
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Order ID</p>
+              <p className="text-sm font-mono">{workflowStatus.order_id}</p>
+            </div>
+            <Badge variant="secondary" className="capitalize">{workflowStatus.status}</Badge>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

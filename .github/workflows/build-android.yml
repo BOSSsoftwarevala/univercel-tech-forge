@@ -66,11 +66,26 @@ jobs:
       
       - name: Update Android app name and config
         run: |
-          # Update app name
-          sed -i 's/app_name">.*</app_name">Software Vala</' android/app/src/main/res/values/strings.xml
-          
-          # Add internet permission for live updates
-          sed -i '/<uses-permission android:name="android.permission.INTERNET"/a\    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' android/app/src/main/AndroidManifest.xml
+          STRINGS="android/app/src/main/res/values/strings.xml"
+          if [ -f "$STRINGS" ]; then
+            if grep -q '<string name="app_name">' "$STRINGS"; then
+              sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Software Vala</string>#' "$STRINGS"
+            else
+              sed -i 's#</resources>#  <string name="app_name">Software Vala</string>\n</resources>#' "$STRINGS"
+            fi
+          fi
+
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            if ! grep -q 'android.permission.ACCESS_NETWORK_STATE' "$MANIFEST"; then
+              if grep -q 'android.permission.INTERNET' "$MANIFEST"; then
+                sed -i '/android.permission.INTERNET/a\    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' "$MANIFEST"
+              else
+                sed -i '/<manifest /a\    <uses-permission android:name="android.permission.INTERNET" />' "$MANIFEST"
+                sed -i '/<manifest /a\    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' "$MANIFEST"
+              fi
+            fi
+          fi
       
       - name: Configure for worldwide scalable release
         run: |

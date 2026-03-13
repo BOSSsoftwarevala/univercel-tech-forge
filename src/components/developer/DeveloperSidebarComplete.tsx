@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, ListTodo, Bug, Code2, Timer, Bot, BarChart3, Settings, 
-  LogOut, ChevronLeft, ChevronRight, Zap, Target, AlertCircle, Sparkles
+  LogOut, ChevronLeft, ChevronRight, Zap, Target, AlertCircle, Sparkles,
+  FolderLock, Brain
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -14,63 +15,16 @@ interface DeveloperSidebarCompleteProps {
 }
 
 const menuItems = [
-  { 
-    id: 'command-center', 
-    label: 'Command Center', 
-    icon: LayoutDashboard, 
-    badge: null,
-    description: 'Dashboard & AI suggestions'
-  },
-  { 
-    id: 'tasks', 
-    label: 'Tasks', 
-    icon: ListTodo, 
-    badge: 3,
-    description: 'All tasks & assignments'
-  },
-  { 
-    id: 'bugs', 
-    label: 'Bugs & Issues', 
-    icon: Bug, 
-    badge: 2,
-    description: 'Bug tracking & fixes'
-  },
-  { 
-    id: 'code-submission', 
-    label: 'Code Submission', 
-    icon: Code2, 
-    badge: null,
-    description: 'Submit code for review'
-  },
-  { 
-    id: 'timer', 
-    label: 'Timer & Productivity', 
-    icon: Timer, 
-    badge: null,
-    description: 'Time tracking & stats'
-  },
-  { 
-    id: 'ai-assistant', 
-    label: 'AI Assistant', 
-    icon: Bot, 
-    badge: null,
-    isAI: true,
-    description: 'Code help & suggestions'
-  },
-  { 
-    id: 'performance', 
-    label: 'Performance', 
-    icon: BarChart3, 
-    badge: null,
-    description: 'Metrics & analytics'
-  },
-  { 
-    id: 'settings', 
-    label: 'Settings', 
-    icon: Settings, 
-    badge: null,
-    description: 'Preferences & config'
-  },
+  { id: 'command-center', label: 'Command Center', icon: LayoutDashboard, badge: null, description: 'Dashboard & AI suggestions' },
+  { id: 'source-lock', label: 'Source Code Lock', icon: FolderLock, badge: null, description: 'Assigned project & code access' },
+  { id: 'tasks', label: 'Tasks', icon: ListTodo, badge: 3, description: 'All tasks & assignments' },
+  { id: 'bugs', label: 'Bugs & Issues', icon: Bug, badge: 2, description: 'Bug tracking & fixes' },
+  { id: 'code-submission', label: 'Code Submission', icon: Code2, badge: null, description: 'Submit code for review' },
+  { id: 'timer', label: 'Timer & Productivity', icon: Timer, badge: null, description: 'Time tracking & stats' },
+  { id: 'ai-chat', label: 'AI Chat', icon: Bot, badge: null, isAI: true, description: 'Live AI coding help' },
+  { id: 'code-quality', label: 'Code Quality AI', icon: Brain, badge: null, isAI: true, description: 'Vala AI reviews & testing' },
+  { id: 'performance', label: 'Performance', icon: BarChart3, badge: null, description: 'Metrics & analytics' },
+  { id: 'settings', label: 'Settings', icon: Settings, badge: null, description: 'Preferences & config' },
 ];
 
 const DeveloperSidebarComplete = ({ activeSection, onSectionChange }: DeveloperSidebarCompleteProps) => {

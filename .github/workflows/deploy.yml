@@ -24,6 +24,11 @@ on:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_ENV: ${{ github.event.inputs.environment || 'production' }}
+
+concurrency:
+  group: vercel-deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -46,15 +51,29 @@ jobs:
         run: npm install -g vercel@latest
       
       - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=${{ env.VERCEL_ENV }} --token=${{ secrets.VERCEL_TOKEN }}
       
-      - name: Build Project
+      - name: Build Project (Production)
+        if: env.VERCEL_ENV == 'production'
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project (Preview)
+        if: env.VERCEL_ENV != 'production'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       
-      - name: Deploy to Vercel Production
+      - name: Deploy to Vercel (Production)
+        if: env.VERCEL_ENV == 'production'
         id: deploy
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "✅ Deployed to: $DEPLOY_URL"
+
+      - name: Deploy to Vercel (Preview)
+        if: env.VERCEL_ENV != 'production'
+        id: deploy-preview
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "✅ Deployed to: $DEPLOY_URL"
       
@@ -63,7 +82,8 @@ jobs:
           echo "================================================"
           echo "✅ AUTO DEPLOYMENT COMPLETE"
           echo "================================================"
-          echo "🌐 URL: ${{ steps.deploy.outputs.deploy_url }}"
+          echo "🌐 URL: ${{ steps.deploy.outputs.deploy_url || steps.deploy-preview.outputs.deploy_url }}"
+          echo "🏷️ Environment: ${{ env.VERCEL_ENV }}"
           echo "👤 Triggered by: ${{ github.actor }}"
           echo "📅 Time: $(date)"
           echo "📝 Commit: ${{ github.sha }}"

@@ -406,6 +406,8 @@ const MaskedInternalChat = () => {
   const [autoTranslate, setAutoTranslate] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [showTranslation, setShowTranslation] = useState(true);
+  const [isEscalatedToAira, setIsEscalatedToAira] = useState(false);
+  const [isAiTyping, setIsAiTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -429,18 +431,55 @@ const MaskedInternalChat = () => {
 
     setMessages([...messages, message]);
     setNewMessage('');
+    setIsAiTyping(true);
 
-    // Simulate AI response
+    // AI response with escalation detection
     setTimeout(() => {
-      const aiResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        sender: generateMaskedId('ai_bot', 'ai-assistant-001', 'IN'),
-        content: 'I understand your query. Let me process that for you.',
-        translatedContent: 'मैं आपकी क्वेरी समझता हूं। मुझे इसे आपके लिए प्रोसेस करने दें।',
-        timestamp: new Date(),
-        originalLanguage: 'en'
-      };
-      setMessages(prev => [...prev, aiResponse]);
+      const aiSender = isEscalatedToAira 
+        ? generateMaskedId('ai_manager', 'aira-senior-001', 'IN')
+        : generateMaskedId('ai_bot', 'vala-assistant-001', 'IN');
+      
+      const shouldEscalate = newMessage.toLowerCase().includes('escalate') || 
+        newMessage.toLowerCase().includes('senior') ||
+        newMessage.toLowerCase().includes('complex') ||
+        newMessage.toLowerCase().includes('strategy') ||
+        newMessage.toLowerCase().includes('aira');
+
+      if (shouldEscalate && !isEscalatedToAira) {
+        const escalationMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: generateMaskedId('ai_bot', 'vala-assistant-001', 'IN'),
+          content: '🔄 I\'d recommend connecting you with **AIRA**, our Senior AI advisor, for this matter. Escalating now...',
+          timestamp: new Date(),
+          originalLanguage: 'en'
+        };
+        setMessages(prev => [...prev, escalationMsg]);
+        setIsEscalatedToAira(true);
+        
+        setTimeout(() => {
+          const airaResponse: ChatMessage = {
+            id: (Date.now() + 2).toString(),
+            sender: generateMaskedId('ai_manager', 'aira-senior-001', 'IN'),
+            content: '👋 Hello! I\'m **AIRA**, the Senior AI Advisor. VALA has briefed me on your query. How may I assist you with this matter?',
+            timestamp: new Date(),
+            originalLanguage: 'en'
+          };
+          setMessages(prev => [...prev, airaResponse]);
+          setIsAiTyping(false);
+        }, 1500);
+      } else {
+        const aiResponse: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: aiSender,
+          content: isEscalatedToAira 
+            ? 'I\'ve reviewed this matter. Let me provide you with a strategic analysis. What specific aspect would you like me to focus on?'
+            : 'I understand your query. Let me process that for you. If this requires senior-level attention, I can escalate to AIRA.',
+          timestamp: new Date(),
+          originalLanguage: 'en'
+        };
+        setMessages(prev => [...prev, aiResponse]);
+        setIsAiTyping(false);
+      }
     }, 1500);
   };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -18,137 +18,122 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock marketing managers data
-const mockMarketingManagers = [
-  {
-    id: "MKT-001",
-    name: "Sarah Johnson",
-    email: "sarah.j@company.com",
-    photo: null,
-    region: "North America",
-    country: "USA",
-    countryFlag: "🇺🇸",
-    activeCampaigns: 12,
-    leadsGenerated: 4520,
-    conversionRate: 3.8,
-    status: "Active",
-    adSpend: 125000,
-    roi: 340,
-  },
-  {
-    id: "MKT-002",
-    name: "James Chen",
-    email: "james.c@company.com",
-    photo: null,
-    region: "Asia Pacific",
-    country: "Singapore",
-    countryFlag: "🇸🇬",
-    activeCampaigns: 8,
-    leadsGenerated: 3200,
-    conversionRate: 4.2,
-    status: "Active",
-    adSpend: 85000,
-    roi: 420,
-  },
-  {
-    id: "MKT-003",
-    name: "Emma Weber",
-    email: "emma.w@company.com",
-    photo: null,
-    region: "Europe",
-    country: "Germany",
-    countryFlag: "🇩🇪",
-    activeCampaigns: 10,
-    leadsGenerated: 2890,
-    conversionRate: 3.5,
-    status: "Active",
-    adSpend: 95000,
-    roi: 290,
-  },
-  {
-    id: "MKT-004",
-    name: "Carlos Rivera",
-    email: "carlos.r@company.com",
-    photo: null,
-    region: "Latin America",
-    country: "Brazil",
-    countryFlag: "🇧🇷",
-    activeCampaigns: 6,
-    leadsGenerated: 1850,
-    conversionRate: 2.9,
-    status: "Hold",
-    adSpend: 45000,
-    roi: 210,
-  },
-  {
-    id: "MKT-005",
-    name: "Aisha Patel",
-    email: "aisha.p@company.com",
-    photo: null,
-    region: "Middle East",
-    country: "UAE",
-    countryFlag: "🇦🇪",
-    activeCampaigns: 9,
-    leadsGenerated: 2100,
-    conversionRate: 4.1,
-    status: "Active",
-    adSpend: 78000,
-    roi: 380,
-  },
-];
-
-// Mock campaigns data
-const mockCampaigns = [
-  { id: "CMP-001", name: "Summer Sale 2024", type: "Ads", status: "Active", budget: 50000, spent: 32000, leads: 1200, roi: 320 },
-  { id: "CMP-002", name: "Brand Awareness Q1", type: "Organic", status: "Active", budget: 20000, spent: 18000, leads: 800, roi: 280 },
-  { id: "CMP-003", name: "Email Nurture Series", type: "Email", status: "Paused", budget: 10000, spent: 7500, leads: 450, roi: 180 },
-  { id: "CMP-004", name: "Referral Program", type: "Referral", status: "Active", budget: 30000, spent: 25000, leads: 920, roi: 410 },
-];
-
-// Mock lead sources
-const mockLeadSources = [
-  { channel: "Google Ads", leads: 2400, quality: 85, cost: 45000, cpl: 18.75 },
-  { channel: "Meta Ads", leads: 1800, quality: 78, cost: 35000, cpl: 19.44 },
-  { channel: "LinkedIn", leads: 650, quality: 92, cost: 28000, cpl: 43.08 },
-  { channel: "Organic SEO", leads: 1200, quality: 88, cost: 15000, cpl: 12.50 },
-  { channel: "Email", leads: 890, quality: 82, cost: 8000, cpl: 8.99 },
-];
-
-// Mock content assets
-const mockContentAssets = [
-  { id: "CNT-001", name: "Hero Banner v2", type: "Banner", status: "Approved", created: "2024-01-15" },
-  { id: "CNT-002", name: "Product Video 30s", type: "Video", status: "Pending", created: "2024-01-18" },
-  { id: "CNT-003", name: "Landing Page A", type: "Landing Page", status: "Approved", created: "2024-01-10" },
-  { id: "CNT-004", name: "Social Carousel", type: "Poster", status: "Rejected", created: "2024-01-20" },
-];
-
-// Mock ad accounts
-const mockAdAccounts = [
-  { platform: "Google Ads", accountId: "GA-XXXX-1234", status: "Active", monthlySpend: 45000, balance: 12000 },
-  { platform: "Meta Ads", accountId: "META-XXXX-5678", status: "Active", monthlySpend: 35000, balance: 8500 },
-  { platform: "LinkedIn Ads", accountId: "LI-XXXX-9012", status: "Limited", monthlySpend: 18000, balance: 3200 },
-  { platform: "TikTok Ads", accountId: "TT-XXXX-3456", status: "Active", monthlySpend: 12000, balance: 5000 },
-];
-
-// Mock activity log
-const mockActivityLog = [
-  { id: 1, action: "Campaign Created", details: "Summer Sale 2024", time: "2 hours ago", type: "create" },
-  { id: 2, action: "Budget Adjusted", details: "+$10,000 to Brand Awareness", time: "4 hours ago", type: "budget" },
-  { id: 3, action: "Campaign Paused", details: "Email Nurture Series", time: "6 hours ago", type: "pause" },
-  { id: 4, action: "Content Approved", details: "Hero Banner v2", time: "8 hours ago", type: "approval" },
-  { id: 5, action: "Performance Spike", details: "+45% conversions on Google Ads", time: "12 hours ago", type: "performance" },
-];
+// Manager type definition
+interface MarketingManager {
+  id: string;
+  name: string;
+  email: string;
+  photo: string | null;
+  region: string;
+  country: string;
+  countryFlag: string;
+  activeCampaigns: number;
+  leadsGenerated: number;
+  conversionRate: number;
+  status: string;
+  adSpend: number;
+  roi: number;
+}
 
 const MarketingManagementDashboard = () => {
-  const [selectedManager, setSelectedManager] = useState<typeof mockMarketingManagers[0] | null>(null);
+  const [selectedManager, setSelectedManager] = useState<MarketingManager | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCountry, setFilterCountry] = useState("all");
   const [filterChannel, setFilterChannel] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [activeTab, setActiveTab] = useState("campaigns");
+  const [marketingManagers, setMarketingManagers] = useState<MarketingManager[]>([]);
+  const [campaigns, setCampaigns] = useState<Array<{ id: string; name: string; type: string; status: string; budget: number; spent: number; leads: number; roi: number }>>([]);
+  const [leadSources, setLeadSources] = useState<Array<{ channel: string; leads: number; quality: number; cost: number; cpl: number }>>([]);
+  const [contentAssets, setContentAssets] = useState<Array<{ id: string; name: string; type: string; status: string; created: string }>>([]);
+  const [adAccounts, setAdAccounts] = useState<Array<{ platform: string; accountId: string; status: string; monthlySpend: number; balance: number }>>([]);
+  const [activityLog, setActivityLog] = useState<Array<{ id: string | number; action: string; details: string; time: string; type: string }>>([]);
 
-  const filteredManagers = mockMarketingManagers.filter(manager => {
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      const { data, error } = await supabase
+        .from('marketing_campaigns')
+        .select('*');
+      if (error) { console.error('Failed to fetch campaigns:', error); setCampaigns([]); }
+      else setCampaigns((data || []).map((c: { id: string; name: string; type: string; status: string; budget: number; spent: number; leads: number; roi: number }) => ({
+        id: c.id, name: c.name, type: c.type || '—', status: c.status || 'Active',
+        budget: c.budget || 0, spent: c.spent || 0, leads: c.leads || 0, roi: c.roi || 0,
+      })));
+    };
+
+    const fetchLeadSources = async () => {
+      const { data, error } = await supabase
+        .from('lead_sources')
+        .select('channel, leads, quality_score, cost');
+      if (error) { console.error('Failed to fetch lead sources:', error); setLeadSources([]); }
+      else setLeadSources((data || []).map((l: { channel: string; leads: number; quality_score: number; cost: number }) => ({
+        channel: l.channel, leads: l.leads || 0, quality: l.quality_score || 0,
+        cost: l.cost || 0, cpl: l.leads > 0 ? (l.cost || 0) / l.leads : 0,
+      })));
+    };
+
+    const fetchContentAssets = async () => {
+      const { data, error } = await supabase
+        .from('content_assets')
+        .select('*');
+      if (error) { console.error('Failed to fetch content assets:', error); setContentAssets([]); }
+      else setContentAssets((data || []).map((a: { id: string; name: string; type: string; status: string; created_at: string }) => ({
+        id: a.id, name: a.name, type: a.type || '—', status: a.status || 'Pending',
+        created: a.created_at ? new Date(a.created_at).toLocaleDateString() : '—',
+      })));
+    };
+
+    const fetchAdAccounts = async () => {
+      const { data, error } = await supabase
+        .from('ad_accounts')
+        .select('*');
+      if (error) { console.error('Failed to fetch ad accounts:', error); setAdAccounts([]); }
+      else setAdAccounts((data || []).map((a: { platform: string; account_id: string; status: string; monthly_spend: number; balance: number }) => ({
+        platform: a.platform, accountId: a.account_id || '—', status: a.status || 'Active',
+        monthlySpend: a.monthly_spend || 0, balance: a.balance || 0,
+      })));
+    };
+
+    const fetchManagers = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name, email, region, country, status')
+        .eq('department', 'marketing');
+      if (error) { console.error('Failed to fetch marketing managers:', error); setMarketingManagers([]); }
+      else setMarketingManagers((data || []).map((u: { id: string; name: string; email: string; region: string; country: string; status: string }) => ({
+        id: u.id, name: u.name || '—', email: u.email || '—', photo: null,
+        region: u.region || '—', country: u.country || '—', countryFlag: '🌍',
+        activeCampaigns: 0, leadsGenerated: 0, conversionRate: 0,
+        status: u.status || 'Active', adSpend: 0, roi: 0,
+      })));
+    };
+
+    const fetchActivityLog = async () => {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('id, action, meta_json, created_at')
+        .eq('module', 'marketing')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (!error) {
+        setActivityLog((data || []).map((l: { id: string; action: string; meta_json?: { details?: string; type?: string }; created_at: string }) => ({
+          id: l.id, action: l.action, details: l.meta_json?.details || '—',
+          time: new Date(l.created_at).toLocaleString(), type: l.meta_json?.type || 'log',
+        })));
+      }
+    };
+
+    fetchCampaigns();
+    fetchLeadSources();
+    fetchContentAssets();
+    fetchAdAccounts();
+    fetchManagers();
+    fetchActivityLog();
+  }, []);
+
+  const filteredManagers = marketingManagers.filter(manager => {
     const matchesSearch = manager.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       manager.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCountry = filterCountry === "all" || manager.country === filterCountry;
@@ -195,7 +180,7 @@ const MarketingManagementDashboard = () => {
               </div>
               <Badge className="bg-pink-500/20 text-pink-400 border-pink-500/50">
                 <Megaphone className="w-3 h-3 mr-1" />
-                {mockMarketingManagers.length} Marketing Managers
+                {marketingManagers.length} Marketing Managers
               </Badge>
             </div>
 
@@ -513,7 +498,7 @@ const MarketingManagementDashboard = () => {
                       <TabsContent value="campaigns" className="mt-0">
                         <ScrollArea className="h-[400px]">
                           <div className="space-y-3">
-                            {mockCampaigns.map((campaign) => (
+                            {campaigns.map((campaign) => (
                               <div key={campaign.id} className="p-3 rounded-lg bg-pink-500/5 border border-pink-500/20">
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="flex items-center gap-2">
@@ -554,7 +539,7 @@ const MarketingManagementDashboard = () => {
                       <TabsContent value="leads" className="mt-0">
                         <ScrollArea className="h-[400px]">
                           <div className="space-y-3">
-                            {mockLeadSources.map((source, idx) => (
+                            {leadSources.map((source, idx) => (
                               <div key={idx} className="p-3 rounded-lg bg-pink-500/5 border border-pink-500/20">
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="flex items-center gap-2">
@@ -589,7 +574,7 @@ const MarketingManagementDashboard = () => {
                       <TabsContent value="content" className="mt-0">
                         <ScrollArea className="h-[400px]">
                           <div className="space-y-3">
-                            {mockContentAssets.map((asset) => (
+                            {contentAssets.map((asset) => (
                               <div key={asset.id} className="p-3 rounded-lg bg-pink-500/5 border border-pink-500/20 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
@@ -614,7 +599,7 @@ const MarketingManagementDashboard = () => {
                       <TabsContent value="ads" className="mt-0">
                         <ScrollArea className="h-[400px]">
                           <div className="space-y-3">
-                            {mockAdAccounts.map((account, idx) => (
+                            {adAccounts.map((account, idx) => (
                               <div key={idx} className="p-3 rounded-lg bg-pink-500/5 border border-pink-500/20">
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="flex items-center gap-2">
@@ -733,7 +718,7 @@ const MarketingManagementDashboard = () => {
                   <CardContent>
                     <ScrollArea className="h-[150px]">
                       <div className="space-y-2">
-                        {mockActivityLog.map((log) => (
+                        {activityLog.map((log) => (
                           <div key={log.id} className="flex items-center justify-between p-2 rounded bg-pink-500/5 text-sm">
                             <div className="flex items-center gap-2">
                               {log.type === "create" && <Megaphone className="w-3 h-3 text-emerald-400" />}

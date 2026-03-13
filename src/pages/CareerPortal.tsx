@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { logCriticalActivity } from "@/hooks/useActivityLogger";
 import softwareValaLogo from "@/assets/software-vala-logo.jpg";
 
 type PortalType = "developer" | "influencer" | "job";
@@ -99,16 +101,64 @@ const CareerPortal = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // 1. Save to job_applications table
+      const { error: insertError } = await (supabase as any).from('job_applications').insert({
+        application_type: selectedType || 'job',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        experience: formData.experience || null,
+        portfolio: formData.portfolio || null,
+        message: formData.message || null,
+        status: 'pending',
+        user_agent: navigator.userAgent,
+      });
 
-    toast({
-      title: "🎉 Application Submitted!",
-      description: "We'll review your application and get back to you within 48 hours.",
-    });
+      if (insertError) throw insertError;
 
-    setFormData({ name: "", email: "", phone: "", experience: "", portfolio: "", message: "" });
-    setIsSubmitting(false);
+      // 2. Log to activity_log for Boss Panel tracking
+      await logCriticalActivity({
+        actionType: selectedType === 'job' ? 'job_apply' : selectedType === 'developer' ? 'franchise_apply' : 'influencer_join',
+        entityType: 'job_application',
+        severity: 'info',
+        metadata: {
+          name: formData.name,
+          email: formData.email,
+          application_type: selectedType,
+          source: 'career_portal',
+        },
+      });
+
+      // 3. Insert into system_events for real-time Boss Panel notification
+      await (supabase as any).from('system_events').insert({
+        event_type: selectedType === 'job' ? 'job_apply' : selectedType === 'developer' ? 'developer_request' : 'influencer_join',
+        source_role: 'public',
+        payload: {
+          request_label: `${selectedType?.toUpperCase()} Application: ${formData.name}`,
+          name: formData.name,
+          email: formData.email,
+          application_type: selectedType,
+        },
+        status: 'PENDING',
+      });
+
+      toast({
+        title: "🎉 Application Submitted!",
+        description: "We'll review your application and get back to you within 48 hours.",
+      });
+
+      setFormData({ name: "", email: "", phone: "", experience: "", portfolio: "", message: "" });
+    } catch (err) {
+      console.error('Application submission error:', err);
+      toast({
+        title: "Submission Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const roleInfo = selectedType ? roleInfoMap[selectedType] : null;

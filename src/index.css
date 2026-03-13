@@ -61,6 +61,64 @@
     --sidebar-ring: 0 0% 100%;
 
     /* ========================================
+       AURORA COLOR PALETTE — Full Spectrum
+       ======================================== */
+    --aurora-violet: 262 83% 58%;
+    --aurora-purple: 280 87% 55%;
+    --aurora-blue: 217 91% 60%;
+    --aurora-cyan: 187 85% 53%;
+    --aurora-teal: 173 80% 40%;
+    --aurora-green: 160 84% 39%;
+    --aurora-lime: 84 81% 44%;
+    --aurora-gold: 45 93% 47%;
+    --aurora-orange: 25 95% 53%;
+    --aurora-rose: 346 77% 49%;
+    --aurora-pink: 330 81% 60%;
+    --aurora-magenta: 292 84% 61%;
+
+    /* ========================================
+       NEON COLOR PALETTE — Vivid Accents
+       ======================================== */
+    --neon-violet: 262 100% 65%;
+    --neon-cyan: 187 100% 50%;
+    --neon-green: 142 90% 45%;
+    --neon-orange: 25 100% 55%;
+    --neon-red: 0 90% 55%;
+    --neon-purple: 280 100% 60%;
+    --neon-blue: 217 100% 60%;
+    --neon-teal: 173 90% 42%;
+    --neon-pink: 330 100% 60%;
+    --neon-gold: 45 100% 50%;
+
+    /* ========================================
+       SURFACE COLORS — Depth Layers
+       ======================================== */
+    --surface-1: 222 47% 95%;
+    --surface-2: 222 30% 92%;
+    --surface-3: 222 20% 88%;
+    --surface-elevated: 0 0% 100%;
+
+    /* ========================================
+       STATUS COLORS - Professional
+       ======================================== */
+    --status-success: 142 76% 36%;
+    --status-warning: 38 92% 50%;
+    --status-error: 0 84% 60%;
+    --status-info: 217 91% 60%;
+    --status-pending: 38 80% 55%;
+
+    /* ========================================
+       LEGACY COMPATIBILITY
+       ======================================== */
+    --sapphire: 217 91% 60%;
+    --sapphire-light: 217 80% 72%;
+    --graphite: 222 14% 40%;
+    --graphite-dark: 222 20% 25%;
+    --sv-primary: 221 83% 53%;
+    --sv-accent: 262 83% 58%;
+    --sv-navy-deep: 224 71% 8%;
+
+    /* ========================================
        PREMIUM CARD GRADIENTS - Vibrant
        ======================================== */
     --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -76,13 +134,14 @@
     --gradient-pink: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     --gradient-mint: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
 
-    /* ========================================
-       STATUS COLORS - Professional
-       ======================================== */
-    --status-success: 142 76% 36%;
-    --status-warning: 38 92% 50%;
-    --status-error: 0 84% 60%;
-    --status-info: 217 91% 60%;
+    /* Premium Named Gradients */
+    --gradient-aurora: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(217 91% 60%) 50%, hsl(187 85% 53%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(346 77% 49%) 0%, hsl(25 95% 53%) 50%, hsl(45 93% 47%) 100%);
+    --gradient-ocean: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(187 85% 53%) 50%, hsl(173 80% 40%) 100%);
+    --gradient-cosmic: linear-gradient(135deg, hsl(280 87% 55%) 0%, hsl(262 83% 58%) 50%, hsl(217 91% 60%) 100%);
+    --gradient-emerald: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(173 80% 40%) 50%, hsl(187 85% 53%) 100%);
+    --gradient-royal: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(280 87% 55%) 100%);
+    --gradient-fire: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(25 95% 53%) 50%, hsl(45 93% 47%) 100%);
 
     /* Premium Shadows - Ultra Soft */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -95,56 +154,75 @@
     /* Glass Effect */
     --glass-bg: 0 0% 100% / 0.9;
     --glass-border: 0 0% 100% / 0.2;
-
-    /* Legacy Compatibility */
-    --sv-primary: 221 83% 53%;
-    --sv-accent: 262 83% 58%;
-    --neon-teal: 173 80% 40%;
-    --neon-orange: 25 95% 53%;
-    --neon-green: 142 76% 36%;
-    --sapphire: 217 91% 60%;
-    --aurora-violet: 262 83% 58%;
-    --aurora-gold: 45 93% 47%;
   }
-
-  /* Dark Mode - Premium Dark */
+  /* ========================================
+     Dark Mode - Software Vala Premium
+     Royal Blue (#1A4FA0) + White + Red (#E63946)
+     Layered depth surfaces, metallic feel
+     ======================================== */
   .dark {
-    --background: 224 71% 8%;
-    --foreground: 220 20% 98%;
+    --background: 222 55% 7%;
+    --foreground: 210 40% 98%;
 
-    --card: 224 71% 11%;
-    --card-foreground: 220 20% 98%;
+    --card: 222 50% 10%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 224 71% 11%;
-    --popover-foreground: 220 20% 98%;
+    --popover: 222 50% 10%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 243 75% 65%;
+    /* Primary - Software Vala Royal Blue */
+    --primary: 217 72% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 224 50% 15%;
-    --secondary-foreground: 220 20% 98%;
+    /* Secondary - Deep Navy Layer */
+    --secondary: 222 45% 14%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 224 50% 15%;
-    --muted-foreground: 220 14% 60%;
+    /* Muted - Steel Blue Gray */
+    --muted: 222 30% 16%;
+    --muted-foreground: 215 20% 55%;
 
-    --accent: 258 90% 70%;
+    /* Accent - Software Vala Red */
+    --accent: 355 78% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 63% 50%;
-    --destructive-foreground: 220 20% 98%;
+    /* Destructive - Clean Red */
+    --destructive: 355 78% 50%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 224 50% 18%;
-    --input: 224 50% 18%;
-    --ring: 243 75% 65%;
+    /* Borders & Inputs - Layered depth */
+    --border: 217 35% 20%;
+    --input: 217 35% 20%;
+    --ring: 217 72% 36%;
 
-    --sidebar-background: 243 75% 55%;
+    /* Sidebar - Deep Royal Blue */
+    --sidebar-background: 217 72% 30%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 243 75% 55%;
-    --sidebar-accent: 243 75% 45%;
+    --sidebar-primary-foreground: 217 72% 30%;
+    --sidebar-accent: 217 72% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 243 60% 60%;
+    --sidebar-border: 217 50% 35%;
     --sidebar-ring: 0 0% 100%;
+
+    /* Dark Surface Colors - Layered Depth (like reference image) */
+    --surface-1: 222 45% 10%;
+    --surface-2: 222 40% 13%;
+    --surface-3: 222 35% 17%;
+    --surface-elevated: 222 45% 12%;
+
+    /* Dark Glass */
+    --glass-bg: 222 55% 9% / 0.85;
+    --glass-border: 217 40% 28% / 0.4;
+
+    /* Software Vala Brand Tokens */
+    --sv-royal: 217 72% 36%;
+    --sv-royal-light: 217 65% 50%;
+    --sv-royal-glow: 217 72% 36% / 0.25;
+    --sv-red: 355 78% 55%;
+    --sv-red-glow: 355 78% 55% / 0.2;
+    --sv-white: 0 0% 100%;
+    --sv-white-muted: 210 25% 85%;
   }
 }
 
@@ -177,17 +255,17 @@
     @apply bg-card/70 backdrop-blur-xl border border-border/40 rounded-xl;
     box-shadow: 
       0 0 0 1px hsl(var(--glass-border)),
-      0 8px 32px hsl(230 25% 4% / 0.4),
-      inset 0 1px 0 hsl(var(--aurora-violet) / 0.08);
+      0 8px 32px hsl(222 55% 4% / 0.5),
+      inset 0 1px 0 hsl(var(--sv-royal) / 0.1);
   }
 
   .glass-panel-glow {
     @apply glass-panel;
     box-shadow: 
       0 0 0 1px hsl(var(--glass-border)),
-      0 0 40px hsl(var(--aurora-violet) / 0.15),
-      0 8px 32px hsl(230 25% 4% / 0.4),
-      inset 0 1px 0 hsl(var(--aurora-violet) / 0.1);
+      0 0 40px hsl(var(--sv-royal) / 0.12),
+      0 8px 32px hsl(222 55% 4% / 0.5),
+      inset 0 1px 0 hsl(var(--sv-royal) / 0.15);
   }
 
   .glass-aurora {
@@ -198,9 +276,9 @@
       hsl(var(--surface-1) / 0.7) 100%
     );
     box-shadow: 
-      0 0 0 1px hsl(var(--aurora-violet) / 0.2),
-      0 0 60px hsl(var(--aurora-violet) / 0.1),
-      0 20px 60px hsl(230 25% 4% / 0.5);
+      0 0 0 1px hsl(var(--sv-royal) / 0.2),
+      0 0 60px hsl(var(--sv-royal) / 0.08),
+      0 20px 60px hsl(222 55% 4% / 0.6);
   }
 
   /* ========================================
@@ -237,7 +315,7 @@
 
   .neon-text {
     @apply text-primary;
-    text-shadow: 0 0 20px hsl(var(--aurora-violet) / 0.8), 0 0 40px hsl(var(--aurora-violet) / 0.4);
+    text-shadow: 0 0 20px hsl(var(--sv-royal) / 0.6), 0 0 40px hsl(var(--sv-royal) / 0.3);
   }
 
   .neon-text-cyan {
@@ -248,6 +326,11 @@
   .neon-text-green {
     color: hsl(var(--aurora-green));
     text-shadow: 0 0 20px hsl(var(--neon-green) / 0.8), 0 0 40px hsl(var(--neon-green) / 0.4);
+  }
+
+  .neon-text-red {
+    color: hsl(var(--sv-red));
+    text-shadow: 0 0 20px hsl(var(--sv-red) / 0.6), 0 0 40px hsl(var(--sv-red) / 0.3);
   }
 
   /* ========================================
@@ -318,14 +401,26 @@
   
   .btn-premium {
     @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
-    background: var(--gradient-aurora);
+    background: linear-gradient(135deg, hsl(var(--sv-royal)) 0%, hsl(217 72% 28%) 100%);
     color: white;
-    box-shadow: 0 4px 20px hsl(var(--aurora-violet) / 0.4);
+    box-shadow: 0 4px 20px hsl(var(--sv-royal) / 0.35);
   }
 
   .btn-premium:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px hsl(var(--aurora-violet) / 0.5);
+    box-shadow: 0 8px 30px hsl(var(--sv-royal) / 0.5);
+  }
+
+  .btn-premium-red {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    background: linear-gradient(135deg, hsl(var(--sv-red)) 0%, hsl(355 78% 45%) 100%);
+    color: white;
+    box-shadow: 0 4px 20px hsl(var(--sv-red) / 0.3);
+  }
+
+  .btn-premium-red:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px hsl(var(--sv-red) / 0.45);
   }
 
   .btn-glass {
@@ -339,11 +434,11 @@
     @apply px-5 py-2.5 rounded-xl font-medium transition-all duration-300;
     @apply bg-transparent border-2 border-primary/60 text-primary;
     @apply hover:bg-primary/10;
-    box-shadow: 0 0 20px hsl(var(--aurora-violet) / 0.2);
+    box-shadow: 0 0 20px hsl(var(--sv-royal) / 0.15);
   }
 
   .btn-outline-glow:hover {
-    box-shadow: 0 0 30px hsl(var(--aurora-violet) / 0.4);
+    box-shadow: 0 0 30px hsl(var(--sv-royal) / 0.3);
   }
 
   /* ========================================
@@ -357,7 +452,7 @@
   .metric-card::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-500;
-    background: radial-gradient(circle at 50% 0%, hsl(var(--aurora-violet) / 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 0%, hsl(var(--sv-royal) / 0.12) 0%, transparent 70%);
   }
 
   .metric-card:hover::before {
@@ -393,7 +488,14 @@
   .sidebar-item-active {
     @apply sidebar-item bg-primary/15 text-primary;
     border-left: 3px solid hsl(var(--primary));
-    box-shadow: inset 0 0 30px hsl(var(--aurora-violet) / 0.1);
+    box-shadow: inset 0 0 30px hsl(var(--sv-royal) / 0.1);
+  }
+
+  /* Software Vala Brand Accent Bar */
+  .sv-accent-bar {
+    height: 3px;
+    background: linear-gradient(90deg, hsl(var(--sv-royal)) 0%, hsl(var(--sv-red)) 50%, hsl(var(--sv-royal)) 100%);
+    border-radius: 2px;
   }
 
   /* ========================================
@@ -619,12 +721,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, hsl(var(--aurora-violet) / 0.5) 0%, hsl(var(--aurora-cyan) / 0.5) 100%);
+  background: linear-gradient(180deg, hsl(217 72% 36% / 0.5) 0%, hsl(217 65% 50% / 0.4) 100%);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, hsl(var(--aurora-violet) / 0.7) 0%, hsl(var(--aurora-cyan) / 0.7) 100%);
+  background: linear-gradient(180deg, hsl(217 72% 36% / 0.7) 0%, hsl(217 65% 50% / 0.6) 100%);
 }
 
 /* ========================================
@@ -776,4 +878,67 @@ html {
 .gpu-accelerated {
   transform: translateZ(0);
   will-change: transform;
+}
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* ========================================
+   MOBILE PERFORMANCE & RESPONSIVENESS
+   ======================================== */
+
+/* Prevent horizontal overflow globally */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100vw;
+  min-height: 100%;
+}
+
+/* Native-app like viewport fill for mobile webview / APK wrappers */
+@supports (height: 100dvh) {
+  html, body, #root {
+    min-height: 100dvh;
+  }
+}
+
+/* Touch-optimized buttons — instant response */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Remove 300ms tap delay */
+  * {
+    touch-action: manipulation;
+  }
+}
+
+/* Active state feedback for buttons */
+button:active, [role="button"]:active {
+  transform: scale(0.97);
+  transition: transform 0.05s ease-out;
+}
+
+/* Smooth button transitions */
+button, [role="button"] {
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out, background-color 0.15s ease-out;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mobile-safe scrolling */
+@media (max-width: 768px) {
+  .overflow-auto, .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent content overflow on mobile */
+  main, section, .container {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
 }
