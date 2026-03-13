@@ -1,7 +1,14 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { applySecurityHeaders } from "./middleware/security-headers";
+import { initSecretsManager } from "./lib/security/secrets-manager";
 
+// Apply security headers (CSP, X-Frame-Options, etc.) as early as possible
+applySecurityHeaders();
+
+// Validate environment configuration at startup
+initSecretsManager();
 // =============================
 // Chunk-load recovery (logic only)
 // =============================

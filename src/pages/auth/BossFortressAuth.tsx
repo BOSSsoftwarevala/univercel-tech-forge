@@ -17,11 +17,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { verifyTOTP } from '@/lib/security/2fa-totp';
+import { audit } from '@/lib/security/audit-enhanced';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(8, 'Password must be at least 8 characters');
 
-type AuthStep = 'credentials' | 'device_verify' | 'email_otp' | 'success';
+type AuthStep = 'credentials' | 'device_verify' | 'email_otp' | 'totp' | 'success';
 
 interface DeviceInfo {
   fingerprint: string;
@@ -68,6 +70,8 @@ const BossFortressAuth = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [step, setStep] = useState<AuthStep>('credentials');
   const [emailOtpCode, setEmailOtpCode] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [totpSecret, setTotpSecret] = useState('');
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [countdown, setCountdown] = useState(0);
   const [sendingOtp, setSendingOtp] = useState(false);
@@ -257,31 +261,79 @@ const BossFortressAuth = () => {
         return;
       }
 
-      // Success - all verification passed
-      setStep('success');
-      
-      await supabase.from('audit_logs').insert({
-        user_id: currentUserId,
-        role: 'boss_owner' as any,
-        module: 'boss_fortress',
-        action: 'fortress_login_success',
-        meta_json: { 
-          device_fingerprint: deviceInfo?.fingerprint,
-          verification_method: 'password_device_email_otp'
-        }
-      });
+      // Fetch the user's TOTP secret (if TOTP is enrolled) via a dedicated RPC to avoid
+      // TypeScript issues with columns that may not be in the generated types.
+      const { data: totpData } = await supabase.rpc('get_user_totp_secret', {
+        p_user_id: currentUserId,
+      }) as { data: string | null; error: unknown };
 
-      toast.success('Welcome, Boss!');
-      
-      setTimeout(() => {
-        navigate('/super-admin', { replace: true });
-      }, 1500);
+      const secret = totpData ?? undefined;
+      if (secret) {
+        // TOTP is enrolled – require one more factor
+        setTotpSecret(secret);
+        setStep('totp');
+        setLoading(false);
+        return;
+      }
+
+      // No TOTP enrolled – finalise login
+      await completeLogin('password_device_email_otp');
     } catch (err) {
       console.error('OTP verify error:', err);
       toast.error('Verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Verify TOTP code
+  const handleTOTPVerify = async () => {
+    if (totpCode.length !== 6) {
+      toast.error('Please enter the 6-digit authenticator code');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await verifyTOTP({ secret: totpSecret }, totpCode);
+
+      if (!result.valid) {
+        await audit.twoFactorFailed(currentUserId ?? '', 'totp');
+        toast.error('Invalid authenticator code. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      await audit.twoFactorVerified(currentUserId ?? '', 'totp');
+      await completeLogin('password_device_email_otp_totp');
+    } catch (err) {
+      console.error('TOTP verify error:', err);
+      toast.error('Verification failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const completeLogin = async (verificationMethod: string) => {
+    setStep('success');
+
+    await audit.info({
+      userId: currentUserId,
+      role: 'boss_owner',
+      module: 'boss_fortress',
+      action: 'fortress_login_success',
+      meta: {
+        device_fingerprint: deviceInfo?.fingerprint,
+        verification_method: verificationMethod,
+      },
+    });
+
+    toast.success('Welcome, Boss!');
+
+    setTimeout(() => {
+      navigate('/super-admin', { replace: true });
+    }, 1500);
   };
 
   const resendEmailOTP = () => {
@@ -585,6 +637,53 @@ const BossFortressAuth = () => {
                     </Button>
                   </>
                 )}
+              </motion.div>
+            )}
+
+            {/* Step: TOTP Authenticator */}
+            {step === 'totp' && (
+              <motion.div
+                key="totp"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center gap-2 mb-6">
+                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                    TOTP
+                  </Badge>
+                  <span className="text-sm text-zinc-400">Authenticator App</span>
+                </div>
+
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center">
+                    <Smartphone className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white">Authenticator Code</h3>
+                  <p className="text-sm text-zinc-500">Enter the 6-digit code from your authenticator app</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <InputOTP maxLength={6} value={totpCode} onChange={setTotpCode}>
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} className="bg-zinc-950 border-zinc-700 text-white" />
+                      <InputOTPSlot index={1} className="bg-zinc-950 border-zinc-700 text-white" />
+                      <InputOTPSlot index={2} className="bg-zinc-950 border-zinc-700 text-white" />
+                      <InputOTPSlot index={3} className="bg-zinc-950 border-zinc-700 text-white" />
+                      <InputOTPSlot index={4} className="bg-zinc-950 border-zinc-700 text-white" />
+                      <InputOTPSlot index={5} className="bg-zinc-950 border-zinc-700 text-white" />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+
+                <Button
+                  onClick={handleTOTPVerify}
+                  disabled={loading || totpCode.length !== 6}
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-5 border-0"
+                >
+                  {loading ? 'Verifying...' : 'Verify Code'}
+                </Button>
               </motion.div>
             )}
 

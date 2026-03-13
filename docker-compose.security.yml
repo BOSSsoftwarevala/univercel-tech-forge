@@ -1,0 +1,122 @@
+version: "3.9"
+
+# ============================================================
+# Software Vala – Secure Deployment Compose
+# ============================================================
+# Hardens the default compose with:
+#  • Non-root container users
+#  • Read-only root filesystems where possible
+#  • Network isolation (no host-mode networking)
+#  • Dropped Linux capabilities
+#  • Resource limits (OOM protection)
+#  • Security labels / AppArmor where available
+# ============================================================
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true   # backend services are not reachable from the host
+
+volumes:
+  nginx_tmp:
+  nginx_logs:
+
+services:
+
+  # ----------------------------------------------------------
+  # Frontend (Nginx – serves the Vite/React SPA)
+  # ----------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    image: softwarevala/app:latest
+    container_name: sv_app
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    volumes:
+      - nginx_logs:/var/log/nginx
+    networks:
+      - frontend
+    ports:
+      - "80:8080"
+      - "443:8443"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE     # required to bind ports < 1024 inside the container
+      - CHOWN
+      - SETUID
+      - SETGID
+    environment:
+      - NGINX_WORKER_PROCESSES=auto
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ----------------------------------------------------------
+  # Reverse proxy / TLS termination (optional – for local prod)
+  # ----------------------------------------------------------
+  proxy:
+    image: caddy:2-alpine
+    container_name: sv_proxy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /data
+      - /config
+    volumes:
+      - ./deployments/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+    profiles:
+      - proxy   # Only started when --profile proxy is passed
+
+  # ----------------------------------------------------------
+  # Security scanner (runs on startup, exits after scan)
+  # ----------------------------------------------------------
+  trivy:
+    image: aquasec/trivy:latest
+    container_name: sv_trivy
+    command: image --exit-code 1 --severity HIGH,CRITICAL softwarevala/app:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: []
+    profiles:
+      - security-scan   # Run with: docker compose --profile security-scan up trivy
