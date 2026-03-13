@@ -1,2 +1,5 @@
-const useBossSidebarNavigation = () => {  return { AIRA: { isImplemented: true } };};
+/**
+ * Boss Sidebar Navigation Hook
+ * Handles sidebar item routing and module activation
+ */
 

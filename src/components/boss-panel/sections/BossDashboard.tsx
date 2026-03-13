@@ -10,12 +10,10 @@ import {
 
 
 
+
 const PIE_COLORS = [T.blue, T.green, T.amber, T.red, T.purple, T.cyan];
 
-// ─── ANIMATION PRESETS ───────────────────────────────────────
-const stagger = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.08 } } };
-const rise = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 400, damping: 28 } } };
-const float = { initial: { y: 0 }, animate: { y: [-1.5, 1.5, -1.5], transition: { duration: 5, repeat: Infinity, ease: 'easeInOut' as const } } };
+
 
 // ─── REUSABLE COMPONENTS ─────────────────────────────────────
 const Glass = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (

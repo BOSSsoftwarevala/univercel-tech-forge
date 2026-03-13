@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
 
@@ -21,18 +21,6 @@ import {
 } from './BossActionModals';
 import { BossPanelNotificationCenter } from './BossPanelNotificationCenter';
 
-// ─── ENTERPRISE DARK SHELL ───────────────────────────────────
-const S = {
-  bg:       'hsl(222, 47%, 7%)',
-  bgHover:  'hsla(217, 92%, 65%, 0.1)',
-  border:   'hsla(215, 40%, 35%, 0.3)',
-  text:     'hsl(210, 40%, 98%)',
-  muted:    'hsl(215, 22%, 58%)',
-  brand:    'hsl(217, 92%, 65%)',
-  green:    'hsl(160, 84%, 44%)',
-  red:      'hsl(346, 82%, 55%)',
-  amber:    'hsl(38, 95%, 55%)',
-};
 
 interface BossPanelHeaderProps {
   streamingOn: boolean;
@@ -47,28 +35,6 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const [showChat, setShowChat] = useState(false);
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCurrency, setShowCurrency] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  const navigate = useNavigate();
-  const { signOut, user } = useAuth();
-
-  useEffect(() => {
-
-    const fetchUnreadCount = async () => {
-      const { count } = await supabase
-        .from('user_notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-      setUnreadCount(count ?? 0);
-    };
-
-    fetchUnreadCount();
-
-    const channel = supabase
-      .channel(`header-notifications:${user.id}`)
-
-  }, [user?.id]);
 
   const handleEmergencyLock = async () => {
     setIsLocking(true);
@@ -172,6 +138,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
 
 
 
+
         <IconBtn onClick={() => setShowAssist(true)}><Headphones className="w-4 h-4" /></IconBtn>
         <IconBtn onClick={() => setShowPromise(true)}><ListChecks className="w-4 h-4" /></IconBtn>
         <IconBtn onClick={() => setShowChat(true)}><MessageSquare className="w-4 h-4" /></IconBtn>
@@ -229,8 +196,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       </div>
 
       {/* Modals */}
- copilot/create-orders-and-licenses-tables
-     
+ main
       <AssistModal open={showAssist} onClose={() => setShowAssist(false)} />
       <PromiseTrackerModal open={showPromise} onClose={() => setShowPromise(false)} />
       <InternalChatModal open={showChat} onClose={() => setShowChat(false)} />

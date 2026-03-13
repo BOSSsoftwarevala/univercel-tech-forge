@@ -1,3 +1,6 @@
+-- V135__create_notifications_table.sql
+-- Mirrors supabase/migrations/20260301000000_notifications_table.sql
+
 -- Create notifications table for real-time notification system
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -10,7 +13,9 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   action_user_id UUID,
   action_user_name VARCHAR(255),
   is_read BOOLEAN DEFAULT FALSE,
-
+  read_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   metadata JSONB DEFAULT '{}'::jsonb
 );
 
