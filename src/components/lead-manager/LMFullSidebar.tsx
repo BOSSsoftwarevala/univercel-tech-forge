@@ -22,6 +22,7 @@ const sidebarSections = [
     label: '1. Lead Overview',
     items: [
       { id: 'dashboard', label: 'Lead Dashboard', icon: LayoutDashboard },
+      { id: 'lead_inbox', label: 'Lead Inbox', icon: Target, badge: 0 },
       { id: 'total_leads', label: 'Total Leads', icon: Target, badge: 3717 },
       { id: 'active_leads', label: 'Active / Cold / Hot Leads', icon: TrendingUp },
       { id: 'time_leads', label: 'Today / Weekly / Monthly', icon: Calendar },

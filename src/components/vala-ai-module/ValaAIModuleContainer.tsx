@@ -6,12 +6,20 @@
  * LOCKED: DO NOT CHANGE COLORS/FONTS/THEME
  */
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { ValaAISidebar, ValaAISection } from './ValaAISidebar';
 import ValaAICommandCenter from './ValaAICommandCenter';
+import ActiveProjectPanel from './sections/ActiveProjectPanel';
+import PromptHistoryPanel from './sections/PromptHistoryPanel';
+import ExecutionLogsPanel from './sections/ExecutionLogsPanel';
+import ErrorDetectionPanel from './sections/ErrorDetectionPanel';
+import RollbackPanel from './sections/RollbackPanel';
+import LockStatusPanel from './sections/LockStatusPanel';
 import { AIModelsPanel } from './AIModelsPanel';
 import { AICreditsPanel } from './AICreditsPanel';
 import { DevSettings } from './DevSettings';
+
+const ContinuousCreationDashboard = lazy(() => import('./ContinuousCreationDashboard'));
 
 interface ValaAIModuleContainerProps {
   initialSection?: ValaAISection;
@@ -27,33 +35,56 @@ export const ValaAIModuleContainer: React.FC<ValaAIModuleContainerProps> = ({
   const renderContent = () => {
     switch (activeSection) {
       case 'command-center':
-      case 'active-project':
-      case 'prompt-history':
-      case 'execution-logs':
-      case 'error-detection':
-      case 'rollback':
-      case 'lock-status':
-        // All core functions route to Command Center
         return <ValaAICommandCenter />;
+      case 'continuous-creation':
+        return (
+          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="text-white/50 font-mono text-sm">Loading Auto Builder...</div></div>}>
+            <ContinuousCreationDashboard />
+          </Suspense>
+        );
+      case 'active-project':
+        return <ActiveProjectPanel />;
+      case 'prompt-history':
+        return <PromptHistoryPanel />;
+      case 'execution-logs':
+        return <ExecutionLogsPanel />;
+      case 'error-detection':
+        return <ErrorDetectionPanel />;
+      case 'rollback':
+        return <RollbackPanel />;
+      case 'lock-status':
+        return <LockStatusPanel />;
       case 'models':
-        return <AIModelsPanel />;
+        return (
+          <div className="p-6 overflow-y-auto h-full">
+            <AIModelsPanel />
+          </div>
+        );
       case 'credits':
-        return <AICreditsPanel />;
+        return (
+          <div className="p-6 overflow-y-auto h-full">
+            <AICreditsPanel />
+          </div>
+        );
       case 'settings':
-        return <DevSettings />;
+        return (
+          <div className="p-6 overflow-y-auto h-full">
+            <DevSettings />
+          </div>
+        );
       default:
         return <ValaAICommandCenter />;
     }
   };
 
   return (
-    <div className="flex min-h-screen w-full" style={{ background: '#0B0F1A' }}>
+    <div className="flex w-full overflow-hidden min-h-[100dvh] h-[100dvh]" style={{ background: '#0B0F1A' }}>
       <ValaAISidebar 
         activeSection={activeSection}
         onSectionChange={setActiveSection}
         onBack={onBack}
       />
-      <div className="flex-1 overflow-hidden" style={{ color: '#FFFFFF' }}>
+      <div className="flex-1 overflow-hidden h-full min-h-0" style={{ color: '#FFFFFF' }}>
         {renderContent()}
       </div>
     </div>

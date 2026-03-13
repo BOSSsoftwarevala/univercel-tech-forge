@@ -44,11 +44,32 @@ export function useBossDashboard() {
       const totalModules = modules?.length || 1;
       const systemHealth = Math.round((activeModules / totalModules) * 100);
 
+      // Get active continents count
+      const { count: continentsCount } = await supabase
+        .from('continents')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+      // Get active countries count
+      const { count: countriesCount } = await supabase
+        .from('master_countries')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+      // Get revenue from completed orders in last 24 hours
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data: revenueData } = await supabase
+        .from('orders')
+        .select('amount')
+        .eq('payment_status', 'completed')
+        .gte('created_at', twentyFourHoursAgo);
+      const revenueToday = revenueData?.reduce((sum, order) => sum + (order.amount || 0), 0) || 0;
+
       return {
         totalSuperAdmins: superAdminCount || 0,
-        activeContinents: 6, // Placeholder - would come from real data
-        countriesLive: 45, // Placeholder
-        revenueToday: 125000, // Placeholder
+        activeContinents: continentsCount || 0,
+        countriesLive: countriesCount || 0,
+        revenueToday,
         criticalAlerts: alertsCount || 0,
         systemHealth
       };

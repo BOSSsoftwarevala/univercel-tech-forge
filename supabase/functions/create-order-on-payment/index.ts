@@ -38,8 +38,7 @@ serve(async (req) => {
       );
     }
 
-    // Generate unique order number
-    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
+
 
     // Create order
     const { data: order, error: orderError } = await supabase
@@ -63,8 +62,7 @@ serve(async (req) => {
 
     if (orderError) throw orderError;
 
-    // Generate license key
-    const licenseKey = `LIC-${order.id.substring(0, 8).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+
 
     // Create license
     const { data: license, error: licenseError } = await supabase

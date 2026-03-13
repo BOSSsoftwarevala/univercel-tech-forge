@@ -78,7 +78,7 @@ export function useInfluencerManagerGuard() {
         description: "You don't have permission to access this area.",
         variant: "destructive",
       });
-      navigate('/influencer-manager-secure');
+      navigate('/secure/influencer-manager');
     }
   }, [location.pathname, checkRouteAccess, navigate, toast]);
 

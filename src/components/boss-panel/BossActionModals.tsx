@@ -98,7 +98,7 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
         .limit(20);
 
       if (data) {
-        setNotifications(data as UserNotification[]);
+
         updateUnreadCount(data.filter((n) => !n.is_read).length);
       }
     };
@@ -117,7 +117,7 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
         },
         (payload) => {
           setNotifications((prev) => [payload.new as UserNotification, ...prev]);
-          updateUnreadCount(unreadCount + 1);
+
         }
       )
       .subscribe();
@@ -145,10 +145,7 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
     toast.success('All notifications marked as read');
   };
 
-  const getNotifType = (type: string | null) => {
-    if (type === 'order_created') return 'info';
-    if (type === 'critical') return 'critical';
-    if (type === 'warning') return 'warning';
+
     return 'info';
   };
 
@@ -169,39 +166,7 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
           </Button>
         </div>
         <div className="space-y-2">
-          {notifications.length === 0 && (
-            <p className="text-sm text-slate-400 text-center py-4">No notifications</p>
-          )}
-          {notifications.map((notif) => {
-            const notifType = getNotifType(notif.type);
-            const timeAgo = new Date(notif.created_at).toLocaleString();
-            return (
-              <div 
-                key={notif.id}
-                className={cn(
-                  "p-3 rounded-lg border transition-all cursor-pointer hover:border-blue-500/50",
-                  notif.is_read
-                    ? "bg-slate-800/50 border-slate-700" 
-                    : "bg-slate-800 border-slate-600"
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={cn(
-                    "w-2 h-2 rounded-full mt-2 flex-shrink-0",
-                    notifType === 'critical' ? "bg-red-500" :
-                    notifType === 'warning' ? "bg-amber-500" : "bg-blue-500"
-                  )} />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className={cn(
-                        "text-sm font-medium",
-                        notif.is_read ? "text-slate-300" : "text-white"
-                      )}>
-                        {notif.title ?? notif.message}
-                      </p>
-                      <span className="text-xs text-slate-500">{timeAgo}</span>
-                    </div>
-                    <p className="text-sm text-slate-400 mt-1">{notif.message}</p>
+
                   </div>
                 </div>
               </div>

@@ -66,7 +66,9 @@ const ROLE_CATEGORIES = [
   { id: 'customer_support_management', label: 'Customer Support', icon: HeartHandshake },
   // GRADE 4
   { id: 'franchise_manager', label: 'Franchise Owner', icon: Building2 },
+  { id: 'franchise_dashboard', label: 'Franchise Dashboard', icon: Building2 },
   { id: 'reseller_manager', label: 'Reseller Manager', icon: Handshake },
+  { id: 'reseller_dashboard', label: 'Reseller Dashboard', icon: Handshake },
   { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
   { id: 'influencer_dashboard', label: 'Influencer Dashboard', icon: User },
   // GRADE 5

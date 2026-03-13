@@ -68,56 +68,34 @@ const EnhancedDemoCard: React.FC<EnhancedDemoCardProps> = ({
     return sessionId;
   };
 
-  const handleBuyNow = async () => {
-    await logAction({
+  const handleBuyNow = () => {
+    // Navigate instantly, log async in background
+    navigate(`/checkout/${id}`);
+    logAction({
       action: 'public_buy_now_clicked',
       module: 'finance',
       severity: 'low',
       metadata: {
-        system_request: {
-          enabled: true,
-          action_type: 'order',
-          role_type: 'client',
-          status: 'NEW',
-          source: 'frontend',
-          payload_json: {
-            intent: 'buy_now',
-            demo_id: id,
-            demo_title: title,
-            category,
-          },
-        },
         demo_id: id,
         demo_title: title,
+        category,
       },
-    });
-    navigate(`/checkout/${id}`);
+    }).catch(() => {});
   };
 
-  const handleStartDemo = async () => {
-    await logAction({
+  const handleStartDemo = () => {
+    // Navigate instantly, log async in background
+    navigate(`/demo/${id}`);
+    logAction({
       action: 'public_try_demo_clicked',
       module: 'vala_builder',
       severity: 'low',
       metadata: {
-        system_request: {
-          enabled: true,
-          action_type: 'demo',
-          role_type: 'client',
-          status: 'NEW',
-          source: 'frontend',
-          payload_json: {
-            intent: 'try_demo',
-            demo_id: id,
-            demo_title: title,
-            category,
-          },
-        },
         demo_id: id,
         demo_title: title,
+        category,
       },
-    });
-    navigate(`/demo/${id}`);
+    }).catch(() => {});
   };
 
   const handleAddToCart = async () => {
