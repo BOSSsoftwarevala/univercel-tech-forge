@@ -48,17 +48,12 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCurrency, setShowCurrency] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [time, setTime] = useState(new Date());
+
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
 
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
 
-  useEffect(() => {
-    if (!user?.id) return;
     const fetchUnreadCount = async () => {
       const { count } = await supabase
         .from('user_notifications')
@@ -67,20 +62,12 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
         .eq('is_read', false);
       setUnreadCount(count ?? 0);
     };
+
     fetchUnreadCount();
 
     const channel = supabase
       .channel(`header-notifications:${user.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT', schema: 'public', table: 'user_notifications',
-        filter: `user_id=eq.${user.id}`,
-      }, (payload) => {
-        if (payload.new && (payload.new as { is_read: boolean }).is_read === false) {
-          setUnreadCount((prev) => prev + 1);
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+
   }, [user?.id]);
 
   const handleEmergencyLock = async () => {
@@ -184,6 +171,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
 
 
 
+
         <IconBtn onClick={() => setShowAssist(true)}><Headphones className="w-4 h-4" /></IconBtn>
         <IconBtn onClick={() => setShowPromise(true)}><ListChecks className="w-4 h-4" /></IconBtn>
         <IconBtn onClick={() => setShowChat(true)}><MessageSquare className="w-4 h-4" /></IconBtn>
@@ -241,7 +229,8 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       </div>
 
       {/* Modals */}
-
+ copilot/create-orders-and-licenses-tables
+     
       <AssistModal open={showAssist} onClose={() => setShowAssist(false)} />
       <PromiseTrackerModal open={showPromise} onClose={() => setShowPromise(false)} />
       <InternalChatModal open={showChat} onClose={() => setShowChat(false)} />
