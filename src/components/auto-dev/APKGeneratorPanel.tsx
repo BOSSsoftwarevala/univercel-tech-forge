@@ -86,7 +86,7 @@ export const APKGeneratorPanel = ({ projectName = "My Project", onApprovalReques
             Mobile App Generator
           </CardTitle>
           <Badge variant="outline" className="bg-violet-500/10 text-violet-400 border-violet-500/50">
-            Not in Lovable
+            Exclusive Feature
           </Badge>
         </div>
       </CardHeader>

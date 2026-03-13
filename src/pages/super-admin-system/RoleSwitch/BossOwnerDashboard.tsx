@@ -5,7 +5,7 @@ import {
   DollarSign, Wallet, BarChart3, ShieldAlert, FileText,
   Scale, Cpu, Clock, ArrowLeft, Eye, Edit3, RefreshCw,
   Play, StopCircle, Pause, CheckCircle, XCircle, UserPlus,
-  Megaphone, Store, Loader2, Bell, Bot, Sparkles
+  Megaphone, Store, Loader2, Bell, Bot, Sparkles, Briefcase, PauseCircle
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,9 @@ import { MarketingModuleContainer } from "@/components/marketing-module/Marketin
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { BossLiveStatsRow } from "@/components/boss-panel/BossLiveStatsRow";
+import { BossOperationalRow } from "@/components/boss-panel/BossOperationalRow";
+import { BossActivityAlertsRow } from "@/components/boss-panel/BossActivityAlertsRow";
 
 // ===== BOX TYPES =====
 type BoxType = 'data' | 'process' | 'ai' | 'approval' | 'live';
@@ -100,7 +103,8 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     resellers: any[];
     franchises: any[];
     influencers: any[];
-  }>({ resellers: [], franchises: [], influencers: [] });
+    jobApplications: any[];
+  }>({ resellers: [], franchises: [], influencers: [], jobApplications: [] });
   const [loadingApprovals, setLoadingApprovals] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -133,10 +137,18 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           .eq('status', 'pending')
           .limit(50);
 
-        const [resellerRes, franchiseRes, influencerRes] = await Promise.all([
+        const jobQuery = (supabase as any)
+          .from('job_applications')
+          .select('*')
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        const [resellerRes, franchiseRes, influencerRes, jobRes] = await Promise.all([
           resellerQuery,
           franchiseQuery,
           influencerQuery,
+          jobQuery,
         ]);
         
         // Add auto_approve_eligible flag to each application
@@ -148,13 +160,15 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
         console.log('All pending approvals fetched:', {
           resellers: resellerRes.data?.length || 0,
           franchises: franchiseRes.data?.length || 0,
-          influencers: influencerRes.data?.length || 0
+          influencers: influencerRes.data?.length || 0,
+          jobApplications: jobRes.data?.length || 0,
         });
         
         setApprovals({
           resellers: processApprovals((resellerRes.data as any[]) || []),
           franchises: processApprovals((franchiseRes.data as any[]) || []),
           influencers: processApprovals((influencerRes.data as any[]) || []),
+          jobApplications: (jobRes.data as any[]) || [],
         });
       } catch (e) {
         console.error('Error fetching approvals:', e);
@@ -220,6 +234,53 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           }));
         }
       )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'job_applications' },
+        (payload) => {
+          console.log('New job application:', payload);
+          const newApp = payload.new as any;
+          toast.success(`🆕 New ${(newApp.application_type || 'Job').toUpperCase()} Application!`, {
+            description: `${newApp.name || 'Applicant'} - ${newApp.email || ''}`,
+            duration: 10000,
+          });
+          setApprovals(prev => ({
+            ...prev,
+            jobApplications: [newApp, ...prev.jobApplications]
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'system_events',
+          filter: 'status=eq.PENDING',
+        },
+        (payload) => {
+          const event = payload.new as any;
+          const trackedEvents = new Set([
+            'reseller_request',
+            'franchise_request',
+            'developer_request',
+            'job_apply',
+            'support_request',
+            'enquiry',
+            'marketplace_order_placed',
+          ]);
+
+          if (!trackedEvents.has(String(event?.event_type || ''))) return;
+
+          const meta = (event?.payload && typeof event.payload === 'object') ? event.payload : {};
+          const label = String((meta as any).request_label || (meta as any).product_name || event.event_type || 'New request');
+
+          toast.success('🔔 Marketplace / Apply action received', {
+            description: label,
+            duration: 10000,
+          });
+        }
+      )
       .subscribe((status) => {
         console.log('Realtime subscription status:', status);
       });
@@ -261,22 +322,30 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
   };
 
   // === APPROVAL ACTIONS ===
-  const handleApproval = async (type: 'reseller' | 'franchise' | 'influencer', id: string, action: 'approve' | 'reject') => {
+  const handleApproval = async (type: 'reseller' | 'franchise' | 'influencer' | 'job', id: string, action: 'approve' | 'reject' | 'hold') => {
     setProcessingId(id);
     try {
-      const table = type === 'reseller' ? 'reseller_applications' : type === 'franchise' ? 'franchise_accounts' : 'influencer_accounts';
-      const newStatus = action === 'approve' ? 'approved' : 'rejected';
+      const tableMap: Record<string, string> = {
+        reseller: 'reseller_applications',
+        franchise: 'franchise_accounts',
+        influencer: 'influencer_accounts',
+        job: 'job_applications',
+      };
+      const table = tableMap[type];
+      const statusMap: Record<string, string> = { approve: 'approved', reject: 'rejected', hold: 'on_hold' };
+      const newStatus = statusMap[action];
       
-      const { error } = await supabase.from(table).update({ status: newStatus }).eq('id', id);
+      const { error } = await (supabase as any).from(table).update({ status: newStatus }).eq('id', id);
       if (error) throw error;
       
       await logAction(`${action}_${type}`, id, { status: newStatus });
-      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} ${action}d successfully`);
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} ${action === 'hold' ? 'put on hold' : action + 'd'} successfully`);
       
       // Remove from local state
+      const stateKey = type === 'job' ? 'jobApplications' : type + 's';
       setApprovals(prev => ({
         ...prev,
-        [type + 's']: prev[type + 's' as keyof typeof prev].filter((item: any) => item.id !== id)
+        [stateKey]: (prev as any)[stateKey].filter((item: any) => item.id !== id)
       }));
     } catch (e) {
       console.error(e);
@@ -330,7 +399,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
     setShowLock(false); setReason(""); setConfirmed(false);
   };
 
-  const totalPendingApprovals = approvals.resellers.length + approvals.franchises.length + approvals.influencers.length;
+  const totalPendingApprovals = approvals.resellers.length + approvals.franchises.length + approvals.influencers.length + approvals.jobApplications.length;
 
   // If module is selected, show module container with back button
   if (activeNav && activeNav in modules) {
@@ -454,7 +523,7 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
             </div>
           </div>
           
-          <div className="p-4 grid grid-cols-3 gap-4">
+          <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* RESELLER PENDING */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
               <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
@@ -547,286 +616,53 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
                 )}
               </ScrollArea>
             </div>
+
+            {/* JOB / CAREER PENDING */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <Briefcase size={14} className="text-white" />
+                <span className="text-xs font-semibold text-white">JOB / CAREER</span>
+                <Badge className="ml-auto text-[10px] bg-white/20 text-white">{approvals.jobApplications.length}</Badge>
+              </div>
+              <ScrollArea className="h-[200px]">
+                {approvals.jobApplications.length === 0 ? (
+                  <p className="text-xs text-center py-4 text-red-200">No job applications waiting</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.jobApplications.map((item: any) => (
+                      <div key={item.id} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <p className="text-sm font-semibold text-white">{item.name || 'Applicant'}</p>
+                        <p className="text-[10px] text-red-200">{item.application_type?.toUpperCase()} • {item.email}</p>
+                        <p className="text-[9px] text-red-300">{item.experience || 'No experience listed'} • {new Date(item.created_at).toLocaleDateString()}</p>
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('job', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Approve'}
+                          </Button>
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-amber-600 hover:bg-amber-700" onClick={() => handleApproval('job', item.id, 'hold')} disabled={processingId === item.id}>
+                            Hold
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-6 px-2 text-[10px]" onClick={() => handleApproval('job', item.id, 'reject')} disabled={processingId === item.id}>
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
           </div>
         </motion.div>
       )}
 
-      {/* ===== ROW 2: KEY STATS — 4 EQUAL LARGE CARDS WITH ACTIONS ===== */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        {/* REVENUE */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <DollarSign size={18} style={{ color: '#60a5fa' }} />
-                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>REVENUE</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Active</Badge>
-            </div>
-            <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>$2.4M</p>
-            <p className="text-xs" style={{ color: '#22c55e' }}>+24% from last month</p>
-            <Chart type="bar" />
-          </div>
-          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'revenue')} />
-            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'revenue')} />
-            <ActionBtn icon={RefreshCw} label="Update" onClick={() => handleBoxAction('update', 'revenue')} />
-          </div>
-        </motion.div>
+      {/* ===== ROW 2: KEY STATS — 4 EQUAL LARGE CARDS WITH ACTIONS (DB-DRIVEN) ===== */}
+      <BossLiveStatsRow handleBoxAction={handleBoxAction} />
 
-        {/* USERS */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Users size={18} style={{ color: '#60a5fa' }} />
-                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>USERS</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Active</Badge>
-            </div>
-            <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>12.5K</p>
-            <p className="text-xs" style={{ color: '#22c55e' }}>+2,847 new this week</p>
-            <Chart type="line" />
-          </div>
-          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'users')} />
-            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'users')} />
-            <ActionBtn icon={RefreshCw} label="Update" onClick={() => handleBoxAction('update', 'users')} />
-          </div>
-        </motion.div>
+      {/* ===== ROW 3: OPERATIONAL AUTHORITY (DB-DRIVEN) ===== */}
+      <BossOperationalRow handleBoxAction={handleBoxAction} />
 
-        {/* FRANCHISES */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Building2 size={18} style={{ color: '#60a5fa' }} />
-                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>FRANCHISES</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Active</Badge>
-            </div>
-            <p className="text-2xl font-bold mb-1" style={{ color: '#e2e8f0' }}>128</p>
-            <p className="text-xs" style={{ color: '#60a5fa' }}>45 countries active</p>
-            <Chart type="bar" />
-          </div>
-          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'franchises')} />
-            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'franchises')} />
-            <ActionBtn icon={RefreshCw} label="Update" onClick={() => handleBoxAction('update', 'franchises')} />
-          </div>
-        </motion.div>
-
-        {/* SYSTEM */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Server size={18} style={{ color: '#60a5fa' }} />
-                <span className="text-xs font-semibold tracking-wider" style={{ color: '#60a5fa' }}>SYSTEM</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Active</Badge>
-            </div>
-            <p className="text-2xl font-bold mb-1" style={{ color: '#22c55e' }}>99.9%</p>
-            <p className="text-xs" style={{ color: '#e2e8f0' }}>Uptime • 124ms response</p>
-            <Chart type="line" />
-          </div>
-          <div className="px-4 py-2 flex gap-2 border-t border-blue-500/10">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'system')} />
-            <ActionBtn icon={Play} label="Start" onClick={() => handleBoxAction('start', 'system')} />
-            <ActionBtn icon={StopCircle} label="Stop" onClick={() => handleBoxAction('stop', 'system')} variant="destructive" />
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ===== ROW 3: OPERATIONAL AUTHORITY — 6 MEDIUM CARDS WITH ACTIONS ===== */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        {/* CEO */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Crown size={16} style={{ color: T.primary }} />
-                <span className="text-sm font-semibold" style={{ color: T.text }}>CEO</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Active</Badge>
-            </div>
-            <p className="text-lg font-bold" style={{ color: T.text }}>12 Tasks</p>
-            <p className="text-xs" style={{ color: T.muted }}>3 pending approval</p>
-          </div>
-          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'ceo')} />
-            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'ceo')} />
-          </div>
-        </motion.div>
-
-        {/* VALA AI */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Brain size={16} style={{ color: T.primary }} />
-                <span className="text-sm font-semibold" style={{ color: T.text }}>VALA AI</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Running</Badge>
-            </div>
-            <p className="text-lg font-bold" style={{ color: T.text }}>847 Requests</p>
-            <p className="text-xs" style={{ color: T.muted }}>AI processing active</p>
-          </div>
-          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'vala-ai')} />
-            <ActionBtn icon={Play} label="Start AI" onClick={() => handleBoxAction('startAi', 'vala-ai')} />
-            <ActionBtn icon={StopCircle} label="Stop AI" onClick={() => handleBoxAction('stopAi', 'vala-ai')} variant="destructive" />
-          </div>
-        </motion.div>
-
-        {/* SERVER */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Cpu size={16} style={{ color: T.primary }} />
-                <span className="text-sm font-semibold" style={{ color: T.text }}>SERVER</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>Healthy</Badge>
-            </div>
-            <p className="text-lg font-bold" style={{ color: '#22c55e' }}>42%</p>
-            <p className="text-xs" style={{ color: T.muted }}>CPU Load • 8GB RAM used</p>
-          </div>
-          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'server')} />
-            <ActionBtn icon={Play} label="Start" onClick={() => handleBoxAction('start', 'server')} />
-            <ActionBtn icon={StopCircle} label="Stop" onClick={() => handleBoxAction('stop', 'server')} variant="destructive" />
-          </div>
-        </motion.div>
-
-        {/* SALES & SUPPORT */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <CreditCard size={16} style={{ color: T.primary }} />
-                <span className="text-sm font-semibold" style={{ color: T.text }}>SALES & SUPPORT</span>
-              </div>
-              <Badge className={STATUS_COLORS['pending']}>24 Open</Badge>
-            </div>
-            <p className="text-lg font-bold" style={{ color: T.text }}>$1.2M</p>
-            <p className="text-xs" style={{ color: T.muted }}>Today's transactions</p>
-          </div>
-          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'sales')} />
-            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'sales')} />
-          </div>
-        </motion.div>
-
-        {/* FRANCHISE OPS */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Globe2 size={16} style={{ color: T.primary }} />
-                <span className="text-sm font-semibold" style={{ color: T.text }}>FRANCHISE OPS</span>
-              </div>
-              <Badge className={STATUS_COLORS['active']}>128</Badge>
-            </div>
-            <p className="text-lg font-bold" style={{ color: T.text }}>Mumbai</p>
-            <p className="text-xs" style={{ color: T.muted }}>Top performer • $18.7K avg</p>
-          </div>
-          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'franchise-ops')} />
-            <ActionBtn icon={Edit3} label="Edit" onClick={() => handleBoxAction('edit', 'franchise-ops')} />
-          </div>
-        </motion.div>
-
-        {/* SYSTEM HEALTH */}
-        <motion.div whileHover={{ y: -2 }} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <ShieldAlert size={16} style={{ color: T.primary }} />
-                <span className="text-sm font-semibold" style={{ color: T.text }}>SYSTEM HEALTH</span>
-              </div>
-              <Badge className={STATUS_COLORS['error']}>3 Alerts</Badge>
-            </div>
-            <p className="text-lg font-bold" style={{ color: '#22c55e' }}>47</p>
-            <p className="text-xs" style={{ color: T.muted }}>Issues resolved today</p>
-          </div>
-          <div className="px-3 py-2 flex gap-2 border-t border-white/5">
-            <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'system-health')} />
-            <ActionBtn icon={Pause} label="Pause" onClick={() => handleBoxAction('pause', 'system-health')} />
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ===== ROW 4: ACTIVITY & ALERTS — FULL WIDTH PANEL WITH ACTIONS ===== */}
-      <motion.div whileHover={{ y: -2 }} style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a1628 100%)', border: '1px solid rgba(37, 99, 235, 0.2)', borderRadius: 8, overflow: 'hidden' }}>
-        <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(37, 99, 235, 0.15)' }}>
-          <div className="flex items-center gap-2">
-            <Activity size={16} style={{ color: '#60a5fa' }} />
-            <span className="text-sm font-semibold tracking-wider" style={{ color: '#60a5fa' }}>ACTIVITY & ALERTS</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Badge className={STATUS_COLORS['active']}>AI: Online</Badge>
-            <Badge className={STATUS_COLORS['pending']}>5 Pending</Badge>
-            <Badge className={STATUS_COLORS['error']}>3 Alerts</Badge>
-          </div>
-        </div>
-        <div className="p-4 grid grid-cols-4 gap-4">
-          {/* AI Status */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <Brain size={14} style={{ color: '#60a5fa' }} />
-              <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>AI STATUS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>Processing 12 requests</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>Avg response: 1.2s</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'ai-status')} />
-              <ActionBtn icon={FileText} label="Logs" onClick={() => handleBoxAction('viewLogs', 'ai-status')} />
-            </div>
-          </motion.div>
-
-          {/* Pending Actions */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <Clock size={14} style={{ color: '#60a5fa' }} />
-              <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>PENDING ACTIONS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>5 items need review</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>3 high priority</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'pending-actions')} />
-            </div>
-          </motion.div>
-
-          {/* Alerts */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(220, 38, 38, 0.05)', border: '1px solid rgba(220, 38, 38, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <ShieldAlert size={14} style={{ color: '#dc2626' }} />
-              <span className="text-xs font-medium" style={{ color: '#dc2626' }}>ALERTS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>3 security alerts</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>1 critical • 2 warnings</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'alerts')} />
-              <ActionBtn icon={Pause} label="Pause" onClick={() => handleBoxAction('pause', 'alerts')} />
-            </div>
-          </motion.div>
-
-          {/* Logs */}
-          <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded" style={{ background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <FileText size={14} style={{ color: '#60a5fa' }} />
-              <span className="text-xs font-medium" style={{ color: '#60a5fa' }}>LOGS</span>
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>1,247 entries today</p>
-            <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>Last: 2 mins ago</p>
-            <div className="mt-3 flex gap-1">
-              <ActionBtn icon={Eye} label="View" onClick={() => handleBoxAction('view', 'logs')} />
-              <ActionBtn icon={RefreshCw} label="Refresh" onClick={() => handleBoxAction('update', 'logs')} />
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
+      {/* ===== ROW 4: ACTIVITY & ALERTS (DB-DRIVEN) ===== */}
+      <BossActivityAlertsRow handleBoxAction={handleBoxAction} />
 
       {/* ===== ROW 5: APPROVAL QUEUE — RESELLER / FRANCHISE / INFLUENCER ===== */}
       <motion.div 
@@ -858,10 +694,10 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
           <div className="p-8 text-center">
             <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-400" />
             <p className="text-sm font-medium" style={{ color: T.text }}>All approvals cleared</p>
-            <p className="text-xs" style={{ color: T.muted }}>No pending reseller, franchise, or influencer applications</p>
+            <p className="text-xs" style={{ color: T.muted }}>No pending reseller, franchise, influencer, or job applications</p>
           </div>
         ) : (
-          <div className="p-4 grid grid-cols-3 gap-4">
+          <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* RESELLER APPROVALS */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
               <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -906,6 +742,9 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
                         <div className="flex gap-1 mt-2">
                           <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('reseller', item.id, 'approve')} disabled={processingId === item.id}>
                             {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
+                          </Button>
+                          <Button size="sm" className="h-7 px-2 text-[11px] bg-amber-600 hover:bg-amber-700" onClick={() => handleApproval('reseller', item.id, 'hold')} disabled={processingId === item.id}>
+                            <PauseCircle className="w-3 h-3 mr-1" /> Hold
                           </Button>
                           <Button size="sm" variant="destructive" className="h-7 px-3 text-[11px]" onClick={() => handleApproval('reseller', item.id, 'reject')} disabled={processingId === item.id}>
                             <XCircle className="w-3 h-3 mr-1" /> Reject
@@ -962,6 +801,9 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
                           <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('franchise', item.id, 'approve')} disabled={processingId === item.id}>
                             {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
                           </Button>
+                          <Button size="sm" className="h-7 px-2 text-[11px] bg-amber-600 hover:bg-amber-700" onClick={() => handleApproval('franchise', item.id, 'hold')} disabled={processingId === item.id}>
+                            <PauseCircle className="w-3 h-3 mr-1" /> Hold
+                          </Button>
                           <Button size="sm" variant="destructive" className="h-7 px-3 text-[11px]" onClick={() => handleApproval('franchise', item.id, 'reject')} disabled={processingId === item.id}>
                             <XCircle className="w-3 h-3 mr-1" /> Reject
                           </Button>
@@ -1017,7 +859,62 @@ const BossOwnerDashboard = ({ activeNav }: Props) => {
                           <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('influencer', item.id, 'approve')} disabled={processingId === item.id}>
                             {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
                           </Button>
+                          <Button size="sm" className="h-7 px-2 text-[11px] bg-amber-600 hover:bg-amber-700" onClick={() => handleApproval('influencer', item.id, 'hold')} disabled={processingId === item.id}>
+                            <PauseCircle className="w-3 h-3 mr-1" /> Hold
+                          </Button>
                           <Button size="sm" variant="destructive" className="h-7 px-3 text-[11px]" onClick={() => handleApproval('influencer', item.id, 'reject')} disabled={processingId === item.id}>
+                            <XCircle className="w-3 h-3 mr-1" /> Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* JOB / CAREER APPROVALS */}
+            <div className="rounded-lg p-3" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+              <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <Briefcase size={14} style={{ color: '#22c55e' }} />
+                <span className="text-xs font-semibold" style={{ color: '#22c55e' }}>JOB / CAREER APPLICATIONS</span>
+                <Badge className="ml-auto text-[10px] bg-emerald-500/20 text-emerald-400">{approvals.jobApplications.length}</Badge>
+              </div>
+              <ScrollArea className="h-[280px]">
+                {approvals.jobApplications.length === 0 ? (
+                  <p className="text-xs text-center py-4" style={{ color: T.muted }}>No job applications waiting</p>
+                ) : (
+                  <div className="space-y-2">
+                    {approvals.jobApplications.map((item: any) => (
+                      <div key={item.id} className="p-3 rounded-lg" style={{ 
+                        background: 'rgba(59, 130, 246, 0.08)', 
+                        border: '1px solid rgba(59, 130, 246, 0.15)' 
+                      }}>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: T.text }}>{item.name || 'Applicant'}</p>
+                            <p className="text-[11px]" style={{ color: T.muted }}>{item.email}</p>
+                            <p className="text-[10px]" style={{ color: T.dim }}>{item.phone || 'No phone'} • {item.application_type?.toUpperCase()}</p>
+                          </div>
+                          <Badge className="bg-blue-500/30 text-blue-300 text-[10px]">
+                            <Briefcase className="w-3 h-3 mr-0.5" />
+                            {item.application_type?.toUpperCase() || 'JOB'}
+                          </Badge>
+                        </div>
+                        <p className="text-[9px] mt-1" style={{ color: T.dim }}>
+                          Exp: {item.experience || 'Not specified'} • Applied: {new Date(item.created_at).toLocaleDateString()}
+                        </p>
+                        {item.message && (
+                          <p className="text-[9px] mt-1 italic" style={{ color: T.dim }}>"{item.message.substring(0, 80)}{item.message.length > 80 ? '...' : ''}"</p>
+                        )}
+                        <div className="flex gap-1 mt-2">
+                          <Button size="sm" className="h-7 px-3 text-[11px] bg-emerald-600 hover:bg-emerald-700 flex-1" onClick={() => handleApproval('job', item.id, 'approve')} disabled={processingId === item.id}>
+                            {processingId === item.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><CheckCircle className="w-3 h-3 mr-1" /> Approve</>}
+                          </Button>
+                          <Button size="sm" className="h-7 px-2 text-[11px] bg-amber-600 hover:bg-amber-700" onClick={() => handleApproval('job', item.id, 'hold')} disabled={processingId === item.id}>
+                            <PauseCircle className="w-3 h-3 mr-1" /> Hold
+                          </Button>
+                          <Button size="sm" variant="destructive" className="h-7 px-3 text-[11px]" onClick={() => handleApproval('job', item.id, 'reject')} disabled={processingId === item.id}>
                             <XCircle className="w-3 h-3 mr-1" /> Reject
                           </Button>
                         </div>

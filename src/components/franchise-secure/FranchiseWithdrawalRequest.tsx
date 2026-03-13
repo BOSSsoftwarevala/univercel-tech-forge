@@ -51,7 +51,41 @@ export function FranchiseWithdrawalRequest({
 
     setSubmitting(true);
     try {
-      // Create payout request
+      // Policy 5: Check for fraud patterns (repeated failed attempts)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { data: recentRequests } = await supabase
+        .from('payout_requests')
+        .select('id')
+        .eq('user_id', user?.id)
+        .gte('timestamp', oneHourAgo);
+
+      if ((recentRequests?.length || 0) >= 3) {
+        toast.error('Too many withdrawal requests. Please try again later.');
+        await supabase.from('finance_security_alerts').insert({
+          alert_type: 'excessive_withdrawals',
+          severity: 'high',
+          user_id: user?.id,
+          description: `Franchise ${franchiseId} made ${recentRequests?.length} withdrawal requests in 1 hour.`,
+          metadata: { franchise_id: franchiseId, amount: withdrawAmount }
+        } as any);
+        return;
+      }
+
+      // Policy 6: Create transaction security lock
+      const transactionId = `WDR-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      await supabase.from('transaction_security_locks').insert({
+        transaction_id: transactionId,
+        lock_type: 'withdrawal',
+        user_id: user?.id,
+        amount: withdrawAmount,
+        lock_status: 'locked',
+        otp_verified: false,
+        gateway_verified: false,
+        boss_approved: false,
+        metadata: { franchise_id: franchiseId }
+      } as any);
+
+      // Policy 3: Create payout request (requires Boss approval)
       const { error } = await supabase
         .from('payout_requests')
         .insert({
@@ -59,25 +93,46 @@ export function FranchiseWithdrawalRequest({
           amount: withdrawAmount,
           status: 'pending',
           request_type: 'franchise_withdrawal',
-          notes: `Franchise withdrawal request for ₹${withdrawAmount}`
+          notes: `Franchise withdrawal request for ₹${withdrawAmount}. Requires OTP verification and Boss approval.`
         });
 
       if (error) throw error;
 
-      // Log the action
+      // Policy 7: Immutable audit log
       await supabase.from('audit_logs').insert({
         user_id: user?.id,
         action: 'withdrawal_requested',
         module: 'franchise_wallet',
-        role: 'franchise',
+        role: 'franchise' as any,
         meta_json: { 
           amount: withdrawAmount,
-          franchise_id: franchiseId
+          franchise_id: franchiseId,
+          transaction_id: transactionId,
+          security_lock: true,
+          otp_required: true,
+          boss_approval_required: true
         }
       });
 
+      // Notify Boss
+      const { data: bossUsers } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'boss_owner');
+
+      if (bossUsers?.length) {
+        await supabase.from('user_notifications').insert(
+          bossUsers.map(b => ({
+            user_id: b.user_id,
+            type: 'approval_required',
+            message: `Franchise withdrawal request: ₹${withdrawAmount.toLocaleString()} — Requires approval`,
+            event_type: 'withdrawal_approval',
+          }))
+        );
+      }
+
       toast.success('Withdrawal request submitted', {
-        description: 'Your request is pending approval.'
+        description: 'Pending OTP verification and Boss approval before processing.'
       });
       
       setAmount('');

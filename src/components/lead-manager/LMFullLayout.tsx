@@ -14,11 +14,29 @@ import LMReports from './screens/LMReports';
 import LMIntegrations from './screens/LMIntegrations';
 import LMSecurity from './screens/LMSecurity';
 import LMSettings from './screens/LMSettings';
+import LMLeadInbox from './screens/LMLeadInbox';
+import LMLeadDetails from './screens/LMLeadDetails';
 
 const LMFullLayout = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
+
+  const handleSelectLead = (leadId: string) => {
+    setSelectedLeadId(leadId);
+    setActiveSection('lead_details');
+  };
 
   const renderContent = () => {
+    // Lead Details
+    if (activeSection === 'lead_details') {
+      return <LMLeadDetails leadId={selectedLeadId} onBack={() => setActiveSection('lead_inbox')} />;
+    }
+
+    // Lead Inbox
+    if (activeSection === 'lead_inbox') {
+      return <LMLeadInbox onSelectLead={handleSelectLead} />;
+    }
+
     // Overview section
     if (['dashboard', 'total_leads', 'active_leads', 'time_leads', 'conversion_rate'].includes(activeSection)) {
       return <LMOverview />;

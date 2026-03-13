@@ -2,66 +2,32 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { 
   Shield, Lock, FileSearch, Eye, Settings,
-  Check, AlertTriangle
+  Check, AlertTriangle, Loader2, AlertCircle
 } from 'lucide-react';
+import { useLeadLogs } from '@/hooks/useLeadData';
+import { formatDistanceToNow } from 'date-fns';
 
-const securitySettings = [
-  { 
-    id: 'access', 
-    name: 'Lead Access Control', 
-    icon: Shield, 
-    enabled: true,
-    description: 'Control who can view and edit leads',
-    rules: 5
-  },
-  { 
-    id: 'masked', 
-    name: 'Masked Contact Info', 
-    icon: Lock, 
-    enabled: true,
-    description: 'Hide sensitive contact information',
-    rules: 3
-  },
-  { 
-    id: 'export', 
-    name: 'Export Permission Lock', 
-    icon: Lock, 
-    enabled: true,
-    description: 'Restrict data export capabilities',
-    rules: 2
-  },
-  { 
-    id: 'audit', 
-    name: 'Audit Logs', 
-    icon: FileSearch, 
-    enabled: true,
-    description: 'Track all lead-related activities',
-    rules: 0
-  },
+const securityFeatures = [
+  { id: 'access', name: 'Lead Access Control', icon: Shield, description: 'RLS-enforced role-based access' },
+  { id: 'masked', name: 'Masked Contact Info', icon: Lock, description: 'PII auto-masked at DB level' },
+  { id: 'export', name: 'Export Permission Lock', icon: Lock, description: 'Restricted data export' },
+  { id: 'audit', name: 'Immutable Audit Logs', icon: FileSearch, description: 'All actions permanently logged' },
 ];
 
-const auditLogs = [
-  { id: 1, action: 'Lead Viewed', user: 'Vikram Singh', lead: 'Rahul Sharma', time: '2 mins ago', ip: '192.168.1.***' },
-  { id: 2, action: 'Lead Edited', user: 'Neha Verma', lead: 'Priya Patel', time: '15 mins ago', ip: '192.168.1.***' },
-  { id: 3, action: 'Export Attempted', user: 'Raj Malhotra', lead: 'Bulk Export', time: '32 mins ago', ip: '192.168.1.***' },
-  { id: 4, action: 'Contact Unmasked', user: 'Anita Desai', lead: 'Amit Kumar', time: '1 hour ago', ip: '192.168.1.***' },
-  { id: 5, action: 'Lead Deleted', user: 'Admin', lead: 'Test Lead', time: '2 hours ago', ip: '192.168.1.***' },
-];
-
-const accessRules = [
+const accessMatrix = [
   { role: 'Admin', view: true, edit: true, delete: true, export: true },
-  { role: 'Team Lead', view: true, edit: true, delete: false, export: true },
+  { role: 'Lead Manager', view: true, edit: true, delete: false, export: true },
   { role: 'Agent', view: true, edit: true, delete: false, export: false },
   { role: 'Viewer', view: true, edit: false, delete: false, export: false },
 ];
 
 const LMSecurity = () => {
+  const { data: logs, isLoading } = useLeadLogs();
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Security & Compliance</h1>
@@ -72,46 +38,23 @@ const LMSecurity = () => {
         </Badge>
       </div>
 
-      {/* Security Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {securitySettings.map((setting, index) => {
-          const Icon = setting.icon;
+        {securityFeatures.map((feature, index) => {
+          const Icon = feature.icon;
           return (
-            <motion.div
-              key={setting.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
+            <motion.div key={feature.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
               <Card className="bg-card border-border">
                 <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-green-500" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{setting.name}</h3>
-                        <p className="text-xs text-muted-foreground">{setting.description}</p>
-                      </div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-green-500" />
                     </div>
-                    <Switch checked={setting.enabled} />
-                  </div>
-                  
-                  {setting.rules > 0 && (
-                    <div className="text-xs text-muted-foreground mb-3">
-                      {setting.rules} active rules
+                    <div>
+                      <h3 className="font-semibold text-foreground">{feature.name}</h3>
+                      <p className="text-xs text-muted-foreground">{feature.description}</p>
                     </div>
-                  )}
-
-                  <div className="flex items-center gap-1 pt-2 border-t border-border">
-                    <Button size="sm" variant="ghost" className="h-7 text-xs">
-                      <Eye className="w-3 h-3 mr-1" /> View
-                    </Button>
-                    <Button size="sm" variant="ghost" className="h-7 text-xs">
-                      <Settings className="w-3 h-3 mr-1" /> Configure
-                    </Button>
                   </div>
+                  <Badge className="bg-green-500/20 text-green-400 text-xs"><Check className="w-3 h-3 mr-1" /> Enforced</Badge>
                 </CardContent>
               </Card>
             </motion.div>
@@ -119,11 +62,8 @@ const LMSecurity = () => {
         })}
       </div>
 
-      {/* Access Control Matrix */}
       <Card className="bg-card border-border">
-        <CardHeader className="border-b border-border">
-          <CardTitle>Access Control Matrix</CardTitle>
-        </CardHeader>
+        <CardHeader className="border-b border-border"><CardTitle>Access Control Matrix</CardTitle></CardHeader>
         <CardContent className="p-0">
           <table className="w-full">
             <thead className="bg-accent/50">
@@ -136,37 +76,14 @@ const LMSecurity = () => {
               </tr>
             </thead>
             <tbody>
-              {accessRules.map((rule) => (
+              {accessMatrix.map((rule) => (
                 <tr key={rule.role} className="border-b border-border hover:bg-accent/30">
                   <td className="p-3 font-medium text-foreground">{rule.role}</td>
-                  <td className="p-3 text-center">
-                    {rule.view ? (
-                      <Check className="w-4 h-4 text-green-500 mx-auto" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-red-500 mx-auto" />
-                    )}
-                  </td>
-                  <td className="p-3 text-center">
-                    {rule.edit ? (
-                      <Check className="w-4 h-4 text-green-500 mx-auto" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-red-500 mx-auto" />
-                    )}
-                  </td>
-                  <td className="p-3 text-center">
-                    {rule.delete ? (
-                      <Check className="w-4 h-4 text-green-500 mx-auto" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-red-500 mx-auto" />
-                    )}
-                  </td>
-                  <td className="p-3 text-center">
-                    {rule.export ? (
-                      <Check className="w-4 h-4 text-green-500 mx-auto" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-red-500 mx-auto" />
-                    )}
-                  </td>
+                  {[rule.view, rule.edit, rule.delete, rule.export].map((val, i) => (
+                    <td key={i} className="p-3 text-center">
+                      {val ? <Check className="w-4 h-4 text-green-500 mx-auto" /> : <AlertTriangle className="w-4 h-4 text-red-500 mx-auto" />}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
@@ -174,45 +91,43 @@ const LMSecurity = () => {
         </CardContent>
       </Card>
 
-      {/* Audit Logs */}
       <Card className="bg-card border-border">
         <CardHeader className="border-b border-border">
           <CardTitle className="flex items-center justify-between">
-            <span>Recent Audit Logs</span>
-            <Button size="sm" variant="outline">View All</Button>
+            <span>Audit Logs</span>
+            <Badge variant="secondary">{(logs || []).length} entries</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <table className="w-full">
-            <thead className="bg-accent/50">
-              <tr>
-                <th className="text-left p-3 text-xs font-medium text-muted-foreground">Action</th>
-                <th className="text-left p-3 text-xs font-medium text-muted-foreground">User</th>
-                <th className="text-left p-3 text-xs font-medium text-muted-foreground">Lead</th>
-                <th className="text-left p-3 text-xs font-medium text-muted-foreground">Time</th>
-                <th className="text-left p-3 text-xs font-medium text-muted-foreground">IP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {auditLogs.map((log, index) => (
-                <motion.tr
-                  key={log.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="border-b border-border hover:bg-accent/30"
-                >
-                  <td className="p-3">
-                    <Badge variant="outline" className="text-xs">{log.action}</Badge>
-                  </td>
-                  <td className="p-3 font-medium text-foreground">{log.user}</td>
-                  <td className="p-3 text-sm text-muted-foreground">{log.lead}</td>
-                  <td className="p-3 text-xs text-muted-foreground">{log.time}</td>
-                  <td className="p-3 text-xs text-muted-foreground font-mono">{log.ip}</td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
+          {isLoading ? (
+            <div className="flex items-center justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+          ) : (logs || []).length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
+              <AlertCircle className="w-8 h-8 mb-2" />
+              <p className="text-sm">No audit logs yet</p>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-accent/50">
+                <tr>
+                  <th className="text-left p-3 text-xs font-medium text-muted-foreground">Action</th>
+                  <th className="text-left p-3 text-xs font-medium text-muted-foreground">Lead</th>
+                  <th className="text-left p-3 text-xs font-medium text-muted-foreground">By</th>
+                  <th className="text-left p-3 text-xs font-medium text-muted-foreground">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(logs || []).slice(0, 10).map((log: any, index: number) => (
+                  <motion.tr key={log.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: index * 0.05 }} className="border-b border-border hover:bg-accent/30">
+                    <td className="p-3"><Badge variant="outline" className="text-xs">{log.action_type || log.action}</Badge></td>
+                    <td className="p-3 text-xs text-muted-foreground font-mono">{log.lead_id?.slice(0, 8) || '—'}...</td>
+                    <td className="p-3 text-sm text-muted-foreground">{log.performed_by?.slice(0, 8) || '—'}</td>
+                    <td className="p-3 text-xs text-muted-foreground">{formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}</td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </CardContent>
       </Card>
     </div>

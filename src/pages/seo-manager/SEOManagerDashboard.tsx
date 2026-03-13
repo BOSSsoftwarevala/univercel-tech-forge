@@ -30,18 +30,24 @@ import SEOAutomation from "./screens/SEOAutomation";
 import SEOIssuesFixes from "./screens/SEOIssuesFixes";
 import SEOReports from "./screens/SEOReports";
 import SEOAudit from "./screens/SEOAudit";
+import SEOBacklinks from "./screens/SEOBacklinks";
+import SEOCompetitors from "./screens/SEOCompetitors";
+import SEOSettings from "./screens/SEOSettings";
 
 const sidebarItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "pages", label: "Pages (View)", icon: FileText },
-  { id: "keywords", label: "Keywords", icon: Search },
-  { id: "meta-rules", label: "Meta Rules", icon: Code },
-  { id: "indexing", label: "Indexing & Crawl", icon: Globe },
+  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+  { id: "keywords", label: "Keyword Tracker", icon: Search },
   { id: "performance", label: "Performance", icon: TrendingUp },
-  { id: "automation", label: "Automation", icon: Zap },
+  { id: "pages", label: "Pages Analysis", icon: FileText },
+  { id: "backlinks", label: "Backlink Monitor", icon: Activity },
+  { id: "competitors", label: "Competitors", icon: Globe },
+  { id: "indexing", label: "Indexing & Crawl", icon: Globe },
+  { id: "meta-rules", label: "Meta & Schema", icon: Code },
+  { id: "automation", label: "Automation Engine", icon: Zap },
   { id: "issues", label: "Issues & Fixes", icon: AlertTriangle },
   { id: "reports", label: "Reports", icon: BarChart3 },
-  { id: "audit", label: "Audit", icon: Shield },
+  { id: "audit", label: "Audit Trail", icon: Shield },
+  { id: "settings", label: "Settings", icon: BarChart3 },
 ];
 
 const SEOManagerDashboard = () => {
@@ -93,6 +99,9 @@ const SEOManagerDashboard = () => {
       case "issues": return <SEOIssuesFixes />;
       case "reports": return <SEOReports />;
       case "audit": return <SEOAudit />;
+      case "backlinks": return <SEOBacklinks />;
+      case "competitors": return <SEOCompetitors />;
+      case "settings": return <SEOSettings />;
       default: return <SEOOverview />;
     }
   };

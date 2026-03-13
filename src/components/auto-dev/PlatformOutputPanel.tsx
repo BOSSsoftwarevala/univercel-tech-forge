@@ -121,10 +121,10 @@ export const PlatformOutputPanel = () => {
         {/* Comparison Note */}
         <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
           <p className="text-xs text-amber-300">
-            <strong>vs Lovable:</strong> Web only, no APK, limited ops automation
+            <strong>Full Stack:</strong> Web + Mobile + Server — One command builds everything
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            <strong>This system:</strong> Web + Mobile + Server — One command builds everything
+            <strong>Enterprise:</strong> APK generation, ops automation, and complete deployment
           </p>
         </div>
       </CardContent>

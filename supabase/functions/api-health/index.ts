@@ -522,6 +522,76 @@ Deno.serve(async (req) => {
       }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    // GET /servers - Server-level health overview
+    if (path === '/servers' && req.method === 'GET') {
+      const allowedRoles = ['super_admin', 'admin', 'incident', 'performance_manager', 'boss_owner', 'ceo'];
+      if (!userRoles.some((r: string) => allowedRoles.includes(r))) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: "Access restricted to system administrators",
+          code: "PERMISSION_DENIED"
+        }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+
+      // Fetch server instances from database
+      const { data: servers, error: serversError } = await supabase
+        .from('server_instances')
+        .select('id, name, status, health_score, region, server_type, created_at, updated_at');
+
+      if (serversError) {
+        console.error('[HEALTH] Failed to fetch server instances:', serversError.message);
+      }
+
+      const serverList = servers || [];
+      const healthyCount = serverList.filter((s: any) => s.status === 'running' || s.health_score >= 80).length;
+      const degradedCount = serverList.filter((s: any) => s.health_score >= 50 && s.health_score < 80).length;
+      const criticalCount = serverList.filter((s: any) => s.status === 'error' || s.health_score < 50).length;
+
+      // Persist snapshot to system_health table
+      await supabase.from('system_health').insert({
+        check_type: 'servers',
+        overall_status: criticalCount > 0 ? 'critical' : degradedCount > 0 ? 'degraded' : 'healthy',
+        total_servers: serverList.length,
+        healthy_servers: healthyCount,
+        degraded_servers: degradedCount,
+        critical_servers: criticalCount,
+        checked_by: user.id,
+        checked_at: new Date().toISOString(),
+      }).then(() => {});
+
+      // Audit log
+      await supabase.from('audit_logs').insert({
+        user_id: user.id,
+        role: userRoles[0] || 'unknown',
+        module: 'system_health',
+        action: 'server_health_check',
+        meta_json: { masked_id: maskedId, server_count: serverList.length }
+      });
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: "Server health check completed",
+        data: {
+          checked_at: new Date().toISOString(),
+          checked_by: maskedId,
+          summary: {
+            total: serverList.length,
+            healthy: healthyCount,
+            degraded: degradedCount,
+            critical: criticalCount,
+          },
+          servers: serverList.map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            status: s.status,
+            health_score: s.health_score,
+            region: s.region,
+            server_type: s.server_type,
+          })),
+        }
+      }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     return new Response(JSON.stringify({
       success: false,
       message: "Endpoint not found",
