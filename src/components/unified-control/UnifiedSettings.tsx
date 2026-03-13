@@ -147,7 +147,7 @@ export const UnifiedSettings = () => {
               No Feature Missing
             </Badge>
             <Badge className="bg-violet-500/20 text-violet-400 px-4 py-2">
-              Better Than Lovable
+              Enterprise Grade
             </Badge>
             <Badge className="bg-orange-500/20 text-orange-400 px-4 py-2">
               System Locked

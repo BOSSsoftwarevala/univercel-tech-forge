@@ -16,6 +16,7 @@ import { SecurityProvider } from "./contexts/SecurityContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { TranslationProvider } from "./contexts/TranslationContext";
 import { GlobalRealtimeProvider } from "./providers/GlobalRealtimeProvider";
+import { TenantProvider } from "./lib/multi-tenant/tenant-context";
 import SystemNotificationsInitializer from "./components/notifications/SystemNotificationsInitializer";
 import RequireRole from "@/components/auth/RequireRole";
 import RequireAuth from "@/components/auth/RequireAuth";
@@ -24,6 +25,7 @@ import DomainProtection from "./components/security/DomainProtection";
 import { SourceCodeProtection } from "./components/security/SourceCodeProtection";
 import FloatingAIChatbotWrapper from "./components/shared/FloatingAIChatbotWrapper";
 import { Loader2 } from "lucide-react";
+
 
 // ============================================
 // LAZY ROUTE IMPORTS - Code splitting for performance
@@ -104,6 +106,8 @@ const lazyLoad = (importFn: () => Promise<any>) => {
 const Homepage = lazyLoad(() => import("./pages/Homepage"));
 const Dashboard = lazyLoad(() => import("./pages/Dashboard"));
 const NotFound = lazyLoad(() => import("./pages/NotFound"));
+const PaymentSuccess = lazyLoad(() => import("./pages/PaymentSuccess"));
+const PaymentFailure = lazyLoad(() => import("./pages/PaymentFailure"));
 const CategoryOnboarding = lazyLoad(() => import("./pages/CategoryOnboarding"));
 
 // Auth Pages
@@ -122,6 +126,7 @@ const BossRegister = lazyLoad(() => import("./pages/auth/BossRegister"));
 const EasyAuth = lazyLoad(() => import("./pages/auth/EasyAuth"));
 const RoleBasedLogin = lazyLoad(() => import("./pages/auth/RoleBasedLogin"));
 const SessionExpiredPage = lazyLoad(() => import("./pages/error/SessionExpiredPage"));
+const DeadlineAnimationDemo = lazyLoad(() => import("./pages/DeadlineAnimationDemo"));
 
 // Demo Pages
 const PublicDemos = lazyLoad(() => import("./pages/demos/PublicDemos"));
@@ -178,6 +183,7 @@ const RestaurantPOSNewDemo = lazyLoad(() => import("./pages/restaurant-pos-new/R
 const AccountingDemo = lazyLoad(() => import("./pages/accounting/AccountingDemo"));
 const ProAccountingDemo = lazyLoad(() => import("./pages/pro-accounting/ProAccountingDemo"));
 const AutoDevEngine = lazyLoad(() => import("./pages/auto-dev/AutoDevEngine"));
+const GoogleClassroomDemo = lazyLoad(() => import("./pages/demos/GoogleClassroomDemo"));
 
 // School Software
 const SchoolSoftwareHomepage = lazyLoad(() => import("./pages/school-software/SchoolSoftwareHomepage"));
@@ -235,6 +241,12 @@ const SecureSEOManagerDashboard = lazyLoad(() => import("./pages/seo-manager/Sec
 const SecureAPIAIManagerDashboard = lazyLoad(() => import("./pages/api-ai-manager/SecureAPIAIManagerDashboard"));
 const SecureResellerManagerDashboard = lazyLoad(() => import("./pages/reseller-manager/SecureResellerManagerDashboard"));
 const SecureSalesSupportManagerDashboard = lazyLoad(() => import("./pages/sales-support-manager/SecureSalesSupportManagerDashboard"));
+const SecureFranchiseManagerDashboard = lazyLoad(() => import("./pages/franchise-manager/SecureFranchiseManagerDashboard"));
+
+// Missing Page Imports
+const OverAI = lazyLoad(() => import("./pages/OverAI"));
+const InternalSupportAI = lazyLoad(() => import("./pages/InternalSupportAI"));
+const SimpleLanding = lazyLoad(() => import("./pages/SimpleLanding"));
 
 // Control System
 const SecureControlSystem = lazyLoad(() => import("./pages/control-system/SecureControlSystem"));
@@ -319,6 +331,15 @@ const AICEOPredictions = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOPre
 const AICEOReports = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOReports"));
 const AICEOLearning = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOLearning"));
 const AICEOSettings = lazyLoad(() => import("./pages/ai-ceo/sections/AICEOSettings"));
+const AIRAVoiceCommands = lazyLoad(() => import("./pages/ai-ceo/sections/AIRAVoiceCommands"));
+const AIRAProviders = lazyLoad(() => import("./pages/ai-ceo/sections/AIRAProviders"));
+const AIRAProjectScanner = lazyLoad(() => import("./pages/ai-ceo/sections/AIRAProjectScanner"));
+const AIRATaskEngine = lazyLoad(() => import("./pages/ai-ceo/sections/AIRATaskEngine"));
+const AIRAMarketing = lazyLoad(() => import("./pages/ai-ceo/sections/AIRAMarketing"));
+const AIRALanguageIntelligence = lazyLoad(() => import("./pages/ai-ceo/sections/AIRALanguageIntelligence"));
+const AIRASalesIntelligence = lazyLoad(() => import("./pages/ai-ceo/sections/AIRASalesIntelligence"));
+const AIRAToolStack = lazyLoad(() => import("./pages/ai-ceo/sections/AIRAToolStack"));
+const AutoHealingEngine = lazyLoad(() => import("./pages/ai-ceo/sections/AutoHealingEngine"));
 
 const DemoCredentials = lazyLoad(() => import("./pages/DemoCredentials"));
 const DemoOrderSystem = lazyLoad(() => import("./pages/demo-system/DemoOrderSystem"));
@@ -370,6 +391,7 @@ const LeaderSecurityAssessment = lazyLoad(() => import("./pages/leader-security/
 // Boss Panel
 const BossPanel = lazyLoad(() => import("./pages/BossPanel"));
 
+
 // ============================================
 // QUERY CLIENT - Optimized caching
 // ============================================
@@ -402,7 +424,8 @@ const BlockingClassCleanup = memo(() => {
 const App = memo(() => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <DemoTestModeProvider>
+      <TenantProvider>
+        <DemoTestModeProvider>
         <AnimationProvider>
           <TooltipProvider>
             <DomainProtection>
@@ -418,12 +441,18 @@ const App = memo(() => (
                           <SystemNotificationsInitializer />
                           <GlobalOfferPopup />
                           <FloatingAIChatbotWrapper />
+
                           <Routes>
                             {/* Public Routes */}
                             <Route path="/" element={<Index />} />
                             <Route path="/demos" element={<Index />} />
                             <Route path="/explore" element={<Navigate to="/demos" replace />} />
                             <Route path="/products" element={<Index />} />
+                            <Route path="/marketplace" element={<MarketplacePage />} />
+                            <Route path="/marketplace/product/:id" element={<ProductDetailPage />} />
+                            <Route path="/marketplace/category/:categoryId" element={<MarketplacePage />} />
+                            <Route path="/user/library" element={<RequireAuth><UserLibraryPage /></RequireAuth>} />
+                            <Route path="/user/licenses" element={<RequireAuth><UserLicensesPage /></RequireAuth>} />
                             <Route path="/pricing" element={<SimpleDemoList />} />
                             <Route path="/demos/public" element={<PublicDemos />} />
                             <Route path="/showcase" element={<PremiumDemoShowcaseNew />} />
@@ -444,8 +473,21 @@ const App = memo(() => (
                             <Route path="/sectors" element={<SectorsBrowse />} />
                             <Route path="/sectors/:sectorId/:subCategoryId" element={<SubCategoryDemos />} />
                             <Route path="/auto-dev" element={<AutoDevEngine />} />
+                            <Route path="/deadline-animation" element={<DeadlineAnimationDemo />} />
+                            <Route path="/ai-builder" element={<RequireRole allowed={["boss_owner", "super_admin", "developer", "ai_manager", "demo_manager", "product_demo_manager"]}><AIBuilderPage /></RequireRole>} />
+                            {/* Marketplace - PUBLIC browsing for visitors, auth only for transactional areas */}
+                            <Route path="/marketplace" element={<MMFullLayout />} />
+                            <Route path="/marketplace/product/:productId" element={<MMFullLayout />} />
+                            <Route path="/marketplace/category/:categoryId" element={<MMFullLayout />} />
+                            <Route path="/marketplace/orders" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/wallet" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/settings" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/development" element={<RequireAuth><MMFullLayout /></RequireAuth>} />
+                            <Route path="/marketplace/*" element={<MMFullLayout />} />
 
-                            {/* Demo Routes */}
+                            {/* Demo Routes - Clean client-facing URLs */}
+                            <Route path="/google-classroom" element={<GoogleClassroomDemo />} />
+                            <Route path="/demo/google-classroom" element={<GoogleClassroomDemo />} />
                             <Route path="/demo/restaurant-pos" element={<RestaurantPOSDemo />} />
                             <Route path="/demo/restaurant-small" element={<RestaurantSmallDemo />} />
                             <Route path="/demo/restaurant-medium" element={<RestaurantMediumDemo />} />
@@ -484,6 +526,9 @@ const App = memo(() => (
                             <Route path="/checkout/:demoId" element={<SimpleCheckout />} />
                             <Route path="/user-dashboard" element={<SimpleUserDashboard />} />
                             <Route path="/user/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
+                            <Route path="/user/library" element={<RequireRole allowed={["boss_owner", "super_admin", "client", "user", "franchise", "reseller"]}><MMFullLayout /></RequireRole>} />
+                            <Route path="/user/orders" element={<RequireRole allowed={["boss_owner", "super_admin", "client", "user", "franchise", "reseller"]}><MMFullLayout /></RequireRole>} />
+                            <Route path="/user/licenses" element={<RequireRole allowed={["boss_owner", "super_admin", "client", "user", "franchise", "reseller"]}><MMFullLayout /></RequireRole>} />
                             <Route path="/demo-login" element={<DemoLogin />} />
                             <Route path="/premium-demos" element={<PremiumDemoShowcase />} />
                             <Route path="/client-portal" element={<ClientPortal />} />
@@ -510,6 +555,9 @@ const App = memo(() => (
 
                             {/* Boss Panel Route */}
                             <Route path="/boss-panel/*" element={<RequireRole allowed={["boss_owner"]}><BossPanel /></RequireRole>} />
+                            <Route path="/boss/marketplace" element={<RequireRole allowed={["boss_owner", "super_admin"]}><BossPanel /></RequireRole>} />
+                            <Route path="/boss/marketplace/products" element={<RequireRole allowed={["boss_owner", "super_admin"]}><BossPanel /></RequireRole>} />
+                            <Route path="/boss/marketplace/banners" element={<RequireRole allowed={["boss_owner", "super_admin"]}><BossPanel /></RequireRole>} />
 
                             {/* Owner Dashboard */}
                             <Route path="/owner" element={<RequireRole allowed={["boss_owner"]}><SoftwareWalaOwnerDashboard /></RequireRole>} />
@@ -543,14 +591,23 @@ const App = memo(() => (
                             <Route path="/ai-ceo" element={<RequireRole allowed={["boss_owner", "ceo"]}><AICEODashboard /></RequireRole>}>
                               <Route index element={<AICEODashboardMain />} />
                               <Route path="live-monitor" element={<AICEOLiveMonitor />} />
+                              <Route path="voice-commands" element={<AIRAVoiceCommands />} />
+                              <Route path="language" element={<AIRALanguageIntelligence />} />
+                              <Route path="sales" element={<AIRASalesIntelligence />} />
+                              <Route path="ai-providers" element={<AIRAProviders />} />
+                              <Route path="tool-stack" element={<AIRAToolStack />} />
+                              <Route path="project-scanner" element={<AIRAProjectScanner />} />
+                              <Route path="task-engine" element={<AIRATaskEngine />} />
                               <Route path="decision-engine" element={<AICEODecisionEngine />} />
                               <Route path="approvals" element={<AICEOApprovals />} />
                               <Route path="risk" element={<AICEORiskCompliance />} />
                               <Route path="performance" element={<AICEOPerformance />} />
+                              <Route path="marketing" element={<AIRAMarketing />} />
                               <Route path="predictions" element={<AICEOPredictions />} />
                               <Route path="reports" element={<AICEOReports />} />
                               <Route path="learning" element={<AICEOLearning />} />
                               <Route path="settings" element={<AICEOSettings />} />
+                              <Route path="auto-healing" element={<AutoHealingEngine />} />
                             </Route>
 
                             {/* Super Admin Routes */}
@@ -673,6 +730,14 @@ const App = memo(() => (
                             <Route path="/secure/api-ai-manager" element={<RequireRole allowed={["ai_manager", "boss_owner"]}><SecureAPIAIManagerDashboard /></RequireRole>} />
                             <Route path="/secure/reseller-manager" element={<RequireRole allowed={["reseller_manager", "boss_owner"]}><SecureResellerManagerDashboard /></RequireRole>} />
                             <Route path="/secure/sales-support-manager" element={<RequireRole allowed={["sales_support_manager", "boss_owner"]}><SecureSalesSupportManagerDashboard /></RequireRole>} />
+                            <Route path="/secure/franchise-manager" element={<RequireRole allowed={["franchise_manager", "boss_owner"]}><SecureFranchiseManagerDashboard /></RequireRole>} />
+
+                            {/* Missing Page Routes */}
+                            <Route path="/over-ai" element={<RequireRole allowed={["boss_owner", "ceo"]}><OverAI /></RequireRole>} />
+                            <Route path="/internal-support-ai" element={<RequireRole allowed={["boss_owner", "support"]}><InternalSupportAI /></RequireRole>} />
+                            <Route path="/simple-landing" element={<SimpleLanding />} />
+                            <Route path="/apply-portal" element={<ApplyPortal />} />
+                            <Route path="/admin/bulk-actions" element={<RequireRole allowed={["boss_owner"]}><BulkActionsReference /></RequireRole>} />
 
                             {/* Control System Routes */}
                             <Route path="/control-system" element={<RequireRole allowed={["boss_owner", "master"]}><SecureControlSystem /></RequireRole>} />
@@ -732,6 +797,10 @@ const App = memo(() => (
                             {/* Wireframe Routes */}
                             <Route path="/wireframe/*" element={<WireframeRoutes />} />
 
+                            {/* Payment Result Pages */}
+                            <Route path="/payment-success" element={<PaymentSuccess />} />
+                            <Route path="/payment-failure" element={<PaymentFailure />} />
+
                             {/* 404 */}
                             <Route path="*" element={<NotFound />} />
                           </Routes>
@@ -745,6 +814,7 @@ const App = memo(() => (
           </TooltipProvider>
         </AnimationProvider>
       </DemoTestModeProvider>
+      </TenantProvider>
     </AuthProvider>
   </QueryClientProvider>
 ));

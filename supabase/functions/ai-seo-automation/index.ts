@@ -2,11 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface SEORequest {
-  type: "meta_tags" | "social_post" | "reels_script" | "auto_reply" | "content_plan";
+  type: "meta_tags" | "social_post" | "reels_script" | "auto_reply" | "content_plan" | "keyword_discover" | "seo_audit" | "competitor_gap";
   data: Record<string, any>;
 }
 
@@ -118,6 +118,50 @@ Region: ${data.region || "Global"}
 Duration: ${data.duration || "1 week"}`;
         break;
 
+      case "keyword_discover":
+        systemPrompt = `You are an expert SEO keyword researcher. Discover high-value keyword opportunities.
+Return a valid JSON object with:
+- keywords: Array of objects with { keyword, searchVolume, difficulty, cpc, intent, opportunity }
+- clusters: Array of keyword groups with theme names
+- longTail: Array of long-tail keyword variations
+- questions: Array of "People Also Ask" style questions`;
+        userPrompt = `Discover keyword opportunities for:
+Domain: ${data.domain || "softwarewala.net"}
+Industry: ${data.industry || "Software & Technology"}
+Current Keywords: ${data.currentKeywords || "software development, CRM, cloud hosting"}
+Target Region: ${data.region || "Global"}
+Competitors: ${data.competitors || "N/A"}`;
+        break;
+
+      case "seo_audit":
+        systemPrompt = `You are a technical SEO auditor. Analyze and provide SEO audit recommendations.
+Return a valid JSON object with:
+- score: Overall SEO score (0-100)
+- issues: Array of { type, severity, description, recommendation, affectedPages }
+- recommendations: Array of prioritized action items
+- technicalHealth: Object with { pageSpeed, mobileFriendly, security, indexability }
+- contentQuality: Object with metrics`;
+        userPrompt = `Perform SEO audit analysis for:
+Domain: ${data.domain || "softwarewala.net"}
+Total Pages: ${data.totalPages || 1847}
+Current Issues: ${JSON.stringify(data.currentIssues || [])}
+Focus Areas: ${data.focusAreas || "technical, on-page, content"}`;
+        break;
+
+      case "competitor_gap":
+        systemPrompt = `You are a competitive SEO analyst. Identify keyword and content gaps vs competitors.
+Return a valid JSON object with:
+- keywordGaps: Array of { keyword, yourPosition, competitorPosition, volume, difficulty, opportunity }
+- contentGaps: Array of content topics competitors cover that you don't
+- backlinkOpportunities: Array of high-DA domains linking to competitors
+- strategicRecommendations: Array of prioritized actions`;
+        userPrompt = `Analyze competitive gaps for:
+Your Domain: ${data.domain || "softwarewala.net"}
+Competitors: ${data.competitors?.join(", ") || "competitor-a.com, competitor-b.io"}
+Industry: ${data.industry || "Software & Technology"}
+Your Keywords: ${data.yourKeywords || "648 tracked keywords"}`;
+        break;
+
       default:
         throw new Error(`Unknown automation type: ${type}`);
     }
@@ -129,7 +173,7 @@ Duration: ${data.duration || "1 week"}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
@@ -164,15 +208,12 @@ Duration: ${data.duration || "1 week"}`;
       throw new Error("No content received from AI");
     }
 
-    // Try to parse JSON from the response
     let result;
     try {
-      // Extract JSON from the response (handle markdown code blocks)
       const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
       result = JSON.parse(jsonStr);
     } catch {
-      // If parsing fails, return the raw content
       result = { rawContent: content };
     }
 
