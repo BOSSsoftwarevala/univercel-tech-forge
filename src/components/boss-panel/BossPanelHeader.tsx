@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Bell, ShieldAlert, LogOut, User, Radio, Loader2,
-  Headphones, MessageSquare, ListChecks, Globe, Banknote,
-  Search, ChevronRight, Crown, Clock
+
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,9 +17,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import {
-  NotificationsModal, AssistModal, PromiseTrackerModal,
-  InternalChatModal, LanguageModal, CurrencyModal,
+
 } from './BossActionModals';
+import { BossPanelNotificationCenter } from './BossPanelNotificationCenter';
 
 // ─── ENTERPRISE DARK SHELL ───────────────────────────────────
 const S = {
@@ -44,7 +42,6 @@ interface BossPanelHeaderProps {
 export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHeaderProps) {
   const [isLocking, setIsLocking] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showAssist, setShowAssist] = useState(false);
   const [showPromise, setShowPromise] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -185,7 +182,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
           {time.toLocaleTimeString('en-US', { hour12: false })}
         </div>
 
-        <div className="h-5 w-px mx-1" style={{ background: S.border }} />
+
 
         <IconBtn onClick={() => setShowAssist(true)}><Headphones className="w-4 h-4" /></IconBtn>
         <IconBtn onClick={() => setShowPromise(true)}><ListChecks className="w-4 h-4" /></IconBtn>
@@ -244,7 +241,7 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
       </div>
 
       {/* Modals */}
-      <NotificationsModal open={showNotifications} onClose={() => setShowNotifications(false)} userId={user?.id} onUnreadCountChange={setUnreadCount} />
+
       <AssistModal open={showAssist} onClose={() => setShowAssist(false)} />
       <PromiseTrackerModal open={showPromise} onClose={() => setShowPromise(false)} />
       <InternalChatModal open={showChat} onClose={() => setShowChat(false)} />
