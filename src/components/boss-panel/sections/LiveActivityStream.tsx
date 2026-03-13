@@ -36,13 +36,14 @@ const riskColors = {
 
 const getIconForAction = (action: string): React.ElementType => {
   if (action.includes('franchise') || action.includes('reseller')) return Package;
-  if (action.includes('purchase') || action.includes('checkout') || action.includes('payment') || action.includes('commission') || action.includes('balance') || action.includes('refund')) return DollarSign;
+  if (action.includes('purchase') || action.includes('checkout') || action.includes('payment') || action.includes('commission') || action.includes('balance') || action.includes('refund') || action.includes('buy')) return DollarSign;
   if (action.includes('security') || action.includes('suspicious') || action.includes('margin_violation')) return Shield;
   if (action.includes('login') || action.includes('signup') || action.includes('user') || action.includes('influencer') || action.includes('job_apply')) return User;
   if (action.includes('alert') || action.includes('error') || action.includes('emergency')) return AlertTriangle;
   if (action.includes('button_click')) return MousePointer;
-  if (action.includes('product') || action.includes('license')) return Package;
+  if (action.includes('product') || action.includes('license') || action.includes('demo')) return Package;
   if (action.includes('server') || action.includes('deploy')) return Zap;
+  if (action.includes('enquiry') || action.includes('support') || action.includes('developer_request')) return Bell;
   return Activity;
 };
 
@@ -50,7 +51,7 @@ const getRiskLevel = (action: string, severity?: string): 'low' | 'medium' | 'hi
   if (severity === 'critical' || severity === 'emergency') return 'high';
   if (severity === 'warning') return 'medium';
   if (action.includes('delete') || action.includes('violation') || action.includes('suspicious') || action.includes('failed_payment') || action.includes('security')) return 'high';
-  if (action.includes('refund') || action.includes('margin') || action.includes('update')) return 'medium';
+  if (action.includes('refund') || action.includes('margin') || action.includes('update') || action.includes('purchase') || action.includes('franchise_request') || action.includes('reseller_request')) return 'medium';
   return 'low';
 };
 

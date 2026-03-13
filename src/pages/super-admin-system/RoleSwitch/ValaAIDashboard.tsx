@@ -1,952 +1,1114 @@
 /**
- * VALA AI DASHBOARD - LOVABLE-STYLE AI PRODUCT ENGINE
- * ====================================================
- * FULLY FUNCTIONAL • ALL BUTTONS WORK • CLIENT-FACING
- * ❌ NO DEAD CLICKS • ❌ NO FAKE ACTIONS • ❌ NO PLACEHOLDERS
+ * VALA AI DASHBOARD - SMART AI PRODUCT BUILDER
+ * =====================================================
+ * Production-grade AI builder with:
+ * - Thinking/reasoning indicator
+ * - Live HTML preview rendering (srcdoc, no sandbox issues)
+ * - Version history & rollback
+ * - Regenerate responses
+ * - Real code extraction & preview
+ * - Streaming chat with SSE
+ * - Working voice input via Web Speech API
+ * - File tree view
+ * LOCKED DARK THEME
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Brain, Cpu, Activity, Zap, AlertTriangle, CheckCircle,
-  Clock, TrendingUp, Play, Pause, RefreshCw, Settings, 
-  Layers, Bot, Workflow, Bell, FileText, Lock, Radio,
-  Sparkles, Send, Trash2, Save, Download, Upload, Copy,
-  RotateCcw, Eye, Edit3, ThumbsUp, ThumbsDown, Rocket,
-  Database, Code2, GitBranch, History, X, ChevronRight,
-  Terminal, Square, SkipForward, AlertCircle
+import {
+  Send, Undo2, Redo2, Eye, Code2,
+  Smartphone, Monitor, Tablet, RefreshCw,
+  Sparkles, User, Copy, ThumbsUp, ThumbsDown,
+  Loader2, Paperclip, Mic, MicOff,
+  PanelLeftClose, PanelLeftOpen, Globe, CheckCircle,
+  Layers, Database, GitBranch, Workflow, Clock, Zap,
+  Activity, Package, Volume2, VolumeX, History,
+  Brain, RotateCcw, Image, FolderTree, FileCode, FileJson,
+  ChevronRight, ChevronDown, Trash2, Plus
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
-// AI State Management
-type AIStatus = "idle" | "running" | "paused" | "completed" | "error";
-type PlanStatus = "draft" | "pending" | "approved" | "rejected";
+// ===== LOCKED COLORS =====
+const C = {
+  bg: '#09090b',
+  bgSidebar: '#0c0c0e',
+  bgChat: '#09090b',
+  border: '#27272a',
+  borderFocus: '#3f3f46',
+  accent: '#8b5cf6',
+  green: '#22c55e',
+  cyan: '#06b6d4',
+  amber: '#f59e0b',
+  red: '#ef4444',
+  text: '#fafafa',
+  textMuted: '#a1a1aa',
+  textDim: '#71717a',
+};
 
-interface AILog {
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vala-ai-openai`;
+const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
+
+interface ChatMessage {
   id: string;
-  timestamp: string;
-  message: string;
-  type: "info" | "success" | "warning" | "error";
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
 }
 
-interface AIStep {
+interface HistorySnapshot {
+  id: string;
+  timestamp: Date;
+  prompt: string;
+  messages: ChatMessage[];
+  generatedCode: string;
+  previewHtml: string;
+  metrics: BuildMetrics;
+}
+
+interface PipelineStep {
   id: string;
   name: string;
-  status: "pending" | "running" | "completed" | "failed" | "skipped";
-  duration?: string;
+  status: 'idle' | 'running' | 'done';
+  icon: React.ElementType;
+  duration?: number;
 }
 
-const ValaAIDashboard = () => {
-  // ==================== STATE MANAGEMENT ====================
-  const [prompt, setPrompt] = useState("");
-  const [savedPrompts, setSavedPrompts] = useState<string[]>([
-    "Build a user dashboard with analytics",
-    "Create an e-commerce checkout flow",
-    "Design a social media feed component"
-  ]);
-  const [aiStatus, setAiStatus] = useState<AIStatus>("idle");
-  const [planStatus, setPlanStatus] = useState<PlanStatus>("draft");
-  const [currentStep, setCurrentStep] = useState(0);
-  const [generatedScreens, setGeneratedScreens] = useState(0);
-  const [generatedAPIs, setGeneratedAPIs] = useState(0);
-  const [generatedDBTables, setGeneratedDBTables] = useState(0);
-  const [generatedFlows, setGeneratedFlows] = useState(0);
-  const [deploymentStatus, setDeploymentStatus] = useState<"none" | "deploying" | "deployed" | "failed">("none");
-  const [currentVersion, setCurrentVersion] = useState(1);
-  const [logs, setLogs] = useState<AILog[]>([
-    { id: "1", timestamp: new Date().toISOString(), message: "VALA AI Engine initialized", type: "info" },
-    { id: "2", timestamp: new Date().toISOString(), message: "Ready to receive prompts", type: "success" },
-  ]);
-  const [steps, setSteps] = useState<AIStep[]>([
-    { id: "1", name: "Requirement Analysis", status: "pending" },
-    { id: "2", name: "Feature Mapping", status: "pending" },
-    { id: "3", name: "Screen Generation", status: "pending" },
-    { id: "4", name: "API Planning", status: "pending" },
-    { id: "5", name: "Database Schema", status: "pending" },
-    { id: "6", name: "Flow Generation", status: "pending" },
-    { id: "7", name: "Integration", status: "pending" },
-    { id: "8", name: "Validation", status: "pending" },
-  ]);
-  const [showPlan, setShowPlan] = useState(false);
-  const [showLogs, setShowLogs] = useState(false);
-  const [showErrors, setShowErrors] = useState(false);
-  const [errors, setErrors] = useState<{id: string; message: string; suggestion: string}[]>([]);
+interface BuildMetrics {
+  screens: number;
+  apis: number;
+  dbTables: number;
+  flows: number;
+}
 
-  // ==================== LOGGING UTILITY ====================
-  const addLog = useCallback((message: string, type: AILog["type"] = "info") => {
-    const newLog: AILog = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      message,
-      type
-    };
-    setLogs(prev => [newLog, ...prev].slice(0, 50));
+interface FileNode {
+  name: string;
+  type: 'file' | 'folder';
+  language?: string;
+  children?: FileNode[];
+}
+
+type PreviewMode = 'preview' | 'code' | 'files';
+type DeviceMode = 'desktop' | 'tablet' | 'mobile';
+
+// ===== EXTRACT CODE BLOCKS =====
+function extractCodeBlocks(markdown: string): { language: string; code: string; filename?: string }[] {
+  const blocks: { language: string; code: string; filename?: string }[] = [];
+  const regex = /```(\w+)?(?:\s+([^\n]+))?\n([\s\S]*?)```/g;
+  let match;
+  while ((match = regex.exec(markdown)) !== null) {
+    blocks.push({
+      language: match[1] || 'text',
+      filename: match[2]?.trim(),
+      code: match[3].trim(),
+    });
+  }
+  return blocks;
+}
+
+// ===== BUILD FILE TREE FROM CONTENT =====
+function buildFileTree(content: string, codeBlocks: { language: string; code: string; filename?: string }[]): FileNode[] {
+  const langToExt: Record<string, string> = {
+    tsx: '.tsx', jsx: '.jsx', typescript: '.ts', javascript: '.js',
+    sql: '.sql', css: '.css', json: '.json', html: '.html',
+  };
+
+  const root: FileNode[] = [
+    { name: 'src', type: 'folder', children: [
+      { name: 'components', type: 'folder', children: [] },
+      { name: 'pages', type: 'folder', children: [] },
+      { name: 'hooks', type: 'folder', children: [] },
+      { name: 'lib', type: 'folder', children: [] },
+    ]},
+    { name: 'database', type: 'folder', children: [] },
+    { name: 'api', type: 'folder', children: [] },
+  ];
+
+  codeBlocks.forEach((block, i) => {
+    const ext = langToExt[block.language] || '.txt';
+    const name = block.filename || `${block.language}_${i + 1}${ext}`;
+
+    if (block.language === 'sql') {
+      root[1].children?.push({ name, type: 'file', language: block.language });
+    } else if (['tsx', 'jsx'].includes(block.language)) {
+      const isPage = block.code.includes('export default') || block.code.includes('Page');
+      if (isPage) {
+        root[0].children?.[1].children?.push({ name, type: 'file', language: block.language });
+      } else {
+        root[0].children?.[0].children?.push({ name, type: 'file', language: block.language });
+      }
+    } else {
+      root[2].children?.push({ name, type: 'file', language: block.language });
+    }
+  });
+
+  // Remove empty folders
+  return root.filter(n => n.type === 'file' || (n.children && n.children.length > 0));
+}
+
+// ===== GENERATE LIVE PREVIEW HTML =====
+function generatePreviewHtml(content: string, metrics: BuildMetrics): string {
+  const codeBlocks = extractCodeBlocks(content);
+  const hasReactCode = codeBlocks.some(b => ['tsx', 'jsx', 'typescript', 'javascript'].includes(b.language));
+  const hasSql = codeBlocks.some(b => b.language === 'sql');
+
+  const screenMatches = content.match(/\|\s*\d+\s*\|([^|]+)\|/g) || [];
+  const screens = screenMatches.map(m => {
+    const parts = m.split('|').filter(Boolean);
+    return parts[1]?.trim() || '';
+  }).filter(s => s && !s.includes('---') && !s.includes('#'));
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0b; color: #fafafa; padding: 24px; min-height: 100vh; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+  .header-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #8b5cf6, #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .header h1 { font-size: 22px; font-weight: 700; }
+  .header p { font-size: 13px; color: #71717a; margin-top: 2px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 28px; font-weight: 700; }
+  .stat-label { font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 13px; font-weight: 600; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px; }
+  .screen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .screen-card { background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; transition: all 0.2s; cursor: pointer; }
+  .screen-card:hover { border-color: #8b5cf6; transform: translateY(-2px); }
+  .screen-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .screen-card p { font-size: 11px; color: #71717a; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+  .badge-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .badge-purple { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .code-block { background: #111113; border: 1px solid #27272a; border-radius: 10px; padding: 16px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 11px; line-height: 1.6; overflow-x: auto; color: #e6edf3; margin-top: 8px; white-space: pre-wrap; word-break: break-all; }
+  .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between; }
+  .footer-text { font-size: 11px; color: #52525b; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-in { animation: fadeIn 0.3s ease forwards; }
+</style>
+</head>
+<body>
+  <div class="header animate-in">
+    <div class="header-icon">🚀</div>
+    <div>
+      <h1>Generated Application</h1>
+      <p>Built by VALA AI Engine • ${new Date().toLocaleTimeString()}</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat animate-in" style="animation-delay:0.1s">
+      <div class="stat-value" style="color:#8b5cf6">${metrics.screens}</div>
+      <div class="stat-label">Screens</div>
+    </div>
+    <div class="stat animate-in" style="animation-delay:0.15s">
+      <div class="stat-value" style="color:#06b6d4">${metrics.apis}</div>
+      <div class="stat-label">API Endpoints</div>
+    </div>
+    <div class="stat animate-in" style="animation-delay:0.2s">
+      <div class="stat-value" style="color:#22c55e">${metrics.dbTables}</div>
+      <div class="stat-label">DB Tables</div>
+    </div>
+    <div class="stat animate-in" style="animation-delay:0.25s">
+      <div class="stat-value" style="color:#f59e0b">${metrics.flows}</div>
+      <div class="stat-label">User Flows</div>
+    </div>
+  </div>
+
+  ${screens.length > 0 ? `
+  <div class="section animate-in" style="animation-delay:0.3s">
+    <div class="section-title">Generated Screens</div>
+    <div class="screen-grid">
+      ${screens.slice(0, 12).map((s, i) => `
+        <div class="screen-card">
+          <h3>${s}</h3>
+          <p>Screen ${i + 1} of ${screens.length}</p>
+          <div style="margin-top:8px"><span class="badge badge-green">✓ Ready</span></div>
+        </div>
+      `).join('')}
+    </div>
+  </div>` : ''}
+
+  ${hasReactCode ? `
+  <div class="section animate-in" style="animation-delay:0.4s">
+    <div class="section-title">Component Code</div>
+    <div class="code-block">${codeBlocks.filter(b => ['tsx', 'jsx', 'typescript', 'javascript'].includes(b.language)).slice(0, 1).map(b =>
+      b.code.replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n').slice(0, 25).join('\n') + (b.code.split('\n').length > 25 ? '\n// ... more code' : '')
+    ).join('')}</div>
+  </div>` : ''}
+
+  ${hasSql ? `
+  <div class="section animate-in" style="animation-delay:0.5s">
+    <div class="section-title">Database Schema</div>
+    <div class="code-block">${codeBlocks.filter(b => b.language === 'sql').slice(0, 1).map(b =>
+      b.code.replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n').slice(0, 20).join('\n') + (b.code.split('\n').length > 20 ? '\n-- ... more tables' : '')
+    ).join('')}</div>
+  </div>` : ''}
+
+  <div class="footer animate-in" style="animation-delay:0.6s">
+    <span class="footer-text">VALA AI Engine v2.1 • Parallel Pipeline</span>
+    <span class="badge badge-purple">⚡ Production Ready</span>
+  </div>
+</body>
+</html>`;
+}
+
+// ===== SSE STREAMING (BUG-FIXED) =====
+async function streamValaAI({
+  messages,
+  onDelta,
+  onDone,
+  onError,
+  signal,
+}: {
+  messages: { role: string; content: string }[];
+  onDelta: (text: string) => void;
+  onDone: () => void;
+  onError: (err: string) => void;
+  signal?: AbortSignal;
+}) {
+  try {
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages }),
+      signal,
+    });
+
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      if (resp.status === 429) { onError("Rate limit exceeded. Please wait a moment."); return; }
+      if (resp.status === 402) { onError("AI credits exhausted. Please add credits."); return; }
+      onError(data.error || `AI request failed (${resp.status})`);
+      return;
+    }
+
+    if (!resp.body) { onError("No response stream"); return; }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split("\n");
+      // Keep the last potentially incomplete line in buffer
+      buffer = lines.pop() || "";
+
+      for (const rawLine of lines) {
+        const line = rawLine.replace(/\r$/, "");
+        if (!line || line.startsWith(":") || !line.startsWith("data: ")) continue;
+        const json = line.slice(6).trim();
+        if (json === "[DONE]") { onDone(); return; }
+        try {
+          const parsed = JSON.parse(json);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch {
+          // Skip malformed JSON lines (don't re-buffer — that causes infinite loops)
+        }
+      }
+    }
+
+    // Flush remaining buffer
+    if (buffer.trim()) {
+      const line = buffer.replace(/\r$/, "");
+      if (line.startsWith("data: ") && line.slice(6).trim() !== "[DONE]") {
+        try {
+          const parsed = JSON.parse(line.slice(6).trim());
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch { /* skip */ }
+      }
+    }
+    onDone();
+  } catch (e) {
+    if ((e as Error).name === 'AbortError') return;
+    onError((e as Error).message || 'Connection failed');
+  }
+}
+
+// ===== FILE TREE COMPONENT =====
+const FileTreeNode = ({ node, depth = 0 }: { node: FileNode; depth?: number }) => {
+  const [open, setOpen] = useState(true);
+  const iconColor = node.language === 'tsx' ? '#06b6d4' : node.language === 'sql' ? '#22c55e' : node.language === 'css' ? '#f59e0b' : '#a1a1aa';
+
+  if (node.type === 'folder') {
+    return (
+      <div>
+        <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full px-2 py-1 text-xs hover:bg-white/5 rounded" style={{ paddingLeft: `${depth * 12 + 8}px`, color: C.text }}>
+          {open ? <ChevronDown className="w-3 h-3 shrink-0" style={{ color: C.textDim }} /> : <ChevronRight className="w-3 h-3 shrink-0" style={{ color: C.textDim }} />}
+          <FolderTree className="w-3.5 h-3.5 shrink-0" style={{ color: C.amber }} />
+          <span>{node.name}</span>
+        </button>
+        {open && node.children?.map((child, i) => <FileTreeNode key={i} node={child} depth={depth + 1} />)}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 px-2 py-1 text-xs hover:bg-white/5 rounded cursor-pointer" style={{ paddingLeft: `${depth * 12 + 20}px`, color: C.textMuted }}>
+      <FileCode className="w-3.5 h-3.5 shrink-0" style={{ color: iconColor }} />
+      <span className="truncate">{node.name}</span>
+    </div>
+  );
+};
+
+// ===== MAIN COMPONENT =====
+const ValaAIDashboard = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: '1', role: 'assistant',
+      content: "# 👋 Welcome to VALA AI Engine v2.1\n\nI'm your autonomous product builder. Describe any software and I'll generate **production-ready** architecture:\n\n- 🖥️ **Screens** — Full UI components with responsive design\n- 🔌 **APIs** — REST endpoints with validation\n- 🗄️ **Database** — Schema, tables, RLS policies\n- 🔄 **Flows** — User workflows & state machines\n\n> Try: *\"Create a hospital management system with patient registration, doctor dashboard, billing, and lab reports\"*\n\n💡 **Features:** Live preview, version history, rollback, file tree, regenerate & voice input!",
+      timestamp: new Date(),
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkingPhase, setThinkingPhase] = useState('');
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('preview');
+  const [deviceMode, setDeviceMode] = useState<DeviceMode>('desktop');
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+  const [metrics, setMetrics] = useState<BuildMetrics>({ screens: 0, apis: 0, dbTables: 0, flows: 0 });
+  const [generatedCode, setGeneratedCode] = useState('// VALA AI Engine — Send a prompt to generate code');
+  const [previewHtml, setPreviewHtml] = useState('');
+  const [buildTime, setBuildTime] = useState<number | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<HistorySnapshot[]>([]);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
+  const [activeCodeTab, setActiveCodeTab] = useState(0);
+  const [codeBlocks, setCodeBlocks] = useState<{ language: string; code: string; filename?: string }[]>([]);
+  const [fileTree, setFileTree] = useState<FileNode[]>([]);
+  const [pipeline, setPipeline] = useState<PipelineStep[]>([
+    { id: '1', name: 'Understanding Prompt', status: 'idle', icon: Brain },
+    { id: '2', name: 'Analyzing Requirements', status: 'idle', icon: Activity },
+    { id: '3', name: 'Mapping Features', status: 'idle', icon: GitBranch },
+    { id: '4', name: 'Generating Screens', status: 'idle', icon: Layers },
+    { id: '5', name: 'Planning APIs', status: 'idle', icon: Zap },
+    { id: '6', name: 'Designing Database', status: 'idle', icon: Database },
+    { id: '7', name: 'Building Flows', status: 'idle', icon: Workflow },
+    { id: '8', name: 'Packaging Build', status: 'idle', icon: Package },
+  ]);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingMsgId, setPlayingMsgId] = useState<string | null>(null);
+  const [ttsLoading, setTtsLoading] = useState<string | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const recognitionRef = useRef<any>(null);
+
+  // ===== TTS =====
+  const speakMessage = useCallback(async (msgId: string, text: string) => {
+    if (playingMsgId === msgId) {
+      audioRef.current?.pause(); audioRef.current = null; setPlayingMsgId(null); return;
+    }
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    setTtsLoading(msgId);
+    try {
+      const cleanText = text.replace(/[#*`>\-\[\]()!|]/g, '').replace(/\n+/g, '. ').substring(0, 3000);
+      const response = await fetch(TTS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+        body: JSON.stringify({ text: cleanText, voiceId: 'JBFqnCBsd6RMkjVDRZzb' }),
+      });
+      if (!response.ok) throw new Error('TTS failed');
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.onplay = () => setPlayingMsgId(msgId);
+      audio.onended = () => { setPlayingMsgId(null); URL.revokeObjectURL(audioUrl); };
+      audio.onerror = () => { setPlayingMsgId(null); toast.error('Audio playback failed'); };
+      await audio.play();
+    } catch { toast.error('Voice output unavailable'); } finally { setTtsLoading(null); }
+  }, [playingMsgId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // ===== THINKING PHASES =====
+  const thinkingPhases = [
+    'Parsing your requirements...',
+    'Analyzing business domain...',
+    'Identifying key entities...',
+    'Planning system architecture...',
+    'Designing component tree...',
+    'Generating implementation...',
+  ];
+
+  useEffect(() => {
+    if (!isThinking) return;
+    let idx = 0;
+    setThinkingPhase(thinkingPhases[0]);
+    const interval = setInterval(() => {
+      idx = (idx + 1) % thinkingPhases.length;
+      setThinkingPhase(thinkingPhases[idx]);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [isThinking]);
+
+  // ===== PIPELINE (tied to actual streaming progress) =====
+  const advancePipeline = useCallback((content: string) => {
+    setPipeline(prev => {
+      const next = [...prev];
+      // Step 1-2: Always done once streaming starts
+      next[0] = { ...next[0], status: 'done', duration: 0.8 };
+      next[1] = { ...next[1], status: 'done', duration: 1.0 };
+      // Step 3: Features mapped when we see tables
+      if (content.includes('|') && content.includes('Screen')) {
+        next[2] = { ...next[2], status: 'done', duration: 1.2 };
+        next[3] = { ...next[3], status: 'running' };
+      }
+      // Step 4: Screens generated when we see component code
+      if (content.includes('```tsx') || content.includes('```jsx')) {
+        next[3] = { ...next[3], status: 'done', duration: 2.0 };
+        next[4] = { ...next[4], status: 'running' };
+      }
+      // Step 5: APIs planned
+      if (content.includes('API') || content.includes('endpoint') || content.includes('GET') || content.includes('POST')) {
+        next[4] = { ...next[4], status: 'done', duration: 1.5 };
+        next[5] = { ...next[5], status: 'running' };
+      }
+      // Step 6: Database designed
+      if (content.includes('```sql') || content.includes('CREATE TABLE')) {
+        next[5] = { ...next[5], status: 'done', duration: 1.8 };
+        next[6] = { ...next[6], status: 'running' };
+      }
+      // Step 7: Flows built
+      if (content.includes('Flow') || content.includes('User Flow') || content.includes('workflow')) {
+        next[6] = { ...next[6], status: 'done', duration: 1.3 };
+        next[7] = { ...next[7], status: 'running' };
+      }
+      return next;
+    });
   }, []);
 
-  // ==================== PROMPT HANDLERS ====================
-  const handleGenerate = useCallback(() => {
-    if (!prompt.trim()) {
-      toast.error("Please enter a prompt first");
-      return;
-    }
-    setAiStatus("running");
-    setPlanStatus("pending");
-    setCurrentStep(0);
-    addLog(`Starting AI generation with prompt: "${prompt.substring(0, 50)}..."`, "info");
-    toast.success("AI Generation Started", { description: "Processing your requirements..." });
-    
-    // Simulate step progression
-    let step = 0;
-    const interval = setInterval(() => {
-      if (step < steps.length) {
-        setSteps(prev => prev.map((s, i) => ({
-          ...s,
-          status: i < step ? "completed" : i === step ? "running" : "pending",
-          duration: i < step ? `${Math.floor(Math.random() * 3) + 1}s` : undefined
-        })));
-        setCurrentStep(step);
-        addLog(`Executing: ${steps[step].name}`, "info");
-        step++;
-      } else {
-        clearInterval(interval);
-        setAiStatus("completed");
-        setSteps(prev => prev.map(s => ({ ...s, status: "completed", duration: `${Math.floor(Math.random() * 3) + 1}s` })));
-        setGeneratedScreens(prev => prev + Math.floor(Math.random() * 5) + 3);
-        setGeneratedAPIs(prev => prev + Math.floor(Math.random() * 8) + 5);
-        setGeneratedDBTables(prev => prev + Math.floor(Math.random() * 4) + 2);
-        setGeneratedFlows(prev => prev + Math.floor(Math.random() * 3) + 2);
-        addLog("AI Generation completed successfully!", "success");
-        toast.success("Generation Complete!", { description: "All assets generated successfully" });
+  const finishPipeline = useCallback(() => {
+    setPipeline(prev => prev.map(s => ({ ...s, status: 'done' as const, duration: s.duration || 1.0 })));
+    setBuildTime(Math.round((Date.now() - startTimeRef.current) / 1000));
+  }, []);
+
+  // ===== EXTRACT METRICS =====
+  const extractMetrics = useCallback((text: string): BuildMetrics => {
+    const screenMatch = text.match(/screens?[:\s]*(\d+)/i) || text.match(/(\d+)\s*screens?/i);
+    const apiMatch = text.match(/apis?[:\s]*(\d+)/i) || text.match(/(\d+)\s*api/i) || text.match(/(\d+)\s*endpoint/i);
+    const dbMatch = text.match(/tables?[:\s]*(\d+)/i) || text.match(/(\d+)\s*table/i);
+    const flowMatch = text.match(/flows?[:\s]*(\d+)/i) || text.match(/(\d+)\s*flow/i);
+    return {
+      screens: screenMatch ? parseInt(screenMatch[1]) : 0,
+      apis: apiMatch ? parseInt(apiMatch[1]) : 0,
+      dbTables: dbMatch ? parseInt(dbMatch[1]) : 0,
+      flows: flowMatch ? parseInt(flowMatch[1]) : 0,
+    };
+  }, []);
+
+  // ===== SAVE HISTORY SNAPSHOT =====
+  const saveSnapshot = useCallback((prompt: string, msgs: ChatMessage[], code: string, html: string, m: BuildMetrics) => {
+    const snapshot: HistorySnapshot = {
+      id: Date.now().toString(),
+      timestamp: new Date(),
+      prompt, messages: msgs,
+      generatedCode: code, previewHtml: html, metrics: m,
+    };
+    setHistory(prev => [...prev, snapshot]);
+    setCurrentHistoryIndex(prev => prev + 1);
+  }, []);
+
+  // ===== ROLLBACK =====
+  const rollbackTo = useCallback((index: number) => {
+    if (index < 0 || index >= history.length) return;
+    const snap = history[index];
+    setMessages(snap.messages);
+    setGeneratedCode(snap.generatedCode);
+    setPreviewHtml(snap.previewHtml);
+    setMetrics(snap.metrics);
+    setCodeBlocks(extractCodeBlocks(snap.messages.filter(m => m.role === 'assistant').pop()?.content || ''));
+    setCurrentHistoryIndex(index);
+    toast.success(`Rolled back to v${index + 1}`);
+    setShowHistory(false);
+  }, [history]);
+
+  const canUndo = currentHistoryIndex > 0;
+  const canRedo = currentHistoryIndex < history.length - 1;
+  const handleUndo = useCallback(() => { if (canUndo) rollbackTo(currentHistoryIndex - 1); }, [canUndo, currentHistoryIndex, rollbackTo]);
+  const handleRedo = useCallback(() => { if (canRedo) rollbackTo(currentHistoryIndex + 1); }, [canRedo, currentHistoryIndex, rollbackTo]);
+
+  // ===== SEND MESSAGE =====
+  const sendMessage = useCallback(async (overrideInput?: string) => {
+    const text = overrideInput || input.trim();
+    if (!text || isGenerating) return;
+
+    const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: text, timestamp: new Date() };
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setInput('');
+    setIsGenerating(true);
+    setIsThinking(true);
+    setBuildTime(null);
+    startTimeRef.current = Date.now();
+
+    // Reset pipeline
+    setPipeline(prev => prev.map(s => ({ ...s, status: 'idle' as const, duration: undefined })));
+
+    const assistantId = (Date.now() + 1).toString();
+    let assistantContent = '';
+    const abortController = new AbortController();
+    abortRef.current = abortController;
+
+    await streamValaAI({
+      messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+      signal: abortController.signal,
+      onDelta: (chunk) => {
+        if (isThinking) setIsThinking(false);
+        assistantContent += chunk;
+
+        setMessages(prev => {
+          const last = prev[prev.length - 1];
+          if (last?.role === 'assistant' && last.id === assistantId) {
+            return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantContent } : m);
+          }
+          return [...prev, { id: assistantId, role: 'assistant', content: assistantContent, timestamp: new Date() }];
+        });
+
+        // Advance pipeline based on actual content
+        advancePipeline(assistantContent);
+
+        // Live-update metrics & preview
+        const m = extractMetrics(assistantContent);
+        if (m.screens > 0 || m.apis > 0 || m.dbTables > 0) {
+          setMetrics(m);
+          setPreviewHtml(generatePreviewHtml(assistantContent, m));
+        }
+
+        // Extract code blocks live
+        const blocks = extractCodeBlocks(assistantContent);
+        if (blocks.length > 0) {
+          setCodeBlocks(blocks);
+          setGeneratedCode(blocks.map(b => `// === ${b.language.toUpperCase()} ===\n${b.code}`).join('\n\n'));
+          setFileTree(buildFileTree(assistantContent, blocks));
+        }
+      },
+      onDone: () => {
+        setIsGenerating(false);
+        setIsThinking(false);
+        finishPipeline();
+
+        const finalMetrics = extractMetrics(assistantContent);
+        if (finalMetrics.screens > 0 || finalMetrics.apis > 0 || finalMetrics.dbTables > 0) setMetrics(finalMetrics);
+
+        const finalBlocks = extractCodeBlocks(assistantContent);
+        const finalCode = finalBlocks.length > 0 ? finalBlocks.map(b => `// === ${b.language.toUpperCase()} ===\n${b.code}`).join('\n\n') : generatedCode;
+        setGeneratedCode(finalCode);
+        setCodeBlocks(finalBlocks);
+        setFileTree(buildFileTree(assistantContent, finalBlocks));
+
+        const finalHtml = generatePreviewHtml(assistantContent, finalMetrics.screens > 0 ? finalMetrics : metrics);
+        setPreviewHtml(finalHtml);
+
+        saveSnapshot(text, [...updatedMessages, { id: assistantId, role: 'assistant', content: assistantContent, timestamp: new Date() }], finalCode, finalHtml, finalMetrics);
+        toast.success('Build complete!');
+      },
+      onError: (err) => {
+        setIsGenerating(false);
+        setIsThinking(false);
+        toast.error(err);
+        setMessages(prev => [...prev, { id: assistantId, role: 'assistant', content: `⚠️ Error: ${err}\n\nPlease try again.`, timestamp: new Date() }]);
+      },
+    });
+  }, [input, isGenerating, messages, advancePipeline, finishPipeline, extractMetrics, saveSnapshot, generatedCode, metrics, isThinking]);
+
+  // ===== REGENERATE =====
+  const regenerateLastResponse = useCallback(() => {
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    if (!lastUserMsg) return;
+    setMessages(prev => {
+      let idx = -1;
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (prev[i].role === 'assistant' && prev[i].id !== '1') { idx = i; break; }
       }
-    }, 800);
-  }, [prompt, steps, addLog]);
+      return idx > 0 ? prev.slice(0, idx) : prev;
+    });
+    setTimeout(() => sendMessage(lastUserMsg.content), 100);
+  }, [messages, sendMessage]);
 
-  const handleRegenerate = useCallback(() => {
-    if (!prompt.trim()) {
-      toast.error("No prompt to regenerate");
+  const handleStop = useCallback(() => {
+    abortRef.current?.abort();
+    setIsGenerating(false);
+    setIsThinking(false);
+    finishPipeline();
+    toast.info("Generation stopped");
+  }, [finishPipeline]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+
+  const handleClearChat = useCallback(() => {
+    setMessages([{
+      id: '1', role: 'assistant',
+      content: "# 👋 Chat cleared\n\nReady for a new build. Describe what you want to create!",
+      timestamp: new Date(),
+    }]);
+    setPreviewHtml('');
+    setGeneratedCode('// VALA AI Engine — Send a prompt to generate code');
+    setCodeBlocks([]);
+    setFileTree([]);
+    setMetrics({ screens: 0, apis: 0, dbTables: 0, flows: 0 });
+    setBuildTime(null);
+    setPipeline(prev => prev.map(s => ({ ...s, status: 'idle' as const, duration: undefined })));
+    toast.success('Chat cleared');
+  }, []);
+
+  // ===== VOICE INPUT (FIXED - uses Web Speech API directly) =====
+  const toggleVoiceInput = useCallback(() => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
       return;
     }
-    setSteps(prev => prev.map(s => ({ ...s, status: "pending", duration: undefined })));
-    setAiStatus("idle");
-    setPlanStatus("draft");
-    addLog("Regeneration requested - resetting pipeline", "warning");
-    toast.info("Resetting pipeline for regeneration...");
-    setTimeout(() => handleGenerate(), 500);
-  }, [prompt, handleGenerate, addLog]);
 
-  const handleClearPrompt = useCallback(() => {
-    setPrompt("");
-    addLog("Prompt cleared", "info");
-    toast.info("Prompt cleared");
-  }, [addLog]);
-
-  const handleSavePrompt = useCallback(() => {
-    if (!prompt.trim()) {
-      toast.error("Nothing to save");
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Voice input not supported in this browser");
       return;
     }
-    if (savedPrompts.includes(prompt)) {
-      toast.warning("Prompt already saved");
-      return;
-    }
-    setSavedPrompts(prev => [prompt, ...prev].slice(0, 10));
-    addLog(`Prompt saved: "${prompt.substring(0, 30)}..."`, "success");
-    toast.success("Prompt saved!");
-  }, [prompt, savedPrompts, addLog]);
 
-  const handleLoadPrompt = useCallback((savedPrompt: string) => {
-    setPrompt(savedPrompt);
-    addLog(`Loaded saved prompt: "${savedPrompt.substring(0, 30)}..."`, "info");
-    toast.success("Prompt loaded");
-  }, [addLog]);
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = true;
 
-  // ==================== AI CONTROL HANDLERS ====================
-  const handleStartAI = useCallback(() => {
-    setAiStatus("running");
-    addLog("AI Engine started", "success");
-    toast.success("AI Engine Started");
-  }, [addLog]);
+    recognition.onresult = (event: any) => {
+      let transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setInput(transcript);
+    };
 
-  const handleStopAI = useCallback(() => {
-    setAiStatus("idle");
-    setSteps(prev => prev.map(s => ({ ...s, status: s.status === "running" ? "pending" : s.status })));
-    addLog("AI Engine stopped", "warning");
-    toast.warning("AI Engine Stopped");
-  }, [addLog]);
+    recognition.onerror = (event: any) => {
+      if (event.error !== 'aborted') toast.error("Voice recognition failed");
+      setIsRecording(false);
+    };
 
-  const handlePauseAI = useCallback(() => {
-    setAiStatus("paused");
-    addLog("AI Engine paused", "info");
-    toast.info("AI Engine Paused");
-  }, [addLog]);
+    recognition.onend = () => {
+      setIsRecording(false);
+      toast.success("Voice captured!");
+    };
 
-  const handleResumeAI = useCallback(() => {
-    setAiStatus("running");
-    addLog("AI Engine resumed", "success");
-    toast.success("AI Engine Resumed");
-  }, [addLog]);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+    toast.info("🎤 Listening... Click again to stop");
+  }, [isRecording]);
 
-  const handleRetryFailedStep = useCallback(() => {
-    const failedStep = steps.find(s => s.status === "failed");
-    if (failedStep) {
-      setSteps(prev => prev.map(s => s.id === failedStep.id ? { ...s, status: "running" } : s));
-      addLog(`Retrying failed step: ${failedStep.name}`, "info");
-      toast.info(`Retrying: ${failedStep.name}`);
-      setTimeout(() => {
-        setSteps(prev => prev.map(s => s.id === failedStep.id ? { ...s, status: "completed", duration: "2s" } : s));
-        addLog(`Step completed: ${failedStep.name}`, "success");
-        toast.success(`Step completed: ${failedStep.name}`);
-      }, 2000);
-    } else {
-      toast.info("No failed steps to retry");
-    }
-  }, [steps, addLog]);
-
-  // ==================== PLAN HANDLERS ====================
-  const handleViewPlan = useCallback(() => {
-    setShowPlan(true);
-    addLog("Viewing AI plan", "info");
-  }, [addLog]);
-
-  const handleEditPlan = useCallback(() => {
-    setPlanStatus("draft");
-    addLog("Plan editing mode enabled", "info");
-    toast.info("Plan is now editable");
-  }, [addLog]);
-
-  const handleApprovePlan = useCallback(() => {
-    setPlanStatus("approved");
-    addLog("Plan approved by Boss", "success");
-    toast.success("Plan Approved!", { description: "AI will proceed with execution" });
-  }, [addLog]);
-
-  const handleRejectPlan = useCallback(() => {
-    setPlanStatus("rejected");
-    addLog("Plan rejected - awaiting modifications", "warning");
-    toast.warning("Plan Rejected", { description: "Please modify and resubmit" });
-  }, [addLog]);
-
-  // ==================== OUTPUT HANDLERS ====================
-  const handleGenerateScreens = useCallback(() => {
-    const count = Math.floor(Math.random() * 5) + 3;
-    setGeneratedScreens(prev => prev + count);
-    addLog(`Generated ${count} new screens`, "success");
-    toast.success(`Generated ${count} Screens`);
-  }, [addLog]);
-
-  const handleGenerateAPIs = useCallback(() => {
-    const count = Math.floor(Math.random() * 8) + 5;
-    setGeneratedAPIs(prev => prev + count);
-    addLog(`Generated ${count} new API endpoints`, "success");
-    toast.success(`Generated ${count} API Endpoints`);
-  }, [addLog]);
-
-  const handleGenerateDB = useCallback(() => {
-    const count = Math.floor(Math.random() * 4) + 2;
-    setGeneratedDBTables(prev => prev + count);
-    addLog(`Generated ${count} database tables`, "success");
-    toast.success(`Generated ${count} DB Tables`);
-  }, [addLog]);
-
-  const handleGenerateFlow = useCallback(() => {
-    const count = Math.floor(Math.random() * 3) + 2;
-    setGeneratedFlows(prev => prev + count);
-    addLog(`Generated ${count} user flows`, "success");
-    toast.success(`Generated ${count} User Flows`);
-  }, [addLog]);
-
-  const handleExportDemo = useCallback(() => {
-    addLog("Exporting demo package...", "info");
-    toast.loading("Preparing export...");
-    setTimeout(() => {
-      addLog("Demo exported successfully", "success");
-      toast.success("Demo Exported!", { description: "Download starting..." });
-    }, 1500);
-  }, [addLog]);
-
-  // ==================== CONTROL HANDLERS ====================
-  const handleDeployDemo = useCallback(() => {
-    setDeploymentStatus("deploying");
-    addLog("Deploying demo to staging...", "info");
-    toast.loading("Deploying...");
-    setTimeout(() => {
-      setDeploymentStatus("deployed");
-      addLog("Demo deployed successfully!", "success");
-      toast.success("Deployment Complete!", { description: "Demo is now live" });
-    }, 3000);
-  }, [addLog]);
-
-  const handleRollback = useCallback(() => {
-    if (currentVersion > 1) {
-      setCurrentVersion(prev => prev - 1);
-      addLog(`Rolled back to version ${currentVersion - 1}`, "warning");
-      toast.warning(`Rolled back to v${currentVersion - 1}`);
-    } else {
-      toast.error("Cannot rollback - already at first version");
-    }
-  }, [currentVersion, addLog]);
-
-  const handleCloneProject = useCallback(() => {
-    addLog("Cloning project...", "info");
-    toast.loading("Cloning project...");
-    setTimeout(() => {
-      addLog("Project cloned successfully", "success");
-      toast.success("Project Cloned!", { description: "New project created" });
-    }, 2000);
-  }, [addLog]);
-
-  const handleVersionSwitch = useCallback((version: number) => {
-    setCurrentVersion(version);
-    addLog(`Switched to version ${version}`, "info");
-    toast.success(`Switched to v${version}`);
-  }, [addLog]);
-
-  // ==================== LOGS & ERRORS HANDLERS ====================
-  const handleViewLogs = useCallback(() => {
-    setShowLogs(true);
-    addLog("Viewing system logs", "info");
-  }, [addLog]);
-
-  const handleViewErrors = useCallback(() => {
-    setShowErrors(true);
-    if (errors.length === 0) {
-      setErrors([
-        { id: "1", message: "API endpoint timeout on /users", suggestion: "Increase timeout limit or optimize query" },
-        { id: "2", message: "Missing required field in schema", suggestion: "Add 'email' field to User model" },
-      ]);
-    }
-    addLog("Viewing error details", "info");
-  }, [errors.length, addLog]);
-
-  const handleFixSuggestion = useCallback((errorId: string) => {
-    setErrors(prev => prev.filter(e => e.id !== errorId));
-    addLog(`Applied fix for error ${errorId}`, "success");
-    toast.success("Fix Applied!");
-  }, [addLog]);
-
-  const handleRerunStep = useCallback((stepId: string) => {
-    const step = steps.find(s => s.id === stepId);
-    if (step) {
-      setSteps(prev => prev.map(s => s.id === stepId ? { ...s, status: "running" } : s));
-      addLog(`Re-running step: ${step.name}`, "info");
-      toast.info(`Re-running: ${step.name}`);
-      setTimeout(() => {
-        setSteps(prev => prev.map(s => s.id === stepId ? { ...s, status: "completed", duration: "1s" } : s));
-        addLog(`Step completed: ${step.name}`, "success");
-      }, 1500);
-    }
-  }, [steps, addLog]);
-
-  // ==================== HELPER FUNCTIONS ====================
-  const getStatusColor = (status: AIStatus) => {
-    switch (status) {
-      case "running": return "bg-emerald-500/20 text-emerald-400 border-emerald-500/50";
-      case "paused": return "bg-amber-500/20 text-amber-400 border-amber-500/50";
-      case "completed": return "bg-blue-500/20 text-blue-400 border-blue-500/50";
-      case "error": return "bg-red-500/20 text-red-400 border-red-500/50";
-      default: return "bg-slate-500/20 text-slate-400 border-slate-500/50";
-    }
+  const getDeviceWidth = () => {
+    switch (deviceMode) { case 'mobile': return '375px'; case 'tablet': return '768px'; default: return '100%'; }
   };
 
-  const getStepStatusIcon = (status: AIStep["status"]) => {
-    switch (status) {
-      case "completed": return <CheckCircle className="w-4 h-4 text-emerald-400" />;
-      case "running": return <RefreshCw className="w-4 h-4 text-blue-400 animate-spin" />;
-      case "failed": return <AlertCircle className="w-4 h-4 text-red-400" />;
-      case "skipped": return <SkipForward className="w-4 h-4 text-slate-400" />;
-      default: return <Clock className="w-4 h-4 text-slate-500" />;
-    }
-  };
+  const completedSteps = pipeline.filter(s => s.status === 'done').length;
 
-  // ==================== RENDER ====================
   return (
-    <div className="flex-1 overflow-hidden flex flex-col">
-      <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                <Brain className="w-7 h-7 text-white" />
+    <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ background: C.bg, color: C.text }}>
+      <div className="flex-1 flex overflow-hidden">
+        {/* ===== LEFT: CHAT PANEL ===== */}
+        <AnimatePresence>
+          {showSidebar && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 440, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col shrink-0"
+              style={{ borderRight: `1px solid ${C.border}` }}
+            >
+              {/* Toolbar */}
+              <div className="flex items-center justify-between px-4 h-10 shrink-0" style={{ borderBottom: `1px solid ${C.border}`, background: C.bgSidebar }}>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' }}>
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-xs font-semibold">VALA AI</span>
+                  {isGenerating && <span className="text-[9px] px-1.5 py-0.5 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa' }}>Building...</span>}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={handleUndo} disabled={!canUndo} className="p-1 rounded hover:bg-white/5 disabled:opacity-20" style={{ color: C.textDim }} title="Undo"><Undo2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={handleRedo} disabled={!canRedo} className="p-1 rounded hover:bg-white/5 disabled:opacity-20" style={{ color: C.textDim }} title="Redo"><Redo2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setShowHistory(!showHistory)} className="p-1 rounded hover:bg-white/5" style={{ color: showHistory ? C.accent : C.textDim }} title="History"><History className="w-3.5 h-3.5" /></button>
+                  <button onClick={handleClearChat} className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }} title="Clear chat"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setShowSidebar(false)} className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><PanelLeftClose className="w-3.5 h-3.5" /></button>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">VALA AI Engine</h1>
-                <p className="text-muted-foreground">Lovable-Style AI Product Builder</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge className={cn("gap-1 px-3 py-1", getStatusColor(aiStatus))}>
-                <Radio className={cn("w-3 h-3", aiStatus === "running" && "animate-pulse")} />
-                {aiStatus.charAt(0).toUpperCase() + aiStatus.slice(1)}
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <History className="w-3 h-3" />
-                v{currentVersion}
-              </Badge>
-            </div>
-          </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-6 gap-4">
-            <Card className="bg-gradient-to-br from-violet-500/10 to-violet-600/5 border-violet-500/30">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Screens</p>
-                    <p className="text-2xl font-bold text-violet-400">{generatedScreens}</p>
-                  </div>
-                  <Layers className="w-8 h-8 text-violet-400/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/30">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">APIs</p>
-                    <p className="text-2xl font-bold text-blue-400">{generatedAPIs}</p>
-                  </div>
-                  <Code2 className="w-8 h-8 text-blue-400/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/30">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">DB Tables</p>
-                    <p className="text-2xl font-bold text-emerald-400">{generatedDBTables}</p>
-                  </div>
-                  <Database className="w-8 h-8 text-emerald-400/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border-cyan-500/30">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Flows</p>
-                    <p className="text-2xl font-bold text-cyan-400">{generatedFlows}</p>
-                  </div>
-                  <Workflow className="w-8 h-8 text-cyan-400/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/30">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Steps Done</p>
-                    <p className="text-2xl font-bold text-amber-400">{steps.filter(s => s.status === "completed").length}/{steps.length}</p>
-                  </div>
-                  <Activity className="w-8 h-8 text-amber-400/30" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className={cn(
-              "border",
-              deploymentStatus === "deployed" 
-                ? "bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/30"
-                : deploymentStatus === "deploying"
-                ? "bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/30"
-                : "bg-gradient-to-br from-slate-500/10 to-slate-600/5 border-slate-500/30"
-            )}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Deploy</p>
-                    <p className={cn(
-                      "text-lg font-bold",
-                      deploymentStatus === "deployed" ? "text-emerald-400" : 
-                      deploymentStatus === "deploying" ? "text-blue-400" : "text-slate-400"
-                    )}>
-                      {deploymentStatus === "deployed" ? "Live" : 
-                       deploymentStatus === "deploying" ? "..." : "Ready"}
-                    </p>
-                  </div>
-                  <Rocket className={cn(
-                    "w-8 h-8",
-                    deploymentStatus === "deployed" ? "text-emerald-400/30" : "text-slate-400/30"
-                  )} />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content - Two Columns */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Left Column - Prompt Input */}
-            <div className="space-y-4">
-              <Card className="bg-card/50 border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Sparkles className="w-5 h-5 text-violet-400" />
-                    Prompt Input
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Textarea
-                    placeholder="Describe what you want to build... e.g., 'Create a user management dashboard with role-based access control'"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="min-h-[120px] bg-background/50"
-                  />
-                  
-                  {/* Prompt Action Buttons - ALL WORKING */}
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={handleGenerate} className="gap-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500">
-                      <Play className="w-4 h-4" /> Generate
-                    </Button>
-                    <Button variant="outline" onClick={handleRegenerate} className="gap-2">
-                      <RefreshCw className="w-4 h-4" /> Regenerate
-                    </Button>
-                    <Button variant="outline" onClick={handleClearPrompt} className="gap-2">
-                      <Trash2 className="w-4 h-4" /> Clear
-                    </Button>
-                    <Button variant="outline" onClick={handleSavePrompt} className="gap-2">
-                      <Save className="w-4 h-4" /> Save
-                    </Button>
-                  </div>
-
-                  {/* Saved Prompts */}
-                  {savedPrompts.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground">Saved Prompts:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {savedPrompts.slice(0, 3).map((p, i) => (
-                          <Button
-                            key={i}
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleLoadPrompt(p)}
-                            className="text-xs h-7 px-2 bg-muted/50 hover:bg-muted"
-                          >
-                            <Upload className="w-3 h-3 mr-1" />
-                            {p.substring(0, 25)}...
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* AI Control Buttons */}
-              <Card className="bg-card/50 border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Bot className="w-5 h-5 text-blue-400" />
-                    AI Control
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-5 gap-2">
-                    <Button 
-                      variant={aiStatus === "running" ? "default" : "outline"} 
-                      onClick={handleStartAI} 
-                      className="gap-1"
-                      disabled={aiStatus === "running"}
-                    >
-                      <Play className="w-4 h-4" /> Start
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleStopAI}
-                      disabled={aiStatus === "idle"}
-                      className="gap-1"
-                    >
-                      <Square className="w-4 h-4" /> Stop
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handlePauseAI}
-                      disabled={aiStatus !== "running"}
-                      className="gap-1"
-                    >
-                      <Pause className="w-4 h-4" /> Pause
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleResumeAI}
-                      disabled={aiStatus !== "paused"}
-                      className="gap-1"
-                    >
-                      <Play className="w-4 h-4" /> Resume
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleRetryFailedStep}
-                      className="gap-1"
-                    >
-                      <RotateCcw className="w-4 h-4" /> Retry
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Output Generation Buttons */}
-              <Card className="bg-card/50 border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Layers className="w-5 h-5 text-emerald-400" />
-                    Generate Outputs
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" onClick={handleGenerateScreens} className="gap-2 justify-start">
-                      <Layers className="w-4 h-4 text-violet-400" /> Generate Screens
-                    </Button>
-                    <Button variant="outline" onClick={handleGenerateAPIs} className="gap-2 justify-start">
-                      <Code2 className="w-4 h-4 text-blue-400" /> Generate APIs
-                    </Button>
-                    <Button variant="outline" onClick={handleGenerateDB} className="gap-2 justify-start">
-                      <Database className="w-4 h-4 text-emerald-400" /> Generate DB
-                    </Button>
-                    <Button variant="outline" onClick={handleGenerateFlow} className="gap-2 justify-start">
-                      <Workflow className="w-4 h-4 text-cyan-400" /> Generate Flow
-                    </Button>
-                  </div>
-                  <div className="mt-3">
-                    <Button variant="outline" onClick={handleExportDemo} className="gap-2 w-full">
-                      <Download className="w-4 h-4" /> Export Demo Package
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column - Pipeline & Controls */}
-            <div className="space-y-4">
-              {/* AI Pipeline Steps */}
-              <Card className="bg-card/50 border-border/50">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Workflow className="w-5 h-5 text-cyan-400" />
-                      AI Pipeline
-                    </CardTitle>
-                    <Badge className={cn(
-                      planStatus === "approved" ? "bg-emerald-500/20 text-emerald-400" :
-                      planStatus === "rejected" ? "bg-red-500/20 text-red-400" :
-                      planStatus === "pending" ? "bg-amber-500/20 text-amber-400" :
-                      "bg-slate-500/20 text-slate-400"
-                    )}>
-                      {planStatus}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 mb-4">
-                    {steps.map((step, i) => (
-                      <motion.div
-                        key={step.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className={cn(
-                          "flex items-center justify-between p-3 rounded-lg border transition-all",
-                          step.status === "running" ? "bg-blue-500/10 border-blue-500/30" :
-                          step.status === "completed" ? "bg-emerald-500/5 border-emerald-500/20" :
-                          step.status === "failed" ? "bg-red-500/10 border-red-500/30" :
-                          "bg-background/50 border-border/50"
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          {getStepStatusIcon(step.status)}
-                          <span className={cn(
-                            "text-sm font-medium",
-                            step.status === "completed" ? "text-emerald-400" :
-                            step.status === "running" ? "text-blue-400" :
-                            step.status === "failed" ? "text-red-400" :
-                            "text-muted-foreground"
-                          )}>
-                            {step.name}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {step.duration && (
-                            <span className="text-xs text-muted-foreground">{step.duration}</span>
-                          )}
-                          {(step.status === "completed" || step.status === "failed") && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => handleRerunStep(step.id)}
-                              className="h-6 px-2"
-                            >
-                              <RotateCcw className="w-3 h-3" />
-                            </Button>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Plan Action Buttons */}
-                  <div className="flex flex-wrap gap-2 pt-3 border-t border-border/50">
-                    <Button variant="outline" size="sm" onClick={handleViewPlan} className="gap-1">
-                      <Eye className="w-3 h-3" /> View Plan
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleEditPlan} className="gap-1">
-                      <Edit3 className="w-3 h-3" /> Edit Plan
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleApprovePlan} className="gap-1 text-emerald-400 border-emerald-500/50 hover:bg-emerald-500/10">
-                      <ThumbsUp className="w-3 h-3" /> Approve
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleRejectPlan} className="gap-1 text-red-400 border-red-500/50 hover:bg-red-500/10">
-                      <ThumbsDown className="w-3 h-3" /> Reject
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Deployment & Version Control */}
-              <Card className="bg-card/50 border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Rocket className="w-5 h-5 text-amber-400" />
-                    Deploy & Control
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      onClick={handleDeployDemo} 
-                      className="gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500"
-                      disabled={deploymentStatus === "deploying"}
-                    >
-                      <Rocket className="w-4 h-4" /> Deploy Demo
-                    </Button>
-                    <Button variant="outline" onClick={handleRollback} className="gap-2">
-                      <RotateCcw className="w-4 h-4" /> Rollback
-                    </Button>
-                    <Button variant="outline" onClick={handleCloneProject} className="gap-2">
-                      <Copy className="w-4 h-4" /> Clone Project
-                    </Button>
-                    <div className="flex gap-1">
-                      {[1, 2, 3].map(v => (
-                        <Button
-                          key={v}
-                          variant={currentVersion === v ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleVersionSwitch(v)}
-                          className="flex-1"
+              {/* History Panel */}
+              <AnimatePresence>
+                {showHistory && history.length > 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                    style={{ borderBottom: `1px solid ${C.border}`, background: '#111113' }}
+                  >
+                    <div className="p-2 max-h-48 overflow-y-auto">
+                      <div className="text-[10px] font-semibold px-2 py-1 mb-1" style={{ color: C.textMuted }}>VERSION HISTORY ({history.length})</div>
+                      {history.map((snap, idx) => (
+                        <button
+                          key={snap.id}
+                          onClick={() => rollbackTo(idx)}
+                          className={cn("w-full text-left px-3 py-2 rounded-lg text-xs mb-1 flex items-center gap-2 transition-colors", idx === currentHistoryIndex ? "bg-violet-500/10 border border-violet-500/20" : "hover:bg-white/5")}
+                          style={{ color: idx === currentHistoryIndex ? C.accent : C.textMuted }}
                         >
-                          v{v}
-                        </Button>
+                          <RotateCcw className="w-3 h-3 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="truncate font-medium" style={{ color: C.text }}>{snap.prompt.slice(0, 40)}{snap.prompt.length > 40 ? '...' : ''}</div>
+                            <div className="text-[10px]" style={{ color: C.textDim }}>{snap.timestamp.toLocaleTimeString()} • v{idx + 1} • {snap.metrics.screens}s {snap.metrics.apis}a {snap.metrics.dbTables}t</div>
+                          </div>
+                          {idx === currentHistoryIndex && <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa' }}>Current</span>}
+                        </button>
                       ))}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              {/* Logs & Error Panel */}
-              <Card className="bg-card/50 border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Terminal className="w-5 h-5 text-slate-400" />
-                    Logs & Diagnostics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <Button variant="outline" onClick={handleViewLogs} className="gap-2">
-                      <FileText className="w-4 h-4" /> View Logs
-                    </Button>
-                    <Button variant="outline" onClick={handleViewErrors} className="gap-2">
-                      <AlertTriangle className="w-4 h-4 text-amber-400" /> Error Details
-                    </Button>
-                  </div>
-
-                  {/* Recent Logs Preview */}
-                  <div className="bg-background/50 rounded-lg border border-border/50 p-3 max-h-[150px] overflow-auto">
-                    {logs.slice(0, 5).map((log) => (
-                      <div key={log.id} className="flex items-start gap-2 text-xs mb-1">
-                        <span className={cn(
-                          "shrink-0",
-                          log.type === "success" ? "text-emerald-400" :
-                          log.type === "warning" ? "text-amber-400" :
-                          log.type === "error" ? "text-red-400" :
-                          "text-muted-foreground"
-                        )}>
-                          [{log.type.toUpperCase()}]
-                        </span>
-                        <span className="text-foreground/80">{log.message}</span>
+              {/* Chat Messages */}
+              <ScrollArea className="flex-1 px-4 py-4">
+                <div className="space-y-6">
+                  {messages.map((msg) => (
+                    <div key={msg.id} className="group">
+                      <div className="flex items-center gap-2 mb-2">
+                        {msg.role === 'assistant' ? (
+                          <>
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' }}>
+                              <Sparkles className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-xs font-medium" style={{ color: C.textMuted }}>VALA AI</span>
+                            {isGenerating && msg.id === messages[messages.length - 1]?.id && msg.role === 'assistant' && (
+                              <Loader2 className="w-3 h-3 animate-spin" style={{ color: C.accent }} />
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#3f3f46' }}>
+                              <User className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-xs font-medium" style={{ color: C.textMuted }}>You</span>
+                          </>
+                        )}
                       </div>
-                    ))}
+                      <div className="pl-8">
+                        {msg.role === 'assistant' ? (
+                          <div className="prose prose-sm prose-invert max-w-none text-sm leading-relaxed [&_h1]:text-lg [&_h1]:font-bold [&_h2]:text-base [&_h2]:font-semibold [&_h3]:text-sm [&_h3]:font-semibold [&_p]:my-1.5 [&_ul]:my-1 [&_li]:my-0.5 [&_code]:text-xs [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:bg-white/10 [&_blockquote]:border-l-2 [&_blockquote]:border-violet-500/50 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-zinc-400 [&_strong]:text-white [&_hr]:border-zinc-700 [&_table]:text-xs [&_th]:px-2 [&_th]:py-1 [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-zinc-700 [&_td]:border [&_td]:border-zinc-800">
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="text-sm leading-relaxed rounded-lg px-3 py-2" style={{ background: '#18181b', color: C.text }}>{msg.content}</div>
+                        )}
+                        {msg.role === 'assistant' && !isGenerating && msg.id !== '1' && (
+                          <div className="flex items-center gap-1 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => { navigator.clipboard.writeText(msg.content); toast.success('Copied!'); }} className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><Copy className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => speakMessage(msg.id, msg.content)} className="p-1 rounded hover:bg-white/5" style={{ color: playingMsgId === msg.id ? C.accent : C.textDim }}>
+                              {ttsLoading === msg.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : playingMsgId === msg.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                            </button>
+                            <button className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><ThumbsUp className="w-3.5 h-3.5" /></button>
+                            <button className="p-1 rounded hover:bg-white/5" style={{ color: C.textDim }}><ThumbsDown className="w-3.5 h-3.5" /></button>
+                            <button onClick={regenerateLastResponse} className="p-1 rounded hover:bg-white/5 flex items-center gap-1" style={{ color: C.textDim }} title="Regenerate">
+                              <RefreshCw className="w-3.5 h-3.5" /><span className="text-[10px]">Regenerate</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Thinking Indicator */}
+                  {isThinking && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' }}>
+                        <Brain className="w-3 h-3 text-white animate-pulse" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-medium" style={{ color: C.textMuted }}>VALA AI</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }}>Thinking</span>
+                        </div>
+                        <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.1)' }}>
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-1">
+                              <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0 }} className="w-1.5 h-1.5 rounded-full" style={{ background: C.accent }} />
+                              <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.3 }} className="w-1.5 h-1.5 rounded-full" style={{ background: C.accent }} />
+                              <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.6 }} className="w-1.5 h-1.5 rounded-full" style={{ background: C.accent }} />
+                            </div>
+                            <span className="text-xs" style={{ color: C.textMuted }}>{thinkingPhase}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+
+              {/* Chat Input */}
+              <div className="p-4 shrink-0" style={{ borderTop: `1px solid ${C.border}` }}>
+                {isGenerating && (
+                  <div className="flex items-center gap-2 mb-3 px-1">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: C.accent }} />
+                    <span className="text-xs" style={{ color: C.textMuted }}>Building your application...</span>
+                    <button onClick={handleStop} className="ml-auto text-xs px-2.5 py-1 rounded-md font-medium transition-colors" style={{ color: C.red, background: 'rgba(239,68,68,0.1)', border: `1px solid rgba(239,68,68,0.2)` }}>Stop</button>
                   </div>
-                </CardContent>
-              </Card>
+                )}
+                <div className="rounded-xl overflow-hidden" style={{ background: '#18181b', border: `1px solid ${C.border}` }}>
+                  <textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Describe what you want to build..."
+                    rows={3}
+                    className="w-full px-4 py-3 text-sm resize-none outline-none"
+                    style={{ background: 'transparent', color: C.text }}
+                    disabled={isGenerating}
+                  />
+                  <div className="flex items-center justify-between px-3 py-2" style={{ borderTop: `1px solid ${C.border}` }}>
+                    <div className="flex items-center gap-1">
+                      <button className="p-1.5 rounded-md hover:bg-white/5" style={{ color: C.textDim }} title="Attach file"><Paperclip className="w-4 h-4" /></button>
+                      <button className="p-1.5 rounded-md hover:bg-white/5" style={{ color: C.textDim }} title="Add image"><Image className="w-4 h-4" /></button>
+                      <button onClick={toggleVoiceInput} className={cn("p-1.5 rounded-md transition-colors", isRecording ? "bg-red-500/20" : "hover:bg-white/5")} style={{ color: isRecording ? '#ef4444' : C.textDim }} title="Voice input">
+                        {isRecording ? <MicOff className="w-4 h-4 animate-pulse" /> : <Mic className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {input.trim() && <span className="text-[10px]" style={{ color: C.textDim }}>{input.length} chars</span>}
+                      <button onClick={() => sendMessage()} disabled={!input.trim() || isGenerating} className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed" style={{ background: input.trim() ? C.accent : 'transparent', color: '#fff' }}>
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Sidebar Toggle */}
+        {!showSidebar && (
+          <button onClick={() => setShowSidebar(true)} className="fixed left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-lg" style={{ background: C.bgSidebar, border: `1px solid ${C.border}`, color: C.textDim }}>
+            <PanelLeftOpen className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* ===== RIGHT: PREVIEW + PIPELINE ===== */}
+        <div className="flex-1 flex flex-col overflow-hidden" style={{ background: '#111113' }}>
+          {/* Preview Toolbar */}
+          <div className="flex items-center justify-between px-4 h-10 shrink-0" style={{ borderBottom: `1px solid ${C.border}`, background: C.bgSidebar }}>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setPreviewMode('preview')} className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors" style={{ background: previewMode === 'preview' ? 'rgba(255,255,255,0.08)' : 'transparent', color: previewMode === 'preview' ? C.text : C.textDim }}>
+                <Eye className="w-3.5 h-3.5" /> Preview
+              </button>
+              <button onClick={() => setPreviewMode('code')} className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors" style={{ background: previewMode === 'code' ? 'rgba(255,255,255,0.08)' : 'transparent', color: previewMode === 'code' ? C.text : C.textDim }}>
+                <Code2 className="w-3.5 h-3.5" /> Code
+              </button>
+              <button onClick={() => setPreviewMode('files')} className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors" style={{ background: previewMode === 'files' ? 'rgba(255,255,255,0.08)' : 'transparent', color: previewMode === 'files' ? C.text : C.textDim }}>
+                <FolderTree className="w-3.5 h-3.5" /> Files
+              </button>
+            </div>
+            <div className="flex items-center gap-1">
+              {([['desktop', Monitor], ['tablet', Tablet], ['mobile', Smartphone]] as [DeviceMode, React.ElementType][]).map(([mode, Icon]) => (
+                <button key={mode} onClick={() => setDeviceMode(mode)} className="p-1.5 rounded-md transition-colors" style={{ background: deviceMode === mode ? 'rgba(255,255,255,0.08)' : 'transparent', color: deviceMode === mode ? C.text : C.textDim }}>
+                  <Icon className="w-4 h-4" />
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setPreviewHtml(prev => prev)} className="p-1.5 rounded-md hover:bg-white/5" style={{ color: C.textDim }} title="Refresh"><RefreshCw className="w-3.5 h-3.5" /></button>
+              {history.length > 0 && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(34,197,94,0.1)', color: '#4ade80' }}>v{currentHistoryIndex + 1}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Content Area */}
+          <div className="flex-1 flex overflow-hidden">
+            {/* Preview/Code/Files */}
+            <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+              {previewMode === 'preview' ? (
+                <div className="h-full rounded-lg overflow-hidden shadow-2xl transition-all duration-300" style={{ width: getDeviceWidth(), maxWidth: '100%', border: `1px solid ${C.border}` }}>
+                  {/* Browser chrome */}
+                  <div className="flex items-center gap-2 px-3 py-2" style={{ background: '#1a1a1d', borderBottom: `1px solid ${C.border}` }}>
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#ef4444' }} />
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#f59e0b' }} />
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#22c55e' }} />
+                    </div>
+                    <div className="flex-1 mx-8">
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs" style={{ background: '#111113', border: `1px solid ${C.border}`, color: C.textDim }}>
+                        <Globe className="w-3 h-3" /><span>localhost:5173</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* BUG FIX: Use srcdoc instead of contentDocument.write — avoids sandbox cross-origin issues */}
+                  {previewHtml ? (
+                    <iframe
+                      srcDoc={previewHtml}
+                      className="w-full bg-black"
+                      style={{ height: 'calc(100% - 36px)', border: 'none' }}
+                      title="VALA Preview"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-80 text-center p-8" style={{ background: C.bg }}>
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' }}>
+                        <Sparkles className="w-8 h-8 text-white" />
+                      </div>
+                      <h2 className="text-lg font-bold mb-2">Live Preview</h2>
+                      <p className="text-sm max-w-xs" style={{ color: C.textMuted }}>Send a build prompt to see your generated application render here in real-time.</p>
+                    </div>
+                  )}
+                </div>
+              ) : previewMode === 'code' ? (
+                <div className="w-full h-full rounded-lg overflow-hidden flex flex-col" style={{ background: '#0d1117', border: `1px solid ${C.border}` }}>
+                  {codeBlocks.length > 0 && (
+                    <div className="flex items-center gap-0 overflow-x-auto shrink-0" style={{ borderBottom: '1px solid #21262d' }}>
+                      {codeBlocks.map((block, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setActiveCodeTab(idx)}
+                          className="px-4 py-2 text-xs font-medium whitespace-nowrap transition-colors"
+                          style={{
+                            background: activeCodeTab === idx ? '#0d1117' : '#161b22',
+                            color: activeCodeTab === idx ? '#e6edf3' : '#8b949e',
+                            borderBottom: activeCodeTab === idx ? '2px solid #8b5cf6' : '2px solid transparent',
+                          }}
+                        >
+                          {block.filename || `${block.language.toUpperCase()}`}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between px-4 py-2 shrink-0" style={{ borderBottom: '1px solid #21262d' }}>
+                    <span className="text-xs font-medium" style={{ color: '#8b949e' }}>
+                      {codeBlocks.length > 0 ? `${codeBlocks[activeCodeTab]?.language || 'code'} • ${codeBlocks[activeCodeTab]?.code.split('\n').length || 0} lines` : 'Generated Code'}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(codeBlocks[activeCodeTab]?.code || generatedCode); toast.success('Code copied!'); }} className="p-1 rounded hover:bg-white/5" style={{ color: '#8b949e' }}><Copy className="w-3.5 h-3.5" /></button>
+                  </div>
+                  <ScrollArea className="flex-1">
+                    <pre className="p-4 text-xs leading-6 font-mono" style={{ color: '#e6edf3' }}>
+                      <code>{codeBlocks[activeCodeTab]?.code || generatedCode}</code>
+                    </pre>
+                  </ScrollArea>
+                </div>
+              ) : (
+                /* Files View */
+                <div className="w-full h-full rounded-lg overflow-hidden flex flex-col" style={{ background: '#0d1117', border: `1px solid ${C.border}` }}>
+                  <div className="flex items-center justify-between px-4 py-2 shrink-0" style={{ borderBottom: '1px solid #21262d' }}>
+                    <span className="text-xs font-medium" style={{ color: '#8b949e' }}>
+                      PROJECT FILES • {codeBlocks.length} files generated
+                    </span>
+                  </div>
+                  <ScrollArea className="flex-1">
+                    <div className="py-2">
+                      {fileTree.length > 0 ? (
+                        fileTree.map((node, i) => <FileTreeNode key={i} node={node} />)
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-16 text-center">
+                          <FolderTree className="w-10 h-10 mb-3" style={{ color: C.textDim }} />
+                          <p className="text-sm" style={{ color: C.textMuted }}>No files generated yet</p>
+                          <p className="text-xs mt-1" style={{ color: C.textDim }}>Send a build prompt to generate project files</p>
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </div>
+
+            {/* Pipeline Sidebar */}
+            <div className="w-56 shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${C.border}`, background: C.bgSidebar }}>
+              <div className="px-3 py-2 text-xs font-semibold flex items-center justify-between shrink-0" style={{ color: C.textMuted, borderBottom: `1px solid ${C.border}` }}>
+                <span>AI PIPELINE</span>
+                {completedSteps > 0 && <span className="text-[10px]" style={{ color: C.green }}>{completedSteps}/{pipeline.length}</span>}
+              </div>
+              <ScrollArea className="flex-1">
+                <div className="p-2 space-y-1">
+                  {pipeline.map((step) => {
+                    const Icon = step.icon;
+                    return (
+                      <div key={step.id} className="flex items-center gap-2 px-2 py-2 rounded-lg text-xs transition-all" style={{
+                        background: step.status === 'running' ? 'rgba(139,92,246,0.1)' : step.status === 'done' ? 'rgba(34,197,94,0.05)' : 'transparent',
+                        border: step.status === 'running' ? '1px solid rgba(139,92,246,0.15)' : '1px solid transparent',
+                      }}>
+                        {step.status === 'done' ? (
+                          <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: C.green }} />
+                        ) : step.status === 'running' ? (
+                          <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" style={{ color: C.accent }} />
+                        ) : (
+                          <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(255,255,255,0.15)' }} />
+                        )}
+                        <span className="flex-1" style={{ color: step.status === 'done' ? C.text : step.status === 'running' ? C.accent : C.textDim }}>
+                          {step.name}
+                        </span>
+                        {step.status === 'done' && step.duration && (
+                          <span className="text-[9px]" style={{ color: C.textDim }}>{step.duration}s</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+
+              {/* Build Stats */}
+              {(metrics.screens > 0 || buildTime) && (
+                <div className="p-3 space-y-2 shrink-0" style={{ borderTop: `1px solid ${C.border}` }}>
+                  {buildTime && (
+                    <div className="text-center">
+                      <div className="text-xs font-medium" style={{ color: C.green }}>✅ Build Complete</div>
+                      <div className="text-[10px] mt-0.5" style={{ color: C.textDim }}>{buildTime}s • Parallel Pipeline</div>
+                    </div>
+                  )}
+                  {metrics.screens > 0 && (
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { label: 'Screens', val: metrics.screens, color: '#8b5cf6' },
+                        { label: 'APIs', val: metrics.apis, color: '#06b6d4' },
+                        { label: 'Tables', val: metrics.dbTables, color: '#22c55e' },
+                        { label: 'Flows', val: metrics.flows, color: '#f59e0b' },
+                      ].filter(m => m.val > 0).map(m => (
+                        <div key={m.label} className="text-center py-1.5 rounded-md" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                          <div className="text-sm font-bold" style={{ color: m.color }}>{m.val}</div>
+                          <div className="text-[9px]" style={{ color: C.textDim }}>{m.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {history.length > 0 && (
+                    <div className="text-center text-[10px] pt-1" style={{ color: C.textDim }}>
+                      {history.length} version{history.length > 1 ? 's' : ''} saved
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </ScrollArea>
-
-      {/* Plan Modal */}
-      <AnimatePresence>
-        {showPlan && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-8"
-            onClick={() => setShowPlan(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-card rounded-xl border border-border/50 w-full max-w-2xl max-h-[80vh] overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between p-4 border-b border-border/50">
-                <h2 className="text-lg font-semibold">AI Execution Plan</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowPlan(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <ScrollArea className="p-4 max-h-[60vh]">
-                <div className="space-y-4">
-                  {steps.map((step, i) => (
-                    <div key={step.id} className="flex items-start gap-4 p-4 rounded-lg bg-background/50 border border-border/50">
-                      <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 font-bold">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-foreground">{step.name}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          This step will analyze and process the relevant components for {step.name.toLowerCase()}.
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-              <div className="flex justify-end gap-2 p-4 border-t border-border/50">
-                <Button variant="outline" onClick={() => setShowPlan(false)}>Close</Button>
-                <Button onClick={handleApprovePlan} className="gap-2 bg-emerald-600 hover:bg-emerald-500">
-                  <ThumbsUp className="w-4 h-4" /> Approve Plan
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Logs Modal */}
-      <AnimatePresence>
-        {showLogs && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-8"
-            onClick={() => setShowLogs(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-card rounded-xl border border-border/50 w-full max-w-3xl max-h-[80vh] overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between p-4 border-b border-border/50">
-                <h2 className="text-lg font-semibold">System Logs</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowLogs(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <ScrollArea className="p-4 max-h-[60vh]">
-                <div className="space-y-1 font-mono text-xs">
-                  {logs.map((log) => (
-                    <div key={log.id} className="flex gap-3 p-2 hover:bg-muted/30 rounded">
-                      <span className="text-muted-foreground shrink-0">
-                        {new Date(log.timestamp).toLocaleTimeString()}
-                      </span>
-                      <span className={cn(
-                        "shrink-0 w-16",
-                        log.type === "success" ? "text-emerald-400" :
-                        log.type === "warning" ? "text-amber-400" :
-                        log.type === "error" ? "text-red-400" :
-                        "text-blue-400"
-                      )}>
-                        [{log.type.toUpperCase()}]
-                      </span>
-                      <span className="text-foreground">{log.message}</span>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Errors Modal */}
-      <AnimatePresence>
-        {showErrors && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-8"
-            onClick={() => setShowErrors(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-card rounded-xl border border-border/50 w-full max-w-2xl max-h-[80vh] overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between p-4 border-b border-border/50">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-amber-400" />
-                  Errors & Fix Suggestions
-                </h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowErrors(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <ScrollArea className="p-4 max-h-[60vh]">
-                {errors.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-400" />
-                    <p>No errors detected</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {errors.map((error) => (
-                      <div key={error.id} className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <p className="font-medium text-red-400">{error.message}</p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              <span className="text-emerald-400 font-medium">Suggestion:</span> {error.suggestion}
-                            </p>
-                          </div>
-                          <Button size="sm" onClick={() => handleFixSuggestion(error.id)} className="shrink-0 gap-1 bg-emerald-600 hover:bg-emerald-500">
-                            <CheckCircle className="w-3 h-3" /> Apply Fix
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 };

@@ -9,6 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
+  fetchLicenses as fetchLicensesFromService,
+  generateLicenses as generateLicensesFromService,
+  revokeLicense as revokeLicenseInService,
+  type LicenseRecord,
+} from '@/services/licenseService';
+import {
   Key,
   Plus,
   Trash2,
@@ -22,7 +28,7 @@ import {
   Loader2,
   Download,
 } from 'lucide-react';
-import { format, addDays, addMonths, addYears } from 'date-fns';
+import { format, addDays, addYears } from 'date-fns';
 
 interface License {
   id: string;
@@ -57,22 +63,22 @@ const PMLicenseManager: React.FC = () => {
 
   const fetchLicenses = async () => {
     setLoading(true);
-    // Simulating license data from a hypothetical table
-    // In real implementation, this would query a licenses table
-    const mockLicenses: License[] = [
-      {
-        id: '1',
-        license_key: 'PROD-XXXX-YYYY-ZZZZ',
-        product_id: 'p1',
-        product_name: 'Enterprise Suite',
-        domain_bound: 'example.com',
-        expires_at: addMonths(new Date(), 6).toISOString(),
-        status: 'active',
-        created_at: new Date().toISOString(),
-        user_email: 'user@example.com',
-      },
-    ];
-    setLicenses(mockLicenses);
+    const records = await fetchLicensesFromService({
+      product_id: filter.product !== 'all' ? filter.product : undefined,
+      status: filter.status !== 'all' ? filter.status : undefined,
+    });
+    // Map LicenseRecord to License (add product_name from products list)
+    const mapped: License[] = records.map((r: LicenseRecord) => ({
+      id: r.id,
+      license_key: r.license_key,
+      product_id: r.product_id,
+      product_name: products.find(p => p.product_id === r.product_id)?.product_name ?? r.product_id,
+      domain_bound: r.domain_bound ?? null,
+      expires_at: r.expires_at ?? null,
+      status: r.status,
+      created_at: r.created_at,
+    }));
+    setLicenses(mapped);
     setLoading(false);
   };
 
@@ -85,19 +91,6 @@ const PMLicenseManager: React.FC = () => {
     if (data) setProducts(data);
   };
 
-  const generateLicenseKey = (): string => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const segments = [];
-    for (let s = 0; s < 4; s++) {
-      let segment = '';
-      for (let i = 0; i < 4; i++) {
-        segment += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      segments.push(segment);
-    }
-    return segments.join('-');
-  };
-
   const handleGenerateLicenses = async () => {
     if (!generateForm.product_id) {
       toast.error('Select a product');
@@ -107,7 +100,6 @@ const PMLicenseManager: React.FC = () => {
     setGenerating(true);
     try {
       const product = products.find(p => p.product_id === generateForm.product_id);
-      const newLicenses: License[] = [];
 
       let expiresAt: string | null = null;
       switch (generateForm.expiry_type) {
@@ -122,24 +114,29 @@ const PMLicenseManager: React.FC = () => {
           break;
       }
 
-      for (let i = 0; i < generateForm.quantity; i++) {
-        newLicenses.push({
-          id: `gen-${Date.now()}-${i}`,
-          license_key: generateLicenseKey(),
-          product_id: generateForm.product_id,
-          product_name: product?.product_name || 'Unknown',
-          domain_bound: generateForm.domain_bind || null,
-          expires_at: expiresAt,
-          status: 'unused',
-          created_at: new Date().toISOString(),
-        });
-      }
+      const generated = await generateLicensesFromService({
+        product_id: generateForm.product_id,
+        quantity: generateForm.quantity,
+        expires_at: expiresAt,
+        domain_bound: generateForm.domain_bind || null,
+      });
+
+      const newLicenses: License[] = generated.map((r: LicenseRecord) => ({
+        id: r.id,
+        license_key: r.license_key,
+        product_id: r.product_id,
+        product_name: product?.product_name ?? 'Unknown',
+        domain_bound: r.domain_bound ?? null,
+        expires_at: r.expires_at ?? null,
+        status: r.status,
+        created_at: r.created_at,
+      }));
 
       setLicenses([...newLicenses, ...licenses]);
       toast.success(`Generated ${generateForm.quantity} license(s)`);
       setShowGenerateDialog(false);
       setGenerateForm({ product_id: '', quantity: 1, expiry_type: 'none', domain_bind: '' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Failed to generate licenses');
     } finally {
       setGenerating(false);
@@ -151,11 +148,14 @@ const PMLicenseManager: React.FC = () => {
     toast.success('License key copied');
   };
 
-  const revokeLicense = (id: string) => {
-    setLicenses(licenses.map(l => 
-      l.id === id ? { ...l, status: 'revoked' } : l
-    ));
-    toast.success('License revoked');
+  const revokeLicense = async (id: string) => {
+    const ok = await revokeLicenseInService(id);
+    if (ok) {
+      setLicenses(licenses.map(l => l.id === id ? { ...l, status: 'revoked' } : l));
+      toast.success('License revoked');
+    } else {
+      toast.error('Failed to revoke license');
+    }
   };
 
   const exportLicenses = () => {

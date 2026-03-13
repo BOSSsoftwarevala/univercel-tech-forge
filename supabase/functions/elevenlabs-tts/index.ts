@@ -32,7 +32,7 @@ serve(async (req) => {
       });
     }
 
-    const selectedVoice = voiceId || "JBFqnCBsd6RMkjVDRZzb"; // George default
+    const selectedVoice = voiceId || "pFZP5JQG7iQjIQuC4Bku"; // Lily - formal, premium CEO voice (AIRA default)
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoice}?output_format=mp3_44100_128`,
@@ -46,11 +46,11 @@ serve(async (req) => {
           text,
           model_id: "eleven_multilingual_v2",
           voice_settings: {
-            stability: stability ?? 0.5,
-            similarity_boost: similarityBoost ?? 0.75,
-            style: style ?? 0.5,
+            stability: stability ?? 0.7,
+            similarity_boost: similarityBoost ?? 0.85,
+            style: style ?? 0.3,
             use_speaker_boost: true,
-            speed: speed ?? 1.0,
+            speed: speed ?? 0.85,
           },
         }),
       }

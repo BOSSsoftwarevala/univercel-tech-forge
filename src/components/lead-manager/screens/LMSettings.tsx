@@ -3,173 +3,92 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { 
   Settings, GitBranch, Bell, Clock, Calendar,
-  Save, Eye, Edit
+  Save, Loader2, AlertCircle
 } from 'lucide-react';
+import { useLeadSettings, useUpdateLeadSetting } from '@/hooks/useLeadData';
 
-const settingsSections = [
-  { 
-    id: 'status', 
-    name: 'Lead Status Rules', 
-    icon: Settings, 
-    description: 'Configure lead status transitions',
-    items: [
-      { label: 'Auto-move to Contacted after first call', enabled: true },
-      { label: 'Require note for Lost status', enabled: true },
-      { label: 'Lock Won leads from editing', enabled: false },
-    ]
-  },
-  { 
-    id: 'assignment', 
-    name: 'Auto Assignment Rules', 
-    icon: GitBranch, 
-    description: 'Configure automatic lead assignment',
-    items: [
-      { label: 'Round Robin assignment', enabled: true },
-      { label: 'Geo-based routing', enabled: true },
-      { label: 'Skill-based matching', enabled: false },
-    ]
-  },
-  { 
-    id: 'notifications', 
-    name: 'Notification Settings', 
-    icon: Bell, 
-    description: 'Configure alert preferences',
-    items: [
-      { label: 'New lead notifications', enabled: true },
-      { label: 'SLA breach alerts', enabled: true },
-      { label: 'Daily summary email', enabled: true },
-    ]
-  },
-  { 
-    id: 'working', 
-    name: 'Working Hours', 
-    icon: Clock, 
-    description: 'Set team availability hours',
-    items: [
-      { label: 'Enforce working hours', enabled: true },
-      { label: 'Weekend handling', enabled: false },
-      { label: 'Holiday calendar', enabled: true },
-    ]
-  },
-  { 
-    id: 'expiry', 
-    name: 'Lead Expiry Policy', 
-    icon: Calendar, 
-    description: 'Configure lead lifecycle rules',
-    items: [
-      { label: 'Auto-archive after 90 days', enabled: true },
-      { label: 'Idle lead alerts', enabled: true },
-      { label: 'Expired lead cleanup', enabled: false },
-    ]
-  },
-];
+const categoryIcons: Record<string, any> = {
+  status: Settings, assignment: GitBranch, notifications: Bell, working_hours: Clock, expiry: Calendar, general: Settings,
+};
 
 const LMSettings = () => {
+  const { data: settings, isLoading } = useLeadSettings();
+  const updateSetting = useUpdateLeadSetting();
+
+  const handleToggle = (id: string, current: boolean) => {
+    updateSetting.mutate({ id, updates: { is_enabled: !current } });
+  };
+
+  // Group settings by category
+  const grouped: Record<string, any[]> = {};
+  (settings || []).forEach((s: any) => {
+    const cat = s.category || 'general';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(s);
+  });
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Lead Settings</h1>
           <p className="text-muted-foreground">Configure lead management rules and policies</p>
         </div>
-        <Button>
-          <Save className="w-4 h-4 mr-2" />
-          Save All Changes
-        </Button>
+        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+          {(settings || []).length} Settings
+        </Badge>
       </div>
 
-      {/* Settings Sections */}
-      <div className="space-y-4">
-        {settingsSections.map((section, index) => {
-          const Icon = section.icon;
-          return (
-            <motion.div
-              key={section.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="bg-card border-border">
-                <CardHeader className="border-b border-border">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <span className="text-base">{section.name}</span>
-                      <p className="text-xs text-muted-foreground font-normal">{section.description}</p>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    {section.items.map((item, itemIndex) => (
-                      <div key={itemIndex} className="flex items-center justify-between p-3 rounded-lg bg-accent/30 border border-border">
-                        <span className="text-sm text-foreground">{item.label}</span>
-                        <Switch checked={item.enabled} />
+      {isLoading ? (
+        <div className="flex items-center justify-center h-40"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+      ) : Object.keys(grouped).length === 0 ? (
+        <Card className="bg-card border-border">
+          <CardContent className="p-8 text-center text-muted-foreground">
+            <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+            <p>No settings configured yet</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(grouped).map(([category, items], index) => {
+            const Icon = categoryIcons[category] || Settings;
+            return (
+              <motion.div key={category} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
+                <Card className="bg-card border-border">
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-primary" />
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Quick Config */}
-      <Card className="bg-card border-border">
-        <CardHeader className="border-b border-border">
-          <CardTitle>Quick Configuration</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Default Lead Status</Label>
-              <Input defaultValue="New" />
-            </div>
-            <div className="space-y-2">
-              <Label>Lead Expiry Days</Label>
-              <Input type="number" defaultValue="90" />
-            </div>
-            <div className="space-y-2">
-              <Label>SLA Response Time (hours)</Label>
-              <Input type="number" defaultValue="24" />
-            </div>
-            <div className="space-y-2">
-              <Label>Max Leads Per Agent</Label>
-              <Input type="number" defaultValue="50" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-4">
-            <Button variant="outline">
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
-            </Button>
-            <Button>
-              <Save className="w-4 h-4 mr-2" />
-              Save
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Footer Actions */}
-      <div className="flex items-center justify-between p-4 rounded-lg bg-accent/30 border border-border">
-        <div>
-          <p className="font-semibold text-foreground">Need Help?</p>
-          <p className="text-xs text-muted-foreground">Contact support for advanced configuration</p>
+                      <div>
+                        <span className="text-base capitalize">{category.replace('_', ' ')}</span>
+                        <p className="text-xs text-muted-foreground font-normal">{items.length} settings</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      {items.map((item: any) => (
+                        <div key={item.id} className="flex items-center justify-between p-3 rounded-lg bg-accent/30 border border-border">
+                          <div>
+                            <span className="text-sm text-foreground">{item.setting_key?.replace(/_/g, ' ')}</span>
+                            {item.setting_value?.description && (
+                              <p className="text-xs text-muted-foreground">{item.setting_value.description}</p>
+                            )}
+                          </div>
+                          <Switch checked={item.is_enabled} onCheckedChange={() => handleToggle(item.id, item.is_enabled)} />
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">Reset to Defaults</Button>
-          <Button size="sm">Contact Support</Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

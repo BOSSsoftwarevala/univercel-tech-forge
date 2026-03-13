@@ -1,12 +1,17 @@
-// Server Manager Dashboard - Infrastructure Command Center (EXPANDED)
+// ============================================
+// SERVER MANAGER — VERCEL CLONE
+// Enterprise Execution Mode
+// ============================================
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Server, LayoutGrid, Activity, AlertTriangle, Database, Shield, 
-  FileText, BarChart3, LogOut, Lock, Clock, Cpu, Network, 
-  Rocket, Layers, ShoppingCart, Receipt, FileSearch, Settings,
-  List, Gauge, ArrowLeft, Plus, Brain, Terminal, HardDrive
+  FileText, LogOut, Lock, Clock, Cpu, Network, Globe,
+  Rocket, Layers, ShoppingCart, Receipt, Settings,
+  List, Gauge, ArrowLeft, Plus, Brain, Terminal, HardDrive,
+  ChevronRight, GitBranch, Search, Bell, MoreVertical,
+  ExternalLink, Zap
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -40,52 +45,89 @@ import SMAddServer from './screens/SMAddServer';
 import SMAIHealthSuggestions from './screens/SMAIHealthSuggestions';
 import SMServerLogin from './screens/SMServerLogin';
 import SMBackupManager from './screens/SMBackupManager';
+import SMDomains from './screens/SMDomains';
 
 type ViewType = 'dashboard' | 'registry' | 'monitoring' | 'performance' | 'alerts' | 
                 'resources' | 'network' | 'storage' | 'security' | 'deployments' |
                 'plans' | 'buy' | 'billing' | 'logs' | 'settings' | 'addserver' | 
-                'aihealth' | 'serverlogin' | 'backups';
+                'aihealth' | 'serverlogin' | 'backups' | 'domains';
 
-const sidebarItems: { id: ViewType; label: string; icon: any; badge?: string }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { id: 'addserver', label: 'Add Server', icon: Plus },
-  { id: 'registry', label: 'Server Registry', icon: List },
-  { id: 'serverlogin', label: 'Server Login', icon: Terminal },
-  { id: 'monitoring', label: 'Live Monitoring', icon: Activity },
-  { id: 'aihealth', label: 'AI Health Suggestions', icon: Brain },
-  { id: 'performance', label: 'Performance', icon: Gauge },
-  { id: 'alerts', label: 'Alerts & Incidents', icon: AlertTriangle, badge: '3' },
-  { id: 'resources', label: 'Resource Usage', icon: Cpu },
-  { id: 'network', label: 'Network & Traffic', icon: Network },
-  { id: 'backups', label: 'Backup Manager', icon: HardDrive },
-  { id: 'storage', label: 'Storage', icon: Database },
-  { id: 'security', label: 'Security & Firewall', icon: Shield },
-  { id: 'deployments', label: 'Deployments', icon: Rocket },
-  { id: 'plans', label: 'Explore Plans', icon: Layers },
-  { id: 'buy', label: 'Buy New Server', icon: ShoppingCart },
-  { id: 'billing', label: 'Billing & Usage', icon: Receipt },
-  { id: 'logs', label: 'Logs & Audit', icon: FileSearch },
-  { id: 'settings', label: 'Settings', icon: Settings },
+interface SidebarSection {
+  title: string;
+  items: { id: ViewType; label: string; icon: any; badge?: string }[];
+}
+
+const sidebarSections: SidebarSection[] = [
+  {
+    title: '',
+    items: [
+      { id: 'dashboard', label: 'Overview', icon: LayoutGrid },
+    ]
+  },
+  {
+    title: 'INFRASTRUCTURE',
+    items: [
+      { id: 'registry', label: 'Servers', icon: Server },
+      { id: 'addserver', label: 'Add Server', icon: Plus },
+      { id: 'serverlogin', label: 'Console', icon: Terminal },
+      { id: 'domains', label: 'Domains', icon: Globe },
+    ]
+  },
+  {
+    title: 'DEPLOYMENTS',
+    items: [
+      { id: 'deployments', label: 'Deployments', icon: Rocket },
+      { id: 'monitoring', label: 'Monitoring', icon: Activity },
+      { id: 'performance', label: 'Performance', icon: Gauge },
+    ]
+  },
+  {
+    title: 'OPERATIONS',
+    items: [
+      { id: 'alerts', label: 'Incidents', icon: AlertTriangle, badge: '3' },
+      { id: 'aihealth', label: 'AI Diagnostics', icon: Brain },
+      { id: 'backups', label: 'Backups', icon: HardDrive },
+      { id: 'security', label: 'Firewall', icon: Shield },
+    ]
+  },
+  {
+    title: 'RESOURCES',
+    items: [
+      { id: 'resources', label: 'Usage', icon: Cpu },
+      { id: 'network', label: 'Network', icon: Network },
+      { id: 'storage', label: 'Storage', icon: Database },
+    ]
+  },
+  {
+    title: 'BILLING',
+    items: [
+      { id: 'plans', label: 'Plans', icon: Layers },
+      { id: 'buy', label: 'New Server', icon: ShoppingCart },
+      { id: 'billing', label: 'Usage & Billing', icon: Receipt },
+    ]
+  },
+  {
+    title: '',
+    items: [
+      { id: 'logs', label: 'Logs', icon: FileText },
+      { id: 'settings', label: 'Settings', icon: Settings },
+    ]
+  }
 ];
 
 const ServerManagerDashboard = () => {
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
-  const [sessionTime, setSessionTime] = useState('00:00:00');
-  const [infraStatus, setInfraStatus] = useState<'healthy' | 'warning' | 'critical'>('healthy');
+  const [sessionTime, setSessionTime] = useState('00:00');
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Session timer
   useEffect(() => {
     const startTime = Date.now();
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
-      const hours = Math.floor(elapsed / 3600000);
-      const minutes = Math.floor((elapsed % 3600000) / 60000);
+      const minutes = Math.floor(elapsed / 60000);
       const seconds = Math.floor((elapsed % 60000) / 1000);
-      setSessionTime(
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-      );
+      setSessionTime(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -99,7 +141,7 @@ const ServerManagerDashboard = () => {
       meta_json: { session_duration: sessionTime }
     });
     await supabase.auth.signOut();
-    toast.success('Secure logout complete');
+    toast.success('Logged out');
     navigate('/auth');
   };
 
@@ -119,6 +161,7 @@ const ServerManagerDashboard = () => {
       case 'storage': return <SMBackups />;
       case 'security': return <SMSecurity />;
       case 'deployments': return <SMDeployments />;
+      case 'domains': return <SMDomains />;
       case 'plans': return <SMExplorePlans />;
       case 'buy': return <SMBuyServer />;
       case 'billing': return <SMBilling />;
@@ -128,127 +171,125 @@ const ServerManagerDashboard = () => {
     }
   };
 
+  const activeLabel = sidebarSections.flatMap(s => s.items).find(i => i.id === activeView)?.label || 'Overview';
+
   return (
-    <div className="h-screen w-screen bg-slate-950 flex flex-col overflow-hidden">
-      {/* TOP HEADER */}
-      <header className="h-14 bg-slate-900/95 backdrop-blur-xl flex items-center justify-between px-6 flex-shrink-0 border-b border-cyan-500/20">
-        <div className="flex items-center gap-4">
+    <div className="h-screen w-screen bg-[#000] flex flex-col overflow-hidden">
+      {/* ═══ VERCEL-STYLE TOP BAR ═══ */}
+      <header className="h-12 bg-[#000] flex items-center justify-between px-4 flex-shrink-0 border-b border-[#333]">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate('/dashboard')}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-2 text-[#888] hover:text-white transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-cyan-500/20">
-              <Server className="h-5 w-5 text-cyan-400" />
+
+          {/* Vercel-style breadcrumb */}
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-white to-[#666] flex items-center justify-center">
+              <Zap className="w-3 h-3 text-black" />
             </div>
-            <div>
-              <span className="font-semibold text-white">Server Manager</span>
-              <span className="text-cyan-400 text-sm ml-2">Command Center</span>
-            </div>
+            <span className="text-white text-sm font-medium">Software Vala</span>
+            <ChevronRight className="w-3 h-3 text-[#555]" />
+            <span className="text-[#888] text-sm">Infrastructure</span>
+            <ChevronRight className="w-3 h-3 text-[#555]" />
+            <span className="text-white text-sm">{activeLabel}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          {/* Global Infra Status */}
-          <motion.div 
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
-              infraStatus === 'healthy' ? 'bg-emerald-500/10 border-emerald-500/30' :
-              infraStatus === 'warning' ? 'bg-amber-500/10 border-amber-500/30' :
-              'bg-red-500/10 border-red-500/30'
-            }`}
-            animate={{ opacity: [0.8, 1, 0.8] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <div className={`w-2 h-2 rounded-full ${
-              infraStatus === 'healthy' ? 'bg-emerald-500' :
-              infraStatus === 'warning' ? 'bg-amber-500' : 'bg-red-500'
-            }`} />
-            <span className={`text-sm font-medium ${
-              infraStatus === 'healthy' ? 'text-emerald-400' :
-              infraStatus === 'warning' ? 'text-amber-400' : 'text-red-400'
-            }`}>
-              {infraStatus === 'healthy' ? 'All Systems Healthy' : 
-               infraStatus === 'warning' ? 'Warning' : 'Critical'}
-            </span>
-          </motion.div>
+        <div className="flex items-center gap-3">
+          {/* Search */}
+          <button className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#333] bg-[#111] text-[#666] text-xs hover:border-[#555] transition-colors">
+            <Search className="w-3 h-3" />
+            <span>Search...</span>
+            <kbd className="ml-4 px-1.5 py-0.5 rounded bg-[#222] text-[#555] text-[10px] border border-[#333]">⌘K</kbd>
+          </button>
 
-          {/* Session Timer */}
-          <div className="flex items-center gap-2 text-slate-400">
-            <Clock className="w-4 h-4" />
-            <span className="font-mono text-sm">{sessionTime}</span>
+          {/* Notifications */}
+          <button className="relative p-2 text-[#888] hover:text-white transition-colors">
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
+          </button>
+
+          {/* Session */}
+          <div className="flex items-center gap-1.5 text-[#555] text-xs font-mono">
+            <Clock className="w-3 h-3" />
+            {sessionTime}
           </div>
 
-          {/* Secure Logout */}
-          <Button 
-            variant="outline" 
-            size="sm" 
+          {/* User */}
+          <button 
             onClick={handleLogout}
-            className="border-slate-600 text-slate-300 hover:bg-slate-800 bg-transparent"
+            className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold"
+            title="Logout"
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+            {user?.email?.charAt(0).toUpperCase() || 'U'}
+          </button>
         </div>
       </header>
 
-      {/* MAIN LAYOUT */}
+      {/* ═══ MAIN LAYOUT ═══ */}
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT SIDEBAR - Fixed, No Hover Popups */}
-        <aside className="w-60 bg-slate-900/80 backdrop-blur-xl flex-shrink-0 border-r border-cyan-500/20 flex flex-col">
-          <ScrollArea className="flex-1 py-4">
-            <nav className="space-y-1 px-3">
-              {sidebarItems.map((item) => {
-                const isActive = activeView === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveView(item.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all relative ${
-                      isActive
-                        ? 'bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
-                    }`}
-                  >
-                    {/* Active Indicator Bar */}
-                    {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full" />
-                    )}
-                    <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-cyan-400' : ''}`} />
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {item.badge && (
-                      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-red-500/20 text-red-400">
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+        {/* LEFT SIDEBAR — Vercel Style */}
+        <aside className="w-56 bg-[#000] flex-shrink-0 border-r border-[#333] flex flex-col">
+          <ScrollArea className="flex-1 py-2">
+            <nav className="space-y-4 px-2">
+              {sidebarSections.map((section, sIdx) => (
+                <div key={sIdx}>
+                  {section.title && (
+                    <p className="px-3 py-1 text-[10px] font-semibold text-[#555] tracking-wider uppercase">
+                      {section.title}
+                    </p>
+                  )}
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => {
+                      const isActive = activeView === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveView(item.id)}
+                          className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-all ${
+                            isActive
+                              ? 'bg-[#222] text-white'
+                              : 'text-[#888] hover:bg-[#111] hover:text-[#ccc]'
+                          }`}
+                        >
+                          <item.icon className={`w-[14px] h-[14px] flex-shrink-0 ${isActive ? 'text-white' : 'text-[#666]'}`} />
+                          <span className="flex-1 text-left">{item.label}</span>
+                          {item.badge && (
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-red-500/20 text-red-400 min-w-[18px] text-center">
+                              {item.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </nav>
           </ScrollArea>
 
-          {/* Security Notice */}
-          <div className="p-4 border-t border-cyan-500/10">
-            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <Lock className="h-3 w-3 text-cyan-400" />
-                <span>IP Locked · Audited</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">Infrastructure scope only</p>
+          {/* Bottom Status */}
+          <div className="p-3 border-t border-[#222]">
+            <div className="flex items-center gap-2 px-2 py-2 rounded-md bg-[#0a0a0a]">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] text-[#888]">All systems operational</span>
             </div>
           </div>
         </aside>
 
-        {/* MAIN CONTENT */}
-        <main className="flex-1 overflow-auto bg-slate-950 p-6">
+        {/* MAIN CONTENT — Dark with minimal borders */}
+        <main className="flex-1 overflow-auto bg-[#0a0a0a]">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="p-6"
             >
               {renderView()}
             </motion.div>

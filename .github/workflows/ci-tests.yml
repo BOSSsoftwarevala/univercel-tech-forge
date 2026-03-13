@@ -110,7 +110,7 @@ jobs:
         with:
           browser: chrome
           config-file: tests/e2e/cypress.config.ts
-          record: true
+          record: ${{ secrets.CYPRESS_RECORD_KEY != '' }}
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -148,6 +148,9 @@ jobs:
           
       - name: Install Newman
         run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Prepare reports directory
+        run: mkdir -p reports
         
       - name: Run API tests
         run: |
@@ -186,6 +189,18 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
+
+      - name: Prepare reports directory
+        run: mkdir -p reports
+
+      - name: Start application
+        run: npm run dev &
+        env:
+          VITE_SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+
+      - name: Wait for app to start
+        run: npx wait-on http://localhost:5173 --timeout 60000
         
       - name: Install Playwright
         run: npx playwright install chromium
@@ -223,6 +238,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Prepare reports directory
+        run: mkdir -p reports
         
       - name: Install K6
         run: |

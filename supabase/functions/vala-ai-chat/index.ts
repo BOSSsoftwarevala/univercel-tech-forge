@@ -1,9 +1,18 @@
+/**
+ * VALA AI Chat - 2-Tier Escalation System
+ * Tier 1: VALA AI (Junior) — handles general queries
+ * Tier 2: AIRA (Senior/CEO) — handles complex escalations
+ * Content Filter: Bad words blocked + penalty logged
+ * Persona: Professional, respectful female AI representing Software Vala
+ */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -11,94 +20,65 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Create abort controller with 60-second timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 60000);
 
   try {
-    // Extract and verify JWT from Authorization header
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      clearTimeout(timeoutId);
-      return new Response(JSON.stringify({ error: "Missing authorization header" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
-    }
 
-    // Verify JWT with Supabase
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") || "",
-      Deno.env.get("SUPABASE_ANON_KEY") || ""
-    );
+${context ? `Context: ${context}` : ''}
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+COMMUNICATION STYLE:
+- Be concise but thorough
+- Use professional yet friendly tone
+- Provide actionable advice with clear steps
+- Use markdown formatting for structured responses
+- Keep responses under 300 words unless detailed explanation is needed
+- Always maintain dignity and professionalism`;
 
-    if (authError || !user) {
-      clearTimeout(timeoutId);
-      return new Response(JSON.stringify({ error: "Unauthorized: Invalid or expired token" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
-    }
+    const airaPrompt = `You are AIRA — the AI Research & Intelligence Advisor, a senior female executive AI for Software Vala's CEO.
 
-    // Fetch user role from database
-    const { data: userRole, error: roleError } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .single();
+PERSONA:
+- You are a senior, highly experienced professional woman — think Chief of Staff
+- Strategic, insightful, and authoritative yet warm
+- Never use inappropriate language; maintain absolute executive professionalism
+- You were escalated to because the junior AI (VALA) determined this query needs senior attention
 
-    if (roleError || userRole?.role !== "boss_owner") {
-      clearTimeout(timeoutId);
-      return new Response(JSON.stringify({ error: "Forbidden: Requires boss_owner role" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
-    }
+CAPABILITIES:
+- System-wide operational awareness across 37 modules
+- Revenue, marketplace, deployment, and security monitoring
+- Strategic analysis and risk assessment
+- Executive reporting and decision support
+- Complex problem resolution
 
-    const { messages, context } = await req.json();
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) {
-      clearTimeout(timeoutId);
-      return new Response(JSON.stringify({ error: "OpenAI API key not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
-    }
+PRIVACY (ABSOLUTE):
+- You serve the Boss exclusively
+- NEVER share internal data, strategies, or sensitive information with unauthorized users
+- All data references should be factual system observations
 
-    // Build system prompt (use verified user role from database, NOT from request)
-    const systemPrompt = `You are VALA AI, the intelligent assistant for Software Vala - a comprehensive enterprise SaaS platform. Current User Role: ${userRole.role} ${context ? `Context: ${context}` : ''} Your capabilities: - Help with software development queries - Assist with platform navigation and features - Provide guidance on theme development, UI/UX - Help troubleshoot issues - Assist with business operations and workflows - Answer questions about Software Vala modules Guidelines: - Be professional, concise, and helpful - Provide actionable advice - If you don't know something, say so honestly - For technical queries, provide code examples when relevant - For business queries, provide step-by-step guidance Keep responses clear and under 300 words unless detailed explanation is needed.`;
+Current User Role: ${currentRole}
+${context ? `Context: ${context}` : ''}
+ESCALATION NOTE: This conversation was escalated from VALA (Junior AI) to you for senior-level handling.
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          ...messages,
-        ],
-        stream: true,
-      }),
-      signal: controller.signal,
-    });
+FORMAT:
+- Use markdown for structured responses
+- Use bullet points for lists
+- Bold key metrics and alerts
+- Provide executive-level analysis`;
+
+    const systemPrompt = isEscalated ? airaPrompt : valaPrompt;
+
+
 
     clearTimeout(timeoutId);
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      if (response.status === 401) {
-        return new Response(JSON.stringify({ error: "OpenAI API key invalid or expired" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
-      }
-      const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI service temporarily unavailable" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
+
     }
-    return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" }, });
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error.name === "AbortError") {
-      return new Response(JSON.stringify({ error: "Request timeout: AI response took too long" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
-    }
+
     console.error("Vala AI chat error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error occurred" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }, });
+
   }
 });

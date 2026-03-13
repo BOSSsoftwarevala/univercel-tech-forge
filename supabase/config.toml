@@ -104,3 +104,24 @@ verify_jwt = false
 
 [functions.auto-dev-engine]
 verify_jwt = false
+
+[functions.vala-ai-builder]
+verify_jwt = false
+
+[functions.elevenlabs-scribe-token]
+verify_jwt = false
+
+[functions.vala-ai-openai]
+verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.vala-continuous-builder]
+verify_jwt = false
+
+[functions.dev-ai-chat]
+verify_jwt = false
+
+[functions.dev-code-review]
+verify_jwt = false

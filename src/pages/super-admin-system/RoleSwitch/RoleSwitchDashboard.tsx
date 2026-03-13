@@ -82,7 +82,7 @@ const FinanceManager = lazyWithRetry(() => import("@/pages/FinanceManager"));
 const CustomerSupportManagementDashboard = lazyWithRetry(() => import("./CustomerSupportManagementDashboard"));
 const RoleManagerDashboard = lazyWithRetry(() => import("./RoleManagerDashboard"));
 const RMEnterpriseLayout = lazyWithRetry(() => import("@/components/role-manager/RMEnterpriseLayout"));
-const CountryHeadDashboard = lazyWithRetry(() => import("@/components/country-dashboard/CountryHeadDashboard"));
+const CountryHeadDashboard = lazyWithRetry(() => import("@/components/country-dashboard/CountryAdminStripeAtlas"));
 const PMEnterpriseLayout = lazyWithRetry(() => import("@/components/product-manager/PMEnterpriseLayout"));
 const LMEnterpriseLayout = lazyWithRetry(() => import("@/components/legal-manager/LMEnterpriseLayout"));
 const AAMEnterpriseLayout = lazyWithRetry(() => import("@/components/api-ai-manager/AAMEnterpriseLayout"));
@@ -346,13 +346,7 @@ const RoleSwitchDashboard = () => {
       debug('requestedRole change', { requestedRole, userRole, isBossOwner, url: window.location.href });
       prevRequestedRoleRef.current = requestedRole;
 
-      const shouldStartInControlPanel = requestedRole === 'boss_owner';
-
-      if (shouldStartInControlPanel) {
-        setActiveRole(null);
-        setActiveNav("dashboard");
-        setSelectedSubItem(undefined);
-      } else if (canAccessView(requestedRole)) {
+      if (canAccessView(requestedRole)) {
         setActiveRole(requestedRole);
         setActiveNav("dashboard");
         setSelectedSubItem(undefined);
@@ -552,6 +546,40 @@ const RoleSwitchDashboard = () => {
     );
   };
 
+  // Roles that are full-screen standalone modules with their own headers
+  const fullScreenRoles: (ActiveRole | null)[] = ['continent_super_admin', 'country_head', 'finance_manager', 'reseller_dashboard'];
+  const isFullScreenModule = fullScreenRoles.includes(activeRole);
+
+  // Roles that use their own light/custom theme (not dark parent wrapper)
+  const lightThemeRoles: (ActiveRole | null)[] = ['finance_manager', 'reseller_dashboard'];
+  const isLightThemeModule = lightThemeRoles.includes(activeRole);
+
+  // Full-screen modules render without the parent header/sidebar
+  if (isFullScreenModule) {
+    // Light-theme modules get a clean wrapper without dark class or dark background
+    if (isLightThemeModule) {
+      return (
+        <div className="min-h-screen w-full">
+          <ErrorBoundary>
+            <Suspense fallback={<ModuleLoader />}>
+              {renderRoleView()}
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="dark min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <ErrorBoundary>
+          <Suspense fallback={<ModuleLoader />}>
+            {renderRoleView()}
+          </Suspense>
+        </ErrorBoundary>
+      </div>
+    );
+  }
+
   return (
     <div className={cn(
       "dark min-h-screen flex flex-col transition-colors duration-300",
@@ -561,7 +589,7 @@ const RoleSwitchDashboard = () => {
       <header className={cn(
         "h-16 backdrop-blur-xl border-b flex items-center justify-between px-6 z-50 transition-colors duration-300",
         "bg-gradient-to-r from-[#0a1628] via-[#0d1b2a] to-[#0a1628] border-[#1e3a5f]",
-        isInControlPanelView && !isInModuleView && "ml-[320px]"
+        shouldShowGlobalSidebar && "ml-[320px]"
       )}>
         <div className="flex items-center gap-4">
           {(!isInControlPanelView || isInModuleView) && (
@@ -623,7 +651,7 @@ const RoleSwitchDashboard = () => {
         {/* MAIN CONTENT */}
         <main className={cn(
           "flex-1 overflow-auto transition-all duration-300",
-          shouldShowGlobalSidebar && !collapsed && "ml-0"
+          shouldShowGlobalSidebar && "ml-[320px]"
         )}>
           <ErrorBoundary>
             {renderRoleView()}

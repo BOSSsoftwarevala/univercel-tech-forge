@@ -1,0 +1,37 @@
+name: Auto Add V110 Migration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  add-migration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create migration file
+        run: |
+          mkdir -p db-migrations/sql
+          echo "-- V110 migration" > db-migrations/sql/V110__create_missing_app_tables.sql
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git checkout -b system-fix/migrations-and-docs
+          git add .
+          git commit -m "Add V110 migration"
+          git push origin system-fix/migrations-and-docs
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: system-fix/migrations-and-docs
+          title: "Add V110 migration"
+          body: "Automated migration creation"
