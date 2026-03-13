@@ -98,7 +98,12 @@ export const NotificationsModal = ({ open, onClose, userId, onUnreadCountChange 
         .limit(20);
 
       if (data) {
-        setNotifications(data as UserNotification[]);
+        const normalizedNotifications = (data as any[]).map((item) => ({
+          ...item,
+          title: item.title ?? item.event_type ?? item.type ?? "Notification",
+          action_id: item.action_id ?? null,
+        }));
+        setNotifications(normalizedNotifications as UserNotification[]);
         updateUnreadCount(data.filter((n) => !n.is_read).length);
       }
     };

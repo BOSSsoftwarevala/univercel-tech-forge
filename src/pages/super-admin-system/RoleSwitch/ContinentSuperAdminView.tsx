@@ -46,6 +46,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContinentDashboard from "@/components/super-admin-wireframe/ContinentDashboard";
 import { ContinentSuperAdminDashboard, getContinentConfig, CONTINENT_CONFIGS } from "@/components/continent-dashboard";
 import GlobalContinentDashboard from "@/components/continent-dashboard/GlobalContinentDashboard";
+import MetaContinentDashboard from "@/pages/continent-super-admin/ContinentSuperAdminDashboard";
+import GlobalCommandCenter from "@/pages/continent-super-admin/views/GlobalCommandCenter";
 
 // Country data for each continent
 const continentCountries: Record<string, { name: string; admin: string; status: string }[]> = {
@@ -89,12 +91,21 @@ const continentCountries: Record<string, { name: string; admin: string; status: 
     { name: "Colombia", admin: "Carlos Mendez", status: "active" },
     { name: "Chile", admin: "Pablo Gonzalez", status: "active" },
   ],
+  "Middle East": [
+    { name: "UAE", admin: "Ahmed Al-Rashid", status: "active" },
+    { name: "Saudi Arabia", admin: "Mohammed Al-Saud", status: "active" },
+    { name: "Qatar", admin: "Khalid Al-Thani", status: "active" },
+    { name: "Kuwait", admin: "Fahad Al-Sabah", status: "active" },
+    { name: "Bahrain", admin: "Ali Al-Khalifa", status: "active" },
+    { name: "Oman", admin: "Said Al-Busaidi", status: "active" },
+    { name: "Jordan", admin: "Omar Hassan", status: "active" },
+    { name: "Israel", admin: "David Cohen", status: "active" },
+  ],
   "Australia/Oceania": [
     { name: "Australia", admin: "Jack Thompson", status: "active" },
     { name: "New Zealand", admin: "William Clarke", status: "active" },
     { name: "Fiji", admin: "Ratu Meli", status: "active" },
   ],
-  "Antarctica": []
 };
 
 // All 7 Continent Super Admins data
@@ -302,35 +313,38 @@ const continentSuperAdmins = [
     ]
   },
   {
-    id: "CSA-ANT-000",
-    continent: "Antarctica",
-    continentCode: "AN",
-    name: "System Reserved",
-    email: "system@reserved.com",
-    username: "system_reserved",
-    status: "locked" as const,
-    countriesAssigned: "None",
-    roleLevel: "Read-only / Monitoring",
-    countriesCount: 0,
-    activeCountryAdmins: 0,
-    createdDate: "2023-01-01",
-    lastActivity: "System Locked",
-    lastLogin: "N/A",
-    actionsToday: 0,
-    healthScore: 0,
-    complianceScore: 0,
-    pendingApprovals: 0,
-    issuesResolved: 0,
-    icon: "🧊",
-    color: "#06b6d4",
+    id: "CSA-ME-001",
+    continent: "Middle East",
+    continentCode: "ME",
+    name: "Middle East Super Admin",
+    email: "middleeast.csa@system.com",
+    username: "me_superadmin",
+    status: "active" as const,
+    countriesAssigned: "UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, Oman, Jordan, Israel",
+    roleLevel: "Continent Super Admin",
+    countriesCount: 15,
+    activeCountryAdmins: 14,
+    createdDate: "2023-06-01",
+    lastActivity: "10 min ago",
+    lastLogin: "Today, 10:30 AM",
+    actionsToday: 14,
+    healthScore: 92,
+    complianceScore: 96,
+    pendingApprovals: 4,
+    issuesResolved: 52,
+    icon: "🕌",
+    color: "#f59e0b",
     permissions: {
-      countriesCreate: false,
-      countriesEdit: false,
-      countryAdminAssign: false,
+      countriesCreate: true,
+      countriesEdit: true,
+      countryAdminAssign: true,
       regionalReports: true,
       liveMonitoring: true,
     },
-    recentActions: []
+    recentActions: [
+      { action: "Approved franchise application for Qatar", time: "10 min ago", type: "approval" },
+      { action: "Updated UAE compliance settings", time: "1 hour ago", type: "config" },
+    ]
   },
 ];
 
@@ -357,7 +371,17 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     "csa-north-america": "north_america",
     "csa-south-america": "south_america",
     "csa-australia": "oceania",
-    "csa-antarctica": "antarctica"
+    "csa-middle-east": "middle_east"
+  };
+
+  const continentNameMap: Record<string, string> = {
+    "asia": "Asia",
+    "africa": "Africa",
+    "europe": "Europe",
+    "north_america": "North America",
+    "south_america": "South America",
+    "oceania": "Australia / Oceania",
+    "middle_east": "Middle East"
   };
 
   // Handle sub-item selection from sidebar - always update when selectedSubItem changes
@@ -373,12 +397,12 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
   // Directly compute continent from selectedSubItem for immediate response
   const currentContinentId = selectedSubItem ? continentIdMap[selectedSubItem] : showContinentDashboard;
 
-  // If any continent is selected (except Antarctica), render the unified continent dashboard
-  if (currentContinentId && currentContinentId !== "antarctica" && CONTINENT_CONFIGS[currentContinentId]) {
-    const config = getContinentConfig(currentContinentId);
+  // If any continent is selected, render the Meta Business Manager dashboard
+  if (currentContinentId && CONTINENT_CONFIGS[currentContinentId]) {
     return (
-      <ContinentSuperAdminDashboard 
-        config={config}
+      <MetaContinentDashboard 
+        continentId={currentContinentId}
+        continentName={continentNameMap[currentContinentId] || currentContinentId}
         onBack={() => {
           setShowContinentDashboard(null);
         }} 
@@ -389,7 +413,7 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
   // Stats calculations
   const totalCSAs = continentSuperAdmins.length;
   const activeCSAs = continentSuperAdmins.filter(c => c.status === "active").length;
-  const lockedCSAs = continentSuperAdmins.filter(c => c.status === "locked").length;
+  const lockedCSAs = 0;
   const liveActionsToday = continentSuperAdmins.reduce((sum, c) => sum + c.actionsToday, 0);
 
   // Filtered CSAs
@@ -486,7 +510,7 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
                       <div className={cn(
                         "w-4 h-4 rounded-full shadow-lg",
                         csa.status === "active" && "bg-emerald-500 shadow-emerald-500/50",
-                        csa.status === "locked" && "bg-slate-500 shadow-slate-500/50"
+                        csa.status !== "active" && "bg-slate-500 shadow-slate-500/50"
                       )} />
                       {csa.status === "active" && (
                         <div className="absolute inset-0 w-4 h-4 rounded-full bg-emerald-500 animate-ping opacity-40" />
@@ -809,10 +833,15 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     </div>
   );
 
-  // If a continent dashboard is selected from sidebar - use currentContinentId for immediate response
-  if (currentContinentId && currentContinentId !== "antarctica" && CONTINENT_CONFIGS[currentContinentId]) {
-    const config = getContinentConfig(currentContinentId);
-    return <ContinentSuperAdminDashboard config={config} onBack={() => setShowContinentDashboard(null)} />;
+  // If a continent dashboard is selected from sidebar - use Meta BM dashboard
+  if (currentContinentId && CONTINENT_CONFIGS[currentContinentId]) {
+    return (
+      <MetaContinentDashboard 
+        continentId={currentContinentId}
+        continentName={continentNameMap[currentContinentId] || currentContinentId}
+        onBack={() => setShowContinentDashboard(null)} 
+      />
+    );
   }
 
   // If activeNav is "admins", show the registry view with the list
@@ -820,15 +849,10 @@ const ContinentSuperAdminView = ({ activeNav = "dashboard", selectedSubItem }: C
     return renderRegistryView();
   }
 
-  // Default: Show the Global Continent Dashboard with world map, sidebar, and boxes
+  // Default: Show the Global Command Center with 7D World Map
   return (
-    <GlobalContinentDashboard
-      onBack={() => {
-        // Exit Continent Admin -> return to Control Panel
-        navigate("/super-admin-system/role-switch?role=boss_owner");
-      }}
-      onContinentClick={(continentId) => {
-        // When clicking a continent on the map, show that continent's dashboard
+    <GlobalCommandCenter
+      onSelectContinent={(continentId) => {
         setShowContinentDashboard(continentId);
       }}
     />

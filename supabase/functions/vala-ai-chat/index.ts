@@ -1,9 +1,18 @@
+/**
+ * VALA AI Chat - 2-Tier Escalation System
+ * Tier 1: VALA AI (Junior) — handles general queries
+ * Tier 2: AIRA (Senior/CEO) — handles complex escalations
+ * Content Filter: Bad words blocked + penalty logged
+ * Persona: Professional, respectful female AI representing Software Vala
+ */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -11,153 +20,65 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
+
   try {
-    // Verify JWT from Authorization header
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Authentication required" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return new Response(JSON.stringify({ error: "Server configuration error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Create client with caller's JWT to verify their identity
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Invalid authentication token" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Verify user has boss_owner role
-    const { data: roleData, error: roleError } = await supabaseClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .single();
-
-    if (roleError || !roleData || roleData.role !== "boss_owner") {
-      return new Response(JSON.stringify({ error: "Access forbidden: boss_owner role required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) {
-      return new Response(JSON.stringify({ error: "OPENAI_API_KEY is not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { messages, context } = await req.json();
-
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return new Response(JSON.stringify({ error: "Invalid messages format" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Build system prompt based on verified role and context
-    const systemPrompt = `You are VALA AI, the intelligent assistant for Software Vala - a comprehensive enterprise SaaS platform.
-
-Current User Role: ${roleData.role}
 ${context ? `Context: ${context}` : ''}
 
-Your capabilities:
-- Help with software development queries
-- Assist with platform navigation and features
-- Provide guidance on theme development, UI/UX
-- Help troubleshoot issues
-- Assist with business operations and workflows
-- Answer questions about Software Vala modules
+COMMUNICATION STYLE:
+- Be concise but thorough
+- Use professional yet friendly tone
+- Provide actionable advice with clear steps
+- Use markdown formatting for structured responses
+- Keep responses under 300 words unless detailed explanation is needed
+- Always maintain dignity and professionalism`;
 
-Guidelines:
-- Be professional, concise, and helpful
-- Provide actionable advice
-- If you don't know something, say so honestly
-- For technical queries, provide code examples when relevant
-- For business queries, provide step-by-step guidance
+    const airaPrompt = `You are AIRA — the AI Research & Intelligence Advisor, a senior female executive AI for Software Vala's CEO.
 
-Keep responses clear and under 300 words unless detailed explanation is needed.`;
+PERSONA:
+- You are a senior, highly experienced professional woman — think Chief of Staff
+- Strategic, insightful, and authoritative yet warm
+- Never use inappropriate language; maintain absolute executive professionalism
+- You were escalated to because the junior AI (VALA) determined this query needs senior attention
 
-    // Create AbortController with 60-second timeout
-    const REQUEST_TIMEOUT_MS = 60000;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+CAPABILITIES:
+- System-wide operational awareness across 37 modules
+- Revenue, marketplace, deployment, and security monitoring
+- Strategic analysis and risk assessment
+- Executive reporting and decision support
+- Complex problem resolution
 
-    let response: Response;
-    try {
-      response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...messages,
-          ],
-          stream: true,
-        }),
-        signal: controller.signal,
-      });
-    } catch (fetchError) {
-      if (fetchError instanceof Error && fetchError.name === "AbortError") {
-        return new Response(JSON.stringify({ error: "Request timed out" }), {
-          status: 504,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw fetchError;
-    } finally {
-      clearTimeout(timeoutId);
-    }
+PRIVACY (ABSOLUTE):
+- You serve the Boss exclusively
+- NEVER share internal data, strategies, or sensitive information with unauthorized users
+- All data references should be factual system observations
+
+Current User Role: ${currentRole}
+${context ? `Context: ${context}` : ''}
+ESCALATION NOTE: This conversation was escalated from VALA (Junior AI) to you for senior-level handling.
+
+FORMAT:
+- Use markdown for structured responses
+- Use bullet points for lists
+- Bold key metrics and alerts
+- Provide executive-level analysis`;
+
+    const systemPrompt = isEscalated ? airaPrompt : valaPrompt;
+
+
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI service temporarily unavailable" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+
     }
 
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
-  } catch (error) {
     console.error("Vala AI chat error:", error);
-    return new Response(JSON.stringify({
-      error: error instanceof Error ? error.message : "Unknown error occurred"
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+
   }
 });

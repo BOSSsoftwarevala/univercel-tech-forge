@@ -1,12 +1,7 @@
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import PMEnterpriseLayout from "@/components/product-manager/PMEnterpriseLayout";
+import PMBuilderLayout from "@/components/product-manager/builder/PMBuilderLayout";
 
 const ProductManagerPage = () => {
-  return (
-    <DashboardLayout roleOverride={"boss_owner" as any}>
-      <PMEnterpriseLayout viewOnly={false} />
-    </DashboardLayout>
-  );
+  return <PMBuilderLayout />;
 };
 
 export default ProductManagerPage;

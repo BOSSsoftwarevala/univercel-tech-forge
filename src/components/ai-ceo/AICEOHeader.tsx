@@ -19,8 +19,8 @@ const AICEOHeader = ({ streamingOn, onStreamingToggle }: AICEOHeaderProps) => {
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-cyan-400">AIRA</h1>
-            <p className="text-[10px] text-cyan-500/60 uppercase tracking-widest">AI-Powered Strategic Intelligence</p>
+            <h1 className="text-lg font-bold text-cyan-400">AIRA v3.0</h1>
+            <p className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Autonomous Intelligent Response Agent</p>
           </div>
         </div>
         

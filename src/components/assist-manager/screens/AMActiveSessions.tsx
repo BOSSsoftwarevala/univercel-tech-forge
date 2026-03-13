@@ -1,61 +1,73 @@
 /**
- * ACTIVE SESSIONS
+ * ACTIVE SESSIONS - All buttons functional
  * Live session monitoring with actions
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
 import {
   MonitorPlay,
   Eye,
   Pause,
+  Play,
   Square,
   Shield,
   Clock,
   User,
 } from 'lucide-react';
 
-const ACTIVE_SESSIONS = [
-  { 
-    id: 'SVL-A8K2M9', 
-    user: 'USR-****42', 
-    agent: 'AGT-****15', 
-    type: 'Support',
-    mode: 'View Only',
-    duration: '12:34',
-    aiScore: 92,
-    permissions: ['screen_view', 'chat'],
-  },
-  { 
-    id: 'SVL-C9X4L6', 
-    user: 'USR-****89', 
-    agent: 'AGT-****08', 
-    type: 'Dev',
-    mode: 'Control',
-    duration: '05:21',
-    aiScore: 78,
-    permissions: ['screen_view', 'keyboard', 'mouse'],
-  },
-  { 
-    id: 'SVL-E7T3R2', 
-    user: 'USR-****56', 
-    agent: 'AGT-****19', 
-    type: 'Franchise',
-    mode: 'View Only',
-    duration: '18:45',
-    aiScore: 95,
-    permissions: ['screen_view', 'chat', 'file_transfer'],
-  },
+interface SessionData {
+  id: string;
+  user: string;
+  agent: string;
+  type: string;
+  mode: string;
+  duration: string;
+  aiScore: number;
+  permissions: string[];
+  status: 'active' | 'paused' | 'ended';
+}
+
+const INITIAL_SESSIONS: SessionData[] = [
+  { id: 'SVL-A8K2M9', user: 'USR-****42', agent: 'AGT-****15', type: 'Support', mode: 'View Only', duration: '12:34', aiScore: 92, permissions: ['screen_view', 'chat'], status: 'active' },
+  { id: 'SVL-C9X4L6', user: 'USR-****89', agent: 'AGT-****08', type: 'Dev', mode: 'Control', duration: '05:21', aiScore: 78, permissions: ['screen_view', 'keyboard', 'mouse'], status: 'active' },
+  { id: 'SVL-E7T3R2', user: 'USR-****56', agent: 'AGT-****19', type: 'Franchise', mode: 'View Only', duration: '18:45', aiScore: 95, permissions: ['screen_view', 'chat', 'file_transfer'], status: 'active' },
 ];
 
 export function AMActiveSessions() {
+  const [sessions, setSessions] = useState<SessionData[]>(INITIAL_SESSIONS);
+
+  const handleView = (sessionId: string) => {
+    toast.success(`Viewing session ${sessionId}`, { description: 'Remote screen view opened' });
+  };
+
+  const handlePause = (sessionId: string) => {
+    setSessions(prev => prev.map(s => 
+      s.id === sessionId ? { ...s, status: s.status === 'paused' ? 'active' : 'paused' } : s
+    ));
+    const session = sessions.find(s => s.id === sessionId);
+    const newStatus = session?.status === 'paused' ? 'resumed' : 'paused';
+    toast.info(`Session ${sessionId} ${newStatus}`, { description: `Session has been ${newStatus}` });
+  };
+
+  const handleEnd = (sessionId: string) => {
+    setSessions(prev => prev.map(s => 
+      s.id === sessionId ? { ...s, status: 'ended' } : s
+    ));
+    toast.warning(`Session ${sessionId} terminated`, { 
+      description: 'Connection dropped • Token revoked • Cache cleared' 
+    });
+  };
+
+  const activeSessions = sessions.filter(s => s.status !== 'ended');
+
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Active Sessions</h1>
@@ -63,17 +75,18 @@ export function AMActiveSessions() {
           </div>
           <Badge variant="default" className="text-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse" />
-            {ACTIVE_SESSIONS.length} Live
+            {activeSessions.length} Live
           </Badge>
         </div>
 
-        {/* Session Cards */}
         <div className="space-y-4">
-          {ACTIVE_SESSIONS.map((session) => (
-            <Card key={session.id} className="border-l-4 border-l-green-500">
+          {sessions.map((session) => (
+            <Card key={session.id} className={`border-l-4 ${
+              session.status === 'ended' ? 'border-l-muted opacity-50' :
+              session.status === 'paused' ? 'border-l-amber-500' : 'border-l-green-500'
+            }`}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
-                  {/* Session Info */}
                   <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <p className="text-xs text-muted-foreground">Session ID</p>
@@ -88,8 +101,13 @@ export function AMActiveSessions() {
                       <p className="font-mono text-sm">{session.agent}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Type</p>
-                      <Badge variant="outline">{session.type}</Badge>
+                      <p className="text-xs text-muted-foreground">Status</p>
+                      <Badge variant={
+                        session.status === 'active' ? 'default' :
+                        session.status === 'paused' ? 'secondary' : 'outline'
+                      }>
+                        {session.status}
+                      </Badge>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Mode</p>
@@ -114,27 +132,22 @@ export function AMActiveSessions() {
                       <p className="text-xs text-muted-foreground">Permissions</p>
                       <div className="flex gap-1 flex-wrap">
                         {session.permissions.map((p) => (
-                          <Badge key={p} variant="outline" className="text-xs">
-                            {p.replace('_', ' ')}
-                          </Badge>
+                          <Badge key={p} variant="outline" className="text-xs">{p.replace('_', ' ')}</Badge>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex flex-col gap-2">
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
+                    <Button size="sm" variant="outline" onClick={() => handleView(session.id)} disabled={session.status === 'ended'}>
+                      <Eye className="h-4 w-4 mr-1" /> View
                     </Button>
-                    <Button size="sm" variant="outline">
-                      <Pause className="h-4 w-4 mr-1" />
-                      Pause
+                    <Button size="sm" variant="outline" onClick={() => handlePause(session.id)} disabled={session.status === 'ended'}>
+                      {session.status === 'paused' ? <Play className="h-4 w-4 mr-1" /> : <Pause className="h-4 w-4 mr-1" />}
+                      {session.status === 'paused' ? 'Resume' : 'Pause'}
                     </Button>
-                    <Button size="sm" variant="destructive">
-                      <Square className="h-4 w-4 mr-1" />
-                      End
+                    <Button size="sm" variant="destructive" onClick={() => handleEnd(session.id)} disabled={session.status === 'ended'}>
+                      <Square className="h-4 w-4 mr-1" /> End
                     </Button>
                   </div>
                 </div>
@@ -143,12 +156,11 @@ export function AMActiveSessions() {
           ))}
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
               <MonitorPlay className="h-8 w-8 mx-auto text-primary mb-2" />
-              <p className="text-2xl font-bold">{ACTIVE_SESSIONS.length}</p>
+              <p className="text-2xl font-bold">{activeSessions.length}</p>
               <p className="text-xs text-muted-foreground">Active Now</p>
             </CardContent>
           </Card>

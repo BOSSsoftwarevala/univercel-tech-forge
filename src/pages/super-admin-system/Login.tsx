@@ -38,6 +38,17 @@ const SuperAdminLogin = () => {
         throw new Error("Login incomplete. Please retry.");
       }
 
+      // IMPORTANT: Prevent "instant repeat logout" caused by stale force-logout flags
+      // and stale session_start from a previous tab session.
+      try {
+        const nowIso = new Date().toISOString();
+        sessionStorage.setItem('session_start', nowIso);
+        sessionStorage.setItem('last_activity', nowIso);
+        await supabase.rpc('clear_force_logout', { clear_user_id: userId });
+      } catch {
+        // If this fails, login should still proceed; force-logout checks will handle it.
+      }
+
       // Log login action (do not block login if logging fails)
       const { error: logError } = await supabase.from("super_admin_sessions").insert({
         user_id: userId,
@@ -63,7 +74,7 @@ const SuperAdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />

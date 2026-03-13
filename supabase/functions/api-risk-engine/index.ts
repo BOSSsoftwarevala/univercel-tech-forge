@@ -816,9 +816,9 @@ async function getCommandCenterData(supabase: any, body: any) {
 async function aiRiskAnalysis(supabase: any, body: any) {
   const { user_id, analysis_type, data } = body;
 
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     // Fallback to rule-based analysis
     return new Response(
       JSON.stringify({
@@ -847,14 +847,14 @@ Provide a structured analysis with:
 Return as JSON.`;
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a fraud detection AI specialist. Analyze user data for risk indicators and provide structured assessments. Always respond with valid JSON.' },
           { role: 'user', content: prompt },

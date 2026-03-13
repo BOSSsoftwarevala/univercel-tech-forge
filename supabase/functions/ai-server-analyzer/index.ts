@@ -91,9 +91,9 @@ serve(async (req) => {
 });
 
 async function preCheckSubmission(serverData: any) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     // Return basic validation without AI
     return {
       approved: true,
@@ -131,14 +131,14 @@ Provide your analysis in JSON format with:
 - flags: string[] (specific red flags if any)`;
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a security analyst AI that evaluates server submissions for potential risks. Always respond with valid JSON only.' },
           { role: 'user', content: prompt }
@@ -182,7 +182,7 @@ Provide your analysis in JSON format with:
 }
 
 async function analyzeServerHealth(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   // Get server data
   const { data: server } = await supabase
@@ -224,7 +224,7 @@ Provide health analysis in JSON format:
 - recommendations: string[] (optimization suggestions)
 - resourceOptimization: { cpu: string, memory: string, disk: string }`;
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     // Calculate basic health score without AI
     const healthScore = Math.round(
       (100 - server.cpu_usage) * 0.3 +
@@ -248,14 +248,14 @@ Provide health analysis in JSON format:
   }
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are an expert DevOps AI that analyzes server health. Respond only with valid JSON.' },
           { role: 'user', content: analysisPrompt }
@@ -296,7 +296,7 @@ Provide health analysis in JSON format:
 }
 
 async function performSecurityScan(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   const { data: server } = await supabase
     .from('server_instances')
@@ -324,7 +324,7 @@ Analyze potential security vulnerabilities and provide in JSON format:
 - complianceIssues: string[]
 - immediateActions: string[]`;
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     const result = {
       riskScore: 30,
       vulnerabilities: [],
@@ -338,14 +338,14 @@ Analyze potential security vulnerabilities and provide in JSON format:
   }
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a cybersecurity AI expert. Analyze server security and respond with valid JSON only.' },
           { role: 'user', content: securityPrompt }
@@ -381,7 +381,7 @@ Analyze potential security vulnerabilities and provide in JSON format:
 }
 
 async function generateSuggestions(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   const { data: server } = await supabase
     .from('server_instances')
@@ -396,7 +396,7 @@ async function generateSuggestions(supabase: any, serverId: string) {
     .order('created_at', { ascending: false })
     .limit(5);
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     return {
       suggestions: [
         { category: 'performance', priority: 'medium', suggestion: 'Monitor resource usage trends' },
@@ -418,14 +418,14 @@ Provide suggestions in JSON format:
 - securityEnhancements: string[]`;
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a server optimization AI. Provide actionable suggestions in valid JSON.' },
           { role: 'user', content: prompt }
@@ -446,7 +446,7 @@ Provide suggestions in JSON format:
 }
 
 async function detectThreats(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   const { data: server } = await supabase
     .from('server_instances')
@@ -461,7 +461,7 @@ async function detectThreats(supabase: any, serverId: string) {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     return {
       threatsDetected: false,
       threats: [],
@@ -483,14 +483,14 @@ Detect threats and respond in JSON:
 - autoRemediationAvailable: boolean`;
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a threat detection AI. Analyze for security threats and respond with valid JSON.' },
           { role: 'user', content: prompt }
@@ -537,7 +537,7 @@ Detect threats and respond in JSON:
 }
 
 async function checkCompliance(supabase: any, serverId: string) {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   const { data: server } = await supabase
     .from('server_instances')
@@ -545,7 +545,7 @@ async function checkCompliance(supabase: any, serverId: string) {
     .eq('id', serverId)
     .single();
 
-  if (!LOVABLE_API_KEY) {
+  if (!OPENAI_API_KEY) {
     return {
       compliant: true,
       status: 'review_required',
@@ -566,14 +566,14 @@ Verify compliance and respond in JSON:
 - recommendations: string[]`;
 
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a compliance audit AI. Check server compliance and respond with valid JSON.' },
           { role: 'user', content: prompt }

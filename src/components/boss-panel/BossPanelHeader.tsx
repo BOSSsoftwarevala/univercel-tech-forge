@@ -1,55 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Bell, 
-  ShieldAlert, 
-  LogOut, 
-  User,
-  Radio,
-  Loader2,
-  Headphones,
-  MessageSquare,
-  ListChecks,
-  Globe,
-  Banknote
+  Bell, ShieldAlert, LogOut, User, Radio, Loader2,
+  Headphones, MessageSquare, ListChecks, Globe, Banknote,
+  Search, ChevronRight, Crown, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import {
-  NotificationsModal,
-  AssistModal,
-  PromiseTrackerModal,
-  InternalChatModal,
-  LanguageModal,
-  CurrencyModal,
+  NotificationsModal, AssistModal, PromiseTrackerModal,
+  InternalChatModal, LanguageModal, CurrencyModal,
 } from './BossActionModals';
+
+// ─── ENTERPRISE DARK SHELL ───────────────────────────────────
+const S = {
+  bg:       'hsl(222, 47%, 7%)',
+  bgHover:  'hsla(217, 92%, 65%, 0.1)',
+  border:   'hsla(215, 40%, 35%, 0.3)',
+  text:     'hsl(210, 40%, 98%)',
+  muted:    'hsl(215, 22%, 58%)',
+  brand:    'hsl(217, 92%, 65%)',
+  green:    'hsl(160, 84%, 44%)',
+  red:      'hsl(346, 82%, 55%)',
+  amber:    'hsl(38, 95%, 55%)',
+};
 
 interface BossPanelHeaderProps {
   streamingOn: boolean;
   onStreamingToggle: () => void;
 }
 
-// BRAND THEME: Dark header with blue accent
 export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHeaderProps) {
   const [isLocking, setIsLocking] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -60,12 +51,17 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCurrency, setShowCurrency] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [time, setTime] = useState(new Date());
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
 
   useEffect(() => {
-    if (!user?.id) return;
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
+  useEffect(() => {
+    if (!user?.id) return;
     const fetchUnreadCount = async () => {
       const { count } = await supabase
         .from('user_notifications')
@@ -74,178 +70,139 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
         .eq('is_read', false);
       setUnreadCount(count ?? 0);
     };
-
     fetchUnreadCount();
 
     const channel = supabase
       .channel(`header-notifications:${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          if (payload.new && (payload.new as { is_read: boolean }).is_read === false) {
-            setUnreadCount((prev) => prev + 1);
-          }
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'user_notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.new && (payload.new as { is_read: boolean }).is_read === false) {
+          setUnreadCount((prev) => prev + 1);
         }
-      )
+      })
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [user?.id]);
 
   const handleEmergencyLock = async () => {
     setIsLocking(true);
     try {
       await supabase.from('audit_logs').insert({
-        user_id: user?.id,
-        role: 'boss_owner' as any,
-        module: 'boss-panel',
-        action: 'emergency_system_lock',
-        meta_json: { timestamp: new Date().toISOString() }
+        user_id: user?.id, role: 'boss_owner' as any, module: 'boss-panel',
+        action: 'emergency_system_lock', meta_json: { timestamp: new Date().toISOString() }
       });
-      
-      toast.success('🔒 EMERGENCY LOCK ACTIVATED', {
-        description: 'All system operations have been frozen.',
-        duration: 5000
-      });
-    } catch (error) {
-      toast.error('Failed to activate emergency lock');
-    } finally {
-      setIsLocking(false);
-    }
+      toast.success('🔒 EMERGENCY LOCK ACTIVATED', { description: 'All system operations frozen.', duration: 5000 });
+    } catch { toast.error('Failed to activate emergency lock'); }
+    finally { setIsLocking(false); }
   };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       await supabase.from('audit_logs').insert({
-        user_id: user?.id,
-        role: 'boss_owner' as any,
-        module: 'boss-panel',
-        action: 'secure_logout',
-        meta_json: { timestamp: new Date().toISOString() }
+        user_id: user?.id, role: 'boss_owner' as any, module: 'boss-panel',
+        action: 'secure_logout', meta_json: { timestamp: new Date().toISOString() }
       });
       await signOut();
       toast.success('Securely logged out');
       navigate('/auth');
-    } catch (error) {
-      toast.error('Logout failed');
-    } finally {
-      setIsLoggingOut(false);
-    }
+    } catch { toast.error('Logout failed'); }
+    finally { setIsLoggingOut(false); }
   };
+
+  const IconBtn = ({ children, onClick, badge }: { children: React.ReactNode; onClick?: () => void; badge?: number }) => (
+    <button
+      onClick={onClick}
+      className="relative flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200"
+      style={{ color: S.muted }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = S.bgHover; e.currentTarget.style.color = S.text; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = S.muted; }}
+    >
+      {children}
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 text-[9px] font-bold rounded-full"
+          style={{ background: S.red, color: S.text }}>{badge > 9 ? '9+' : badge}</span>
+      )}
+    </button>
+  );
 
   return (
     <header 
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
-      style={{ background: 'hsl(217 91% 50%)' }}
+      className="fixed top-0 left-0 right-0 z-50 flex items-center h-12 px-4"
+      style={{ 
+        background: S.bg, 
+        borderBottom: `1px solid ${S.border}`,
+        boxShadow: '0 4px 20px -4px hsla(222,47%,4%,0.6)',
+      }}
     >
-      {/* LEFT: Logo Icon Only */}
+      {/* LEFT: Brand + Breadcrumb */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white">
-          <span className="font-bold text-lg" style={{ color: 'hsl(217 91% 50%)' }}>S</span>
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center" 
+          style={{ background: `linear-gradient(135deg, ${S.brand}, hsl(262, 83%, 58%))` }}>
+          <Crown className="w-4 h-4" style={{ color: S.text }} />
+        </div>
+        <div className="h-5 w-px" style={{ background: S.border }} />
+        <div className="flex items-center gap-1.5 text-xs">
+          <span className="font-bold" style={{ color: S.text }}>Software Vala</span>
+          <ChevronRight className="w-3 h-3" style={{ color: S.muted }} />
+          <span className="font-semibold" style={{ color: S.brand }}>Boss Command Center</span>
         </div>
       </div>
 
-      {/* CENTER: Live Status */}
-      <button
-        onClick={onStreamingToggle}
-        className={`flex items-center gap-2 px-4 py-2 h-9 rounded-full transition-all border ${
-          streamingOn 
-            ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-500' 
-            : 'bg-destructive/15 border-destructive/50 text-destructive'
-        }`}
-      >
-        <Radio className={`w-4 h-4 ${streamingOn ? 'animate-pulse' : ''}`} />
-        <span className="text-[13px] font-medium">
-          {streamingOn ? 'LIVE' : 'PAUSED'}
-        </span>
-      </button>
+      {/* CENTER: Search */}
+      <div className="flex-1 flex justify-center max-w-lg mx-auto">
+        <div className="flex items-center gap-2 px-3.5 h-8 rounded-lg w-full transition-all"
+          style={{ background: 'hsla(215, 28%, 20%, 0.5)', border: `1px solid ${S.border}` }}>
+          <Search className="w-3.5 h-3.5" style={{ color: S.muted }} />
+          <input type="text" placeholder="Search modules, reports, users..."
+            className="bg-transparent text-xs outline-none flex-1 placeholder:text-inherit"
+            style={{ color: S.text }} />
+          <kbd className="text-[9px] px-1.5 py-0.5 rounded font-mono" 
+            style={{ background: 'hsla(215, 28%, 25%, 0.6)', color: S.muted, border: `1px solid ${S.border}` }}>⌘K</kbd>
+        </div>
+      </div>
 
-      {/* RIGHT: Icon-only actions */}
+      {/* RIGHT: Actions */}
       <div className="flex items-center gap-1">
-        {/* Assist (UltraViewer) */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowAssist(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <Headphones className="w-5 h-5 text-white" />
-        </Button>
+        {/* Live indicator */}
+        <button onClick={onStreamingToggle}
+          className="flex items-center gap-1.5 px-3 h-7 rounded-lg text-[11px] font-bold mr-1 transition-all"
+          style={{
+            background: streamingOn ? 'hsla(160, 84%, 39%, 0.12)' : 'hsla(346, 77%, 49%, 0.12)',
+            color: streamingOn ? S.green : S.red,
+            border: `1px solid ${streamingOn ? 'hsla(160, 84%, 39%, 0.25)' : 'hsla(346, 77%, 49%, 0.25)'}`,
+          }}>
+          <Radio className={`w-3 h-3 ${streamingOn ? 'animate-pulse' : ''}`} />
+          {streamingOn ? 'LIVE' : 'PAUSED'}
+        </button>
 
-        {/* Promise Tracker */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowPromise(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <ListChecks className="w-5 h-5 text-white" />
-        </Button>
+        {/* Clock */}
+        <div className="flex items-center gap-1.5 px-2.5 h-7 rounded-lg mr-1 text-[11px] font-mono tabular-nums"
+          style={{ color: S.muted, background: 'hsla(215, 28%, 20%, 0.3)' }}>
+          <Clock className="w-3 h-3" />
+          {time.toLocaleTimeString('en-US', { hour12: false })}
+        </div>
 
-        {/* Internal Chat Bot */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowChat(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <MessageSquare className="w-5 h-5 text-white" />
-        </Button>
+        <div className="h-5 w-px mx-1" style={{ background: S.border }} />
 
-        {/* Notifications / Buzzer */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowNotifications(true)}
-          className="relative hover:bg-white/20 w-10 h-10"
-        >
-          <Bell className="w-5 h-5 text-white" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-semibold bg-red-500 text-white rounded-full">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </Button>
+        <IconBtn onClick={() => setShowAssist(true)}><Headphones className="w-4 h-4" /></IconBtn>
+        <IconBtn onClick={() => setShowPromise(true)}><ListChecks className="w-4 h-4" /></IconBtn>
+        <IconBtn onClick={() => setShowChat(true)}><MessageSquare className="w-4 h-4" /></IconBtn>
+        <IconBtn onClick={() => setShowNotifications(true)} badge={unreadCount}><Bell className="w-4 h-4" /></IconBtn>
+        <IconBtn onClick={() => setShowLanguage(true)}><Globe className="w-4 h-4" /></IconBtn>
+        <IconBtn onClick={() => setShowCurrency(true)}><Banknote className="w-4 h-4" /></IconBtn>
 
-        {/* Language */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowLanguage(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <Globe className="w-5 h-5 text-white" />
-        </Button>
-
-        {/* Currency */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setShowCurrency(true)}
-          className="hover:bg-white/20 w-10 h-10"
-        >
-          <Banknote className="w-5 h-5 text-white" />
-        </Button>
+        <div className="h-5 w-px mx-1" style={{ background: S.border }} />
 
         {/* Emergency Lock */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="hover:bg-destructive/10 w-10 h-10"
-            >
-              <ShieldAlert className="w-5 h-5 text-destructive" />
-            </Button>
+            <button className="flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-red-500/10"
+              style={{ color: S.red }}>
+              <ShieldAlert className="w-4 h-4" />
+            </button>
           </AlertDialogTrigger>
           <AlertDialogContent className="bg-sidebar border-destructive/30">
             <AlertDialogHeader>
@@ -255,61 +212,31 @@ export function BossPanelHeader({ streamingOn, onStreamingToggle }: BossPanelHea
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-sidebar-accent border-sidebar-border text-foreground">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleEmergencyLock}
-                disabled={isLocking}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                {isLocking ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Locking...
-                  </>
-                ) : (
-                  'ACTIVATE LOCKDOWN'
-                )}
+              <AlertDialogCancel className="bg-sidebar-accent border-sidebar-border text-foreground">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleEmergencyLock} disabled={isLocking}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                {isLocking ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Locking...</> : 'ACTIVATE LOCKDOWN'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
-        {/* Profile Avatar */}
+        {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="hover:bg-white/20 w-10 h-10 p-0"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white">
-                <User className="w-4 h-4" style={{ color: 'hsl(217 91% 50%)' }} />
-              </div>
-            </Button>
+            <button className="flex items-center justify-center w-8 h-8 rounded-full ml-1"
+              style={{ background: `linear-gradient(135deg, ${S.brand}, hsl(262, 83%, 58%))`, color: S.text }}>
+              <User className="w-4 h-4" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end"
-            className="bg-sidebar border-sidebar-border"
-          >
-            <DropdownMenuItem 
-              onClick={() => navigate('/settings')}
-              className="text-muted-foreground hover:bg-white/5 focus:bg-white/5 cursor-pointer"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Profile
+          <DropdownMenuContent align="end" className="bg-sidebar border-sidebar-border">
+            <DropdownMenuItem onClick={() => navigate('/settings')} className="text-muted-foreground hover:bg-white/5 cursor-pointer">
+              <User className="w-4 h-4 mr-2" />Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-sidebar-border" />
-            <DropdownMenuItem 
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10 cursor-pointer"
-            >
-              {isLoggingOut ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <LogOut className="w-4 h-4 mr-2" />
-              )}
+            <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}
+              className="text-destructive hover:bg-destructive/10 cursor-pointer">
+              {isLoggingOut ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <LogOut className="w-4 h-4 mr-2" />}
               {isLoggingOut ? 'Logging out...' : 'Logout'}
             </DropdownMenuItem>
           </DropdownMenuContent>
