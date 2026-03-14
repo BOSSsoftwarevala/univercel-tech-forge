@@ -128,42 +128,50 @@ export default function MarketplaceUserSystem(): JSX.Element {
     setProcessingIds((prev) => ({ ...prev, [id]: v }));
   }, []);
 
+  // Use Edge Function to perform approve/reject (avoids RLS issues). This does not change UI layout.
   const handleAction = useCallback(
     async (it: PendingItem, action: 'approve' | 'reject') => {
       const idKey = it.id;
       if (processingIds[idKey]) return;
       setProcessing(idKey, true);
 
-      const newStatus = action === 'approve' ? 'approved' : 'rejected';
-      const updatePayload: Record<string, any> = {
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      };
-      if (action === 'approve') updatePayload.approved_at = new Date().toISOString();
-      if (action === 'reject') updatePayload.rejected_at = new Date().toISOString();
-
       try {
-        const table = it.source;
-        const { error } = await supabase.from(table).update(updatePayload).eq('id', it.originalId);
+        // Call Supabase Edge Function that performs the update using the service role key:
+        // Endpoint (deployed in your Supabase project): /functions/v1/approve-reject-approval
+        // Payload: { table: it.source, id: it.originalId, action: 'approve'|'reject' }
+        const resp = await fetch('/functions/v1/approve-reject-approval', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            table: it.source,
+            id: it.originalId,
+            action,
+          }),
+        });
 
-        if (error) {
-          console.error(`[MarketplaceUserSystem] failed to ${action} ${table}:${it.originalId}`, error);
-          // minimal feedback
-          alert(`Failed to ${action} item: ${error.message || String(error)}`);
+        let json: any = null;
+        try {
+          json = await resp.json();
+        } catch {
+          json = null;
+        }
+
+        if (!resp.ok) {
+          console.error('[MarketplaceUserSystem] edge function update failed', { status: resp.status, body: json });
+          alert(`Failed to ${action} item: ${json?.error || `status ${resp.status}`}`);
         } else {
-          // invalidate/refetch the central query
+          // success — refresh approvals
           await queryClient.invalidateQueries({ queryKey: ['boss-approvals'] });
-          // also trigger a direct refetch if needed
           await refetch();
         }
       } catch (e) {
-        console.error('[MarketplaceUserSystem] action error:', e);
+        console.error('[MarketplaceUserSystem] action error calling edge function:', e);
         alert(`Failed to ${action} item: ${String(e)}`);
       } finally {
         setProcessing(idKey, false);
       }
     },
-    [processingIds, queryClient, refetch, setProcessing]
+    [processingIds, queryClient, refetch]
   );
 
   const empty = !isLoading && collected.length === 0;
