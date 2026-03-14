@@ -52,7 +52,10 @@ export function MMSupportScreen() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const mountedRef = useRef<boolean>(true);
+  const timeoutsRef = useRef<number[]>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -62,22 +65,42 @@ export function MMSupportScreen() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      // clear any pending timeouts to avoid state updates after unmount
+      timeoutsRef.current.forEach((id) => {
+        try {
+          clearTimeout(id);
+        } catch {
+          // ignore
+        }
+      });
+      timeoutsRef.current = [];
+    };
+  }, []);
+
   const simulateBotResponse = (userMessage: string) => {
+    if (!mountedRef.current) return;
     setIsTyping(true);
-    
+
     // Simulate human-like delay (2-4 seconds)
     const delay = 2000 + Math.random() * 2000;
-    
-    setTimeout(() => {
+
+    const timeoutId = window.setTimeout(() => {
+      if (!mountedRef.current) return;
+
       let response = '';
-      
-      if (userMessage.toLowerCase().includes('status') || userMessage.toLowerCase().includes('order')) {
+
+      const lower = (userMessage || '').toLowerCase();
+      if (lower.includes('status') || lower.includes('order')) {
         response = 'Let me check that for you... Your order ORD-2024-001 is progressing well. The development team has completed the core modules and is now working on the custom fields you requested. Expected completion is by January 30th.';
-      } else if (userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('cost')) {
+      } else if (lower.includes('price') || lower.includes('cost')) {
         response = 'As a franchise partner, you receive an automatic 30% discount on all products. The pricing you see in the marketplace already reflects your discounted rate.';
-      } else if (userMessage.toLowerCase().includes('wallet') || userMessage.toLowerCase().includes('payment')) {
+      } else if (lower.includes('wallet') || lower.includes('payment')) {
         response = 'Your current wallet balance is ₹45,230 with ₹5,000 locked for pending orders. You can add more funds anytime through UPI or bank transfer. Would you like me to guide you through the process?';
-      } else if (userMessage.toLowerCase().includes('help') || userMessage.toLowerCase().includes('support')) {
+      } else if (lower.includes('help') || lower.includes('support')) {
         response = 'I\'m here to help! I can assist you with:\n• Order status and tracking\n• Product information\n• Wallet and payments\n• Technical issues\n• Feature requests\n\nWhat would you like to know more about?';
       } else {
         response = 'Thank you for your message. I understand you need assistance. Could you please provide more details so I can help you better? If this is urgent, I can connect you with our support team.';
@@ -91,26 +114,29 @@ export function MMSupportScreen() {
         status: 'delivered'
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
       setIsTyping(false);
     }, delay);
+
+    timeoutsRef.current.push(timeoutId);
   };
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
 
+    const text = inputValue;
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: 'user',
-      content: inputValue,
+      content: text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       status: 'sent'
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
-    
-    simulateBotResponse(inputValue);
+
+    simulateBotResponse(text);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -146,7 +172,7 @@ export function MMSupportScreen() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950">
-        {messages.map(message => (
+        {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
