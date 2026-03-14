@@ -16,6 +16,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface Transaction {
   id: string;
@@ -44,6 +45,22 @@ export function MMWalletScreen() {
   const walletBalance = 45230;
   const lockedAmount = 5000;
   const availableBalance = walletBalance - lockedAmount;
+
+  const parseAmount = (val: string | number) => {
+    const n = Number(val ?? 0);
+    return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+  };
+
+  const handleProceedToPay = () => {
+    const amt = parseAmount(rechargeAmount);
+    if (amt < 1000) {
+      toast.error('Minimum amount to add is ₹1,000');
+      return;
+    }
+    // Close dialog and show non-destructive feedback; actual payment flow handled elsewhere.
+    setShowRechargeDialog(false);
+    toast.success(`Proceeding to pay ₹${amt.toLocaleString()}`);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -119,9 +136,10 @@ export function MMWalletScreen() {
 
               <Button 
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
-                disabled={!rechargeAmount || parseInt(rechargeAmount) < 1000}
+                disabled={parseAmount(rechargeAmount) < 1000}
+                onClick={handleProceedToPay}
               >
-                Proceed to Pay ₹{parseInt(rechargeAmount || '0').toLocaleString()}
+                Proceed to Pay ₹{parseAmount(rechargeAmount || '0').toLocaleString()}
               </Button>
             </div>
           </DialogContent>
