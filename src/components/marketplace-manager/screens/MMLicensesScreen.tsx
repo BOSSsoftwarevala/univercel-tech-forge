@@ -30,14 +30,22 @@ export function MMLicensesScreen() {
       setLoading(true);
       try {
         const res = await marketplaceEnterpriseService.getUserLicenses(user!.id);
+
+        // Debug raw response shape to help diagnose issues in production
+        console.debug('[MMLicensesScreen] getUserLicenses response:', res);
+
         if (!mounted) return;
 
-        if (res?.error) {
-          console.error('[MMLicensesScreen] failed to load licenses:', res.error);
+        // Support service returning either an array or { data, error }
+        const error = res?.error ?? null;
+        const data = Array.isArray(res) ? res : res?.data ?? [];
+
+        if (error) {
+          console.error('[MMLicensesScreen] failed to load licenses:', error);
           setLicenses([]);
           toast.error('Unable to load licenses');
         } else {
-          setLicenses(res?.data || []);
+          setLicenses(Array.isArray(data) ? data : []);
         }
       } catch (err) {
         if (!mounted) return;
@@ -100,7 +108,7 @@ export function MMLicensesScreen() {
       ) : (
         <div className="space-y-3">
           {licenses.map((license, idx) => (
-            <Card key={license.id ?? license.license_key ?? `lic-${idx}`} className="bg-slate-800/50 border-slate-700">
+            <Card key={license?.id ?? license?.license_key ?? `lic-${idx}`} className="bg-slate-800/50 border-slate-700">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -108,14 +116,14 @@ export function MMLicensesScreen() {
                       <Shield className="h-5 w-5 text-purple-400" />
                     </div>
                     <div>
-                      <p className="font-medium">{license.product_id ?? '—'}</p>
-                      <p className="text-xs text-slate-400 font-mono">{license.license_key ?? '—'}</p>
+                      <p className="font-medium">{license?.product_id ?? '—'}</p>
+                      <p className="text-xs text-slate-400 font-mono">{license?.license_key ?? '—'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right text-xs text-slate-500">
-                      <p>Type: {license.license_type ?? '—'}</p>
-                      {license.expires_at && (
+                      <p>Type: {license?.license_type ?? '—'}</p>
+                      {license?.expires_at && (
                         <p>
                           Exp:{' '}
                           {isNaN(new Date(license.expires_at).getTime())
@@ -126,18 +134,18 @@ export function MMLicensesScreen() {
                     </div>
                     <Badge
                       className={
-                        license.status === 'active'
+                        (license?.status ?? '') === 'active'
                           ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                           : 'bg-red-500/20 text-red-400 border-red-500/30'
                       }
                     >
-                      {license.status ?? 'unknown'}
+                      {license?.status ?? 'unknown'}
                     </Badge>
                     <Button
                       size="sm"
                       variant="outline"
                       className="border-slate-600"
-                      onClick={() => copyKey(license.license_key)}
+                      onClick={() => copyKey(license?.license_key)}
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
