@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface AIRAMetrics {
@@ -30,47 +30,113 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export function useAIRAMetrics() {
   const [metrics, setMetrics] = useState<AIRAMetrics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const mountedRef = useRef(true);
+
+  // Keep a short cap on how many historical rows we pull to avoid huge payloads.
+  const ORDERS_FETCH_LIMIT = 1000;
+  const PRODUCTS_FETCH_LIMIT = 1000;
+  const ACTIVITY_FETCH_LIMIT = 200;
+  const AUDIT_FETCH_LIMIT = 200;
 
   const fetchMetrics = useCallback(async () => {
+    setLoading(true);
     try {
-      // Parallel queries for all metrics — cast to any to avoid deep type instantiation
       const db = supabase as any;
+
+      // Lightweight counts (use head:true for counts where we don't need rows)
       const usersRes = await db.from('profiles').select('id', { count: 'exact', head: true });
-      const ordersRes = await db.from('marketplace_orders').select('id, final_amount, created_at');
-      const productsRes = await db.from('marketplace_products').select('*', { count: 'exact', head: true });
-      const serversRes = await db.from('server_instances').select('*', { count: 'exact', head: true }).eq('status', 'running');
-      const approvalsRes = await db.from('approvals').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      const alertsRes = await db.from('system_alerts').select('*', { count: 'exact', head: true });
-      const auditRes = await db.from('audit_logs').select('id, module, action, role, timestamp').order('timestamp', { ascending: false }).limit(200);
-      const activityRes = await db.from('activity_log').select('id, action_type, entity_type, role, severity_level, created_at').order('created_at', { ascending: false }).limit(100);
+
+      // Orders: get count + recent order rows (for revenue/time-series)
+      const ordersCountRes = await db.from('marketplace_orders').select('id', { count: 'exact', head: true });
+      const ordersDataRes = await db
+        .from('marketplace_orders')
+        .select('id, final_amount, created_at')
+        .order('created_at', { ascending: false })
+        .limit(ORDERS_FETCH_LIMIT);
+
+      // Products: fetch rows (we need category field for breakdown) + count via separate head query could be added
+      const productsRes = await db
+        .from('marketplace_products')
+        .select('id, category')
+        .limit(PRODUCTS_FETCH_LIMIT);
+
+      // Counts for components
+      const serversRes = await db.from('server_instances').select('id', { count: 'exact', head: true }).eq('status', 'running');
+      const approvalsRes = await db.from('approvals').select('id', { count: 'exact', head: true }).eq('status', 'pending');
+      const alertsRes = await db.from('system_alerts').select('id', { count: 'exact', head: true });
+
+      // Activity/audit rows (we need recent rows)
+      const auditRes = await db
+        .from('audit_logs')
+        .select('id, module, action, role, timestamp')
+        .order('timestamp', { ascending: false })
+        .limit(AUDIT_FETCH_LIMIT);
+
+      const activityRes = await db
+        .from('activity_log')
+        .select('id, action_type, entity_type, role, severity_level, created_at')
+        .order('created_at', { ascending: false })
+        .limit(ACTIVITY_FETCH_LIMIT);
+
       const rolesRes = await db.from('user_roles').select('role');
 
-      // Calculate revenue
-      const orders = ordersRes.data || [];
-      const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.final_amount) || 0), 0);
+      // Defensive: check for errors on each response and abort partially if critical failures occur
+      // Supabase SDK returns { data, error, count } shape
+      const responses = {
+        usersRes,
+        ordersCountRes,
+        ordersDataRes,
+        productsRes,
+        serversRes,
+        approvalsRes,
+        alertsRes,
+        auditRes,
+        activityRes,
+        rolesRes,
+      };
 
-      // Revenue by month (from real orders)
+      for (const [key, res] of Object.entries(responses)) {
+        if (res?.error) {
+          console.warn(`[AIRA] ${key} query error:`, res.error);
+        }
+      }
+
+      // Calculate counts & data safely with fallbacks
+      const totalUsers = usersRes?.count ?? 0;
+      const totalOrders = ordersCountRes?.count ?? (ordersDataRes?.data?.length ?? 0);
+      const orders = Array.isArray(ordersDataRes?.data) ? ordersDataRes.data : [];
+      const totalProducts = (productsRes?.data?.length ?? 0);
+
+      // Revenue (from fetched orders)
+      const totalRevenue = orders.reduce((sum: number, o: any) => sum + (Number(o.final_amount) || 0), 0);
+
+      // Revenue by month (based on fetched orders)
       const monthlyRev: Record<string, number> = {};
-      MONTHS.forEach(m => { monthlyRev[m] = 0; });
-      orders.forEach(o => {
+      MONTHS.forEach((m) => {
+        monthlyRev[m] = 0;
+      });
+      orders.forEach((o: any) => {
+        if (!o?.created_at) return;
         const d = new Date(o.created_at);
+        if (isNaN(d.getTime())) return;
         const m = MONTHS[d.getMonth()];
         if (m) monthlyRev[m] += Number(o.final_amount) || 0;
       });
-      const revenueByMonth = MONTHS.map(m => ({
+      const revenueByMonth = MONTHS.map((m) => ({
         month: m,
-        revenue: monthlyRev[m] || 0,
-        target: (totalRevenue / 12) * 1.1, // 10% above avg as target
+        revenue: Math.round(monthlyRev[m] || 0),
+        target: Math.round((totalRevenue / 12) * 1.1), // 10% above avg as target
       }));
 
       // Module activity from audit logs
       const moduleMap: Record<string, { actions: number; errors: number }> = {};
-      (auditRes.data || []).forEach(l => {
-        const mod = l.module || 'unknown';
+      (auditRes?.data || []).forEach((l: any) => {
+        const mod = l?.module || 'unknown';
         if (!moduleMap[mod]) moduleMap[mod] = { actions: 0, errors: 0 };
         moduleMap[mod].actions++;
-        if (l.action?.includes('error') || l.action?.includes('fail')) moduleMap[mod].errors++;
+        const actionLower = String(l?.action || '').toLowerCase();
+        if (actionLower.includes('error') || actionLower.includes('fail')) moduleMap[mod].errors++;
       });
       const moduleActivity = Object.entries(moduleMap)
         .sort((a, b) => b[1].actions - a[1].actions)
@@ -79,8 +145,8 @@ export function useAIRAMetrics() {
 
       // Role distribution
       const roleCounts: Record<string, number> = {};
-      (rolesRes.data || []).forEach(r => {
-        const role = String(r.role);
+      (rolesRes?.data || []).forEach((r: any) => {
+        const role = String(r?.role ?? 'unknown');
         roleCounts[role] = (roleCounts[role] || 0) + 1;
       });
       const roleDistribution = Object.entries(roleCounts)
@@ -88,10 +154,10 @@ export function useAIRAMetrics() {
         .slice(0, 8)
         .map(([name, value]) => ({ name, value }));
 
-      // Category breakdown from products
+      // Category breakdown from products rows
       const catMap: Record<string, number> = {};
-      (productsRes.data || []).forEach(p => {
-        const cat = (p as any).category || 'Other';
+      (productsRes?.data || []).forEach((p: any) => {
+        const cat = (p?.category as string) || 'Other';
         catMap[cat] = (catMap[cat] || 0) + 1;
       });
       const categoryBreakdown = Object.entries(catMap)
@@ -99,14 +165,17 @@ export function useAIRAMetrics() {
         .slice(0, 12)
         .map(([name, value]) => ({ name, value }));
 
-      // Hourly activity (last 24h)
+      // Hourly activity (last 24h) computed from activity rows
       const hourlyMap: Record<string, { events: number; critical: number }> = {};
       for (let i = 0; i < 24; i++) {
         const h = `${i.toString().padStart(2, '0')}:00`;
         hourlyMap[h] = { events: 0, critical: 0 };
       }
-      (activityRes.data || []).forEach(a => {
-        const h = new Date(a.created_at).getHours();
+      (activityRes?.data || []).forEach((a: any) => {
+        if (!a?.created_at) return;
+        const d = new Date(a.created_at);
+        if (isNaN(d.getTime())) return;
+        const h = d.getHours();
         const key = `${h.toString().padStart(2, '0')}:00`;
         if (hourlyMap[key]) {
           hourlyMap[key].events++;
@@ -117,17 +186,17 @@ export function useAIRAMetrics() {
       });
       const hourlyActivity = Object.entries(hourlyMap).map(([hour, d]) => ({ hour, ...d }));
 
-      // Recent activity
-      const recentActivity = (activityRes.data || []).slice(0, 20).map(a => ({
+      // Recent activity (from activity log)
+      const recentActivity = (activityRes?.data || []).slice(0, 20).map((a: any) => ({
         id: a.id,
         action: a.action_type,
         entity: a.entity_type || '-',
         role: a.role || 'system',
-        time: new Date(a.created_at).toLocaleTimeString(),
+        time: new Date(a.created_at).toLocaleString(),
         severity: a.severity_level || 'info',
       }));
 
-      // System health (computed)
+      // System health (static/computed example)
       const systemHealth = [
         { metric: 'Uptime', score: 99, benchmark: 99.5 },
         { metric: 'API Speed', score: 92, benchmark: 95 },
@@ -138,46 +207,63 @@ export function useAIRAMetrics() {
       ];
 
       // Sparklines (synthetic from real counts)
-      const totalUsers = usersRes.count || 0;
-      const genSparkline = (base: number) => Array.from({ length: 12 }, (_, i) => Math.max(0, base * (0.5 + Math.random() * 0.6 + i * 0.04)));
+      const genSparkline = (base: number) =>
+        Array.from({ length: 12 }, (_, i) => Math.max(0, Math.round(base * (0.5 + Math.random() * 0.6 + i * 0.04))));
 
-      setMetrics({
-        totalUsers,
-        totalOrders: orders.length,
-        totalRevenue,
-        totalProducts: productsRes.count || 0,
-        activeServers: serversRes.count || 0,
-        pendingApprovals: approvalsRes.count || 0,
-        criticalAlerts: alertsRes.count || 0,
-        auditEvents24h: (auditRes.data || []).length,
+      const activeServers = serversRes?.count ?? 0;
+      const pendingApprovals = approvalsRes?.count ?? 0;
+      const criticalAlerts = alertsRes?.count ?? 0;
+      const auditEvents24h = (auditRes?.data || []).length;
+
+      const computed: AIRAMetrics = {
+        totalUsers: totalUsers ?? 0,
+        totalOrders: totalOrders ?? (orders.length || 0),
+        totalRevenue: Math.round(totalRevenue),
+        totalProducts: totalProducts ?? 0,
+        activeServers,
+        pendingApprovals,
+        criticalAlerts,
+        auditEvents24h,
         revenueByMonth,
         moduleActivity,
-        roleDistribution: roleDistribution.length > 0 ? roleDistribution : [{ name: 'Users', value: totalUsers }],
+        roleDistribution: roleDistribution.length > 0 ? roleDistribution : [{ name: 'Users', value: totalUsers ?? 0 }],
         systemHealth,
         hourlyActivity,
         categoryBreakdown,
         recentActivity,
         kpiSparklines: {
-          users: genSparkline(totalUsers / 12),
-          revenue: genSparkline(totalRevenue / 12),
-          orders: genSparkline(orders.length / 12),
-          servers: genSparkline((serversRes.count || 1)),
+          users: genSparkline((totalUsers ?? 0) / 12),
+          revenue: genSparkline((totalRevenue ?? 0) / 12),
+          orders: genSparkline((totalOrders ?? 0) / 12),
+          servers: genSparkline(Math.max(1, activeServers)),
         },
-      });
+      };
+
+      if (mountedRef.current) {
+        setMetrics(computed);
+        setLastRefresh(new Date());
+      }
     } catch (err) {
       console.error('[AIRA] Metrics fetch error:', err);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    mountedRef.current = true;
+    // Initial fetch
     fetchMetrics();
+
     const interval = setInterval(() => {
       fetchMetrics();
-      setLastRefresh(new Date());
-    }, 30000); // refresh every 30s
-    return () => clearInterval(interval);
+    }, 30_000); // refresh every 30s
+
+    return () => {
+      mountedRef.current = false;
+      clearInterval(interval);
+    };
   }, [fetchMetrics]);
 
   return { metrics, loading, lastRefresh, refresh: fetchMetrics };
