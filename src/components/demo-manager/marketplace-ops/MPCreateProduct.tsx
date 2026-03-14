@@ -14,20 +14,41 @@ const MPCreateProduct = () => {
   const [form, setForm] = useState({ product_name: "", category: "", product_type: "SaaS", tech_stack: "", description: "" });
 
   const handleSubmit = async () => {
-    if (!form.product_name) { toast.error("Product name is required"); return; }
+    if (!form.product_name) {
+      toast.error("Product name is required");
+      return;
+    }
+
     setLoading(true);
-    const { error } = await supabase.from('products').insert({
-      product_name: form.product_name,
-      category: form.category || null,
-      product_type: form.product_type,
-      tech_stack: form.tech_stack || null,
-      description: form.description || null,
-      is_active: true,
-    } as any);
-    setLoading(false);
-    if (error) { toast.error("Failed to create product"); return; }
-    toast.success("Product created successfully");
-    setForm({ product_name: "", category: "", product_type: "SaaS", tech_stack: "", description: "" });
+    try {
+      const payload = {
+        product_name: form.product_name,
+        name: form.product_name,
+        short_description: form.description || null,
+        category: form.category || null,
+        type: form.product_type,
+        tech_stack: form.tech_stack || null,
+        is_active: true,
+        listing_status: "draft",
+        vendor: "Self",
+      } as any;
+
+      const { data, error } = await supabase.from("software_catalog").insert(payload).select().single();
+
+      if (error) {
+        console.error("Create product error:", error);
+        toast.error("Failed to create product");
+        return;
+      }
+
+      toast.success("Product created successfully");
+      setForm({ product_name: "", category: "", product_type: "SaaS", tech_stack: "", description: "" });
+    } catch (e) {
+      console.error("Unexpected error creating product:", e);
+      toast.error("Failed to create product");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
