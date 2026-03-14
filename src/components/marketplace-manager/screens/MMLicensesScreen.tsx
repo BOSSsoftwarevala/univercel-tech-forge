@@ -13,19 +13,65 @@ export function MMLicensesScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.id) return;
+    let mounted = true;
+
+    if (!user?.id) {
+      if (mounted) {
+        setLicenses([]);
+        setLoading(false);
+      }
+      return () => {
+        mounted = false;
+      };
+    }
+
+    const loadLicenses = async () => {
+      if (!mounted) return;
+      setLoading(true);
+      try {
+        const res = await marketplaceEnterpriseService.getUserLicenses(user!.id);
+        if (!mounted) return;
+
+        if (res?.error) {
+          console.error('[MMLicensesScreen] failed to load licenses:', res.error);
+          setLicenses([]);
+          toast.error('Unable to load licenses');
+        } else {
+          setLicenses(res?.data || []);
+        }
+      } catch (err) {
+        if (!mounted) return;
+        console.error('[MMLicensesScreen] Unexpected error loading licenses:', err);
+        setLicenses([]);
+        toast.error('Unable to load licenses');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
     loadLicenses();
+
+    return () => {
+      mounted = false;
+    };
   }, [user?.id]);
 
-  const loadLicenses = async () => {
-    const { data } = await marketplaceEnterpriseService.getUserLicenses(user!.id);
-    setLicenses(data);
-    setLoading(false);
-  };
-
-  const copyKey = (key: string) => {
-    navigator.clipboard.writeText(key);
-    toast.success('License key copied');
+  const copyKey = async (key?: string) => {
+    if (!key) {
+      toast.error('No license key available to copy');
+      return;
+    }
+    try {
+      if (!navigator?.clipboard?.writeText) {
+        toast.error('Clipboard not available');
+        return;
+      }
+      await navigator.clipboard.writeText(key);
+      toast.success('License key copied');
+    } catch (err) {
+      console.error('[MMLicensesScreen] failed to copy key:', err);
+      toast.error('Failed to copy license key');
+    }
   };
 
   if (loading) {
@@ -53,8 +99,8 @@ export function MMLicensesScreen() {
         </div>
       ) : (
         <div className="space-y-3">
-          {licenses.map(license => (
-            <Card key={license.id} className="bg-slate-800/50 border-slate-700">
+          {licenses.map((license, idx) => (
+            <Card key={license.id ?? license.license_key ?? `lic-${idx}`} className="bg-slate-800/50 border-slate-700">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -62,23 +108,37 @@ export function MMLicensesScreen() {
                       <Shield className="h-5 w-5 text-purple-400" />
                     </div>
                     <div>
-                      <p className="font-medium">{license.product_id}</p>
-                      <p className="text-xs text-slate-400 font-mono">{license.license_key}</p>
+                      <p className="font-medium">{license.product_id ?? '—'}</p>
+                      <p className="text-xs text-slate-400 font-mono">{license.license_key ?? '—'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right text-xs text-slate-500">
-                      <p>Type: {license.license_type}</p>
-                      {license.expires_at && <p>Exp: {new Date(license.expires_at).toLocaleDateString()}</p>}
+                      <p>Type: {license.license_type ?? '—'}</p>
+                      {license.expires_at && (
+                        <p>
+                          Exp:{' '}
+                          {isNaN(new Date(license.expires_at).getTime())
+                            ? '—'
+                            : new Date(license.expires_at).toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
-                    <Badge className={
-                      license.status === 'active'
-                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                        : 'bg-red-500/20 text-red-400 border-red-500/30'
-                    }>
-                      {license.status}
+                    <Badge
+                      className={
+                        license.status === 'active'
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                          : 'bg-red-500/20 text-red-400 border-red-500/30'
+                      }
+                    >
+                      {license.status ?? 'unknown'}
                     </Badge>
-                    <Button size="sm" variant="outline" className="border-slate-600" onClick={() => copyKey(license.license_key)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-slate-600"
+                      onClick={() => copyKey(license.license_key)}
+                    >
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
