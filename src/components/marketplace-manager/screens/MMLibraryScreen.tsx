@@ -11,16 +11,44 @@ export function MMLibraryScreen() {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user?.id) return;
-    loadLicenses();
-  }, [user?.id]);
+  const loadLicenses = async (userId?: string) => {
+    if (!userId) {
+      setLicenses([]);
+      setLoading(false);
+      return;
+    }
 
-  const loadLicenses = async () => {
-    const { data } = await marketplaceEnterpriseService.getUserLicenses(user!.id);
-    setLicenses(data);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const res = await marketplaceEnterpriseService.getUserLicenses(userId);
+      // service expected to return { data, error } or data directly
+      const data = res?.data ?? res;
+      setLicenses(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('[MMLibraryScreen] Failed to load licenses:', err);
+      setLicenses([]);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    let mounted = true;
+    if (!mounted) return;
+
+    if (!user?.id) {
+      // No user - ensure loader stops and empty state shown
+      setLicenses([]);
+      setLoading(false);
+      return;
+    }
+
+    loadLicenses(user.id);
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id]);
 
   if (loading) {
     return (
@@ -43,13 +71,13 @@ export function MMLibraryScreen() {
       <div className="grid grid-cols-3 gap-4">
         <Card className="bg-emerald-500/10 border-emerald-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-emerald-400">{licenses.filter(l => l.status === 'active').length}</p>
+            <p className="text-3xl font-bold text-emerald-400">{licenses.filter(l => l?.status === 'active').length}</p>
             <p className="text-xs text-emerald-400">Active Licenses</p>
           </CardContent>
         </Card>
         <Card className="bg-amber-500/10 border-amber-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-amber-400">{licenses.filter(l => l.status === 'expired').length}</p>
+            <p className="text-3xl font-bold text-amber-400">{licenses.filter(l => l?.status === 'expired').length}</p>
             <p className="text-xs text-amber-400">Expired</p>
           </CardContent>
         </Card>
