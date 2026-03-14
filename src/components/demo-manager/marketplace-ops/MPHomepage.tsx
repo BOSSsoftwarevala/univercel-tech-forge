@@ -127,20 +127,29 @@ export function MMMarketplaceScreen() {
   const visible = useMemo(() => {
     if (!products) return [];
     const q = query.trim().toLowerCase();
-    return products.filter((p) => {
-      if (!q) return true;
-      return (
-        p.name.toLowerCase().includes(q) ||
-        (p.category || '').toLowerCase().includes(q) ||
-        (p.description || '').toLowerCase().includes(q) ||
-        (p.tech_stack || '').toLowerCase().includes(q)
-      );
-    });
+
+    return products
+      .filter((p) => p && typeof p.id === 'string' && p.id.trim() !== '')
+      .filter((p) => {
+        if (!q) return true;
+        return (
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.category || '').toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q) ||
+          (p.tech_stack || '').toLowerCase().includes(q)
+        );
+      });
   }, [products, query]);
 
   const handleBuyNow = async (product: UnifiedProduct) => {
     // Prevent double clicks
     if (buyingId) return;
+
+    if (!product?.id) {
+      toast.error('Product is not purchasable (missing id).');
+      return;
+    }
+
     setBuyingId(product.id);
 
     try {
@@ -165,14 +174,35 @@ export function MMMarketplaceScreen() {
           buyer_id: user.id,
         };
 
-        // Edge function invocation might be blocked in some environments; handle errors and fallback
-        const fnResult = await supabase.functions.invoke('create-order-on-payment', { body: fnPayload }).catch(() => null);
-        if (fnResult && typeof fnResult === 'object') {
-          // Best-effort: If the edge function returns a redirect or checkout url, navigate
-          // fnResult could be like: { order_id, checkout_url }
-          // Use simple guards
-          // @ts-ignore
-          const body = (fnResult as any).data ?? (fnResult as any);
+        // Ensure JSON body and content-type for functions
+        const fnResult = await supabase.functions
+          .invoke('create-order-on-payment', {
+            body: JSON.stringify(fnPayload),
+            headers: { 'Content-Type': 'application/json' },
+          })
+          .catch(() => null);
+
+        if (fnResult) {
+          // Normalize possible responses (supabase may return a Response-like or object)
+          let body: any = null;
+          try {
+            // If it's a fetch Response-like with json()
+            if (typeof (fnResult as any).json === 'function') {
+              body = await (fnResult as any).json();
+            } else if (typeof (fnResult as any).text === 'function') {
+              const txt = await (fnResult as any).text();
+              try {
+                body = txt ? JSON.parse(txt) : null;
+              } catch {
+                body = txt;
+              }
+            } else {
+              body = (fnResult as any).data ?? fnResult;
+            }
+          } catch {
+            body = (fnResult as any).data ?? fnResult;
+          }
+
           const checkout = body?.checkout_url || body?.checkoutUrl || body?.redirect;
           const orderId = body?.order_id || body?.id;
           toast.success('Order created', { description: orderId ? `Order: ${orderId}` : undefined });
