@@ -18,7 +18,23 @@ interface TrustBadgeProps {
   variant?: 'compact' | 'full' | 'card';
 }
 
-export function TrustBadge({
+function normalizeDomain(domain?: string | null) {
+  if (!domain) return null;
+  let d = domain.trim();
+  d = d.replace(/^https?:\/\//i, '');
+  d = d.replace(/^\/\//, '');
+  d = d.replace(/\/+$/, '');
+  return d || null;
+}
+
+function normalizeUrl(url?: string | null) {
+  if (!url) return null;
+  const u = url.trim();
+  if (/^https?:\/\//i.test(u)) return u;
+  return `https://${u}`;
+}
+
+export const TrustBadge = React.memo(function TrustBadge({
   businessName,
   demoDomain,
   githubRepo,
@@ -28,32 +44,38 @@ export function TrustBadge({
   trustScore = 0,
   variant = 'compact',
 }: TrustBadgeProps) {
-  const rating = Number(avgRating) || 0;
-  const reviews = Number(totalRatings) || 0;
-  const score = Number(trustScore) || 0;
+  // Defensive normalization / clamping
+  const ratingRaw = Number.isFinite(Number(avgRating)) ? Number(avgRating) : 0;
+  const rating = Math.max(0, Math.min(5, ratingRaw));
+
+  const reviewsRaw = Number.isFinite(Number(totalRatings)) ? Math.floor(Number(totalRatings)) : 0;
+  const reviews = Math.max(0, reviewsRaw);
+
+  const scoreRaw = Number.isFinite(Number(trustScore)) ? Number(trustScore) : 0;
+  const score = Math.max(0, Math.min(100, Math.floor(scoreRaw)));
+
+  const cleanDemo = normalizeDomain(demoDomain);
+  const demoHref = cleanDemo ? `https://${cleanDemo}` : null;
+  const repoHref = normalizeUrl(githubRepo);
 
   if (variant === 'card') {
     return (
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="flex items-center gap-1.5 flex-wrap" aria-hidden={false}>
         {isVerified && (
-          <Badge variant="outline" className="text-[9px] border-emerald-500/40 text-emerald-400 gap-0.5 px-1.5 py-0">
+          <Badge variant="outline" className="text-[9px] border-emerald-500/40 text-emerald-400 gap-0.5 px-1.5 py-0" title="Verified">
             <CheckCircle2 className="w-2.5 h-2.5" />
             Verified
           </Badge>
         )}
         {rating > 0 && (
-          <span className="flex items-center gap-0.5 text-[10px] text-amber-400">
+          <span className="flex items-center gap-0.5 text-[10px] text-amber-400" aria-label={`Rating ${rating.toFixed(1)} out of 5`}>
             <Star className="w-2.5 h-2.5 fill-amber-400" />
             {rating.toFixed(1)}
             {reviews > 0 && <span className="text-slate-500">({reviews})</span>}
           </span>
         )}
-        {githubRepo && (
-          <Github className="w-3 h-3 text-slate-500" />
-        )}
-        {demoDomain && (
-          <Globe className="w-3 h-3 text-blue-400" />
-        )}
+        {githubRepo && <Github className="w-3 h-3 text-slate-500" aria-hidden />}
+        {demoDomain && <Globe className="w-3 h-3 text-blue-400" aria-hidden />}
       </div>
     );
   }
@@ -65,7 +87,7 @@ export function TrustBadge({
           {isVerified && (
             <Tooltip>
               <TooltipTrigger>
-                <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-400 gap-1 cursor-help">
+                <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-400 gap-1 cursor-help" aria-label="Verified">
                   <Shield className="w-3 h-3" />
                   Verified
                 </Badge>
@@ -76,11 +98,18 @@ export function TrustBadge({
             </Tooltip>
           )}
           {rating > 0 && (
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map(i => (
-                <Star key={i} className={`w-3 h-3 ${i <= Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`} />
+            <div className="flex items-center gap-1" aria-hidden>
+              {[1, 2, 3, 4, 5].map((i) => (
+                // use filled/star color based on rounded rating
+                <Star
+                  key={i}
+                  className={`w-3 h-3 ${i <= Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`}
+                  aria-hidden
+                />
               ))}
-              <span className="text-[10px] text-slate-400 ml-0.5">{rating.toFixed(1)} ({reviews})</span>
+              <span className="text-[10px] text-slate-400 ml-0.5" aria-label={`Rating ${rating.toFixed(1)} from ${reviews} reviews`}>
+                {rating.toFixed(1)} ({reviews})
+              </span>
             </div>
           )}
         </div>
@@ -90,42 +119,42 @@ export function TrustBadge({
 
   // Full variant — for product detail pages
   return (
-    <div className="border border-slate-700/50 rounded-lg p-3 bg-slate-800/30 space-y-2.5">
+    <div className="border border-slate-700/50 rounded-lg p-3 bg-slate-800/30 space-y-2.5" role="region" aria-label="Trust badge">
       <div className="flex items-center gap-2">
-        <Shield className={`w-4 h-4 ${isVerified ? 'text-emerald-400' : 'text-slate-500'}`} />
+        <Shield className={`w-4 h-4 ${isVerified ? 'text-emerald-400' : 'text-slate-500'}`} aria-hidden />
         <span className="text-xs font-medium text-slate-300">Trust Score</span>
-        <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden ml-1">
+        <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden ml-1" aria-hidden>
           <div
             className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all"
             style={{ width: `${Math.min(score, 100)}%` }}
           />
         </div>
-        <span className="text-[10px] text-emerald-400 font-semibold">{score}%</span>
+        <span className="text-[10px] text-emerald-400 font-semibold" aria-label={`Trust score ${score}%`}>{score}%</span>
       </div>
 
       <div className="grid grid-cols-2 gap-2 text-[11px]">
         <div className="flex items-center gap-1.5 text-slate-400">
           <Building2 className="w-3 h-3" />
-          <span className="truncate">{businessName || 'Software Vala'}</span>
+          <span className="truncate" title={businessName || 'Software Vala'}>{businessName || 'Software Vala'}</span>
         </div>
-        {demoDomain && (
+        {cleanDemo && demoHref && (
           <div className="flex items-center gap-1.5 text-blue-400">
             <Globe className="w-3 h-3" />
-            <a href={`https://${demoDomain}`} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
-              {demoDomain}
+            <a href={demoHref} target="_blank" rel="noopener noreferrer" className="truncate hover:underline" title={`Visit ${cleanDemo}`}>
+              {cleanDemo}
             </a>
           </div>
         )}
-        {githubRepo && (
+        {repoHref && (
           <div className="flex items-center gap-1.5 text-slate-400">
             <Github className="w-3 h-3" />
-            <a href={githubRepo} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
+            <a href={repoHref} target="_blank" rel="noopener noreferrer" className="truncate hover:underline" title="Open repository">
               Repository
             </a>
           </div>
         )}
-        <div className="flex items-center gap-1.5">
-          {[1, 2, 3, 4, 5].map(i => (
+        <div className="flex items-center gap-1.5" aria-hidden>
+          {[1, 2, 3, 4, 5].map((i) => (
             <Star key={i} className={`w-3 h-3 ${i <= Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`} />
           ))}
           <span className="text-slate-400">{rating.toFixed(1)} ({reviews})</span>
@@ -140,4 +169,4 @@ export function TrustBadge({
       )}
     </div>
   );
-}
+});
