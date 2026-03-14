@@ -1,264 +1,280 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, ExternalLink, Check, Loader2, Globe } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useDemoTestMode } from '@/contexts/DemoTestModeContext';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  ShoppingCart, Clock, CheckCircle, XCircle, Package, Eye,
+  Calendar, IndianRupee, Loader2, AlertCircle
+} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useAuth } from '@/hooks/useAuth';
+import { marketplaceEnterpriseService } from '@/services/marketplaceEnterpriseService';
+import { toast } from 'sonner';
 
-interface DemoData {
-  id: string;
-  title: string;
-  url: string;
-  description: string | null;
-  category: string;
-  login_url: string | null;
-  status: string;
-}
+const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+  pending: { label: 'Pending', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', icon: Clock },
+  processing: { label: 'Processing', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Package },
+  in_development: { label: 'In Development', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: Package },
+  completed: { label: 'Completed', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle },
+  cancelled: { label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30', icon: XCircle },
+  paid: { label: 'Paid', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle },
+};
 
-interface LoginRole {
-  id: string;
-  role_name: string;
-  username: string;
-  password_encrypted: string;
-}
+const getStatusConfig = (status?: string) =>
+  statusConfig[status ?? ''] || { label: status || 'Unknown', color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', icon: Clock };
 
-const SimpleDemoView = () => {
-  const { demoId } = useParams();
-  const [selectedRole, setSelectedRole] = useState('');
-  const [demo, setDemo] = useState<DemoData | null>(null);
-  const [loginRoles, setLoginRoles] = useState<LoginRole[]>([]);
+export function MMOrdersScreen() {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Demo Test Mode - Check if we should skip restrictions
-  const { isTestMode, shouldShowAnimation } = useDemoTestMode();
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     let mounted = true;
 
-    const fetchDemo = async () => {
-      if (!demoId) {
-        if (mounted) setLoading(false);
-        return;
+    if (!user?.id) {
+      if (mounted) {
+        setOrders([]);
+        setLoading(false);
       }
-      
-      if (mounted) setLoading(true);
+      return () => {
+        mounted = false;
+      };
+    }
 
+    const loadOrders = async () => {
+      if (!mounted) return;
+      setLoading(true);
       try {
-        // In test mode, fetch ALL demos (not just active)
-        // Otherwise only fetch active demos
-        let query = supabase
-          .from('demos')
-          .select('id, title, url, description, category, login_url, status')
-          .eq('id', demoId);
+        const res = await marketplaceEnterpriseService.getUserOrders(user!.id);
 
-        // Only filter by status if NOT in test mode
-        if (!isTestMode) {
-          query = query.eq('status', 'active');
+        // Debug: always log the raw response to help troubleshoot shape issues
+        console.debug('[MMOrdersScreen] getUserOrders response:', res);
+
+        if (!mounted) return;
+
+        // Support multiple service shapes:
+        // - an array (direct)
+        // - { data, error }
+        const error = res?.error ?? null;
+        const data = Array.isArray(res) ? res : res?.data ?? [];
+
+        if (error) {
+          console.error('[MMOrdersScreen] Failed to load orders:', error);
+          toast.error('Failed to load orders: ' + (error?.message ?? 'server error'));
+          setOrders([]);
+        } else {
+          setOrders(Array.isArray(data) ? data : []);
         }
-
-        const { data: demoData, error: demoError } = await query.single();
-        if (demoError) {
-          console.error('Failed to fetch demo:', demoError);
-        } else if (demoData && mounted) {
-          setDemo(demoData);
-        }
-
-        // Fetch login roles for this demo
-        const { data: rolesData, error: rolesError } = await supabase
-          .from('demo_login_roles')
-          .select('id, role_name, username, password_encrypted')
-          .eq('demo_id', demoId)
-          .eq('is_active', true)
-          .order('display_order');
-
-        if (rolesError) {
-          console.error('Failed to fetch demo roles:', rolesError);
-        } else if (rolesData && rolesData.length > 0 && mounted) {
-          setLoginRoles(rolesData);
-          setSelectedRole(rolesData[0].id);
-        }
-      } catch (err) {
-        console.error('Unexpected error fetching demo:', err);
+      } catch (err: any) {
+        if (!mounted) return;
+        console.error('[MMOrdersScreen] Unexpected error loading orders:', err);
+        toast.error('Failed to load orders (unexpected). Check console for details.');
+        setOrders([]);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
-    fetchDemo();
+    loadOrders();
 
     return () => {
       mounted = false;
     };
-  }, [demoId, isTestMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
-  const handleOpenDemo = () => {
-    if (!demo) return;
-    const rawUrl = demo.login_url || demo.url;
-    if (!rawUrl) return;
+  // Memoize derived values to avoid unnecessary recomputations on each render
+  const filteredOrders = useMemo(() => {
+    if (filter === 'all') return orders;
+    return orders.filter(o => (o?.status ?? '') === filter);
+  }, [orders, filter]);
 
-    // normalize url - open in new tab safely
-    const normalized = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl.replace(/^\/+/, '')}`;
+  const stats = useMemo(() => ({
+    total: orders.length,
+    pending: orders.filter(o => (o?.status ?? '') === 'pending').length,
+    inProgress: orders.filter(o => ['processing', 'in_development'].includes(o?.status ?? '')).length,
+    completed: orders.filter(o => (o?.status ?? '') === 'completed').length,
+  }), [orders]);
+
+  const formatDate = (d?: string | null) => {
     try {
-      window.open(normalized, '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      // fallback
-      window.open(normalized, '_blank');
+      return d ? new Date(d).toLocaleDateString() : '-';
+    } catch {
+      return '-';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
-      </div>
-    );
-  }
-
-  if (!demo) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl mb-4">Demo not found</p>
-          <Link to="/demos" className="text-cyan-400 hover:underline">Back to Demos</Link>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      {/* Simple Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/demos" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Back to Demos</span>
-            </Link>
-            {/* Hide login button in test mode - no login required */}
-            {!isTestMode && (
-              <Link to="/login" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors">
-                Login
-              </Link>
-            )}
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <ShoppingCart className="h-6 w-6 text-purple-400" />
+          My Orders
+        </h1>
+        <p className="text-slate-400 mt-1">Track and manage your software orders</p>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardContent className="p-4">
+            <p className="text-xs text-slate-400">Total Orders</p>
+            <p className="text-2xl font-bold">{stats.total}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-amber-500/10 border-amber-500/30">
+          <CardContent className="p-4">
+            <p className="text-xs text-amber-400">Pending</p>
+            <p className="text-2xl font-bold text-amber-400">{stats.pending}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-purple-500/10 border-purple-500/30">
+          <CardContent className="p-4">
+            <p className="text-xs text-purple-400">In Progress</p>
+            <p className="text-2xl font-bold text-purple-400">{stats.inProgress}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-emerald-500/10 border-emerald-500/30">
+          <CardContent className="p-4">
+            <p className="text-xs text-emerald-400">Completed</p>
+            <p className="text-2xl font-bold text-emerald-400">{stats.completed}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex gap-2">
+        {['all', 'pending', 'processing', 'in_development', 'completed', 'cancelled'].map(status => (
+          <Button
+            key={status}
+            variant={filter === status ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter(status)}
+            className={filter === status ? 'bg-purple-500 hover:bg-purple-600' : 'border-slate-700'}
+          >
+            {status === 'all' ? 'All' : getStatusConfig(status).label}
+          </Button>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        {filteredOrders.length === 0 ? (
+          <div className="text-center py-16 text-slate-500">
+            <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p>{orders.length === 0 ? 'No orders yet. Browse the marketplace to get started!' : 'No orders match this filter.'}</p>
           </div>
-        </div>
-      </header>
+        ) : (
+          filteredOrders.map(order => {
+            const sc = getStatusConfig(order?.status);
+            const StatusIcon = sc.icon;
+            const items = Array.isArray(order?.marketplace_order_items) ? order.marketplace_order_items : [];
 
-      <main className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
-        {/* Demo Header - Minimal animation in test mode */}
-        <div
-          className={`text-center mb-10 ${shouldShowAnimation ? (shouldShowAnimation() ? 'animate-fade-in' : '') : ''}`}
-        >
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3">{demo.title}</h1>
-          <p className="text-slate-400 text-lg">{demo.description || demo.category}</p>
-        </div>
-
-        {/* Demo Preview Card */}
-        <div
-          className={`bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-8 ${shouldShowAnimation ? (shouldShowAnimation() ? 'animate-fade-in' : '') : ''}`}
-        >
-          {/* Demo Preview Image */}
-          <div className="aspect-video bg-slate-800 relative">
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-500/10 to-blue-600/10">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Play className="w-10 h-10 text-cyan-400" />
-                </div>
-                <p className="text-slate-400">Live demo preview</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {/* Demo URL Display */}
-            <div className="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
-              <div className="flex items-center gap-2 mb-2">
-                <Globe className="w-4 h-4 text-cyan-400" />
-                <span className="text-sm font-medium text-slate-300">Demo URL</span>
-              </div>
-              <p className="text-cyan-400 text-sm break-all">{demo.url}</p>
-              {demo.login_url && demo.login_url !== demo.url && (
-                <p className="text-slate-400 text-xs mt-2">Login: {demo.login_url}</p>
-              )}
-            </div>
-
-            {/* Role Selector - Always available, no approval needed in test mode */}
-            {loginRoles.length > 1 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-slate-400 mb-3">Select Role to View</h3>
-                <div className="grid grid-cols-3 gap-3">
-                  {loginRoles.map((role) => (
-                    <button
-                      key={role.id}
-                      onClick={() => setSelectedRole(role.id)}
-                      className={`p-4 rounded-xl border text-left transition-all ${
-                        selectedRole === role.id
-                          ? 'bg-cyan-500/10 border-cyan-500'
-                          : 'bg-slate-800/50 border-slate-700 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        {selectedRole === role.id && <Check className="w-4 h-4 text-cyan-400" />}
-                        <span className="font-semibold">{role.role_name}</span>
+            return (
+              <Card key={order?.id ?? order?.order_number} className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-slate-700">
+                        <Package className="h-6 w-6 text-purple-400" />
                       </div>
-                      <p className="text-xs text-slate-400">User: {role.username}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                      <div>
+                        <h3 className="font-semibold">
+                          {items.length > 0 ? items.map((i: any) => i?.product_name ?? 'Unnamed').join(', ') : 'Order'}
+                        </h3>
+                        <p className="text-sm text-slate-400">{order?.order_number ?? '-'}</p>
+                      </div>
+                    </div>
 
-            {/* Single Open Demo Button - Direct access, no popups */}
-            <button
-              onClick={handleOpenDemo}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-lg font-bold hover:from-cyan-400 hover:to-blue-500 transition-all shadow-[0_0_30px_rgba(6,182,212,0.3)]"
-            >
-              <ExternalLink className="w-5 h-5" />
-              Open Demo
-            </button>
-          </div>
-        </div>
+                    <div className="flex items-center gap-6">
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-lg font-bold">
+                          <IndianRupee className="h-4 w-4" />
+                          {Number(order?.final_amount ?? 0).toLocaleString()}
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-slate-400">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(order?.created_at)}
+                        </div>
+                      </div>
 
-        {/* Category & Actions */}
-        <div className="grid sm:grid-cols-2 gap-6">
-          {/* Demo Info */}
-          <div
-            className={`bg-slate-900 border border-slate-800 rounded-xl p-6 ${shouldShowAnimation ? (shouldShowAnimation() ? 'animate-fade-in' : '') : ''}`}
-          >
-            <h3 className="text-lg font-semibold mb-4">Demo Details</h3>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-slate-300">
-                <Check className="w-4 h-4 text-cyan-400" />
-                Category: {demo.category}
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <Check className="w-4 h-4 text-cyan-400" />
-                Live demo access
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <Check className="w-4 h-4 text-cyan-400" />
-                {loginRoles.length > 0 ? `${loginRoles.length} login role(s)` : 'Direct access'}
-              </li>
-            </ul>
-          </div>
+                      <Badge className={sc.color}>
+                        <StatusIcon className="h-3 w-3 mr-1" />
+                        {sc.label}
+                      </Badge>
 
-          {/* Actions - Only show purchase option if not in test mode for real purchases */}
-          <div
-            className={`bg-slate-900 border border-slate-800 rounded-xl p-6 ${shouldShowAnimation ? (shouldShowAnimation() ? 'animate-fade-in' : '') : ''}`}
-          >
-            <h3 className="text-lg font-semibold mb-4">Interested?</h3>
-            <p className="text-slate-400 text-sm mb-4">Try the demo first, then purchase if you like it.</p>
-            <Link
-              to={`/checkout/${demo.id}`}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-400 rounded-lg font-semibold transition-colors"
-            >
-              Buy Now
-            </Link>
-          </div>
-        </div>
-      </main>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          {/* native button ensures DialogTrigger can attach refs reliably */}
+                          <button
+                            type="button"
+                            aria-label={`View order ${order?.order_number ?? ''}`}
+                            className="inline-flex items-center justify-center px-2 py-1 border rounded text-sm border-slate-600 bg-transparent hover:bg-slate-800"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-900 border-slate-700">
+                          <DialogHeader>
+                            <DialogTitle>Order Details — {order?.order_number ?? '-'}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 mt-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-xs text-slate-400">Total Amount</p>
+                                <p className="font-medium">₹{Number(order?.total_amount ?? 0).toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-slate-400">Discount</p>
+                                <p className="font-medium text-emerald-400">-₹{Number(order?.discount_amount ?? 0).toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-slate-400">Final Amount</p>
+                                <p className="font-medium text-cyan-400">₹{Number(order?.final_amount ?? 0).toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-slate-400">Payment Status</p>
+                                <Badge className={getStatusConfig(order?.payment_status ?? '').color}>
+                                  {order?.payment_status ?? 'unknown'}
+                                </Badge>
+                              </div>
+                            </div>
+                            {items.length > 0 && (
+                              <div>
+                                <p className="text-xs text-slate-400 mb-2">Items</p>
+                                <div className="space-y-2">
+                                  {items.map((item: any, idx: number) => (
+                                    <div key={item?.id ?? `${item?.product_name ?? 'item'}-${idx}`} className="flex justify-between p-2 rounded bg-slate-800 border border-slate-700">
+                                      <span className="text-sm">{item?.product_name ?? 'Unnamed'}</span>
+                                      <span className="text-sm font-medium">₹{Number(item?.total_price ?? 0).toLocaleString()}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {order?.requirements && (
+                              <div>
+                                <p className="text-xs text-slate-400 mb-1">Requirements</p>
+                                <p className="text-sm p-3 rounded-lg bg-slate-800 border border-slate-700">{order.requirements}</p>
+                              </div>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
+      </div>
     </div>
   );
-};
-
-export default SimpleDemoView;
+}
