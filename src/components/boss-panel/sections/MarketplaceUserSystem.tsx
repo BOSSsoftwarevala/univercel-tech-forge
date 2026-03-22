@@ -19,7 +19,7 @@ type PendingItem = {
   raw: RawRow;
 };
 
-export default function MarketplaceUserSystem(): JSX.Element {
+export function MarketplaceUserSystem(): JSX.Element {
   const [processingIds, setProcessingIds] = useState<Record<string, boolean>>({});
   const queryClient = useQueryClient();
 

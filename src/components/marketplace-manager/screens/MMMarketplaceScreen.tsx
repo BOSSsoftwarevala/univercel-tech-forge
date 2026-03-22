@@ -17,8 +17,8 @@ import { toast } from 'sonner';
 import { ProductSEOHead } from '@/components/seo/ProductSEOHead';
 
 // Virtualization imports
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List } from 'react-window';
+import { AutoSizer } from 'react-virtualized-auto-sizer';
+import { List } from 'react-window';
 
 interface Product {
   product_id: string;
