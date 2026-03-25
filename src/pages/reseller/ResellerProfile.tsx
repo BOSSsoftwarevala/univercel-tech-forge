@@ -213,4 +213,3 @@ export default function ResellerProfile() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\reseller\ResellerProfile.tsx

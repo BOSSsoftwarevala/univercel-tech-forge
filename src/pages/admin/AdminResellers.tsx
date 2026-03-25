@@ -260,4 +260,3 @@ export default function AdminResellers() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\admin\AdminResellers.tsx

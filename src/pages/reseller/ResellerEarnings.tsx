@@ -335,4 +335,3 @@ export default function ResellerEarnings() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\reseller\ResellerEarnings.tsx

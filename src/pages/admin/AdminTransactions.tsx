@@ -214,4 +214,3 @@ export default function AdminTransactions() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\admin\AdminTransactions.tsx

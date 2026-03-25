@@ -326,4 +326,3 @@ export default function ResellerOrders() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\reseller\ResellerOrders.tsx

@@ -166,4 +166,3 @@ export default function AdminSettings() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\admin\AdminSettings.tsx

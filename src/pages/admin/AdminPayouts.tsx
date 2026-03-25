@@ -229,4 +229,3 @@ export default function AdminPayouts() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\admin\AdminPayouts.tsx

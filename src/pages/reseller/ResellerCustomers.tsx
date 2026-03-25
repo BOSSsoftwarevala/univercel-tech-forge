@@ -387,4 +387,3 @@ export default function ResellerCustomers() {
     </div>
   );
 }
-<parameter name="filePath">c:\Users\dell\softwarewalanet\src\pages\reseller\ResellerCustomers.tsx
