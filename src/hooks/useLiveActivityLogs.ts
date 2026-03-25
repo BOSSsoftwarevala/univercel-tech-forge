@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
@@ -242,19 +242,10 @@ export function useLiveActivityLogs(options: UseLiveActivityLogsOptions = {}) {
     };
   }, [user, userRole, limit]);
 
-  // Auto-refresh for live mode
-  useEffect(() => {
-    if (dateFilter !== 'live') return;
+  // Real-time subscriptions (set up above) already push updates for live mode.
+  // A polling fallback is not needed and would create redundant API traffic.
 
-    const interval = setInterval(() => {
-      fetchLogs();
-      fetchOnlineUsers();
-    }, 5000); // Refresh every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [dateFilter, fetchLogs, fetchOnlineUsers]);
-
-  const stats = {
+  const stats = useMemo(() => ({
     totalLogs: logs.length,
     successCount: logs.filter(l => l.status === 'success').length,
     failCount: logs.filter(l => l.status === 'fail').length,
@@ -264,7 +255,7 @@ export function useLiveActivityLogs(options: UseLiveActivityLogsOptions = {}) {
     offlineCount: onlineUsers.filter(u => !u.is_online).length,
     pendingCount: onlineUsers.filter(u => u.pending_approval).length,
     forceLoggedOutCount: onlineUsers.filter(u => u.force_logged_out).length,
-  };
+  }), [logs, onlineUsers]);
 
   return {
     logs,

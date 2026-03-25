@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, Users, Plus, Edit, Trash2, Check, X, Eye, Lock, 
@@ -380,16 +380,19 @@ const RoleManagerComplete = () => {
     hierarchyLevel: 30,
   });
 
-  const filteredRoles = roles.filter(role => {
-    const matchesSearch = role.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         role.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesScope = scopeFilter === 'all' || role.scopeLevel === scopeFilter;
-    return matchesSearch && matchesScope;
-  });
+  const filteredRoles = useMemo(() => {
+    const lowerQuery = searchQuery.toLowerCase();
+    return roles.filter(role => {
+      const matchesSearch = role.displayName.toLowerCase().includes(lowerQuery) ||
+                           role.name.toLowerCase().includes(lowerQuery);
+      const matchesScope = scopeFilter === 'all' || role.scopeLevel === scopeFilter;
+      return matchesSearch && matchesScope;
+    });
+  }, [roles, searchQuery, scopeFilter]);
 
-  const pendingApprovals = approvals.filter(a => a.status === 'pending');
-  const currentRole = roles.find(r => r.id === selectedRole);
-  const currentPermissions = permissionMatrix[selectedRole] || {};
+  const pendingApprovals = useMemo(() => approvals.filter(a => a.status === 'pending'), [approvals]);
+  const currentRole = useMemo(() => roles.find(r => r.id === selectedRole), [roles, selectedRole]);
+  const currentPermissions = useMemo(() => permissionMatrix[selectedRole] || {}, [permissionMatrix, selectedRole]);
   const isSuperAdminSelected = currentRole?.isSuperAdmin;
 
   // Count granted permissions for a role
