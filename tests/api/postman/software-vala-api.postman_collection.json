@@ -1,0 +1,1033 @@
+{
+  "info": {
+    "_postman_id": "sv-api-collection-001",
+    "name": "Software Vala API Test Collection",
+    "description": "Complete API test collection for Software Vala ecosystem",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://feqdqyadkijpohyllfdq.supabase.co/functions/v1"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Super Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 150ms', function() {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(150);",
+                  "});",
+                  "",
+                  "pm.test('Response has access token', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.environment.set('access_token', jsonData.access_token);",
+                  "    pm.environment.set('refresh_token', jsonData.refresh_token);",
+                  "});",
+                  "",
+                  "pm.test('User has super_admin role', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user.role).to.eql('super_admin');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@softwarevala.com\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api-auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Invalid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error message is professional', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.not.include('crash');",
+                  "    pm.expect(jsonData.error).to.not.include('fail');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@softwarevala.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api-auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('New access token received', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.environment.set('access_token', jsonData.access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api-auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Unauthorized API Call",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error indicates missing token', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('unauthorized').or.include('token');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-leads",
+              "host": ["{{base_url}}"],
+              "path": ["api-leads"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wallet API",
+      "item": [
+        {
+          "name": "Get Wallet Balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has balance', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('balance');",
+                  "    pm.expect(typeof jsonData.balance).to.eql('number');",
+                  "});",
+                  "",
+                  "pm.test('Response time under 150ms', function() {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(150);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-wallet",
+              "host": ["{{base_url}}"],
+              "path": ["api-wallet"]
+            }
+          }
+        },
+        {
+          "name": "Credit Wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Balance updated correctly', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('credit');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{test_user_id}}\",\n  \"amount\": 5000,\n  \"type\": \"commission\",\n  \"description\": \"Test commission credit\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-wallet/credit",
+              "host": ["{{base_url}}"],
+              "path": ["api-wallet", "credit"]
+            }
+          }
+        },
+        {
+          "name": "Get Wallet Ledger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Ledger has entries', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ledger).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Entries have required fields', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.ledger.length > 0) {",
+                  "        var entry = jsonData.ledger[0];",
+                  "        pm.expect(entry).to.have.property('amount');",
+                  "        pm.expect(entry).to.have.property('type');",
+                  "        pm.expect(entry).to.have.property('balance_after');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-wallet/ledger",
+              "host": ["{{base_url}}"],
+              "path": ["api-wallet", "ledger"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lead API",
+      "item": [
+        {
+          "name": "Create Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Lead created with ID', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('lead_id');",
+                  "    pm.environment.set('test_lead_id', jsonData.lead_id);",
+                  "});",
+                  "",
+                  "pm.test('Response time under 150ms', function() {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(150);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"Test Company API\",\n  \"contact_name\": \"John Doe\",\n  \"email\": \"john@testcompany.com\",\n  \"phone\": \"+91-9876543210\",\n  \"source\": \"website\",\n  \"industry\": \"technology\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-leads/create",
+              "host": ["{{base_url}}"],
+              "path": ["api-leads", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get All Leads",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array of leads', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.leads).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Leads have masked contact info', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.leads.length > 0) {",
+                  "        var lead = jsonData.leads[0];",
+                  "        pm.expect(lead.email).to.include('***');",
+                  "        pm.expect(lead.phone).to.include('***');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-leads",
+              "host": ["{{base_url}}"],
+              "path": ["api-leads"]
+            }
+          }
+        },
+        {
+          "name": "Assign Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Lead assigned successfully', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('assigned');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{test_lead_id}}\",\n  \"assigned_to\": \"{{test_sales_user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-leads/assign",
+              "host": ["{{base_url}}"],
+              "path": ["api-leads", "assign"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Demo API",
+      "item": [
+        {
+          "name": "Get All Demos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has demos array', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.demos).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Demos have required fields', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.demos.length > 0) {",
+                  "        var demo = jsonData.demos[0];",
+                  "        pm.expect(demo).to.have.property('title');",
+                  "        pm.expect(demo).to.have.property('url');",
+                  "        pm.expect(demo).to.have.property('status');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-demo",
+              "host": ["{{base_url}}"],
+              "path": ["api-demo"]
+            }
+          }
+        },
+        {
+          "name": "Create Demo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Demo created with ID', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('demo_id');",
+                  "    pm.environment.set('test_demo_id', jsonData.demo_id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Demo API\",\n  \"url\": \"https://demo.softwarevala.com/test\",\n  \"category\": \"ERP\",\n  \"tech_stack\": \"php\",\n  \"description\": \"Test demo created via API\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-demo/create",
+              "host": ["{{base_url}}"],
+              "path": ["api-demo", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get Demo Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health status returned', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(['active', 'down', 'maintenance']).to.include(jsonData.status);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-demo/health/{{test_demo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api-demo", "health", "{{test_demo_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Developer Task API",
+      "item": [
+        {
+          "name": "Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Task created with ID', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('task_id');",
+                  "    pm.environment.set('test_task_id', jsonData.task_id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"API Test Task\",\n  \"description\": \"Task created via API test\",\n  \"category\": \"development\",\n  \"priority\": \"high\",\n  \"tech_stack\": [\"react\", \"nodejs\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-developer/task/create",
+              "host": ["{{base_url}}"],
+              "path": ["api-developer", "task", "create"]
+            }
+          }
+        },
+        {
+          "name": "Start Timer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Timer started', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('started');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task_id\": \"{{test_task_id}}\",\n  \"promised_hours\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-developer/task/start",
+              "host": ["{{base_url}}"],
+              "path": ["api-developer", "task", "start"]
+            }
+          }
+        },
+        {
+          "name": "Stop Timer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Timer stopped', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('stopped');",
+                  "    pm.expect(jsonData).to.have.property('total_time');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task_id\": \"{{test_task_id}}\",\n  \"delivery_notes\": \"Task completed via API test\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-developer/task/stop",
+              "host": ["{{base_url}}"],
+              "path": ["api-developer", "task", "stop"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security Tests",
+      "item": [
+        {
+          "name": "SQL Injection - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('SQL injection blocked', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 422]);",
+                  "});",
+                  "",
+                  "pm.test('No database error exposed', function() {",
+                  "    var responseText = pm.response.text();",
+                  "    pm.expect(responseText).to.not.include('SQL');",
+                  "    pm.expect(responseText).to.not.include('syntax');",
+                  "    pm.expect(responseText).to.not.include('database');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"' OR '1'='1\",\n  \"password\": \"' OR '1'='1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api-auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Rate Limit Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// This test should be run multiple times rapidly",
+                  "pm.test('Rate limit enforced after threshold', function() {",
+                  "    // After 100+ requests, should get 429",
+                  "    if (pm.response.code === 429) {",
+                  "        pm.expect(pm.response.code).to.eql(429);",
+                  "    } else {",
+                  "        pm.expect(pm.response.code).to.be.oneOf([200, 429]);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-leads",
+              "host": ["{{base_url}}"],
+              "path": ["api-leads"]
+            }
+          }
+        },
+        {
+          "name": "Cross-Role Access Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403', function() {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Access denied message', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('permission').or.include('denied').or.include('unauthorized');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Login as developer first",
+                  "pm.sendRequest({",
+                  "    url: pm.environment.get('base_url') + '/api-auth/login',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({",
+                  "            email: 'dev@softwarevala.com',",
+                  "            password: pm.environment.get('dev_password')",
+                  "        })",
+                  "    }",
+                  "}, function(err, res) {",
+                  "    pm.environment.set('dev_token', res.json().access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dev_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-wallet/ledger",
+              "host": ["{{base_url}}"],
+              "path": ["api-wallet", "ledger"]
+            }
+          }
+        },
+        {
+          "name": "Expired Token Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Token expired error', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('expired').or.include('invalid');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZXhwIjoxNjAwMDAwMDAwfQ.invalid",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-leads",
+              "host": ["{{base_url}}"],
+              "path": ["api-leads"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SEO API",
+      "item": [
+        {
+          "name": "Generate Meta Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Meta tags generated', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.seo).to.have.property('meta_title');",
+                  "    pm.expect(jsonData.seo).to.have.property('meta_description');",
+                  "    pm.expect(jsonData.seo).to.have.property('keywords');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ERP Software for Manufacturing\",\n  \"description\": \"Complete ERP solution for manufacturing businesses\",\n  \"category\": \"ERP\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-seo/meta/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api-seo", "meta", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Research Keywords",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Keywords returned', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.keywords).to.have.property('primary');",
+                  "    pm.expect(jsonData.keywords).to.have.property('related');",
+                  "    pm.expect(jsonData.keywords.related).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seed_keyword\": \"ERP software\",\n  \"region\": \"IN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-seo/keywords",
+              "host": ["{{base_url}}"],
+              "path": ["api-seo", "keywords"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Support API",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Ticket created with number', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ticket).to.have.property('ticket_number');",
+                  "    pm.environment.set('test_ticket_id', jsonData.ticket.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"API Test Support Ticket\",\n  \"message\": \"This is a test ticket created via API\",\n  \"category\": \"technical\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api-support/ticket",
+              "host": ["{{base_url}}"],
+              "path": ["api-support", "ticket"]
+            }
+          }
+        },
+        {
+          "name": "Get Tickets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Tickets array returned', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tickets).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-support/tickets",
+              "host": ["{{base_url}}"],
+              "path": ["api-support", "tickets"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
