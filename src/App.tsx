@@ -1,4 +1,5 @@
 import React from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { AppRoutes } from "./routes/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
 import InfluencerCommandCenter from "@/pages/InfluencerCommandCenter";
@@ -822,6 +823,7 @@ const App = () => (
         </AnimationProvider>
       </DemoTestModeProvider>
     </AuthProvider>
+    <Analytics />
   </QueryClientProvider>
 );
 
