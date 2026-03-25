@@ -744,6 +744,316 @@ async function listCollection(supabaseAdmin: any, table: string, url: URL, order
   };
 }
 
+type BriefingPriority = 'critical' | 'high' | 'medium' | 'low';
+
+function riskToBriefingPriority(risk: string): BriefingPriority {
+  switch (risk) {
+    case 'critical': return 'critical';
+    case 'high': return 'high';
+    case 'medium': return 'medium';
+    default: return 'low';
+  }
+}
+
+// ── Secretary: build briefing ─────────────────────────────────────────────────
+  const now = new Date();
+  const hourUtc = now.getUTCHours();
+  const period: 'morning' | 'afternoon' | 'evening' | 'overnight' =
+    hourUtc < 6 ? 'overnight' : hourUtc < 12 ? 'morning' : hourUtc < 18 ? 'afternoon' : 'evening';
+
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+
+  const [alertsResult, tasksResult, aiActionsResult, eventsResult, dealsResult] = await Promise.all([
+    supabaseAdmin
+      .from('alerts')
+      .select('id, severity, type, title, message, approval_required, created_at, source_module')
+      .is('deleted_at', null)
+      .in('status', ['open', 'acknowledged'])
+      .order('created_at', { ascending: false })
+      .limit(30),
+    supabaseAdmin
+      .from('tasks')
+      .select('task_id, title, description, status, priority, due_at, entity_type, created_at')
+      .is('deleted_at', null)
+      .not('status', 'in', '("done","completed","cancelled")')
+      .order('created_at', { ascending: false })
+      .limit(20),
+    supabaseAdmin
+      .from('ai_actions')
+      .select('id, intent, risk, status, approval_required, created_at')
+      .in('status', ['approval_required', 'pending'])
+      .order('created_at', { ascending: false })
+      .limit(15),
+    supabaseAdmin
+      .from('system_events')
+      .select('id, event_type, source_module, target_module, severity, title, description, requires_action, created_at')
+      .gte('created_at', yesterday)
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabaseAdmin
+      .from('deals')
+      .select('id, stage, status, summary, updated_at')
+      .is('deleted_at', null)
+      .not('status', 'in', '("won","lost","archived")')
+      .limit(10),
+  ]);
+
+  const alerts: any[] = alertsResult.data || [];
+  const tasks: any[] = tasksResult.data || [];
+  const aiActions: any[] = aiActionsResult.data || [];
+  const events: any[] = eventsResult.data || [];
+  const deals: any[] = dealsResult.data || [];
+
+  // Build urgent items from critical alerts + high-priority tasks
+  const urgentItems = [
+    ...alerts
+      .filter((a: any) => ['critical', 'emergency'].includes(a.severity))
+      .slice(0, 5)
+      .map((a: any) => ({
+        id: a.id,
+        priority: a.severity === 'emergency' ? 'critical' : 'high' as const,
+        module: a.source_module || 'system',
+        title: a.title || a.type,
+        detail: a.message || 'No detail available.',
+        actionRequired: Boolean(a.approval_required),
+      })),
+    ...tasks
+      .filter((t: any) => t.priority === 'critical')
+      .slice(0, 3)
+      .map((t: any) => ({
+        id: t.task_id,
+        priority: 'critical' as const,
+        module: t.entity_type || 'task_manager',
+        title: t.title || 'Untitled task',
+        detail: t.description || 'No description.',
+        actionRequired: true,
+        dueAt: t.due_at || undefined,
+      })),
+  ].slice(0, 8);
+
+  // Pending decisions from AI actions requiring approval
+  const pendingDecisions = aiActions.map((a: any) => ({
+    id: a.id,
+    priority: riskToBriefingPriority(a.risk),
+    module: 'ceo_dashboard',
+    title: a.intent || 'Pending AI Action',
+    detail: `Risk level: ${a.risk}. Status: ${a.status}.`,
+    actionRequired: Boolean(a.approval_required),
+  }));
+
+  // Module updates from events
+  const modulesSeen = new Set<string>();
+  const moduleUpdates: any[] = [];
+  for (const ev of events) {
+    const mod = ev.source_module || 'api_layer';
+    if (!modulesSeen.has(mod)) {
+      modulesSeen.add(mod);
+      moduleUpdates.push({
+        module: mod,
+        status: ev.severity === 'critical' ? 'error' : 'active',
+        lastActivity: ev.created_at,
+        summary: ev.title || ev.event_type || 'Recent activity recorded',
+      });
+    }
+    if (moduleUpdates.length >= 12) break;
+  }
+
+  // Scheduled actions from pending tasks with due dates
+  const scheduledActions = tasks
+    .filter((t: any) => t.due_at)
+    .slice(0, 8)
+    .map((t: any) => ({
+      id: t.task_id,
+      title: t.title || 'Scheduled task',
+      module: t.entity_type || 'task_manager',
+      scheduledFor: t.due_at,
+      status: t.status === 'in_progress' ? 'executing' : t.status === 'done' ? 'done' : 'pending',
+    }));
+
+  // Summary text
+  const criticalCount = urgentItems.filter((i: any) => i.priority === 'critical').length;
+  const summary = [
+    `System briefing for ${period}.`,
+    criticalCount > 0 ? `There are ${criticalCount} critical items requiring immediate attention.` : 'No critical items at this time.',
+    pendingDecisions.length > 0 ? `${pendingDecisions.length} AI action(s) are waiting for approval.` : '',
+    deals.length > 0 ? `${deals.length} active deal(s) in progress.` : '',
+    `${moduleUpdates.length} module(s) reported activity in the last 24 hours.`,
+  ].filter(Boolean).join(' ');
+
+  return {
+    id: `briefing-${Date.now()}`,
+    generatedAt: now.toISOString(),
+    period,
+    summary,
+    urgentItems,
+    pendingDecisions,
+    moduleUpdates,
+    scheduledActions,
+  };
+}
+
+// ── Spy: build surveillance report ────────────────────────────────────────────
+async function buildSurveillanceReport(supabaseAdmin: any) {
+  const now = new Date();
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+
+  const [healthResult, alertsResult, actionsResult, eventsResult] = await Promise.all([
+    supabaseAdmin
+      .from('system_health')
+      .select('service, status, error_rate, latency, uptime, timestamp')
+      .order('timestamp', { ascending: false })
+      .limit(200),
+    supabaseAdmin
+      .from('alerts')
+      .select('id, severity, type, title, message, source_module, status, created_at')
+      .is('deleted_at', null)
+      .gte('created_at', oneDayAgo)
+      .order('created_at', { ascending: false })
+      .limit(100),
+    supabaseAdmin
+      .from('actions_log')
+      .select('id, action, status, module, created_at')
+      .gte('created_at', oneDayAgo)
+      .order('created_at', { ascending: false })
+      .limit(500),
+    supabaseAdmin
+      .from('system_events')
+      .select('id, event_type, source_module, severity, title, description, created_at')
+      .gte('created_at', oneDayAgo)
+      .order('created_at', { ascending: false })
+      .limit(200),
+  ]);
+
+  const healthRows: any[] = healthResult.data || [];
+  const alertRows: any[] = alertsResult.data || [];
+  const actionRows: any[] = actionsResult.data || [];
+  const eventRows: any[] = eventsResult.data || [];
+
+  // Detect anomalies from health metrics and alerts
+  const anomaliesDetected: any[] = [];
+
+  // Error surge: high error rate in health metrics
+  const recentHealth = healthRows.filter((h: any) => h.timestamp >= oneHourAgo);
+  const serviceErrorRates: Record<string, number[]> = {};
+  for (const row of recentHealth) {
+    const svc = row.service || 'unknown';
+    if (!serviceErrorRates[svc]) serviceErrorRates[svc] = [];
+    serviceErrorRates[svc].push(Number(row.error_rate || 0));
+  }
+  for (const [svc, rates] of Object.entries(serviceErrorRates)) {
+    const avg = rates.reduce((s, r) => s + r, 0) / rates.length;
+    if (avg > 0.05) {
+      anomaliesDetected.push({
+        id: `anomaly-error-${svc}`,
+        module: svc,
+        type: 'error_surge',
+        severity: avg > 0.2 ? 'critical' : avg > 0.1 ? 'high' : 'medium',
+        description: `Average error rate of ${(avg * 100).toFixed(1)}% detected over the last hour.`,
+        detectedAt: now.toISOString(),
+        resolved: false,
+      });
+    }
+  }
+
+  // Latency spikes
+  const serviceLatencies: Record<string, number[]> = {};
+  for (const row of recentHealth) {
+    const svc = row.service || 'unknown';
+    if (!serviceLatencies[svc]) serviceLatencies[svc] = [];
+    if (row.latency != null) serviceLatencies[svc].push(Number(row.latency));
+  }
+  for (const [svc, latencies] of Object.entries(serviceLatencies)) {
+    if (latencies.length === 0) continue;
+    const avg = latencies.reduce((s, l) => s + l, 0) / latencies.length;
+    if (avg > 2000) {
+      anomaliesDetected.push({
+        id: `anomaly-latency-${svc}`,
+        module: svc,
+        type: 'latency_spike',
+        severity: avg > 5000 ? 'high' : 'medium',
+        description: `Average latency of ${Math.round(avg)}ms detected.`,
+        detectedAt: now.toISOString(),
+        resolved: false,
+      });
+    }
+  }
+
+  // Auth failures from alerts
+  const authAlerts = alertRows.filter((a: any) => a.type === 'auth_failure' || String(a.title || '').toLowerCase().includes('auth'));
+  for (const alert of authAlerts.slice(0, 3)) {
+    anomaliesDetected.push({
+      id: `anomaly-auth-${alert.id}`,
+      module: alert.source_module || 'security_layer',
+      type: 'auth_failure',
+      severity: alert.severity || 'medium',
+      description: alert.message || alert.title || 'Authentication failure detected.',
+      detectedAt: alert.created_at,
+      resolved: ['resolved', 'dismissed'].includes(alert.status),
+    });
+  }
+
+  // Activity summary per module from actions
+  const moduleActivity: Record<string, { last1h: number; last24h: number; failed: number; total: number; actions: Set<string> }> = {};
+  for (const action of actionRows) {
+    const mod = action.module || 'api_layer';
+    if (!moduleActivity[mod]) moduleActivity[mod] = { last1h: 0, last24h: 0, failed: 0, total: 0, actions: new Set() };
+    moduleActivity[mod].total++;
+    moduleActivity[mod].last24h++;
+    if (action.created_at >= oneHourAgo) moduleActivity[mod].last1h++;
+    if (action.status === 'failed') moduleActivity[mod].failed++;
+    if (action.action) moduleActivity[mod].actions.add(String(action.action).split('.').pop() || action.action);
+  }
+
+  const activitySummary = Object.entries(moduleActivity).map(([mod, stats]) => ({
+    module: mod,
+    actionsLast1h: stats.last1h,
+    actionsLast24h: stats.last24h,
+    failureRate: stats.total > 0 ? stats.failed / stats.total : 0,
+    topActions: Array.from(stats.actions).slice(0, 5),
+  }));
+
+  // Security flags from critical / emergency alerts
+  const securityFlags = alertRows
+    .filter((a: any) => ['critical', 'emergency'].includes(a.severity) && !['resolved', 'dismissed'].includes(a.status))
+    .slice(0, 10)
+    .map((a: any) => ({
+      id: `flag-${a.id}`,
+      module: a.source_module || 'security_layer',
+      flag: a.title || a.type || 'Security alert',
+      severity: a.severity,
+      details: a.message || 'No additional details.',
+      flaggedAt: a.created_at,
+      requiresBossApproval: a.severity === 'emergency',
+    }));
+
+  // Determine top anomaly modules
+  const moduleCounts: Record<string, number> = {};
+  for (const a of anomaliesDetected) {
+    moduleCounts[a.module] = (moduleCounts[a.module] || 0) + 1;
+  }
+  const topAnomalyModules = Object.entries(moduleCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([mod]) => mod);
+
+  // Overall threat level
+  const criticalAnomalies = anomaliesDetected.filter((a: any) => a.severity === 'critical').length;
+  const highAnomalies = anomaliesDetected.filter((a: any) => a.severity === 'high').length;
+  const overallThreatLevel: 'low' | 'medium' | 'high' | 'critical' =
+    criticalAnomalies > 0 ? 'critical' : highAnomalies > 2 ? 'high' : anomaliesDetected.length > 5 ? 'medium' : 'low';
+
+  return {
+    generatedAt: now.toISOString(),
+    anomaliesDetected: anomaliesDetected.slice(0, 20),
+    activitySummary: activitySummary.slice(0, 20),
+    topAnomalyModules,
+    overallThreatLevel,
+    securityFlags,
+  };
+}
+
+
 Deno.serve(async (req) => {
   const url = new URL(req.url);
   const path = url.pathname.replace('/api-ceo', '');
@@ -941,6 +1251,53 @@ Deno.serve(async (req) => {
       });
       return jsonResponse(response.data);
     }, { module: 'ceo_mission_control', action: 'server_restart', skipKYC: true, skipSubscription: true, skipIPLock: true, rateLimitType: 'admin_action' });
+  }
+
+  // ── Secretary: generate briefing ─────────────────────────────────────────
+  if (method === 'GET' && path === '/secretary/briefing') {
+    return withAuth(req, ['boss_owner', 'ceo', 'admin'], async ({ supabaseAdmin }) => {
+      const briefing = await buildSecretaryBriefing(supabaseAdmin);
+      return jsonResponse({ briefing });
+    }, { module: 'ceo_secretary', action: 'generate_briefing', skipKYC: true, skipSubscription: true, skipIPLock: true });
+  }
+
+  // ── Spy: run surveillance ─────────────────────────────────────────────────
+  if (method === 'GET' && path === '/spy/surveillance') {
+    return withAuth(req, ['boss_owner', 'ceo', 'admin'], async ({ supabaseAdmin }) => {
+      const report = await buildSurveillanceReport(supabaseAdmin);
+      return jsonResponse({ report });
+    }, { module: 'ceo_spy', action: 'surveillance_scan', skipKYC: true, skipSubscription: true, skipIPLock: true });
+  }
+
+  // ── Module action trigger ─────────────────────────────────────────────────
+  if (method === 'POST' && path === '/module/action') {
+    return withAuth(req, ['boss_owner', 'ceo', 'admin'], async ({ supabaseAdmin, user, body }) => {
+      const moduleId = String(body?.module ?? '');
+      const action = String(body?.action ?? '');
+      const payload = (body?.payload ?? {}) as Record<string, unknown>;
+
+      if (!moduleId || !action) {
+        return errorResponse('module and action are required', 400);
+      }
+
+      await insertEvent(
+        supabaseAdmin,
+        'module_action_triggered',
+        { module: moduleId, action, payload, triggered_by: user.userId },
+        moduleId,
+        null,
+        user.userId,
+      );
+
+      await createAuditLog(supabaseAdmin, {
+        userId: user.userId,
+        action: `module_action:${moduleId}:${action}`,
+        module: 'ceo_mission_control',
+        details: { module: moduleId, action, payload },
+      });
+
+      return jsonResponse({ status: 'triggered', module: moduleId, action });
+    }, { module: 'ceo_mission_control', action: 'module_action', skipKYC: true, skipSubscription: true, skipIPLock: true, rateLimitType: 'admin_action' });
   }
 
   return errorResponse('Not found', 404);
