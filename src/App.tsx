@@ -373,7 +373,7 @@ const App = () => (
                           <FloatingAIChatbotWrapper />
                           <Routes>
                           {/* Public Routes - No login required */}
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Navigate to="/marketplace" replace />} />
               <Route path="/demos" element={<Index />} />
               <Route path="/explore" element={<Navigate to="/demos" replace />} />
               <Route path="/products" element={<Index />} />
@@ -452,6 +452,7 @@ const App = () => (
               <Route path="/marketplace/offers" element={<MarketplaceOffersPage />} />
               <Route path="/marketplace/product/:productId" element={<MarketplaceProductPage />} />
               <Route path="/marketplace/:productId" element={<MarketplaceProductPage />} />
+              <Route path="/product/:productId" element={<MarketplaceProductPage />} />
               <Route path="/checkout/:productId" element={<SimpleCheckout />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-failure" element={<PaymentFailure />} />

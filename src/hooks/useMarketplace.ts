@@ -126,10 +126,24 @@ interface JoinInfluencerResponse {
 
 const PAGE_SIZE = 18;
 
+interface FavouriteItem {
+  product_id: string;
+}
+
+interface FavouriteListResponse {
+  items: FavouriteItem[];
+}
+
+interface FavouriteToggleResponse {
+  action: 'added' | 'removed';
+  product_id: string;
+}
+
 export function useMarketplace() {
   const [products, setProducts] = useState<MarketplaceProduct[]>([]);
   const [orders, setOrders] = useState<MarketplaceOrder[]>([]);
   const [categories, setCategories] = useState<MarketplaceCategory[]>([{ id: 'all', label: 'All Products', count: 0 }]);
+  const [favourites, setFavourites] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [isCatalogLoading, setIsCatalogLoading] = useState(true);
@@ -329,10 +343,68 @@ export function useMarketplace() {
     void fetchOrders();
   }, [fetchOrders]);
 
+  const fetchFavourites = useCallback(async () => {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      if (!authData.user) return;
+      const response = await callEdgeRoute<FavouriteListResponse>('api-marketplace', 'favourite/list');
+      const ids = new Set((response.data.items || []).map((f) => f.product_id));
+      setFavourites(ids);
+    } catch {
+      // Silently fail - favourites are a non-critical feature
+    }
+  }, []);
+
+  const toggleFavourite = useCallback(async (productId: string) => {
+    const { data: authData } = await supabase.auth.getUser();
+    if (!authData.user) {
+      toast.error('Please sign in to save favourites');
+      return;
+    }
+    // Optimistic update
+    setFavourites((prev) => {
+      const next = new Set(prev);
+      if (next.has(productId)) {
+        next.delete(productId);
+      } else {
+        next.add(productId);
+      }
+      return next;
+    });
+    try {
+      const response = await callEdgeRoute<FavouriteToggleResponse>('api-marketplace', 'favourite/toggle', {
+        method: 'POST',
+        body: { product_id: productId },
+      });
+      if (response.data.action === 'added') {
+        toast.success('Added to favourites');
+      } else {
+        toast.success('Removed from favourites');
+      }
+    } catch (error) {
+      // Revert optimistic update on failure
+      setFavourites((prev) => {
+        const next = new Set(prev);
+        if (next.has(productId)) {
+          next.delete(productId);
+        } else {
+          next.add(productId);
+        }
+        return next;
+      });
+      toast.error(error instanceof Error ? error.message : 'Failed to update favourite');
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchFavourites();
+  }, [fetchFavourites]);
+
   return {
     products,
     orders,
     categories,
+    favourites,
     search,
     setSearch,
     category,
@@ -348,6 +420,7 @@ export function useMarketplace() {
     refreshCatalog,
     refreshOrders: fetchOrders,
     createOrder,
+    toggleFavourite,
     joinFranchise,
     joinReseller,
     joinInfluencer,

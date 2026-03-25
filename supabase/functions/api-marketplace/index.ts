@@ -1019,6 +1019,66 @@ serve(async (req: Request) => {
   const url = new URL(req.url);
   const path = url.pathname.replace('/api-marketplace', '');
 
+  if (path === '/favourite/list' && req.method === 'GET') {
+    return withAuth(req, [], async ({ supabaseAdmin, user }) => {
+      const { data, error } = await supabaseAdmin
+        .from('favourites')
+        .select('product_id')
+        .eq('user_id', user.userId);
+
+      if (error) {
+        return errorResponse(error.message, 400);
+      }
+
+      return jsonResponse({ items: (data || []).map((row: any) => ({ product_id: row.product_id })) });
+    }, { module: 'marketplace', action: 'list_favourites' });
+  }
+
+  if (path === '/favourite/toggle' && req.method === 'POST') {
+    return withAuth(req, [], async ({ supabaseAdmin, body, user }) => {
+      const validation = validateRequired(body, ['product_id']);
+      if (validation) return validation;
+
+      const productId = String(body.product_id || '').trim();
+      if (!productId) return errorResponse('product_id is required', 400);
+
+      // Validate product exists
+      const { data: product } = await supabaseAdmin
+        .from('products')
+        .select('product_id')
+        .eq('product_id', productId)
+        .maybeSingle();
+
+      if (!product) return errorResponse('Product not found', 404);
+
+      // Check if already favourited
+      const { data: existing } = await supabaseAdmin
+        .from('favourites')
+        .select('id')
+        .eq('user_id', user.userId)
+        .eq('product_id', productId)
+        .maybeSingle();
+
+      if (existing) {
+        // Remove favourite
+        const { error: deleteError } = await supabaseAdmin
+          .from('favourites')
+          .delete()
+          .eq('user_id', user.userId)
+          .eq('product_id', productId);
+        if (deleteError) return errorResponse(deleteError.message, 400);
+        return jsonResponse({ action: 'removed', product_id: productId });
+      } else {
+        // Add favourite
+        const { error: insertError } = await supabaseAdmin
+          .from('favourites')
+          .insert({ user_id: user.userId, product_id: productId });
+        if (insertError) return errorResponse(insertError.message, 400);
+        return jsonResponse({ action: 'added', product_id: productId });
+      }
+    }, { module: 'marketplace', action: 'toggle_favourite' });
+  }
+
   if (path === '/catalog' && req.method === 'GET') {
     return withAuth(req, [], async ({ supabaseAdmin }) => {
       const page = Math.max(Number(url.searchParams.get('page') || '1'), 1);
