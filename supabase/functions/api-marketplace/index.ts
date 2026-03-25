@@ -1501,5 +1501,229 @@ serve(async (req: Request) => {
     }, { module: 'marketplace', action: 'health' });
   }
 
+  // ---- Wallet endpoints ----
+
+  if (path === '/wallet' && req.method === 'GET') {
+    return withAuth(req, [], async ({ supabaseAdmin, user }) => {
+      // Use unified_wallets; ignore any client-supplied user_id – always use authenticated user.
+      const { data: wallet, error } = await supabaseAdmin
+        .from('unified_wallets')
+        .select('available_balance, pending_balance, currency, is_frozen, updated_at')
+        .eq('user_id', user.userId)
+        .maybeSingle();
+
+      if (error) return errorResponse(error.message, 400);
+
+      if (!wallet) {
+        return jsonResponse({
+          balance_cents: 0,
+          currency: 'INR',
+          reserved_cents: 0,
+        });
+      }
+
+      return jsonResponse({
+        balance_cents: Math.round(toNumber(wallet.available_balance) * 100),
+        currency: wallet.currency || 'INR',
+        reserved_cents: Math.round(toNumber(wallet.pending_balance) * 100),
+        is_frozen: Boolean(wallet.is_frozen),
+        updated_at: wallet.updated_at,
+      });
+    }, { module: 'marketplace', action: 'wallet_get' });
+  }
+
+  if (path === '/wallet/transactions' && req.method === 'GET') {
+    return withAuth(req, [], async ({ supabaseAdmin, user }) => {
+      // Ignore any client-supplied user_id – always use authenticated user.
+      const limit = Math.min(Math.max(Number(url.searchParams.get('limit') || '20'), 1), 100);
+      const page = Math.max(Number(url.searchParams.get('page') || '1'), 1);
+      const offset = (page - 1) * limit;
+
+      const { data, error } = await supabaseAdmin
+        .from('unified_wallet_transactions')
+        .select('id, transaction_type, amount, currency, description, status, reference_type, created_at')
+        .eq('user_id', user.userId)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) return errorResponse(error.message, 400);
+
+      return jsonResponse({
+        items: (data || []).map((txn: any) => ({
+          id: String(txn.id),
+          type: txn.transaction_type === 'credit' || toNumber(txn.amount) > 0 ? 'credit' : 'debit',
+          amount_cents: Math.round(Math.abs(toNumber(txn.amount)) * 100),
+          description: txn.description || txn.reference_type || null,
+          created_at: txn.created_at,
+          status: txn.status || 'completed',
+        })),
+        page,
+        limit,
+      });
+    }, { module: 'marketplace', action: 'wallet_transactions' });
+  }
+
+  if (path === '/wallet/topup' && req.method === 'POST') {
+    // Payment gateway integration is required. Returning 501 until implemented.
+    // The server must NOT trust amount from client – price/limits must be validated server-side.
+    return withAuth(req, [], async ({ body }) => {
+      const amountCents = Number(body?.amount_cents);
+      if (!Number.isFinite(amountCents) || amountCents <= 0) {
+        return errorResponse('amount_cents must be a positive integer', 400);
+      }
+      return new Response(
+        JSON.stringify({
+          error: 'Not Implemented',
+          message: 'Wallet top-up requires payment gateway integration. This endpoint is not yet live.',
+          code: 'TOPUP_NOT_IMPLEMENTED',
+        }),
+        { status: 501, headers: { 'Content-Type': 'application/json' } }
+      );
+    }, { module: 'marketplace', action: 'wallet_topup' });
+  }
+
+  if (path === '/wallet/withdraw' && req.method === 'POST') {
+    // Withdrawal processing requires bank/UPI payout integration. Returning 501 until implemented.
+    return withAuth(req, [], async () => {
+      return new Response(
+        JSON.stringify({
+          error: 'Not Implemented',
+          message: 'Wallet withdrawal requires payout integration. This endpoint is not yet live.',
+          code: 'WITHDRAW_NOT_IMPLEMENTED',
+        }),
+        { status: 501, headers: { 'Content-Type': 'application/json' } }
+      );
+    }, { module: 'marketplace', action: 'wallet_withdraw' });
+  }
+
+  // ---- Development / custom order endpoints ----
+
+  if (path === '/development/orders' && req.method === 'GET') {
+    return withAuth(req, [], async ({ supabaseAdmin, user }) => {
+      // Ignore any client-supplied user_id – always use authenticated user.
+      const { data, error } = await supabaseAdmin
+        .from('marketplace_orders')
+        .select(`
+          id,
+          order_number,
+          product_id,
+          order_status,
+          requirements,
+          created_at,
+          updated_at,
+          products!marketplace_orders_product_id_fkey(product_name, category)
+        `)
+        .eq('buyer_user_id', user.userId)
+        .order('created_at', { ascending: false });
+
+      if (error) return errorResponse(error.message, 400);
+
+      return jsonResponse({
+        items: (data || []).map((item: any) => ({
+          id: String(item.id),
+          product_name: item.products?.product_name || 'Unknown Product',
+          order_ref: item.order_number || item.id,
+          // progress_percent not yet stored; defaults to 0 until a progress tracking table is added
+          progress_percent: 0,
+          started_at: item.created_at,
+          eta: null,
+          status: item.order_status || 'new',
+          lead: null,
+          notes: item.requirements || null,
+        })),
+      });
+    }, { module: 'marketplace', action: 'development_orders' });
+  }
+
+  if (path === '/development/request-update' && req.method === 'POST') {
+    return withAuth(req, [], async ({ supabaseAdmin, body, user }) => {
+      const orderId = String(body?.order_id || '').trim();
+      if (!orderId) return errorResponse('order_id is required', 400);
+
+      // Verify the order belongs to the authenticated user (ignore client user_id).
+      const { data: order, error: orderError } = await supabaseAdmin
+        .from('marketplace_orders')
+        .select('id, order_number')
+        .eq('id', orderId)
+        .eq('buyer_user_id', user.userId)
+        .maybeSingle();
+
+      if (orderError) return errorResponse(orderError.message, 400);
+      if (!order) return errorResponse('Order not found or access denied', 404);
+
+      // Log request as a support ticket so it is actionable.
+      const { data: ticket, error: ticketError } = await supabaseAdmin
+        .from('user_support_tickets')
+        .insert({
+          user_id: user.userId,
+          subject: `Update request for order ${order.order_number || orderId}`,
+          description: body?.message || 'Client requested an update on their development order.',
+          category: 'product',
+          priority: 'normal',
+        })
+        .select('id, ticket_number')
+        .single();
+
+      if (ticketError) return errorResponse(ticketError.message, 400);
+
+      return jsonResponse({
+        success: true,
+        ticket_id: ticket?.id,
+        ticket_number: ticket?.ticket_number,
+        message: 'Update request received. Our team will be in touch shortly.',
+      });
+    }, { module: 'marketplace', action: 'development_request_update' });
+  }
+
+  if (path === '/development/contact-lead' && req.method === 'POST') {
+    // Contact details for a lead are sensitive; returning 501 until a secure lookup is implemented.
+    return withAuth(req, [], async ({ body }) => {
+      const orderId = String(body?.order_id || '').trim();
+      if (!orderId) return errorResponse('order_id is required', 400);
+      return new Response(
+        JSON.stringify({
+          error: 'Not Implemented',
+          message: 'Lead contact lookup is not yet implemented on this endpoint.',
+          code: 'CONTACT_LEAD_NOT_IMPLEMENTED',
+        }),
+        { status: 501, headers: { 'Content-Type': 'application/json' } }
+      );
+    }, { module: 'marketplace', action: 'development_contact_lead' });
+  }
+
+  // ---- Support endpoint ----
+
+  if (path === '/support' && req.method === 'POST') {
+    return withAuth(req, [], async ({ supabaseAdmin, body, user }) => {
+      const subject = String(body?.subject || '').trim();
+      const message = String(body?.message || '').trim();
+
+      if (!subject) return errorResponse('subject is required', 400);
+      if (!message) return errorResponse('message is required', 400);
+
+      // Always use the authenticated user's ID – ignore any client-supplied user_id.
+      const { data: ticket, error } = await supabaseAdmin
+        .from('user_support_tickets')
+        .insert({
+          user_id: user.userId,
+          subject,
+          description: message,
+          category: String(body?.category || 'general').toLowerCase(),
+          priority: String(body?.priority || 'normal').toLowerCase(),
+        })
+        .select('id, ticket_number')
+        .single();
+
+      if (error) return errorResponse(error.message, 400);
+
+      return jsonResponse({
+        ticket_id: ticket?.id,
+        ticket_number: ticket?.ticket_number,
+        message: 'Support ticket created successfully.',
+      }, 201);
+    }, { module: 'marketplace', action: 'support_create' });
+  }
+
   return errorResponse('Not found', 404);
 });
+
