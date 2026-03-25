@@ -230,24 +230,6 @@ export function useBossAPI<T = any>(config: APIConfig = {}) {
 }
 
 // Specialized hooks for common Boss Panel operations
-export function useBossDashboard() {
-  const api = useBossAPI();
-
-  const getDashboardData = useCallback(async () => {
-    return api.execute('/api/boss/dashboard/summary');
-  }, [api]);
-
-  const getRealtimeStats = useCallback(async () => {
-    return api.execute('/api/boss/dashboard/realtime');
-  }, [api]);
-
-  return {
-    ...api,
-    getDashboardData,
-    getRealtimeStats,
-  };
-}
-
 export function useBossModules() {
   const api = useBossAPI();
 

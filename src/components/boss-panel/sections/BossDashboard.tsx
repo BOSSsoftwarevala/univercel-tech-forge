@@ -234,9 +234,6 @@ export function BossDashboard() {
     },
   ];
 
-export function BossDashboard() {
-  const navigate = useNavigate();
-
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-full">
       {/* Header */}
