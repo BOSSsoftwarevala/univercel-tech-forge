@@ -91,35 +91,37 @@ serve(async (req) => {
     const healthChecks = demos.map((demo) => checkUrl(demo.id, demo.url));
     const results = await Promise.all(healthChecks);
 
-    // Update demos in database
-    const updates = results.map(async (result) => {
-      const healthScore = result.status === "healthy" ? 100 : 
+    // Build all update payloads and batch upsert in a single DB round-trip
+    const updatePayloads = results.map((result) => {
+      const healthScore = result.status === "healthy" ? 100 :
                           result.status === "unhealthy" ? 50 : 0;
-      
       const verificationStatus = result.status === "healthy" ? "verified" :
                                   result.status === "unhealthy" ? "failed" : "error";
-
-      return supabase
-        .from("demos")
-        .update({
-          http_status: result.http_status,
-          response_time_ms: result.response_time_ms,
-          health_score: healthScore,
-          verification_status: verificationStatus,
-          last_health_check: new Date().toISOString(),
-          last_verified_at: result.status === "healthy" ? new Date().toISOString() : null,
-        })
-        .eq("id", result.id);
+      const now = new Date().toISOString();
+      return {
+        id: result.id,
+        http_status: result.http_status,
+        response_time_ms: result.response_time_ms,
+        health_score: healthScore,
+        verification_status: verificationStatus,
+        last_health_check: now,
+        last_verified_at: result.status === "healthy" ? now : null,
+      };
     });
 
-    await Promise.all(updates);
+    await supabase.from("demos").upsert(updatePayloads);
 
-    const summary = {
-      total: results.length,
-      healthy: results.filter((r) => r.status === "healthy").length,
-      unhealthy: results.filter((r) => r.status === "unhealthy").length,
-      error: results.filter((r) => r.status === "error").length,
-    };
+    // Compute summary in a single pass
+    const summary = results.reduce(
+      (acc, r) => {
+        acc.total++;
+        if (r.status === "healthy") acc.healthy++;
+        else if (r.status === "unhealthy") acc.unhealthy++;
+        else acc.error++;
+        return acc;
+      },
+      { total: 0, healthy: 0, unhealthy: 0, error: 0 }
+    );
 
     return new Response(
       JSON.stringify({ 

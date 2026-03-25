@@ -230,6 +230,7 @@ export function useBossAPI<T = any>(config: APIConfig = {}) {
 }
 
 // Specialized hooks for common Boss Panel operations
+<<<<<<< HEAD
 export function useBossDashboard() {
   const api = useBossAPI();
 
@@ -253,6 +254,8 @@ export function useBossDashboard() {
   };
 }
 
+=======
+>>>>>>> 9fbec492df536e4e1501205ea56c2ba58a44a388
 export function useBossModules() {
   const api = useBossAPI();
 

@@ -3,43 +3,43 @@ import { Database } from '@/integrations/supabase/types';
 type AppRole = Database['public']['Enums']['app_role'];
 
 export const ROLE_DASHBOARD_MAP: Partial<Record<AppRole, string>> = {
-  boss_owner: '/dashboard/boss',
-  master: '/dashboard/boss',
-  super_admin: '/dashboard/admin',
-  admin: '/dashboard/admin',
-  ceo: '/dashboard/boss',
+  boss_owner: '/app/control-center',
+  master: '/app/control-center',
+  super_admin: '/app/control-center',
+  admin: '/app/control-center',
+  ceo: '/app/control-center',
   country_head: '/super-admin-system/role-switch?role=country_head',
   area_manager: '/super-admin-system/role-switch?role=country_head',
   continent_super_admin: '/super-admin-system/role-switch?role=continent_super_admin',
-  franchise: '/franchise',
-  reseller: '/reseller',
-  reseller_manager: '/reseller',
-  influencer: '/dashboard/influencer',
-  developer: '/dashboard/developer',
-  server_manager: '/server-manager',
-  api_security: '/api-integrations',
-  ai_manager: '/ai-console',
+  franchise: '/app/franchise',
+  reseller: '/app/reseller',
+  reseller_manager: '/app/reseller',
+  influencer: '/app/influencer',
+  developer: '/app/developer',
+  server_manager: '/app/server',
+  api_security: '/app/integrations',
+  ai_manager: '/app/ai',
   r_and_d: '/rnd-dashboard',
   rnd_manager: '/rnd-dashboard',
-  lead_manager: '/lead-manager',
-  marketing_manager: '/marketing',
-  seo_manager: '/seo',
-  client_success: '/client-success',
-  performance_manager: '/performance',
-  support: '/support',
+  lead_manager: '/app/leads',
+  marketing_manager: '/app/marketing',
+  seo_manager: '/app/seo',
+  client_success: '/app/support',
+  performance_manager: '/app/analytics',
+  support: '/app/support',
   safe_assist: '/safe-assist',
   assist_manager: '/assist-manager',
   promise_tracker: '/promise-tracker',
   promise_management: '/promise-management',
   demo_manager: '/demo-manager',
   product_demo_manager: '/product-demo-manager',
-  task_manager: '/task-manager',
-  finance_manager: '/finance',
+  task_manager: '/app/tasks',
+  finance_manager: '/app/finance',
   hr_manager: '/hr',
-  legal_compliance: '/legal',
+  legal_compliance: '/app/legal',
   prime: '/prime',
-  user: '/dashboard/user',
-  client: '/dashboard/user',
+  user: '/app/user',
+  client: '/app/user',
 };
 
 const ROLE_PRIORITY: AppRole[] = [
@@ -82,8 +82,8 @@ export const selectBestRole = (roles: AppRole[]): AppRole | null => {
 
 export const getDashboardRouteForRole = (role: AppRole | null) => {
   if (!role) {
-    return '/dashboard/user';
+    return '/app/user';
   }
 
-  return ROLE_DASHBOARD_MAP[role] || '/dashboard/user';
+  return ROLE_DASHBOARD_MAP[role] || '/app/user';
 };

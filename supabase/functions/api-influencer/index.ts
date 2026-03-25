@@ -96,25 +96,29 @@ async function checkFraudState(supabaseAdmin: any, influencer: any, requestData:
   const userAgent = String(requestData.user_agent || '');
   const deviceFingerprint = String(requestData.device_fingerprint || '');
 
-  // Check for IP spam (same IP, multiple influencers)
-  const { count: ipCount } = await supabaseAdmin
-    .from('influencer_click_logs')
-    .select('*', { count: 'exact', head: true })
-    .eq('ip_address', ipAddress)
-    .gte('clicked_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+  // Run all three fraud-check queries in parallel instead of sequentially
+  const [
+    { count: ipCount },
+    { count: recentSignups },
+    { data: fraudFlags },
+  ] = await Promise.all([
+    supabaseAdmin
+      .from('influencer_click_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('ip_address', ipAddress)
+      .gte('clicked_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
 
-  // Check for rapid signup
-  const { count: recentSignups } = await supabaseAdmin
-    .from('influencer_accounts')
-    .select('*', { count: 'exact', head: true })
-    .eq('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()); // Last hour
+    supabaseAdmin
+      .from('influencer_accounts')
+      .select('*', { count: 'exact', head: true })
+      .eq('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()),
 
-  // Check for existing fraud flags
-  const { data: fraudFlags } = await supabaseAdmin
-    .from('influencer_fraud_flags')
-    .select('*')
-    .eq('influencer_id', influencer.id)
-    .is('resolved_at', null);
+    supabaseAdmin
+      .from('influencer_fraud_flags')
+      .select('*')
+      .eq('influencer_id', influencer.id)
+      .is('resolved_at', null),
+  ]);
 
   const isSafe = ipCount < 10 && recentSignups < 5 && (!fraudFlags || fraudFlags.length === 0);
   const referralLink = isSafe ? await ensureReferralLink(supabaseAdmin, influencer, {}) : null;

@@ -4,16 +4,51 @@
  * Centralized client-side service wrapper for marketplace-related server endpoints.
  * - Uses fetch under the hood with sensible defaults, timeout and retry behavior.
  * - Provides typed method signatures used across the marketplace UI.
- * - Falls back to sample/mock data when server endpoints are not available (useful during local dev).
  *
- * NOTE:
- * - Adjust NEXT_PUBLIC_API_BASE in your env to point to API root if needed.
- * - All endpoints used here are conventions — update paths to match your backend.
+ * Environment variables (Vite):
+ * - VITE_API_BASE           – API root URL (same-origin if omitted). Preferred over NEXT_PUBLIC_API_BASE.
+ * - VITE_ENABLE_MARKETPLACE_MOCKS – Set to "true" to enable mock/sample fallbacks during local dev.
+ *   Default (omitted / "false") = fail loudly so missing backend is visible. Never enable in production.
+ *
+ * Security note:
+ * - user_id is NOT included in request bodies/query strings. The server must derive the user
+ *   identity from the authenticated session/JWT token.
+ *   TODO: Remove any remaining user_id parameters once all backend endpoints derive user from auth.
  */
 
-const API_BASE = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_BASE) || '';
+// Prefer VITE_API_BASE (standard Vite env); fall back to NEXT_PUBLIC_API_BASE for backward compat.
+const API_BASE: string =
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE) ||
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.NEXT_PUBLIC_API_BASE) ||
+  '';
+
+/** True only when explicitly opted-in via VITE_ENABLE_MARKETPLACE_MOCKS=true */
+const MOCKS_ENABLED: boolean =
+  typeof import.meta !== 'undefined' &&
+  (import.meta as any).env?.VITE_ENABLE_MARKETPLACE_MOCKS === 'true';
 
 type FetchOpts = RequestInit & { timeoutMs?: number; retries?: number };
+
+/**
+ * Throw a standardized "mock mode not enabled" error so callers fail loudly
+ * when the backend is unreachable and VITE_ENABLE_MARKETPLACE_MOCKS is not set.
+ */
+function rejectWithBackendError(method: string, cause: unknown): never {
+  const base = cause instanceof Error ? cause.message : String(cause);
+  throw new Error(
+    `[marketplaceEnterpriseService] ${method}: backend request failed and mock mode is disabled. ` +
+    `Set VITE_ENABLE_MARKETPLACE_MOCKS=true to enable sample data in development. Cause: ${base}`
+  );
+}
+
+/** Emit a clearly visible warning when mock data is being returned. */
+function warnMockMode(method: string) {
+  console.warn(
+    `%c[MOCK MODE] marketplaceEnterpriseService.${method} – returning simulated data.\n` +
+    'This is NOT real data. Set VITE_ENABLE_MARKETPLACE_MOCKS=false (or remove it) to see real errors.',
+    'color: orange; font-weight: bold;'
+  );
+}
 
 async function apiFetch<T = any>(path: string, opts: FetchOpts = {}): Promise<T> {
   const { timeoutMs = 12_000, retries = 1, ...init } = opts;
@@ -142,150 +177,151 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
 
 export const marketplaceEnterpriseService = {
   /**
-   * Fetch development orders for a user
+   * Fetch development orders for the authenticated user.
+   * user_id is intentionally omitted – the server derives it from the auth session.
    */
-  async getDevelopmentOrders(userId?: string): Promise<DevOrder[] | { data: DevOrder[] }> {
-    if (!userId) {
-      // return empty to allow UI to handle unauthenticated case
-      return [];
-    }
-
+  async getDevelopmentOrders(_userId?: string): Promise<DevOrder[] | { data: DevOrder[] }> {
     try {
-      const res = await apiFetch<DevOrder[]>(`/api/marketplace/development/orders?user_id=${encodeURIComponent(userId)}`, {
+      const res = await apiFetch<DevOrder[]>(`/api/marketplace/development/orders`, {
         method: 'GET',
         retries: 2,
       });
       return res;
     } catch (err) {
-      // fallback to sample data in dev
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] getDevelopmentOrders fallback to sample', err);
-        return SAMPLE_DEVORDERS;
+      if (MOCKS_ENABLED) {
+        warnMockMode('getDevelopmentOrders');
+        return SAMPLE_DEVORDERS.map((o) => ({ ...o, isMock: true } as any));
       }
-      throw err;
+      rejectWithBackendError('getDevelopmentOrders', err);
     }
   },
 
   /**
-   * Request an update for an order
+   * Request an update for an order.
+   * user_id is intentionally omitted – server derives identity from auth session.
    */
-  async requestOrderUpdate(userId: string, orderId: string): Promise<{ success: boolean }> {
-    if (!userId) throw new Error('userId required');
+  async requestOrderUpdate(_userId: string, orderId: string): Promise<{ success: boolean }> {
     try {
       const res = await apiFetch<{ success: boolean }>(`/api/marketplace/development/request-update`, {
         method: 'POST',
-        body: JSON.stringify({ user_id: userId, order_id: orderId }),
+        // TODO: Remove _userId param from call sites once all callers are updated.
+        body: JSON.stringify({ order_id: orderId }),
         retries: 1,
       });
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] requestOrderUpdate fallback simulated', err);
+      if (MOCKS_ENABLED) {
+        warnMockMode('requestOrderUpdate');
         return { success: true };
       }
-      throw err;
+      rejectWithBackendError('requestOrderUpdate', err);
     }
   },
 
   /**
-   * Get wallet summary
+   * Get wallet summary for the authenticated user.
+   * user_id is intentionally omitted – server derives identity from auth session.
    */
-  async getWallet(userId?: string): Promise<Wallet | { data: Wallet } | null> {
-    if (!userId) return null;
+  async getWallet(_userId?: string): Promise<Wallet | { data: Wallet } | null> {
     try {
-      const res = await apiFetch<Wallet>(`/api/marketplace/wallet?user_id=${encodeURIComponent(userId)}`, {
+      const res = await apiFetch<Wallet>(`/api/marketplace/wallet`, {
         method: 'GET',
         retries: 2,
       });
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] getWallet fallback sample', err);
-        return SAMPLE_WALLET;
+      if (MOCKS_ENABLED) {
+        warnMockMode('getWallet');
+        return { ...SAMPLE_WALLET, isMock: true } as any;
       }
-      throw err;
+      rejectWithBackendError('getWallet', err);
     }
   },
 
   /**
-   * Get wallet transactions
+   * Get wallet transactions for the authenticated user.
+   * user_id is intentionally omitted – server derives identity from auth session.
    */
-  async getWalletTransactions(userId?: string): Promise<Transaction[] | { data: Transaction[] }> {
-    if (!userId) return [];
+  async getWalletTransactions(_userId?: string): Promise<Transaction[] | { data: Transaction[] }> {
     try {
-      const res = await apiFetch<Transaction[]>(`/api/marketplace/wallet/transactions?user_id=${encodeURIComponent(userId)}`, {
+      const res = await apiFetch<Transaction[]>(`/api/marketplace/wallet/transactions`, {
         method: 'GET',
         retries: 2,
       });
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] getWalletTransactions fallback', err);
-        return SAMPLE_TRANSACTIONS;
+      if (MOCKS_ENABLED) {
+        warnMockMode('getWalletTransactions');
+        return SAMPLE_TRANSACTIONS.map((t) => ({ ...t, isMock: true } as any));
       }
-      throw err;
+      rejectWithBackendError('getWalletTransactions', err);
     }
   },
 
   /**
-   * Initiate top-up. Accepts amount in cents (paise)
+   * Initiate top-up. Accepts amount in cents (paise).
+   * user_id is intentionally omitted – server derives identity from auth session.
    */
-  async topUpWallet(userId: string, { amount_cents }: { amount_cents: number }) {
-    if (!userId) throw new Error('userId required');
+  async topUpWallet(_userId: string, { amount_cents }: { amount_cents: number }) {
     try {
       const res = await apiFetch<{ checkout_url?: string; payment_id?: string }>(`/api/marketplace/wallet/topup`, {
         method: 'POST',
-        body: JSON.stringify({ user_id: userId, amount_cents }),
+        // TODO: Remove _userId param from call sites once all callers are updated.
+        body: JSON.stringify({ amount_cents }),
         retries: 1,
       });
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] topUpWallet simulated', err);
-        return { checkout_url: undefined, payment_id: 'SIMULATED-' + Date.now() };
+      if (MOCKS_ENABLED) {
+        warnMockMode('topUpWallet');
+        return { checkout_url: undefined, payment_id: 'SIMULATED-' + Date.now(), isMock: true };
       }
-      throw err;
+      rejectWithBackendError('topUpWallet', err);
     }
   },
 
   /**
-   * Withdraw funds
+   * Withdraw funds.
+   * user_id is intentionally omitted – server derives identity from auth session.
    */
-  async withdrawFromWallet(userId: string) {
-    if (!userId) throw new Error('userId required');
+  async withdrawFromWallet(_userId: string) {
     try {
       const res = await apiFetch<{ success: boolean; request_id?: string }>(`/api/marketplace/wallet/withdraw`, {
         method: 'POST',
-        body: JSON.stringify({ user_id: userId }),
+        // TODO: Remove _userId param from call sites once all callers are updated.
+        body: JSON.stringify({}),
         retries: 1,
       });
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] withdrawFromWallet simulated', err);
-        return { success: true, request_id: 'SIM-' + Date.now() };
+      if (MOCKS_ENABLED) {
+        warnMockMode('withdrawFromWallet');
+        return { success: true, request_id: 'SIM-' + Date.now(), isMock: true };
       }
-      throw err;
+      rejectWithBackendError('withdrawFromWallet', err);
     }
   },
 
   /**
-   * Create support ticket
+   * Create support ticket.
+   * user_id is intentionally omitted from the payload – server derives identity from auth session.
    */
-  async createSupportTicket(payload: { user_id: string; subject: string; message: string }) {
+  async createSupportTicket(payload: { user_id?: string; subject: string; message: string }) {
+    // Exclude user_id from what we send – server should use the authenticated session.
+    const { subject, message } = payload;
     try {
       const res = await apiFetch<{ ticket_id?: string }>(`/api/marketplace/support`, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ subject, message }),
         retries: 1,
       });
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] createSupportTicket simulated', err);
-        return { ticket_id: 'SIM-' + Date.now() };
+      if (MOCKS_ENABLED) {
+        warnMockMode('createSupportTicket');
+        return { ticket_id: 'SIM-' + Date.now(), isMock: true };
       }
-      throw err;
+      rejectWithBackendError('createSupportTicket', err);
     }
   },
 
@@ -294,14 +330,11 @@ export const marketplaceEnterpriseService = {
    */
   openOrderDetails(orderId: string) {
     try {
-      // try to open internal SPA route
       const path = `/marketplace/development/orders/${encodeURIComponent(orderId)}`;
       if (typeof window !== 'undefined' && window.location) {
-        // If SPA supports routing library, it will handle - navigation fallback to new tab
         window.open(path, '_blank');
       }
     } catch (err) {
-      // swallow
       console.error('[marketplaceEnterpriseService] openOrderDetails', err);
     }
   },
@@ -316,22 +349,20 @@ export const marketplaceEnterpriseService = {
         body: JSON.stringify({ order_id: orderId }),
         retries: 1,
       });
-      // if server returns contact email, open mailto
       const contact = (res as any)?.contact;
       if (contact?.email && typeof window !== 'undefined') {
         window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent('Query about order ' + orderId)}`;
       }
       return res;
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[marketplaceEnterpriseService] contactLead simulated', err);
-        // fallback mailto
+      if (MOCKS_ENABLED) {
+        warnMockMode('contactLead');
         if (typeof window !== 'undefined') {
           window.location.href = `mailto:support@softwarevala.com?subject=${encodeURIComponent('Query about order ' + orderId)}`;
         }
-        return { success: true };
+        return { success: true, isMock: true };
       }
-      throw err;
+      rejectWithBackendError('contactLead', err);
     }
   },
 };

@@ -1,5 +1,5 @@
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle, Eye, Globe, Package, Search, ShoppingCart, Sparkles, Star } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Eye, Globe, Heart, Package, Play, Search, ShoppingCart, Sparkles, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,7 @@ export function MarketplaceCatalog({ title, subtitle, audienceLabel }: Marketpla
   const {
     products,
     categories,
+    favourites,
     search,
     setSearch,
     category,
@@ -59,6 +60,7 @@ export function MarketplaceCatalog({ title, subtitle, audienceLabel }: Marketpla
     hasMore,
     isLoadingMore,
     createOrder,
+    toggleFavourite,
     joinFranchise,
     joinReseller,
     joinInfluencer,
@@ -440,15 +442,29 @@ export function MarketplaceCatalog({ title, subtitle, audienceLabel }: Marketpla
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button type="button" variant="outline" className="flex-1 border-slate-800 bg-slate-900/80 hover:bg-slate-800" onClick={() => setSelectedProduct(product)}>
+                      <Button type="button" variant="outline" className="flex-1 border-slate-800 bg-slate-900/80 hover:bg-slate-800" onClick={() => navigate(`/product/${product.product_id}`)}>
                         <Eye className="mr-2 h-4 w-4" />
-                        Details
+                        View
                       </Button>
-                      {product.demo_id && !product.has_broken_demo ? (
-                        <Button type="button" variant="outline" className="border-slate-800 bg-slate-900/80 hover:bg-slate-800" onClick={() => void handlePreview(product)}>
-                          <Globe className="h-4 w-4" />
-                        </Button>
-                      ) : null}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={`border-slate-800 bg-slate-900/80 hover:bg-slate-800 ${favourites.has(product.product_id) ? 'text-rose-400 border-rose-400/40' : 'text-slate-400'}`}
+                        onClick={() => void toggleFavourite(product.product_id)}
+                        title={favourites.has(product.product_id) ? 'Remove from favourites' : 'Add to favourites'}
+                      >
+                        <Heart className={`h-4 w-4 ${favourites.has(product.product_id) ? 'fill-current' : ''}`} />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-slate-800 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-40"
+                        onClick={() => product.demo_id && !product.has_broken_demo ? void handlePreview(product) : undefined}
+                        disabled={!product.demo_id || product.has_broken_demo}
+                        title={product.demo_id && !product.has_broken_demo ? 'Live Demo' : 'Demo not available'}
+                      >
+                        <Play className="h-4 w-4" />
+                      </Button>
                       <Button
                         type="button"
                         className="flex-1 bg-cyan-500 text-slate-950 hover:bg-cyan-400"

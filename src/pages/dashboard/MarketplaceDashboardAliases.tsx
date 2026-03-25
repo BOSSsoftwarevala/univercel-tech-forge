@@ -42,6 +42,6 @@ export const InfluencerDashboardEntry = () => {
 
 export const JobsDashboardEntry = () => <CareerPortal />;
 
-export const AdminDashboardEntry = () => <Navigate to="/super-admin-system/role-switch?role=admin" replace />;
+export const AdminDashboardEntry = () => <Navigate to="/app/control-center" replace />;
 
-export const BossDashboardEntry = () => <Navigate to="/super-admin-system/role-switch?role=boss_owner" replace />;
+export const BossDashboardEntry = () => <Navigate to="/app/control-center" replace />;

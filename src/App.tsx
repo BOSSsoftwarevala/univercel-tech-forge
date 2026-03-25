@@ -1,4 +1,6 @@
 import React from "react";
+import { Analytics } from "@vercel/analytics/react";
+import { AppRoutes } from "./routes/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
 import InfluencerCommandCenter from "@/pages/InfluencerCommandCenter";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -284,6 +286,8 @@ import AICEOPredictions from "./pages/ai-ceo/sections/AICEOPredictions";
 import AICEOReports from "./pages/ai-ceo/sections/AICEOReports";
 import AICEOLearning from "./pages/ai-ceo/sections/AICEOLearning";
 import AICEOSettings from "./pages/ai-ceo/sections/AICEOSettings";
+import AICEOSecretary from "./pages/ai-ceo/sections/AICEOSecretary";
+import AICEOSpy from "./pages/ai-ceo/sections/AICEOSpy";
 import DemoCredentials from "./pages/DemoCredentials";
 import DemoOrderSystem from "./pages/demo-system/DemoOrderSystem";
 import SectorsBrowse from "./pages/SectorsBrowse";
@@ -382,7 +386,7 @@ const App = () => (
                           <FloatingAIChatbotWrapper />
                           <Routes>
                           {/* Public Routes - No login required */}
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Navigate to="/marketplace" replace />} />
               <Route path="/demos" element={<Index />} />
               <Route path="/explore" element={<Navigate to="/demos" replace />} />
               <Route path="/products" element={<Index />} />
@@ -461,6 +465,7 @@ const App = () => (
               <Route path="/marketplace/offers" element={<MarketplaceOffersPage />} />
               <Route path="/marketplace/product/:productId" element={<MarketplaceProductPage />} />
               <Route path="/marketplace/:productId" element={<MarketplaceProductPage />} />
+              <Route path="/product/:productId" element={<MarketplaceProductPage />} />
               <Route path="/checkout/:productId" element={<SimpleCheckout />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-failure" element={<PaymentFailure />} />
@@ -468,9 +473,12 @@ const App = () => (
               <Route path="/user-dashboard" element={<SimpleUserDashboard />} />
               <Route path="/boss-panel" element={<RequireRole allowed={["boss_owner", "master", "super_admin", "ceo", "admin"]}><BossPanel /></RequireRole>} />
               <Route path="/user/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
-              <Route path="/dashboard/user" element={<RequireAuth><UserDashboard /></RequireAuth>} />
-              <Route path="/dashboard/developer" element={<RequireAuth><DeveloperDashboardEntry /></RequireAuth>} />
-              <Route path="/dashboard/influencer" element={<RequireAuth><InfluencerDashboardEntry /></RequireAuth>} />
+              {/* /app/* – RBAC dynamic routing (new primary app entry point) */}
+              <Route path="/app/*" element={<AppRoutes />} />
+              {/* Legacy /dashboard/* routes redirect to /app/* equivalents */}
+              <Route path="/dashboard/user" element={<Navigate to="/app/user" replace />} />
+              <Route path="/dashboard/developer" element={<Navigate to="/app/developer" replace />} />
+              <Route path="/dashboard/influencer" element={<Navigate to="/app/influencer" replace />} />
               <Route path="/dashboard/jobs" element={<RequireAuth><JobsDashboardEntry /></RequireAuth>} />
               <Route path="/dashboard/admin" element={<RequireRole allowed={["admin", "super_admin", "boss_owner", "master", "ceo"]}><AdminDashboardEntry /></RequireRole>} />
               <Route path="/dashboard/boss" element={<RequireRole allowed={["boss_owner", "master", "super_admin", "ceo", "admin"]}><BossDashboardEntry /></RequireRole>} />
@@ -570,6 +578,8 @@ const App = () => (
                 <Route path="predictions" element={<AICEOPredictions />} />
                 <Route path="reports" element={<AICEOReports />} />
                 <Route path="learning" element={<AICEOLearning />} />
+                <Route path="secretary" element={<AICEOSecretary />} />
+                <Route path="spy" element={<AICEOSpy />} />
                 <Route path="settings" element={<AICEOSettings />} />
               </Route>
 
@@ -838,6 +848,7 @@ const App = () => (
         </AnimationProvider>
       </DemoTestModeProvider>
     </AuthProvider>
+    <Analytics />
   </QueryClientProvider>
 );
 
