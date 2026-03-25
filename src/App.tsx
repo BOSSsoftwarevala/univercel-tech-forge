@@ -272,6 +272,8 @@ import AICEOPredictions from "./pages/ai-ceo/sections/AICEOPredictions";
 import AICEOReports from "./pages/ai-ceo/sections/AICEOReports";
 import AICEOLearning from "./pages/ai-ceo/sections/AICEOLearning";
 import AICEOSettings from "./pages/ai-ceo/sections/AICEOSettings";
+import AICEOSecretary from "./pages/ai-ceo/sections/AICEOSecretary";
+import AICEOSpy from "./pages/ai-ceo/sections/AICEOSpy";
 import DemoCredentials from "./pages/DemoCredentials";
 import DemoOrderSystem from "./pages/demo-system/DemoOrderSystem";
 import SectorsBrowse from "./pages/SectorsBrowse";
@@ -558,6 +560,8 @@ const App = () => (
                 <Route path="predictions" element={<AICEOPredictions />} />
                 <Route path="reports" element={<AICEOReports />} />
                 <Route path="learning" element={<AICEOLearning />} />
+                <Route path="secretary" element={<AICEOSecretary />} />
+                <Route path="spy" element={<AICEOSpy />} />
                 <Route path="settings" element={<AICEOSettings />} />
               </Route>
 

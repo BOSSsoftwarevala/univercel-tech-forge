@@ -14,7 +14,9 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Bot
+  Bot,
+  BookOpen,
+  SearchCode,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -34,6 +36,8 @@ const menuItems = [
   { id: "predictions", label: "Predictive Insights", icon: Lightbulb, path: "/ai-ceo/predictions" },
   { id: "reports", label: "AI Reports", icon: FileText, path: "/ai-ceo/reports" },
   { id: "learning", label: "System Learning Log", icon: Database, path: "/ai-ceo/learning" },
+  { id: "secretary", label: "AI Secretary", icon: BookOpen, path: "/ai-ceo/secretary" },
+  { id: "spy", label: "AI Spy — Surveillance", icon: SearchCode, path: "/ai-ceo/spy" },
   { id: "settings", label: "Settings (Read-Only)", icon: Settings, path: "/ai-ceo/settings" },
 ];
 
