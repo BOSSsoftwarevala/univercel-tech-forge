@@ -97,7 +97,7 @@ export function useSourceCodeProtection() {
   useEffect(() => {
     // Skip in development or preview environment
     const isDevMode = import.meta.env.DEV;
-    const isPreviewEnv = window.location.hostname.includes('lovable.app') || 
+    const isPreviewEnv = window.location.hostname.includes('vercel.app') || 
                          window.location.hostname.includes('preview') ||
                          window.location.hostname.includes('localhost');
     

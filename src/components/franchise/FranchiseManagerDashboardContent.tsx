@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { FranchiseManagerSection } from "./FranchiseManagerSidebar";
 
+const APP_URL = import.meta.env.VITE_APP_URL || 'https://softwarewala.net';
+
 interface FranchiseManagerDashboardContentProps {
   activeSection: FranchiseManagerSection;
 }
@@ -159,7 +161,7 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
   };
 
   const handleShareDemoLink = (product: CatalogProduct) => {
-    const demoLink = product.demo_url || `https://${product.demo_domain}` || `https://softwarewalanet.lovable.app/demo/${product.id}`;
+    const demoLink = product.demo_url || (product.demo_domain ? `https://${product.demo_domain}` : `${APP_URL}/demo/${product.id}`);
     navigator.clipboard.writeText(demoLink);
     toast.success('Demo link copied!', { description: `${product.name} - Share with clients` });
     supabase.from('audit_logs').insert({
@@ -171,7 +173,7 @@ const FranchiseManagerDashboardContent = ({ activeSection }: FranchiseManagerDas
   };
 
   const handleGeneratePurchaseLink = (product: CatalogProduct) => {
-    const purchaseLink = `https://softwarewalanet.lovable.app/checkout/${product.id}?ref=franchise&uid=${user?.id}`;
+    const purchaseLink = `${APP_URL}/checkout/${product.id}?ref=franchise&uid=${user?.id}`;
     navigator.clipboard.writeText(purchaseLink);
     toast.success('Purchase link generated!', { description: `${product.name} - Trackable franchise link` });
     supabase.from('audit_logs').insert({

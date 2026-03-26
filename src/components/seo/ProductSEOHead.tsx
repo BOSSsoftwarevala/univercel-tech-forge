@@ -33,8 +33,9 @@ export function ProductSEOHead({
   const title = metaTitle || `${productName} | SaaS Vala Marketplace`;
   const description = metaDescription || 
     `${productName} - ${category || 'Software'} solution. Try live demo and buy instantly on SaaS Vala Marketplace.`;
-  const url = `https://softwarewalanet.lovable.app/marketplace/${slug || 'product'}`;
-  const image = imageUrl || 'https://softwarewalanet.lovable.app/og-image.png';
+  const appUrl = import.meta.env.VITE_APP_URL || 'https://softwarewala.net';
+  const url = `${appUrl}/marketplace/${slug || 'product'}`;
+  const image = imageUrl || `${appUrl}/og-image.png`;
 
   useEffect(() => {
     // Title
@@ -88,7 +89,7 @@ export function ProductSEOHead({
       publisher: {
         '@type': 'Organization',
         name: 'SaaS Vala',
-        url: 'https://softwarewalanet.lovable.app',
+        url: appUrl,
       },
     };
 
