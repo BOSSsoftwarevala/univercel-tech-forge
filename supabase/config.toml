@@ -125,3 +125,6 @@ verify_jwt = false
 
 [functions.dev-code-review]
 verify_jwt = false
+
+[functions.api-module-catalog]
+verify_jwt = false

@@ -25215,6 +25215,320 @@ export type Database = {
         }
         Relationships: []
       }
+      module_definitions: {
+        Row: {
+          id: string
+          module_key: string
+          name: string
+          description: string | null
+          icon: string | null
+          status: string
+          is_critical: boolean
+          sort_order: number
+          config: Json
+          metadata: Json
+          created_by: string | null
+          updated_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          module_key: string
+          name: string
+          description?: string | null
+          icon?: string | null
+          status?: string
+          is_critical?: boolean
+          sort_order?: number
+          config?: Json
+          metadata?: Json
+          created_by?: string | null
+          updated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          module_key?: string
+          name?: string
+          description?: string | null
+          icon?: string | null
+          status?: string
+          is_critical?: boolean
+          sort_order?: number
+          config?: Json
+          metadata?: Json
+          created_by?: string | null
+          updated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_definitions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_definitions_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      module_categories: {
+        Row: {
+          id: string
+          module_id: string
+          category_key: string
+          name: string
+          description: string | null
+          icon: string | null
+          status: string
+          sort_order: number
+          config: Json
+          metadata: Json
+          created_by: string | null
+          updated_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          module_id: string
+          category_key: string
+          name: string
+          description?: string | null
+          icon?: string | null
+          status?: string
+          sort_order?: number
+          config?: Json
+          metadata?: Json
+          created_by?: string | null
+          updated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          module_id?: string
+          category_key?: string
+          name?: string
+          description?: string | null
+          icon?: string | null
+          status?: string
+          sort_order?: number
+          config?: Json
+          metadata?: Json
+          created_by?: string | null
+          updated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_categories_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "module_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_categories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_categories_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      module_subcategories: {
+        Row: {
+          id: string
+          category_id: string
+          module_id: string
+          subcategory_key: string
+          name: string
+          description: string | null
+          icon: string | null
+          status: string
+          sort_order: number
+          config: Json
+          metadata: Json
+          created_by: string | null
+          updated_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          category_id: string
+          module_id: string
+          subcategory_key: string
+          name: string
+          description?: string | null
+          icon?: string | null
+          status?: string
+          sort_order?: number
+          config?: Json
+          metadata?: Json
+          created_by?: string | null
+          updated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          category_id?: string
+          module_id?: string
+          subcategory_key?: string
+          name?: string
+          description?: string | null
+          icon?: string | null
+          status?: string
+          sort_order?: number
+          config?: Json
+          metadata?: Json
+          created_by?: string | null
+          updated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "module_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_subcategories_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "module_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_subcategories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_subcategories_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      module_access_roles: {
+        Row: {
+          id: string
+          module_id: string
+          role: string
+          can_read: boolean
+          can_write: boolean
+          can_delete: boolean
+          can_admin: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          module_id: string
+          role: string
+          can_read?: boolean
+          can_write?: boolean
+          can_delete?: boolean
+          can_admin?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          module_id?: string
+          role?: string
+          can_read?: boolean
+          can_write?: boolean
+          can_delete?: boolean
+          can_admin?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_access_roles_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "module_definitions"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      category_access_roles: {
+        Row: {
+          id: string
+          category_id: string
+          module_id: string
+          role: string
+          can_read: boolean
+          can_write: boolean
+          can_delete: boolean
+          can_admin: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          category_id: string
+          module_id: string
+          role: string
+          can_read?: boolean
+          can_write?: boolean
+          can_delete?: boolean
+          can_admin?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          category_id?: string
+          module_id?: string
+          role?: string
+          can_read?: boolean
+          can_write?: boolean
+          can_delete?: boolean
+          can_admin?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_access_roles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "module_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "category_access_roles_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "module_definitions"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       system_modules: {
         Row: {
           created_at: string | null
