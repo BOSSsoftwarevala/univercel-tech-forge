@@ -29,7 +29,7 @@ serve(async (req) => {
     const categoryId = url.searchParams.get("category_id");
 
     switch (req.method) {
-      case "GET":
+      case "GET": {
         // List subcategories, optionally filtered by category_id
         let query = supabaseClient
           .from("subcategories")
@@ -47,8 +47,9 @@ serve(async (req) => {
         return new Response(JSON.stringify(subcategories), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
 
-      case "POST":
+      case "POST": {
         // Create new subcategory
         const { name, description, category_id } = await req.json();
 
@@ -83,8 +84,9 @@ serve(async (req) => {
         return new Response(JSON.stringify(newSubcategory), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
 
-      case "PUT":
+      case "PUT": {
         // Update subcategory
         if (!id || id === "subcategories-crud") {
           return new Response(JSON.stringify({ error: "Subcategory ID required" }), {
@@ -106,8 +108,9 @@ serve(async (req) => {
         return new Response(JSON.stringify(updatedSubcategory), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
 
-      case "DELETE":
+      case "DELETE": {
         // Delete subcategory
         if (!id || id === "subcategories-crud") {
           return new Response(JSON.stringify({ error: "Subcategory ID required" }), {
@@ -126,12 +129,14 @@ serve(async (req) => {
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
 
-      default:
+      default: {
         return new Response(JSON.stringify({ error: "Method not allowed" }), {
           status: 405,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
     }
   } catch (error) {
     console.error("Error:", error);

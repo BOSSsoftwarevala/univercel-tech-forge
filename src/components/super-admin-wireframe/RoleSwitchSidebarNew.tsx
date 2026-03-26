@@ -18,7 +18,7 @@ import {
   Server,
   Building2,
   Headphones,
-  Handshake,
+  UsersRound,
   Target,
   Scale,
   ListTodo,
@@ -209,7 +209,7 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     id: "reseller_manager",
     label: "Reseller Manager",
     shortLabel: "RM",
-    icon: Handshake,
+    icon: UsersRound,
     description: "Partner & channel view",
   },
   lead_manager: {
@@ -440,7 +440,7 @@ export const roleConfigs: Record<ActiveRole, RoleConfig> = {
     id: "reseller_dashboard",
     label: "Reseller Dashboard",
     shortLabel: "RDSH",
-    icon: Handshake,
+    icon: UsersRound,
     description: "Direct reseller dashboard access",
   },
   franchise_dashboard: {

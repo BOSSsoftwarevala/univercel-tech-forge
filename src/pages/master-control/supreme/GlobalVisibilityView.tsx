@@ -53,7 +53,7 @@ const GlobalVisibilityView = () => {
   }, [isLive, roleFilter]);
 
   const fetchLiveSessions = async () => {
-    let query = supabase
+    const query = supabase
       .from('user_online_status')
       .select('*')
       .eq('is_online', true)

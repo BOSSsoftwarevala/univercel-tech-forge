@@ -19,24 +19,25 @@ export const maskData = (input: string | null | undefined, type: MaskType = 'par
       if (input.length <= 4) return '****';
       return input.substring(0, 2) + '****' + input.substring(input.length - 1);
     
-    case 'email':
+    case 'email': {
       const [username, domain] = input.split('@');
       if (!domain) return '***@***.***';
       const maskedUsername = username.length > 2 
         ? username.substring(0, 2) + '***' 
         : '***';
       return `${maskedUsername}@***.***`;
+    }
     
     case 'phone':
       if (input.length < 4) return '****';
       return input.substring(0, 3) + '****' + input.substring(input.length - 2);
     
-    case 'name':
+    case 'name': {
       const parts = input.split(' ');
       return parts.map(part => 
         part.length > 1 ? part[0] + '***' : '***'
       ).join(' ');
-    
+    }
     default:
       return '***';
   }
@@ -92,9 +93,9 @@ export const shouldMaskField = (viewerRole: string, fieldName: string): boolean 
  * Mask an object's sensitive fields based on viewer role
  */
 export const maskObjectForRole = (
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   viewerRole: string
-): Record<string, any> => {
+): Record<string, unknown> => {
   const result = { ...data };
   
   const fieldMaskTypes: Record<string, MaskType> = {

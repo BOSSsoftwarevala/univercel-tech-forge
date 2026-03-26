@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles, User, Settings, TrendingUp, MessageSquare, Bell, HandHeart } from 'lucide-react';
+import { Sparkles, User, Settings, TrendingUp, MessageSquare, Bell, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalNotificationHeader from '@/components/shared/GlobalNotificationHeader';
@@ -116,7 +116,7 @@ const InfluencerTopBar = ({
           className="relative p-2.5 rounded-lg bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-500/30 hover:border-emerald-400/50 transition-all group"
           data-testid="promise-button"
         >
-          <HandHeart className="w-5 h-5 text-emerald-400 group-hover:text-emerald-300" />
+          <Heart className="w-5 h-5 text-emerald-400 group-hover:text-emerald-300" />
         </motion.button>
 
         {/* Internal Chat Button */}

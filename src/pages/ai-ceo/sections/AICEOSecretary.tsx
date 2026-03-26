@@ -18,7 +18,7 @@ import {
   Loader2,
   RefreshCw,
   Sparkles,
-  TriangleAlert,
+  AlertTriangle,
   Zap,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -157,7 +157,7 @@ const AICEOSecretary = () => {
           {
             label: 'Urgent Items',
             value: briefing?.urgentItems.length ?? '—',
-            icon: TriangleAlert,
+            icon: AlertTriangle,
             color: 'text-red-400',
           },
           {
@@ -221,7 +221,7 @@ const AICEOSecretary = () => {
         >
           <CardTitle className="flex items-center justify-between text-white">
             <span className="flex items-center gap-2">
-              <TriangleAlert className="h-5 w-5 text-red-400" />
+              <AlertTriangle className="h-5 w-5 text-red-400" />
               Urgent Items
               {(briefing?.urgentItems.length ?? 0) > 0 && (
                 <Badge className="border-red-500/30 bg-red-500/15 text-red-300 text-xs">

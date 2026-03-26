@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
-  Headset, Users, Ticket, Inbox, MessageCircle,
+  Headphones, Users, Ticket, Inbox, MessageCircle,
   Clock, AlertCircle, FileText, History, CheckCircle,
   TrendingUp, Eye, Store
 } from "lucide-react";
@@ -416,7 +416,7 @@ const SalesSupportDashboardContent = ({ activeSection }: SalesSupportDashboardCo
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
-              <Headset className="w-7 h-7 text-white" />
+              <Headphones className="w-7 h-7 text-white" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Sales & Support</h1>

@@ -21,9 +21,9 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
   Crown, Eye, Brain, Server, Globe2, Flag, Building2, 
-  Headphones, Handshake, Target, Box, Terminal, 
+  Headphones, UsersRound, Target, Box, Terminal, 
   Star, Scale, ListTodo, DollarSign, Code2, 
-  Megaphone, HeartHandshake, Users, LogOut, Zap, Timer, MonitorPlay, 
+  Megaphone, Heart, Users, LogOut, Zap, Timer, MonitorPlay, 
   Home, Shield, Settings, Search, User, UserCircle
 } from "lucide-react";
 // ScrollArea removed - NO SCROLLING in Control Panel
@@ -63,12 +63,12 @@ const ROLE_CATEGORIES = [
   { id: 'seo_manager', label: 'SEO Manager', icon: Search },
   { id: 'lead_manager', label: 'Lead Manager', icon: Target },
   { id: 'sales_support_manager', label: 'Sales & Support', icon: Headphones },
-  { id: 'customer_support_management', label: 'Customer Support', icon: HeartHandshake },
+  { id: 'customer_support_management', label: 'Customer Support', icon: Heart },
   // GRADE 4
   { id: 'franchise_manager', label: 'Franchise Owner', icon: Building2 },
   { id: 'franchise_dashboard', label: 'Franchise Dashboard', icon: Building2 },
-  { id: 'reseller_manager', label: 'Reseller Manager', icon: Handshake },
-  { id: 'reseller_dashboard', label: 'Reseller Dashboard', icon: Handshake },
+  { id: 'reseller_manager', label: 'Reseller Manager', icon: UsersRound },
+  { id: 'reseller_dashboard', label: 'Reseller Dashboard', icon: UsersRound },
   { id: 'influencer_manager', label: 'Influencer Manager', icon: Users },
   { id: 'influencer_dashboard', label: 'Influencer Dashboard', icon: User },
   // GRADE 5

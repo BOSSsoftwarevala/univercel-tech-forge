@@ -6,7 +6,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Radio, Globe, Monitor, ShoppingCart, Building2, Handshake,
+  Radio, Globe, Monitor, ShoppingCart, Building2, UsersRound,
   Briefcase, Search, Target, Instagram, PenLine
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,7 +17,7 @@ const sources = [
   { id: 'demo', name: 'Demo Requests', icon: Monitor, leads: 156, active: true, color: 'from-violet-500 to-purple-600' },
   { id: 'order', name: 'Order Page', icon: ShoppingCart, leads: 89, active: true, color: 'from-emerald-500 to-teal-600' },
   { id: 'franchise', name: 'Franchise Apply', icon: Building2, leads: 45, active: true, color: 'from-amber-500 to-orange-600' },
-  { id: 'reseller', name: 'Reseller Apply', icon: Handshake, leads: 32, active: true, color: 'from-rose-500 to-pink-600' },
+  { id: 'reseller', name: 'Reseller Apply', icon: UsersRound, leads: 32, active: true, color: 'from-rose-500 to-pink-600' },
   { id: 'job', name: 'Job Apply', icon: Briefcase, leads: 78, active: true, color: 'from-indigo-500 to-blue-600' },
   { id: 'seo', name: 'SEO Organic', icon: Search, leads: 412, active: true, color: 'from-green-500 to-emerald-600' },
   { id: 'google', name: 'Google Ads', icon: Target, leads: 189, active: true, color: 'from-red-500 to-orange-600' },

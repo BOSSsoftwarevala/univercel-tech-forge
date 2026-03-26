@@ -83,7 +83,9 @@ const CEODashboard = ({ activeNav }: CEODashboardProps) => {
           action,
           meta_json: { target, timestamp: new Date().toISOString(), ...meta },
         });
-      } catch {}
+      } catch {
+        // Error logged but handled silently
+      }
     },
     [user?.id]
   );

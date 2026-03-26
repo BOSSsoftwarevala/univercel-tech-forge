@@ -85,7 +85,6 @@ async function apiFetch<T = any>(path: string, opts: FetchOpts = {}): Promise<T>
       if (contentType.includes('application/json')) {
         return (await res.json()) as T;
       } else {
-        // @ts-ignore
         return (await res.text()) as T;
       }
     } catch (err) {

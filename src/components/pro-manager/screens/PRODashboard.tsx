@@ -7,12 +7,12 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Users, 
-  HeadphonesIcon, 
+  Headphones, 
   AlertTriangle, 
   ArrowUpCircle, 
   CalendarClock, 
   Key,
-  Handshake,
+  UsersRound,
   Bot,
   ArrowUp,
   Wallet,
@@ -38,7 +38,7 @@ const dashboardCards = [
     id: 'support_requests' as PROScreen, 
     label: 'Open Support Tickets', 
     value: 156, 
-    icon: HeadphonesIcon, 
+    icon: Headphones, 
     color: 'text-amber-500',
     bgColor: 'bg-amber-500/10'
   },
@@ -78,7 +78,7 @@ const dashboardCards = [
     id: 'premium_assist' as PROScreen, 
     label: 'Assist Sessions Running', 
     value: 5, 
-    icon: Handshake, 
+    icon: UsersRound, 
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-500/10'
   },

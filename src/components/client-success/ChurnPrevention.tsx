@@ -6,7 +6,7 @@ import {
   Heart,
   BookOpen,
   MessageSquare,
-  Handshake,
+  UsersRound,
   Sparkles,
   ArrowRight
 } from "lucide-react";
@@ -62,7 +62,7 @@ const preventionStrategies = [
   { id: "value", label: "Value Addition", icon: Heart, desc: "Highlight underused features", color: "teal" },
   { id: "training", label: "Training", icon: BookOpen, desc: "Personalized education", color: "violet" },
   { id: "explain", label: "Explanation", icon: MessageSquare, desc: "Clear communication", color: "amber" },
-  { id: "trust", label: "Trust Touchpoints", icon: Handshake, desc: "Relationship building", color: "emerald" },
+  { id: "trust", label: "Trust Touchpoints", icon: UsersRound, desc: "Relationship building", color: "emerald" },
 ];
 
 const getRiskColor = (score: number) => {

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, Handshake, ArrowUp, CheckCircle } from 'lucide-react';
+import { Bot, UsersRound, ArrowUp, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const mockTickets = [
@@ -76,7 +76,7 @@ export const PROSupportRequests: React.FC = () => {
                         Assign AI
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => toast.info('Assist assigned')}>
-                        <Handshake className="h-4 w-4 mr-1" />
+                        <UsersRound className="h-4 w-4 mr-1" />
                         Assign Assist
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => toast.warning('Escalated')}>

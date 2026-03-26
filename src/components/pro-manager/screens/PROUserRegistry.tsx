@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Eye, HeadphonesIcon, Handshake, Ban } from 'lucide-react';
+import { Search, Eye, Headphones, UsersRound, Ban } from 'lucide-react';
 import { toast } from 'sonner';
 
 const mockUsers = [
@@ -90,10 +90,10 @@ export const PROUserRegistry: React.FC = () => {
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => toast.info('Open Support')}>
-                        <HeadphonesIcon className="h-4 w-4" />
+                        <Headphones className="h-4 w-4" />
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => toast.info('Assign Assist')}>
-                        <Handshake className="h-4 w-4" />
+                        <UsersRound className="h-4 w-4" />
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => toast.warning('Suspend Access')}>
                         <Ban className="h-4 w-4" />

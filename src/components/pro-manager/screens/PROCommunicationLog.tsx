@@ -7,7 +7,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Bot, Handshake, Lock } from 'lucide-react';
+import { MessageSquare, Bot, UsersRound, Lock } from 'lucide-react';
 
 const mockLogs = [
   { id: 'LOG-001', type: 'chat', user: 'PRO-***21', content: 'User inquired about API limits...', time: '10 min ago' },
@@ -22,7 +22,7 @@ export const PROCommunicationLog: React.FC = () => {
     switch (type) {
       case 'chat': return <MessageSquare className="h-5 w-5 text-blue-500" />;
       case 'ai': return <Bot className="h-5 w-5 text-green-500" />;
-      case 'assist': return <Handshake className="h-5 w-5 text-purple-500" />;
+      case 'assist': return <UsersRound className="h-5 w-5 text-purple-500" />;
       default: return <MessageSquare className="h-5 w-5" />;
     }
   };

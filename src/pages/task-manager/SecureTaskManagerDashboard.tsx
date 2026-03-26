@@ -11,7 +11,6 @@ import {
   Activity,
   Ban,
   AlertTriangle,
-  ClockAlert,
   TrendingUp,
   Lock
 } from 'lucide-react';
@@ -130,7 +129,7 @@ const SecureTaskManagerDashboard: React.FC = () => {
             <p className="text-xs text-muted-foreground">Near Breach</p>
           </div>
           <div className="p-4 rounded-lg bg-card/50 border border-border/50 text-center">
-            <ClockAlert className="h-5 w-5 mx-auto mb-2 text-orange-400" />
+            <AlertTriangle className="h-5 w-5 mx-auto mb-2 text-orange-400" />
             <p className="text-2xl font-bold">{stats.overdue}</p>
             <p className="text-xs text-muted-foreground">Overdue</p>
           </div>
@@ -165,7 +164,7 @@ const SecureTaskManagerDashboard: React.FC = () => {
               <span className="hidden sm:inline">SLA</span>
             </TabsTrigger>
             <TabsTrigger value="overdue" className="gap-1">
-              <ClockAlert className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
               <span className="hidden sm:inline">Overdue</span>
             </TabsTrigger>
             <TabsTrigger value="escalations" className="gap-1">

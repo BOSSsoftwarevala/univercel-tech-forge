@@ -367,7 +367,11 @@ const ProductManagerDashboard = () => {
       data: { bulkAction: action, count, ids: type === 'product' ? selectedProducts : selectedDemos },
       successMessage: `${action} applied to ${count} ${type}(s)`
     });
-    type === "product" ? setSelectedProducts([]) : setSelectedDemos([]);
+    if (type === "product") {
+      setSelectedProducts([]);
+    } else {
+      setSelectedDemos([]);
+    }
   };
 
   const handleCreateDemo = () => {

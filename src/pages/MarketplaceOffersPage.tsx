@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Gift, Globe, Sparkles, TicketPercent } from 'lucide-react';
+import { Gift, Globe, Sparkles, Percent } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -112,7 +112,7 @@ const MarketplaceOffersPage = () => {
             <Card className="border-white/10 bg-slate-950/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <TicketPercent className="h-5 w-5 text-amber-300" />
+                  <Percent className="h-5 w-5 text-amber-300" />
                   Live country filter
                 </CardTitle>
               </CardHeader>

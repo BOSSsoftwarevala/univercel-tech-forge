@@ -14,7 +14,7 @@ export interface BlackboxEvent {
   module_name: string;
   entity_type?: string;
   entity_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AccessCheckResult {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
-  Handshake, User, Shield, Calendar, Clock, Activity,
+  UsersRound, User, Shield, Calendar, Clock, Activity,
   Eye, MapPin, Ban, Lock, ChevronRight, X,
   CheckCircle, AlertTriangle, Search, RefreshCw,
   DollarSign, Users, Wallet, TrendingUp, Phone, Mail,
@@ -239,7 +239,7 @@ const ResellerManagerView = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                  <Handshake className="w-7 h-7 text-white" />
+                  <UsersRound className="w-7 h-7 text-white" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">Reseller Manager Dashboard</h1>
@@ -271,7 +271,7 @@ const ResellerManagerView = () => {
                       <p className="text-xs text-muted-foreground">Total Resellers</p>
                       <p className="text-3xl font-bold text-amber-400">{totalStats.total}</p>
                     </div>
-                    <Handshake className="w-10 h-10 text-amber-400/30" />
+                    <UsersRound className="w-10 h-10 text-amber-400/30" />
                   </div>
                 </CardContent>
               </Card>

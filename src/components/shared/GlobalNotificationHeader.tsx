@@ -15,7 +15,7 @@ import {
   Volume2,
   VolumeX,
   ChevronDown,
-  Handshake,
+  Users,
   User
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -165,7 +165,7 @@ const GlobalNotificationHeader = ({
             : 'bg-slate-800/50 text-slate-300 border border-slate-700/50 hover:border-cyan-500/50'
         }`}
       >
-        <Handshake className="w-3 h-3" />
+        <Users className="w-3 h-3" />
         <span className="hidden sm:inline">
           {promiseState === 'active' ? 'Active' : promiseState === 'pending' ? 'Promise' : 'No Task'}
         </span>

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, 
   Users, 
   UserCheck, 
-  Handshake, 
+  UsersRound, 
   CheckSquare, 
   BarChart3, 
   Settings,
@@ -35,7 +35,7 @@ const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "leads", label: "Leads", icon: Users, badge: 12 },
   { id: "customers", label: "Customers", icon: UserCheck },
-  { id: "deals", label: "Deals", icon: Handshake, badge: 5 },
+  { id: "deals", label: "Deals", icon: UsersRound, badge: 5 },
   { id: "tasks", label: "Tasks", icon: CheckSquare, badge: 8 },
   { id: "reports", label: "Reports", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
@@ -69,7 +69,7 @@ const SalesCRMLayout = ({ children, activeSection, onSectionChange }: SalesCRMLa
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-              <Handshake className="w-5 h-5 text-white" />
+              <UsersRound className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">Sales CRM</h1>

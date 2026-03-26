@@ -153,7 +153,7 @@ class AIObservationService {
         result: obs.result || null,
       }));
 
-      await supabase.from('ai_observation_logs' as 'ai_observation_logs').insert(records as never);
+      await supabase.from('ai_observation_logs' as const).insert(records as never);
     } catch (error) {
       // Silent fail - put observations back in queue
       this.observationQueue.unshift(...observations);

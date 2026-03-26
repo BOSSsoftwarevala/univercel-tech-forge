@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ClockAlert, User, Calendar, ArrowUpRight } from 'lucide-react';
+import { AlertTriangle, User, Calendar, ArrowUpRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -46,7 +46,7 @@ const TMOverdueTasks: React.FC = () => {
     <Card className="bg-card/50 border-border/50">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <ClockAlert className="h-5 w-5 text-red-500" />
+          <AlertTriangle className="h-5 w-5 text-red-500" />
           Overdue Tasks
           <Badge variant="destructive" className="ml-2">{mockOverdueTasks.length}</Badge>
         </CardTitle>
@@ -102,7 +102,7 @@ const TMOverdueTasks: React.FC = () => {
           ))}
           {mockOverdueTasks.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              <ClockAlert className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
               No overdue tasks
             </div>
           )}

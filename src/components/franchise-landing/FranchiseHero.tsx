@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Handshake, Play, MessageSquare, Sparkles } from 'lucide-react';
+import { UsersRound, Play, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const FranchiseHero = () => {
@@ -193,7 +193,7 @@ const FranchiseHero = () => {
                   transition={{ duration: 3, repeat: Infinity }}
                 >
                   <div className="w-40 h-40 rounded-full bg-gradient-to-br from-primary/20 to-neon-teal/20 backdrop-blur-xl border border-primary/30 flex items-center justify-center">
-                    <Handshake className="w-20 h-20 text-primary" />
+                    <UsersRound className="w-20 h-20 text-primary" />
                   </div>
                   <motion.div
                     className="absolute inset-0 rounded-full bg-primary/30 blur-2xl -z-10"

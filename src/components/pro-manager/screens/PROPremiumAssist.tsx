@@ -7,7 +7,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Handshake, Play, Pause, Square, ArrowUp, Shield } from 'lucide-react';
+import { UsersRound, Play, Pause, Square, ArrowUp, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 const mockSessions = [
@@ -63,7 +63,7 @@ export const PROPremiumAssist: React.FC = () => {
             {mockSessions.map((session, idx) => (
               <div key={idx} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-4">
-                  <Handshake className="h-5 w-5 text-primary" />
+                  <UsersRound className="h-5 w-5 text-primary" />
                   <span className="font-mono text-sm text-foreground">{session.id}</span>
                   <span className="text-sm text-foreground">{session.user}</span>
                   <Badge variant="outline">{session.mode}</Badge>

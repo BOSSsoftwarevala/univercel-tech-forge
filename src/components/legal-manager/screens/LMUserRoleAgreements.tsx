@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, User, ShieldCheck, Store, Building, Code, Briefcase, Handshake, Eye, Edit, Lock, CheckCircle, XCircle, History } from "lucide-react";
+import { Users, User, ShieldCheck, Store, Building, Code, Briefcase, UsersRound, Eye, Edit, Lock, CheckCircle, XCircle, History } from "lucide-react";
 import { toast } from "sonner";
 
 interface LMUserRoleAgreementsProps {
@@ -16,7 +16,7 @@ const roleAgreements = [
   { id: "4", name: "Franchise Agreement", role: "Franchise", status: "pending", version: "v2.5", acceptances: 45, icon: Building },
   { id: "5", name: "Developer Agreement", role: "Developer", status: "active", version: "v1.8", acceptances: 234, icon: Code },
   { id: "6", name: "Employee Agreement", role: "Employee", status: "active", version: "v3.2", acceptances: 78, icon: Briefcase },
-  { id: "7", name: "Partner Agreement", role: "Partner", status: "review", version: "v1.5", acceptances: 23, icon: Handshake },
+  { id: "7", name: "Partner Agreement", role: "Partner", status: "review", version: "v1.5", acceptances: 23, icon: UsersRound },
 ];
 
 const LMUserRoleAgreements = ({ activeSubSection }: LMUserRoleAgreementsProps) => {

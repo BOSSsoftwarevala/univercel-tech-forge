@@ -422,7 +422,7 @@ const ValaAIDashboard = () => {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     setTtsLoading(msgId);
     try {
-      const cleanText = text.replace(/[#*`>\-\[\]()!|]/g, '').replace(/\n+/g, '. ').substring(0, 3000);
+      const cleanText = text.replace(/[#*`>\-[\]()!|]/g, '').replace(/\n+/g, '. ').substring(0, 3000);
       const response = await fetch(TTS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
