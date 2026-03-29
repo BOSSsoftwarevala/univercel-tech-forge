@@ -1,0 +1,130 @@
+project_id = "feqdqyadkijpohyllfdq"
+
+[functions.server-management]
+verify_jwt = false
+
+[functions.ai-server-analyzer]
+verify_jwt = false
+
+[functions.send-otp]
+verify_jwt = false
+
+[functions.paypal]
+verify_jwt = false
+
+[functions.payu]
+verify_jwt = false
+
+[functions.api-risk-engine]
+verify_jwt = false
+
+[functions.api-email]
+verify_jwt = false
+
+[functions.api-health]
+verify_jwt = false
+
+[functions.api-backup]
+verify_jwt = false
+
+[functions.check-demo-health]
+verify_jwt = false
+
+[functions.ai-empathy-engine]
+verify_jwt = false
+
+[functions.ai-crisis-analyzer]
+verify_jwt = false
+
+[functions.ai-task-assistant]
+verify_jwt = false
+
+[functions.ai-performance-analyzer]
+verify_jwt = false
+
+[functions.ai-demo-assistant]
+verify_jwt = false
+
+[functions.campaign-optimizer]
+verify_jwt = false
+
+[functions.ai-seo-automation]
+verify_jwt = false
+
+[functions.ai-legal-assistant]
+verify_jwt = false
+
+[functions.ai-performance-coach]
+verify_jwt = false
+
+[functions.ai-hr-assistant]
+verify_jwt = false
+
+[functions.ai-client-success]
+verify_jwt = false
+
+[functions.ai-rnd-assistant]
+verify_jwt = false
+
+[functions.ai-developer-assistant]
+verify_jwt = false
+
+[functions.ai-reseller-assistant]
+verify_jwt = false
+
+[functions.safe-assist-relay]
+verify_jwt = false
+
+[functions.safe-assist-ai]
+verify_jwt = false
+
+[functions.super-admin-auth]
+verify_jwt = false
+
+[functions.super-admin-actions]
+verify_jwt = false
+
+[functions.super-admin-users]
+verify_jwt = false
+
+[functions.super-admin-security]
+verify_jwt = false
+
+[functions.super-admin-locks]
+verify_jwt = false
+
+[functions.super-admin-operations]
+verify_jwt = false
+
+[functions.super-admin-live]
+verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false
+
+[functions.auto-dev-engine]
+verify_jwt = false
+
+[functions.vala-ai-builder]
+verify_jwt = false
+
+[functions.elevenlabs-scribe-token]
+verify_jwt = false
+
+[functions.vala-ai-openai]
+verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.vala-continuous-builder]
+verify_jwt = false
+
+[functions.dev-ai-chat]
+verify_jwt = false
+
+[functions.dev-code-review]
+verify_jwt = false
+
+[functions.api-module-catalog]
+verify_jwt = false

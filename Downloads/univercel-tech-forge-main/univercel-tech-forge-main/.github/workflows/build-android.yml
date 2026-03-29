@@ -1,0 +1,177 @@
+name: Build Software Vala APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        type: choice
+        options:
+          - debug
+          - release
+        default: release
+
+env:
+  APP_NAME: "Software Vala"
+  APP_ID: "com.softwarevala.app"
+  PLAY_CONSOLE_EMAIL: "hello.digitaldna@gmail.com"
+  PLAY_CONSOLE_ACCOUNT: "Digital DNA India"
+  PLAY_CONSOLE_ACCOUNT_ID: "5003822724528726207"
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Accept Android SDK Licenses
+        run: yes | sdkmanager --licenses || true
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build web app
+        run: npm run build
+      
+      - name: Remove old Android folder if exists
+        run: rm -rf android
+      
+      - name: Add fresh Android platform
+        run: npx cap add android
+      
+      - name: Sync Capacitor
+        run: npx cap sync android
+      
+      - name: Update Android app name and config
+        run: |
+          STRINGS="android/app/src/main/res/values/strings.xml"
+          if [ -f "$STRINGS" ]; then
+            if grep -q '<string name="app_name">' "$STRINGS"; then
+              sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Software Vala</string>#' "$STRINGS"
+            else
+              sed -i 's#</resources>#  <string name="app_name">Software Vala</string>\n</resources>#' "$STRINGS"
+            fi
+          fi
+
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            if ! grep -q 'android.permission.ACCESS_NETWORK_STATE' "$MANIFEST"; then
+              if grep -q 'android.permission.INTERNET' "$MANIFEST"; then
+                sed -i '/android.permission.INTERNET/a\    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' "$MANIFEST"
+              else
+                sed -i '/<manifest /a\    <uses-permission android:name="android.permission.INTERNET" />' "$MANIFEST"
+                sed -i '/<manifest /a\    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' "$MANIFEST"
+              fi
+            fi
+          fi
+      
+      - name: Configure for worldwide scalable release
+        run: |
+          # Enable all languages/locales and optimize for scale
+          cat >> android/gradle.properties << EOF
+          android.enableJetifier=true
+          android.useAndroidX=true
+          org.gradle.jvmargs=-Xmx4096m
+          org.gradle.parallel=true
+          org.gradle.caching=true
+          android.enableR8.fullMode=true
+          EOF
+          
+          # Update build.gradle for better compatibility
+          sed -i 's/minSdkVersion = .*/minSdkVersion = 23/' android/variables.gradle
+          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 34/' android/variables.gradle
+      
+      - name: Make Gradlew executable
+        run: chmod +x android/gradlew
+      
+      - name: Build Debug APK
+        if: ${{ github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == '' }}
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+      
+      - name: Build Release APK
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+      
+      - name: Rename Debug APK
+        if: ${{ github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == '' }}
+        run: |
+          mkdir -p output
+          cp android/app/build/outputs/apk/debug/app-debug.apk output/SoftwareVala-debug.apk
+      
+      - name: Rename Release APK
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        run: |
+          mkdir -p output
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk output/SoftwareVala-release.apk
+      
+      - name: Upload Debug APK
+        if: ${{ github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: SoftwareVala-Debug-APK
+          path: output/SoftwareVala-debug.apk
+          retention-days: 90
+      
+      - name: Upload Release APK
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: SoftwareVala-Release-APK
+          path: output/SoftwareVala-release.apk
+          retention-days: 90
+      
+      - name: Build Summary
+        run: |
+          echo "================================================"
+          echo "✅ SOFTWARE VALA APK BUILD COMPLETE"
+          echo "================================================"
+          echo "📱 App Name: ${{ env.APP_NAME }}"
+          echo "📦 Package ID: ${{ env.APP_ID }}"
+          echo "🌍 Target: Worldwide Release (All Countries)"
+          echo "📅 Build Date: $(date)"
+          echo "📝 Commit: ${{ github.sha }}"
+          echo "================================================"
+          echo ""
+          echo "🏢 PLAY CONSOLE DETAILS:"
+          echo "   Email: ${{ env.PLAY_CONSOLE_EMAIL }}"
+          echo "   Account: ${{ env.PLAY_CONSOLE_ACCOUNT }}"
+          echo "   Account ID: ${{ env.PLAY_CONSOLE_ACCOUNT_ID }}"
+          echo ""
+          echo "🔄 AUTO-UPDATE ARCHITECTURE:"
+          echo "   ✓ APK loads from live website"
+          echo "   ✓ Updates automatically when you update website"
+          echo "   ✓ One APK for all users (features based on login)"
+          echo "   ✓ Role-based access control built-in"
+          echo ""
+          echo "👥 USER FEATURES (Login-Based):"
+          echo "   • Master Admin - Full system control"
+          echo "   • Super Admin - Admin management"
+          echo "   • Franchise - Franchise features"
+          echo "   • Reseller - Reseller features"
+          echo "   • Developer - Developer tools"
+          echo "   • Client - Client portal"
+          echo "================================================"

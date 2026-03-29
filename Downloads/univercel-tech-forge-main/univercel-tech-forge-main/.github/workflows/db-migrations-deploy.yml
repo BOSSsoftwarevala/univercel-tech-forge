@@ -1,0 +1,113 @@
+name: 🗄️ Database Migrations - Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'db-migrations/sql/**'
+      - '.github/workflows/db-migrations-deploy.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'db-migrations/sql/**'
+
+env:
+  FLYWAY_VERSION: "9.22.3"
+
+jobs:
+  validate-migrations:
+    name: 📋 Validate Migration Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check migration naming convention
+        run: |
+          echo "🔍 Validating migration file naming..."
+          VALID=true
+          for file in db-migrations/sql/V*.sql; do
+            if [ -f "$file" ]; then
+              if ! [[ $(basename "$file") =~ ^V[0-9]{3}__[a-zA-Z0-9_-]+\.sql$ ]]; then
+                echo "❌ Invalid naming: $(basename "$file")"
+                VALID=false
+              fi
+            fi
+          done
+          if [ "$VALID" = false ]; then exit 1; fi
+          echo "✅ All migration files have valid naming"
+
+      - name: Check for idempotency
+        run: |
+          echo "🔍 Checking for idempotent SQL patterns..."
+          for file in db-migrations/sql/V*.sql; do
+            if [ -f "$file" ]; then
+              if grep -q "^CREATE TABLE" "$file" && ! grep -q "CREATE TABLE IF NOT EXISTS" "$file"; then
+                echo "⚠️  Warning: $file uses CREATE TABLE without IF NOT EXISTS"
+              fi
+            fi
+          done
+          echo "✅ Idempotency check complete"
+
+  test-migrations-dev:
+    name: 🧪 Test Migrations
+    runs-on: ubuntu-latest
+    needs: validate-migrations
+    if: github.event_name == 'pull_request'
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass123
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Flyway
+        run: |
+          wget -qO flyway.tar.gz https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz
+          tar -xzf flyway.tar.gz
+          sudo ln -s `pwd`/flyway-${FLYWAY_VERSION}/flyway /usr/local/bin
+
+      - name: Run Flyway migrations
+        env:
+          FLYWAY_URL: jdbc:postgresql://localhost:5432/testdb
+          FLYWAY_USER: testuser
+          FLYWAY_PASSWORD: testpass123
+          FLYWAY_LOCATIONS: filesystem:./db-migrations/sql
+        run: |
+          flyway info
+          flyway migrate
+          echo "✅ Test migrations applied successfully"
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: validate-migrations
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Staging
+        run: echo "✅ Staging deployment placeholder"
+
+  deploy-production:
+    name: 🔴 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: validate-migrations
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Production
+        run: echo "✅ Production deployment placeholder"
